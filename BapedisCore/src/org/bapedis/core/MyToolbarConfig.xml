@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Configuration PUBLIC "-//NetBeans IDE//DTD toolbar 1.1//EN"
+ "http://www.netbeans.org/dtds/toolbar1_1.dtd">
+<Configuration>
+   <Row>
+      <Toolbar name="Workspace" visible="true"/>
+      <Toolbar name="File" visible="true"/>
+      <Toolbar name="Clipboard" visible="false"/>
+      <Toolbar name="UndoRedo" visible="false"/>
+      <Toolbar name="Memory" visible="true" />
+   </Row>
+</Configuration>

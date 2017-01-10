@@ -15,7 +15,7 @@ import org.openide.util.Lookup;
 import org.openide.util.lookup.Lookups;
 
 /**
- *
+ * A node representation for the class ObjectAttributes
  * @author loge
  */
 public class ObjectAttributesNode extends AbstractNode {

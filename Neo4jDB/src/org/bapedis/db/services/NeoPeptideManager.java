@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db.controller;
+package org.bapedis.db.services;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,21 +18,20 @@ import org.bapedis.db.model.NeoNeighbor;
 import org.bapedis.db.model.NeoNeighborsModel;
 import org.bapedis.db.model.NeoPeptide;
 import org.bapedis.db.model.NeoPeptideModel;
-import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author loge
  */
-@ServiceProvider(service = NeoPeptideController.class)
-public class NeoPeptideController {
+@ServiceProvider(service = NeoPeptideManager.class)
+public class NeoPeptideManager {
 
     protected final NeoPeptideDAO neoModelDAO;
     protected boolean loadNeighbors;
 
-    public NeoPeptideController() {
-        neoModelDAO = Lookup.getDefault().lookup(NeoPeptideDAO.class);
+    public NeoPeptideManager() {
+        neoModelDAO = new NeoPeptideDAO();
         loadNeighbors = false;
     }
 

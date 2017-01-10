@@ -13,7 +13,7 @@ import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.ui.actions.WorkspaceContextSensitiveAction;
-import org.bapedis.db.controller.NeoPeptideController;
+import org.bapedis.db.services.NeoPeptideManager;
 import org.bapedis.db.model.NeoNeighborsModel;
 import org.bapedis.db.model.NeoPeptideModel;
 import org.bapedis.db.ui.NeoPeptideModelTopComponent;
@@ -54,9 +54,9 @@ public class ShowNeighbors extends WorkspaceContextSensitiveAction<NeoPeptideMod
     public void actionPerformed(ActionEvent e) {
         final NeoPeptideModelTopComponent tc = (NeoPeptideModelTopComponent) WindowManager.getDefault().findTopComponent("NeoPeptideModelTopComponent");
         tc.showNeighborsPanel(menuItem.isSelected());
-        final NeoPeptideController npc = Lookup.getDefault().lookup(NeoPeptideController.class);
+        final NeoPeptideManager npc = Lookup.getDefault().lookup(NeoPeptideManager.class);
         npc.setLoadNeighbors(menuItem.isSelected());
-        final Workspace workspace = pc.getProject().getCurrentWorkspace();
+        final Workspace workspace = pc.getCurrentWorkspace();
         if (menuItem.isSelected()) {
             tc.setNeighborBusyLabel();
             tc.open();

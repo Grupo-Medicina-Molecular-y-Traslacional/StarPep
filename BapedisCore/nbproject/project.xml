@@ -97,9 +97,9 @@
                 </dependency>
             </module-dependencies>
             <public-packages>
-                <package>org.bapedis.core.controller</package>
                 <package>org.bapedis.core.events</package>
                 <package>org.bapedis.core.model</package>
+                <package>org.bapedis.core.services</package>
                 <package>org.bapedis.core.ui.actions</package>
                 <package>org.bapedis.core.ui.components</package>
             </public-packages>

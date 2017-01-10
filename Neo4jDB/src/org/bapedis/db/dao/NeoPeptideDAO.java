@@ -28,13 +28,11 @@ import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.Uniqueness;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author loge
  */
-@ServiceProvider(service = NeoPeptideDAO.class)
 public class NeoPeptideDAO {
 
     protected final GraphDatabaseService graphDb;
@@ -74,7 +72,7 @@ public class NeoPeptideDAO {
             String displayName;
             for (Node node : peptideNodes) {                
                 displayName =  node.getProperty(PRO_DISPLAY_NAME).toString();
-                neoPeptide = new NeoPeptide(node.getId(),  displayName, node.getProperty(PRO_SEQUENCE).toString());
+                neoPeptide = new NeoPeptide(node.getId(),  displayName, node.getProperty(PRO_SEQUENCE).toString(), this);
                 for (String propertyKey : node.getPropertyKeys()) {
                     Object value = node.getProperty(propertyKey);
                     if (!neoModel.hasAttribute(propertyKey)) {

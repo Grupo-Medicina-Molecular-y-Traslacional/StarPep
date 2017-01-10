@@ -7,7 +7,7 @@ package org.bapedis.core;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import org.bapedis.core.controller.ProjectController;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.openide.awt.Toolbar;
@@ -18,13 +18,13 @@ import org.openide.windows.WindowManager;
 
 public class Installer extends ModuleInstall implements WorkspaceEventListener, PropertyChangeListener {
 
-    private ProjectController pc;
+    private ProjectManager pc;
 
     @Override
     public void restored() {
-        pc = Lookup.getDefault().lookup(ProjectController.class);
-        pc.getProject().addWorkspaceEventListener(this);
-        workspaceChanged(null, pc.getProject().getCurrentWorkspace());
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
+        pc.addWorkspaceEventListener(this);
+        workspaceChanged(null, pc.getCurrentWorkspace());
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
 
             @Override
@@ -59,7 +59,7 @@ public class Installer extends ModuleInstall implements WorkspaceEventListener, 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(Workspace.PRO_NAME)) {
-            setAppName(pc.getProject().getCurrentWorkspace());
+            setAppName(pc.getCurrentWorkspace());
         }
     }
 

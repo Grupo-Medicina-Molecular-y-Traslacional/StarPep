@@ -9,10 +9,10 @@ import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.SwingUtilities;
-import org.bapedis.core.controller.ProjectController;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.db.controller.BioCategoryController;
-import org.bapedis.db.controller.NeoPeptideController;
+import org.bapedis.db.services.BioCategoryManager;
+import org.bapedis.db.services.NeoPeptideManager;
 import org.bapedis.db.model.BioCategory;
 import org.bapedis.db.ui.NeoPeptideModelTopComponent;
 import org.openide.awt.ActionID;
@@ -58,10 +58,10 @@ public class ShowPeptideNodes extends AbstractAction {
             public void run() {
                 TopComponent tcExplorer = WindowManager.getDefault().findTopComponent("PeptideExplorerTopComponent");
                 try {
-                    ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-                    Workspace currentWorkspace = pc.getProject().getCurrentWorkspace();
+                    ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+                    Workspace currentWorkspace = pc.getCurrentWorkspace();
 
-                    BioCategoryController bcc = Lookup.getDefault().lookup(BioCategoryController.class);
+                    BioCategoryManager bcc = Lookup.getDefault().lookup(BioCategoryManager.class);
 
                     Lookup.Result<BioCategory> lkpInfo = tcExplorer.getLookup().lookupResult(BioCategory.class);
                     BioCategory[] selectedCategories = lkpInfo.allInstances().toArray(new BioCategory[]{});
@@ -69,7 +69,7 @@ public class ShowPeptideNodes extends AbstractAction {
                         selectedCategories = new BioCategory[]{bcc.getRootCategory()};
                     }
                     bcc.setSelectedCategoriesTo(currentWorkspace, selectedCategories);                    
-                    NeoPeptideController npc = Lookup.getDefault().lookup(NeoPeptideController.class);
+                    NeoPeptideManager npc = Lookup.getDefault().lookup(NeoPeptideManager.class);
                     npc.setNeoPeptidesTo(currentWorkspace, false);
 
                 } catch (Exception ex) {

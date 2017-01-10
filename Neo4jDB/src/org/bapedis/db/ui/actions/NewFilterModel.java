@@ -6,10 +6,8 @@
 package org.bapedis.db.ui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.AbstractAction;
-import org.bapedis.core.controller.ProjectController;
-import org.bapedis.core.model.Project;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.db.model.FilterModel;
 import org.openide.DialogDescriptor;
@@ -21,7 +19,6 @@ import org.openide.awt.ActionRegistration;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
-import static org.bapedis.db.ui.actions.Bundle.*;
 
 @ActionID(
         category = "Edit",
@@ -42,7 +39,7 @@ public final class NewFilterModel extends AbstractAction {
         putValue(NAME, name);
     }
 
-    protected final ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
+    protected final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -52,9 +49,8 @@ public final class NewFilterModel extends AbstractAction {
         if (DialogDisplayer.getDefault().notify(dd).equals(DialogDescriptor.OK_OPTION) && !dd.getInputText().isEmpty()) {
             name = dd.getInputText();
             FilterModel newFilterModel = new FilterModel(name);
-            Project pj = pc.getProject();
-            pj.add(newFilterModel);
-            Workspace currentWs = pj.getCurrentWorkspace();
+            pc.add(newFilterModel);
+            Workspace currentWs = pc.getCurrentWorkspace();
             FilterModel oldFilterModel = currentWs.getLookup().lookup(FilterModel.class);
             if (oldFilterModel != null) {
                 currentWs.remove(oldFilterModel);

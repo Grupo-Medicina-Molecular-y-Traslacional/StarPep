@@ -24,9 +24,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
-import org.bapedis.core.controller.ProjectController;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
-import org.bapedis.core.model.Project;
 import org.bapedis.core.model.Workspace;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -60,14 +59,13 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
     protected ButtonGroup menuGroup;
     protected HashMap<Integer, JCheckBoxMenuItem> popupMap;
     protected HashMap<Integer, JCheckBoxMenuItem> menuMap;
-    protected ProjectController pc;
+    protected ProjectManager pc;
     protected Lookup.Result<Workspace> lkpResult;
 
     public SelectWorkspace() {
-        pc = Lookup.getDefault().lookup(ProjectController.class);
-        Project pj = pc.getProject();
-        pj.addWorkspaceEventListener(this);
-        lkpResult = pj.getLookup().lookupResult(Workspace.class);
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
+        pc.addWorkspaceEventListener(this);
+        lkpResult = pc.getLookup().lookupResult(Workspace.class);
         lkpResult.addLookupListener(this);
         popup = new JPopupMenu();
         popupGroup = new ButtonGroup();
@@ -75,8 +73,8 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
         menu = new JMenu(NbBundle.getMessage(SelectWorkspace.class, "CTL_SelectWorkspace"));
         menuGroup = new ButtonGroup();
         menuMap = new HashMap<>();
-        populateMenuItems(pc.getProject().getWorkspaces());
-        pc.getProject().getCurrentWorkspace().addPropertyChangeListener(this);
+        populateMenuItems(pc.getWorkspaces());
+        pc.getCurrentWorkspace().addPropertyChangeListener(this);
     }
 
     @Override
@@ -88,10 +86,10 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
         item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                pc.getProject().setCurrentWorkspace(ws);
+                pc.setCurrentWorkspace(ws);
             }
         });
-        if (ws.equals(pc.getProject().getCurrentWorkspace())) {
+        if (ws.equals(pc.getCurrentWorkspace())) {
             item.setSelected(true);
         }
         return item;

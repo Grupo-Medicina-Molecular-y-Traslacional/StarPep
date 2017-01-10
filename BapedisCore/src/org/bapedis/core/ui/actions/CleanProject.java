@@ -2,7 +2,7 @@ package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import org.bapedis.core.controller.ProjectController;
+import org.bapedis.core.services.ProjectManager;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionID;
@@ -31,8 +31,8 @@ public class CleanProject implements ActionListener {
         String msg = NbBundle.getMessage(CleanProject.class, "CleanProject.dialog.confirm");
         NotifyDescriptor nd = new NotifyDescriptor.Confirmation(msg, NotifyDescriptor.YES_NO_OPTION);
         if (DialogDisplayer.getDefault().notify(nd) == NotifyDescriptor.YES_OPTION) {
-            ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-            pc.getProject().clean();
+            ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+            pc.clean();
         }
     }
 

@@ -10,7 +10,7 @@ import java.util.Collection;
 import static javax.swing.Action.NAME;
 import static javax.swing.Action.SMALL_ICON;
 import org.bapedis.core.ui.actions.GlobalContextSensitiveAction;
-import org.bapedis.db.controller.FilterFactoryController;
+import org.bapedis.db.services.FilterFactoryManager;
 import org.bapedis.db.filters.spi.Filter;
 import org.bapedis.db.filters.spi.FilterFactory;
 import org.bapedis.db.model.FilterNode;
@@ -44,12 +44,12 @@ import org.openide.windows.WindowManager;
 })
 @NbBundle.Messages("CTL_EditFilter=Edit filter")
 public class EditFilter extends GlobalContextSensitiveAction<Filter> {
-    protected final FilterFactoryController ffc;
+    protected final FilterFactoryManager ffc;
     protected final FilterSetupDialog dialog;    
 
     public EditFilter() {
         super(Filter.class);
-        ffc = Lookup.getDefault().lookup(FilterFactoryController.class);
+        ffc = Lookup.getDefault().lookup(FilterFactoryManager.class);
         String name = NbBundle.getMessage(RemoveFilter.class, "CTL_EditFilter");
         putValue(NAME, name);
         putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/db/resources/edit.png", false));        

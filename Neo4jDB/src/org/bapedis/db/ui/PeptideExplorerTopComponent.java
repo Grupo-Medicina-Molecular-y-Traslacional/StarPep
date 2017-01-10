@@ -7,10 +7,10 @@ package org.bapedis.db.ui;
 
 import java.awt.BorderLayout;
 import java.util.Collection;
-import org.bapedis.core.controller.ProjectController;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.db.controller.BioCategoryController;
+import org.bapedis.db.services.BioCategoryManager;
 import org.bapedis.db.model.BioCategory;
 import org.bapedis.db.model.BioCategoryNode;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -56,15 +56,14 @@ public final class PeptideExplorerTopComponent extends TopComponent implements E
         setName(Bundle.CTL_PeptideExplorerTopComponent());
         setToolTipText(Bundle.HINT_PeptideExplorerTopComponent());
 
-        setLayout(new BorderLayout());
         add(new BeanTreeView(), BorderLayout.CENTER);
 
         associateLookup(ExplorerUtils.createLookup(mgr, getActionMap()));
 
-        BioCategoryController bcc = Lookup.getDefault().lookup(BioCategoryController.class);
+        BioCategoryManager bcc = Lookup.getDefault().lookup(BioCategoryManager.class);
         mgr.setRootContext(new BioCategoryNode(bcc.getRootCategory()));
-        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-        pc.getProject().addWorkspaceEventListener(this);
+        ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+        pc.addWorkspaceEventListener(this);
     }
 
     /**
@@ -75,16 +74,7 @@ public final class PeptideExplorerTopComponent extends TopComponent implements E
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        setLayout(new java.awt.BorderLayout());
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

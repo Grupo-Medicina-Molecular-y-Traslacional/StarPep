@@ -2,7 +2,7 @@ package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
-import org.bapedis.core.controller.ProjectController;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.Workspace;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -29,16 +29,16 @@ import org.openide.util.NbBundle;
     @ActionReference(path = "Actions/RemoveWorkspace", position = 100)
 })
 public class RemoveCurrentWorkspace extends AbstractAction implements LookupListener{
-    protected ProjectController pc;
+    protected ProjectManager pc;
     protected Lookup.Result<Workspace> lkpResult;
 
     public RemoveCurrentWorkspace() {
-        pc = Lookup.getDefault().lookup(ProjectController.class);
-        lkpResult = pc.getProject().getLookup().lookupResult(Workspace.class);
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
+        lkpResult = pc.getLookup().lookupResult(Workspace.class);
         lkpResult.addLookupListener(this);
         putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/core/resources/removeWorkspace.png", false));
         putValue(NAME, NbBundle.getMessage(RemoveCurrentWorkspace.class, "CTL_RemoveWorkspace"));                
-        setEnabled(pc.getProject().getLookup().lookupAll(Workspace.class).size()>1);
+        setEnabled(pc.getLookup().lookupAll(Workspace.class).size()>1);
     }        
     
     @Override
@@ -46,7 +46,7 @@ public class RemoveCurrentWorkspace extends AbstractAction implements LookupList
         String msg = NbBundle.getMessage(RemoveCurrentWorkspace.class, "RemoveCurrentWorkspace.dialog.confirm");
         NotifyDescriptor nd = new NotifyDescriptor.Confirmation(msg, NotifyDescriptor.YES_NO_OPTION);
         if (DialogDisplayer.getDefault().notify(nd) == NotifyDescriptor.YES_OPTION) {
-            pc.getProject().remove(pc.getProject().getCurrentWorkspace());
+            pc.remove(pc.getCurrentWorkspace());
         }                
     }
 

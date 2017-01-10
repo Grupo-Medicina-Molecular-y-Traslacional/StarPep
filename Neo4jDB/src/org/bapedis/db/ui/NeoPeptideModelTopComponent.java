@@ -6,7 +6,7 @@
 package org.bapedis.db.ui;
 
 import java.util.Collection;
-import org.bapedis.core.controller.ProjectController;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.db.model.NeoNeighborsModel;
@@ -48,7 +48,7 @@ import org.openide.util.lookup.ProxyLookup;
 public final class NeoPeptideModelTopComponent extends TopComponent implements
         WorkspaceEventListener, LookupListener {
 
-    protected ProjectController pc;
+    protected ProjectManager pc;
     protected Lookup.Result<NeoPeptideModel> peptideLkpResult;
     protected Lookup.Result<NeoNeighborsModel> neighborLkpResult;
     protected PeptideModelPanel peptideModelViewer;
@@ -65,7 +65,7 @@ public final class NeoPeptideModelTopComponent extends TopComponent implements
         splitPane.setBottomComponent(neighborModelViwer);
         showNeighbors = false;
         showNeighborsPanel(showNeighbors);
-        pc = Lookup.getDefault().lookup(ProjectController.class);
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
         associateLookup(new ProxyLookup(peptideModelViewer.getLookup(), neighborModelViwer.getLookup()));
     }
 
@@ -103,8 +103,8 @@ public final class NeoPeptideModelTopComponent extends TopComponent implements
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {
-        pc.getProject().addWorkspaceEventListener(this);
-        Workspace currentWorkspace = pc.getProject().getCurrentWorkspace();
+        pc.addWorkspaceEventListener(this);
+        Workspace currentWorkspace = pc.getCurrentWorkspace();
         workspaceChanged(null, currentWorkspace);
     }
 
@@ -140,7 +140,7 @@ public final class NeoPeptideModelTopComponent extends TopComponent implements
     @Override
     public void componentClosed() {
         removeLookupListener();
-        pc.getProject().removeWorkspaceEventListener(this);
+        pc.removeWorkspaceEventListener(this);
     }
 
     void writeProperties(java.util.Properties p) {

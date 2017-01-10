@@ -16,10 +16,10 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
-import org.bapedis.core.controller.ProjectController;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.db.controller.NeoPeptideController;
+import org.bapedis.db.services.NeoPeptideManager;
 import org.bapedis.db.filters.spi.FilterFactory;
 import org.bapedis.db.model.BioCategory;
 import org.bapedis.db.model.FilterModel;
@@ -69,7 +69,7 @@ import org.openide.windows.WindowManager;
 public final class FilterExplorerTopComponent extends TopComponent implements WorkspaceEventListener, LookupListener, PropertyChangeListener, ExplorerManager.Provider {
 
     protected final ExplorerManager filterModelManager;
-    protected final ProjectController pc;
+    protected final ProjectManager pc;
     protected Lookup.Result<FilterModel> projectLkpResult;
     protected Lookup.Result<FilterModel> workspaceLkpResult;
     protected final String NO_FILTER = NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.filterModelComboBox.none");
@@ -81,8 +81,8 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 
         filterModelManager = new ExplorerManager();
         associateLookup(ExplorerUtils.createLookup(filterModelManager, getActionMap()));
-        pc = Lookup.getDefault().lookup(ProjectController.class);
-        projectLkpResult = pc.getProject().getLookup().lookupResult(FilterModel.class);
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
+        projectLkpResult = pc.getLookup().lookupResult(FilterModel.class);
         projectLkpResult.addLookupListener(this);
 
         filterModelComboBox.addItem(NO_FILTER);
@@ -191,7 +191,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     }//GEN-LAST:event_restrictiveComboBoxActionPerformed
 
     private void filterModelComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterModelComboBoxActionPerformed
-        Workspace currentWs = pc.getProject().getCurrentWorkspace();
+        Workspace currentWs = pc.getCurrentWorkspace();
         FilterModel currentfilterModel = currentWs.getLookup().lookup(FilterModel.class);
         if (workspaceLkpResult != null) {
             workspaceLkpResult.removeLookupListener(this);
@@ -235,14 +235,14 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {
-        pc.getProject().addWorkspaceEventListener(this);
-        Workspace currentWs = pc.getProject().getCurrentWorkspace();
+        pc.addWorkspaceEventListener(this);
+        Workspace currentWs = pc.getCurrentWorkspace();
         workspaceChanged(null, currentWs);
     }
 
     @Override
     public void componentClosed() {
-        pc.getProject().removeWorkspaceEventListener(this);
+        pc.removeWorkspaceEventListener(this);
     }
 
     void writeProperties(java.util.Properties p) {
@@ -311,7 +311,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
                 }
             }
         } else if (le.getSource().equals(workspaceLkpResult)) {
-            setFilterModel(pc.getProject().getCurrentWorkspace());
+            setFilterModel(pc.getCurrentWorkspace());
         }
     }
 
@@ -393,8 +393,8 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
             @Override
             public void run() {
                 try {
-                    NeoPeptideController npc = Lookup.getDefault().lookup(NeoPeptideController.class);
-                    Workspace currentWs = pc.getProject().getCurrentWorkspace();
+                    NeoPeptideManager npc = Lookup.getDefault().lookup(NeoPeptideManager.class);
+                    Workspace currentWs = pc.getCurrentWorkspace();
                     npc.setNeoPeptidesTo(currentWs, true);
                 } catch (Exception ex) {
                     ex.printStackTrace();

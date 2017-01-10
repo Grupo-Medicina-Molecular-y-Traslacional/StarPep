@@ -3,7 +3,7 @@ package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import org.bapedis.core.controller.ProjectController;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.Workspace;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -30,8 +30,8 @@ public class RenameWorkspace implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-        Workspace workspace = pc.getProject().getCurrentWorkspace();
+        ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+        Workspace workspace = pc.getCurrentWorkspace();
         String name = workspace.getName();
         DialogDescriptor.InputLine dd = new DialogDescriptor.InputLine("", NbBundle.getMessage(RenameWorkspace.class, "RenameWorkspace.dialog.title"));
         dd.setInputText(name);

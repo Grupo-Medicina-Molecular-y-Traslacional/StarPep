@@ -10,8 +10,7 @@ import java.util.Collection;
 import javax.swing.AbstractAction;
 import static javax.swing.Action.NAME;
 import static javax.swing.Action.SMALL_ICON;
-import org.bapedis.core.controller.ProjectController;
-import org.bapedis.core.model.Project;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.Workspace;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -43,16 +42,16 @@ import org.openide.util.NbBundle;
 })
 public class RemoveOtherWorkspaces extends AbstractAction implements LookupListener {
 
-    protected ProjectController pc;
+    protected ProjectManager pc;
     protected Lookup.Result<Workspace> lkpResult;
 
     public RemoveOtherWorkspaces() {
-        pc = Lookup.getDefault().lookup(ProjectController.class);
-        lkpResult = pc.getProject().getLookup().lookupResult(Workspace.class);
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
+        lkpResult = pc.getLookup().lookupResult(Workspace.class);
         lkpResult.addLookupListener(this);
         putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/core/resources/removeWorkspace.png", false));
         putValue(NAME, NbBundle.getMessage(RemoveCurrentWorkspace.class, "CTL_RemoveOtherWorkspaces"));
-        setEnabled(pc.getProject().getLookup().lookupAll(Workspace.class).size() > 1);
+        setEnabled(pc.getLookup().lookupAll(Workspace.class).size() > 1);
     }
 
     @Override
@@ -60,11 +59,10 @@ public class RemoveOtherWorkspaces extends AbstractAction implements LookupListe
         String msg = NbBundle.getMessage(RemoveOtherWorkspaces.class, "RemoveOtherWorkspaces.dialog.confirm");
         NotifyDescriptor nd = new NotifyDescriptor.Confirmation(msg, NotifyDescriptor.YES_NO_OPTION);
         if (DialogDisplayer.getDefault().notify(nd) == NotifyDescriptor.YES_OPTION) {
-            Project pj = pc.getProject();
-            Collection<? extends Workspace> workspaces = pj.getLookup().lookupAll(Workspace.class);
+            Collection<? extends Workspace> workspaces = pc.getLookup().lookupAll(Workspace.class);
             for (Workspace ws : workspaces) {
-                if (pj.getCurrentWorkspace() != ws) {
-                    pj.remove(ws);
+                if (pc.getCurrentWorkspace() != ws) {
+                    pc.remove(ws);
                 }
             }
         }

@@ -42,7 +42,7 @@ public class RenameFilterModel extends WorkspaceContextSensitiveAction<FilterMod
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Workspace ws = pc.getProject().getCurrentWorkspace();
+        Workspace ws = pc.getCurrentWorkspace();
         FilterModel filterModel = ws.getLookup().lookup(FilterModel.class);
         String name = filterModel.getName();
         DialogDescriptor.InputLine dd = new DialogDescriptor.InputLine("", getValue(NAME).toString());

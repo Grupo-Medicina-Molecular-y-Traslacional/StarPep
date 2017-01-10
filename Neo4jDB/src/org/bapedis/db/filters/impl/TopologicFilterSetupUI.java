@@ -20,10 +20,10 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.bapedis.core.controller.ProjectController;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.Attribute;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.db.controller.NeoPeptideController;
+import org.bapedis.db.services.NeoPeptideManager;
 import org.bapedis.db.filters.spi.Filter;
 import org.bapedis.db.filters.spi.FilterSetupUI;
 import static org.bapedis.db.filters.spi.FilterSetupUI.VALID_STATE;
@@ -41,7 +41,7 @@ public class TopologicFilterSetupUI extends javax.swing.JPanel implements Filter
 
     protected boolean validState;
     protected TopologicFilter topologicFilter;
-    protected final ProjectController pc;
+    protected final ProjectManager pc;
     protected final PropertyChangeSupport changeSupport;
     protected final JLabel busyLabel;
     protected Lookup.Result<NeoNeighborsModel> lkpResult;
@@ -54,7 +54,7 @@ public class TopologicFilterSetupUI extends javax.swing.JPanel implements Filter
         busyLabel = new JLabel(NbBundle.getMessage(TopologicFilterSetupUI.class, "TopologicFilterSetupUI.busyLabel.text"));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         busyLabel.setVerticalAlignment(SwingConstants.CENTER);
-        pc = Lookup.getDefault().lookup(ProjectController.class);
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
         changeSupport = new PropertyChangeSupport(this);
         validState = false;
         for (IntegerFilterOperator operator : IntegerFilterOperator.values()) {
@@ -375,7 +375,7 @@ public class TopologicFilterSetupUI extends javax.swing.JPanel implements Filter
                 }
         }
         notCheckBox.setSelected(topologicFilter.isNeighborCondNegative());
-        Workspace ws = pc.getProject().getCurrentWorkspace();
+        Workspace ws = pc.getCurrentWorkspace();
         initAttrComboBox(ws);
         Attribute attr = topologicFilter.getNeighborCondAttribute();
         if (attr != null && !attr.equals(attrComboBox.getSelectedItem())) {
@@ -407,7 +407,7 @@ public class TopologicFilterSetupUI extends javax.swing.JPanel implements Filter
             add(busyLabel, BorderLayout.CENTER);
             lkpResult = workspace.getLookup().lookupResult(NeoNeighborsModel.class);
             lkpResult.addLookupListener(this);
-            final NeoPeptideController npc = Lookup.getDefault().lookup(NeoPeptideController.class);
+            final NeoPeptideManager npc = Lookup.getDefault().lookup(NeoPeptideManager.class);
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
@@ -490,8 +490,8 @@ public class TopologicFilterSetupUI extends javax.swing.JPanel implements Filter
         if (!attrModels.isEmpty()) {
             remove(busyLabel);
             add(filterPanel, BorderLayout.CENTER);
-            ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-            initAttrComboBox(pc.getProject().getCurrentWorkspace());
+            ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+            initAttrComboBox(pc.getCurrentWorkspace());
             revalidate();
         }
 

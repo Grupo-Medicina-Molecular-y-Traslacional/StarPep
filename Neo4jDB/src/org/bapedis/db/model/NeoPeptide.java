@@ -7,7 +7,6 @@ package org.bapedis.db.model;
 
 import org.bapedis.core.model.Peptide;
 import org.bapedis.db.dao.NeoPeptideDAO;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
@@ -18,13 +17,15 @@ public class NeoPeptide extends Peptide {
 
     protected final long neoId;
     protected NeoNeighborsModel neoNeighborsModel;
+    protected NeoPeptideDAO dao;
 
     public static String getPrefixName(){
         return NbBundle.getMessage(NeoPeptide.class, "NeoPeptide.prefix");
     }    
-    public NeoPeptide(long neoId, String displayName, String sequence) {
+    public NeoPeptide(long neoId, String displayName, String sequence, NeoPeptideDAO dao) {
         super(displayName, sequence);
         this.neoId = neoId;
+        this.dao = dao;
     }
 
     public long getNeoId() {
@@ -32,7 +33,6 @@ public class NeoPeptide extends Peptide {
     }
     
     public NeoNeighborsModel getNeighbors(){
-        NeoPeptideDAO dao = Lookup.getDefault().lookup(NeoPeptideDAO.class);
         return dao.getNeoNeighborsBy(this);
     }
 

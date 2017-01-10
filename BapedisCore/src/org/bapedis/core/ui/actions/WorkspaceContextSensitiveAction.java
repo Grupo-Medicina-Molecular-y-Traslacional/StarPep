@@ -7,7 +7,7 @@ package org.bapedis.core.ui.actions;
 
 import java.util.Collection;
 import javax.swing.AbstractAction;
-import org.bapedis.core.controller.ProjectController;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.openide.util.Lookup;
@@ -20,15 +20,15 @@ import org.openide.util.LookupListener;
  */
 public abstract class WorkspaceContextSensitiveAction<T> extends AbstractAction implements WorkspaceEventListener, LookupListener {
 
-    protected final ProjectController pc;
+    protected final ProjectManager pc;
     protected Lookup.Result<T> lkpResult;
     protected Class<T> contextClass;
 
     public WorkspaceContextSensitiveAction(Class<T> contextClass) {
         this.contextClass = contextClass;
-        pc = Lookup.getDefault().lookup(ProjectController.class);
-        pc.getProject().addWorkspaceEventListener(this);
-        Workspace currentWorkspace = pc.getProject().getCurrentWorkspace();
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
+        pc.addWorkspaceEventListener(this);
+        Workspace currentWorkspace = pc.getCurrentWorkspace();
         workspaceChanged(null, currentWorkspace);
     }
 

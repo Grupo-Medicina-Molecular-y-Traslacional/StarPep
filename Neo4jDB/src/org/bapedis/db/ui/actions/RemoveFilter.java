@@ -7,7 +7,7 @@ package org.bapedis.db.ui.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.Collection;
-import org.bapedis.core.controller.ProjectController;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.ui.actions.GlobalContextSensitiveAction;
 import org.bapedis.db.filters.spi.Filter;
@@ -37,11 +37,11 @@ import org.openide.util.NbBundle;
 })
 @NbBundle.Messages("CTL_RemoveFilter=Remove filter")
 public class RemoveFilter extends GlobalContextSensitiveAction<Filter> {
-    protected final ProjectController pc;
+    protected final ProjectManager pc;
 
     public RemoveFilter() {
         super(Filter.class);
-        pc = Lookup.getDefault().lookup(ProjectController.class);
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
         String name = NbBundle.getMessage(RemoveFilter.class, "CTL_RemoveFilter");
         putValue(NAME, name);
         putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/db/resources/remove.png", false));
@@ -53,7 +53,7 @@ public class RemoveFilter extends GlobalContextSensitiveAction<Filter> {
         Collection<? extends Filter> context = lkpResult.allInstances();
         if (!context.isEmpty()){
             Filter filter = context.iterator().next();
-            Workspace workspace = pc.getProject().getCurrentWorkspace();
+            Workspace workspace = pc.getCurrentWorkspace();
             FilterModel filterModel = workspace.getLookup().lookup(FilterModel.class);
             filterModel.removeFilter(filter);
         }

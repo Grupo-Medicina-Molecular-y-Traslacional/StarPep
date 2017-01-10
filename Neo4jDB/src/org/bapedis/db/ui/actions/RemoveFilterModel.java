@@ -6,7 +6,6 @@
 package org.bapedis.db.ui.actions;
 
 import java.awt.event.ActionEvent;
-import org.bapedis.core.model.Project;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.ui.actions.WorkspaceContextSensitiveAction;
 import org.bapedis.db.model.FilterModel;
@@ -46,16 +45,15 @@ public class RemoveFilterModel extends WorkspaceContextSensitiveAction<FilterMod
         String msg = NbBundle.getMessage(RemoveFilterModel.class, "RemoveFilterModel.dialog.confirm");
         NotifyDescriptor nd = new NotifyDescriptor.Confirmation(msg, NotifyDescriptor.YES_NO_OPTION);
         if (DialogDisplayer.getDefault().notify(nd) == NotifyDescriptor.YES_OPTION) {
-            Project pj = pc.getProject();
-            Workspace currentWs = pj.getCurrentWorkspace();
+            Workspace currentWs = pc.getCurrentWorkspace();
             FilterModel filterModel = currentWs.getLookup().lookup(FilterModel.class);
             currentWs.remove(filterModel);
-            for(Workspace otherWs: pj.getWorkspaces()){
+            for(Workspace otherWs: pc.getWorkspaces()){
                 if (otherWs != currentWs){
                     otherWs.remove(filterModel);
                 }
             }
-            pj.remove(filterModel);
+            pc.remove(filterModel);
         }
     }
 

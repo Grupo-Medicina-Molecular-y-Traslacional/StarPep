@@ -7,8 +7,7 @@ package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import org.bapedis.core.controller.ProjectController;
-import org.bapedis.core.model.Project;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.Workspace;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -43,11 +42,10 @@ public final class NewWorkspace implements ActionListener {
         dd.setInputText(name);
         if (DialogDisplayer.getDefault().notify(dd).equals(DialogDescriptor.OK_OPTION) && !dd.getInputText().isEmpty()) {
             name = dd.getInputText();
-            ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-            Project pj = pc.getProject();
+            ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
             Workspace ws = new Workspace(name);
-            pj.add(ws);
-            pj.setCurrentWorkspace(ws);
+            pc.add(ws);
+            pc.setCurrentWorkspace(ws);
         }
     }
 

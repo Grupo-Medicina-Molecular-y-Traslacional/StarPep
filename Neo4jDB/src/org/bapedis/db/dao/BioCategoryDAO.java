@@ -15,13 +15,11 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author loge
  */
-@ServiceProvider(service = BioCategoryDAO.class)
 public class BioCategoryDAO{
     protected final String rootName = "Peptide";
     protected final GraphDatabaseService graphDb;

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db.controller;
+package org.bapedis.db.services;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -17,11 +17,11 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author loge
  */
-@ServiceProvider(service=FilterFactoryController.class)
-public class FilterFactoryController {
+@ServiceProvider(service=FilterFactoryManager.class)
+public class FilterFactoryManager {
     protected final List<FilterFactory> builders;
 
-    public FilterFactoryController() {
+    public FilterFactoryManager() {
         builders = new LinkedList<>();
         Collection<? extends FilterFactory> factories = Lookup.getDefault().lookupAll(FilterFactory.class);
         for(FilterFactory factory: factories){

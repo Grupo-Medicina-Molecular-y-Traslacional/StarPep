@@ -80,7 +80,7 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
         errorLabel = new JLabel(NbBundle.getMessage(AttributesPanel.class, "AttributesPanel.errorLabel.text"));
         errorLabel.setHorizontalAlignment(SwingConstants.CENTER);
         dataPanel.add(view, BorderLayout.CENTER);
-        filterPanel.add(createDropDownButtonSearch(), 0);
+        filterPanel.add(createDropDownButtonSearch(), 1);
         defaultFilter = createQuickFilter();
         //Quick Filter
         outline.getColumnModel().addColumnModelListener(createColumnModelListener());
@@ -271,7 +271,7 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
                 new BufferedImage(16, 16, BufferedImage.TYPE_BYTE_GRAY)), quickFilterPopup);
 
         dropDownButton.setIcon(icon);
-        dropDownButton.setMargin(new java.awt.Insets(2, 4, 0, 4));
+//        dropDownButton.setMargin(new java.awt.Insets(2, 4, 0, 4));
         dropDownButton.setToolTipText(NbBundle.getMessage(AttributesPanel.class, "CTL_QuickFilter"));
         dropDownButton.addActionListener(new ActionListener() {
 
@@ -311,7 +311,7 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
         add(dataPanel, gridBagConstraints);
 
         filterPanel.setMinimumSize(new java.awt.Dimension(262, 25));
-        filterPanel.setPreferredSize(new java.awt.Dimension(514, 25));
+        filterPanel.setPreferredSize(new java.awt.Dimension(514, 30));
         filterPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 2));
 
         org.openide.awt.Mnemonics.setLocalizedText(labelFilter, org.openide.util.NbBundle.getMessage(AttributesPanel.class, "AttributesPanel.labelFilter.text")); // NOI18N

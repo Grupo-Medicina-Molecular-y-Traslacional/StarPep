@@ -36,7 +36,7 @@ public class AddFilter extends WorkspaceContextSensitiveAction<NeoPeptideModel> 
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Workspace currentWs = pc.getProject().getCurrentWorkspace();
+        Workspace currentWs = pc.getCurrentWorkspace();
         FilterModel filterModel = currentWs.getLookup().lookup(FilterModel.class);
         if (filterModel == null) {
             for (ActionListener a : Utilities.actionsForPath("Actions/EditFilterModel")) {

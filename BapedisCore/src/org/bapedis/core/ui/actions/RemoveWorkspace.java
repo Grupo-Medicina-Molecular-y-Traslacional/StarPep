@@ -13,7 +13,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JPopupMenu;
-import org.bapedis.core.controller.ProjectController;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.Workspace;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -45,22 +45,22 @@ import org.openide.util.actions.Presenter;
 })
 public class RemoveWorkspace extends AbstractAction implements LookupListener, Presenter.Toolbar {
 
-    protected ProjectController pc;
+    protected ProjectManager pc;
     protected Lookup.Result<Workspace> lkpResult;
     protected JPopupMenu popup;
     protected JButton dropDownButton;
 
     public RemoveWorkspace() {
         popup = new JPopupMenu();
-        pc = Lookup.getDefault().lookup(ProjectController.class);
-        lkpResult = pc.getProject().getLookup().lookupResult(Workspace.class);
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
+        lkpResult = pc.getLookup().lookupResult(Workspace.class);
         lkpResult.addLookupListener(this);
         putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/core/resources/removeWorkspace.png", false));
         putValue(NAME, NbBundle.getMessage(RemoveCurrentWorkspace.class, "CTL_RemoveWorkspace"));
 
         dropDownButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/bapedis/core/resources/removeWorkspace.png", false), popup);
         dropDownButton.setToolTipText(NbBundle.getMessage(RemoveWorkspace.class, "CTL_RemoveWorkspace"));
-        dropDownButton.setEnabled(pc.getProject().getLookup().lookupAll(Workspace.class).size() > 1);
+        dropDownButton.setEnabled(pc.getLookup().lookupAll(Workspace.class).size() > 1);
     }
 
     @Override

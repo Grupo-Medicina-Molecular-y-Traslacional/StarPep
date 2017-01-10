@@ -14,9 +14,7 @@ public class Installer extends ModuleInstall {
     public void restored() {
         try {
             Neo4jDB.extractDatabase();
-            System.out.println("Path: " + Neo4jDB.DB_DIR.getAbsolutePath());
             Neo4jDB.loadDatabase();
-            System.out.println("loaded...");
         } catch (Exception ex) {
             System.out.println(ex);
             ex.printStackTrace();

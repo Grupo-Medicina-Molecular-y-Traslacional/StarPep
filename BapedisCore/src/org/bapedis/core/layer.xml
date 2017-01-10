@@ -52,5 +52,6 @@
             <attr name="position" intvalue="90"/>
             <attr name="displayName" bundlevalue="org.bapedis.core.ui.Bundle#Toolbar/Workspace"/>
         </folder>
+        <file name="QuickSearch_hidden"/> 
     </folder>
 </filesystem>

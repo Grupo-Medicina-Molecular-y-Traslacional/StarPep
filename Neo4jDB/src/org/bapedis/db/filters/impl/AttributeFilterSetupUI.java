@@ -13,7 +13,7 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.bapedis.core.controller.ProjectController;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.Attribute;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.db.filters.spi.Filter;
@@ -30,7 +30,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
     
     protected AttributeFilter filter;
     protected boolean validState;
-    protected final ProjectController pc;
+    protected final ProjectManager pc;
     protected final PropertyChangeSupport changeSupport;
 
     /**
@@ -38,7 +38,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
      */
     public AttributeFilterSetupUI() {
         initComponents();
-        pc = Lookup.getDefault().lookup(ProjectController.class);
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
         changeSupport = new PropertyChangeSupport(this);
         validState = false;
         valueTextField.getDocument().addDocumentListener(new DocumentListener() {
@@ -221,7 +221,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
     public JPanel getEditPanel(Filter filter) {
         this.filter = (AttributeFilter) filter;
         notCheckBox.setSelected(this.filter.isNegative());
-        Workspace ws = pc.getProject().getCurrentWorkspace();
+        Workspace ws = pc.getCurrentWorkspace();
         initAttrComboBox(ws);
         Attribute attr = this.filter.getAttribute();
         if (attr != null && !attr.equals(attrComboBox.getSelectedItem())) {

@@ -3,27 +3,26 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db.controller;
+package org.bapedis.db.services;
 
 import java.util.Collection;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.db.dao.BioCategoryDAO;
 import org.bapedis.db.model.BioCategory;
-import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author loge
  */
-@ServiceProvider(service = BioCategoryController.class)
-public class BioCategoryController {
+@ServiceProvider(service = BioCategoryManager.class)
+public class BioCategoryManager {
 
     protected final BioCategoryDAO categoryDAO;
     protected final BioCategory rootCategory;
 
-    public BioCategoryController() {
-        categoryDAO = Lookup.getDefault().lookup(BioCategoryDAO.class);
+    public BioCategoryManager() {
+        categoryDAO = new BioCategoryDAO();
         rootCategory = categoryDAO.getRootBioCategory();
     }
 

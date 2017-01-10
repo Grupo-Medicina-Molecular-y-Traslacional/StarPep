@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 
 /**
- *
+ * Class that store all attributes and its values for an entity
  * @author loge
  */
 public class ObjectAttributes {

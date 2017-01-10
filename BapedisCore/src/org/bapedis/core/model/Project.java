@@ -14,7 +14,7 @@ import org.openide.util.lookup.InstanceContent;
  * Project that internally stores the workspaces and various information and
  * instances.
  *
- * @author Longendri Aguilera Mendoza
+ * @author loge
  */
 public class Project implements Lookup.Provider {
 

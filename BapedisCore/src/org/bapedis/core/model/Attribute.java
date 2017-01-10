@@ -8,7 +8,7 @@ package org.bapedis.core.model;
 import java.util.Objects;
 
 /**
- *
+ * Class that represents an attribute type for the entity
  * @author loge
  */
 public class Attribute {

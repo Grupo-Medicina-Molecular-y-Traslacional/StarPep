@@ -29,7 +29,7 @@ public class Workspace implements Lookup.Provider {
     protected static Workspace defaultWorkspace = new Workspace(0, NbBundle.getMessage(Workspace.class, "Workspace.defaultName"));
     protected final transient PropertyChangeSupport changeSupport;
 
-    public static void resetDefault() {
+    static void resetDefault() {
         counter.set(1);
         defaultWorkspace = new Workspace(0, NbBundle.getMessage(Workspace.class, "Workspace.defaultName"));
     }
@@ -71,7 +71,7 @@ public class Workspace implements Lookup.Provider {
     }
 
     public void setName(String name) {
-        changeSupport.firePropertyChange("name", this.name, name);
+        changeSupport.firePropertyChange(PRO_NAME, this.name, name);
         this.name = name;
     }
 

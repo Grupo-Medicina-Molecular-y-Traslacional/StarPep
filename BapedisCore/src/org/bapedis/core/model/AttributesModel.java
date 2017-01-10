@@ -14,10 +14,12 @@ import org.openide.nodes.Index;
 import org.openide.nodes.Node;
 
 /**
- *
+ * An abstract class that represents an attribute-based data model for entities. 
+ * Basically, it consist on a node container for instances of the class:
+ * ObjectAttributesNode.
  * @author loge
  */
-public class AttributesModel extends Index.ArrayChildren {
+public abstract class AttributesModel extends Index.ArrayChildren {
 
     protected final List<Attribute> attributes;
     protected final HashMap<String, Attribute> attrsMap;

@@ -5,6 +5,7 @@
  */
 package org.bapedis.db.model;
 
+import java.util.List;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.db.dao.NeoPeptideDAO;
 import org.openide.util.NbBundle;
@@ -16,7 +17,7 @@ import org.openide.util.NbBundle;
 public class NeoPeptide extends Peptide {
 
     protected final long neoId;
-    protected NeoNeighborsModel neoNeighborsModel;
+    protected List<NeoNeighbor> neighbors;
     protected NeoPeptideDAO dao;
 
     public static String getPrefixName(){
@@ -26,14 +27,18 @@ public class NeoPeptide extends Peptide {
         super(displayName, sequence);
         this.neoId = neoId;
         this.dao = dao;
+        
     }
 
     public long getNeoId() {
         return neoId;
     }
     
-    public NeoNeighborsModel getNeighbors(){
-        return dao.getNeoNeighborsBy(this);
+    public List<NeoNeighbor> getNeighbors(){
+        if (neighbors == null){
+            neighbors = dao.getNeoNeighbors(this);
+        }
+        return neighbors;
     }
 
     @Override

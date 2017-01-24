@@ -47,23 +47,23 @@ public class ShowPeptideNodes extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        final NeoPeptideModelTopComponent tcPeptide = (NeoPeptideModelTopComponent) WindowManager.getDefault().findTopComponent("NeoPeptideModelTopComponent");
-        tcPeptide.setBusyLabel();
-        tcPeptide.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        tcPeptide.open();
-        tcPeptide.requestActive();
+        final NeoPeptideModelTopComponent peptideTC = (NeoPeptideModelTopComponent) WindowManager.getDefault().findTopComponent("NeoPeptideModelTopComponent");
+        peptideTC.setBusyLabel();
+        peptideTC.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        peptideTC.open();
+        peptideTC.requestActive();
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
             public void run() {
-                TopComponent tcExplorer = WindowManager.getDefault().findTopComponent("PeptideExplorerTopComponent");
+                TopComponent bioCategoryTC = WindowManager.getDefault().findTopComponent("BioCategoryExplorerTopComponent");
                 try {
                     ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
                     Workspace currentWorkspace = pc.getCurrentWorkspace();
 
                     BioCategoryManager bcc = Lookup.getDefault().lookup(BioCategoryManager.class);
 
-                    Lookup.Result<BioCategory> lkpInfo = tcExplorer.getLookup().lookupResult(BioCategory.class);
+                    Lookup.Result<BioCategory> lkpInfo = bioCategoryTC.getLookup().lookupResult(BioCategory.class);
                     BioCategory[] selectedCategories = lkpInfo.allInstances().toArray(new BioCategory[]{});
                     if (selectedCategories.length == 0) {
                         selectedCategories = new BioCategory[]{bcc.getRootCategory()};
@@ -74,9 +74,9 @@ public class ShowPeptideNodes extends AbstractAction {
 
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    tcPeptide.setErrorLabel();
+                    peptideTC.setErrorLabel();
                 } finally {
-                    tcPeptide.setCursor(Cursor.getDefaultCursor());
+                    peptideTC.setCursor(Cursor.getDefaultCursor());
                 }
             }
         });

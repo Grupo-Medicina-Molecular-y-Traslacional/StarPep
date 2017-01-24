@@ -27,34 +27,34 @@ import org.openide.util.NbBundle.Messages;
  * Top component which displays something.
  */
 @ConvertAsProperties(
-        dtd = "-//org.bapedis.db.ui//PeptideExplorer//EN",
+        dtd = "-//org.bapedis.db.ui//BioCategoryExplorer//EN",
         autostore = false
 )
 @TopComponent.Description(
-        preferredID = "PeptideExplorerTopComponent",
+        preferredID = "BioCategoryExplorerTopComponent",
         //iconBase="SET/PATH/TO/ICON/HERE", 
         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
 @TopComponent.Registration(mode = "explorer", openAtStartup = true)
-@ActionID(category = "Window", id = "org.bapedis.db.ui.PeptideExplorerTopComponent")
+@ActionID(category = "Window", id = "org.bapedis.db.ui.BioCategoryExplorerTopComponent")
 @ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.OpenActionRegistration(
-        displayName = "#CTL_PeptideExplorerAction",
-        preferredID = "PeptideExplorerTopComponent"
+        displayName = "#CTL_BioCategoryExplorerAction",
+        preferredID = "BioCategoryExplorerTopComponent"
 )
 @Messages({
-    "CTL_PeptideExplorerAction=Peptide Explorer",
-    "CTL_PeptideExplorerTopComponent=Peptide Explorer",
-    "HINT_PeptideExplorerTopComponent=This is a Peptide Explorer window"
+    "CTL_BioCategoryExplorerAction= Explorer",
+    "CTL_BioCategoryExplorerTopComponent=Explorer",
+    "HINT_BioCategoryExplorerTopComponent=This is a Explorer window"
 })
-public final class PeptideExplorerTopComponent extends TopComponent implements ExplorerManager.Provider, WorkspaceEventListener {
+public final class BioCategoryExplorerTopComponent extends TopComponent implements ExplorerManager.Provider, WorkspaceEventListener {
 
     private final ExplorerManager mgr = new ExplorerManager();
 
-    public PeptideExplorerTopComponent() {
+    public BioCategoryExplorerTopComponent() {
         initComponents();
-        setName(Bundle.CTL_PeptideExplorerTopComponent());
-        setToolTipText(Bundle.HINT_PeptideExplorerTopComponent());
+        setName(Bundle.CTL_BioCategoryExplorerTopComponent());
+        setToolTipText(Bundle.HINT_BioCategoryExplorerTopComponent());
 
         add(new BeanTreeView(), BorderLayout.CENTER);
 

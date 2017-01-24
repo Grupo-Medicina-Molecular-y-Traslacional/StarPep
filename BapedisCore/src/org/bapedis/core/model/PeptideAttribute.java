@@ -8,23 +8,23 @@ package org.bapedis.core.model;
 import java.util.Objects;
 
 /**
- * Class that represents an attribute type for the entity
+ * Class that represents an attribute type for the peptide
  * @author loge
  */
-public class Attribute {
+public class PeptideAttribute {
     protected String id;
     protected String displayName;
     protected Class<?> type;
     protected boolean visible;
     
-    public Attribute(String id, String displayName, Class<?> type, boolean visible) {
+    public PeptideAttribute(String id, String displayName, Class<?> type, boolean visible) {
         this.id = id;
         this.displayName = displayName;
         this.type = type;
         this.visible = visible;
     }    
 
-    public Attribute(String id, String displayName, Class<?> type) {
+    public PeptideAttribute(String id, String displayName, Class<?> type) {
         this(id, displayName, type,true);
     }
     
@@ -50,8 +50,8 @@ public class Attribute {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Attribute){
-           Attribute column = (Attribute)obj;
+        if (obj instanceof PeptideAttribute){
+           PeptideAttribute column = (PeptideAttribute)obj;
            return id.equals(column.id);
         }
         return false;

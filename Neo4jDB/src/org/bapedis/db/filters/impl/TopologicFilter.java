@@ -6,10 +6,9 @@
 package org.bapedis.db.filters.impl;
 
 import java.util.Arrays;
-import org.bapedis.core.model.Attribute;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.db.filters.spi.Filter;
 import org.bapedis.db.model.NeoNeighbor;
-import org.bapedis.db.model.NeoNeighborsModel;
 import org.bapedis.db.model.NeoPeptide;
 
 /**
@@ -21,7 +20,7 @@ public class TopologicFilter implements Filter {
     protected TopologicCondition topologicCond;
     protected IntegerFilterOperator degreeOp;
     protected String degreeValue;
-    protected Attribute neighborCondAttr;
+    protected PeptideAttribute neighborCondAttr;
     protected FilterOperator neighborCondOp;
     protected String neighborCondValue;
     protected boolean neighborCondMatchCase;
@@ -61,11 +60,11 @@ public class TopologicFilter implements Filter {
         this.degreeValue = degreeValue;
     }
 
-    public Attribute getNeighborCondAttribute() {
+    public PeptideAttribute getNeighborCondAttribute() {
         return neighborCondAttr;
     }
 
-    public void setNeighborCondAttribute(Attribute neighborCondAttr) {
+    public void setNeighborCondAttribute(PeptideAttribute neighborCondAttr) {
         this.neighborCondAttr = neighborCondAttr;
     }
 
@@ -118,32 +117,32 @@ public class TopologicFilter implements Filter {
 
     @Override
     public boolean accept(NeoPeptide peptide) {
-        NeoNeighborsModel neoModel = peptide.getNeighbors();
-        int count = 0;
-        boolean accepted;
-        for (NeoNeighbor neighbor : neoModel.getNeighbors()) {
-            accepted = false;
-            if (neighbor.getAttributes().contains(neighborCondAttr)) {
-                Object objValue = neighbor.getAttributeValue(neighborCondAttr);
-                if (String[].class.equals(neighborCondAttr.getType())) {
-                    String strValue = Arrays.toString((String[]) objValue);
-                    accepted = (neighborCondMatchCase) ? neighborCondOp.applyTo(strValue, neighborCondValue) : neighborCondOp.applyTo(strValue.toUpperCase(), neighborCondValue.toUpperCase());
-                } else if (String.class.equals(neighborCondAttr.getType())) {
-                    accepted = (neighborCondMatchCase) ? neighborCondOp.applyTo(objValue, neighborCondValue) : neighborCondOp.applyTo(objValue.toString().toUpperCase(), neighborCondValue.toUpperCase());
-                } else { // The matchCase is ignored
-                    accepted = neighborCondOp.applyTo(objValue, neighborCondValue);
-                }
-            }
-            if (accepted) {
-                count++;
-            }
-        }
-        switch (topologicCond) {
-            case RFLATIONSHIP:
-                return count > 0;
-            case DEGREE:
-                return degreeOp.applyTo(count, degreeValue);
-        }
+//        NeoNeighborsModel neoModel = peptide.getNeighbors();
+//        int count = 0;
+//        boolean accepted;
+//        for (NeoNeighbor neighbor : neoModel.getNeighbors()) {
+//            accepted = false;
+//            if (neighbor.getAttributes().contains(neighborCondAttr)) {
+//                Object objValue = neighbor.getAttributeValue(neighborCondAttr);
+//                if (String[].class.equals(neighborCondAttr.getType())) {
+//                    String strValue = Arrays.toString((String[]) objValue);
+//                    accepted = (neighborCondMatchCase) ? neighborCondOp.applyTo(strValue, neighborCondValue) : neighborCondOp.applyTo(strValue.toUpperCase(), neighborCondValue.toUpperCase());
+//                } else if (String.class.equals(neighborCondAttr.getType())) {
+//                    accepted = (neighborCondMatchCase) ? neighborCondOp.applyTo(objValue, neighborCondValue) : neighborCondOp.applyTo(objValue.toString().toUpperCase(), neighborCondValue.toUpperCase());
+//                } else { // The matchCase is ignored
+//                    accepted = neighborCondOp.applyTo(objValue, neighborCondValue);
+//                }
+//            }
+//            if (accepted) {
+//                count++;
+//            }
+//        }
+//        switch (topologicCond) {
+//            case RFLATIONSHIP:
+//                return count > 0;
+//            case DEGREE:
+//                return degreeOp.applyTo(count, degreeValue);
+//        }
         return false;
     }
 

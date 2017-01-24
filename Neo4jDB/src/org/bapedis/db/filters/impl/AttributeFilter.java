@@ -6,7 +6,7 @@
 package org.bapedis.db.filters.impl;
 
 import java.util.Arrays;
-import org.bapedis.core.model.Attribute;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.db.filters.spi.Filter;
 import org.bapedis.db.model.NeoPeptide;
 
@@ -17,16 +17,16 @@ import org.bapedis.db.model.NeoPeptide;
 public class AttributeFilter implements Filter {
 
     protected boolean negative;
-    protected Attribute attr;
+    protected PeptideAttribute attr;
     protected FilterOperator operator;
     protected String value;
     protected boolean matchCase;
 
-    public Attribute getAttribute() {
+    public PeptideAttribute getAttribute() {
         return attr;
     }
 
-    public void setAttribute(Attribute attr) {
+    public void setAttribute(PeptideAttribute attr) {
         this.attr = attr;
     }
 

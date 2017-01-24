@@ -14,7 +14,7 @@ import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.bapedis.core.services.ProjectManager;
-import org.bapedis.core.model.Attribute;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.db.filters.spi.Filter;
 import org.bapedis.db.filters.spi.FilterSetupUI;
@@ -194,8 +194,8 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
 
     private void attrComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_attrComboBoxActionPerformed
         opComboBox.removeAllItems();
-        if (attrComboBox.getSelectedItem() instanceof Attribute) {
-            Attribute attr = (Attribute) attrComboBox.getSelectedItem();
+        if (attrComboBox.getSelectedItem() instanceof PeptideAttribute) {
+            PeptideAttribute attr = (PeptideAttribute) attrComboBox.getSelectedItem();
             FilterOperator[] operators = FilterHelper.getOperators(attr.getType());
             for (FilterOperator operator : operators) {
                 opComboBox.addItem(operator);
@@ -223,7 +223,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         notCheckBox.setSelected(this.filter.isNegative());
         Workspace ws = pc.getCurrentWorkspace();
         initAttrComboBox(ws);
-        Attribute attr = this.filter.getAttribute();
+        PeptideAttribute attr = this.filter.getAttribute();
         if (attr != null && !attr.equals(attrComboBox.getSelectedItem())) {
             attrComboBox.setSelectedItem(attr);
         }
@@ -245,7 +245,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         attrComboBox.removeAllItems();
         NeoPeptideModel pModel = workspace.getLookup().lookup(NeoPeptideModel.class);
         if (pModel != null) {
-            for (Attribute attr : pModel.getAttributes()) {
+            for (PeptideAttribute attr : pModel.getAttributes()) {
                 attrComboBox.addItem(attr);
             }
             attrComboBox.setSelectedIndex(0);
@@ -255,7 +255,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
     @Override
     public void finishSettings() {
         filter.setNegative(notCheckBox.isSelected());
-        filter.setAttribute((Attribute) attrComboBox.getSelectedItem());
+        filter.setAttribute((PeptideAttribute) attrComboBox.getSelectedItem());
         filter.setOperator((FilterOperator) opComboBox.getSelectedItem());
         filter.setValue(valueTextField.getText().trim());
         filter.setMatchCase(matchCaseCheckBox.isSelected());

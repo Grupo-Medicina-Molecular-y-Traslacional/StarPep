@@ -7,14 +7,13 @@ package org.bapedis.db.dao;
 
 import java.util.LinkedList;
 import java.util.List;
-import org.bapedis.core.model.Attribute;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.db.Neo4jDB;
 import org.bapedis.db.filters.spi.Filter;
 import org.bapedis.db.model.BioCategory;
 import org.bapedis.db.model.FilterModel;
 import org.bapedis.db.model.NeoPeptideModel;
 import org.bapedis.db.model.NeoNeighbor;
-import org.bapedis.db.model.NeoNeighborsModel;
 import org.bapedis.db.model.NeoPeptide;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
@@ -50,15 +49,15 @@ public class NeoPeptideDAO {
         is_a, instance_of
     }
 
-    public NeoPeptideModel getNeoPeptidesBy(BioCategory[] categories, Attribute[] attributes, FilterModel filterModel) {
+    public NeoPeptideModel getNeoPeptidesBy(BioCategory[] categories, PeptideAttribute[] attributes, FilterModel filterModel) {
         NeoPeptideModel neoModel = new NeoPeptideModel();
         if (attributes != null) {
-            for (Attribute attr : attributes) {
+            for (PeptideAttribute attr : attributes) {
                 neoModel.addAttribute(attr);
             }
         }
         if (!neoModel.hasAttribute(PRO_DISPLAY_NAME)) {
-            Attribute attr = neoModel.addAttribute(PRO_DISPLAY_NAME, PRO_DISPLAY_NAME, String.class);
+            PeptideAttribute attr = neoModel.addAttribute(PRO_DISPLAY_NAME, PRO_DISPLAY_NAME, String.class);
             attr.setVisible(false);
         }
         try (Transaction tx = graphDb.beginTx()) {
@@ -68,7 +67,7 @@ public class NeoPeptideDAO {
             }
             Iterable<Node> peptideNodes = getPeptides(startNodes);
             NeoPeptide neoPeptide;
-            Attribute attr;
+            PeptideAttribute attr;
             String displayName;
             for (Node node : peptideNodes) {                
                 displayName =  node.getProperty(PRO_DISPLAY_NAME).toString();
@@ -145,33 +144,30 @@ public class NeoPeptideDAO {
         return nodes;
     }
 
-    public NeoNeighborsModel getNeoNeighborsBy(NeoPeptide neoPeptide) {
-        NeoNeighborsModel neoNeighborsModel = new NeoNeighborsModel();
-        neoNeighborsModel.addAttribute(PRO_LABEL, "Label", String.class);
-        Attribute attr;
+    public List<NeoNeighbor> getNeoNeighbors(NeoPeptide neoPeptide) {
+        List<NeoNeighbor> neighbors = new LinkedList<>();
         try (Transaction tx = graphDb.beginTx()) {
             Iterable<Node> neighborNodes = getNeighbors(graphDb.getNodeById(neoPeptide.getNeoId()));
             NeoNeighbor neoNeighbor;
             for (Node node : neighborNodes) {
-                neoNeighbor = new NeoNeighbor(node.getId(), node.getProperty(PRO_NAME).toString());
+                neoNeighbor = new NeoNeighbor(node.getId(), node.getLabels().iterator().next().name(), node.getProperty(PRO_NAME).toString());
                 neoNeighbor.addSourcePeptide(neoPeptide);
-                attr = neoNeighborsModel.getAttribute(PRO_LABEL);
-                neoNeighbor.setAttributeValue(attr, node.getLabels().iterator().next().name());
-                for (String propertyKey : node.getPropertyKeys()) {
-                    Object value = node.getProperty(propertyKey);
-                    if (!neoNeighborsModel.hasAttribute(propertyKey)) {
-                        attr = neoNeighborsModel.addAttribute(propertyKey, propertyKey, value.getClass());
-                        attr.setVisible(false);
-                    } else {
-                        attr = neoNeighborsModel.getAttribute(propertyKey);
-                    }
-                    neoNeighbor.setAttributeValue(attr, value);
-                }
-                neoNeighborsModel.addNeighbor(neoNeighbor);
+                neighbors.add(neoNeighbor);
+//                for (String propertyKey : node.getPropertyKeys()) {
+//                    Object value = node.getProperty(propertyKey);
+//                    if (!neoNeighborsModel.hasAttribute(propertyKey)) {
+//                        attr = neoNeighborsModel.addAttribute(propertyKey, propertyKey, value.getClass());
+//                        attr.setVisible(false);
+//                    } else {
+//                        attr = neoNeighborsModel.getAttribute(propertyKey);
+//                    }
+//                    neoNeighbor.setAttributeValue(attr, value);
+//                }
+//                neoNeighborsModel.addNeighbor(neoNeighbor);
             }
             tx.success();
         }
-        return neoNeighborsModel;
+        return neighbors;
     }
 
     protected Iterable<Relationship> getRelationships(Node startNode) {

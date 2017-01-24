@@ -5,17 +5,18 @@
  */
 package org.bapedis.db.model;
 
+import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideModel;
 
 /**
  *
  * @author loge
  */
-public class NeoPeptideModel extends PeptideModel {    
+public class NeoPeptideModel extends AttributesModel {    
     @Override
     public void addPeptide(Peptide peptide) {
-        objAttrsNode.add(new NeoPeptideNode((NeoPeptide)peptide)); 
+        peptides.add(peptide);
+        container.addPeptideNode(new NeoPeptideNode((NeoPeptide)peptide)); 
     } 
     
 }

@@ -21,13 +21,12 @@ import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.bapedis.core.services.ProjectManager;
-import org.bapedis.core.model.Attribute;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.db.services.NeoPeptideManager;
 import org.bapedis.db.filters.spi.Filter;
 import org.bapedis.db.filters.spi.FilterSetupUI;
 import static org.bapedis.db.filters.spi.FilterSetupUI.VALID_STATE;
-import org.bapedis.db.model.NeoNeighborsModel;
 import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
@@ -44,7 +43,6 @@ public class TopologicFilterSetupUI extends javax.swing.JPanel implements Filter
     protected final ProjectManager pc;
     protected final PropertyChangeSupport changeSupport;
     protected final JLabel busyLabel;
-    protected Lookup.Result<NeoNeighborsModel> lkpResult;
 
     /**
      * Creates new form TopologicFilterSetupUI
@@ -303,8 +301,8 @@ public class TopologicFilterSetupUI extends javax.swing.JPanel implements Filter
 
     private void attrComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_attrComboBoxActionPerformed
         opComboBox.removeAllItems();
-        if (attrComboBox.getSelectedItem() instanceof Attribute) {
-            Attribute attr = (Attribute) attrComboBox.getSelectedItem();
+        if (attrComboBox.getSelectedItem() instanceof PeptideAttribute) {
+            PeptideAttribute attr = (PeptideAttribute) attrComboBox.getSelectedItem();
             FilterOperator[] operators = FilterHelper.getOperators(attr.getType());
             for (FilterOperator operator : operators) {
                 opComboBox.addItem(operator);
@@ -377,7 +375,7 @@ public class TopologicFilterSetupUI extends javax.swing.JPanel implements Filter
         notCheckBox.setSelected(topologicFilter.isNeighborCondNegative());
         Workspace ws = pc.getCurrentWorkspace();
         initAttrComboBox(ws);
-        Attribute attr = topologicFilter.getNeighborCondAttribute();
+        PeptideAttribute attr = topologicFilter.getNeighborCondAttribute();
         if (attr != null && !attr.equals(attrComboBox.getSelectedItem())) {
             attrComboBox.setSelectedItem(attr);
         }
@@ -397,26 +395,26 @@ public class TopologicFilterSetupUI extends javax.swing.JPanel implements Filter
 
     protected void initAttrComboBox(final Workspace workspace) {
         attrComboBox.removeAllItems();
-        NeoNeighborsModel nModel = workspace.getLookup().lookup(NeoNeighborsModel.class);
-        if (nModel != null) {
-            for (Attribute attr : nModel.getAttributes()) {
-                attrComboBox.addItem(attr);
-            }
-        } else {
-            remove(filterPanel);
-            add(busyLabel, BorderLayout.CENTER);
-            lkpResult = workspace.getLookup().lookupResult(NeoNeighborsModel.class);
-            lkpResult.addLookupListener(this);
-            final NeoPeptideManager npc = Lookup.getDefault().lookup(NeoPeptideManager.class);
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    npc.setNeoNeighborsTo(workspace);
-                }
-            });
-            revalidate();
-        }
+//        NeoNeighborsModel nModel = workspace.getLookup().lookup(NeoNeighborsModel.class);
+//        if (nModel != null) {
+//            for (PeptideAttribute attr : nModel.getAttributes()) {
+//                attrComboBox.addItem(attr);
+//            }
+//        } else {
+//            remove(filterPanel);
+//            add(busyLabel, BorderLayout.CENTER);
+//            lkpResult = workspace.getLookup().lookupResult(NeoNeighborsModel.class);
+//            lkpResult.addLookupListener(this);
+//            final NeoPeptideManager npc = Lookup.getDefault().lookup(NeoPeptideManager.class);
+//            SwingUtilities.invokeLater(new Runnable() {
+//
+//                @Override
+//                public void run() {
+//                    npc.setNeoNeighborsTo(workspace);
+//                }
+//            });
+//            revalidate();
+//        }
     }
 
     private void updateValidState() {
@@ -452,21 +450,21 @@ public class TopologicFilterSetupUI extends javax.swing.JPanel implements Filter
             topologicFilter.setDegreeValue(degreeValueTextField.getText());
         }
         topologicFilter.setNeighborCondNegative(notCheckBox.isSelected());
-        topologicFilter.setNeighborCondAttribute((Attribute) attrComboBox.getSelectedItem());
+        topologicFilter.setNeighborCondAttribute((PeptideAttribute) attrComboBox.getSelectedItem());
         topologicFilter.setNeighborCondOperator((FilterOperator) opComboBox.getSelectedItem());
         topologicFilter.setNeighborCondValue(valueTextField.getText());
         topologicFilter.setNeighborCondMatchCase(matchCaseCheckBox.isSelected());
-        if (lkpResult != null) {
-            lkpResult.removeLookupListener(this);
-        }
+//        if (lkpResult != null) {
+//            lkpResult.removeLookupListener(this);
+//        }
     }
 
     @Override
     public void cancelSettings() {
         topologicFilter = null;
-        if (lkpResult != null) {
-            lkpResult.removeLookupListener(this);
-        }
+//        if (lkpResult != null) {
+//            lkpResult.removeLookupListener(this);
+//        }
     }
 
     @Override
@@ -486,14 +484,14 @@ public class TopologicFilterSetupUI extends javax.swing.JPanel implements Filter
 
     @Override
     public void resultChanged(LookupEvent le) {
-        Collection<? extends NeoNeighborsModel> attrModels = lkpResult.allInstances();
-        if (!attrModels.isEmpty()) {
-            remove(busyLabel);
-            add(filterPanel, BorderLayout.CENTER);
-            ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-            initAttrComboBox(pc.getCurrentWorkspace());
-            revalidate();
-        }
+//        Collection<? extends NeoNeighborsModel> attrModels = lkpResult.allInstances();
+//        if (!attrModels.isEmpty()) {
+//            remove(busyLabel);
+//            add(filterPanel, BorderLayout.CENTER);
+//            ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+//            initAttrComboBox(pc.getCurrentWorkspace());
+//            revalidate();
+//        }
 
     }
 }

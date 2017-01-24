@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.model;
 
+import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.Lookups;
@@ -13,20 +14,25 @@ import org.openide.util.lookup.Lookups;
  *
  * @author loge
  */
-public class PeptideNode extends ObjectAttributesNode {
+public class PeptideNode extends AbstractNode {
+    protected Peptide peptide;
     
     public PeptideNode(Peptide peptide) {
         this(peptide, Children.LEAF, Lookups.singleton(peptide));
     }
     
-    public PeptideNode(Peptide peptide, Children children, Lookup lookup){
-        super(peptide, children, lookup);
+    public PeptideNode(Peptide peptide, Children children, Lookup lookup) {
+        super(children, lookup);
+        this.peptide = peptide;
     }
     
     @Override
     public String getDisplayName() {
-        return ((Peptide)objAttr).getDisplayName(); 
+        return peptide.getDisplayName(); 
     }
     
-    
+    public PeptideNode(Peptide peptide, Children children) {
+        this(peptide, children, Lookups.singleton(peptide));
+    }
+ 
 }

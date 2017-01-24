@@ -30,7 +30,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.TableColumn;
-import org.bapedis.core.model.Attribute;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.AttributesModel;
 import org.netbeans.swing.etable.ETableColumn;
 import org.netbeans.swing.etable.ETableColumnModel;
@@ -191,17 +191,17 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
     public void showData(AttributesModel attrModel) {
         if (attrModel != null) {
             manager.setRootContext(attrModel.getRootContext());
-            Attribute[] attrs = attrModel.getAttributes();
+            PeptideAttribute[] attrs = attrModel.getAttributes();
             String[] columns = new String[attrs.length * 2];
             int pos = 0;
-            for (Attribute attr : attrs) {
+            for (PeptideAttribute attr : attrs) {
                 columns[pos++] = attr.getId();
                 columns[pos++] = attr.getId();
             }
             view.setPropertyColumns(columns);
             ETableColumnModel columnModel = (ETableColumnModel) view.getOutline().getColumnModel();
             ETableColumn column;
-            for (Attribute attr : attrs) {
+            for (PeptideAttribute attr : attrs) {
                 column = (ETableColumn) view.getOutline().getColumn(attr.getId());
                 columnModel.setColumnHidden(column, !attr.isVisible());
             }

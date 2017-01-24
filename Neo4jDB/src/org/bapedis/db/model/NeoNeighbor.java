@@ -6,26 +6,31 @@
 package org.bapedis.db.model;
 
 import java.util.HashSet;
-import org.bapedis.core.model.ObjectAttributes;
 
 /**
  *
  * @author loge
  */
-public class NeoNeighbor extends ObjectAttributes {
+public class NeoNeighbor {
     protected final long neoId;
+    protected final String label;    
     protected final String name;
     protected final HashSet<NeoPeptide> sourcePeptides;
     
-    public NeoNeighbor(long neoId, String name) {
+    public NeoNeighbor(long neoId, String label, String name) {
         this.neoId = neoId;
+        this.label = label;
         this.name = name;
         sourcePeptides = new HashSet<>();
     }
 
     public long getNeoId() {
         return neoId;
-    }        
+    }  
+
+    public String getLabel() {
+        return label;
+    }
 
     public String getName() {
         return name;

@@ -35,7 +35,7 @@ import org.neo4j.graphdb.traversal.Uniqueness;
 public class NeoPeptideDAO {
 
     protected final GraphDatabaseService graphDb;
-    public final String PRO_DISPLAY_NAME = "id";
+    public final String PRO_ID = "id";
     public final String PRO_SEQUENCE = "seq";
     public final String PRO_XREF = "xref";
     public final String PRO_NAME = "name";
@@ -57,8 +57,8 @@ public class NeoPeptideDAO {
                 neoModel.addAttribute(attr);
             }
         }
-        if (!neoModel.hasAttribute(PRO_DISPLAY_NAME)) {
-            PeptideAttribute attr = neoModel.addAttribute(PRO_DISPLAY_NAME, PRO_DISPLAY_NAME, String.class);
+        if (!neoModel.hasAttribute(PRO_ID)) {
+            PeptideAttribute attr = neoModel.addAttribute(PRO_ID, PRO_ID, String.class);
             attr.setVisible(false);
         }
         if (!neoModel.hasAttribute(PRO_XREF)) {
@@ -73,21 +73,23 @@ public class NeoPeptideDAO {
             Iterable<Node> peptideNodes = getPeptides(startNodes);
             NeoPeptide neoPeptide;
             PeptideAttribute attr;
-            String displayName, seq;
+            String id, seq;
             String[] xref;
-            for (Node node : peptideNodes) {                
-                displayName =  node.getProperty(PRO_DISPLAY_NAME).toString();
+            for (Node node : peptideNodes) {
+                id = node.getProperty(PRO_ID).toString();
                 seq = node.getProperty(PRO_SEQUENCE).toString();
-                xref = (String[])node.getProperty(PRO_XREF);
-                neoPeptide = new NeoPeptide(node.getId(), displayName, seq, xref, this);
-                for (String propertyKey : node.getPropertyKeys()) {                  
-                    Object value = node.getProperty(propertyKey);
-                    if (!neoModel.hasAttribute(propertyKey)) {
-                        attr = neoModel.addAttribute(propertyKey, propertyKey, value.getClass());
-                    } else {
-                        attr = neoModel.getAttribute(propertyKey);
+                xref = (String[]) node.getProperty(PRO_XREF);
+                neoPeptide = new NeoPeptide(node.getId(), id, seq, xref, this);
+                for (String propertyKey : node.getPropertyKeys()) {
+                    if (!propertyKey.equals(PRO_XREF)) {
+                        Object value = node.getProperty(propertyKey);
+                        if (!neoModel.hasAttribute(propertyKey)) {
+                            attr = neoModel.addAttribute(propertyKey, propertyKey, value.getClass());
+                        } else {
+                            attr = neoModel.getAttribute(propertyKey);
+                        }
+                        neoPeptide.setAttributeValue(attr, value);
                     }
-                    neoPeptide.setAttributeValue(attr, value);
                 }
                 if (filterModel == null || isAccepted(neoPeptide, filterModel)) {
                     neoModel.addPeptide(neoPeptide);

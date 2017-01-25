@@ -20,8 +20,10 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import javax.swing.MenuElement;
 import javax.swing.MenuSelectionManager;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
@@ -71,11 +73,12 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
         quickFilterPopup = new JPopupMenu();
         matchCase = NbPreferences.forModule(AttributesPanel.class).getBoolean("matchCase", false);
         view = new OutlineView(NbBundle.getMessage(AttributesPanel.class, "AttributesPanel.nodelColumnLabel"));
-        view.setQuickSearchAllowed(false);
-        
+        view.setQuickSearchAllowed(true);
+
         final Outline outline = view.getOutline();
         outline.setPopupUsedFromTheCorner(true);
         outline.setRootVisible(false);
+
         busyLabel = new JLabel(NbBundle.getMessage(AttributesPanel.class, "AttributesPanel.busyLabel.text"));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         errorLabel = new JLabel(NbBundle.getMessage(AttributesPanel.class, "AttributesPanel.errorLabel.text"));
@@ -83,6 +86,7 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
         dataPanel.add(view, BorderLayout.CENTER);
         filterPanel.add(createDropDownButtonSearch(), 1);
         defaultFilter = createQuickFilter();
+
         //Quick Filter
         outline.getColumnModel().addColumnModelListener(createColumnModelListener());
         filterTextField.getDocument().addDocumentListener(new DocumentListener() {
@@ -127,6 +131,8 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
 
             @Override
             public void columnAdded(final TableColumnModelEvent te) {
+                TableColumn column = columnModel.getColumn(te.getToIndex());
+
                 refreshPopup();
             }
 
@@ -234,7 +240,7 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
             filterPanel.setVisible(true);
             dataPanel.add(view, BorderLayout.CENTER);
         }
-        dataPanel.revalidate();        
+        dataPanel.revalidate();
     }
 
     private void applyDefaultFilter() {
@@ -260,8 +266,8 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
     public void unsetQuickFilter() {
         applyDefaultFilter();
     }
-    
-    public void clearSelection(){
+
+    public void clearSelection() {
         view.getOutline().getSelectionModel().clearSelection();
     }
 

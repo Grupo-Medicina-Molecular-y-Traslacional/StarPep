@@ -24,8 +24,8 @@ public class NeoPeptide extends Peptide {
     public static String getPrefixName(){
         return NbBundle.getMessage(NeoPeptide.class, "NeoPeptide.prefix");
     }    
-    public NeoPeptide(long neoId, String displayName, String sequence, String[] xref, NeoPeptideDAO dao) {
-        super(displayName, sequence);
+    public NeoPeptide(long neoId, String id, String sequence, String[] xref, NeoPeptideDAO dao) {
+        super(id, sequence);
         this.neoId = neoId;
         this.xref = xref;
         this.dao = dao;

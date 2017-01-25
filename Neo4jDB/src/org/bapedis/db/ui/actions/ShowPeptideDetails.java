@@ -57,7 +57,7 @@ public class ShowPeptideDetails extends GlobalContextSensitiveAction<NeoPeptide>
             multiviews[pos++] = new NeoPeptideStructureViewDescription(neoPeptide);
             multiviews[pos++] = new NeoPeptideGraphViewDescription(neoPeptide);
             TopComponent tc = MultiViewFactory.createCloneableMultiView(multiviews, multiviews[0]);
-            tc.setDisplayName(neoPeptide.getDisplayName());
+            tc.setDisplayName(neoPeptide.getId());
             tc.open();
             tc.requestActive();
         }

@@ -28,7 +28,7 @@ public class PeptideNode extends AbstractNode {
     
     @Override
     public String getDisplayName() {
-        return peptide.getDisplayName(); 
+        return peptide.getId(); 
     }
     
     public PeptideNode(Peptide peptide, Children children) {

@@ -14,23 +14,23 @@ import java.util.Set;
  * @author loge
  */
 public class Peptide {
-    protected final String displayName;
+    protected final String id;
     protected final String sequence;
     protected HashMap<PeptideAttribute, Object> attrsValue;
 
-    public Peptide(String displayName, String sequence) {
-        this.displayName = displayName;
+    public Peptide(String id, String sequence) {
+        this.id = id;
         this.sequence = sequence;
         attrsValue = new LinkedHashMap<>();
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getSequence() {
         return sequence;
     }        
-
-    public String getDisplayName() {
-        return displayName!=null?displayName: sequence;
-    }
 
     public void setAttributeValue(PeptideAttribute attr, Object value) {
         attrsValue.put(attr, value);
@@ -42,6 +42,11 @@ public class Peptide {
 
     public Set<PeptideAttribute> getAttributes() {
         return attrsValue.keySet();
+    }
+
+    @Override
+    public String toString() {
+        return sequence;
     }
         
 }

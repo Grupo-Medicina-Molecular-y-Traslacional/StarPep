@@ -18,16 +18,17 @@ public class NeoPeptide extends Peptide {
 
     protected final long neoId;
     protected List<NeoNeighbor> neighbors;
+    protected String[] xref;
     protected NeoPeptideDAO dao;
 
     public static String getPrefixName(){
         return NbBundle.getMessage(NeoPeptide.class, "NeoPeptide.prefix");
     }    
-    public NeoPeptide(long neoId, String displayName, String sequence, NeoPeptideDAO dao) {
+    public NeoPeptide(long neoId, String displayName, String sequence, String[] xref, NeoPeptideDAO dao) {
         super(displayName, sequence);
         this.neoId = neoId;
+        this.xref = xref;
         this.dao = dao;
-        
     }
 
     public long getNeoId() {
@@ -39,6 +40,10 @@ public class NeoPeptide extends Peptide {
             neighbors = dao.getNeoNeighbors(this);
         }
         return neighbors;
+    }
+
+    public String[] getXref() {
+        return xref;
     }
 
     @Override

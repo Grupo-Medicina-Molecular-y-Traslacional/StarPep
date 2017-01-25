@@ -37,6 +37,7 @@ public class NeoPeptideDAO {
     protected final GraphDatabaseService graphDb;
     public final String PRO_DISPLAY_NAME = "id";
     public final String PRO_SEQUENCE = "seq";
+    public final String PRO_XREF = "xref";
     public final String PRO_NAME = "name";
     public final String PRO_LABEL = "label";
 
@@ -60,6 +61,10 @@ public class NeoPeptideDAO {
             PeptideAttribute attr = neoModel.addAttribute(PRO_DISPLAY_NAME, PRO_DISPLAY_NAME, String.class);
             attr.setVisible(false);
         }
+        if (!neoModel.hasAttribute(PRO_XREF)) {
+            PeptideAttribute attr = neoModel.addAttribute(PRO_XREF, PRO_XREF, String[].class);
+            attr.setVisible(false);
+        }
         try (Transaction tx = graphDb.beginTx()) {
             List<Node> startNodes = new LinkedList<>();
             for (BioCategory category : categories) {
@@ -68,11 +73,14 @@ public class NeoPeptideDAO {
             Iterable<Node> peptideNodes = getPeptides(startNodes);
             NeoPeptide neoPeptide;
             PeptideAttribute attr;
-            String displayName;
+            String displayName, seq;
+            String[] xref;
             for (Node node : peptideNodes) {                
                 displayName =  node.getProperty(PRO_DISPLAY_NAME).toString();
-                neoPeptide = new NeoPeptide(node.getId(),  displayName, node.getProperty(PRO_SEQUENCE).toString(), this);
-                for (String propertyKey : node.getPropertyKeys()) {
+                seq = node.getProperty(PRO_SEQUENCE).toString();
+                xref = (String[])node.getProperty(PRO_XREF);
+                neoPeptide = new NeoPeptide(node.getId(), displayName, seq, xref, this);
+                for (String propertyKey : node.getPropertyKeys()) {                  
                     Object value = node.getProperty(propertyKey);
                     if (!neoModel.hasAttribute(propertyKey)) {
                         attr = neoModel.addAttribute(propertyKey, propertyKey, value.getClass());
@@ -151,7 +159,6 @@ public class NeoPeptideDAO {
             NeoNeighbor neoNeighbor;
             for (Node node : neighborNodes) {
                 neoNeighbor = new NeoNeighbor(node.getId(), node.getLabels().iterator().next().name(), node.getProperty(PRO_NAME).toString());
-                neoNeighbor.addSourcePeptide(neoPeptide);
                 neighbors.add(neoNeighbor);
 //                for (String propertyKey : node.getPropertyKeys()) {
 //                    Object value = node.getProperty(propertyKey);

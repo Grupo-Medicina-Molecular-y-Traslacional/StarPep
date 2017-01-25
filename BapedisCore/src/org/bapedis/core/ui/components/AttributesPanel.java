@@ -70,11 +70,12 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
         lookup = ExplorerUtils.createLookup(manager, getActionMap());
         quickFilterPopup = new JPopupMenu();
         matchCase = NbPreferences.forModule(AttributesPanel.class).getBoolean("matchCase", false);
-        view = new OutlineView();
+        view = new OutlineView(NbBundle.getMessage(AttributesPanel.class, "AttributesPanel.nodelColumnLabel"));
         view.setQuickSearchAllowed(false);
+        
         final Outline outline = view.getOutline();
-        outline.setRootVisible(false);
         outline.setPopupUsedFromTheCorner(true);
+        outline.setRootVisible(false);
         busyLabel = new JLabel(NbBundle.getMessage(AttributesPanel.class, "AttributesPanel.busyLabel.text"));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         errorLabel = new JLabel(NbBundle.getMessage(AttributesPanel.class, "AttributesPanel.errorLabel.text"));

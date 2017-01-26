@@ -5,8 +5,10 @@
  */
 package org.bapedis.core.model;
 
+import java.awt.Image;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.Lookups;
 
@@ -34,5 +36,12 @@ public class PeptideNode extends AbstractNode {
     public PeptideNode(Peptide peptide, Children children) {
         this(peptide, children, Lookups.singleton(peptide));
     }
+
+    @Override
+    public Image getIcon(int type) {
+        return ImageUtilities.loadImage("org/bapedis/core/resources/molecule.png", true);
+    }
+    
+    
  
 }

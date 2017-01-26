@@ -5,8 +5,6 @@
  */
 package org.bapedis.core.model;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.HashMap;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Node;
@@ -16,27 +14,22 @@ import org.openide.nodes.Node;
  * @author loge
  */
 public class AttributesModel  {
-
-    protected final List<PeptideAttribute> attributes;
     protected final HashMap<String, PeptideAttribute> attrsMap;
-    protected List<Peptide> peptides;
     protected PeptideNodeContainer container;
-    protected Node rootContext;
+    protected Node rootNode;
 
     public AttributesModel() {
-        attributes = new LinkedList<>();
         attrsMap = new HashMap<>();
-        peptides = new LinkedList<>();
         container = new PeptideNodeContainer();
-        rootContext = new AbstractNode(container);
+        rootNode = new AbstractNode(container);
     }
 
     public PeptideAttribute[] getAttributes() {
-        return attributes.toArray(new PeptideAttribute[0]);
+        return attrsMap.values().toArray(new PeptideAttribute[0]);
     }
 
-    public List<Peptide> getPeptides() {
-        return peptides;
+    public Peptide[] getPeptides() {
+        return container.getPeptides();
     }
 
     public PeptideAttribute getAttribute(String id) {
@@ -47,16 +40,15 @@ public class AttributesModel  {
     }
 
     public PeptideAttribute addAttribute(String id, String displayName, Class<?> cclass) {
-        if (hasAttribute(id)) {
-            throw new IllegalArgumentException("Duplicated attribute: " + id);
-        }
         PeptideAttribute attr = new PeptideAttribute(id, displayName, cclass);
         addAttribute(attr);
         return attr;
     }
 
     public void addAttribute(PeptideAttribute attr) {
-        attributes.add(attr);
+        if (hasAttribute(attr.getId())) {
+            throw new IllegalArgumentException("Duplicated attribute: " + attr.getId());
+        }
         attrsMap.put(attr.id, attr);
     }
 
@@ -64,12 +56,11 @@ public class AttributesModel  {
         return attrsMap.containsKey(id);
     }
 
-    public Node getRootContext() {
-        return rootContext;
+    public Node getRootNode() {
+        return rootNode;
     }
     
     public void addPeptide(Peptide peptide){
-        peptides.add(peptide);
         container.addPeptideNode(new PeptideNode(peptide));
     }    
 

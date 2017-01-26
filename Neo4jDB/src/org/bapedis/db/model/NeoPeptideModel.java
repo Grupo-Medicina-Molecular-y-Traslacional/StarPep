@@ -15,7 +15,6 @@ import org.bapedis.core.model.Peptide;
 public class NeoPeptideModel extends AttributesModel {    
     @Override
     public void addPeptide(Peptide peptide) {
-        peptides.add(peptide);
         container.addPeptideNode(new NeoPeptideNode((NeoPeptide)peptide)); 
     } 
     

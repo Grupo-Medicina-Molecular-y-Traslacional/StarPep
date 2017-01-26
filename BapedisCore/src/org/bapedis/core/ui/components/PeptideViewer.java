@@ -53,7 +53,7 @@ import org.openide.util.NbPreferences;
  *
  * @author loge
  */
-public class AttributesPanel extends javax.swing.JPanel implements ExplorerManager.Provider, Lookup.Provider {
+public class PeptideViewer extends javax.swing.JPanel implements ExplorerManager.Provider, Lookup.Provider {
 
     protected final ExplorerManager manager;
     private final JLabel busyLabel;
@@ -66,15 +66,15 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
 //    protected final QuickFilter defaultFilter;
     protected final Lookup lookup;
 
-    public AttributesPanel() {
+    public PeptideViewer() {
         manager = new ExplorerManager();
         initComponents();
         lookup = ExplorerUtils.createLookup(manager, getActionMap());
         quickFilterPopup = new JPopupMenu();
-        matchCase = NbPreferences.forModule(AttributesPanel.class).getBoolean("matchCase", false);
-        view = new OutlineView(NbBundle.getMessage(AttributesPanel.class, "AttributesPanel.nodelColumnLabel"));
-        view.setPropertyColumns("seq", NbBundle.getMessage(AttributesPanel.class, "AttributesPanel.nodelColumnLabel.seq"),
-                                "length", NbBundle.getMessage(AttributesPanel.class, "AttributesPanel.nodelColumnLabel.length"));
+        matchCase = NbPreferences.forModule(PeptideViewer.class).getBoolean("matchCase", false);
+        view = new OutlineView(NbBundle.getMessage(PeptideViewer.class, "PeptideViewer.nodelColumnLabel"));
+        view.setPropertyColumns("seq", NbBundle.getMessage(PeptideViewer.class, "PeptideViewer.nodelColumnLabel.seq"),
+                                "length", NbBundle.getMessage(PeptideViewer.class, "PeptideViewer.nodelColumnLabel.length"));
         view.setQuickSearchAllowed(true);
 
         final Outline outline = view.getOutline();
@@ -94,9 +94,9 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
         column.setMaxWidth(240);
         column.setPreferredWidth(240);
         
-        busyLabel = new JLabel(NbBundle.getMessage(AttributesPanel.class, "AttributesPanel.busyLabel.text"), new ImageIcon(getClass().getResource("/org/bapedis/core/resources/loading.gif")), JLabel.CENTER);
+        busyLabel = new JLabel(NbBundle.getMessage(PeptideViewer.class, "PeptideViewer.busyLabel.text"), new ImageIcon(getClass().getResource("/org/bapedis/core/resources/loading.gif")), JLabel.CENTER);
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        errorLabel = new JLabel(NbBundle.getMessage(AttributesPanel.class, "AttributesPanel.errorLabel.text"),new ImageIcon(getClass().getResource("/org/bapedis/core/resources/sad.png")), JLabel.CENTER);
+        errorLabel = new JLabel(NbBundle.getMessage(PeptideViewer.class, "PeptideViewer.errorLabel.text"),new ImageIcon(getClass().getResource("/org/bapedis/core/resources/sad.png")), JLabel.CENTER);
         errorLabel.setHorizontalAlignment(SwingConstants.CENTER);
         dataPanel.add(view, BorderLayout.CENTER);
 //        filterPanel.add(createDropDownButtonSearch(), 1);
@@ -120,15 +120,15 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
     }
 
 //    private TableColumnModelListener createColumnModelListener() {
-//        final JCheckBoxMenuItem matchCaseItem = new JCheckBoxMenuItem(NbBundle.getMessage(AttributesPanel.class, "CTL_MatchCase"), matchCase);
+//        final JCheckBoxMenuItem matchCaseItem = new JCheckBoxMenuItem(NbBundle.getMessage(PeptideViewer.class, "CTL_MatchCase"), matchCase);
 //        matchCaseItem.addActionListener(new ActionListener() {
 //            @Override
 //            public void actionPerformed(ActionEvent e) {
 //                matchCase = matchCaseItem.isSelected();
-//                NbPreferences.forModule(AttributesPanel.class).putBoolean("matchCase", matchCase);
+//                NbPreferences.forModule(PeptideViewer.class).putBoolean("matchCase", matchCase);
 //            }
 //        });
-//        final JMenuItem description = new JMenuItem(NbBundle.getMessage(AttributesPanel.class, "CTL_ColumnsToSearch")) {
+//        final JMenuItem description = new JMenuItem(NbBundle.getMessage(PeptideViewer.class, "CTL_ColumnsToSearch")) {
 //            @Override
 //            public void processMouseEvent(MouseEvent e, MenuElement[] path, MenuSelectionManager manager) {
 //                // Ignore
@@ -180,7 +180,7 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
 //                                @Override
 //                                public void actionPerformed(ActionEvent ae) {
 //                                    columnToFilter = column.getIdentifier().toString();
-//                                    labelFilter.setText(NbBundle.getMessage(AttributesPanel.class, "AttributesPanel.labelFilter.text", column.getHeaderValue().toString()));
+//                                    labelFilter.setText(NbBundle.getMessage(PeptideViewer.class, "PeptideViewer.labelFilter.text", column.getHeaderValue().toString()));
 //                                    applyDefaultFilter();
 //                                }
 //                            });
@@ -212,7 +212,7 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
 
     public void showData(AttributesModel attrModel) {
         if (attrModel != null) {
-            manager.setRootContext(attrModel.getRootContext());
+            manager.setRootContext(attrModel.getRootNode());
 //            PeptideAttribute[] attrs = attrModel.getAttributes();
 //            String[] columns = new String[attrs.length * 2];
 //            int pos = 0;
@@ -269,7 +269,7 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
 //            } catch (Exception ex) {
 //                view.getOutline().unsetQuickFilter();
 //                filterTextField.setBackground(new Color(254, 150, 150));
-////                Logger.getLogger(AttributesPanel.class.getName()).log(Level.WARNING, e.getMessage(), e);
+////                Logger.getLogger(PeptideViewer.class.getName()).log(Level.WARNING, e.getMessage(), e);
 //            }
 //        }
 //    }
@@ -294,7 +294,7 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
 //
 //        dropDownButton.setIcon(icon);
 ////        dropDownButton.setMargin(new java.awt.Insets(2, 4, 0, 4));
-//        dropDownButton.setToolTipText(NbBundle.getMessage(AttributesPanel.class, "CTL_QuickFilter"));
+//        dropDownButton.setToolTipText(NbBundle.getMessage(PeptideViewer.class, "CTL_QuickFilter"));
 //        dropDownButton.addActionListener(new ActionListener() {
 //
 //            @Override
@@ -336,10 +336,10 @@ public class AttributesPanel extends javax.swing.JPanel implements ExplorerManag
         filterPanel.setPreferredSize(new java.awt.Dimension(514, 30));
         filterPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 2));
 
-        org.openide.awt.Mnemonics.setLocalizedText(labelFilter, org.openide.util.NbBundle.getMessage(AttributesPanel.class, "AttributesPanel.labelFilter.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(labelFilter, org.openide.util.NbBundle.getMessage(PeptideViewer.class, "PeptideViewer.labelFilter.text")); // NOI18N
         filterPanel.add(labelFilter);
 
-        filterTextField.setText(org.openide.util.NbBundle.getMessage(AttributesPanel.class, "AttributesPanel.filterTextField.text")); // NOI18N
+        filterTextField.setText(org.openide.util.NbBundle.getMessage(PeptideViewer.class, "PeptideViewer.filterTextField.text")); // NOI18N
         filterTextField.setPreferredSize(new java.awt.Dimension(150, 20));
         filterTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

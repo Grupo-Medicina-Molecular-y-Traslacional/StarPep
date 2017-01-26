@@ -36,14 +36,13 @@ public class PeptideNodeContainer extends Index.ArrayChildren {
         list.add(node);
     }
     
-//    
-//    public Peptide[] getPeptides(){
-//        Peptide[] peptides = new Peptide[objAttrsNode.size()];
-//        int cursor = 0;
-//        for(ObjectAttributesNode pNode: objAttrsNode){
-//            peptides[cursor++] = pNode.getLookup().lookup(Peptide.class);
-//        }
-//        return peptides;
-//    }
+    public Peptide[] getPeptides(){
+        Peptide[] peptides = new Peptide[list.size()];
+        int cursor = 0;
+        for(PeptideNode pNode: list){
+            peptides[cursor++] = pNode.getLookup().lookup(Peptide.class);
+        }
+        return peptides;
+    }
 
 }

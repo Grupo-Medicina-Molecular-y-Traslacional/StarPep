@@ -10,7 +10,7 @@ import java.util.Collection;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.ui.components.AttributesPanel;
+import org.bapedis.core.ui.components.PeptideViewer;
 import org.bapedis.db.model.NeoPeptideModel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -50,17 +50,17 @@ public final class NeoPeptideModelTopComponent extends TopComponent implements
 
     protected ProjectManager pc;
     protected Lookup.Result<NeoPeptideModel> peptideLkpResult;
-    protected final AttributesPanel attributesViewer;
+    protected final PeptideViewer peptideViewer;
 
 
     public NeoPeptideModelTopComponent() {
         initComponents();
         setName(Bundle.CTL_NeoPeptideModelTopComponent());
         setToolTipText(Bundle.HINT_NeoPeptideModelTopComponent());
-        attributesViewer = new AttributesPanel();
-        add(attributesViewer, BorderLayout.CENTER);
+        peptideViewer = new PeptideViewer();
+        add(peptideViewer, BorderLayout.CENTER);
         pc = Lookup.getDefault().lookup(ProjectManager.class);
-        associateLookup(attributesViewer.getLookup());
+        associateLookup(peptideViewer.getLookup());
     }
 
 
@@ -94,12 +94,12 @@ public final class NeoPeptideModelTopComponent extends TopComponent implements
     }
     
     public void setBusyLabel(){
-        attributesViewer.setBusyLabel();
+        peptideViewer.setBusyLabel();
     }
     
     
     public void setErrorLabel(){
-        attributesViewer.setErrorLabel();
+        peptideViewer.setErrorLabel();
     }
 
     @Override
@@ -126,7 +126,7 @@ public final class NeoPeptideModelTopComponent extends TopComponent implements
         peptideLkpResult = newWs.getLookup().lookupResult(NeoPeptideModel.class);
         peptideLkpResult.addLookupListener(this);
         NeoPeptideModel peptidesModel = newWs.getLookup().lookup(NeoPeptideModel.class);
-        attributesViewer.showData(peptidesModel);
+        peptideViewer.showData(peptidesModel);
     }
 
     @Override
@@ -135,7 +135,7 @@ public final class NeoPeptideModelTopComponent extends TopComponent implements
             Collection<? extends NeoPeptideModel> attrModels = peptideLkpResult.allInstances();
             if (!attrModels.isEmpty()) {
                 NeoPeptideModel attrModel = attrModels.iterator().next();
-                attributesViewer.showData(attrModel);
+                peptideViewer.showData(attrModel);
             }
         } 
     }

@@ -5,8 +5,14 @@
  */
 package org.bapedis.db;
 
+import org.bapedis.core.model.Workspace;
+import org.bapedis.core.services.ProjectManager;
+import org.bapedis.db.model.BioCategory;
+import org.bapedis.db.services.BioCategoryManager;
+import org.bapedis.db.services.NeoPeptideManager;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.openide.modules.ModuleInstall;
+import org.openide.util.Lookup;
 
 public class Installer extends ModuleInstall {
 
@@ -15,6 +21,13 @@ public class Installer extends ModuleInstall {
         try {
             Neo4jDB.extractDatabase();
             Neo4jDB.loadDatabase();
+            //Load all peptides into the default workspace
+            ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+            Workspace currentWorkspace = pc.getCurrentWorkspace();
+            BioCategoryManager bcManager = Lookup.getDefault().lookup(BioCategoryManager.class);
+            NeoPeptideManager npManager = Lookup.getDefault().lookup(NeoPeptideManager.class);
+            bcManager.setSelectedCategoriesTo(currentWorkspace, new BioCategory[]{bcManager.getRootCategory()});
+            npManager.setNeoPeptidesTo(currentWorkspace, false);
         } catch (Exception ex) {
             System.out.println(ex);
             ex.printStackTrace();

@@ -94,9 +94,9 @@ public class PeptideViewer extends javax.swing.JPanel implements ExplorerManager
         column.setMaxWidth(240);
         column.setPreferredWidth(240);
         
-        busyLabel = new JLabel(NbBundle.getMessage(PeptideViewer.class, "PeptideViewer.busyLabel.text"), new ImageIcon(getClass().getResource("/org/bapedis/core/resources/loading.gif")), JLabel.CENTER);
+        busyLabel = new JLabel(NbBundle.getMessage(PeptideViewer.class, "PeptideViewer.busyLabel.text"), new ImageIcon(ImageUtilities.loadImage("org/bapedis/core/resources/loading.gif", true)), JLabel.CENTER);
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        errorLabel = new JLabel(NbBundle.getMessage(PeptideViewer.class, "PeptideViewer.errorLabel.text"),new ImageIcon(getClass().getResource("/org/bapedis/core/resources/sad.png")), JLabel.CENTER);
+        errorLabel = new JLabel(NbBundle.getMessage(PeptideViewer.class, "PeptideViewer.errorLabel.text"),new ImageIcon(ImageUtilities.loadImage("org/bapedis/core/resources/sad.png", true)), JLabel.CENTER);
         errorLabel.setHorizontalAlignment(SwingConstants.CENTER);
         dataPanel.add(view, BorderLayout.CENTER);
 //        filterPanel.add(createDropDownButtonSearch(), 1);
@@ -256,6 +256,7 @@ public class PeptideViewer extends javax.swing.JPanel implements ExplorerManager
             dataPanel.add(view, BorderLayout.CENTER);
         }
         dataPanel.revalidate();
+        dataPanel.repaint();
     }
 
 //    private void applyDefaultFilter() {

@@ -61,16 +61,16 @@ public class ShowPeptideNodes extends AbstractAction {
                     ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
                     Workspace currentWorkspace = pc.getCurrentWorkspace();
 
-                    BioCategoryManager bcc = Lookup.getDefault().lookup(BioCategoryManager.class);
+                    BioCategoryManager bcManager = Lookup.getDefault().lookup(BioCategoryManager.class);
 
                     Lookup.Result<BioCategory> lkpInfo = bioCategoryTC.getLookup().lookupResult(BioCategory.class);
                     BioCategory[] selectedCategories = lkpInfo.allInstances().toArray(new BioCategory[]{});
                     if (selectedCategories.length == 0) {
-                        selectedCategories = new BioCategory[]{bcc.getRootCategory()};
+                        selectedCategories = new BioCategory[]{bcManager.getRootCategory()};
                     }
-                    bcc.setSelectedCategoriesTo(currentWorkspace, selectedCategories);                    
-                    NeoPeptideManager npc = Lookup.getDefault().lookup(NeoPeptideManager.class);
-                    npc.setNeoPeptidesTo(currentWorkspace, false);
+                    bcManager.setSelectedCategoriesTo(currentWorkspace, selectedCategories);                    
+                    NeoPeptideManager npManager = Lookup.getDefault().lookup(NeoPeptideManager.class);
+                    npManager.setNeoPeptidesTo(currentWorkspace, false);
 
                 } catch (Exception ex) {
                     ex.printStackTrace();

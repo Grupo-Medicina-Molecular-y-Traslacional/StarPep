@@ -26,9 +26,9 @@ import org.openide.util.Lookup;
  */
 public class Neo4jDB {
 
-    public static final String DB_NAME = "neo4j";
+    public static final String DB_NAME = "neo4jDB";
     public static final File DB_DIR = new File (System.getProperty("netbeans.user"), "db");
-    public static final String ZIP_DB = "org/bapedis/db/resources/neo4j.zip";
+    public static final String ZIP_DB = "org/bapedis/db/resources/neo4jDB.zip";
     private static final int BUFFER_SIZE = 4096;
     private static GraphDatabaseService graphDb;
 //    private static ArrayList<String> representatives, allPeptides;
@@ -65,8 +65,7 @@ public class Neo4jDB {
     }
 
     public static GraphDatabaseService loadDatabase() throws IOException {
-        graphDb = new GraphDatabaseFactory()
-                .newEmbeddedDatabaseBuilder(DB_DIR.getCanonicalPath() + File.separator + DB_NAME)
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(new File(DB_DIR, DB_NAME))
                 .setConfig(GraphDatabaseSettings.read_only, "true")
                 .newGraphDatabase();
         registerShutdownHook(graphDb);

@@ -31,6 +31,10 @@ public class Peptide {
     public String getSequence() {
         return sequence;
     }        
+    
+    public int getLength(){
+        return sequence.length();
+    }
 
     public void setAttributeValue(PeptideAttribute attr, Object value) {
         attrsValue.put(attr, value);

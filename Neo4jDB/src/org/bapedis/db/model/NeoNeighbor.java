@@ -5,6 +5,8 @@
  */
 package org.bapedis.db.model;
 
+import java.util.Arrays;
+
 /**
  *
  * @author loge
@@ -13,11 +15,13 @@ public class NeoNeighbor {
     protected final long neoId;
     protected final String label;    
     protected final String name;
+    protected final String[] xref;
     
-    public NeoNeighbor(long neoId, String label, String name) {
+    public NeoNeighbor(long neoId, String label, String name, String[] xref) {
         this.neoId = neoId;
         this.label = label;
         this.name = name;
+        this.xref = xref;
     }
 
     public long getNeoId() {
@@ -30,8 +34,12 @@ public class NeoNeighbor {
 
     public String getName() {
         return name;
-    }        
+    }      
 
+    public String[] getXref() {
+        return xref;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 5;

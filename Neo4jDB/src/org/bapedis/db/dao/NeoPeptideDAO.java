@@ -36,7 +36,7 @@ public class NeoPeptideDAO {
 
     protected final GraphDatabaseService graphDb;
     public final String PRO_ID = "id";
-    public final String PRO_SEQUENCE = "seq";
+    public final String PRO_SEQ = "seq";
     public final String PRO_XREF = "xref";
     public final String PRO_NAME = "name";
     public final String PRO_LABEL = "label";
@@ -57,14 +57,6 @@ public class NeoPeptideDAO {
                 neoModel.addAttribute(attr);
             }
         }
-        if (!neoModel.hasAttribute(PRO_ID)) {
-            PeptideAttribute attr = neoModel.addAttribute(PRO_ID, PRO_ID, String.class);
-            attr.setVisible(false);
-        }
-        if (!neoModel.hasAttribute(PRO_XREF)) {
-            PeptideAttribute attr = neoModel.addAttribute(PRO_XREF, PRO_XREF, String[].class);
-            attr.setVisible(false);
-        }
         try (Transaction tx = graphDb.beginTx()) {
             List<Node> startNodes = new LinkedList<>();
             for (BioCategory category : categories) {
@@ -74,14 +66,12 @@ public class NeoPeptideDAO {
             NeoPeptide neoPeptide;
             PeptideAttribute attr;
             String id, seq;
-            String[] xref;
             for (Node node : peptideNodes) {
                 id = node.getProperty(PRO_ID).toString();
-                seq = node.getProperty(PRO_SEQUENCE).toString();
-                xref = (String[]) node.getProperty(PRO_XREF);
-                neoPeptide = new NeoPeptide(node.getId(), id, seq, xref, this);
+                seq = node.getProperty(PRO_SEQ).toString();
+                neoPeptide = new NeoPeptide(node.getId(), id, seq, this);
                 for (String propertyKey : node.getPropertyKeys()) {
-                    if (!propertyKey.equals(PRO_XREF)) {
+                    if (!(propertyKey.equals(PRO_ID) || propertyKey.equals(PRO_SEQ))) {
                         Object value = node.getProperty(propertyKey);
                         if (!neoModel.hasAttribute(propertyKey)) {
                             attr = neoModel.addAttribute(propertyKey, propertyKey, value.getClass());
@@ -157,11 +147,17 @@ public class NeoPeptideDAO {
     public List<NeoNeighbor> getNeoNeighbors(NeoPeptide neoPeptide) {
         List<NeoNeighbor> neighbors = new LinkedList<>();
         try (Transaction tx = graphDb.beginTx()) {
-            Iterable<Node> neighborNodes = getNeighbors(graphDb.getNodeById(neoPeptide.getNeoId()));
+            Node startNode = graphDb.getNodeById(neoPeptide.getNeoId());
+            Iterable<Node> neighborNodes = getNeighbors(startNode);
             NeoNeighbor neoNeighbor;
-            for (Node node : neighborNodes) {
-                neoNeighbor = new NeoNeighbor(node.getId(), node.getLabels().iterator().next().name(), node.getProperty(PRO_NAME).toString());
-                neighbors.add(neoNeighbor);
+            for (Node endNode : neighborNodes) {
+                for (Relationship relation : startNode.getRelationships(Direction.OUTGOING)) {
+                    if (relation.getEndNode().equals(endNode)) {
+                        neoNeighbor = new NeoNeighbor(endNode.getId(), endNode.getLabels().iterator().next().name(),
+                                endNode.getProperty(PRO_NAME).toString(), (String[]) relation.getProperty(PRO_XREF));
+                        neighbors.add(neoNeighbor);
+                    }
+                }
 //                for (String propertyKey : node.getPropertyKeys()) {
 //                    Object value = node.getProperty(propertyKey);
 //                    if (!neoNeighborsModel.hasAttribute(propertyKey)) {

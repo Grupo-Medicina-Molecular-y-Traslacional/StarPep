@@ -7,6 +7,9 @@ package org.bapedis.db.model;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.StringTokenizer;
 import javax.swing.Action;
 import org.bapedis.core.model.PeptideAttribute;
@@ -67,43 +70,71 @@ public class NeoPeptideNode extends PeptideNode {
     @Override
     protected Sheet createSheet() {
         Sheet sheet = Sheet.createDefault();
-        Sheet.Set set = Sheet.createPropertiesSet();
-        for (PeptideAttribute attr : peptide.getAttributes()) {
-            PropertySupport.ReadOnly property = createPropertyField(attr.getId(), attr.getId(), attr.getId(), attr.getType(), peptide.getAttributeValue(attr));
-            set.put(property);
-        }
-        sheet.put(set);
-        // Annotations
-        set = Sheet.createPropertiesSet();
-        set.setName("annotations");
-        set.setDisplayName(NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.annotations"));
 
-        for (NeoNeighbor neighbor : ((NeoPeptide) peptide).getNeighbors()) {
-            PropertySupport.ReadOnly property = createPropertyField(neighbor.getLabel(), neighbor.getLabel(), neighbor.getLabel(), String.class, neighbor.getName());
-            set.put(property);
-        }
+        // Primary
+        Sheet.Set set = Sheet.createPropertiesSet();
+        set.setName("primary");
+        set.setDisplayName(NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.primary"));
+        PropertySupport.ReadOnly property;
+        // Id property
+        property = createPropertyField("id", NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.id"),
+                NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.id.desc"), String.class, peptide.getId());
+        set.put(property);
+        // Sequence property
+        property = createPropertyField("seq", NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.seq"),
+                NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.seq.desc"), String.class, peptide.getSequence());
+        set.put(property);
+        // Length property
+        property = createPropertyField("length", NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.length"),
+                NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.length.desc"), Integer.class, peptide.getLength());
+        set.put(property);
         sheet.put(set);
+
+        // Annotations
+        List<NeoNeighbor> neighbors;
+        String name;
+        String desc;
+        int count;
+        for (AnnotationType aType : AnnotationType.values()) {
+            count = 1;
+            name = aType.name().toLowerCase();
+            set = Sheet.createPropertiesSet();
+            set.setName(name);
+            set.setDisplayName(NbBundle.getMessage(NeoPeptideNode.class, "PropertySet." + name));
+            neighbors = ((NeoPeptide) peptide).getAnnotations(aType);
+            for (NeoNeighbor neighbor : neighbors) {
+                desc = Arrays.toString(neighbor.getXref());
+                property = createPropertyField(name + count, NbBundle.getMessage(NeoPeptideNode.class, "PropertySet." + name),
+                        desc, String.class, neighbor.getName());
+                set.put(property);
+                count++;
+            }
+            sheet.put(set);
+        }
         // Databases
-        set = Sheet.createPropertiesSet();
-        set.setName("databases");
-        set.setDisplayName(NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.databases"));
-        StringTokenizer tokenizer;
-        String label, value;
-        for (String xref : ((NeoPeptide) peptide).getXref()) {
-            tokenizer = new StringTokenizer(xref, ":");
-            label = tokenizer.nextToken().trim();
-            value = tokenizer.nextToken().trim();
-            PropertySupport.ReadOnly property = createPropertyField(label, label, label, String.class, value);
-            set.put(property);
-        }
-        sheet.put(set);
+//        set = Sheet.createPropertiesSet();
+//        set.setName("databases");
+//        set.setDisplayName(NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.databases"));
+//        StringTokenizer tokenizer;
+//        String label, value;
+//        for (String xref : ((NeoPeptide) peptide).getXref()) {
+//            tokenizer = new StringTokenizer(xref, ":");
+//            label = tokenizer.nextToken().trim();
+//            value = tokenizer.nextToken().trim();
+//            PropertySupport.ReadOnly property = createPropertyField(label, label, label, String.class, value);
+//            set.put(property);
+//        }
+//        sheet.put(set);
         // Descriptors
         set = Sheet.createPropertiesSet();
-        set.setName("descriptors");
-        set.setDisplayName(NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.descriptors"));
-        PropertySupport.ReadOnly property = createPropertyField("desc", "desc", "desc", Integer.class, 0);
+        set.setName("attributes");
+        set.setDisplayName(NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.attributes"));
+        for (PeptideAttribute attr : peptide.getAttributes()) {
+            property = createPropertyField(attr.getId(), attr.getId(), attr.getId(), attr.getType(), peptide.getAttributeValue(attr));
+            set.put(property);
+        }
         set.put(property);
-//        set.setValue("tabName", NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.descriptors.tabName"));
+        set.setValue("tabName", NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.attributes.tabName"));
         sheet.put(set);
         return sheet;
     }

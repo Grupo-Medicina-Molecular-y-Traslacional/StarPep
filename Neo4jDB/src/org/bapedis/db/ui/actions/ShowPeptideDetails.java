@@ -42,7 +42,7 @@ public class ShowPeptideDetails extends GlobalContextSensitiveAction<NeoPeptide>
 
     public ShowPeptideDetails() {
         super(NeoPeptide.class);
-        String name = NbBundle.getMessage(RemoveFilter.class, "CTL_ShowPeptideDetails");
+        String name = NbBundle.getMessage(ShowPeptideDetails.class, "CTL_ShowPeptideDetails");
         putValue(NAME, name);
     }
 

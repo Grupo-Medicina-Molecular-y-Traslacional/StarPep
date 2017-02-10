@@ -10,8 +10,8 @@ import java.beans.PropertyChangeSupport;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.bapedis.db.filters.spi.Filter;
-import org.bapedis.db.filters.spi.FilterSetupUI;
+import org.bapedis.core.spi.filters.Filter;
+import org.bapedis.core.spi.filters.FilterSetupUI;
 
 /**
  *

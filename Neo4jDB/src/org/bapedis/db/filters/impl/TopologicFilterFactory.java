@@ -5,9 +5,9 @@
  */
 package org.bapedis.db.filters.impl;
 
-import org.bapedis.db.filters.spi.Filter;
-import org.bapedis.db.filters.spi.FilterFactory;
-import org.bapedis.db.filters.spi.FilterSetupUI;
+import org.bapedis.core.spi.filters.Filter;
+import org.bapedis.core.spi.filters.FilterFactory;
+import org.bapedis.core.spi.filters.FilterSetupUI;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -18,11 +18,11 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service=FilterFactory.class)
 public class TopologicFilterFactory implements FilterFactory{
     protected final String name;
-    protected final FilterSetupUI setupUI;
+    protected  FilterSetupUI setupUI;
 
     public TopologicFilterFactory() {
         name = NbBundle.getMessage(TopologicFilterFactory.class, "TopologicFilterFactory.name");
-        setupUI = new TopologicFilterSetupUI();
+//        setupUI = new TopologicFilterSetupUI();
     }
 
     

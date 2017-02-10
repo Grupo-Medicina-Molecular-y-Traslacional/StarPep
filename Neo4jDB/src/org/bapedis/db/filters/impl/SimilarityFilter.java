@@ -5,7 +5,8 @@
  */
 package org.bapedis.db.filters.impl;
 
-import org.bapedis.db.filters.spi.Filter;
+import org.bapedis.core.model.Peptide;
+import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.db.model.NeoPeptide;
 
 /**
@@ -22,7 +23,7 @@ public class SimilarityFilter implements Filter {
     }
 
     @Override
-    public boolean accept(NeoPeptide peptide) {
+    public boolean accept(Peptide peptide) {
         return false;
     }
 

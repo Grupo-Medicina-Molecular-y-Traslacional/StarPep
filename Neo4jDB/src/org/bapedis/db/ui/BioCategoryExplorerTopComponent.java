@@ -49,7 +49,7 @@ import org.openide.util.NbBundle.Messages;
 })
 public final class BioCategoryExplorerTopComponent extends TopComponent implements ExplorerManager.Provider, WorkspaceEventListener {
 
-    private final ExplorerManager mgr = new ExplorerManager();
+    private final ExplorerManager explorerMgr = new ExplorerManager();
 
     public BioCategoryExplorerTopComponent() {
         initComponents();
@@ -58,10 +58,10 @@ public final class BioCategoryExplorerTopComponent extends TopComponent implemen
 
         add(new BeanTreeView(), BorderLayout.CENTER);
 
-        associateLookup(ExplorerUtils.createLookup(mgr, getActionMap()));
+        associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));
 
         BioCategoryManager bcc = Lookup.getDefault().lookup(BioCategoryManager.class);
-        mgr.setRootContext(new BioCategoryNode(bcc.getRootCategory()));
+        explorerMgr.setRootContext(new BioCategoryNode(bcc.getRootCategory()));
         ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
         pc.addWorkspaceEventListener(this);
     }
@@ -103,7 +103,7 @@ public final class BioCategoryExplorerTopComponent extends TopComponent implemen
 
     @Override
     public ExplorerManager getExplorerManager() {
-        return mgr;
+        return explorerMgr;
     }
 
     @Override

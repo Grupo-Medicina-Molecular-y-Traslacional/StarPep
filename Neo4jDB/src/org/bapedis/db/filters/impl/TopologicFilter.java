@@ -6,8 +6,9 @@
 package org.bapedis.db.filters.impl;
 
 import java.util.Arrays;
+import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
-import org.bapedis.db.filters.spi.Filter;
+import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.db.model.NeoNeighbor;
 import org.bapedis.db.model.NeoPeptide;
 
@@ -116,7 +117,7 @@ public class TopologicFilter implements Filter {
     }
 
     @Override
-    public boolean accept(NeoPeptide peptide) {
+    public boolean accept(Peptide peptide) {
 //        NeoNeighborsModel neoModel = peptide.getNeighbors();
 //        int count = 0;
 //        boolean accepted;

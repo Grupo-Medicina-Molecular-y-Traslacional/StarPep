@@ -5,9 +5,9 @@
  */
 package org.bapedis.db.filters.impl;
 
-import org.bapedis.db.filters.spi.Filter;
-import org.bapedis.db.filters.spi.FilterFactory;
-import org.bapedis.db.filters.spi.FilterSetupUI;
+import org.bapedis.core.spi.filters.Filter;
+import org.bapedis.core.spi.filters.FilterFactory;
+import org.bapedis.core.spi.filters.FilterSetupUI;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -20,7 +20,7 @@ public class SimilarityFilterFactory implements FilterFactory {
     SimilarityFilterSetupUI setupUI;
     
     public SimilarityFilterFactory(){
-        setupUI = new SimilarityFilterSetupUI();
+//        setupUI = new SimilarityFilterSetupUI();
     }
             
     @Override

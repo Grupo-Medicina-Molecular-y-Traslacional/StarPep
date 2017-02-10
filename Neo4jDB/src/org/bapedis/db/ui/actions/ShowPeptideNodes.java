@@ -14,7 +14,7 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.db.services.BioCategoryManager;
 import org.bapedis.db.services.NeoPeptideManager;
 import org.bapedis.db.model.BioCategory;
-import org.bapedis.db.ui.NeoPeptideModelTopComponent;
+import org.bapedis.core.ui.PeptideViewerTopComponent;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -47,7 +47,7 @@ public class ShowPeptideNodes extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        final NeoPeptideModelTopComponent peptideTC = (NeoPeptideModelTopComponent) WindowManager.getDefault().findTopComponent("NeoPeptideModelTopComponent");
+        final PeptideViewerTopComponent peptideTC = (PeptideViewerTopComponent) WindowManager.getDefault().findTopComponent("PeptideViewerTopComponent");
         peptideTC.setBusyLabel();
         peptideTC.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         peptideTC.open();
@@ -70,7 +70,7 @@ public class ShowPeptideNodes extends AbstractAction {
                     }
                     bcManager.setSelectedCategoriesTo(currentWorkspace, selectedCategories);                    
                     NeoPeptideManager npManager = Lookup.getDefault().lookup(NeoPeptideManager.class);
-                    npManager.setNeoPeptidesTo(currentWorkspace, false);
+                    npManager.setNeoPeptidesTo(currentWorkspace);
 
                 } catch (Exception ex) {
                     ex.printStackTrace();

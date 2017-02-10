@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db.model;
+package org.bapedis.core.model;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
-import org.bapedis.db.filters.spi.Filter;
+import org.bapedis.core.spi.filters.Filter;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Node;
 

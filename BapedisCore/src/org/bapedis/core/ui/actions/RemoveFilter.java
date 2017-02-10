@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db.ui.actions;
+package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.ui.actions.GlobalContextSensitiveAction;
-import org.bapedis.db.filters.spi.Filter;
-import org.bapedis.db.model.FilterModel;
+import org.bapedis.core.spi.filters.Filter;
+import org.bapedis.core.model.FilterModel;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -44,7 +44,7 @@ public class RemoveFilter extends GlobalContextSensitiveAction<Filter> {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         String name = NbBundle.getMessage(RemoveFilter.class, "CTL_RemoveFilter");
         putValue(NAME, name);
-        putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/db/resources/remove.png", false));
+        putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/core/resources/remove.png", false));
         putValue(SHORT_DESCRIPTION, name);
     }
 

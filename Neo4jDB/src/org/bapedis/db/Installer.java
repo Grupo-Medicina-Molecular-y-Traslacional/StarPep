@@ -27,7 +27,7 @@ public class Installer extends ModuleInstall {
             BioCategoryManager bcManager = Lookup.getDefault().lookup(BioCategoryManager.class);
             NeoPeptideManager npManager = Lookup.getDefault().lookup(NeoPeptideManager.class);
             bcManager.setSelectedCategoriesTo(currentWorkspace, new BioCategory[]{bcManager.getRootCategory()});
-            npManager.setNeoPeptidesTo(currentWorkspace, false);
+            npManager.setNeoPeptidesTo(currentWorkspace);
         } catch (Exception ex) {
             System.out.println(ex);
             ex.printStackTrace();

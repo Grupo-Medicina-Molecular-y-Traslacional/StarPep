@@ -9,9 +9,9 @@ import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.db.Neo4jDB;
-import org.bapedis.db.filters.spi.Filter;
+import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.db.model.BioCategory;
-import org.bapedis.db.model.FilterModel;
+import org.bapedis.core.model.FilterModel;
 import org.bapedis.db.model.NeoPeptideModel;
 import org.bapedis.db.model.NeoNeighbor;
 import org.bapedis.db.model.NeoPeptide;
@@ -50,7 +50,7 @@ public class NeoPeptideDAO {
         is_a, instance_of
     }
 
-    public NeoPeptideModel getNeoPeptidesBy(BioCategory[] categories, PeptideAttribute[] attributes, FilterModel filterModel) {
+    public NeoPeptideModel getNeoPeptidesBy(BioCategory[] categories, PeptideAttribute[] attributes) {
         NeoPeptideModel neoModel = new NeoPeptideModel();
         if (attributes != null) {
             for (PeptideAttribute attr : attributes) {
@@ -69,7 +69,7 @@ public class NeoPeptideDAO {
             for (Node node : peptideNodes) {
                 id = node.getProperty(PRO_ID).toString();
                 seq = node.getProperty(PRO_SEQ).toString();
-                neoPeptide = new NeoPeptide(node.getId(), id, seq, this);
+                neoPeptide = new NeoPeptide(node.getId(), id, seq, getNeighbors(node));
                 for (String propertyKey : node.getPropertyKeys()) {
                     if (!(propertyKey.equals(PRO_ID) || propertyKey.equals(PRO_SEQ))) {
                         Object value = node.getProperty(propertyKey);
@@ -81,35 +81,33 @@ public class NeoPeptideDAO {
                         neoPeptide.setAttributeValue(attr, value);
                     }
                 }
-                if (filterModel == null || isAccepted(neoPeptide, filterModel)) {
-                    neoModel.addPeptide(neoPeptide);
-                }
+                neoModel.addPeptide(neoPeptide);
             }
             tx.success();
         }
         return neoModel;
     }
 
-    protected boolean isAccepted(NeoPeptide neoPeptide, FilterModel filterModel) {
-        FilterModel.RestrictionLevel restriction = filterModel.getRestriction();
-        switch (restriction) {
-            case MATCH_ALL:
-                for (Filter filter : filterModel.getFilters()) {
-                    if (!filter.accept(neoPeptide)) {
-                        return false;
-                    }
-                }
-                return true;
-            case MATCH_ANY:
-                for (Filter filter : filterModel.getFilters()) {
-                    if (filter.accept(neoPeptide)) {
-                        return true;
-                    }
-                }
-                return false;
-        }
-        return false;
-    }
+//    protected boolean isAccepted(NeoPeptide neoPeptide, FilterModel filterModel) {
+//        FilterModel.RestrictionLevel restriction = filterModel.getRestriction();
+//        switch (restriction) {
+//            case MATCH_ALL:
+//                for (Filter filter : filterModel.getFilters()) {
+//                    if (!filter.accept(neoPeptide)) {
+//                        return false;
+//                    }
+//                }
+//                return true;
+//            case MATCH_ANY:
+//                for (Filter filter : filterModel.getFilters()) {
+//                    if (filter.accept(neoPeptide)) {
+//                        return true;
+//                    }
+//                }
+//                return false;
+//        }
+//        return false;
+//    }
 
     protected Iterable<Node> getPeptides(List<Node> startNodes) {
         Iterable<Node> nodes = graphDb.traversalDescription()
@@ -133,7 +131,8 @@ public class NeoPeptideDAO {
         return nodes;
     }
 
-    protected Iterable<Node> getNeighbors(Node startNode) {
+    private List<NeoNeighbor> getNeighbors(Node startNode) {
+        List<NeoNeighbor> neighbors = new LinkedList<>();
         Iterable<Node> nodes = graphDb.traversalDescription()
                 .breadthFirst()
                 .evaluator(Evaluators.atDepth(1))
@@ -141,36 +140,15 @@ public class NeoPeptideDAO {
                 .uniqueness(Uniqueness.NODE_GLOBAL)
                 .traverse(startNode)
                 .nodes();
-        return nodes;
-    }
-
-    public List<NeoNeighbor> getNeoNeighbors(NeoPeptide neoPeptide) {
-        List<NeoNeighbor> neighbors = new LinkedList<>();
-        try (Transaction tx = graphDb.beginTx()) {
-            Node startNode = graphDb.getNodeById(neoPeptide.getNeoId());
-            Iterable<Node> neighborNodes = getNeighbors(startNode);
-            NeoNeighbor neoNeighbor;
-            for (Node endNode : neighborNodes) {
-                for (Relationship relation : startNode.getRelationships(Direction.OUTGOING)) {
-                    if (relation.getEndNode().equals(endNode)) {
-                        neoNeighbor = new NeoNeighbor(endNode.getId(), endNode.getLabels().iterator().next().name(),
-                                endNode.getProperty(PRO_NAME).toString(), (String[]) relation.getProperty(PRO_XREF));
-                        neighbors.add(neoNeighbor);
-                    }
+        NeoNeighbor neoNeighbor;
+        for (Node endNode : nodes) {
+            for (Relationship relation : startNode.getRelationships(Direction.OUTGOING)) {
+                if (relation.getEndNode().equals(endNode)) {
+                    neoNeighbor = new NeoNeighbor(endNode.getId(), endNode.getLabels().iterator().next().name(),
+                            endNode.getProperty(PRO_NAME).toString(), (String[]) relation.getProperty(PRO_XREF));
+                    neighbors.add(neoNeighbor);
                 }
-//                for (String propertyKey : node.getPropertyKeys()) {
-//                    Object value = node.getProperty(propertyKey);
-//                    if (!neoNeighborsModel.hasAttribute(propertyKey)) {
-//                        attr = neoNeighborsModel.addAttribute(propertyKey, propertyKey, value.getClass());
-//                        attr.setVisible(false);
-//                    } else {
-//                        attr = neoNeighborsModel.getAttribute(propertyKey);
-//                    }
-//                    neoNeighbor.setAttributeValue(attr, value);
-//                }
-//                neoNeighborsModel.addNeighbor(neoNeighbor);
             }
-            tx.success();
         }
         return neighbors;
     }

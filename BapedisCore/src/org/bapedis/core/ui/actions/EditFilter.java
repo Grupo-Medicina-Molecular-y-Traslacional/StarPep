@@ -3,19 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db.ui.actions;
+package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 import static javax.swing.Action.NAME;
 import static javax.swing.Action.SMALL_ICON;
-import org.bapedis.core.ui.actions.GlobalContextSensitiveAction;
-import org.bapedis.db.services.FilterFactoryManager;
-import org.bapedis.db.filters.spi.Filter;
-import org.bapedis.db.filters.spi.FilterFactory;
-import org.bapedis.db.model.FilterNode;
-import org.bapedis.db.ui.FilterExplorerTopComponent;
-import org.bapedis.db.ui.util.FilterSetupDialog;
+import org.bapedis.core.spi.filters.Filter;
+import org.bapedis.core.spi.filters.FilterFactory;
+import org.bapedis.core.model.FilterNode;
+import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.ui.FilterExplorerTopComponent;
+import org.bapedis.core.ui.components.FilterSetupDialog;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -44,15 +43,15 @@ import org.openide.windows.WindowManager;
 })
 @NbBundle.Messages("CTL_EditFilter=Edit filter")
 public class EditFilter extends GlobalContextSensitiveAction<Filter> {
-    protected final FilterFactoryManager ffc;
+    protected final ProjectManager pm;
     protected final FilterSetupDialog dialog;    
 
     public EditFilter() {
         super(Filter.class);
-        ffc = Lookup.getDefault().lookup(FilterFactoryManager.class);
-        String name = NbBundle.getMessage(RemoveFilter.class, "CTL_EditFilter");
+        pm = Lookup.getDefault().lookup(ProjectManager.class);
+        String name = NbBundle.getMessage(EditFilter.class, "CTL_EditFilter");
         putValue(NAME, name);
-        putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/db/resources/edit.png", false));        
+        putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/core/resources/edit.png", false));        
         putValue(SHORT_DESCRIPTION, name);
         dialog = new FilterSetupDialog();                
     }
@@ -62,7 +61,7 @@ public class EditFilter extends GlobalContextSensitiveAction<Filter> {
         Collection<? extends Filter> context = lkpResult.allInstances();
         if (!context.isEmpty()){
             Filter filter = context.iterator().next();
-            FilterFactory filterFactory = ffc.getBuilder(filter); 
+            FilterFactory filterFactory = pm.getFactory(filter); 
             String title = NbBundle.getMessage(EditFilter.class, "FilterSetupDialog.title", filterFactory.getName());
             if (dialog.setup(filter, filterFactory.getSetupUI(), title)){
                 FilterExplorerTopComponent tc  = (FilterExplorerTopComponent) WindowManager.getDefault().findTopComponent("FilterExplorerTopComponent");

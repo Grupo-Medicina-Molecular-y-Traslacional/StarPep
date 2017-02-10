@@ -55,7 +55,7 @@ import org.openide.util.NbPreferences;
  */
 public class PeptideViewer extends javax.swing.JPanel implements ExplorerManager.Provider, Lookup.Provider {
 
-    protected final ExplorerManager manager;
+    protected final ExplorerManager explorerMgr;
     private final JLabel busyLabel;
     private final JLabel errorLabel;
     protected final OutlineView view;
@@ -67,9 +67,9 @@ public class PeptideViewer extends javax.swing.JPanel implements ExplorerManager
     protected final Lookup lookup;
 
     public PeptideViewer() {
-        manager = new ExplorerManager();
+        explorerMgr = new ExplorerManager();
         initComponents();
-        lookup = ExplorerUtils.createLookup(manager, getActionMap());
+        lookup = ExplorerUtils.createLookup(explorerMgr, getActionMap());
         quickFilterPopup = new JPopupMenu();
         matchCase = NbPreferences.forModule(PeptideViewer.class).getBoolean("matchCase", false);
         view = new OutlineView(NbBundle.getMessage(PeptideViewer.class, "PeptideViewer.nodelColumnLabel"));
@@ -130,7 +130,7 @@ public class PeptideViewer extends javax.swing.JPanel implements ExplorerManager
 //        });
 //        final JMenuItem description = new JMenuItem(NbBundle.getMessage(PeptideViewer.class, "CTL_ColumnsToSearch")) {
 //            @Override
-//            public void processMouseEvent(MouseEvent e, MenuElement[] path, MenuSelectionManager manager) {
+//            public void processMouseEvent(MouseEvent e, MenuElement[] path, MenuSelectionManager explorerMgr) {
 //                // Ignore
 //            }
 //
@@ -212,7 +212,7 @@ public class PeptideViewer extends javax.swing.JPanel implements ExplorerManager
 
     public void showData(AttributesModel attrModel) {
         if (attrModel != null) {
-            manager.setRootContext(attrModel.getRootNode());
+            explorerMgr.setRootContext(attrModel.getRootNode());
 //            PeptideAttribute[] attrs = attrModel.getAttributes();
 //            String[] columns = new String[attrs.length * 2];
 //            int pos = 0;
@@ -228,7 +228,7 @@ public class PeptideViewer extends javax.swing.JPanel implements ExplorerManager
 //                columnModel.setColumnHidden(column, !attr.isVisible());
 //            }
         } else {
-            manager.setRootContext(Node.EMPTY);
+            explorerMgr.setRootContext(Node.EMPTY);
 //            view.setPropertyColumns(new String[]{});
         }
         this.attrModel = attrModel;
@@ -398,7 +398,7 @@ public class PeptideViewer extends javax.swing.JPanel implements ExplorerManager
 
     @Override
     public ExplorerManager getExplorerManager() {
-        return manager;
+        return explorerMgr;
     }
 
     @Override

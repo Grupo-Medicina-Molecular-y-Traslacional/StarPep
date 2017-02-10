@@ -6,8 +6,9 @@
 package org.bapedis.db.filters.impl;
 
 import java.util.Arrays;
+import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
-import org.bapedis.db.filters.spi.Filter;
+import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.db.model.NeoPeptide;
 
 /**
@@ -69,7 +70,7 @@ public class AttributeFilter implements Filter {
     }
 
     @Override
-    public boolean accept(NeoPeptide peptide) {
+    public boolean accept(Peptide peptide) {
         boolean accepted = false;
         if (peptide.getAttributes().contains(attr)) {
             Object objValue = peptide.getAttributeValue(attr);

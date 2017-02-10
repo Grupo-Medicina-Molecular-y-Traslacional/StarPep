@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db.filters.spi;
+package org.bapedis.core.spi.filters;
 
-import org.bapedis.db.model.NeoPeptide;
+import org.bapedis.core.model.Peptide;
 
 /**
  *
@@ -13,5 +13,5 @@ import org.bapedis.db.model.NeoPeptide;
  */
 public interface Filter {
     String getDisplayName();
-    boolean accept(NeoPeptide peptide);
+    boolean accept(Peptide peptide);
 }

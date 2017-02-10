@@ -11,6 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
+import org.bapedis.core.spi.filters.Filter;
+import org.bapedis.core.spi.filters.FilterFactory;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
@@ -21,16 +23,23 @@ import org.openide.util.lookup.ServiceProvider;
  * @author loge
  */
 @ServiceProvider(service = ProjectManager.class)
-public class ProjectManager implements Lookup.Provider{
+public class ProjectManager implements Lookup.Provider {
+
     protected String name;
     protected File folder;
     protected Lookup lookup;
     protected InstanceContent content;
     protected Workspace currentWS;
     protected List<WorkspaceEventListener> wsListeners;
+    protected final List<FilterFactory> filtersFactories;
 
     public ProjectManager() {
         newProject();
+        filtersFactories = new LinkedList<>();
+//        Collection<? extends FilterFactory> factories = Lookup.getDefault().lookupAll(FilterFactory.class);
+//        for (FilterFactory factory : factories) {
+//            filtersFactories.add(factory);
+//        }
     }
 
     public void newProject() {
@@ -44,11 +53,11 @@ public class ProjectManager implements Lookup.Provider{
     public String getProjectName() {
         return name;
     }
-    
+
     public void renameProject(String name) {
         this.name = name;
     }
-       
+
     public File getProjectFolder() {
         return folder;
     }
@@ -56,7 +65,7 @@ public class ProjectManager implements Lookup.Provider{
     public Workspace getCurrentWorkspace() {
         return currentWS;
     }
-    
+
     public void setCurrentWorkspace(Workspace workspace) {
         if (!currentWS.equals(workspace)) {
             Collection<? extends Workspace> workspaces = lookup.lookupAll(Workspace.class);
@@ -111,6 +120,14 @@ public class ProjectManager implements Lookup.Provider{
             }
         }
         setCurrentWorkspace(defaultWorkspace);
+    }
+    
+    public FilterFactory getFactory(Filter filter){
+        for(FilterFactory factory: filtersFactories){
+            if (factory.getFilterClass().equals(filter.getClass()))
+                return factory;
+        }
+        return null;
     }
 
     /**
@@ -173,7 +190,7 @@ public class ProjectManager implements Lookup.Provider{
             }
         }
     }
-    
+
     public boolean isProjectFolder(File folder) {
         return false;
     }
@@ -185,6 +202,5 @@ public class ProjectManager implements Lookup.Provider{
     public Runnable saveProject(File file) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
 
 }

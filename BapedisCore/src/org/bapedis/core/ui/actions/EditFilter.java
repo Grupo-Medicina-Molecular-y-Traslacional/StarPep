@@ -61,7 +61,7 @@ public class EditFilter extends GlobalContextSensitiveAction<Filter> {
         Collection<? extends Filter> context = lkpResult.allInstances();
         if (!context.isEmpty()){
             Filter filter = context.iterator().next();
-            FilterFactory filterFactory = pm.getFactory(filter); 
+            FilterFactory filterFactory = pm.getFilterFactory(filter); 
             String title = NbBundle.getMessage(EditFilter.class, "FilterSetupDialog.title", filterFactory.getName());
             if (dialog.setup(filter, filterFactory.getSetupUI(), title)){
                 FilterExplorerTopComponent tc  = (FilterExplorerTopComponent) WindowManager.getDefault().findTopComponent("FilterExplorerTopComponent");

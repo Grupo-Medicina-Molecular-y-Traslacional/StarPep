@@ -287,24 +287,24 @@ public class PeptideViewer extends javax.swing.JPanel implements ExplorerManager
         view.getOutline().getSelectionModel().clearSelection();
     }
 
-//    private JButton createDropDownButtonSearch() {
-//        Image iconImage = ImageUtilities.loadImage("org/bapedis/core/resources/search.png");
-//        ImageIcon icon = new ImageIcon(iconImage);
-//        final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(new ImageIcon(
-//                new BufferedImage(16, 16, BufferedImage.TYPE_BYTE_GRAY)), quickFilterPopup);
-//
-//        dropDownButton.setIcon(icon);
-////        dropDownButton.setMargin(new java.awt.Insets(2, 4, 0, 4));
-//        dropDownButton.setToolTipText(NbBundle.getMessage(PeptideViewer.class, "CTL_QuickFilter"));
-//        dropDownButton.addActionListener(new ActionListener() {
-//
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                quickFilterPopup.show(dropDownButton, 0, dropDownButton.getHeight());
-//            }
-//        });
-//        return dropDownButton;
-//    }
+    private JButton createDropDownButtonSearch() {
+        Image iconImage = ImageUtilities.loadImage("org/bapedis/core/resources/search.png");
+        ImageIcon icon = new ImageIcon(iconImage);
+        final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(new ImageIcon(
+                new BufferedImage(16, 16, BufferedImage.TYPE_BYTE_GRAY)), quickFilterPopup);
+
+        dropDownButton.setIcon(icon);
+//        dropDownButton.setMargin(new java.awt.Insets(2, 4, 0, 4));
+        dropDownButton.setToolTipText(NbBundle.getMessage(PeptideViewer.class, "CTL_QuickFilter"));
+        dropDownButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                quickFilterPopup.show(dropDownButton, 0, dropDownButton.getHeight());
+            }
+        });
+        return dropDownButton;
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.

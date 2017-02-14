@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db.filters.impl;
+package org.bapedis.core.spi.filters.impl;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -13,12 +13,12 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterSetupUI;
-import org.bapedis.db.model.NeoPeptideModel;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -243,9 +243,9 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
     
     protected void initAttrComboBox(Workspace workspace) {
         attrComboBox.removeAllItems();
-        NeoPeptideModel pModel = workspace.getLookup().lookup(NeoPeptideModel.class);
-        if (pModel != null) {
-            for (PeptideAttribute attr : pModel.getAttributes()) {
+        AttributesModel attrModel = workspace.getLookup().lookup(AttributesModel.class);
+        if (attrModel != null) {
+            for (PeptideAttribute attr : attrModel.getAttributes()) {
                 attrComboBox.addItem(attr);
             }
             attrComboBox.setSelectedIndex(0);

@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db.filters.impl;
+package org.bapedis.core.spi.filters.impl;
 
+import org.bapedis.core.spi.filters.impl.FilterOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

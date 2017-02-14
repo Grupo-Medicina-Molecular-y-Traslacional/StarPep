@@ -11,19 +11,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.bapedis.core.spi.filters.Filter;
+import org.bapedis.core.spi.filters.impl.AttributeFilter;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.Lookups;
+import org.netbeans.swing.etable.QuickFilter;
 
 /**
  *
  * @author loge
  */
-public class FilterModel {
+public class FilterModel implements QuickFilter {
     protected int id;
     protected String name;
+    protected AttributeFilter onlineFilter;
     protected final List<Filter> filters;
     protected transient final PropertyChangeSupport propertyChangeSupport;
     public static final String ADD_CHILD = "ADD";
@@ -33,6 +36,28 @@ public class FilterModel {
     protected static final AtomicInteger counter = new AtomicInteger(1);
     protected RestrictionLevel restriction;
     protected Node rootContext;
+
+    @Override
+    public boolean accept(Object obj) {
+        Peptide peptide = (Peptide)obj;
+        switch (restriction) {
+            case MATCH_ALL:
+                for (Filter filter : filters) {
+                    if (!filter.accept(peptide)) {
+                        return false;
+                    }
+                }
+                return true;
+            case MATCH_ANY:
+                for (Filter filter : filters) {
+                    if (filter.accept(peptide)) {
+                        return true;
+                    }
+                }
+                return false;
+        }
+        return false;
+    }
     
     public enum RestrictionLevel{
         MATCH_ALL{
@@ -81,7 +106,15 @@ public class FilterModel {
 
     public Node getRootContext() {
         return rootContext;
-    }        
+    } 
+
+    public AttributeFilter getOnlineFilter() {
+        return onlineFilter;
+    }
+
+    public void setOnlineFilter(AttributeFilter onlineFilter) {
+        this.onlineFilter = onlineFilter;
+    }
 
     public void addFilter(Filter filter) {
         boolean oldIsEmpty = filters.isEmpty();

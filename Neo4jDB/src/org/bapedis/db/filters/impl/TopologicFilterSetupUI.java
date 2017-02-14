@@ -5,13 +5,14 @@
  */
 package org.bapedis.db.filters.impl;
 
-import java.awt.BorderLayout;
+import org.bapedis.core.spi.filters.impl.IntegerFilterOperator;
+import org.bapedis.core.spi.filters.impl.FilterHelper;
+import org.bapedis.core.spi.filters.impl.FilterOperator;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.Collection;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -23,7 +24,6 @@ import javax.swing.event.DocumentListener;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.db.services.NeoPeptideManager;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterSetupUI;
 import static org.bapedis.core.spi.filters.FilterSetupUI.VALID_STATE;

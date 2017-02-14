@@ -102,6 +102,7 @@
                 <package>org.bapedis.core.model</package>
                 <package>org.bapedis.core.services</package>
                 <package>org.bapedis.core.spi.filters</package>
+                <package>org.bapedis.core.spi.filters.impl</package>
                 <package>org.bapedis.core.ui</package>
                 <package>org.bapedis.core.ui.actions</package>
                 <package>org.bapedis.core.ui.components</package>

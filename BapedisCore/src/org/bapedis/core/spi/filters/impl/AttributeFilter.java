@@ -3,13 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db.filters.impl;
+package org.bapedis.core.spi.filters.impl;
 
 import java.util.Arrays;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.filters.Filter;
-import org.bapedis.db.model.NeoPeptide;
 
 /**
  *

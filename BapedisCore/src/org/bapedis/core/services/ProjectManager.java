@@ -31,15 +31,9 @@ public class ProjectManager implements Lookup.Provider {
     protected InstanceContent content;
     protected Workspace currentWS;
     protected List<WorkspaceEventListener> wsListeners;
-    protected final List<FilterFactory> filtersFactories;
 
     public ProjectManager() {
         newProject();
-        filtersFactories = new LinkedList<>();
-//        Collection<? extends FilterFactory> factories = Lookup.getDefault().lookupAll(FilterFactory.class);
-//        for (FilterFactory factory : factories) {
-//            filtersFactories.add(factory);
-//        }
     }
 
     public void newProject() {
@@ -122,8 +116,13 @@ public class ProjectManager implements Lookup.Provider {
         setCurrentWorkspace(defaultWorkspace);
     }
     
-    public FilterFactory getFactory(Filter filter){
-        for(FilterFactory factory: filtersFactories){
+    public FilterFactory[] getFilterFactories(){
+        Collection<? extends FilterFactory> factories = Lookup.getDefault().lookupAll(FilterFactory.class);
+        return factories.toArray(new FilterFactory[0]);
+    }
+    
+    public FilterFactory getFilterFactory(Filter filter){
+        for(FilterFactory factory: getFilterFactories()){
             if (factory.getFilterClass().equals(filter.getClass()))
                 return factory;
         }

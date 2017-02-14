@@ -80,10 +80,10 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
             restrictiveComboBox.addItem(restriction);
         }
 
-        filterToolBar2.add(createAddFilterButton());
+        filterToolBar1.add(createAddFilterButton());
         List<? extends Action> actions = Utilities.actionsForPath("Actions/EditFilter");
         for (Action action : actions) {
-            filterToolBar2.add(action);
+            filterToolBar1.add(action);
         }
         viewerScrollPane.setViewportView(new ListView());
     }
@@ -99,7 +99,6 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 
         viewerScrollPane = new javax.swing.JScrollPane();
         autoApplyCheckBox = new javax.swing.JCheckBox();
-        filterToolBar2 = new javax.swing.JToolBar();
         runButton = new javax.swing.JButton();
         filterToolBar1 = new javax.swing.JToolBar();
         restrictiveComboBox = new javax.swing.JComboBox();
@@ -122,14 +121,6 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         add(autoApplyCheckBox, gridBagConstraints);
-
-        filterToolBar2.setFloatable(false);
-        filterToolBar2.setRollover(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        add(filterToolBar2, gridBagConstraints);
 
         runButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/run.gif"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(runButton, org.openide.util.NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.runButton.text")); // NOI18N
@@ -176,7 +167,6 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox autoApplyCheckBox;
     private javax.swing.JToolBar filterToolBar1;
-    private javax.swing.JToolBar filterToolBar2;
     private javax.swing.JComboBox restrictiveComboBox;
     private javax.swing.JButton runButton;
     private javax.swing.JScrollPane viewerScrollPane;
@@ -234,11 +224,9 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 //    }
     private JButton createAddFilterButton() {
         final JPopupMenu popup = new JPopupMenu();
-        Collection<? extends FilterFactory> factories = Lookup.getDefault().lookupAll(FilterFactory.class);
-        if (!factories.isEmpty()) {
-            for (final FilterFactory factory : factories) {
-                popup.add(new AddFilter(factory));
-            }
+        FilterFactory[] factories = pc.getFilterFactories();
+        for (final FilterFactory factory : factories) {
+            popup.add(new AddFilter(factory));
         }
 
         final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/bapedis/core/resources/add.png", false), popup);

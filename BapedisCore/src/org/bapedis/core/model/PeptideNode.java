@@ -41,7 +41,9 @@ public class PeptideNode extends AbstractNode {
     public Image getIcon(int type) {
         return ImageUtilities.loadImage("org/bapedis/core/resources/molecule.png", true);
     }
-    
-    
+
+    public Peptide getPeptide() {
+        return peptide;
+    }
  
 }

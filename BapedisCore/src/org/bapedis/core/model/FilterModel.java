@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.bapedis.core.spi.filters.Filter;
-import org.bapedis.core.spi.filters.impl.AttributeFilter;
+import org.bapedis.core.spi.filters.impl.PrimaryFilter;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
@@ -24,9 +24,10 @@ import org.netbeans.swing.etable.QuickFilter;
  * @author loge
  */
 public class FilterModel implements QuickFilter {
+
     protected int id;
     protected String name;
-    protected AttributeFilter onlineFilter;
+    protected PrimaryFilter onlineFilter;
     protected final List<Filter> filters;
     protected transient final PropertyChangeSupport propertyChangeSupport;
     public static final String ADD_CHILD = "ADD";
@@ -39,7 +40,7 @@ public class FilterModel implements QuickFilter {
 
     @Override
     public boolean accept(Object obj) {
-        Peptide peptide = (Peptide)obj;
+        Peptide peptide = ((PeptideNode) obj).getPeptide();
         switch (restriction) {
             case MATCH_ALL:
                 for (Filter filter : filters) {
@@ -58,40 +59,41 @@ public class FilterModel implements QuickFilter {
         }
         return false;
     }
-    
-    public enum RestrictionLevel{
-        MATCH_ALL{
 
-            @Override
-            public String toString() {
-                return NbBundle.getMessage(FilterModel.class, "FilterModel.restrictiveMode.matchAll"); 
-            }
-         
-        },
-        MATCH_ANY{
+    public enum RestrictionLevel {
 
-            @Override
-            public String toString() {
-                return NbBundle.getMessage(FilterModel.class, "FilterModel.restrictiveMode.matchAny");
-            }
-            
-        };                
-        
+        MATCH_ALL {
+
+                    @Override
+                    public String toString() {
+                        return NbBundle.getMessage(FilterModel.class, "FilterModel.restrictiveMode.matchAll");
+                    }
+
+                },
+        MATCH_ANY {
+
+                    @Override
+                    public String toString() {
+                        return NbBundle.getMessage(FilterModel.class, "FilterModel.restrictiveMode.matchAny");
+                    }
+
+                };
+
     }
-    
-    public static String getPrefixName(){
+
+    public static String getPrefixName() {
         return NbBundle.getMessage(FilterModel.class, "FilterModel.prefix");
     }
-    
-    public static int getCount(){
+
+    public static int getCount() {
         return counter.get();
     }
-    
+
     public FilterModel() {
         this(counter.getAndIncrement(), NbBundle.getMessage(FilterModel.class, "FilterModel.prefix") + " " + (counter.get() - 1));
     }
-    
-    public FilterModel(String name){
+
+    public FilterModel(String name) {
         this(counter.getAndIncrement(), name);
     }
 
@@ -106,14 +108,18 @@ public class FilterModel implements QuickFilter {
 
     public Node getRootContext() {
         return rootContext;
-    } 
+    }
 
-    public AttributeFilter getOnlineFilter() {
+    public PrimaryFilter getOnlineFilter() {
         return onlineFilter;
     }
 
-    public void setOnlineFilter(AttributeFilter onlineFilter) {
+    public void setOnlineFilter(PrimaryFilter onlineFilter) {
+        if (this.onlineFilter != null) {
+            removeFilter(this.onlineFilter);
+        }
         this.onlineFilter = onlineFilter;
+        addFilter(onlineFilter);
     }
 
     public void addFilter(Filter filter) {
@@ -129,18 +135,18 @@ public class FilterModel implements QuickFilter {
         propertyChangeSupport.firePropertyChange(IS_EMPTY, oldIsEmpty, filters.isEmpty());
         propertyChangeSupport.firePropertyChange(REMOVE_CHILD, filter, null);
     }
-    
-    public boolean isEmpty(){
+
+    public boolean isEmpty() {
         return filters.isEmpty();
     }
-    
-    public Filter[] getFilters(){
+
+    public Filter[] getFilters() {
         return filters.toArray(new Filter[0]);
     }
 
     public int getId() {
         return id;
-    }        
+    }
 
     public String getName() {
         return name;
@@ -158,7 +164,7 @@ public class FilterModel implements QuickFilter {
 
     public void setRestriction(RestrictionLevel restriction) {
         this.restriction = restriction;
-    }        
+    }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
@@ -171,7 +177,7 @@ public class FilterModel implements QuickFilter {
     @Override
     public String toString() {
         return name;
-    }   
+    }
 
     @Override
     public int hashCode() {
@@ -190,6 +196,6 @@ public class FilterModel implements QuickFilter {
         }
         final FilterModel other = (FilterModel) obj;
         return id == other.id;
-    }   
-    
+    }
+
 }

@@ -5,13 +5,16 @@
  */
 package org.bapedis.core.spi.filters;
 
+import org.bapedis.core.model.PeptideAttribute;
+import org.bapedis.core.spi.filters.impl.FilterOperator;
+
 /**
  *
  * @author loge
  */
 public interface FilterFactory {
-    String getName();
-    Filter createFilter();
-    FilterSetupUI getSetupUI();
-    Class getFilterClass();
+    PeptideAttribute[] getAttributes();
+    Filter createFilter(PeptideAttribute attr, FilterOperator op, String val);
+//    FilterSetupUI getSetupUI();
+//    Class getFilterClass();
 }

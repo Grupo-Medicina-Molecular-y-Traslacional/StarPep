@@ -14,8 +14,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author loge
  */
-@ServiceProvider(service=FilterFactory.class)
-public class SimilarityFilterFactory implements FilterFactory {
+public class SimilarityFilterFactory  {
 
     SimilarityFilterSetupUI setupUI;
     
@@ -23,22 +22,20 @@ public class SimilarityFilterFactory implements FilterFactory {
 //        setupUI = new SimilarityFilterSetupUI();
     }
             
-    @Override
+
     public String getName() {
         return "Similarity filter";
     }
 
-    @Override
     public Filter createFilter() {
         return new SimilarityFilter();
     }
 
-    @Override
+
     public FilterSetupUI getSetupUI() {
         return setupUI;
     }
 
-    @Override
     public Class getFilterClass() {
         return SimilarityFilter.class;
     }

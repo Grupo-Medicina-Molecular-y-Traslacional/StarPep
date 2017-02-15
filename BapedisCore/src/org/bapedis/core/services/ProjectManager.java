@@ -120,14 +120,6 @@ public class ProjectManager implements Lookup.Provider {
         Collection<? extends FilterFactory> factories = Lookup.getDefault().lookupAll(FilterFactory.class);
         return factories.toArray(new FilterFactory[0]);
     }
-    
-    public FilterFactory getFilterFactory(Filter filter){
-        for(FilterFactory factory: getFilterFactories()){
-            if (factory.getFilterClass().equals(filter.getClass()))
-                return factory;
-        }
-        return null;
-    }
 
     /**
      * Adds an abilities to this project.

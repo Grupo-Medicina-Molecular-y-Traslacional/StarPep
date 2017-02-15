@@ -10,19 +10,22 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.ui.components.PeptideViewer;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.PeptideAttribute;
+import org.bapedis.core.spi.filters.Filter;
+import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.spi.filters.impl.FilterHelper;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -69,9 +72,9 @@ import org.openide.util.NbBundle.Messages;
     "HINT_PeptideViewerTopComponent=A peptide and neighbor nodes window"
 })
 public final class PeptideViewerTopComponent extends TopComponent implements
-        ExplorerManager.Provider, WorkspaceEventListener, LookupListener {
+        ExplorerManager.Provider, WorkspaceEventListener, LookupListener, PropertyChangeListener {
 
-    protected ProjectManager pc;
+    protected final ProjectManager pc;
     protected Lookup.Result<AttributesModel> peptideLkpResult;
     protected final ExplorerManager explorerMgr;
     protected final OutlineView view;
@@ -110,32 +113,35 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         //Populate filter panel
         populateFilterFields();
         rightPanel.add(createDropDownButtonSearch());
-        jValueTextField.getDocument().addDocumentListener(new DocumentListener() {
+//        jValueTextField.getDocument().addDocumentListener(new DocumentListener() {
+//            
+//            public void insertUpdate(DocumentEvent e) {
+//                
+//            }
+//            
+//            public void removeUpdate(DocumentEvent e) {
+//                
+//            }
+//            
+//            public void changedUpdate(DocumentEvent e) {
+//            }
+//        });
 
-            public void insertUpdate(DocumentEvent e) {
-                applyPrimaryFilter();
-            }
-
-            public void removeUpdate(DocumentEvent e) {
-                applyPrimaryFilter();
-            }
-
-            public void changedUpdate(DocumentEvent e) {
-            }
-        });
-        
     }
 
     private void populateFilterFields() {
-        jFieldComboBox.addItem(new PeptideAttribute("id", "ID", String.class));
-        jFieldComboBox.addItem(new PeptideAttribute("seq", "Sequence", String.class));
-        jFieldComboBox.addItem(new PeptideAttribute("length", "Lenght", Integer.class));
+        FilterFactory[] filterFactories = pc.getFilterFactories();
+        for (FilterFactory filterFactory : filterFactories) {
+            for (PeptideAttribute attr : filterFactory.getAttributes()) {
+                jFieldComboBox.addItem(new MyComboBoxItem(attr, filterFactory));
+            }
+        }
         jFieldComboBox.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 jOperatorComboBox.removeAllItems();
-                PeptideAttribute attr = (PeptideAttribute) jFieldComboBox.getSelectedItem();
+                PeptideAttribute attr = ((MyComboBoxItem) jFieldComboBox.getSelectedItem()).attr;
                 FilterOperator[] operators = FilterHelper.getOperators(attr.getType());
                 for (FilterOperator operator : operators) {
                     jOperatorComboBox.addItem(operator);
@@ -144,15 +150,15 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         });
         jFieldComboBox.setSelectedIndex(0);
     }
-    
-   private JButton createDropDownButtonSearch() {
+
+    private JButton createDropDownButtonSearch() {
         final JPopupMenu filterPopup = new JPopupMenu();
         JMenuItem item = new JMenuItem("add");
         filterPopup.add(item);
         item = new JMenuItem("remove");
         filterPopup.add(item);
-        
-        Image iconImage = ImageUtilities.loadImage("org/bapedis/core/resources/search.png");
+
+        Image iconImage = ImageUtilities.loadImage("org/bapedis/core/resources/config.png");
         ImageIcon icon = new ImageIcon(iconImage);
         final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(new ImageIcon(
                 new BufferedImage(16, 16, BufferedImage.TYPE_BYTE_GRAY)), filterPopup);
@@ -169,10 +175,16 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         });
         return dropDownButton;
     }
-   
-    private void applyPrimaryFilter() {
+
+    private void applyFilter(FilterModel filterModel) {
+        if (filterModel != null) {
+            view.getOutline().setQuickFilter(0, filterModel);
+        } else {
+            view.getOutline().unsetQuickFilter();
+        }
 //       if value is empty view.set filter: filtermodel
 //       else view.set filter: online filter (field, operator, value)
+        // pensar en un filermodel.update
     }
 
     /**
@@ -191,6 +203,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         jFieldComboBox = new javax.swing.JComboBox();
         jOperatorComboBox = new javax.swing.JComboBox();
         jValueTextField = new javax.swing.JTextField();
+        jAddButton = new javax.swing.JButton();
         dataPanel = new javax.swing.JPanel();
 
         setMinimumSize(new java.awt.Dimension(331, 250));
@@ -218,6 +231,15 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         jValueTextField.setPreferredSize(new java.awt.Dimension(150, 26));
         rightPanel.add(jValueTextField);
 
+        jAddButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/add.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jAddButton, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jAddButton.text")); // NOI18N
+        jAddButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jAddButtonActionPerformed(evt);
+            }
+        });
+        rightPanel.add(jAddButton);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -240,8 +262,26 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         add(dataPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jAddButtonActionPerformed
+        Workspace currentWs = pc.getCurrentWorkspace();
+        FilterModel filterModel = currentWs.getLookup().lookup(FilterModel.class);
+        if (filterModel == null) {
+            filterModel = new FilterModel();
+            currentWs.add(filterModel);
+            filterModel.addPropertyChangeListener(this);
+        }
+        MyComboBoxItem item = (MyComboBoxItem) jFieldComboBox.getSelectedItem();
+        FilterFactory factory = item.filterFactory;
+        PeptideAttribute attr = item.attr;
+        FilterOperator operator = (FilterOperator) jOperatorComboBox.getSelectedItem();
+        Filter filter = factory.createFilter(attr, operator, jValueTextField.getText());
+        filterModel.addFilter(filter);
+
+    }//GEN-LAST:event_jAddButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel dataPanel;
+    private javax.swing.JButton jAddButton;
     private javax.swing.JComboBox jFieldComboBox;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JComboBox jOperatorComboBox;
@@ -276,6 +316,10 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     public void componentClosed() {
         removeLookupListener();
         pc.removeWorkspaceEventListener(this);
+        FilterModel filterModel = pc.getCurrentWorkspace().getLookup().lookup(FilterModel.class);
+        if (filterModel != null) {
+            filterModel.removePropertyChangeListener(this);
+        }
     }
 
     void writeProperties(java.util.Properties p) {
@@ -293,10 +337,21 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
         removeLookupListener();
+        if (oldWs != null) {
+            FilterModel oldFilterModel = oldWs.getLookup().lookup(FilterModel.class);
+            if (oldFilterModel != null) {
+                oldFilterModel.removePropertyChangeListener(this);
+            }
+        }
         peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
         peptideLkpResult.addLookupListener(this);
         AttributesModel peptidesModel = newWs.getLookup().lookup(AttributesModel.class);
         showData(peptidesModel);
+        FilterModel filterModel = newWs.getLookup().lookup(FilterModel.class);
+        if (filterModel != null) {
+            filterModel.addPropertyChangeListener(this);
+            applyFilter(filterModel);
+        }
     }
 
     @Override
@@ -321,6 +376,30 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     @Override
     public ExplorerManager getExplorerManager() {
         return explorerMgr;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getSource() instanceof FilterModel) {
+            applyFilter((FilterModel) evt.getSource());
+        }
+    }
+
+    class MyComboBoxItem {
+
+        PeptideAttribute attr;
+        FilterFactory filterFactory;
+
+        public MyComboBoxItem(PeptideAttribute attr, FilterFactory filterFactory) {
+            this.attr = attr;
+            this.filterFactory = filterFactory;
+        }
+
+        @Override
+        public String toString() {
+            return attr.getDisplayName();
+        }
+
     }
 
 }

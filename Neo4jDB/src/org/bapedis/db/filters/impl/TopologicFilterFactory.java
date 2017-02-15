@@ -6,17 +6,15 @@
 package org.bapedis.db.filters.impl;
 
 import org.bapedis.core.spi.filters.Filter;
-import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.spi.filters.FilterSetupUI;
 import org.openide.util.NbBundle;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author loge
  */
-@ServiceProvider(service=FilterFactory.class)
-public class TopologicFilterFactory implements FilterFactory{
+
+public class TopologicFilterFactory {
     protected final String name;
     protected  FilterSetupUI setupUI;
 
@@ -26,22 +24,18 @@ public class TopologicFilterFactory implements FilterFactory{
     }
 
     
-    @Override
     public String getName() {
         return name;
     }
 
-    @Override
     public Filter createFilter() {
         return new TopologicFilter();
     }
 
-    @Override
     public FilterSetupUI getSetupUI() {
         return setupUI;
     }
 
-    @Override
     public Class getFilterClass() {
         return TopologicFilter.class;
     }

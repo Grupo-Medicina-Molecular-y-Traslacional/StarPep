@@ -7,10 +7,7 @@ package org.bapedis.db.model;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.StringTokenizer;
 import javax.swing.Action;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.PeptideNode;

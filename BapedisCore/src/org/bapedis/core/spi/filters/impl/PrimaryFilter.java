@@ -14,13 +14,19 @@ import org.bapedis.core.spi.filters.Filter;
  *
  * @author loge
  */
-public class AttributeFilter implements Filter {
+public class PrimaryFilter implements Filter {
 
     protected boolean negative;
     protected PeptideAttribute attr;
     protected FilterOperator operator;
     protected String value;
     protected boolean matchCase;
+
+    public PrimaryFilter(PeptideAttribute attr, FilterOperator operator, String value) {
+        this.attr = attr;
+        this.operator = operator;
+        this.value = value;
+    }
 
     public PeptideAttribute getAttribute() {
         return attr;
@@ -71,17 +77,15 @@ public class AttributeFilter implements Filter {
     @Override
     public boolean accept(Peptide peptide) {
         boolean accepted = false;
-        if (peptide.getAttributes().contains(attr)) {
-            Object objValue = peptide.getAttributeValue(attr);
-            if (String[].class.equals(attr.getType())) {
-                String strValue = Arrays.toString((String[]) objValue);
-                accepted = (matchCase) ? operator.applyTo(strValue, value) : operator.applyTo(strValue.toUpperCase(), value.toUpperCase());
-            } else if (String.class.equals(attr.getType())) {
-                accepted = (matchCase) ? operator.applyTo(objValue, value) : operator.applyTo(objValue.toString().toUpperCase(), value.toUpperCase());
-            } else { // The matchCase is ignored
-                accepted = operator.applyTo(objValue, value);
-            }
+        Object objValue = null;
+        if (attr.getId().equals("id")) {
+            objValue = peptide.getId();
+        } else if (attr.getId().equals("seq")) {
+            objValue = peptide.getSequence();
+        } else if (attr.getId().equals("length")) {
+            objValue = peptide.getLength();
         }
+        accepted = (matchCase) ? operator.applyTo(objValue, value) : operator.applyTo(objValue.toString().toUpperCase(), value.toUpperCase());
         return negative ? !accepted : accepted;
     }
 

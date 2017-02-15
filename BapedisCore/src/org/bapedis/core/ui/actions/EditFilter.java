@@ -59,22 +59,22 @@ public class EditFilter extends GlobalContextSensitiveAction<Filter> {
     @Override
     public void actionPerformed(ActionEvent e) {
         Collection<? extends Filter> context = lkpResult.allInstances();
-        if (!context.isEmpty()){
-            Filter filter = context.iterator().next();
-            FilterFactory filterFactory = pm.getFilterFactory(filter); 
-            String title = NbBundle.getMessage(EditFilter.class, "FilterSetupDialog.title", filterFactory.getName());
-            if (dialog.setup(filter, filterFactory.getSetupUI(), title)){
-                FilterExplorerTopComponent tc  = (FilterExplorerTopComponent) WindowManager.getDefault().findTopComponent("FilterExplorerTopComponent");
-                ExplorerManager manager = tc.getExplorerManager();
-                Node[] nodes = manager.getRootContext().getChildren().getNodes();
-                for(Node node: nodes){
-                    FilterNode filterNode = (FilterNode)node;
-                    if (filterNode.getFilter().equals(filter)){
-                        filterNode.refresh();
-                        break;
-                    }
-                }
-            }
-        }        
+//        if (!context.isEmpty()){
+//            Filter filter = context.iterator().next();
+//            FilterFactory filterFactory = pm.getFilterFactory(filter); 
+//            String title = NbBundle.getMessage(EditFilter.class, "FilterSetupDialog.title", filterFactory.getName());
+//            if (dialog.setup(filter, filterFactory.getSetupUI(), title)){
+//                FilterExplorerTopComponent tc  = (FilterExplorerTopComponent) WindowManager.getDefault().findTopComponent("FilterExplorerTopComponent");
+//                ExplorerManager manager = tc.getExplorerManager();
+//                Node[] nodes = manager.getRootContext().getChildren().getNodes();
+//                for(Node node: nodes){
+//                    FilterNode filterNode = (FilterNode)node;
+//                    if (filterNode.getFilter().equals(filter)){
+//                        filterNode.refresh();
+//                        break;
+//                    }
+//                }
+//            }
+//        }        
     }            
 }

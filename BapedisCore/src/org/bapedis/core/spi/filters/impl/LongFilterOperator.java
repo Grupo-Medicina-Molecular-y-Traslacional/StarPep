@@ -5,8 +5,6 @@
  */
 package org.bapedis.core.spi.filters.impl;
 
-import org.bapedis.core.spi.filters.impl.FilterOperator;
-
 /**
  *
  * @author loge

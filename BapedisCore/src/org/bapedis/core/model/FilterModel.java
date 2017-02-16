@@ -30,10 +30,9 @@ public class FilterModel implements QuickFilter {
     protected PrimaryFilter onlineFilter;
     protected final List<Filter> filters;
     protected transient final PropertyChangeSupport propertyChangeSupport;
-    public static final String ADD_CHILD = "ADD";
-    public static final String REMOVE_CHILD = "REMOVE";
-    public static final String IS_EMPTY = "IS_EMPTY";
-    public static final String NAME = "NAME";
+    public static final String ADDED_CHILD = "ADD";
+    public static final String REMOVED_CHILD = "REMOVE";
+    public static final String CHANGED_RESTRICTION = "RESTRICTION";
     protected static final AtomicInteger counter = new AtomicInteger(1);
     protected RestrictionLevel restriction;
     protected Node rootContext;
@@ -100,7 +99,7 @@ public class FilterModel implements QuickFilter {
     private FilterModel(int id, String name) {
         this.id = id;
         this.name = name;
-        this.restriction = RestrictionLevel.MATCH_ALL;
+        this.restriction = RestrictionLevel.MATCH_ANY;
         filters = new LinkedList<>();
         propertyChangeSupport = new PropertyChangeSupport(this);
         rootContext = new AbstractNode(Children.create(new FilterModelChildFactory(this), true), Lookups.singleton(this));
@@ -123,17 +122,13 @@ public class FilterModel implements QuickFilter {
     }
 
     public void addFilter(Filter filter) {
-        boolean oldIsEmpty = filters.isEmpty();
         filters.add(filter);
-        propertyChangeSupport.firePropertyChange(IS_EMPTY, oldIsEmpty, filters.isEmpty());
-        propertyChangeSupport.firePropertyChange(ADD_CHILD, null, filter);
+        propertyChangeSupport.firePropertyChange(ADDED_CHILD, null, filter);
     }
 
     public void removeFilter(Filter filter) {
-        boolean oldIsEmpty = filters.isEmpty();
         filters.remove(filter);
-        propertyChangeSupport.firePropertyChange(IS_EMPTY, oldIsEmpty, filters.isEmpty());
-        propertyChangeSupport.firePropertyChange(REMOVE_CHILD, filter, null);
+        propertyChangeSupport.firePropertyChange(REMOVED_CHILD, filter, null);
     }
 
     public boolean isEmpty() {
@@ -153,9 +148,7 @@ public class FilterModel implements QuickFilter {
     }
 
     public void setName(String name) {
-        String oldName = this.name;
         this.name = name;
-        propertyChangeSupport.firePropertyChange(NAME, oldName, name);
     }
 
     public RestrictionLevel getRestriction() {
@@ -163,7 +156,9 @@ public class FilterModel implements QuickFilter {
     }
 
     public void setRestriction(RestrictionLevel restriction) {
+        RestrictionLevel old = this.restriction;
         this.restriction = restriction;
+        propertyChangeSupport.firePropertyChange(CHANGED_RESTRICTION, old, restriction);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {

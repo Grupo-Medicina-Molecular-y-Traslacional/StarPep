@@ -61,7 +61,7 @@ import org.openide.util.Utilities;
     "CTL_FilterExplorerTopComponent=Filter Explorer",
     "HINT_FilterExplorerTopComponent=This is a FilterExplorer window"
 })
-public final class FilterExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener, LookupListener, ExplorerManager.Provider {
+public final class FilterExplorerTopComponent extends TopComponent implements WorkspaceEventListener, LookupListener, ExplorerManager.Provider {
 
     protected final ExplorerManager explorerMgr;
     protected final ProjectManager pc;
@@ -80,7 +80,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
             restrictiveComboBox.addItem(restriction);
         }
 
-        filterToolBar1.add(createAddFilterButton());
+//        filterToolBar1.add(createAddFilterButton());
         List<? extends Action> actions = Utilities.actionsForPath("Actions/EditFilter");
         for (Action action : actions) {
             filterToolBar1.add(action);
@@ -98,8 +98,6 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         java.awt.GridBagConstraints gridBagConstraints;
 
         viewerScrollPane = new javax.swing.JScrollPane();
-        autoApplyCheckBox = new javax.swing.JCheckBox();
-        runButton = new javax.swing.JButton();
         filterToolBar1 = new javax.swing.JToolBar();
         restrictiveComboBox = new javax.swing.JComboBox();
 
@@ -108,31 +106,11 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         viewerScrollPane.setPreferredSize(new java.awt.Dimension(100, 177));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(viewerScrollPane, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(autoApplyCheckBox, org.openide.util.NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.autoApplyCheckBox.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        add(autoApplyCheckBox, gridBagConstraints);
-
-        runButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/run.gif"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(runButton, org.openide.util.NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.runButton.text")); // NOI18N
-        runButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                runButtonActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        add(runButton, gridBagConstraints);
 
         filterToolBar1.setFloatable(false);
         filterToolBar1.setRollover(true);
@@ -147,9 +125,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
         add(filterToolBar1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -160,15 +136,9 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         }
     }//GEN-LAST:event_restrictiveComboBoxActionPerformed
 
-    private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
-        run();
-    }//GEN-LAST:event_runButtonActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox autoApplyCheckBox;
     private javax.swing.JToolBar filterToolBar1;
     private javax.swing.JComboBox restrictiveComboBox;
-    private javax.swing.JButton runButton;
     private javax.swing.JScrollPane viewerScrollPane;
     // End of variables declaration//GEN-END:variables
     @Override
@@ -188,10 +158,6 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         if (filterModelkpResult != null) {
             filterModelkpResult.removeLookupListener(this);
             filterModelkpResult = null;
-        }
-        FilterModel filterModel = getFilterModel();
-        if (filterModel != null) {
-            filterModel.removePropertyChangeListener(this);
         }
     }
 
@@ -247,7 +213,6 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 
     private void setFilterModel(FilterModel filterModel) {
         if (filterModel != null) {
-            filterModel.addPropertyChangeListener(this);
             restrictiveComboBox.setSelectedItem(filterModel.getRestriction());
             restrictiveComboBox.setVisible(true);
             explorerMgr.setRootContext(filterModel.getRootContext());
@@ -264,29 +229,10 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
             filterModelkpResult.removeLookupListener(this);
             filterModelkpResult = null;
         }
-        if (oldWs != null) {
-            FilterModel oldFilterModel = oldWs.getLookup().lookup(FilterModel.class);
-            if (oldFilterModel != null) {
-                oldFilterModel.removePropertyChangeListener(this);
-            }
-        }
         filterModelkpResult = newWs.getLookup().lookupResult(FilterModel.class);
         filterModelkpResult.addLookupListener(this);
         FilterModel filterModel = newWs.getLookup().lookup(FilterModel.class);
         setFilterModel(filterModel);
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource() instanceof FilterModel) {
-//            else if (evt.getPropertyName().equals(FilterModel.IS_EMPTY)){
-//                FilterModel filterModel = (FilterModel)evt.getSource();
-//                boolean isEmpty = filterModel.isEmpty();
-//                if (isEmpty){
-//                    
-//                }
-//            }
-        }
     }
 
     @Override

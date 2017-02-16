@@ -76,7 +76,6 @@ public class PrimaryFilter implements Filter {
 
     @Override
     public boolean accept(Peptide peptide) {
-        boolean accepted = false;
         Object objValue = null;
         if (attr.getId().equals("id")) {
             objValue = peptide.getId();
@@ -85,7 +84,8 @@ public class PrimaryFilter implements Filter {
         } else if (attr.getId().equals("length")) {
             objValue = peptide.getLength();
         }
-        accepted = (matchCase) ? operator.applyTo(objValue, value) : operator.applyTo(objValue.toString().toUpperCase(), value.toUpperCase());
+        boolean accepted = operator.applyTo(objValue, value);
+//        accepted = (matchCase) ? operator.applyTo(objValue, value) : operator.applyTo(objValue.toString().toUpperCase(), value.toUpperCase());
         return negative ? !accepted : accepted;
     }
 

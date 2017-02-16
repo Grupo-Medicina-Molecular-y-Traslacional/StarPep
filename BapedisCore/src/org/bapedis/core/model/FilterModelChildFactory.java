@@ -42,11 +42,10 @@ public class FilterModelChildFactory extends ChildFactory<Filter> implements Pro
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(FilterModel.ADD_CHILD)){
+        if (evt.getPropertyName().equals(FilterModel.ADDED_CHILD) ||
+            evt.getPropertyName().equals(FilterModel.REMOVED_CHILD) ){
             refresh(true);
-        } else if (evt.getPropertyName().equals(FilterModel.REMOVE_CHILD)){
-            refresh(true);
-        }                    
+        }                   
     }
     
 }

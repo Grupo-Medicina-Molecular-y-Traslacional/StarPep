@@ -38,8 +38,6 @@ public class FilterModelChildFactory extends ChildFactory<Filter> implements Pro
         return new FilterNode(key);
     }
     
-    
-
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(FilterModel.ADDED_CHILD) ||

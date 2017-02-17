@@ -37,6 +37,8 @@ public class BioCategoryNode extends AbstractNode implements PropertyChangeListe
         
         return nodeActions.toArray(new Action[0]);
     }
+    
+    
 
     @Override
     public String getHtmlDisplayName() {

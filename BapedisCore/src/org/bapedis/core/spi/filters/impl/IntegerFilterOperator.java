@@ -15,14 +15,18 @@ public enum IntegerFilterOperator implements FilterOperator {
 
                 @Override
                 public boolean applyTo(Object obj, String operand, boolean matchCase) {
-                    return obj.equals(operand);
+                    int val1 = (int) obj;
+                    int val2 = Integer.parseInt(operand);
+                    return val1 == val2;
                 }
             },
     NOT_EQUALS("<>") {
 
                 @Override
                 public boolean applyTo(Object obj, String operand, boolean matchCase) {
-                    return !obj.equals(operand);
+                    int val1 = (int) obj;
+                    int val2 = Integer.parseInt(operand);
+                    return val1 != val2;
                 }
 
             },
@@ -30,37 +34,37 @@ public enum IntegerFilterOperator implements FilterOperator {
 
                 @Override
                 public boolean applyTo(Object obj, String operand, boolean matchCase) {
-                    int val1 = (int)obj;
+                    int val1 = (int) obj;
                     int val2 = Integer.parseInt(operand);
                     return val1 < val2;
                 }
 
-            }, 
+            },
     LESS_OR_EQUALS("<=") {
 
                 @Override
                 public boolean applyTo(Object obj, String operand, boolean matchCase) {
-                    int val1 = (int)obj;
+                    int val1 = (int) obj;
                     int val2 = Integer.parseInt(operand);
                     return val1 <= val2;
                 }
 
-            }, 
+            },
     GREATER(">") {
 
                 @Override
                 public boolean applyTo(Object obj, String operand, boolean matchCase) {
-                    int val1 = (int)obj;
+                    int val1 = (int) obj;
                     int val2 = Integer.parseInt(operand);
                     return val1 > val2;
                 }
 
-            }, 
+            },
     GREATER_OR_EQUALS(">=") {
 
                 @Override
                 public boolean applyTo(Object obj, String operand, boolean matchCase) {
-                    int val1 = (int)obj;
+                    int val1 = (int) obj;
                     int val2 = Integer.parseInt(operand);
                     return val1 >= val2;
                 }

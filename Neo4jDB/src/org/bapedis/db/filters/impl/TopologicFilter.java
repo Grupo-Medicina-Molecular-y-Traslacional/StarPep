@@ -7,12 +7,9 @@ package org.bapedis.db.filters.impl;
 
 import org.bapedis.core.spi.filters.impl.IntegerFilterOperator;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
-import java.util.Arrays;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.filters.Filter;
-import org.bapedis.db.model.NeoNeighbor;
-import org.bapedis.db.model.NeoPeptide;
 
 /**
  *

@@ -97,11 +97,11 @@ public class NeoPeptideNode extends PeptideNode {
             name = aType.name().toLowerCase();
             set = Sheet.createPropertiesSet();
             set.setName(name);
-            set.setDisplayName(NbBundle.getMessage(NeoPeptideNode.class, "PropertySet." + name));
+            set.setDisplayName(aType.getDisplayName());
             neighbors = ((NeoPeptide) peptide).getAnnotations(aType);
             for (NeoNeighbor neighbor : neighbors) {
                 desc = Arrays.toString(neighbor.getXref());
-                property = createPropertyField(name + count, NbBundle.getMessage(NeoPeptideNode.class, "PropertySet." + name),
+                property = createPropertyField(name + count, aType.getDisplayName(),
                         desc, String.class, neighbor.getName());
                 set.put(property);
                 count++;
@@ -126,16 +126,16 @@ public class NeoPeptideNode extends PeptideNode {
         
         
         // Descriptors
-        set = Sheet.createPropertiesSet();
-        set.setName("attributes");
-        set.setDisplayName(NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.attributes"));
-        for (PeptideAttribute attr : peptide.getAttributes()) {
-            property = createPropertyField(attr.getId(), attr.getId(), attr.getId(), attr.getType(), peptide.getAttributeValue(attr));
-            set.put(property);
-        }
-        set.put(property);
-        set.setValue("tabName", NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.attributes.tabName"));
-        sheet.put(set);
+//        set = Sheet.createPropertiesSet();
+//        set.setName("attributes");
+//        set.setDisplayName(NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.attributes"));
+//        for (PeptideAttribute attr : peptide.getAttributes()) {
+//            property = createPropertyField(attr.getId(), attr.getId(), attr.getId(), attr.getType(), peptide.getAttributeValue(attr));
+//            set.put(property);
+//        }
+//        set.put(property);
+//        set.setValue("tabName", NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.attributes.tabName"));
+//        sheet.put(set);
         
         return sheet;
     }

@@ -98,7 +98,6 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         valueTextField = new javax.swing.JTextField();
         errorLabel = new javax.swing.JLabel();
         matchCaseCheckBox = new javax.swing.JCheckBox();
-        blankLabel = new javax.swing.JLabel();
         notCheckBox = new javax.swing.JCheckBox();
 
         setMinimumSize(new java.awt.Dimension(126, 90));
@@ -175,14 +174,6 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         add(matchCaseCheckBox, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(blankLabel, org.openide.util.NbBundle.getMessage(AttributeFilterSetupUI.class, "AttributeFilterSetupUI.blankLabel.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.weighty = 1.0;
-        add(blankLabel, gridBagConstraints);
-
         org.openide.awt.Mnemonics.setLocalizedText(notCheckBox, org.openide.util.NbBundle.getMessage(AttributeFilterSetupUI.class, "AttributeFilterSetupUI.notCheckBox.text")); // NOI18N
         notCheckBox.setMargin(new java.awt.Insets(2, 0, 2, 2));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -207,7 +198,6 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox attrComboBox;
     private javax.swing.JLabel attrLabel;
-    private javax.swing.JLabel blankLabel;
     private javax.swing.JLabel errorLabel;
     private javax.swing.JCheckBox matchCaseCheckBox;
     private javax.swing.JCheckBox notCheckBox;

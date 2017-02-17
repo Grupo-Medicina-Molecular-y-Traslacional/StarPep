@@ -14,14 +14,18 @@ public enum LongFilterOperator implements FilterOperator {
 
                 @Override
                 public boolean applyTo(Object obj, String operand, boolean matchCase) {
-                    return obj.equals(operand);
+                    long val1 = (long) obj;
+                    long val2 = Long.parseLong(operand);
+                    return val1 == val2;
                 }
             },
     NOT_EQUALS("<>") {
 
                 @Override
                 public boolean applyTo(Object obj, String operand, boolean matchCase) {
-                    return !obj.equals(operand);
+                    long val1 = (long) obj;
+                    long val2 = Long.parseLong(operand);
+                    return val1 != val2;
                 }
 
             },

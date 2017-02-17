@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.spi.filters.impl;
 
-import java.util.Arrays;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.filters.Filter;

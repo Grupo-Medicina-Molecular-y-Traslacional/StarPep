@@ -5,15 +5,86 @@
  */
 package org.bapedis.db.model;
 
+import org.openide.util.NbBundle;
+
 /**
  *
  * @author loge
  */
 public enum AnnotationType {
-    DATABASE, 
-    NAME,
-    ORIGIN,
-    TARGET,
-    BIOCATEGORY,
-    LITERATURE
+    DATABASE {
+
+        @Override
+        public String getDisplayName() {
+            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.database");
+        }
+
+        @Override
+        public String getDescription() {
+            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.database.desc");
+        }
+    }, 
+    NAME {
+
+        @Override
+        public String getDisplayName() {
+            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.name");
+        }
+
+        @Override
+        public String getDescription() {
+            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.name.desc");
+        }
+    },
+    ORIGIN {
+
+        @Override
+        public String getDisplayName() {
+            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.origin");
+        }
+
+        @Override
+        public String getDescription() {
+            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.origin.desc");
+        }
+    },
+    TARGET {
+
+        @Override
+        public String getDisplayName() {
+            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.target");
+        }
+
+        @Override
+        public String getDescription() {
+            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.target.desc");
+        }
+    },
+    BIOCATEGORY {
+
+        @Override
+        public String getDisplayName() {
+            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.biocategory");
+        }
+
+        @Override
+        public String getDescription() {
+            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.biocategory.desc");
+        }
+    },
+    LITERATURE {
+
+        @Override
+        public String getDisplayName() {
+             return NbBundle.getMessage(AnnotationType.class, "AnnotationType.literature");
+        }
+
+        @Override
+        public String getDescription() {
+            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.literature.desc");
+        }
+    };
+    
+    public abstract String getDisplayName();
+    public abstract String getDescription();
 }

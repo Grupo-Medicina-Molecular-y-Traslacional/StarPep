@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.spi.filters.impl;
 
-import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.spi.filters.FilterSetupUI;
@@ -17,25 +16,29 @@ import org.openide.util.lookup.ServiceProvider;
  * @author loge
  */
 @ServiceProvider(service=FilterFactory.class)
-public class PrimaryFilterFactory implements FilterFactory {
-
-    public PrimaryFilterFactory() {
+public class AttributeFilterFactory implements FilterFactory {
+    protected final String name;
+    protected final FilterSetupUI setupUI;
+    
+    public AttributeFilterFactory() {
+        name = NbBundle.getMessage(AttributeFilterFactory.class, "AttributeFilterFactory.name");
+        setupUI = new AttributeFilterSetupUI();
     }
     
     
     @Override
-    public Filter createFilter(PeptideAttribute attr, FilterOperator op, String val) {
-        return new PrimaryFilter(attr, op, val);
+    public Filter createFilter() {
+        return new AttributeFilter();
     }
 
     @Override
-    public PeptideAttribute[] getAttributes() {
-        return new PeptideAttribute[]{
-            new PeptideAttribute("id", "ID", String.class),
-            new PeptideAttribute("seq", "Sequence", String.class),
-            new PeptideAttribute("length", "Lenght", Integer.class)
-        };
+    public String getName() {
+        return name;
     }
 
+    @Override
+    public FilterSetupUI getSetupUI() {
+        return setupUI;
+    }
     
 }

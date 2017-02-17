@@ -123,6 +123,8 @@ public class NeoPeptideNode extends PeptideNode {
 //            set.put(property);
 //        }
 //        sheet.put(set);
+        
+        
         // Descriptors
         set = Sheet.createPropertiesSet();
         set.setName("attributes");
@@ -134,6 +136,7 @@ public class NeoPeptideNode extends PeptideNode {
         set.put(property);
         set.setValue("tabName", NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.attributes.tabName"));
         sheet.put(set);
+        
         return sheet;
     }
 

@@ -14,18 +14,23 @@ import org.bapedis.core.spi.filters.Filter;
  *
  * @author loge
  */
-public class PrimaryFilter implements Filter {
+public class AttributeFilter implements Filter {
 
     protected boolean negative;
     protected PeptideAttribute attr;
     protected FilterOperator operator;
     protected String value;
     protected boolean matchCase;
+    
+    public AttributeFilter(){
+        matchCase = false;
+    }
 
-    public PrimaryFilter(PeptideAttribute attr, FilterOperator operator, String value) {
+    public AttributeFilter(PeptideAttribute attr, FilterOperator operator, String value) {
         this.attr = attr;
         this.operator = operator;
         this.value = value;
+        matchCase = false;
     }
 
     public PeptideAttribute getAttribute() {
@@ -76,15 +81,8 @@ public class PrimaryFilter implements Filter {
 
     @Override
     public boolean accept(Peptide peptide) {
-        Object objValue = null;
-        if (attr.getId().equals("id")) {
-            objValue = peptide.getId();
-        } else if (attr.getId().equals("seq")) {
-            objValue = peptide.getSequence();
-        } else if (attr.getId().equals("length")) {
-            objValue = peptide.getLength();
-        }
-        boolean accepted = operator.applyTo(objValue, value);
+        Object objValue = peptide.getAttributeValue(attr);
+        boolean accepted = operator.applyTo(objValue, value, matchCase);
 //        accepted = (matchCase) ? operator.applyTo(objValue, value) : operator.applyTo(objValue.toString().toUpperCase(), value.toUpperCase());
         return negative ? !accepted : accepted;
     }

@@ -27,24 +27,28 @@ public class AddFilter extends WorkspaceContextSensitiveAction<AttributesModel> 
     public AddFilter(FilterFactory filterFactory) {
         super(AttributesModel.class);
         this.filterFactory = filterFactory;
-//        putValue(NAME, filterFactory.getName());
+        putValue(NAME, filterFactory.getName());
         dialog = new FilterSetupDialog();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-//        Workspace currentWs = pc.getCurrentWorkspace();
-//        FilterModel filterModel = currentWs.getLookup().lookup(FilterModel.class);
-//        if (filterModel == null) {
-//            filterModel = new FilterModel();
-//        }
-//        Filter filter = filterFactory.createFilter();
-//        FilterSetupUI setupUI = filterFactory.getSetupUI();
-//        String title = NbBundle.getMessage(AddFilter.class, "FilterSetupDialog.title", filterFactory.getName());
-//        if (dialog.setup(filter, setupUI, title)) {
-//            filterModel.addFilter(filter);
-//            currentWs.add(filterModel);
-//        }
+        Workspace currentWs = pc.getCurrentWorkspace();
+        FilterModel filterModel = currentWs.getLookup().lookup(FilterModel.class);
+        boolean added = true;
+        if (filterModel == null) {
+            filterModel = new FilterModel();
+            added = false;
+        }
+        Filter filter = filterFactory.createFilter();
+        FilterSetupUI setupUI = filterFactory.getSetupUI();
+        String title = NbBundle.getMessage(AddFilter.class, "FilterSetupDialog.title", filterFactory.getName());
+        if (dialog.setup(filter, setupUI, title)) {
+            filterModel.addFilter(filter);
+            if (!added) {
+                currentWs.add(filterModel);
+            }
+        }
     }
 
 }

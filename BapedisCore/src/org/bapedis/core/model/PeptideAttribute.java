@@ -32,7 +32,7 @@ public class PeptideAttribute {
         this.visible = visible;
     }
 
-    public boolean isVisible() {
+    public boolean isPrimary() {
         return visible;
     }        
 

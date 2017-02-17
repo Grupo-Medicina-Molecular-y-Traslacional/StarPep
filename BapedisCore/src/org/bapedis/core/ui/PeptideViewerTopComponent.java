@@ -27,6 +27,8 @@ import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
+import org.bapedis.core.spi.filters.impl.AttributeFilter;
+import org.bapedis.core.spi.filters.impl.AttributeFilterFactory;
 import org.bapedis.core.spi.filters.impl.FilterHelper;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -80,6 +82,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
     protected final ProjectManager pc;
     protected Lookup.Result<AttributesModel> peptideLkpResult;
+    protected Lookup.Result<FilterModel> filterLkpResult;
     protected final ExplorerManager explorerMgr;
     protected final OutlineView view;
 
@@ -116,22 +119,18 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
         //Populate filter panel
         populateFilterFields();
-        rightPanel.add(createDropDownButtonSearch());
     }
 
     private void populateFilterFields() {
-        FilterFactory[] filterFactories = pc.getFilterFactories();
-        for (FilterFactory filterFactory : filterFactories) {
-            for (PeptideAttribute attr : filterFactory.getAttributes()) {
-                jFieldComboBox.addItem(new MyComboBoxItem(attr, filterFactory));
-            }
-        }
+        jFieldComboBox.addItem(new PeptideAttribute("id", "ID", String.class));
+        jFieldComboBox.addItem(new PeptideAttribute("seq", "Sequence", String.class));
+        jFieldComboBox.addItem(new PeptideAttribute("length", "Lenght", Integer.class));
         jFieldComboBox.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 jOperatorComboBox.removeAllItems();
-                PeptideAttribute attr = ((MyComboBoxItem) jFieldComboBox.getSelectedItem()).attr;
+                PeptideAttribute attr = (PeptideAttribute) jFieldComboBox.getSelectedItem();
                 FilterOperator[] operators = FilterHelper.getOperators(attr.getType());
                 for (FilterOperator operator : operators) {
                     jOperatorComboBox.addItem(operator);
@@ -139,31 +138,6 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             }
         });
         jFieldComboBox.setSelectedIndex(0);
-    }
-
-    private JButton createDropDownButtonSearch() {
-        final JPopupMenu filterPopup = new JPopupMenu();
-        JMenuItem item = new JMenuItem("add");
-        filterPopup.add(item);
-        item = new JMenuItem("remove");
-        filterPopup.add(item);
-
-        Image iconImage = ImageUtilities.loadImage("org/bapedis/core/resources/config.png");
-        ImageIcon icon = new ImageIcon(iconImage);
-        final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(new ImageIcon(
-                new BufferedImage(16, 16, BufferedImage.TYPE_BYTE_GRAY)), filterPopup);
-
-        dropDownButton.setIcon(icon);
-//        dropDownButton.setMargin(new java.awt.Insets(2, 4, 0, 4));
-        dropDownButton.setToolTipText(NbBundle.getMessage(PeptideViewer.class, "CTL_QuickFilter"));
-        dropDownButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                filterPopup.show(dropDownButton, 0, dropDownButton.getHeight());
-            }
-        });
-        return dropDownButton;
     }
 
     /**
@@ -257,17 +231,14 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
     private void applyFilter() {
         FilterOperator operator = (FilterOperator) jOperatorComboBox.getSelectedItem();
-        MyComboBoxItem item = (MyComboBoxItem) jFieldComboBox.getSelectedItem();
-        FilterFactory factory = item.filterFactory;
-        PeptideAttribute attr = item.attr;
+        PeptideAttribute attr = (PeptideAttribute) jFieldComboBox.getSelectedItem();
         if (operator.isValid(jValueTextField.getText())) {
-            Filter filter = factory.createFilter(attr, operator, jValueTextField.getText());
+            Filter filter = new AttributeFilter(attr, operator, jValueTextField.getText());
             Workspace currentWs = pc.getCurrentWorkspace();
             FilterModel filterModel = currentWs.getLookup().lookup(FilterModel.class);
             if (filterModel == null) {
                 filterModel = new FilterModel();
                 currentWs.add(filterModel);
-                filterModel.addPropertyChangeListener(this);
             }
             filterModel.addFilter(filter);
             jValueTextField.setText("");
@@ -318,6 +289,10 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             peptideLkpResult.removeLookupListener(this);
             peptideLkpResult = null;
         }
+        if (filterLkpResult != null) {
+            filterLkpResult.removeLookupListener(this);
+            filterLkpResult = null;
+        }
     }
 
     public void setBusyLabel() {
@@ -361,6 +336,8 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         }
         peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
         peptideLkpResult.addLookupListener(this);
+        filterLkpResult = newWs.getLookup().lookupResult(FilterModel.class);
+        filterLkpResult.addLookupListener(this);
         AttributesModel peptidesModel = newWs.getLookup().lookup(AttributesModel.class);
         showData(peptidesModel);
         FilterModel filterModel = newWs.getLookup().lookup(FilterModel.class);
@@ -376,6 +353,15 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             if (!attrModels.isEmpty()) {
                 AttributesModel attrModel = attrModels.iterator().next();
                 showData(attrModel);
+            }
+        } else if (le.getSource().equals(filterLkpResult)) {
+            Collection<? extends FilterModel> filterModels = filterLkpResult.allInstances();
+            if (!filterModels.isEmpty()) {
+                FilterModel filterModel = filterModels.iterator().next();
+                filterModel.addPropertyChangeListener(this);
+                view.getOutline().setQuickFilter(0, filterModel);
+            } else {
+                view.getOutline().unsetQuickFilter();
             }
         }
     }
@@ -404,25 +390,12 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof FilterModel) {
             FilterModel filterModel = (FilterModel) evt.getSource();
-            view.getOutline().setQuickFilter(0, filterModel);
+            if (!filterModel.isEmpty()) {
+                view.getOutline().setQuickFilter(0, filterModel);
+            } else {
+                view.getOutline().unsetQuickFilter();
+            }
         }
-    }
-
-    class MyComboBoxItem {
-
-        PeptideAttribute attr;
-        FilterFactory filterFactory;
-
-        public MyComboBoxItem(PeptideAttribute attr, FilterFactory filterFactory) {
-            this.attr = attr;
-            this.filterFactory = filterFactory;
-        }
-
-        @Override
-        public String toString() {
-            return attr.getDisplayName();
-        }
-
     }
 
 }

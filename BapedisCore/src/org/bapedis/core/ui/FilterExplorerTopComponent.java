@@ -80,7 +80,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
             restrictiveComboBox.addItem(restriction);
         }
 
-//        filterToolBar1.add(createAddFilterButton());
+        filterToolBar1.add(createAddFilterButton());
         List<? extends Action> actions = Utilities.actionsForPath("Actions/EditFilter");
         for (Action action : actions) {
             filterToolBar1.add(action);
@@ -100,6 +100,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         viewerScrollPane = new javax.swing.JScrollPane();
         filterToolBar1 = new javax.swing.JToolBar();
         restrictiveComboBox = new javax.swing.JComboBox();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -121,6 +122,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
             }
         });
         filterToolBar1.add(restrictiveComboBox);
+        filterToolBar1.add(jSeparator1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -138,6 +140,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToolBar filterToolBar1;
+    private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JComboBox restrictiveComboBox;
     private javax.swing.JScrollPane viewerScrollPane;
     // End of variables declaration//GEN-END:variables
@@ -173,21 +176,6 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         // TODO read your settings according to their version
     }
 
-//    private JButton createEditFilterModelButton() {
-//        final JPopupMenu popup = new JPopupMenu();
-//        for (Action a : Utilities.actionsForPath("Actions/EditFilterModel")) {
-//            popup.add(a);
-//        }
-//        final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/bapedis/db/resources/filterModel.png", false), popup);
-//        dropDownButton.setToolTipText(NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.editFilterModel.tooltiptext"));
-//        dropDownButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                popup.show(dropDownButton, 0, dropDownButton.getHeight());
-//            }
-//        });
-//        return dropDownButton;
-//    }
     private JButton createAddFilterButton() {
         final JPopupMenu popup = new JPopupMenu();
         FilterFactory[] factories = pc.getFilterFactories();
@@ -214,11 +202,11 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     private void setFilterModel(FilterModel filterModel) {
         if (filterModel != null) {
             restrictiveComboBox.setSelectedItem(filterModel.getRestriction());
-            restrictiveComboBox.setVisible(true);
+            restrictiveComboBox.setEnabled(true);
             explorerMgr.setRootContext(filterModel.getRootContext());
         } else {
             restrictiveComboBox.setSelectedItem(null);
-            restrictiveComboBox.setVisible(false);
+            restrictiveComboBox.setEnabled(false);
             explorerMgr.setRootContext(Node.EMPTY);
         }
     }
@@ -238,30 +226,6 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     @Override
     public ExplorerManager getExplorerManager() {
         return explorerMgr;
-    }
-
-    private void run() {
-//        final NeoPeptideModelTopComponent tcPeptide = (NeoPeptideModelTopComponent) WindowManager.getDefault().findTopComponent("NeoPeptideModelTopComponent");
-//        tcPeptide.setBusyLabel();
-//        tcPeptide.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-//        tcPeptide.open();
-//        tcPeptide.requestActive();
-//        SwingUtilities.invokeLater(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//                try {
-//                    NeoPeptideManager npc = Lookup.getDefault().lookup(NeoPeptideManager.class);
-//                    Workspace currentWs = pc.getCurrentWorkspace();
-//                    npc.setNeoPeptidesTo(currentWs, true);
-//                } catch (Exception ex) {
-//                    ex.printStackTrace();
-//                    tcPeptide.setErrorLabel();
-//                } finally {
-//                    tcPeptide.setCursor(Cursor.getDefaultCursor());
-//                }
-//            }
-//        });
     }
 
     @Override

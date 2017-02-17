@@ -9,9 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.db.Neo4jDB;
-import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.db.model.BioCategory;
-import org.bapedis.core.model.FilterModel;
+import org.bapedis.core.model.Peptide;
 import org.bapedis.db.model.NeoPeptideModel;
 import org.bapedis.db.model.NeoNeighbor;
 import org.bapedis.db.model.NeoPeptide;
@@ -37,6 +36,7 @@ public class NeoPeptideDAO {
     protected final GraphDatabaseService graphDb;
     public final String PRO_ID = "id";
     public final String PRO_SEQ = "seq";
+    public final String PRO_LENGHT = "length";
     public final String PRO_XREF = "xref";
     public final String PRO_NAME = "name";
     public final String PRO_LABEL = "label";
@@ -50,13 +50,12 @@ public class NeoPeptideDAO {
         is_a, instance_of
     }
 
-    public NeoPeptideModel getNeoPeptidesBy(BioCategory[] categories, PeptideAttribute[] attributes) {
+    public NeoPeptideModel getNeoPeptidesBy(BioCategory[] categories) {
         NeoPeptideModel neoModel = new NeoPeptideModel();
-        if (attributes != null) {
-            for (PeptideAttribute attr : attributes) {
-                neoModel.addAttribute(attr);
-            }
-        }
+        neoModel.addAttribute(Peptide.ID);
+        neoModel.addAttribute(Peptide.SEQ);
+        neoModel.addAttribute(Peptide.LENGHT);
+
         try (Transaction tx = graphDb.beginTx()) {
             List<Node> startNodes = new LinkedList<>();
             for (BioCategory category : categories) {
@@ -69,9 +68,13 @@ public class NeoPeptideDAO {
             for (Node node : peptideNodes) {
                 id = node.getProperty(PRO_ID).toString();
                 seq = node.getProperty(PRO_SEQ).toString();
-                neoPeptide = new NeoPeptide(node.getId(), id, seq, getNeighbors(node));
+                neoPeptide = new NeoPeptide(node.getId(), getNeighbors(node));
+                neoPeptide.setAttributeValue(Peptide.ID, id);
+                neoPeptide.setAttributeValue(Peptide.SEQ, seq);
+                neoPeptide.setAttributeValue(Peptide.LENGHT, seq.length());
                 for (String propertyKey : node.getPropertyKeys()) {
-                    if (!(propertyKey.equals(PRO_ID) || propertyKey.equals(PRO_SEQ))) {
+                    if (!(propertyKey.equals(PRO_ID) || propertyKey.equals(PRO_SEQ)
+                            || propertyKey.equals(PRO_LENGHT))) {
                         Object value = node.getProperty(propertyKey);
                         if (!neoModel.hasAttribute(propertyKey)) {
                             attr = neoModel.addAttribute(propertyKey, propertyKey, value.getClass());
@@ -108,7 +111,6 @@ public class NeoPeptideDAO {
 //        }
 //        return false;
 //    }
-
     protected Iterable<Node> getPeptides(List<Node> startNodes) {
         Iterable<Node> nodes = graphDb.traversalDescription()
                 .breadthFirst()

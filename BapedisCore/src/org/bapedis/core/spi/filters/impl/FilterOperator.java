@@ -10,6 +10,6 @@ package org.bapedis.core.spi.filters.impl;
  * @author loge
  */
 public interface FilterOperator {
-    boolean applyTo(Object obj, String operand);
+    boolean applyTo(Object obj, String operand, boolean matchCase);
     boolean isValid(String operand);
 }

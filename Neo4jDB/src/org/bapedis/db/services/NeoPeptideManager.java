@@ -31,12 +31,11 @@ public class NeoPeptideManager {
     public void setNeoPeptidesTo(final Workspace workspace) {
         Collection<? extends BioCategory> categories = workspace.getLookup().lookupAll(BioCategory.class);
         NeoPeptideModel oldModel = workspace.getLookup().lookup(NeoPeptideModel.class);
-        PeptideAttribute[] attributes = null;
         if (oldModel != null) {
             workspace.remove(oldModel);
-            attributes = oldModel.getAttributes();
+            oldModel = null;
         }
-        NeoPeptideModel neoModel = neoModelDAO.getNeoPeptidesBy(categories.toArray(new BioCategory[0]), attributes);
+        NeoPeptideModel neoModel = neoModelDAO.getNeoPeptidesBy(categories.toArray(new BioCategory[0]));
         workspace.add(neoModel);
     }
 

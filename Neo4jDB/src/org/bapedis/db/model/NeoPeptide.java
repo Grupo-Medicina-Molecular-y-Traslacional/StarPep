@@ -24,8 +24,7 @@ public class NeoPeptide extends Peptide {
         return NbBundle.getMessage(NeoPeptide.class, "NeoPeptide.prefix");
     }
 
-    public NeoPeptide(long neoId, String id, String sequence, List<NeoNeighbor> neighbors) {
-        super(id, sequence);
+    public NeoPeptide(long neoId, List<NeoNeighbor> neighbors) {
         this.neoId = neoId;
         annotations = new EnumMap<>(AnnotationType.class);
         for (AnnotationType aType : AnnotationType.values()) {

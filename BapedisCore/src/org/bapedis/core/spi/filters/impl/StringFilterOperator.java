@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.spi.filters.impl;
 
-import org.bapedis.core.spi.filters.impl.FilterOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,43 +17,48 @@ public enum StringFilterOperator implements FilterOperator {
     EQUALS("equal to") {
 
                 @Override
-                public boolean applyTo(Object obj, String operand) {
-                    return obj.equals(operand);
+                public boolean applyTo(Object obj, String operand, boolean matchCase) {
+                    return matchCase ? obj.equals(operand) : ((String) obj).toLowerCase().equals(operand.toLowerCase());
                 }
             },
-    NOT_EQUALS("not equal to"){
+    NOT_EQUALS("not equal to") {
                 @Override
-                public boolean applyTo(Object obj, String operand) {
-                    return !obj.equals(operand);
-                }    
-    },
+                public boolean applyTo(Object obj, String operand, boolean matchCase) {
+                    return !matchCase ? obj.equals(operand) : ((String) obj).toLowerCase().equals(operand.toLowerCase());
+                }
+            },
     CONTAINS("contains") {
 
                 @Override
-                public boolean applyTo(Object obj, String operand) {
-                    return ((String)obj).contains(operand);
+                public boolean applyTo(Object obj, String operand, boolean matchCase) {
+                    return matchCase ? ((String) obj).contains(operand) : ((String) obj).toLowerCase().contains(operand.toLowerCase());
                 }
             },
     STARTS_WITH("starts with") {
 
                 @Override
-                public boolean applyTo(Object obj, String operand) {
-                    return ((String)obj).startsWith(operand);
+                public boolean applyTo(Object obj, String operand, boolean matchCase) {
+                    return matchCase ? ((String) obj).startsWith(operand) : ((String) obj).toLowerCase().startsWith(operand.toLowerCase());
                 }
             },
     ENDS_WITH("ends with") {
 
                 @Override
-                public boolean applyTo(Object obj, String operand) {
-                    return ((String)obj).endsWith(operand);
+                public boolean applyTo(Object obj, String operand, boolean matchCase) {
+                    return matchCase ? ((String) obj).endsWith(operand) : ((String) obj).toLowerCase().endsWith(operand.toLowerCase());
                 }
             },
     REGEX("regex") {
 
                 @Override
-                public boolean applyTo(Object obj, String operand) {
-                    Pattern p = Pattern.compile(operand);
-                    Matcher m = p.matcher((String)obj);
+                public boolean applyTo(Object obj, String operand, boolean matchCase) {
+                    if (matchCase) {
+                        Pattern p = Pattern.compile(operand);
+                        Matcher m = p.matcher((String) obj);
+                        return m.matches();
+                    }
+                    Pattern p = Pattern.compile(operand.toLowerCase());
+                    Matcher m = p.matcher(((String) obj).toLowerCase());
                     return m.matches();
                 }
             };

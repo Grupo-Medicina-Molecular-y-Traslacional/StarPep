@@ -28,7 +28,7 @@ import org.openide.util.NbBundle;
  */
 public class AttributeFilterSetupUI extends javax.swing.JPanel implements FilterSetupUI {
     
-    protected PrimaryFilter filter;
+    protected AttributeFilter filter;
     protected boolean validState;
     protected final ProjectManager pc;
     protected final PropertyChangeSupport changeSupport;
@@ -219,7 +219,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
 
     @Override
     public JPanel getEditPanel(Filter filter) {
-        this.filter = (PrimaryFilter) filter;
+        this.filter = (AttributeFilter) filter;
         notCheckBox.setSelected(this.filter.isNegative());
         Workspace ws = pc.getCurrentWorkspace();
         initAttrComboBox(ws);

@@ -13,14 +13,14 @@ public enum LongFilterOperator implements FilterOperator {
     EQUALS("=") {
 
                 @Override
-                public boolean applyTo(Object obj, String operand) {
+                public boolean applyTo(Object obj, String operand, boolean matchCase) {
                     return obj.equals(operand);
                 }
             },
     NOT_EQUALS("<>") {
 
                 @Override
-                public boolean applyTo(Object obj, String operand) {
+                public boolean applyTo(Object obj, String operand, boolean matchCase) {
                     return !obj.equals(operand);
                 }
 
@@ -28,7 +28,7 @@ public enum LongFilterOperator implements FilterOperator {
     LESS("<") {
 
                 @Override
-                public boolean applyTo(Object obj, String operand) {
+                public boolean applyTo(Object obj, String operand, boolean matchCase) {
                     long val1 = (long)obj;
                     long val2 = Long.parseLong(operand);
                     return val1 < val2;
@@ -38,7 +38,7 @@ public enum LongFilterOperator implements FilterOperator {
     LESS_OR_EQUALS("<=") {
 
                 @Override
-                public boolean applyTo(Object obj, String operand) {
+                public boolean applyTo(Object obj, String operand, boolean matchCase) {
                     long val1 = (long)obj;
                     long val2 = Long.parseLong(operand);
                     return val1 <= val2;
@@ -48,7 +48,7 @@ public enum LongFilterOperator implements FilterOperator {
     GREATER(">") {
 
                 @Override
-                public boolean applyTo(Object obj, String operand) {
+                public boolean applyTo(Object obj, String operand, boolean matchCase) {
                     long val1 = (long)obj;
                     long val2 = Long.parseLong(operand);
                     return val1 > val2;
@@ -58,7 +58,7 @@ public enum LongFilterOperator implements FilterOperator {
     GREATER_OR_EQUALS(">=") {
 
                 @Override
-                public boolean applyTo(Object obj, String operand) {
+                public boolean applyTo(Object obj, String operand, boolean matchCase) {
                     long val1 = (long)obj;
                     long val2 = Long.parseLong(operand);
                     return val1 >= val2;

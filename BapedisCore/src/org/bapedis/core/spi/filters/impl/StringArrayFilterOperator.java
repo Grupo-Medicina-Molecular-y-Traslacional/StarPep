@@ -16,7 +16,7 @@ public enum StringArrayFilterOperator implements FilterOperator {
     CONTAINS("contains") {
 
                 @Override
-                public boolean applyTo(Object obj, String operand) {
+                public boolean applyTo(Object obj, String operand, boolean matchCase) {
                     String arrayAsString = (String) obj;
                     return arrayAsString.contains(operand);
                 }

@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.bapedis.core.spi.filters.Filter;
-import org.bapedis.core.spi.filters.impl.PrimaryFilter;
+import org.bapedis.core.spi.filters.impl.AttributeFilter;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
@@ -27,11 +27,12 @@ public class FilterModel implements QuickFilter {
 
     protected int id;
     protected String name;
-    protected PrimaryFilter onlineFilter;
+    protected AttributeFilter onlineFilter;
     protected final List<Filter> filters;
     protected transient final PropertyChangeSupport propertyChangeSupport;
-    public static final String ADDED_CHILD = "ADD";
-    public static final String REMOVED_CHILD = "REMOVE";
+    public static final String ADDED_FILTER = "ADD";
+    public static final String EDITED_FILTER = "EDITED";
+    public static final String REMOVED_FILTER = "REMOVE";
     public static final String CHANGED_RESTRICTION = "RESTRICTION";
     protected static final AtomicInteger counter = new AtomicInteger(1);
     protected RestrictionLevel restriction;
@@ -99,7 +100,7 @@ public class FilterModel implements QuickFilter {
     private FilterModel(int id, String name) {
         this.id = id;
         this.name = name;
-        this.restriction = RestrictionLevel.MATCH_ANY;
+        this.restriction = RestrictionLevel.MATCH_ALL;
         filters = new LinkedList<>();
         propertyChangeSupport = new PropertyChangeSupport(this);
         rootContext = new AbstractNode(Children.create(new FilterModelChildFactory(this), true), Lookups.singleton(this));
@@ -109,11 +110,11 @@ public class FilterModel implements QuickFilter {
         return rootContext;
     }
 
-    public PrimaryFilter getOnlineFilter() {
+    public AttributeFilter getOnlineFilter() {
         return onlineFilter;
     }
 
-    public void setOnlineFilter(PrimaryFilter onlineFilter) {
+    public void setOnlineFilter(AttributeFilter onlineFilter) {
         if (this.onlineFilter != null) {
             removeFilter(this.onlineFilter);
         }
@@ -123,12 +124,12 @@ public class FilterModel implements QuickFilter {
 
     public void addFilter(Filter filter) {
         filters.add(filter);
-        propertyChangeSupport.firePropertyChange(ADDED_CHILD, null, filter);
+        propertyChangeSupport.firePropertyChange(ADDED_FILTER, null, filter);
     }
 
     public void removeFilter(Filter filter) {
         filters.remove(filter);
-        propertyChangeSupport.firePropertyChange(REMOVED_CHILD, filter, null);
+        propertyChangeSupport.firePropertyChange(REMOVED_FILTER, filter, null);
     }
 
     public boolean isEmpty() {
@@ -167,6 +168,10 @@ public class FilterModel implements QuickFilter {
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+    
+    public void fireEditedEvent(Filter filter){
+        propertyChangeSupport.firePropertyChange(EDITED_FILTER, null, filter);
     }
 
     @Override

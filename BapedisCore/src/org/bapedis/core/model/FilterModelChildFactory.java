@@ -40,8 +40,8 @@ public class FilterModelChildFactory extends ChildFactory<Filter> implements Pro
     
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(FilterModel.ADDED_CHILD) ||
-            evt.getPropertyName().equals(FilterModel.REMOVED_CHILD) ){
+        if (evt.getPropertyName().equals(FilterModel.ADDED_FILTER) ||
+            evt.getPropertyName().equals(FilterModel.REMOVED_FILTER)){
             refresh(true);
         }                   
     }

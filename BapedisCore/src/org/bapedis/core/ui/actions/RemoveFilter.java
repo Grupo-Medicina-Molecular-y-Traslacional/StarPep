@@ -33,7 +33,7 @@ import org.openide.util.NbBundle;
         lazy = false
 )
 @ActionReferences({
-    @ActionReference(path = "Actions/EditFilter", position = 100)
+    @ActionReference(path = "Actions/EditFilter", position = 200)
 })
 @NbBundle.Messages("CTL_RemoveFilter=Remove filter")
 public class RemoveFilter extends GlobalContextSensitiveAction<Filter> {

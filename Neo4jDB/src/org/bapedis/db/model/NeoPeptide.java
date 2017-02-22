@@ -29,7 +29,6 @@ public class NeoPeptide extends Peptide {
         annotations = new EnumMap<>(AnnotationType.class);
         for (AnnotationType aType : AnnotationType.values()) {
             annotations.put(aType, new LinkedList<NeoNeighbor>());
-            
         }
         for (NeoNeighbor neighbor : neighbors) {
             AnnotationType aType = AnnotationType.valueOf(neighbor.getLabel().toUpperCase());
@@ -43,6 +42,16 @@ public class NeoPeptide extends Peptide {
 
     public List<NeoNeighbor> getAnnotations(AnnotationType aType) {
         return annotations.get(aType);
+    }
+
+    public String[] getAnnotationValues(AnnotationType aType) {
+        List<NeoNeighbor> neighbors = annotations.get(aType);
+        String[] values = new String[neighbors.size()];
+        int pos = 0;
+        for (NeoNeighbor n : neighbors) {
+            values[pos++] = n.getName();
+        }
+        return values;
     }
 
     @Override

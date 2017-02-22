@@ -117,27 +117,23 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         column.setMaxWidth(240);
         column.setPreferredWidth(240);
 
-        //Populate filter panel
-        populateFilterFields();
     }
 
-    private void populateFilterFields() {
-        jFieldComboBox.addItem(new PeptideAttribute("id", "ID", String.class));
-        jFieldComboBox.addItem(new PeptideAttribute("seq", "Sequence", String.class));
-        jFieldComboBox.addItem(new PeptideAttribute("length", "Lenght", Integer.class));
-        jFieldComboBox.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                jOperatorComboBox.removeAllItems();
-                PeptideAttribute attr = (PeptideAttribute) jFieldComboBox.getSelectedItem();
-                FilterOperator[] operators = FilterHelper.getOperators(attr.getType());
-                for (FilterOperator operator : operators) {
-                    jOperatorComboBox.addItem(operator);
-                }
+    private void populateFilterFields(AttributesModel attrModel) {
+        jFieldComboBox.removeAllItems();
+        jLabelFilter.setVisible(attrModel != null);
+        jFieldComboBox.setVisible(attrModel != null);
+        jOperatorComboBox.setVisible(attrModel != null);
+        jValueTextField.setVisible(attrModel != null);
+        jAddButton.setVisible(attrModel != null);
+        if (attrModel != null) {
+            for (PeptideAttribute attr : attrModel.getAttributes()) {
+                jFieldComboBox.addItem(attr);
             }
-        });
-        jFieldComboBox.setSelectedIndex(0);
+            if (jFieldComboBox.getItemCount() > 0) {
+                jFieldComboBox.setSelectedIndex(0);
+            }
+        }
     }
 
     /**
@@ -152,7 +148,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         topPanel = new javax.swing.JPanel();
         leftPanel = new javax.swing.JPanel();
         rightPanel = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
+        jLabelFilter = new javax.swing.JLabel();
         jFieldComboBox = new javax.swing.JComboBox();
         jOperatorComboBox = new javax.swing.JComboBox();
         jValueTextField = new javax.swing.JTextField();
@@ -173,9 +169,14 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         gridBagConstraints.weightx = 1.0;
         topPanel.add(leftPanel, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jLabel2.text")); // NOI18N
-        rightPanel.add(jLabel2);
+        org.openide.awt.Mnemonics.setLocalizedText(jLabelFilter, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jLabelFilter.text")); // NOI18N
+        rightPanel.add(jLabelFilter);
 
+        jFieldComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jFieldComboBoxActionPerformed(evt);
+            }
+        });
         rightPanel.add(jFieldComboBox);
 
         rightPanel.add(jOperatorComboBox);
@@ -232,22 +233,24 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     private void applyFilter() {
         FilterOperator operator = (FilterOperator) jOperatorComboBox.getSelectedItem();
         PeptideAttribute attr = (PeptideAttribute) jFieldComboBox.getSelectedItem();
-        if (operator.isValid(jValueTextField.getText())) {
-            Filter filter = new AttributeFilter(attr, operator, jValueTextField.getText());
-            Workspace currentWs = pc.getCurrentWorkspace();
-            FilterModel filterModel = currentWs.getLookup().lookup(FilterModel.class);
-            if (filterModel == null) {
-                filterModel = new FilterModel();
-                currentWs.add(filterModel);
+        if (attr != null && operator != null) {
+            if (operator.isValid(jValueTextField.getText())) {
+                Filter filter = new AttributeFilter(attr, operator, jValueTextField.getText());
+                Workspace currentWs = pc.getCurrentWorkspace();
+                FilterModel filterModel = currentWs.getLookup().lookup(FilterModel.class);
+                if (filterModel == null) {
+                    filterModel = new FilterModel();
+                    currentWs.add(filterModel);
+                }
+                filterModel.addFilter(filter);
+                jValueTextField.setText("");
+                TopComponent tc = WindowManager.getDefault().findTopComponent("FilterExplorerTopComponent");
+                tc.open();
+                tc.requestActive();
+            } else {
+                String errorMsg = NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jValueTextField.badinput", attr.getDisplayName());
+                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(errorMsg, NotifyDescriptor.ERROR_MESSAGE));
             }
-            filterModel.addFilter(filter);
-            jValueTextField.setText("");
-            TopComponent tc = WindowManager.getDefault().findTopComponent("FilterExplorerTopComponent");
-            tc.open();
-            tc.requestActive();
-        } else {
-            String errorMsg = NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jValueTextField.badinput", attr.getDisplayName());
-            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(errorMsg, NotifyDescriptor.ERROR_MESSAGE));
         }
     }
 
@@ -259,18 +262,31 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     private void jValueTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jValueTextFieldKeyTyped
         FilterOperator operator = (FilterOperator) jOperatorComboBox.getSelectedItem();
         char c = evt.getKeyChar();
-        if (c != KeyEvent.VK_BACK_SPACE && c != KeyEvent.VK_DELETE
-                && !operator.isValid(jValueTextField.getText() + c)) {
-            evt.consume();
-            getToolkit().beep();
+        if (operator != null) {
+            if (c != KeyEvent.VK_BACK_SPACE && c != KeyEvent.VK_DELETE
+                    && !operator.isValid(jValueTextField.getText() + c)) {
+                evt.consume();
+                getToolkit().beep();
+            }
         }
     }//GEN-LAST:event_jValueTextFieldKeyTyped
+
+    private void jFieldComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFieldComboBoxActionPerformed
+        jOperatorComboBox.removeAllItems();
+        PeptideAttribute attr = (PeptideAttribute) jFieldComboBox.getSelectedItem();
+        if (attr != null) {
+            FilterOperator[] operators = FilterHelper.getOperators(attr.getType());
+            for (FilterOperator operator : operators) {
+                jOperatorComboBox.addItem(operator);
+            }     // TODO add your handling code here:
+        }
+    }//GEN-LAST:event_jFieldComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel dataPanel;
     private javax.swing.JButton jAddButton;
     private javax.swing.JComboBox jFieldComboBox;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabelFilter;
     private javax.swing.JComboBox jOperatorComboBox;
     private javax.swing.JTextField jValueTextField;
     private javax.swing.JPanel leftPanel;
@@ -367,6 +383,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }
 
     protected void showData(AttributesModel attrModel) {
+        populateFilterFields(attrModel);
         view.getOutline().unsetQuickFilter();
         if (attrModel != null) {
             explorerMgr.setRootContext(attrModel.getRootNode());

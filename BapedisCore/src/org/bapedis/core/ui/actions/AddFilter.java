@@ -42,11 +42,18 @@ public class AddFilter extends WorkspaceContextSensitiveAction<AttributesModel> 
         }
         Filter filter = filterFactory.createFilter();
         FilterSetupUI setupUI = filterFactory.getSetupUI();
-        String title = NbBundle.getMessage(AddFilter.class, "FilterSetupDialog.title", filterFactory.getName());
-        if (dialog.setup(filter, setupUI, title)) {
+        if (setupUI == null) {
             filterModel.addFilter(filter);
             if (!added) {
                 currentWs.add(filterModel);
+            }
+        } else {
+            String title = NbBundle.getMessage(AddFilter.class, "FilterSetupDialog.title", filterFactory.getName());
+            if (dialog.setup(filter, setupUI, title)) {
+                filterModel.addFilter(filter);
+                if (!added) {
+                    currentWs.add(filterModel);
+                }
             }
         }
     }

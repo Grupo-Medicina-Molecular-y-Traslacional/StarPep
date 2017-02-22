@@ -5,8 +5,6 @@
  */
 package org.bapedis.db.model;
 
-import java.util.Arrays;
-
 /**
  *
  * @author loge
@@ -58,6 +56,10 @@ public class NeoNeighbor {
         final NeoNeighbor other = (NeoNeighbor) obj;
         return this.neoId == other.neoId;
     }
-    
+
+    @Override
+    public String toString() {
+        return label + ":" + name;
+    }
     
 }

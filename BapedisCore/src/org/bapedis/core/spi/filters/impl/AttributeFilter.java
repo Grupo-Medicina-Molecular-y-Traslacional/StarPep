@@ -20,8 +20,8 @@ public class AttributeFilter implements Filter {
     protected FilterOperator operator;
     protected String value;
     protected boolean matchCase;
-    
-    public AttributeFilter(){
+
+    public AttributeFilter() {
         matchCase = false;
     }
 
@@ -80,8 +80,19 @@ public class AttributeFilter implements Filter {
 
     @Override
     public boolean accept(Peptide peptide) {
+        boolean accepted = false;
         Object objValue = peptide.getAttributeValue(attr);
-        boolean accepted = operator.applyTo(objValue, value, matchCase);
+        if (objValue.getClass().isArray()) {
+            Object[] array = (Object[]) objValue;
+            for (Object obj : array) {
+                accepted = operator.applyTo(obj, value, matchCase);
+                if (accepted) {
+                    break;
+                }
+            }
+        } else {
+            accepted = operator.applyTo(objValue, value, matchCase);
+        }
 //        accepted = (matchCase) ? operator.applyTo(objValue, value) : operator.applyTo(objValue.toString().toUpperCase(), value.toUpperCase());
         return negative ? !accepted : accepted;
     }

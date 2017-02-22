@@ -8,13 +8,12 @@ package org.bapedis.db.filters.impl;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.spi.filters.FilterSetupUI;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author loge
  */
-public class SimilarityFilterFactory  {
+public class SimilarityFilterFactory implements FilterFactory  {
 
     SimilarityFilterSetupUI setupUI;
     
@@ -23,21 +22,21 @@ public class SimilarityFilterFactory  {
     }
             
 
+    @Override
     public String getName() {
         return "Similarity filter";
     }
 
+    @Override
     public Filter createFilter() {
         return new SimilarityFilter();
     }
 
 
+    @Override
     public FilterSetupUI getSetupUI() {
         return setupUI;
     }
 
-    public Class getFilterClass() {
-        return SimilarityFilter.class;
-    }
 
 }

@@ -15,27 +15,13 @@ public class PeptideAttribute {
     protected String id;
     protected String displayName;
     protected Class<?> type;
-    protected boolean visible;
     
-    public PeptideAttribute(String id, String displayName, Class<?> type, boolean visible) {
+    public PeptideAttribute(String id, String displayName, Class<?> type) {
         this.id = id;
         this.displayName = displayName;
         this.type = type;
-        this.visible = visible;
     }    
-
-    public PeptideAttribute(String id, String displayName, Class<?> type) {
-        this(id, displayName, type,true);
-    }
     
-    public void setVisible(boolean visible){
-        this.visible = visible;
-    }
-
-    public boolean isPrimary() {
-        return visible;
-    }        
-
     public String getId() {
         return id;
     }

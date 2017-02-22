@@ -6,6 +6,7 @@
 package org.bapedis.core.model;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Node;
 
@@ -19,7 +20,7 @@ public class AttributesModel  {
     protected Node rootNode;
 
     public AttributesModel() {
-        attrsMap = new HashMap<>();
+        attrsMap = new LinkedHashMap<>();
         container = new PeptideNodeContainer();
         rootNode = new AbstractNode(container);
     }

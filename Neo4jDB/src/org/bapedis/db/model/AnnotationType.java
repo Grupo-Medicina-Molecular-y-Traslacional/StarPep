@@ -11,19 +11,7 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public enum AnnotationType {
-    DATABASE {
-
-        @Override
-        public String getDisplayName() {
-            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.database");
-        }
-
-        @Override
-        public String getDescription() {
-            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.database.desc");
-        }
-    }, 
+public enum AnnotationType { 
     NAME {
 
         @Override
@@ -72,6 +60,18 @@ public enum AnnotationType {
             return NbBundle.getMessage(AnnotationType.class, "AnnotationType.biocategory.desc");
         }
     },
+    DATABASE {
+
+        @Override
+        public String getDisplayName() {
+            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.database");
+        }
+
+        @Override
+        public String getDescription() {
+            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.database.desc");
+        }
+    },
     LITERATURE {
 
         @Override
@@ -82,6 +82,18 @@ public enum AnnotationType {
         @Override
         public String getDescription() {
             return NbBundle.getMessage(AnnotationType.class, "AnnotationType.literature.desc");
+        }
+    },
+    CROSSREF {
+
+        @Override
+        public String getDisplayName() {
+             return NbBundle.getMessage(AnnotationType.class, "AnnotationType.crossref");
+        }
+
+        @Override
+        public String getDescription() {
+            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.crossref.desc");
         }
     };
     

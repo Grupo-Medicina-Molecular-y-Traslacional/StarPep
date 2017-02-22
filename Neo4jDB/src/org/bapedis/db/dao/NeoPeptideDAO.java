@@ -11,6 +11,7 @@ import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.db.Neo4jDB;
 import org.bapedis.db.model.BioCategory;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.db.model.AnnotationType;
 import org.bapedis.db.model.NeoPeptideModel;
 import org.bapedis.db.model.NeoNeighbor;
 import org.bapedis.db.model.NeoPeptide;
@@ -55,6 +56,9 @@ public class NeoPeptideDAO {
         neoModel.addAttribute(Peptide.ID);
         neoModel.addAttribute(Peptide.SEQ);
         neoModel.addAttribute(Peptide.LENGHT);
+        for (AnnotationType aType : AnnotationType.values()) {
+            neoModel.addAttribute(new PeptideAttribute(aType.name(), aType.getDisplayName(), String.class));
+        }
 
         try (Transaction tx = graphDb.beginTx()) {
             List<Node> startNodes = new LinkedList<>();
@@ -72,6 +76,10 @@ public class NeoPeptideDAO {
                 neoPeptide.setAttributeValue(Peptide.ID, id);
                 neoPeptide.setAttributeValue(Peptide.SEQ, seq);
                 neoPeptide.setAttributeValue(Peptide.LENGHT, seq.length());
+                for (AnnotationType aType : AnnotationType.values()) {
+                    attr = neoModel.getAttribute(aType.name());
+                    neoPeptide.setAttributeValue(attr, neoPeptide.getAnnotationValues(aType));
+                }
                 for (String propertyKey : node.getPropertyKeys()) {
                     if (!(propertyKey.equals(PRO_ID) || propertyKey.equals(PRO_SEQ)
                             || propertyKey.equals(PRO_LENGHT))) {

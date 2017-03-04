@@ -101,6 +101,7 @@
                 <package>org.bapedis.core.events</package>
                 <package>org.bapedis.core.model</package>
                 <package>org.bapedis.core.services</package>
+                <package>org.bapedis.core.spi</package>
                 <package>org.bapedis.core.spi.filters</package>
                 <package>org.bapedis.core.spi.filters.impl</package>
                 <package>org.bapedis.core.ui</package>

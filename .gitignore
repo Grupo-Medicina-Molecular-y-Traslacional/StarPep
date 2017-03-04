@@ -1,2 +1,6 @@
 /dist/
 /Neo4jWrapper/build/
+/Gephi/build/
+/Gephi/nbproject/private/
+/GephiWrapper/build/
+/GephiWrapper/nbproject/private/

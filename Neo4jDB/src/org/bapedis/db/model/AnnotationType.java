@@ -12,7 +12,7 @@ import org.openide.util.NbBundle;
  * @author loge
  */
 public enum AnnotationType { 
-    NAME {
+    NAME("named") {
 
         @Override
         public String getDisplayName() {
@@ -24,7 +24,7 @@ public enum AnnotationType {
             return NbBundle.getMessage(AnnotationType.class, "AnnotationType.name.desc");
         }
     },
-    ORIGIN {
+    ORIGIN("produced_by") {
 
         @Override
         public String getDisplayName() {
@@ -36,7 +36,7 @@ public enum AnnotationType {
             return NbBundle.getMessage(AnnotationType.class, "AnnotationType.origin.desc");
         }
     },
-    TARGET {
+    TARGET("active_against") {
 
         @Override
         public String getDisplayName() {
@@ -48,7 +48,7 @@ public enum AnnotationType {
             return NbBundle.getMessage(AnnotationType.class, "AnnotationType.target.desc");
         }
     },
-    BIOCATEGORY {
+    BIOCATEGORY("instance_of") {
 
         @Override
         public String getDisplayName() {
@@ -60,7 +60,7 @@ public enum AnnotationType {
             return NbBundle.getMessage(AnnotationType.class, "AnnotationType.biocategory.desc");
         }
     },
-    DATABASE {
+    DATABASE("compiled_in") {
 
         @Override
         public String getDisplayName() {
@@ -72,7 +72,7 @@ public enum AnnotationType {
             return NbBundle.getMessage(AnnotationType.class, "AnnotationType.database.desc");
         }
     },
-    LITERATURE {
+    LITERATURE("referenced_by") {
 
         @Override
         public String getDisplayName() {
@@ -84,7 +84,7 @@ public enum AnnotationType {
             return NbBundle.getMessage(AnnotationType.class, "AnnotationType.literature.desc");
         }
     },
-    CROSSREF {
+    CROSSREF("linked_to") {
 
         @Override
         public String getDisplayName() {
@@ -97,6 +97,16 @@ public enum AnnotationType {
         }
     };
     
+    private final String relType;
+
+    private AnnotationType(String relType) {
+        this.relType = relType;
+    }
+    
     public abstract String getDisplayName();
     public abstract String getDescription();
+    
+    public String getRelationType(){
+        return relType;
+    }
 }

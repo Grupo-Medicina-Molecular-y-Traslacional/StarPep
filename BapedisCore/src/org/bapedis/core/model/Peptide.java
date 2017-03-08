@@ -14,10 +14,10 @@ import java.util.Set;
  * @author loge
  */
 public class Peptide {
+
     public static final PeptideAttribute ID = new PeptideAttribute("id", "ID", String.class);
     public static final PeptideAttribute SEQ = new PeptideAttribute("seq", "Sequence", String.class);
     public static final PeptideAttribute LENGHT = new PeptideAttribute("length", "Length", Integer.class);
-    
     protected HashMap<PeptideAttribute, Object> attrsValue;
 
     public Peptide() {
@@ -25,15 +25,15 @@ public class Peptide {
     }
 
     public String getId() {
-        return (String)attrsValue.get(ID);
+        return (String) attrsValue.get(ID);
     }
 
     public String getSequence() {
-        return (String)attrsValue.get(SEQ);
-    }        
-    
-    public int getLength(){
-        return (int)attrsValue.get(LENGHT);
+        return (String) attrsValue.get(SEQ);
+    }
+
+    public int getLength() {
+        return (int) attrsValue.get(LENGHT);
     }
 
     public void setAttributeValue(PeptideAttribute attr, Object value) {
@@ -47,10 +47,10 @@ public class Peptide {
     public Set<PeptideAttribute> getAttributes() {
         return attrsValue.keySet();
     }
-
+    
     @Override
     public String toString() {
         return getSequence();
     }
-        
+
 }

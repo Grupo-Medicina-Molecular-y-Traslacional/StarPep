@@ -8,7 +8,13 @@ package org.bapedis.db.model;
 import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.PeptideAttribute;
+import org.gephi.graph.api.Graph;
+import org.gephi.graph.api.Node;
+import org.gephi.graph.api.NodeIterable;
 import org.openide.util.NbBundle;
 
 /**
@@ -18,38 +24,35 @@ import org.openide.util.NbBundle;
 public class NeoPeptide extends Peptide {
 
     protected final long neoId;
-    protected EnumMap<AnnotationType, List<NeoNeighbor>> annotations;
+    protected Node graphNode;
+    protected Graph graph;
 
     public static String getPrefixName() {
         return NbBundle.getMessage(NeoPeptide.class, "NeoPeptide.prefix");
     }
 
-    public NeoPeptide(long neoId, List<NeoNeighbor> neighbors) {
+    public NeoPeptide(long neoId, Node graphNode, Graph graph) {
         this.neoId = neoId;
-        annotations = new EnumMap<>(AnnotationType.class);
-        for (AnnotationType aType : AnnotationType.values()) {
-            annotations.put(aType, new LinkedList<NeoNeighbor>());
-        }
-        for (NeoNeighbor neighbor : neighbors) {
-            AnnotationType aType = AnnotationType.valueOf(neighbor.getLabel().toUpperCase());
-            annotations.get(aType).add(neighbor);
-        }
+        this.graphNode = graphNode;
+        this.graph = graph;
     }
 
     public long getNeoId() {
         return neoId;
     }
-
-    public List<NeoNeighbor> getAnnotations(AnnotationType aType) {
-        return annotations.get(aType);
+    
+    public NodeIterable getAnnotations(AnnotationType aType){
+        int relType = graph.getModel().getEdgeType(aType.getRelationType());
+        return graph.getNeighbors(graphNode, relType);
     }
 
-    public String[] getAnnotationValues(AnnotationType aType) {
-        List<NeoNeighbor> neighbors = annotations.get(aType);
-        String[] values = new String[neighbors.size()];
+    public String[] getAnnotationValues(AnnotationType aType) {    
+        NodeIterable neighbors = getAnnotations(aType);
+        Node[] nodes = neighbors.toArray();
+        String[] values = new String[nodes.length];
         int pos = 0;
-        for (NeoNeighbor n : neighbors) {
-            values[pos++] = n.getName();
+        for (Node node : nodes) {
+            values[pos++] = node.getLabel();
         }
         return values;
     }
@@ -72,5 +75,6 @@ public class NeoPeptide extends Peptide {
         final NeoPeptide other = (NeoPeptide) obj;
         return other.neoId == this.neoId;
     }
+
 
 }

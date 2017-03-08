@@ -12,6 +12,8 @@ import javax.swing.Action;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.PeptideNode;
 import org.bapedis.db.ui.actions.ShowPeptideDetails;
+import org.gephi.graph.api.Node;
+import org.gephi.graph.api.NodeIterable;
 import org.openide.actions.PropertiesAction;
 import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;
@@ -88,9 +90,9 @@ public class NeoPeptideNode extends PeptideNode {
         sheet.put(set);
 
         // Annotations
-        List<NeoNeighbor> neighbors;
+        NodeIterable neighbors;
         String name;
-        String desc;
+        String desc = "";
         int count;
         for (AnnotationType aType : AnnotationType.values()) {
             count = 1;
@@ -99,10 +101,10 @@ public class NeoPeptideNode extends PeptideNode {
             set.setName(name);
             set.setDisplayName(aType.getDisplayName());
             neighbors = ((NeoPeptide) peptide).getAnnotations(aType);
-            for (NeoNeighbor neighbor : neighbors) {
-                desc = Arrays.toString(neighbor.getXref());
+            for (Node neighbor : neighbors) {
+//                desc = Arrays.toString(neighbor.getXref());
                 property = createPropertyField(name + count, aType.getDisplayName(),
-                        desc, String.class, neighbor.getName());
+                        desc, String.class, neighbor.getLabel());
                 set.put(property);
                 count++;
             }

@@ -63,27 +63,27 @@ public final class GraphTopComponent extends TopComponent {
         setToolTipText(Bundle.HINT_GraphTopComponent());
 
         //Create graph
-        GraphController gc = Lookup.getDefault().lookup(GraphController.class);
-        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
-        Workspace w = pm.getCurrentWorkspace();
-        GraphModel graphModel = gc.getGraphModel();
-        GraphFactory factory = graphModel.factory();
-        Random r = new Random();
-        Graph g = graphModel.getGraph();
-        for (int i = 0; i < 1000; i++) {
-            org.gephi.graph.api.Node n1 = factory.newNode();
-            org.gephi.graph.api.Node n2 = factory.newNode();
-            n1.setSize(20);
-            n2.setSize(40);
-            n1.setX(i*10);
-            n1.setY(i*5);
-            g.addNode(n1);
-            g.addNode(n2);
-            if (r.nextDouble() > 0.5) {
-                org.gephi.graph.api.Edge e = factory.newEdge(n2, n1);
-                g.addEdge(e);
-            }
-        }
+//        GraphController gc = Lookup.getDefault().lookup(GraphController.class);
+//        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
+//        Workspace w = pm.getCurrentWorkspace();
+//        GraphModel graphModel = gc.getGraphModel();
+//        GraphFactory factory = graphModel.factory();
+//        Random r = new Random();
+//        Graph g = graphModel.getGraph();
+//        for (int i = 0; i < 1000; i++) {
+//            org.gephi.graph.api.Node n1 = factory.newNode();
+//            org.gephi.graph.api.Node n2 = factory.newNode();
+//            n1.setSize(20);
+//            n2.setSize(40);
+//            n1.setX(i*10);
+//            n1.setY(i*5);
+//            g.addNode(n1);
+//            g.addNode(n2);
+//            if (r.nextDouble() > 0.5) {
+//                org.gephi.graph.api.Edge e = factory.newEdge(n2, n1);
+//                g.addEdge(e);
+//            }
+//        }
 
 //        DefaultScaler scaler = new DefaultScaler();
 //        scaler.doScale(g);

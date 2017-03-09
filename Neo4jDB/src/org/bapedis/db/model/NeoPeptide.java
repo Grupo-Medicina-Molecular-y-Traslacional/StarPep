@@ -5,6 +5,7 @@
  */
 package org.bapedis.db.model;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Set;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
+import org.gephi.graph.api.EdgeIterable;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.NodeIterable;
@@ -40,21 +42,19 @@ public class NeoPeptide extends Peptide {
     public long getNeoId() {
         return neoId;
     }
-    
-    public NodeIterable getAnnotations(AnnotationType aType){
+
+    public NodeIterable getAnnotations(AnnotationType aType) {
         int relType = graph.getModel().getEdgeType(aType.getRelationType());
-        return graph.getNeighbors(graphNode, relType);
+        return relType != -1 ? graph.getNeighbors(graphNode, relType): new NodeIterable.NodeIterableEmpty();
     }
 
-    public String[] getAnnotationValues(AnnotationType aType) {    
+    public String[] getAnnotationValues(AnnotationType aType) {
         NodeIterable neighbors = getAnnotations(aType);
-        Node[] nodes = neighbors.toArray();
-        String[] values = new String[nodes.length];
-        int pos = 0;
-        for (Node node : nodes) {
-            values[pos++] = node.getLabel();
+        ArrayList<String> values = new ArrayList<>();
+        for(Node node: neighbors){
+            values.add(node.getLabel());
         }
-        return values;
+        return values.toArray(new String[0]);
     }
 
     @Override
@@ -75,6 +75,5 @@ public class NeoPeptide extends Peptide {
         final NeoPeptide other = (NeoPeptide) obj;
         return other.neoId == this.neoId;
     }
-
 
 }

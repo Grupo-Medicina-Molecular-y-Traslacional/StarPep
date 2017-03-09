@@ -6,12 +6,12 @@
 package org.bapedis.db.services;
 
 import java.util.Collection;
-import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.db.dao.NeoPeptideDAO;
 import org.bapedis.db.model.BioCategory;
 import org.bapedis.db.model.NeoPeptideModel;
+import org.gephi.graph.api.Graph;
+import org.gephi.graph.api.GraphModel;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -33,6 +33,9 @@ public class NeoPeptideManager {
         NeoPeptideModel oldModel = workspace.getLookup().lookup(NeoPeptideModel.class);
         if (oldModel != null) {
             workspace.remove(oldModel);
+            Graph graph = oldModel.getGraph();
+            GraphModel graphModel = graph.getModel();
+            graphModel.destroyView(graph.getView());
             oldModel = null;
         }
         NeoPeptideModel neoModel = neoModelDAO.getNeoPeptidesBy(categories.toArray(new BioCategory[0]));

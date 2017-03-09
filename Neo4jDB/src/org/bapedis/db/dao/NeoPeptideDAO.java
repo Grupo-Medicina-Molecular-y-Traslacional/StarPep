@@ -16,6 +16,8 @@ import org.bapedis.db.model.NeoPeptideModel;
 import org.bapedis.db.model.NeoPeptide;
 import org.gephi.graph.api.GraphFactory;
 import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.GraphView;
+import org.gephi.graph.api.Subgraph;
 import org.gephi.graph.api.Table;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
@@ -37,6 +39,7 @@ import org.neo4j.graphdb.traversal.Uniqueness;
 public class NeoPeptideDAO {
 
     protected final GraphDatabaseService graphDb;
+    protected final GraphModel graphModel;
     public final String PRO_ID = "id";
     public final String PRO_SEQ = "seq";
     public final String PRO_LENGHT = "length";
@@ -48,6 +51,12 @@ public class NeoPeptideDAO {
 
     public NeoPeptideDAO() {
         graphDb = Neo4jDB.getDbService();
+        graphModel = GraphModel.Factory.newInstance();
+        
+//        Table nodeTable = graphModel.getNodeTable();
+//        nodeTable.addColumn(PRO_ID, long.class);
+        Table edgeTable = graphModel.getEdgeTable();
+        edgeTable.addColumn(PRO_XREF, String[].class);
     }
 
     private enum RELS implements RelationshipType {
@@ -56,15 +65,10 @@ public class NeoPeptideDAO {
     }
 
     public NeoPeptideModel getNeoPeptidesBy(BioCategory[] categories) {
-        GraphModel graphModel = GraphModel.Factory.newInstance();
-//        Table nodeTable = graphModel.getNodeTable();
-//        nodeTable.addColumn(PRO_ID, long.class);
-        Table edgeTable = graphModel.getEdgeTable();
-        edgeTable.addColumn(PRO_XREF, String[].class);
+        GraphView gView = graphModel.createView();
+        Subgraph graph = graphModel.getGraph(gView);
 
-        NeoPeptideModel neoModel = new NeoPeptideModel();
-        neoModel.setGraphModel(graphModel);
-
+        NeoPeptideModel neoModel = new NeoPeptideModel(graph);
         neoModel.addAttribute(Peptide.ID);
         neoModel.addAttribute(Peptide.SEQ);
         neoModel.addAttribute(Peptide.LENGHT);
@@ -89,10 +93,12 @@ public class NeoPeptideDAO {
                 seq = neoNode.getProperty(PRO_SEQ).toString();
                 // Fill graph
                 graphNode = addGraphNodeFromNeoNode(neoNode, graphModel);
-                graphNode.setLabel(id);
+                graph.addNode(graphNode);
                 for (Relationship relation : neoNode.getRelationships(Direction.OUTGOING)) {
-                    graphNeighborNode = addGraphNodeFromNeoNode(neoNode, graphModel);
+                    graphNeighborNode = addGraphNodeFromNeoNode(relation.getEndNode(), graphModel);
                     graphEdge = addGraphEdgeFromNeoRelationship(graphNode, graphNeighborNode, relation, graphModel);
+                    graph.addNode(graphNeighborNode);
+                    graph.addEdge(graphEdge);
 //                    if (relation.getEndNode().equals(endNode)) {
 //                        neoNeighbor = new NeoNeighbor(endNode.getId(), endNode.getLabels().iterator().next().name(),
 //                                endNode.getProperty(PRO_NAME).toString(), (String[]) relation.getProperty(PRO_XREF));
@@ -101,7 +107,7 @@ public class NeoPeptideDAO {
                 }
 
                 //Fill NeoPeptideModel
-                neoPeptide = new NeoPeptide(neoNode.getId(), graphNode, graphModel.getGraph());
+                neoPeptide = new NeoPeptide(neoNode.getId(), graphNode, graph);
                 neoPeptide.setAttributeValue(Peptide.ID, id);
                 neoPeptide.setAttributeValue(Peptide.SEQ, seq);
                 neoPeptide.setAttributeValue(Peptide.LENGHT, seq.length());
@@ -183,10 +189,12 @@ public class NeoPeptideDAO {
             graphNode = factory.newNode(id);
             if (neoNode.hasProperty(PRO_NAME)) {
                 graphNode.setLabel(neoNode.getProperty(PRO_NAME).toString());
+            }else{
+                graphNode.setLabel(id);
             }
             graphNode.setSize(GRAPH_NODE_SIZE);
 
-            //Set random position to the neoNode:
+            //Set random position
             graphNode.setX((float) ((0.01 + Math.random()) * 1000) - 500);
             graphNode.setY((float) ((0.01 + Math.random()) * 1000) - 500);
 

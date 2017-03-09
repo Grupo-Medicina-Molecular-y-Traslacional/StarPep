@@ -6,29 +6,21 @@
 package org.bapedis.core.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.ui.components.PeptideViewer;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.filters.Filter;
-import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.spi.filters.impl.AttributeFilter;
-import org.bapedis.core.spi.filters.impl.AttributeFilterFactory;
 import org.bapedis.core.spi.filters.impl.FilterHelper;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -39,7 +31,6 @@ import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
-import org.openide.awt.DropDownButtonFactory;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
 import org.openide.explorer.view.OutlineView;
@@ -85,6 +76,9 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     protected Lookup.Result<FilterModel> filterLkpResult;
     protected final ExplorerManager explorerMgr;
     protected final OutlineView view;
+    
+    protected final JLabel busyLabel;
+    protected final JLabel errorLabel;
 
     public PeptideViewerTopComponent() {
         initComponents();
@@ -116,6 +110,11 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         column = (ETableColumn) columnModel.getColumn(2);
         column.setMaxWidth(240);
         column.setPreferredWidth(240);
+        
+        busyLabel = new JLabel(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.busyLabel.text"), new ImageIcon(ImageUtilities.loadImage("org/bapedis/core/resources/loading.gif", true)), JLabel.CENTER);
+        busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        errorLabel = new JLabel(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.errorLabel.text"),new ImageIcon(ImageUtilities.loadImage("org/bapedis/core/resources/sad.png", true)), JLabel.CENTER);
+        errorLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
     }
 
@@ -312,11 +311,15 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }
 
     public void setBusyLabel() {
-        //todo
+        setBusy(true);
     }
 
     public void setErrorLabel() {
-        //todo
+        dataPanel.removeAll();
+        dataPanel.add(errorLabel, BorderLayout.CENTER);
+        dataPanel.revalidate();
+        dataPanel.repaint();
+        topPanel.setVisible(false);
     }
 
     @Override
@@ -394,13 +397,24 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         if (filterModel != null) {
             view.getOutline().setQuickFilter(0, filterModel);
         }
-        dataPanel.revalidate();
-        dataPanel.repaint();
+        setBusy(false);
     }
 
     @Override
     public ExplorerManager getExplorerManager() {
         return explorerMgr;
+    }
+    
+    protected void setBusy(boolean busy) {
+        dataPanel.removeAll();
+        if (busy) {
+            dataPanel.add(busyLabel, BorderLayout.CENTER);
+        } else {
+            dataPanel.add(view, BorderLayout.CENTER);
+        }
+        topPanel.setVisible(!busy);
+        dataPanel.revalidate();
+        dataPanel.repaint();
     }
 
     @Override

@@ -11,7 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;

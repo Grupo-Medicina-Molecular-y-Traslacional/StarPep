@@ -13,6 +13,7 @@ import org.openide.nodes.Node;
 
 /**
  * A node container for instances of PeptideNode.
+ *
  * @author loge
  */
 public class PeptideNodeContainer extends Index.ArrayChildren {
@@ -35,12 +36,13 @@ public class PeptideNodeContainer extends Index.ArrayChildren {
     public void addPeptideNode(PeptideNode node) {
         list.add(node);
     }
-    
-    public Peptide[] getPeptides(){
-        Peptide[] peptides = new Peptide[list.size()];
-        int cursor = 0;
-        for(PeptideNode pNode: list){
-            peptides[cursor++] = pNode.getLookup().lookup(Peptide.class);
+
+    public List<Peptide> getPeptides() {
+        List<Peptide> peptides = new LinkedList<>();
+        for (PeptideNode pNode : list) {
+            if (pNode.isAccepted()) {
+                peptides.add(pNode.getLookup().lookup(Peptide.class));
+            }
         }
         return peptides;
     }

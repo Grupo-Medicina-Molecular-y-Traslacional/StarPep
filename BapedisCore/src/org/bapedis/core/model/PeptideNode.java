@@ -18,14 +18,24 @@ import org.openide.util.lookup.Lookups;
  */
 public class PeptideNode extends AbstractNode {
     protected Peptide peptide;
+    protected boolean accepted;
     
     public PeptideNode(Peptide peptide) {
         this(peptide, Children.LEAF, Lookups.singleton(peptide));
+        accepted = true;
     }
     
     public PeptideNode(Peptide peptide, Children children, Lookup lookup) {
         super(children, lookup);
         this.peptide = peptide;
+    }
+
+    public boolean isAccepted() {
+        return accepted;
+    }
+
+    public void setAccepted(boolean accepted) {
+        this.accepted = accepted;
     }
     
     @Override

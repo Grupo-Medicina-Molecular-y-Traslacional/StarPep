@@ -60,7 +60,6 @@ public class NeoPeptideDAO {
     }
 
     private enum RELS implements RelationshipType {
-
         is_a, instance_of
     }
 
@@ -92,11 +91,11 @@ public class NeoPeptideDAO {
                 id = neoNode.getProperty(PRO_ID).toString();
                 seq = neoNode.getProperty(PRO_SEQ).toString();
                 // Fill graph
-                graphNode = addGraphNodeFromNeoNode(neoNode, graphModel);
+                graphNode = getGraphNodeFromNeoNode(neoNode, graphModel);
                 graph.addNode(graphNode);
                 for (Relationship relation : neoNode.getRelationships(Direction.OUTGOING)) {
-                    graphNeighborNode = addGraphNodeFromNeoNode(relation.getEndNode(), graphModel);
-                    graphEdge = addGraphEdgeFromNeoRelationship(graphNode, graphNeighborNode, relation, graphModel);
+                    graphNeighborNode = getGraphNodeFromNeoNode(relation.getEndNode(), graphModel);
+                    graphEdge = getGraphEdgeFromNeoRelationship(graphNode, graphNeighborNode, relation, graphModel);
                     graph.addNode(graphNeighborNode);
                     graph.addEdge(graphEdge);
 //                    if (relation.getEndNode().equals(endNode)) {
@@ -181,7 +180,7 @@ public class NeoPeptideDAO {
         return edges;
     }
 
-    private org.gephi.graph.api.Node addGraphNodeFromNeoNode(Node neoNode, GraphModel graphModel) {
+    private org.gephi.graph.api.Node getGraphNodeFromNeoNode(Node neoNode, GraphModel graphModel) {
         String id = String.valueOf(neoNode.getId());
         org.gephi.graph.api.Node graphNode = graphModel.getGraph().getNode(id);
         if (graphNode == null) {
@@ -203,7 +202,7 @@ public class NeoPeptideDAO {
         return graphNode;
     }
 
-    private org.gephi.graph.api.Edge addGraphEdgeFromNeoRelationship(org.gephi.graph.api.Node startNode, org.gephi.graph.api.Node endNode, Relationship relation, GraphModel graphModel) {
+    private org.gephi.graph.api.Edge getGraphEdgeFromNeoRelationship(org.gephi.graph.api.Node startNode, org.gephi.graph.api.Node endNode, Relationship relation, GraphModel graphModel) {
         String id = String.valueOf(relation.getId());
         org.gephi.graph.api.Edge graphEdge = graphModel.getGraph().getEdge(id);
         if (graphEdge == null) {

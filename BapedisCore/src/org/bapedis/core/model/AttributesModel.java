@@ -30,7 +30,7 @@ public class AttributesModel  {
     }
 
     public Peptide[] getPeptides() {
-        return container.getPeptides();
+        return container.getPeptides().toArray(new Peptide[0]);
     }
 
     public PeptideAttribute getAttribute(String id) {

@@ -40,7 +40,14 @@ public class FilterModel implements QuickFilter {
 
     @Override
     public boolean accept(Object obj) {
-        Peptide peptide = ((PeptideNode) obj).getPeptide();
+        PeptideNode node = ((PeptideNode) obj);
+        Peptide peptide = node.getPeptide();
+        boolean accepted = verify(peptide);
+        node.setAccepted(accepted);
+        return accepted;
+    }
+    
+    private boolean verify(Peptide peptide){
         switch (restriction) {
             case MATCH_ALL:
                 for (Filter filter : filters) {

@@ -41,14 +41,10 @@
  */
 package org.gephi.graph.api;
 
-import java.util.Collection;
-import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.db.model.NeoPeptideModel;
 import org.openide.util.Lookup;
-import org.openide.util.LookupEvent;
-import org.openide.util.LookupListener;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -56,14 +52,9 @@ import org.openide.util.lookup.ServiceProvider;
  * @author mbastian
  */
 @ServiceProvider(service = GraphController.class)
-public final class GraphControllerImpl implements GraphController, WorkspaceEventListener, LookupListener {
-
-    protected Lookup.Result<NeoPeptideModel> peptideLkpResult;
+public final class GraphControllerImpl implements GraphController {
 
     public GraphControllerImpl() {
-        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
-        pm.addWorkspaceEventListener(this);
-        workspaceChanged(null, pm.getCurrentWorkspace());
     }
 
     @Override
@@ -79,43 +70,5 @@ public final class GraphControllerImpl implements GraphController, WorkspaceEven
             return peptideModel.getGraph().getModel();
         }
         return null;
-    }
-
-//    private GraphModel newGraphModel(Workspace workspace) {
-//        Configuration config = new Configuration();
-//        config.setTimeRepresentation(TimeRepresentation.INTERVAL);
-//        GraphModel graphModelImpl = GraphModel.Factory.newInstance(config);
-//        workspace.add(graphModelImpl);
-//        return graphModelImpl;
-//    }
-    @Override
-    public void workspaceChanged(Workspace oldWs, Workspace newWs) {
-        if (peptideLkpResult != null) {
-            peptideLkpResult.removeLookupListener(this);
-            peptideLkpResult = null;
-        }
-        NeoPeptideModel peptideModel = newWs.getLookup().lookup(NeoPeptideModel.class);
-        if (peptideModel != null) {
-            Graph graph = peptideModel.getGraph();
-            GraphModel model = graph.getModel();
-            model.setVisibleView(graph.getView());
-        }
-        peptideLkpResult = newWs.getLookup().lookupResult(NeoPeptideModel.class);
-        peptideLkpResult.addLookupListener(this);
-    }
-
-    @Override
-    public void resultChanged(LookupEvent le) {
-        Collection<? extends NeoPeptideModel> peptideModels = peptideLkpResult.allInstances();
-        if (!peptideModels.isEmpty()) {
-            NeoPeptideModel peptideModel = peptideModels.iterator().next();            
-            Graph graph = peptideModel.getGraph();
-            
-//            DefaultScaler scaler = new DefaultScaler();
-//            scaler.doScale(graph);
-            
-            GraphModel model = graph.getModel();
-            model.setVisibleView(graph.getView());            
-        }
     }
 }

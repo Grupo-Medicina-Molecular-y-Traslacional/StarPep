@@ -24,6 +24,7 @@ import org.bapedis.core.spi.filters.impl.AttributeFilter;
 import org.bapedis.core.spi.filters.impl.FilterHelper;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.netbeans.swing.etable.ETable;
 import org.netbeans.swing.etable.ETableColumn;
 import org.netbeans.swing.etable.ETableColumnModel;
 import org.netbeans.swing.outline.Outline;
@@ -76,7 +77,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     protected Lookup.Result<FilterModel> filterLkpResult;
     protected final ExplorerManager explorerMgr;
     protected final OutlineView view;
-    
+
     protected final JLabel busyLabel;
     protected final JLabel errorLabel;
 
@@ -89,6 +90,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         view.setPropertyColumns("seq", NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.nodelColumnLabel.seq"),
                 "length", NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.nodelColumnLabel.length"));
         view.setQuickSearchAllowed(false);
+        view.getOutline().addPropertyChangeListener(ETable.PROP_QUICK_FILTER, this);
         dataPanel.add(view, BorderLayout.CENTER);
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));
@@ -110,10 +112,10 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         column = (ETableColumn) columnModel.getColumn(2);
         column.setMaxWidth(240);
         column.setPreferredWidth(240);
-        
+
         busyLabel = new JLabel(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.busyLabel.text"), new ImageIcon(ImageUtilities.loadImage("org/bapedis/core/resources/loading.gif", true)), JLabel.CENTER);
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        errorLabel = new JLabel(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.errorLabel.text"),new ImageIcon(ImageUtilities.loadImage("org/bapedis/core/resources/sad.png", true)), JLabel.CENTER);
+        errorLabel = new JLabel(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.errorLabel.text"), new ImageIcon(ImageUtilities.loadImage("org/bapedis/core/resources/sad.png", true)), JLabel.CENTER);
         errorLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
     }
@@ -378,24 +380,19 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             if (!filterModels.isEmpty()) {
                 FilterModel filterModel = filterModels.iterator().next();
                 filterModel.addPropertyChangeListener(this);
-                view.getOutline().setQuickFilter(0, filterModel);
-            } else {
-                view.getOutline().unsetQuickFilter();
+                if (!filterModel.isEmpty()) {
+                    view.getOutline().setQuickFilter(0, filterModel);
+                }
             }
         }
     }
 
     protected void showData(AttributesModel attrModel) {
         populateFilterFields(attrModel);
-        view.getOutline().unsetQuickFilter();
         if (attrModel != null) {
             explorerMgr.setRootContext(attrModel.getRootNode());
         } else {
             explorerMgr.setRootContext(Node.EMPTY);
-        }
-        FilterModel filterModel = pc.getCurrentWorkspace().getLookup().lookup(FilterModel.class);
-        if (filterModel != null) {
-            view.getOutline().setQuickFilter(0, filterModel);
         }
         setBusy(false);
     }
@@ -404,7 +401,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     public ExplorerManager getExplorerManager() {
         return explorerMgr;
     }
-    
+
     protected void setBusy(boolean busy) {
         dataPanel.removeAll();
         if (busy) {
@@ -421,10 +418,17 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof FilterModel) {
             FilterModel filterModel = (FilterModel) evt.getSource();
-            if (!filterModel.isEmpty()) {
-                view.getOutline().setQuickFilter(0, filterModel);
-            } else {
+            if (filterModel.isEmpty()) {
                 view.getOutline().unsetQuickFilter();
+            } else {              
+                view.getOutline().setQuickFilter(0, filterModel);
+            }
+        } else if (evt.getSource() instanceof Outline
+                && ETable.PROP_QUICK_FILTER.equals(evt.getPropertyName())) {
+            AttributesModel attrModel = pc.getCurrentWorkspace().getLookup().lookup(AttributesModel.class);
+            if (attrModel != null) {
+                attrModel.setFiltered();
+                attrModel.notifyObservers();
             }
         }
     }

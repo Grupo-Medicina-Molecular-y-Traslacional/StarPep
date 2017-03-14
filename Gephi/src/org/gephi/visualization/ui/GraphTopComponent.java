@@ -1,111 +1,238 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ Copyright 2008-2010 Gephi
+ Authors : Mathieu Bastian <mathieu.bastian@gephi.org>
+ Website : http://www.gephi.org
+
+ This file is part of Gephi.
+
+ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+ Copyright 2011 Gephi Consortium. All rights reserved.
+
+ The contents of this file are subject to the terms of either the GNU
+ General Public License Version 3 only ("GPL") or the Common
+ Development and Distribution License("CDDL") (collectively, the
+ "License"). You may not use this file except in compliance with the
+ License. You can obtain a copy of the License at
+ http://gephi.org/about/legal/license-notice/
+ or /cddl-1.0.txt and /gpl-3.0.txt. See the License for the
+ specific language governing permissions and limitations under the
+ License.  When distributing the software, include this License Header
+ Notice in each file and include the License files at
+ /cddl-1.0.txt and /gpl-3.0.txt. If applicable, add the following below the
+ License Header, with the fields enclosed by brackets [] replaced by
+ your own identifying information:
+ "Portions Copyrighted [year] [name of copyright owner]"
+
+ If you wish your version of this file to be governed by only the CDDL
+ or only the GPL Version 3, indicate your decision by adding
+ "[Contributor] elects to include this software in this distribution
+ under the [CDDL or GPL Version 3] license." If you do not indicate a
+ single choice of license, a recipient has the option to distribute
+ your version of this file under either the CDDL, the GPL Version 3 or
+ to extend the choice of license to its licensees as provided above.
+ However, if you add GPL Version 3 code and therefore, elected the GPL
+ Version 3 license, then the option applies only if the new code is
+ made subject to such option by the copyright holder.
+
+ Contributor(s):
+
+ Portions Copyrighted 2011 Gephi Consortium.
  */
 package org.gephi.visualization.ui;
 
+import java.awt.AWTEvent;
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.util.Random;
+import java.awt.event.AWTEventListener;
+import java.awt.event.KeyEvent;
+import java.util.Collection;
+import java.util.Observable;
+import java.util.Observer;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import org.bapedis.core.events.WorkspaceEventListener;
+import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
+import org.bapedis.db.model.NeoPeptide;
+import org.bapedis.db.model.NeoPeptideModel;
 import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphController;
-import org.gephi.graph.api.GraphFactory;
 import org.gephi.graph.api.GraphModel;
-import org.gephi.preview.api.G2DTarget;
-import org.gephi.preview.api.PreviewController;
-import org.gephi.preview.api.PreviewModel;
-import org.gephi.preview.api.PreviewProperty;
-import org.gephi.preview.api.RenderTarget;
-import org.gephi.preview.types.DependantOriginalColor;
+import org.gephi.graph.api.GraphView;
+import org.gephi.graph.api.Subgraph;
+import org.gephi.tools.api.ToolController;
+import org.gephi.ui.utils.UIUtils;
 import org.gephi.visualization.VizController;
 import org.gephi.visualization.apiimpl.GraphDrawable;
+import org.gephi.visualization.opengl.AbstractEngine;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.util.Lookup;
+import org.openide.util.LookupEvent;
+import org.openide.util.LookupListener;
+import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
-import org.openide.util.NbBundle.Messages;
+import org.openide.windows.WindowManager;
 
-/**
- * Top component which displays something.
- */
-@ConvertAsProperties(
-        dtd = "-//org.gephi.visualization.ui//Graph//EN",
-        autostore = false
-)
-@TopComponent.Description(
-        preferredID = "GraphTopComponent",
-        //iconBase="SET/PATH/TO/ICON/HERE", 
-        persistenceType = TopComponent.PERSISTENCE_ALWAYS
-)
-@TopComponent.Registration(mode = "editor", openAtStartup = false)
-@ActionID(category = "Window", id = "org.gephi.visualization.ui.GraphTopComponent")
-@ActionReference(path = "Menu/Window" /*, position = 333 */)
-@TopComponent.OpenActionRegistration(
-        displayName = "#CTL_GraphAction",
-        preferredID = "GraphTopComponent"
-)
-@Messages({
-    "CTL_GraphAction=Graph",
-    "CTL_GraphTopComponent=Graph Window",
-    "HINT_GraphTopComponent=This is a Graph window"
-})
-public final class GraphTopComponent extends TopComponent {
+@ConvertAsProperties(dtd = "-//org.gephi.visualization.component//Graph//EN",
+        autostore = false)
+@TopComponent.Description(preferredID = "GraphTopComponent",
+        persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+@TopComponent.Registration(mode = "editor", openAtStartup = true, roles = {"overview"})
+@ActionID(category = "Window", id = "org.gephi.visualization.component.GraphTopComponent")
+@ActionReference(path = "Menu/Window", position = 500)
+@TopComponent.OpenActionRegistration(displayName = "#CTL_GraphTopComponent",
+        preferredID = "GraphTopComponent")
+public class GraphTopComponent extends TopComponent implements WorkspaceEventListener, LookupListener, Observer {
 
-    private GraphDrawable drawable;
+    protected final ProjectManager pm;
+    protected Lookup.Result<NeoPeptideModel> peptideLkpResult;
+    private transient AbstractEngine engine;
+    private transient VizBarController vizBarController;
+    private transient GraphDrawable drawable;
+    private CollapsePanel collapsePanel;
 
     public GraphTopComponent() {
         initComponents();
-        setName(Bundle.CTL_GraphTopComponent());
-        setToolTipText(Bundle.HINT_GraphTopComponent());
 
-        //Create graph
-//        GraphController gc = Lookup.getDefault().lookup(GraphController.class);
-//        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
-//        Workspace w = pm.getCurrentWorkspace();
-//        GraphModel graphModel = gc.getGraphModel();
-//        GraphFactory factory = graphModel.factory();
-//        Random r = new Random();
-//        Graph g = graphModel.getGraph();
-//        for (int i = 0; i < 1000; i++) {
-//            org.gephi.graph.api.Node n1 = factory.newNode();
-//            org.gephi.graph.api.Node n2 = factory.newNode();
-//            n1.setSize(20);
-//            n2.setSize(40);
-//            n1.setX(i*10);
-//            n1.setY(i*5);
-//            g.addNode(n1);
-//            g.addNode(n2);
-//            if (r.nextDouble() > 0.5) {
-//                org.gephi.graph.api.Edge e = factory.newEdge(n2, n1);
-//                g.addEdge(e);
+        setName(NbBundle.getMessage(GraphTopComponent.class, "CTL_GraphTopComponent"));
+//        setToolTipText(NbBundle.getMessage(GraphTopComponent.class, "HINT_GraphTopComponent"));
+
+        //Request component activation and therefore initialize JOGL2 component
+        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
+            @Override
+            public void run() {
+                open();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        //Init
+                        initCollapsePanel();
+                        add(collapsePanel, java.awt.BorderLayout.PAGE_END);
+                        initToolPanels();
+                        drawable = VizController.getInstance().getDrawable();
+                        engine = VizController.getInstance().getEngine();
+
+                        requestActive();
+                        add(drawable.getGraphComponent(), BorderLayout.CENTER);
+                        remove(waitingLabel);
+                    }
+                });
+            }
+        });
+
+        pm = Lookup.getDefault().lookup(ProjectManager.class);
+    }
+
+    private void initCollapsePanel() {
+        vizBarController = new VizBarController();
+        collapsePanel = new CollapsePanel();
+        if (VizController.getInstance().getVizConfig().isShowVizVar()) {
+            collapsePanel.init(vizBarController.getToolbar(), vizBarController.getExtendedBar(), false);
+        } else {
+            collapsePanel.setVisible(false);
+        }
+    }
+    private SelectionToolbar selectionToolbar;
+    private ActionsToolbar actionsToolbar;
+    private JComponent toolbar;
+    private JComponent propertiesBar;
+
+    private void initToolPanels() {
+        final ToolController tc = Lookup.getDefault().lookup(ToolController.class);
+        if (tc != null) {
+            if (VizController.getInstance().getVizConfig().isToolbar()) {
+                JPanel westPanel = new JPanel(new BorderLayout(0, 0));
+                if (UIUtils.isAquaLookAndFeel()) {
+                    westPanel.setBackground(UIManager.getColor("NbExplorerView.background"));
+                }
+
+                toolbar = tc.getToolbar();
+                if (toolbar != null) {
+                    westPanel.add(toolbar, BorderLayout.CENTER);
+                }
+                selectionToolbar = new SelectionToolbar();
+                actionsToolbar = new ActionsToolbar();
+
+                westPanel.add(selectionToolbar, BorderLayout.NORTH);
+                westPanel.add(actionsToolbar, BorderLayout.SOUTH);
+                add(westPanel, BorderLayout.WEST);
+            }
+
+            if (VizController.getInstance().getVizConfig().isPropertiesbar()) {
+                propertiesBar = tc.getPropertiesBar();
+                if (propertiesBar != null) {
+                    add(propertiesBar, BorderLayout.NORTH);
+                }
+            }
+        }
+
+        //Workspace events
+//        ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
+//        projectController.addWorkspaceListener(new WorkspaceListener() {
+//            @Override
+//            public void initialize(Workspace workspace) {
 //            }
-//        }
-
-//        DefaultScaler scaler = new DefaultScaler();
-//        scaler.doScale(g);
-
-        drawable = VizController.getInstance().getDrawable();
-        centerPanel.add(drawable.getGraphComponent(), BorderLayout.CENTER);
-
-//        //Preview configuration
-//        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-//        PreviewModel previewModel = previewController.getModel();
-//        previewModel.getProperties().putValue(PreviewProperty.SHOW_NODE_LABELS, Boolean.TRUE);
-//        previewModel.getProperties().putValue(PreviewProperty.NODE_LABEL_COLOR, new DependantOriginalColor(Color.WHITE));
-//        previewModel.getProperties().putValue(PreviewProperty.EDGE_CURVED, Boolean.FALSE);
-//        previewModel.getProperties().putValue(PreviewProperty.EDGE_OPACITY, 50);
-//        previewModel.getProperties().putValue(PreviewProperty.BACKGROUND_COLOR, Color.BLACK);
-//        
-//       //New Processing target, get the PApplet
-//        G2DTarget target = (G2DTarget) previewController.getRenderTarget(RenderTarget.G2D_TARGET);
-//        final PreviewSketch previewSketch = new PreviewSketch(target);
-//        previewController.refreshPreview();
-//        
-//        centerPanel.add(previewSketch, BorderLayout.CENTER);
+//
+//            @Override
+//            public void select(Workspace workspace) {
+//                if (toolbar != null) {
+//                    toolbar.setEnabled(true);
+//                }
+//                if (propertiesBar != null) {
+//                    propertiesBar.setEnabled(true);
+//                }
+//                if (actionsToolbar != null) {
+//                    actionsToolbar.setEnabled(true);
+//                }
+//                if (selectionToolbar != null) {
+//                    selectionToolbar.setEnabled(true);
+//                }
+//            }
+//
+//            @Override
+//            public void unselect(Workspace workspace) {
+//            }
+//
+//            @Override
+//            public void close(Workspace workspace) {
+//            }
+//
+//            @Override
+//            public void disable() {
+//                if (toolbar != null) {
+//                    toolbar.setEnabled(false);
+//                }
+//                if (tc != null) {
+//                    tc.select(null);//Unselect any selected tool
+//                }
+//                if (propertiesBar != null) {
+//                    propertiesBar.setEnabled(false);
+//                }
+//                if (actionsToolbar != null) {
+//                    actionsToolbar.setEnabled(false);
+//                }
+//                if (selectionToolbar != null) {
+//                    selectionToolbar.setEnabled(false);
+//                }
+//            }
+//        });
+        boolean hasWorkspace = true;
+        if (toolbar != null) {
+            toolbar.setEnabled(hasWorkspace);
+        }
+        if (propertiesBar != null) {
+            propertiesBar.setEnabled(hasWorkspace);
+        }
+        if (actionsToolbar != null) {
+            actionsToolbar.setEnabled(hasWorkspace);
+        }
+        if (selectionToolbar != null) {
+            selectionToolbar.setEnabled(hasWorkspace);
+        }
     }
 
     /**
@@ -116,41 +243,29 @@ public final class GraphTopComponent extends TopComponent {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        centerPanel = new javax.swing.JPanel();
+        waitingLabel = new javax.swing.JLabel();
 
         setLayout(new java.awt.BorderLayout());
 
-        centerPanel.setLayout(new java.awt.BorderLayout());
-        add(centerPanel, java.awt.BorderLayout.CENTER);
+        waitingLabel.setBackground(new java.awt.Color(255, 255, 255));
+        org.openide.awt.Mnemonics.setLocalizedText(waitingLabel, org.openide.util.NbBundle.getMessage(GraphTopComponent.class, "GraphTopComponent.waitingLabel.text")); // NOI18N
+        waitingLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        add(waitingLabel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel centerPanel;
+    private javax.swing.JLabel waitingLabel;
     // End of variables declaration//GEN-END:variables
+
     @Override
     public void componentOpened() {
-//        GraphController gc = Lookup.getDefault().lookup(GraphController.class);
-//        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
-//        Workspace w = pm.getCurrentWorkspace();
-//        GraphModel graphModel = gc.getGraphModel();
-//        GraphFactory factory = graphModel.factory();
-//        org.gephi.graph.api.Node n1 = factory.newNode();
-//        org.gephi.graph.api.Node n2 = factory.newNode();
-//        org.gephi.graph.api.Edge e = factory.newEdge(n2, n1);
-//        Graph g = graphModel.getGraph();
-//        g.addNode(n1);
-//        g.addNode(n2);
-//        g.addEdge(e);
-//        GraphView gv = graphModel.createView();
-//        graphModel.setVisibleView(gv);
-//        drawable = VizController.getInstance().getDrawable();
-//        centerPanel.add(drawable.getGraphComponent(), BorderLayout.CENTER);
-
+        pm.addWorkspaceEventListener(this);
+        workspaceChanged(null, pm.getCurrentWorkspace());
     }
 
     @Override
     public void componentClosed() {
-        // TODO add custom code on component closing
+        peptideLkpResult.removeLookupListener(this);
+        pm.removeWorkspaceEventListener(this);
     }
 
     void writeProperties(java.util.Properties p) {
@@ -163,5 +278,55 @@ public final class GraphTopComponent extends TopComponent {
     void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
+    }
+
+    @Override
+    public void workspaceChanged(Workspace oldWs, Workspace newWs) {
+        if (peptideLkpResult != null) {
+            peptideLkpResult.removeLookupListener(this);
+            peptideLkpResult = null;
+        }
+        NeoPeptideModel peptideModel = newWs.getLookup().lookup(NeoPeptideModel.class);
+        if (peptideModel != null) {
+            setGraphFrom(peptideModel);
+        }
+        peptideLkpResult = newWs.getLookup().lookupResult(NeoPeptideModel.class);
+        peptideLkpResult.addLookupListener(this);
+    }
+
+    @Override
+    public void resultChanged(LookupEvent le) {
+        Collection<? extends NeoPeptideModel> peptideModels = peptideLkpResult.allInstances();
+        if (!peptideModels.isEmpty()) {
+            NeoPeptideModel peptideModel = peptideModels.iterator().next();
+            setGraphFrom(peptideModel);
+        }
+    }
+
+    private void setGraphFrom(NeoPeptideModel peptideModel) {
+        Graph graph = peptideModel.getGraph();
+        GraphModel model = graph.getModel();
+        model.setVisibleView(graph.getView());
+        peptideModel.addObserver(this);
+//            DefaultScaler scaler = new DefaultScaler();
+//            scaler.doScale(graph);            
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        NeoPeptideModel peptideModel = (NeoPeptideModel) o;
+        Peptide[] peptides = peptideModel.getPeptides();
+        GraphModel model = peptideModel.getGraph().getModel();
+        GraphView  view = model.createView();
+        Subgraph subGraph = model.getGraph(view);
+        for (Peptide p : peptides) {
+            subGraph.addNode(((NeoPeptide) p).getGraphNode());
+        }
+        model.setVisibleView(view);
+
+//        List<Node> nodesToRemove = new ArrayList<>();
+//        List<Node> nodesToAdd = new ArrayList<>();
+//        graph.removeAllNodes(nodesToRemove);
+//        graph.addAllNodes(nodesToAdd);
     }
 }

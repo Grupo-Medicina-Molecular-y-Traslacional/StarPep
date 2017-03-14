@@ -7,6 +7,7 @@ package org.bapedis.core.model;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Observable;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Node;
 
@@ -14,7 +15,7 @@ import org.openide.nodes.Node;
  * A class that represents an attribute-based data model for peptides. 
  * @author loge
  */
-public class AttributesModel  {
+public class AttributesModel extends Observable  {
     protected final HashMap<String, PeptideAttribute> attrsMap;
     protected PeptideNodeContainer container;
     protected Node rootNode;
@@ -23,6 +24,10 @@ public class AttributesModel  {
         attrsMap = new LinkedHashMap<>();
         container = new PeptideNodeContainer();
         rootNode = new AbstractNode(container);
+    }
+    
+    public void setFiltered(){
+        setChanged();
     }
 
     public PeptideAttribute[] getAttributes() {

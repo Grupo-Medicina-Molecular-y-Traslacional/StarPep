@@ -7,9 +7,7 @@ package org.bapedis.db.model;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.List;
 import javax.swing.Action;
-import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.PeptideNode;
 import org.bapedis.db.ui.actions.ShowPeptideDetails;
 import org.gephi.graph.api.Node;

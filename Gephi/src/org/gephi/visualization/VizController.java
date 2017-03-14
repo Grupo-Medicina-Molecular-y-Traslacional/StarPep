@@ -45,10 +45,8 @@ import org.bapedis.core.services.ProjectManager;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
-
 import org.gephi.visualization.api.VisualizationController;
 import org.gephi.visualization.api.selection.SelectionManager;
-
 import org.gephi.visualization.apiimpl.GraphDrawable;
 import org.gephi.visualization.apiimpl.GraphIO;
 import org.gephi.visualization.apiimpl.Scheduler;
@@ -59,13 +57,12 @@ import org.gephi.visualization.events.StandardVizEventManager;
 import org.gephi.visualization.opengl.AbstractEngine;
 import org.gephi.visualization.opengl.CompatibilityEngine;
 import org.gephi.visualization.scheduler.CompatibilityScheduler;
-//import org.gephi.visualization.screenshot.ScreenshotMaker;
+import org.gephi.visualization.screenshot.ScreenshotMaker;
 import org.gephi.visualization.swing.GLAbstractListener;
 import org.gephi.visualization.swing.GraphCanvas;
 import org.gephi.visualization.swing.NewtGraphCanvas;
 import org.gephi.visualization.swing.StandardGraphIO;
 import org.gephi.visualization.text.TextManager;
-
 import org.openide.util.Lookup;
 import org.openide.util.Utilities;
 import org.openide.util.lookup.ServiceProvider;
@@ -100,7 +97,7 @@ public class VizController implements VisualizationController {
     private GraphLimits limits;
     private DataBridge dataBridge;
     private TextManager textManager;
-//    private ScreenshotMaker screenshotMaker;
+    private ScreenshotMaker screenshotMaker;
     private SelectionManager selectionManager;
     //Variable
     private VizModel currentModel;
@@ -114,7 +111,7 @@ public class VizController implements VisualizationController {
         limits = new GraphLimits();
         dataBridge = new DataBridge();
         textManager = new TextManager();
-//        screenshotMaker = new ScreenshotMaker();
+        screenshotMaker = new ScreenshotMaker();
         currentModel = new VizModel(true);
         selectionManager = new SelectionManager();
 
@@ -131,10 +128,11 @@ public class VizController implements VisualizationController {
         ((StandardGraphIO) graphIO).initArchitecture();
         dataBridge.initArchitecture();
         textManager.initArchitecture();
-//        screenshotMaker.initArchitecture();
+        screenshotMaker.initArchitecture();
         vizEventManager.initArchitecture();
         selectionManager.initArchitecture();
 
+        //Todo
 //        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
 //        pc.addWorkspaceListener(new WorkspaceListener() {
 //            @Override
@@ -164,20 +162,22 @@ public class VizController implements VisualizationController {
 //        });
 
 //        if (pc.getCurrentWorkspace() != null) {
-            engine.reinit();
+//            engine.reinit();
 //        }
+        engine.reinit();
     }
 
     public void refreshWorkspace() {
-        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
+        ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
         VizModel model = null;
-        if (pm.getCurrentWorkspace() == null) {
+        if (pc.getCurrentWorkspace() == null) {
             model = new VizModel(true);
         } else {
-            model = pm.getCurrentWorkspace().getLookup().lookup(VizModel.class);
+            model = pc.getCurrentWorkspace().getLookup().lookup(VizModel.class);
             if (model == null) {
-                model = new VizModel(pm.getCurrentWorkspace());
-                pm.getCurrentWorkspace().add(model);
+                model = new VizModel(pc.getCurrentWorkspace());
+                pc.getCurrentWorkspace().add(model);
+
             }
         }
         if (model != currentModel) {
@@ -199,7 +199,7 @@ public class VizController implements VisualizationController {
         vizEventManager = null;
         dataBridge = null;
         textManager = null;
-//        screenshotMaker = null;
+        screenshotMaker = null;
         selectionManager = null;
     }
 
@@ -285,9 +285,9 @@ public class VizController implements VisualizationController {
         return textManager;
     }
 
-//    public ScreenshotMaker getScreenshotMaker() {
-//        return screenshotMaker;
-//    }
+    public ScreenshotMaker getScreenshotMaker() {
+        return screenshotMaker;
+    }
 
     public SelectionManager getSelectionManager() {
         return selectionManager;

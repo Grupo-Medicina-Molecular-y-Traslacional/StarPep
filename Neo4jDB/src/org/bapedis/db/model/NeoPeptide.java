@@ -43,6 +43,10 @@ public class NeoPeptide extends Peptide {
         return neoId;
     }
 
+    public Node getGraphNode() {
+        return graphNode;
+    }
+
     public NodeIterable getAnnotations(AnnotationType aType) {
         int relType = graph.getModel().getEdgeType(aType.getRelationType());
         return relType != -1 ? graph.getNeighbors(graphNode, relType): new NodeIterable.NodeIterableEmpty();

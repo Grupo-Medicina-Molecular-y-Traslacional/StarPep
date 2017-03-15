@@ -8,8 +8,10 @@ package org.bapedis.core.model;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import org.bapedis.core.services.ProjectManager;
 import org.openide.nodes.Index;
 import org.openide.nodes.Node;
+import org.openide.util.Lookup;
 
 /**
  * A node container for instances of PeptideNode.
@@ -38,10 +40,14 @@ public class PeptideNodeContainer extends Index.ArrayChildren {
     }
 
     public List<Peptide> getPeptides() {
+        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
+        FilterModel filterModel = pm.getCurrentWorkspace().getLookup().lookup(FilterModel.class);
         List<Peptide> peptides = new LinkedList<>();
+        Peptide peptide;
         for (PeptideNode pNode : list) {
-            if (pNode.isAccepted()) {
-                peptides.add(pNode.getLookup().lookup(Peptide.class));
+            peptide = pNode.getLookup().lookup(Peptide.class);
+            if (filterModel == null || filterModel.accept(peptide)) {
+                peptides.add(peptide);
             }
         }
         return peptides;

@@ -17,13 +17,12 @@ import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.Lookups;
-import org.netbeans.swing.etable.QuickFilter;
 
 /**
  *
  * @author loge
  */
-public class FilterModel implements QuickFilter {
+public class FilterModel {
 
     protected int id;
     protected String name;
@@ -38,16 +37,7 @@ public class FilterModel implements QuickFilter {
     protected RestrictionLevel restriction;
     protected Node rootContext;
 
-    @Override
-    public boolean accept(Object obj) {
-        PeptideNode node = ((PeptideNode) obj);
-        Peptide peptide = node.getPeptide();
-        boolean accepted = verify(peptide);
-        node.setAccepted(accepted);
-        return accepted;
-    }
-    
-    private boolean verify(Peptide peptide){
+    public boolean accept(Peptide peptide) {
         switch (restriction) {
             case MATCH_ALL:
                 for (Filter filter : filters) {

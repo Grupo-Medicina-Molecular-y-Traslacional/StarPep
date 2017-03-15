@@ -15,7 +15,7 @@ import org.openide.nodes.Node;
  * A class that represents an attribute-based data model for peptides. 
  * @author loge
  */
-public class AttributesModel extends Observable  {
+public class AttributesModel  {
     protected final HashMap<String, PeptideAttribute> attrsMap;
     protected PeptideNodeContainer container;
     protected Node rootNode;
@@ -24,10 +24,6 @@ public class AttributesModel extends Observable  {
         attrsMap = new LinkedHashMap<>();
         container = new PeptideNodeContainer();
         rootNode = new AbstractNode(container);
-    }
-    
-    public void setFiltered(){
-        setChanged();
     }
 
     public PeptideAttribute[] getAttributes() {

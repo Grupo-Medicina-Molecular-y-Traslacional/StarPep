@@ -45,6 +45,8 @@ import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.event.AWTEventListener;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Observable;
 import java.util.Observer;
@@ -53,6 +55,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import org.bapedis.core.events.WorkspaceEventListener;
+import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
@@ -86,10 +89,11 @@ import org.openide.windows.WindowManager;
 @ActionReference(path = "Menu/Window", position = 500)
 @TopComponent.OpenActionRegistration(displayName = "#CTL_GraphTopComponent",
         preferredID = "GraphTopComponent")
-public class GraphTopComponent extends TopComponent implements WorkspaceEventListener, LookupListener, Observer {
+public class GraphTopComponent extends TopComponent implements WorkspaceEventListener, LookupListener, PropertyChangeListener {
 
     protected final ProjectManager pm;
     protected Lookup.Result<NeoPeptideModel> peptideLkpResult;
+    protected Lookup.Result<FilterModel> filterLkpResult;
     private transient AbstractEngine engine;
     private transient VizBarController vizBarController;
     private transient GraphDrawable drawable;
@@ -264,8 +268,19 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
 
     @Override
     public void componentClosed() {
-        peptideLkpResult.removeLookupListener(this);
+        removeLookupListener();
         pm.removeWorkspaceEventListener(this);
+    }
+
+    private void removeLookupListener() {
+        if (peptideLkpResult != null) {
+            peptideLkpResult.removeLookupListener(this);
+            peptideLkpResult = null;
+        }
+        if (filterLkpResult != null) {
+            filterLkpResult.removeLookupListener(this);
+            filterLkpResult = null;
+        }
     }
 
     void writeProperties(java.util.Properties p) {
@@ -282,9 +297,12 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
 
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
-        if (peptideLkpResult != null) {
-            peptideLkpResult.removeLookupListener(this);
-            peptideLkpResult = null;
+        removeLookupListener();
+        if (oldWs != null) {
+            FilterModel oldFilterModel = oldWs.getLookup().lookup(FilterModel.class);
+            if (oldFilterModel != null) {
+                oldFilterModel.removePropertyChangeListener(this);
+            }
         }
         NeoPeptideModel peptideModel = newWs.getLookup().lookup(NeoPeptideModel.class);
         if (peptideModel != null) {
@@ -292,41 +310,76 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
         }
         peptideLkpResult = newWs.getLookup().lookupResult(NeoPeptideModel.class);
         peptideLkpResult.addLookupListener(this);
+        filterLkpResult = newWs.getLookup().lookupResult(FilterModel.class);
+        filterLkpResult.addLookupListener(this);
+        FilterModel filterModel = newWs.getLookup().lookup(FilterModel.class);
+        if (filterModel != null) {
+            filterModel.addPropertyChangeListener(this);
+        }
     }
 
     @Override
     public void resultChanged(LookupEvent le) {
-        Collection<? extends NeoPeptideModel> peptideModels = peptideLkpResult.allInstances();
-        if (!peptideModels.isEmpty()) {
-            NeoPeptideModel peptideModel = peptideModels.iterator().next();
-            setGraphFrom(peptideModel);
+        if (le.getSource().equals(peptideLkpResult)) {
+            Collection<? extends NeoPeptideModel> peptideModels = peptideLkpResult.allInstances();
+            if (!peptideModels.isEmpty()) {
+                NeoPeptideModel peptideModel = peptideModels.iterator().next();
+                setGraphFrom(peptideModel);
+            }
+        } else if (le.getSource().equals(filterLkpResult)) {
+            Collection<? extends FilterModel> filterModels = filterLkpResult.allInstances();
+            if (!filterModels.isEmpty()) {
+                FilterModel filterModel = filterModels.iterator().next();
+                filterModel.addPropertyChangeListener(this);
+                updateView(filterModel.isEmpty());
+            }
         }
     }
 
     private void setGraphFrom(NeoPeptideModel peptideModel) {
         Graph graph = peptideModel.getGraph();
         GraphModel model = graph.getModel();
+        
+        Workspace workspace = Lookup.getDefault().lookup(ProjectManager.class).getCurrentWorkspace();
+        FilterModel filterModel = workspace.getLookup().lookup(FilterModel.class);
+        
         model.setVisibleView(graph.getView());
-        peptideModel.addObserver(this);
+        
 //            DefaultScaler scaler = new DefaultScaler();
 //            scaler.doScale(graph);            
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        NeoPeptideModel peptideModel = (NeoPeptideModel) o;
+    private void updateView(boolean isMainView) {
+        Workspace workspace = Lookup.getDefault().lookup(ProjectManager.class).getCurrentWorkspace();
+        NeoPeptideModel peptideModel = workspace.getLookup().lookup(NeoPeptideModel.class);
         Peptide[] peptides = peptideModel.getPeptides();
-        GraphModel model = peptideModel.getGraph().getModel();
-        GraphView  view = model.createView();
-        Subgraph subGraph = model.getGraph(view);
-        for (Peptide p : peptides) {
-            subGraph.addNode(((NeoPeptide) p).getGraphNode());
-        }
-        model.setVisibleView(view);
 
-//        List<Node> nodesToRemove = new ArrayList<>();
-//        List<Node> nodesToAdd = new ArrayList<>();
-//        graph.removeAllNodes(nodesToRemove);
-//        graph.addAllNodes(nodesToAdd);
+        GraphModel model = peptideModel.getGraph().getModel();
+        GraphView mainView = peptideModel.getGraph().getView();
+        GraphView oldView = model.getVisibleView();
+
+        if (oldView != mainView) {
+            model.destroyView(oldView);
+        }
+
+        if (isMainView) {
+            model.setVisibleView(mainView);
+        } else {
+            GraphView newView = model.createView();
+            Subgraph subGraph = model.getGraph(newView);
+
+            for (Peptide p : peptides) {
+                subGraph.addNode(((NeoPeptide) p).getGraphNode());
+            }
+            model.setVisibleView(newView);
+        }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getSource() instanceof FilterModel) {
+            FilterModel filterModel = (FilterModel) evt.getSource();
+            updateView(filterModel.isEmpty());
+        }
     }
 }

@@ -41,15 +41,10 @@
  */
 package org.gephi.visualization.ui;
 
-import java.awt.AWTEvent;
 import java.awt.BorderLayout;
-import java.awt.event.AWTEventListener;
-import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
-import java.util.Observable;
-import java.util.Observer;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -342,7 +337,6 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
         
         Workspace workspace = Lookup.getDefault().lookup(ProjectManager.class).getCurrentWorkspace();
         FilterModel filterModel = workspace.getLookup().lookup(FilterModel.class);
-        
         model.setVisibleView(graph.getView());
         
 //            DefaultScaler scaler = new DefaultScaler();

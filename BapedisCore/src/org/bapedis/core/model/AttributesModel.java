@@ -7,7 +7,6 @@ package org.bapedis.core.model;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Observable;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Node;
 

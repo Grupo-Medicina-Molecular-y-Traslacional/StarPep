@@ -18,7 +18,9 @@ import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FilterModel;
+import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
+import org.bapedis.core.model.PeptideNode;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.impl.AttributeFilter;
 import org.bapedis.core.spi.filters.impl.FilterHelper;
@@ -27,6 +29,7 @@ import org.netbeans.api.settings.ConvertAsProperties;
 import org.netbeans.swing.etable.ETable;
 import org.netbeans.swing.etable.ETableColumn;
 import org.netbeans.swing.etable.ETableColumnModel;
+import org.netbeans.swing.etable.QuickFilter;
 import org.netbeans.swing.outline.Outline;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -90,7 +93,6 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         view.setPropertyColumns("seq", NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.nodelColumnLabel.seq"),
                 "length", NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.nodelColumnLabel.length"));
         view.setQuickSearchAllowed(false);
-        view.getOutline().addPropertyChangeListener(ETable.PROP_QUICK_FILTER, this);
         dataPanel.add(view, BorderLayout.CENTER);
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));
@@ -378,10 +380,18 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         } else if (le.getSource().equals(filterLkpResult)) {
             Collection<? extends FilterModel> filterModels = filterLkpResult.allInstances();
             if (!filterModels.isEmpty()) {
-                FilterModel filterModel = filterModels.iterator().next();
+                final FilterModel filterModel = filterModels.iterator().next();
                 filterModel.addPropertyChangeListener(this);
                 if (!filterModel.isEmpty()) {
-                    view.getOutline().setQuickFilter(0, filterModel);
+                    view.getOutline().setQuickFilter(0, new QuickFilter() {
+
+                        @Override
+                        public boolean accept(Object o) {
+                            PeptideNode node = ((PeptideNode) o);
+                            Peptide peptide = node.getPeptide();
+                            return filterModel.accept(peptide);
+                        }
+                    });
                 }
             }
         }
@@ -417,18 +427,19 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof FilterModel) {
-            FilterModel filterModel = (FilterModel) evt.getSource();
+            final FilterModel filterModel = (FilterModel) evt.getSource();
             if (filterModel.isEmpty()) {
                 view.getOutline().unsetQuickFilter();
-            } else {              
-                view.getOutline().setQuickFilter(0, filterModel);
-            }
-        } else if (evt.getSource() instanceof Outline
-                && ETable.PROP_QUICK_FILTER.equals(evt.getPropertyName())) {
-            AttributesModel attrModel = pc.getCurrentWorkspace().getLookup().lookup(AttributesModel.class);
-            if (attrModel != null) {
-                attrModel.setFiltered();
-                attrModel.notifyObservers();
+            } else {
+                view.getOutline().setQuickFilter(0, new QuickFilter() {
+
+                    @Override
+                    public boolean accept(Object o) {
+                        PeptideNode node = ((PeptideNode) o);
+                        Peptide peptide = node.getPeptide();
+                        return filterModel.accept(peptide);
+                    }
+                });
             }
         }
     }

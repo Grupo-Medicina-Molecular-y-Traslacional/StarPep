@@ -60,6 +60,7 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
 import org.gephi.graph.api.Subgraph;
+import org.gephi.preview.api.PreviewController;
 import org.gephi.tools.api.ToolController;
 import org.gephi.ui.utils.UIUtils;
 import org.gephi.visualization.VizController;
@@ -116,14 +117,30 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
                         engine = VizController.getInstance().getEngine();
 
                         requestActive();
+//                        scrollPane.setViewportView(drawable.getGraphComponent());
                         add(drawable.getGraphComponent(), BorderLayout.CENTER);
                         remove(waitingLabel);
                     }
                 });
             }
         });
-
         pm = Lookup.getDefault().lookup(ProjectManager.class);
+
+//Preview configuration
+//        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+//        PreviewModel previewModel = previewController.getModel();
+//        previewModel.getProperties().putValue(PreviewProperty.SHOW_NODE_LABELS, Boolean.TRUE);
+//        previewModel.getProperties().putValue(PreviewProperty.NODE_LABEL_COLOR, new DependantOriginalColor(Color.WHITE));
+//        previewModel.getProperties().putValue(PreviewProperty.EDGE_CURVED, Boolean.FALSE);
+//        previewModel.getProperties().putValue(PreviewProperty.EDGE_OPACITY, 50);
+//        previewModel.getProperties().putValue(PreviewProperty.BACKGROUND_COLOR, Color.BLACK);
+//
+//        //New Processing target, get the PApplet
+//        G2DTarget target = (G2DTarget) previewController.getRenderTarget(RenderTarget.G2D_TARGET);
+//        final PreviewSketch previewSketch = new PreviewSketch(target);
+//        previewController.refreshPreview();
+//
+//        add(previewSketch, BorderLayout.CENTER);
     }
 
     private void initCollapsePanel() {
@@ -334,11 +351,11 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
     private void setGraphFrom(NeoPeptideModel peptideModel) {
         Graph graph = peptideModel.getGraph();
         GraphModel model = graph.getModel();
-        
+
         Workspace workspace = Lookup.getDefault().lookup(ProjectManager.class).getCurrentWorkspace();
         FilterModel filterModel = workspace.getLookup().lookup(FilterModel.class);
         model.setVisibleView(graph.getView());
-        
+
 //            DefaultScaler scaler = new DefaultScaler();
 //            scaler.doScale(graph);            
     }
@@ -359,7 +376,7 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
         if (isMainView) {
             model.setVisibleView(mainView);
         } else {
-            GraphView newView = model.createView();
+            GraphView newView = model.createView(true,false);
             Subgraph subGraph = model.getGraph(newView);
 
             for (Peptide p : peptides) {
@@ -367,6 +384,9 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
             }
             model.setVisibleView(newView);
         }
+
+        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+        previewController.refreshPreview();
     }
 
     @Override

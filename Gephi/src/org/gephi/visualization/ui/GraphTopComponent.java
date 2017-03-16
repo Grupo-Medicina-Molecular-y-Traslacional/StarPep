@@ -354,7 +354,11 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
 
         Workspace workspace = Lookup.getDefault().lookup(ProjectManager.class).getCurrentWorkspace();
         FilterModel filterModel = workspace.getLookup().lookup(FilterModel.class);
-        model.setVisibleView(graph.getView());
+        if (filterModel == null || filterModel.isEmpty()) {
+            model.setVisibleView(graph.getView());
+        } else {
+            updateView(false);
+        }
 
 //            DefaultScaler scaler = new DefaultScaler();
 //            scaler.doScale(graph);            
@@ -376,7 +380,7 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
         if (isMainView) {
             model.setVisibleView(mainView);
         } else {
-            GraphView newView = model.createView(true,false);
+            GraphView newView = model.createView(true, false);
             Subgraph subGraph = model.getGraph(newView);
 
             for (Peptide p : peptides) {

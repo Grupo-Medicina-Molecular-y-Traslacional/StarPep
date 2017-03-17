@@ -351,17 +351,17 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
         NeoPeptideModel peptideModel = workspace.getLookup().lookup(NeoPeptideModel.class);
         if (peptideModel != null) {
             Peptide[] peptides = peptideModel.getPeptides();
-            Graph mainGraph = peptideModel.getGraph();
-            GraphModel model = mainGraph.getModel();
-            GraphView mainView = mainGraph.getView();
+            Graph graph = peptideModel.getGraph();
+            GraphModel model = graph.getModel();
+            GraphView graphView = graph.getView();
             GraphView oldView = model.getVisibleView();
 
-            if (!oldView.isMainView()) {
+            if (!oldView.isMainView() && oldView != graphView) {
                 model.destroyView(oldView);
             }
 
             if (filterModel == null || filterModel.isEmpty()) {
-                model.setVisibleView(mainView);
+                model.setVisibleView(graphView);
             } else {
                 GraphView newView = model.createView();
                 Subgraph subGraph = model.getGraph(newView);
@@ -379,7 +379,7 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
                         }
                     }
                     subGraph.addAllNodes(neighbors);
-                    for (Edge edge : mainGraph.getEdges(neoPeptide.getGraphNode())) {
+                    for (Edge edge : graph.getEdges(neoPeptide.getGraphNode())) {
                         edges.add(edge);
                     }
                     subGraph.addAllEdges(edges);

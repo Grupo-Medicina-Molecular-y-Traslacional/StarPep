@@ -41,6 +41,7 @@
  */
 package org.gephi.visualization.ui;
 
+import org.gephi.ui.components.JColorButton;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;

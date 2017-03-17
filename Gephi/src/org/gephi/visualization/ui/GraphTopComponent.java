@@ -42,29 +42,10 @@
 package org.gephi.visualization.ui;
 
 import java.awt.BorderLayout;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import org.bapedis.core.events.WorkspaceEventListener;
-import org.bapedis.core.model.FilterModel;
-import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.Workspace;
-import org.bapedis.core.services.ProjectManager;
-import org.bapedis.db.model.NeoPeptide;
-import org.bapedis.db.model.NeoPeptideModel;
-import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.GraphView;
-import org.gephi.graph.api.Node;
-import org.gephi.graph.api.Subgraph;
-import org.gephi.preview.api.PreviewController;
 import org.gephi.tools.api.ToolController;
 import org.gephi.ui.utils.UIUtils;
 import org.gephi.visualization.VizController;
@@ -74,8 +55,6 @@ import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.util.Lookup;
-import org.openide.util.LookupEvent;
-import org.openide.util.LookupListener;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -89,11 +68,9 @@ import org.openide.windows.WindowManager;
 @ActionReference(path = "Menu/Window", position = 500)
 @TopComponent.OpenActionRegistration(displayName = "#CTL_GraphTopComponent",
         preferredID = "GraphTopComponent")
-public class GraphTopComponent extends TopComponent implements WorkspaceEventListener, LookupListener, PropertyChangeListener {
+public class GraphTopComponent extends TopComponent  {
 
-    protected final ProjectManager pm;
-    protected Lookup.Result<NeoPeptideModel> peptideLkpResult;
-    protected Lookup.Result<FilterModel> filterLkpResult;
+
     private transient AbstractEngine engine;
     private transient VizBarController vizBarController;
     private transient GraphDrawable drawable;
@@ -121,30 +98,13 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
                         engine = VizController.getInstance().getEngine();
 
                         requestActive();
-//                        scrollPane.setViewportView(drawable.getGraphComponent());
+//                        jScrollPane1.setViewportView(drawable.getGraphComponent());
                         add(drawable.getGraphComponent(), BorderLayout.CENTER);
                         remove(waitingLabel);
                     }
                 });
             }
         });
-        pm = Lookup.getDefault().lookup(ProjectManager.class);
-
-//Preview configuration
-//        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-//        PreviewModel previewModel = previewController.getModel();
-//        previewModel.getProperties().putValue(PreviewProperty.SHOW_NODE_LABELS, Boolean.TRUE);
-//        previewModel.getProperties().putValue(PreviewProperty.NODE_LABEL_COLOR, new DependantOriginalColor(Color.WHITE));
-//        previewModel.getProperties().putValue(PreviewProperty.EDGE_CURVED, Boolean.FALSE);
-//        previewModel.getProperties().putValue(PreviewProperty.EDGE_OPACITY, 50);
-//        previewModel.getProperties().putValue(PreviewProperty.BACKGROUND_COLOR, Color.BLACK);
-//
-//        //New Processing target, get the PApplet
-//        G2DTarget target = (G2DTarget) previewController.getRenderTarget(RenderTarget.G2D_TARGET);
-//        final PreviewSketch previewSketch = new PreviewSketch(target);
-//        previewController.refreshPreview();
-//
-//        add(previewSketch, BorderLayout.CENTER);
     }
 
     private void initCollapsePanel() {
@@ -264,6 +224,7 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
     private void initComponents() {
 
         waitingLabel = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -271,33 +232,23 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
         org.openide.awt.Mnemonics.setLocalizedText(waitingLabel, org.openide.util.NbBundle.getMessage(GraphTopComponent.class, "GraphTopComponent.waitingLabel.text")); // NOI18N
         waitingLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         add(waitingLabel, java.awt.BorderLayout.CENTER);
+        add(jScrollPane1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel waitingLabel;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void componentOpened() {
-        pm.addWorkspaceEventListener(this);
-        workspaceChanged(null, pm.getCurrentWorkspace());
     }
 
     @Override
     public void componentClosed() {
-        removeLookupListener();
-        pm.removeWorkspaceEventListener(this);
+
     }
 
-    private void removeLookupListener() {
-        if (peptideLkpResult != null) {
-            peptideLkpResult.removeLookupListener(this);
-            peptideLkpResult = null;
-        }
-        if (filterLkpResult != null) {
-            filterLkpResult.removeLookupListener(this);
-            filterLkpResult = null;
-        }
-    }
+
 
     void writeProperties(java.util.Properties p) {
         // better to version settings since initial version as advocated at
@@ -311,88 +262,4 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
         // TODO read your settings according to their version
     }
 
-    @Override
-    public void workspaceChanged(Workspace oldWs, Workspace newWs) {
-        removeLookupListener();
-        if (oldWs != null) {
-            FilterModel oldFilterModel = oldWs.getLookup().lookup(FilterModel.class);
-            if (oldFilterModel != null) {
-                oldFilterModel.removePropertyChangeListener(this);
-            }
-        }
-        updateView();
-        peptideLkpResult = newWs.getLookup().lookupResult(NeoPeptideModel.class);
-        peptideLkpResult.addLookupListener(this);
-        filterLkpResult = newWs.getLookup().lookupResult(FilterModel.class);
-        filterLkpResult.addLookupListener(this);
-        FilterModel filterModel = newWs.getLookup().lookup(FilterModel.class);
-        if (filterModel != null) {
-            filterModel.addPropertyChangeListener(this);
-        }
-    }
-
-    @Override
-    public void resultChanged(LookupEvent le) {
-        if (le.getSource().equals(peptideLkpResult)) {
-            updateView();
-        } else if (le.getSource().equals(filterLkpResult)) {
-            Collection<? extends FilterModel> filterModels = filterLkpResult.allInstances();
-            if (!filterModels.isEmpty()) {
-                FilterModel filterModel = filterModels.iterator().next();
-                filterModel.addPropertyChangeListener(this);
-                updateView();
-            }
-        }
-    }
-
-    private void updateView() {
-        Workspace workspace = Lookup.getDefault().lookup(ProjectManager.class).getCurrentWorkspace();
-        FilterModel filterModel = workspace.getLookup().lookup(FilterModel.class);
-        NeoPeptideModel peptideModel = workspace.getLookup().lookup(NeoPeptideModel.class);
-        if (peptideModel != null) {
-            Peptide[] peptides = peptideModel.getPeptides();
-            Graph graph = peptideModel.getGraph();
-            GraphModel model = graph.getModel();
-            GraphView graphView = graph.getView();
-            GraphView oldView = model.getVisibleView();
-
-            if (!oldView.isMainView() && oldView != graphView) {
-                model.destroyView(oldView);
-            }
-
-            if (filterModel == null || filterModel.isEmpty()) {
-                model.setVisibleView(graphView);
-            } else {
-                GraphView newView = model.createView();
-                Subgraph subGraph = model.getGraph(newView);
-                NeoPeptide neoPeptide;
-                List<Node> neighbors;
-                List<Edge> edges;
-                for (Peptide p : peptides) {
-                    neoPeptide = (NeoPeptide) p;
-                    subGraph.addNode(neoPeptide.getGraphNode());
-                    neighbors = new LinkedList<>();
-                    edges = new LinkedList<>();
-                    for (Node neighbor : neoPeptide.getNeighbors()) {
-                        if (!subGraph.hasNode(neighbor.getId())) {
-                            neighbors.add(neighbor);
-                        }
-                    }
-                    subGraph.addAllNodes(neighbors);
-                    for (Edge edge : graph.getEdges(neoPeptide.getGraphNode())) {
-                        edges.add(edge);
-                    }
-                    subGraph.addAllEdges(edges);
-                }
-                model.setVisibleView(newView);
-            }
-        }
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource() instanceof FilterModel) {
-            updateView();
-        }
-    }
 }

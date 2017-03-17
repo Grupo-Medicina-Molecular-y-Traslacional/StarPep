@@ -41,10 +41,21 @@
  */
 package org.gephi.graph.api;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import org.bapedis.core.events.WorkspaceEventListener;
+import org.bapedis.core.model.FilterModel;
+import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
+import org.bapedis.db.model.NeoPeptide;
 import org.bapedis.db.model.NeoPeptideModel;
 import org.openide.util.Lookup;
+import org.openide.util.LookupEvent;
+import org.openide.util.LookupListener;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -52,9 +63,16 @@ import org.openide.util.lookup.ServiceProvider;
  * @author mbastian
  */
 @ServiceProvider(service = GraphController.class)
-public final class GraphControllerImpl implements GraphController {
+public final class GraphControllerImpl implements GraphController, WorkspaceEventListener, LookupListener, PropertyChangeListener {
+
+    protected final ProjectManager pm;
+    protected Lookup.Result<NeoPeptideModel> peptideLkpResult;
+    protected Lookup.Result<FilterModel> filterLkpResult;
 
     public GraphControllerImpl() {
+        pm = Lookup.getDefault().lookup(ProjectManager.class);
+        pm.addWorkspaceEventListener(this);
+        workspaceChanged(null, pm.getCurrentWorkspace());
     }
 
     @Override
@@ -71,4 +89,101 @@ public final class GraphControllerImpl implements GraphController {
         }
         return null;
     }
+
+    private void removeLookupListener() {
+        if (peptideLkpResult != null) {
+            peptideLkpResult.removeLookupListener(this);
+            peptideLkpResult = null;
+        }
+        if (filterLkpResult != null) {
+            filterLkpResult.removeLookupListener(this);
+            filterLkpResult = null;
+        }
+    }
+
+    @Override
+    public void workspaceChanged(Workspace oldWs, Workspace newWs) {
+        removeLookupListener();
+        if (oldWs != null) {
+            FilterModel oldFilterModel = oldWs.getLookup().lookup(FilterModel.class);
+            if (oldFilterModel != null) {
+                oldFilterModel.removePropertyChangeListener(this);
+            }
+        }
+        updateView();
+        peptideLkpResult = newWs.getLookup().lookupResult(NeoPeptideModel.class);
+        peptideLkpResult.addLookupListener(this);
+        filterLkpResult = newWs.getLookup().lookupResult(FilterModel.class);
+        filterLkpResult.addLookupListener(this);
+        FilterModel filterModel = newWs.getLookup().lookup(FilterModel.class);
+        if (filterModel != null) {
+            filterModel.addPropertyChangeListener(this);
+        }
+    }
+
+    @Override
+    public void resultChanged(LookupEvent le) {
+        if (le.getSource().equals(peptideLkpResult)) {
+            updateView();
+        } else if (le.getSource().equals(filterLkpResult)) {
+            Collection<? extends FilterModel> filterModels = filterLkpResult.allInstances();
+            if (!filterModels.isEmpty()) {
+                FilterModel filterModel = filterModels.iterator().next();
+                filterModel.addPropertyChangeListener(this);
+                updateView();
+            }
+        }
+    }
+
+    private void updateView() {
+        Workspace workspace = Lookup.getDefault().lookup(ProjectManager.class).getCurrentWorkspace();
+        FilterModel filterModel = workspace.getLookup().lookup(FilterModel.class);
+        NeoPeptideModel peptideModel = workspace.getLookup().lookup(NeoPeptideModel.class);
+        if (peptideModel != null) {
+            Peptide[] peptides = peptideModel.getPeptides();
+            Graph graph = peptideModel.getGraph();
+            GraphModel model = graph.getModel();
+            GraphView graphView = graph.getView();
+            GraphView oldView = model.getVisibleView();
+
+            if (!oldView.isMainView() && oldView != graphView) {
+                model.destroyView(oldView);
+            }
+
+            if (filterModel == null || filterModel.isEmpty()) {
+                model.setVisibleView(graphView);
+            } else {
+                GraphView newView = model.createView();
+                Subgraph subGraph = model.getGraph(newView);
+                NeoPeptide neoPeptide;
+                List<Node> neighbors;
+                List<Edge> edges;
+                for (Peptide p : peptides) {
+                    neoPeptide = (NeoPeptide) p;
+                    subGraph.addNode(neoPeptide.getGraphNode());
+                    neighbors = new LinkedList<>();
+                    edges = new LinkedList<>();
+                    for (Node neighbor : neoPeptide.getNeighbors()) {
+                        if (!subGraph.hasNode(neighbor.getId())) {
+                            neighbors.add(neighbor);
+                        }
+                    }
+                    subGraph.addAllNodes(neighbors);
+                    for (Edge edge : graph.getEdges(neoPeptide.getGraphNode())) {
+                        edges.add(edge);
+                    }
+                    subGraph.addAllEdges(edges);
+                }
+                model.setVisibleView(newView);
+            }
+        }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getSource() instanceof FilterModel) {
+            updateView();
+        }
+    }
+
 }

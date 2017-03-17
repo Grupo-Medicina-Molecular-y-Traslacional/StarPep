@@ -41,6 +41,7 @@
  */
 package org.gephi.visualization.ui;
 
+import org.gephi.ui.components.JColorButton;
 import com.connectina.swing.fontchooser.JFontChooser;
 import java.awt.Color;
 import java.awt.Dimension;

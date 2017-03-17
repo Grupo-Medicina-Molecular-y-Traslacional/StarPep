@@ -45,6 +45,8 @@ import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -56,9 +58,11 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.db.model.NeoPeptide;
 import org.bapedis.db.model.NeoPeptideModel;
+import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
+import org.gephi.graph.api.Node;
 import org.gephi.graph.api.Subgraph;
 import org.gephi.preview.api.PreviewController;
 import org.gephi.tools.api.ToolController;
@@ -316,10 +320,7 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
                 oldFilterModel.removePropertyChangeListener(this);
             }
         }
-        NeoPeptideModel peptideModel = newWs.getLookup().lookup(NeoPeptideModel.class);
-        if (peptideModel != null) {
-            setGraphFrom(peptideModel);
-        }
+        updateView();
         peptideLkpResult = newWs.getLookup().lookupResult(NeoPeptideModel.class);
         peptideLkpResult.addLookupListener(this);
         filterLkpResult = newWs.getLookup().lookupResult(FilterModel.class);
@@ -333,71 +334,65 @@ public class GraphTopComponent extends TopComponent implements WorkspaceEventLis
     @Override
     public void resultChanged(LookupEvent le) {
         if (le.getSource().equals(peptideLkpResult)) {
-            Collection<? extends NeoPeptideModel> peptideModels = peptideLkpResult.allInstances();
-            if (!peptideModels.isEmpty()) {
-                NeoPeptideModel peptideModel = peptideModels.iterator().next();
-                setGraphFrom(peptideModel);
-            }
+            updateView();
         } else if (le.getSource().equals(filterLkpResult)) {
             Collection<? extends FilterModel> filterModels = filterLkpResult.allInstances();
             if (!filterModels.isEmpty()) {
                 FilterModel filterModel = filterModels.iterator().next();
                 filterModel.addPropertyChangeListener(this);
-                updateView(filterModel.isEmpty());
+                updateView();
             }
         }
     }
 
-    private void setGraphFrom(NeoPeptideModel peptideModel) {
-        Graph graph = peptideModel.getGraph();
-        GraphModel model = graph.getModel();
-
+    private void updateView() {
         Workspace workspace = Lookup.getDefault().lookup(ProjectManager.class).getCurrentWorkspace();
         FilterModel filterModel = workspace.getLookup().lookup(FilterModel.class);
-        if (filterModel == null || filterModel.isEmpty()) {
-            model.setVisibleView(graph.getView());
-        } else {
-            updateView(false);
-        }
-
-//            DefaultScaler scaler = new DefaultScaler();
-//            scaler.doScale(graph);            
-    }
-
-    private void updateView(boolean isMainView) {
-        Workspace workspace = Lookup.getDefault().lookup(ProjectManager.class).getCurrentWorkspace();
         NeoPeptideModel peptideModel = workspace.getLookup().lookup(NeoPeptideModel.class);
-        Peptide[] peptides = peptideModel.getPeptides();
+        if (peptideModel != null) {
+            Peptide[] peptides = peptideModel.getPeptides();
+            Graph mainGraph = peptideModel.getGraph();
+            GraphModel model = mainGraph.getModel();
+            GraphView mainView = mainGraph.getView();
+            GraphView oldView = model.getVisibleView();
 
-        GraphModel model = peptideModel.getGraph().getModel();
-        GraphView mainView = peptideModel.getGraph().getView();
-        GraphView oldView = model.getVisibleView();
-
-        if (oldView != mainView) {
-            model.destroyView(oldView);
-        }
-
-        if (isMainView) {
-            model.setVisibleView(mainView);
-        } else {
-            GraphView newView = model.createView(true, false);
-            Subgraph subGraph = model.getGraph(newView);
-
-            for (Peptide p : peptides) {
-                subGraph.addNode(((NeoPeptide) p).getGraphNode());
+            if (!oldView.isMainView()) {
+                model.destroyView(oldView);
             }
-            model.setVisibleView(newView);
-        }
 
-        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-        previewController.refreshPreview();
+            if (filterModel == null || filterModel.isEmpty()) {
+                model.setVisibleView(mainView);
+            } else {
+                GraphView newView = model.createView();
+                Subgraph subGraph = model.getGraph(newView);
+                NeoPeptide neoPeptide;
+                List<Node> neighbors;
+                List<Edge> edges;
+                for (Peptide p : peptides) {
+                    neoPeptide = (NeoPeptide) p;
+                    subGraph.addNode(neoPeptide.getGraphNode());
+                    neighbors = new LinkedList<>();
+                    edges = new LinkedList<>();
+                    for (Node neighbor : neoPeptide.getNeighbors()) {
+                        if (!subGraph.hasNode(neighbor.getId())) {
+                            neighbors.add(neighbor);
+                        }
+                    }
+                    subGraph.addAllNodes(neighbors);
+                    for (Edge edge : mainGraph.getEdges(neoPeptide.getGraphNode())) {
+                        edges.add(edge);
+                    }
+                    subGraph.addAllEdges(edges);
+                }
+                model.setVisibleView(newView);
+            }
+        }
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof FilterModel) {
-            FilterModel filterModel = (FilterModel) evt.getSource();
-            updateView(filterModel.isEmpty());
+            updateView();
         }
     }
 }

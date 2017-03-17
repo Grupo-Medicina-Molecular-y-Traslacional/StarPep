@@ -98,7 +98,7 @@ public class NeoPeptideNode extends PeptideNode {
             set = Sheet.createPropertiesSet();
             set.setName(name);
             set.setDisplayName(aType.getDisplayName());
-            neighbors = ((NeoPeptide) peptide).getAnnotations(aType);
+            neighbors = ((NeoPeptide) peptide).getNeighbors(aType);
             for (Node neighbor : neighbors) {
 //                desc = Arrays.toString(neighbor.getXref());
                 property = createPropertyField(name + count, aType.getDisplayName(),

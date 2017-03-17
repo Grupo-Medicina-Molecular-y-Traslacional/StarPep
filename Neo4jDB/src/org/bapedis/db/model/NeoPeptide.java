@@ -47,13 +47,17 @@ public class NeoPeptide extends Peptide {
         return graphNode;
     }
 
-    public NodeIterable getAnnotations(AnnotationType aType) {
+    public NodeIterable getNeighbors(AnnotationType aType) {
         int relType = graph.getModel().getEdgeType(aType.getRelationType());
         return relType != -1 ? graph.getNeighbors(graphNode, relType): new NodeIterable.NodeIterableEmpty();
     }
+    
+    public NodeIterable getNeighbors(){
+        return graph.getNeighbors(graphNode);
+    }
 
     public String[] getAnnotationValues(AnnotationType aType) {
-        NodeIterable neighbors = getAnnotations(aType);
+        NodeIterable neighbors = getNeighbors(aType);
         ArrayList<String> values = new ArrayList<>();
         for(Node node: neighbors){
             values.add(node.getLabel());

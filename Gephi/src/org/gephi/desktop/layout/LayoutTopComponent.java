@@ -57,7 +57,7 @@ import org.openide.windows.TopComponent;
         autostore = false)
 @TopComponent.Description(preferredID = "LayoutTopComponent",
         iconBase = "org/gephi/desktop/layout/resources/small.png",
-        persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+        persistenceType = TopComponent.PERSISTENCE_NEVER)
 @TopComponent.Registration(mode = "explorer", openAtStartup = true, roles = {"overview"})
 @ActionID(category = "Window", id = "org.gephi.desktop.layout.LayoutTopComponent")
 @ActionReference(path = "Menu/Window", position = 700)

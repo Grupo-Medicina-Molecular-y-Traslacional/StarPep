@@ -224,7 +224,6 @@ public class GraphTopComponent extends TopComponent  {
     private void initComponents() {
 
         waitingLabel = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -232,10 +231,8 @@ public class GraphTopComponent extends TopComponent  {
         org.openide.awt.Mnemonics.setLocalizedText(waitingLabel, org.openide.util.NbBundle.getMessage(GraphTopComponent.class, "GraphTopComponent.waitingLabel.text")); // NOI18N
         waitingLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         add(waitingLabel, java.awt.BorderLayout.CENTER);
-        add(jScrollPane1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel waitingLabel;
     // End of variables declaration//GEN-END:variables
 

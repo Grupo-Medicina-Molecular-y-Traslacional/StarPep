@@ -198,10 +198,10 @@ public class DataBridge implements VizArchitecture {
 
                 textManager.refreshEdge(graph, model, textModel);
             }
-            if (!isView) {
+//            if (!isView) {
                 limits.setMaxWeight(maxWeight);
                 limits.setMinWeight(minWeight);
-            }
+//            }
 
             graph.readUnlock();
 

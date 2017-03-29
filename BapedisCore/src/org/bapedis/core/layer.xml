@@ -24,6 +24,10 @@
                 <attr name="position" intvalue="1200"/>
             </folder>                                                   
             <file name="org-openide-actions-SaveAsAction.shadow_hidden"/>
+            <folder name="ExportData">
+                <attr name="displayName" bundlevalue="org.bapedis.core.ui.Bundle#Menu/ExportData"/> 
+                <attr name="position" intvalue="1500"/>
+            </folder> 
         </folder>
         <file name="GoTo_hidden"/>
         <folder name="View">

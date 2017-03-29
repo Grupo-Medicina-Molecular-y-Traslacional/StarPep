@@ -15,8 +15,9 @@ import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.model.FilterNode;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.spi.filters.FilterSetupUI;
 import org.bapedis.core.ui.FilterExplorerTopComponent;
-import org.bapedis.core.ui.components.FilterSetupDialog;
+import org.bapedis.core.ui.components.SetupDialog;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -47,7 +48,7 @@ import org.openide.windows.WindowManager;
 public class EditFilter extends GlobalContextSensitiveAction<Filter> {
 
     protected final ProjectManager pm;
-    protected final FilterSetupDialog dialog;
+    protected final SetupDialog dialog;
 
     public EditFilter() {
         super(Filter.class);
@@ -56,7 +57,7 @@ public class EditFilter extends GlobalContextSensitiveAction<Filter> {
         putValue(NAME, name);
         putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/core/resources/edit.png", false));
         putValue(SHORT_DESCRIPTION, name);
-        dialog = new FilterSetupDialog();
+        dialog = new SetupDialog();
     }
 
     @Override
@@ -64,10 +65,12 @@ public class EditFilter extends GlobalContextSensitiveAction<Filter> {
         Collection<? extends Filter> context = lkpResult.allInstances();
         if (!context.isEmpty()) {
             Filter filter = context.iterator().next();
+            FilterSetupUI setupUI;
             for (FilterFactory filterFactory : pm.getFilterFactories()) {
                 if (filterFactory.createFilter().getClass().equals(filter.getClass())) {
                     String title = NbBundle.getMessage(EditFilter.class, "FilterSetupDialog.title", filterFactory.getName());
-                    if (dialog.setup(filter, filterFactory.getSetupUI(), title)) {
+                    setupUI = filterFactory.getSetupUI();
+                    if (dialog.setup(setupUI.getEditPanel(filter), setupUI, title)) {
                         FilterExplorerTopComponent tc = (FilterExplorerTopComponent) WindowManager.getDefault().findTopComponent("FilterExplorerTopComponent");
                         ExplorerManager manager = tc.getExplorerManager();
                         Node[] nodes = manager.getRootContext().getChildren().getNodes();

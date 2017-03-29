@@ -5,20 +5,15 @@
  */
 package org.bapedis.core.spi.filters;
 
-import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
+import org.bapedis.core.ui.components.ValidationSupportUI;
 
 /**
  *
  * @author loge
  */
-public interface FilterSetupUI {
-    public final String VALID_STATE = "valid_state";
+public interface FilterSetupUI extends ValidationSupportUI {
     
     JPanel getEditPanel(Filter filter);
-    void finishSettings();
-    void cancelSettings();
-    boolean isValidState();
-    void addValidStateListener(PropertyChangeListener listener);
-    void removeValidStateListener(PropertyChangeListener listener);
+
 }

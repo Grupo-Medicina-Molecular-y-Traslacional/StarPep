@@ -12,7 +12,7 @@ import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.spi.filters.FilterSetupUI;
 import org.bapedis.core.model.FilterModel;
-import org.bapedis.core.ui.components.FilterSetupDialog;
+import org.bapedis.core.ui.components.SetupDialog;
 import org.openide.util.NbBundle;
 
 /**
@@ -22,13 +22,13 @@ import org.openide.util.NbBundle;
 public class AddFilter extends WorkspaceContextSensitiveAction<AttributesModel> {
 
     protected final FilterFactory filterFactory;
-    protected final FilterSetupDialog dialog;
+    protected final SetupDialog dialog;
 
     public AddFilter(FilterFactory filterFactory) {
         super(AttributesModel.class);
         this.filterFactory = filterFactory;
         putValue(NAME, filterFactory.getName());
-        dialog = new FilterSetupDialog();
+        dialog = new SetupDialog();
     }
 
     @Override
@@ -49,7 +49,7 @@ public class AddFilter extends WorkspaceContextSensitiveAction<AttributesModel> 
             }
         } else {
             String title = NbBundle.getMessage(AddFilter.class, "FilterSetupDialog.title", filterFactory.getName());
-            if (dialog.setup(filter, setupUI, title)) {
+            if (dialog.setup(setupUI.getEditPanel(filter), setupUI, title)) {
                 filterModel.addFilter(filter);
                 if (!added) {
                     currentWs.add(filterModel);

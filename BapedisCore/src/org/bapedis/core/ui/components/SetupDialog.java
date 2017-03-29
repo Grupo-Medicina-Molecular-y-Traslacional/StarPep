@@ -7,8 +7,7 @@ package org.bapedis.core.ui.components;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import org.bapedis.core.spi.filters.Filter;
-import org.bapedis.core.spi.filters.FilterSetupUI;
+import javax.swing.JPanel;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -17,34 +16,34 @@ import org.openide.NotifyDescriptor;
  *
  * @author loge
  */
-public class FilterSetupDialog implements PropertyChangeListener{
+public class SetupDialog implements PropertyChangeListener {
+
     protected DialogDescriptor dd;
-    
-    public boolean setup(Filter filter, FilterSetupUI setupUI, String title){        
-        dd = new DialogDescriptor(setupUI.getEditPanel(filter), title);
-        boolean listenValidState = !setupUI.isValidState();
+
+    public boolean setup(JPanel panel, ValidationSupportUI setupUI, String title) {
+        dd = new DialogDescriptor(panel, title);
         dd.setValid(setupUI.isValidState());
-        if (listenValidState) {
+        if (!setupUI.isValidState()) {
             setupUI.addValidStateListener(this);
         }
+        boolean flag;
         if (DialogDisplayer.getDefault().notify(dd).equals(NotifyDescriptor.OK_OPTION)) {
             setupUI.finishSettings();
-            return true;
+            flag = true;
         } else {
             setupUI.cancelSettings();
+            flag = false;
         }
-        if (listenValidState) {
-            setupUI.removeValidStateListener(this);
-        }        
-        return false;
+        setupUI.removeValidStateListener(this);
+        return flag;
     }
-    
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName() == FilterSetupUI.VALID_STATE && dd != null) {
+        if (evt.getPropertyName() == ValidationSupportUI.VALID_STATE && dd != null) {
             boolean validState = (boolean) evt.getNewValue();
             dd.setValid(validState);
         }
     }
-    
+
 }

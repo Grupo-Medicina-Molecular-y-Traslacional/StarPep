@@ -18,13 +18,29 @@ import org.openide.util.NbBundle;
  */
 public class PDBFilter implements Filter {
 
+    protected boolean negative;
+
+    public PDBFilter() {
+        negative = false;
+    }
+
+    public boolean isNegative() {
+        return negative;
+    }
+
+    public void setNegative(boolean negative) {
+        this.negative = negative;
+    }
+
     @Override
     public String getDisplayName() {
-        return NbBundle.getMessage(PDBFilter.class, "PDBFilter.name");
+        String text = NbBundle.getMessage(PDBFilter.class, "PDBFilter.name");
+        return negative ? "Not (" + text + ")" : text;
     }
 
     @Override
     public boolean accept(Peptide peptide) {
+        boolean accepted = false;
         NeoPeptide neoPeptide = (NeoPeptide) peptide;
         String[] crossRefs = neoPeptide.getAnnotationValues(AnnotationType.CROSSREF);
         StringTokenizer tokenizer;
@@ -33,10 +49,11 @@ public class PDBFilter implements Filter {
             tokenizer = new StringTokenizer(crossRef, ":");
             db = tokenizer.nextToken();
             if (db.equals("PDB")) {
-                return true;
+                accepted = true;
+                break;
             }
         }
-        return false;
+        return negative ? !accepted : accepted;
     }
 
 }

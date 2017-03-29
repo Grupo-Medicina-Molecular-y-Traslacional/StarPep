@@ -70,7 +70,7 @@ public class EditFilter extends GlobalContextSensitiveAction<Filter> {
                 if (filterFactory.createFilter().getClass().equals(filter.getClass())) {
                     String title = NbBundle.getMessage(EditFilter.class, "FilterSetupDialog.title", filterFactory.getName());
                     setupUI = filterFactory.getSetupUI();
-                    if (dialog.setup(setupUI.getEditPanel(filter), setupUI, title)) {
+                    if (setupUI != null && dialog.setup(setupUI.getEditPanel(filter), setupUI, title)) {
                         FilterExplorerTopComponent tc = (FilterExplorerTopComponent) WindowManager.getDefault().findTopComponent("FilterExplorerTopComponent");
                         ExplorerManager manager = tc.getExplorerManager();
                         Node[] nodes = manager.getRootContext().getChildren().getNodes();
@@ -89,5 +89,6 @@ public class EditFilter extends GlobalContextSensitiveAction<Filter> {
                 }
             }
         }
-    }
+    }    
+
 }

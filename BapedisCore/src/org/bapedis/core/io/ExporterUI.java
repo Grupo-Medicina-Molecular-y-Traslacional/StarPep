@@ -12,7 +12,8 @@ import org.bapedis.core.ui.components.ValidationSupportUI;
  *
  * @author loge
  */
-public interface ExporterUI extends ValidationSupportUI{   
+public interface ExporterUI extends ValidationSupportUI {
+
     JPanel getPanel();
 
 }

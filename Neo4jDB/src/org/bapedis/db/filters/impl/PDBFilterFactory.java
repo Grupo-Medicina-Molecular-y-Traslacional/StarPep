@@ -17,7 +17,12 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service = FilterFactory.class)
 public class PDBFilterFactory implements FilterFactory {
+    protected final PDBFilterSetupUI setupUI;
 
+    public PDBFilterFactory() {
+        setupUI = new PDBFilterSetupUI();
+    }
+    
     @Override
     public String getName() {
         return NbBundle.getMessage(PDBFilterFactory.class, "PDBFilterFactory.name");
@@ -30,7 +35,7 @@ public class PDBFilterFactory implements FilterFactory {
 
     @Override
     public FilterSetupUI getSetupUI() {
-        return null;
+        return setupUI;
     }
     
 }

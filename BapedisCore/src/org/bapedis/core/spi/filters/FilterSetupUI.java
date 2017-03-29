@@ -13,7 +13,7 @@ import org.bapedis.core.ui.components.ValidationSupportUI;
  * @author loge
  */
 public interface FilterSetupUI extends ValidationSupportUI {
-    
+
     JPanel getEditPanel(Filter filter);
 
 }

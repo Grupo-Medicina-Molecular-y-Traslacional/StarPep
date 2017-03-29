@@ -13,6 +13,6 @@ import java.io.File;
  */
 public interface Exporter {
     
-    void exportTo(File file);
+    void exportTo(File file) throws Exception;
     
 }

@@ -11,17 +11,17 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.ArrayList;
-import javafx.scene.control.CheckBox;
+import java.util.List;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import org.bapedis.core.io.ExporterUI;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.openide.util.Lookup;
-import sun.security.jca.JCAUtil;
 
 /**
  *
@@ -30,28 +30,25 @@ import sun.security.jca.JCAUtil;
 public class FastaExporterUI extends javax.swing.JPanel implements ExporterUI {
 
     protected JFileChooser chooser;
-    protected static File parentDirectory, selectedFile;
+    protected static File parentDirectory;
+    protected File selectedFile;
     protected boolean validState;
     protected final PropertyChangeSupport changeSupport;
-    protected ArrayList<PeptideAttribute> attributes;
-    protected AttributesModel attrModel;
+    protected PeptideAttribute[] attributes;
+    protected ArrayList<PeptideAttribute> selectedAttr;
 
     /**
      * Creates new form ExportFastaUI
      */
-    public FastaExporterUI() {
+    public FastaExporterUI(PeptideAttribute[] attributes) {
         initComponents();
         chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         validState = false;
         changeSupport = new PropertyChangeSupport(this);
-        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
-        attrModel = pm.getCurrentWorkspace().getLookup().lookup(AttributesModel.class);
-        if (attrModel != null) {
-            PeptideAttribute[] arr = attrModel.getAttributes();                   
-            attributes = new ArrayList<>(arr.length);
-            populateAttributes(arr);
-        }
+        this.attributes = attributes;
+        selectedAttr = new ArrayList<>(attributes.length);
+        populateAttributes(attributes);
     }
 
     private void populateAttributes(PeptideAttribute[] attributes) {
@@ -65,9 +62,18 @@ public class FastaExporterUI extends javax.swing.JPanel implements ExporterUI {
             c.gridy = count;
             c.fill = GridBagConstraints.HORIZONTAL;
             cb = new JCheckBox(attr.getDisplayName());
+            cb.setName(attr.getId());
+            if (attr.equals(Peptide.ID) || attr.equals(Peptide.SEQ) ){
+                cb.setSelected(true);
+                cb.setEnabled(false);
+            }
             jPanelAtrr.add(cb, c);
             count++;
         }
+    }
+
+    public List<PeptideAttribute> getSelectedAttributes() {
+        return selectedAttr;
     }
 
     /**
@@ -166,18 +172,21 @@ public class FastaExporterUI extends javax.swing.JPanel implements ExporterUI {
 
     @Override
     public void finishSettings() {
-        attributes.clear();
         JCheckBox cb;
-        for(Component comp: jPanelAtrr.getComponents()){
-            cb = (JCheckBox)comp;
-            if (cb.isSelected()){
-                for (PeptideAttribute attr : attrModel.getAttributes()){
-                    if (cb.getName().equals(attr.getDisplayName())){
-                        attributes.add(attr);
+        for (Component comp : jPanelAtrr.getComponents()) {
+            cb = (JCheckBox) comp;
+            if (cb.isSelected()) {
+                for (PeptideAttribute attr : attributes) {
+                    if (cb.getName().equals(attr.getId())) {
+                        selectedAttr.add(attr);
                     }
                 }
             }
         }
+    }
+
+    public File getSelectedFile() {
+        return selectedFile;
     }
 
     @Override

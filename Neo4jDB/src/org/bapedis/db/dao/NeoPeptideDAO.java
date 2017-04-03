@@ -63,6 +63,10 @@ public class NeoPeptideDAO {
         is_a, instance_of
     }
 
+    public GraphModel getGraphModel() {
+        return graphModel;
+    }
+
     public NeoPeptideModel getNeoPeptidesBy(BioCategory[] categories) {
         GraphView gView = graphModel.createView();
         Subgraph graph = graphModel.getGraph(gView);

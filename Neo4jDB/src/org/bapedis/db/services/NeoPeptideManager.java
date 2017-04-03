@@ -12,6 +12,7 @@ import org.bapedis.db.model.BioCategory;
 import org.bapedis.db.model.NeoPeptideModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.GraphView;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -33,10 +34,9 @@ public class NeoPeptideManager {
         NeoPeptideModel oldModel = workspace.getLookup().lookup(NeoPeptideModel.class);
         if (oldModel != null) {
             workspace.remove(oldModel);
-            Graph graph = oldModel.getGraph();
-            GraphModel graphModel = graph.getModel();
-            graphModel.destroyView(graph.getView());
-            oldModel = null;
+            GraphView oldView = oldModel.getCurrentView();
+            if (!oldView.isMainView())
+                neoModelDAO.getGraphModel().destroyView(oldView);
         }
         NeoPeptideModel neoModel = neoModelDAO.getNeoPeptidesBy(categories.toArray(new BioCategory[0]));
         workspace.add(neoModel);

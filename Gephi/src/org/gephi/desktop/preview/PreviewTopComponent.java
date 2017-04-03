@@ -64,6 +64,9 @@ import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
 import org.gephi.ui.components.JColorButton;
 import org.gephi.ui.utils.UIUtils;
+import org.gephi.visualization.VizController;
+import org.gephi.visualization.ui.CollapsePanel;
+import org.gephi.visualization.ui.VizBarController;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -92,6 +95,8 @@ public final class PreviewTopComponent extends TopComponent implements PropertyC
     private transient PreviewUIModel model;
     private transient G2DTarget target;
     private transient PreviewSketch sketch;
+    private CollapsePanel collapsePanel;
+    private transient VizBarController vizBarController;
 
     public PreviewTopComponent() {
         initComponents();
@@ -104,7 +109,7 @@ public final class PreviewTopComponent extends TopComponent implements PropertyC
             southToolbar.setBackground(UIManager.getColor("NbExplorerView.background"));
         }
 
-        bannerPanel.setVisible(false);
+        bannerPanel.setVisible(true);
 
         //background color
         ((JColorButton) backgroundButton).addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
@@ -144,7 +149,21 @@ public final class PreviewTopComponent extends TopComponent implements PropertyC
             this.model = m;
             initTarget(model);
         }
+        
+        // Collapse panel
+        initCollapsePanel();
+        
     }
+    
+    private void initCollapsePanel() {
+        vizBarController = new VizBarController();
+        collapsePanel = new CollapsePanel();
+        if (VizController.getInstance().getVizConfig().isShowVizVar()) {
+            collapsePanel.init(vizBarController.getToolbar(), vizBarController.getExtendedBar(), false);
+        } else {
+            collapsePanel.setVisible(false);
+        }
+    }    
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {

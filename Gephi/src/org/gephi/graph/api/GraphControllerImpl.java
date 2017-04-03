@@ -87,7 +87,7 @@ public final class GraphControllerImpl implements GraphController, WorkspaceEven
         if (peptideModel != null) {
             return peptideModel.getGraph().getModel();
         }
-        return null;
+        return GraphModel.Factory.newInstance();
     }
 
     private void removeLookupListener() {
@@ -110,7 +110,7 @@ public final class GraphControllerImpl implements GraphController, WorkspaceEven
                 oldFilterModel.removePropertyChangeListener(this);
             }
         }
-        updateView();
+
         peptideLkpResult = newWs.getLookup().lookupResult(NeoPeptideModel.class);
         peptideLkpResult.addLookupListener(this);
         filterLkpResult = newWs.getLookup().lookupResult(FilterModel.class);
@@ -119,6 +119,13 @@ public final class GraphControllerImpl implements GraphController, WorkspaceEven
         if (filterModel != null) {
             filterModel.addPropertyChangeListener(this);
         }
+        NeoPeptideModel peptideModel = newWs.getLookup().lookup(NeoPeptideModel.class);
+        if (peptideModel != null) {
+            GraphView graphView = peptideModel.getCurrentView();
+            GraphModel model = peptideModel.getGraph().getModel();
+            model.setVisibleView(graphView);
+        }
+
     }
 
     @Override
@@ -137,21 +144,23 @@ public final class GraphControllerImpl implements GraphController, WorkspaceEven
 
     private void updateView() {
         Workspace workspace = Lookup.getDefault().lookup(ProjectManager.class).getCurrentWorkspace();
-        FilterModel filterModel = workspace.getLookup().lookup(FilterModel.class);
         NeoPeptideModel peptideModel = workspace.getLookup().lookup(NeoPeptideModel.class);
+        FilterModel filterModel = workspace.getLookup().lookup(FilterModel.class);
+
         if (peptideModel != null) {
             Peptide[] peptides = peptideModel.getPeptides();
             Graph graph = peptideModel.getGraph();
             GraphModel model = graph.getModel();
             GraphView graphView = graph.getView();
-            GraphView oldView = model.getVisibleView();
 
+            GraphView oldView = peptideModel.getCurrentView();
             if (!oldView.isMainView() && oldView != graphView) {
                 model.destroyView(oldView);
             }
 
             if (filterModel == null || filterModel.isEmpty()) {
                 model.setVisibleView(graphView);
+                peptideModel.setCurrentView(graphView);
             } else {
                 GraphView newView = model.createView();
                 Subgraph subGraph = model.getGraph(newView);
@@ -175,6 +184,7 @@ public final class GraphControllerImpl implements GraphController, WorkspaceEven
                     subGraph.addAllEdges(edges);
                 }
                 model.setVisibleView(newView);
+                peptideModel.setCurrentView(newView);
             }
         }
     }

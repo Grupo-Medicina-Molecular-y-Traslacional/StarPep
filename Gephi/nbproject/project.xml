@@ -15,14 +15,6 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.bapedis.db</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>1.0</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
                     <code-name-base>org.bapedis.lib.graphstore</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -121,7 +113,87 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <public-packages/>
+            <public-packages>
+                <package>org.gephi</package>
+                <package>org.gephi.appearance</package>
+                <package>org.gephi.appearance.api</package>
+                <package>org.gephi.appearance.plugin</package>
+                <package>org.gephi.appearance.plugin.palette</package>
+                <package>org.gephi.appearance.spi</package>
+                <package>org.gephi.desktop.appearance</package>
+                <package>org.gephi.desktop.io.export</package>
+                <package>org.gephi.desktop.io.export.api</package>
+                <package>org.gephi.desktop.io.export.spi</package>
+                <package>org.gephi.desktop.layout</package>
+                <package>org.gephi.desktop.preview</package>
+                <package>org.gephi.desktop.preview.api</package>
+                <package>org.gephi.desktop.preview.propertyeditors</package>
+                <package>org.gephi.desktop.progress</package>
+                <package>org.gephi.graph.api</package>
+                <package>org.gephi.io.exporter.api</package>
+                <package>org.gephi.io.exporter.impl</package>
+                <package>org.gephi.io.exporter.preview</package>
+                <package>org.gephi.io.exporter.preview.util</package>
+                <package>org.gephi.io.exporter.spi</package>
+                <package>org.gephi.layout</package>
+                <package>org.gephi.layout.api</package>
+                <package>org.gephi.layout.plugin</package>
+                <package>org.gephi.layout.plugin.force</package>
+                <package>org.gephi.layout.plugin.force.quadtree</package>
+                <package>org.gephi.layout.plugin.force.yifanHu</package>
+                <package>org.gephi.layout.plugin.forceAtlas</package>
+                <package>org.gephi.layout.plugin.forceAtlas2</package>
+                <package>org.gephi.layout.plugin.fruchterman</package>
+                <package>org.gephi.layout.plugin.labelAdjust</package>
+                <package>org.gephi.layout.plugin.noverlap</package>
+                <package>org.gephi.layout.plugin.openord</package>
+                <package>org.gephi.layout.plugin.random</package>
+                <package>org.gephi.layout.plugin.rotate</package>
+                <package>org.gephi.layout.plugin.scale</package>
+                <package>org.gephi.layout.spi</package>
+                <package>org.gephi.lib.gleem.linalg</package>
+                <package>org.gephi.preview</package>
+                <package>org.gephi.preview.api</package>
+                <package>org.gephi.preview.plugin.builders</package>
+                <package>org.gephi.preview.plugin.items</package>
+                <package>org.gephi.preview.plugin.renderers</package>
+                <package>org.gephi.preview.presets</package>
+                <package>org.gephi.preview.spi</package>
+                <package>org.gephi.preview.types</package>
+                <package>org.gephi.preview.types.editors</package>
+                <package>org.gephi.tools.api</package>
+                <package>org.gephi.tools.spi</package>
+                <package>org.gephi.ui.appearance.plugin</package>
+                <package>org.gephi.ui.appearance.plugin.category</package>
+                <package>org.gephi.ui.appearance.plugin.palette</package>
+                <package>org.gephi.ui.components</package>
+                <package>org.gephi.ui.components.gradientslider</package>
+                <package>org.gephi.ui.components.richtooltip</package>
+                <package>org.gephi.ui.components.splineeditor</package>
+                <package>org.gephi.ui.components.splineeditor.equation</package>
+                <package>org.gephi.ui.utils</package>
+                <package>org.gephi.utils</package>
+                <package>org.gephi.utils.longtask.api</package>
+                <package>org.gephi.utils.longtask.spi</package>
+                <package>org.gephi.utils.progress</package>
+                <package>org.gephi.visualization</package>
+                <package>org.gephi.visualization.api</package>
+                <package>org.gephi.visualization.api.selection</package>
+                <package>org.gephi.visualization.apiimpl</package>
+                <package>org.gephi.visualization.bridge</package>
+                <package>org.gephi.visualization.events</package>
+                <package>org.gephi.visualization.model</package>
+                <package>org.gephi.visualization.model.edge</package>
+                <package>org.gephi.visualization.model.node</package>
+                <package>org.gephi.visualization.octree</package>
+                <package>org.gephi.visualization.opengl</package>
+                <package>org.gephi.visualization.scheduler</package>
+                <package>org.gephi.visualization.screenshot</package>
+                <package>org.gephi.visualization.selection</package>
+                <package>org.gephi.visualization.swing</package>
+                <package>org.gephi.visualization.text</package>
+                <package>org.gephi.visualization.ui</package>
+            </public-packages>
             <class-path-extension>
                 <runtime-relative-path>ext/batik-svg-dom-1.7.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/batik-svg-dom-1.7.jar</binary-origin>

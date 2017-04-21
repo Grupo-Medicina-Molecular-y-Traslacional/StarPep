@@ -9,7 +9,6 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
-import org.bapedis.db.model.NeoPeptide;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
@@ -21,15 +20,14 @@ import org.openide.util.lookup.Lookups;
  *
  * @author loge
  */
-public class NeoPeptideStructureView extends JPanel implements MultiViewElement {
+public class NeoGraphPreView extends JPanel implements MultiViewElement {
+
     private MultiViewElementCallback callback;
     private final JToolBar toolbar = new JToolBar();
-    private final NeoPeptide neoPeptide; 
 
-    public NeoPeptideStructureView(NeoPeptide neoPeptide) {
-        this.neoPeptide = neoPeptide;
+    public NeoGraphPreView() {
     }
-    
+
     @Override
     public JComponent getVisualRepresentation() {
         return this;
@@ -54,27 +52,31 @@ public class NeoPeptideStructureView extends JPanel implements MultiViewElement 
     }
 
     @Override
-    public void componentOpened() {        
+    public void componentOpened() {
     }
 
     @Override
-    public void componentClosed() {        
+    public void componentClosed() {
+
     }
 
     @Override
-    public void componentShowing() {       
+    public void componentShowing() {
+
     }
 
     @Override
-    public void componentHidden() {        
+    public void componentHidden() {
+
     }
 
     @Override
-    public void componentActivated() {        
+    public void componentActivated() {
     }
 
     @Override
-    public void componentDeactivated() {        
+    public void componentDeactivated() {
+
     }
 
     @Override
@@ -84,12 +86,12 @@ public class NeoPeptideStructureView extends JPanel implements MultiViewElement 
 
     @Override
     public void setMultiViewCallback(MultiViewElementCallback mvec) {
-        this.callback = mvec;
+        callback = mvec;
     }
 
     @Override
     public CloseOperationState canCloseElement() {
         return CloseOperationState.STATE_OK;
     }
-    
+
 }

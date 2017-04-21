@@ -9,7 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import javax.swing.Action;
 import org.bapedis.core.model.PeptideNode;
-import org.bapedis.db.ui.actions.ShowPeptideDetails;
+import org.bapedis.db.ui.actions.ShowGraph;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.NodeIterable;
 import org.openide.actions.PropertiesAction;
@@ -31,7 +31,7 @@ public class NeoPeptideNode extends PeptideNode {
     @Override
     public Action[] getActions(boolean context) {
         Action[] nodeActions = new Action[]{
-            new ShowPeptideDetails(),
+            new ShowGraph(),
             SystemAction.get(PropertiesAction.class)};
         return nodeActions;
 //        Action[] result = new Action[]{

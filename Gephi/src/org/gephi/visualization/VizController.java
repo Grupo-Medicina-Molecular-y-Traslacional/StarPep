@@ -118,8 +118,7 @@ public class VizController implements VisualizationController {
         if (vizConfig.isUseGLJPanel()) {
             //No more supported
         } else if (Utilities.isMac()) {
-//            drawable = createCanvas();
-            drawable = createNewtCanvas();
+            drawable = createCanvas();
         } else {
             drawable = createNewtCanvas();
         }

@@ -7,7 +7,6 @@ package org.bapedis.db.ui;
 
 import java.awt.Image;
 import java.io.Serializable;
-import org.bapedis.db.model.NeoPeptide;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.openide.util.HelpCtx;
@@ -18,12 +17,9 @@ import org.openide.windows.TopComponent;
  *
  * @author loge
  */
-public class NeoPeptideStructureViewDescription implements MultiViewDescription, Serializable {
+public class NeoGraphSceneDescription implements MultiViewDescription, Serializable {
 
-    private final NeoPeptide neoPeptide;
-
-    public NeoPeptideStructureViewDescription(NeoPeptide neoPeptide) {
-        this.neoPeptide = neoPeptide;
+    public NeoGraphSceneDescription() {
     }
 
     @Override
@@ -33,7 +29,7 @@ public class NeoPeptideStructureViewDescription implements MultiViewDescription,
 
     @Override
     public String getDisplayName() {
-        return NbBundle.getMessage(NeoPeptideStructureView.class, "NeoPeptideStructureView.title");
+       return NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.title");
     }
 
     @Override
@@ -48,12 +44,12 @@ public class NeoPeptideStructureViewDescription implements MultiViewDescription,
 
     @Override
     public String preferredID() {
-        return "StructureView";
+        return "GraphScene";
     }
 
     @Override
     public MultiViewElement createElement() {
-        return new NeoPeptideStructureView(neoPeptide);
+        return new NeoGraphScene();
     }
 
 }

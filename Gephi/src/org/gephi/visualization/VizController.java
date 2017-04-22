@@ -59,7 +59,7 @@ import org.gephi.visualization.opengl.CompatibilityEngine;
 import org.gephi.visualization.scheduler.CompatibilityScheduler;
 import org.gephi.visualization.screenshot.ScreenshotMaker;
 import org.gephi.visualization.swing.GLAbstractListener;
-import org.gephi.visualization.swing.GraphCanvas;
+import org.gephi.visualization.swing.GraphPanel;
 import org.gephi.visualization.swing.NewtGraphCanvas;
 import org.gephi.visualization.swing.StandardGraphIO;
 import org.gephi.visualization.text.TextManager;
@@ -115,13 +115,16 @@ public class VizController implements VisualizationController {
         currentModel = new VizModel(true);
         selectionManager = new SelectionManager();
 
-        if (vizConfig.isUseGLJPanel()) {
-            //No more supported
-        } else if (Utilities.isMac()) {
-            drawable = createCanvas();
-        } else {
-            drawable = createNewtCanvas();
-        }
+//        if (vizConfig.isUseGLJPanel()) {
+//            //No more supported
+//              drawable = new GraphPanel();
+//        } else if (Utilities.isMac()) {
+//            drawable = new GraphCanvas();
+//        } else {
+//            drawable = new NewtGraphCanvas();
+//        }
+
+        drawable = new GraphPanel();
         drawable.initArchitecture();
         engine.initArchitecture();
         ((CompatibilityScheduler) scheduler).initArchitecture();
@@ -160,7 +163,6 @@ public class VizController implements VisualizationController {
 //                engine.reinit();
 //            }
 //        });
-
 //        if (pc.getCurrentWorkspace() != null) {
 //            engine.reinit();
 //        }
@@ -291,16 +293,6 @@ public class VizController implements VisualizationController {
 
     public SelectionManager getSelectionManager() {
         return selectionManager;
-    }
-
-    public GraphCanvas createCanvas() {
-        GraphCanvas canvas = new GraphCanvas();
-        return canvas;
-    }
-
-    public NewtGraphCanvas createNewtCanvas() {
-        NewtGraphCanvas canvas = new NewtGraphCanvas();
-        return canvas;
     }
 
 //

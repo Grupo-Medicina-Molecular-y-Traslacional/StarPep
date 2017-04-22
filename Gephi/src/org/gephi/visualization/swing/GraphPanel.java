@@ -42,7 +42,7 @@
 package org.gephi.visualization.swing;
 
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.gl2.GLUT;
 import java.awt.BorderLayout;
@@ -56,20 +56,19 @@ import org.gephi.ui.utils.UIUtils;
  *
  * @author Mathieu Bastian
  */
-public class GraphCanvas extends GLAbstractListener {
-
-    private final GLCanvas glCanvas;
+public class GraphPanel extends GLAbstractListener {
+    private final GLJPanel gljpanel;
     private final GLUT glut = new GLUT();
 
-    public GraphCanvas() {
+    public GraphPanel() {
         super();
-        glCanvas = new GLCanvas(getCaps());
+        gljpanel = new GLJPanel(getCaps());
 
-        super.initDrawable(glCanvas);
-//        glCanvas.setMinimumSize(new Dimension(0, 0));   //Fix Canvas resize Issue
+        super.initDrawable(gljpanel);
 
         //Basic init
-        graphComponent = (Component) glCanvas;
+        graphComponent = (Component) gljpanel;
+        
 //        graphComponent.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
         //False lets the components appear on top of the canvas
@@ -79,7 +78,7 @@ public class GraphCanvas extends GLAbstractListener {
 
     @Override
     protected void init(GL2 gl) {
-        globalScale = glCanvas.getCurrentSurfaceScale(new float[2])[0];
+        globalScale = gljpanel.getCurrentSurfaceScale(new float[2])[0];
 
         engine.startDisplay();
     }
@@ -128,6 +127,6 @@ public class GraphCanvas extends GLAbstractListener {
     @Override
     public void destroy() {
         super.destroy();
-        glCanvas.destroy();
+        gljpanel.destroy();
     }
 }

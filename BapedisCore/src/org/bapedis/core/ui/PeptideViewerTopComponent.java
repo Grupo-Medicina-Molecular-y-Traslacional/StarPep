@@ -6,13 +6,17 @@
 package org.bapedis.core.ui;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
@@ -47,6 +51,9 @@ import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
+import org.jdesktop.swingx.JXBusyLabel;
+import org.openide.awt.Mnemonics;
+import org.openide.util.Exceptions;
 
 /**
  * Top component which displays something.
@@ -81,7 +88,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     protected final ExplorerManager explorerMgr;
     protected final OutlineView view;
 
-    protected final JLabel busyLabel;
+    protected final JXBusyLabel busyLabel;
     protected final JLabel errorLabel;
 
     public PeptideViewerTopComponent() {
@@ -115,10 +122,14 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         column.setMaxWidth(240);
         column.setPreferredWidth(240);
 
-        busyLabel = new JLabel(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.busyLabel.text"), new ImageIcon(ImageUtilities.loadImage("org/bapedis/core/resources/loading.gif", true)), JLabel.CENTER);
+        busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        Mnemonics.setLocalizedText(busyLabel, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.busyLabel.text")); // NOI18N
+        centerPanel.add(busyLabel, "busyCard");
+
         errorLabel = new JLabel(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.errorLabel.text"), new ImageIcon(ImageUtilities.loadImage("org/bapedis/core/resources/sad.png", true)), JLabel.CENTER);
         errorLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        centerPanel.add(errorLabel, "errorCard");
 
     }
 
@@ -156,6 +167,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         jOperatorComboBox = new javax.swing.JComboBox();
         jValueTextField = new javax.swing.JTextField();
         jAddButton = new javax.swing.JButton();
+        centerPanel = new javax.swing.JPanel();
         dataPanel = new javax.swing.JPanel();
 
         setMinimumSize(new java.awt.Dimension(331, 250));
@@ -219,14 +231,18 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         gridBagConstraints.weightx = 1.0;
         add(topPanel, gridBagConstraints);
 
+        centerPanel.setLayout(new java.awt.CardLayout());
+
         dataPanel.setLayout(new java.awt.BorderLayout());
+        centerPanel.add(dataPanel, "dataCard");
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        add(dataPanel, gridBagConstraints);
+        add(centerPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jAddButtonActionPerformed
@@ -286,6 +302,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }//GEN-LAST:event_jFieldComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel centerPanel;
     private javax.swing.JPanel dataPanel;
     private javax.swing.JButton jAddButton;
     private javax.swing.JComboBox jFieldComboBox;
@@ -314,15 +331,17 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         }
     }
 
-    public void setBusyLabel() {
-        setBusy(true);
+    public void setBusyLabel(boolean busy) {
+        CardLayout cl = (CardLayout) centerPanel.getLayout();
+        busyLabel.setBusy(busy);
+        cl.show(centerPanel, busy ? "busyCard" : "dataCard");
+        topPanel.setVisible(!busy);
     }
 
     public void setErrorLabel() {
-        dataPanel.removeAll();
-        dataPanel.add(errorLabel, BorderLayout.CENTER);
-        dataPanel.revalidate();
-        dataPanel.repaint();
+        CardLayout cl = (CardLayout) centerPanel.getLayout();
+        busyLabel.setBusy(false);
+        cl.show(centerPanel, "errorCard");
         topPanel.setVisible(false);
     }
 
@@ -362,7 +381,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         filterLkpResult = newWs.getLookup().lookupResult(FilterModel.class);
         filterLkpResult.addLookupListener(this);
         AttributesModel peptidesModel = newWs.getLookup().lookup(AttributesModel.class);
-        showData(peptidesModel);
+        setData(peptidesModel);
         FilterModel filterModel = newWs.getLookup().lookup(FilterModel.class);
         if (filterModel != null) {
             filterModel.addPropertyChangeListener(this);
@@ -375,7 +394,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             Collection<? extends AttributesModel> attrModels = peptideLkpResult.allInstances();
             if (!attrModels.isEmpty()) {
                 AttributesModel attrModel = attrModels.iterator().next();
-                showData(attrModel);
+                setData(attrModel);
             }
         } else if (le.getSource().equals(filterLkpResult)) {
             Collection<? extends FilterModel> filterModels = filterLkpResult.allInstances();
@@ -397,31 +416,18 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         }
     }
 
-    protected void showData(AttributesModel attrModel) {
+    protected void setData(AttributesModel attrModel) {
         populateFilterFields(attrModel);
         if (attrModel != null) {
             explorerMgr.setRootContext(attrModel.getRootNode());
         } else {
             explorerMgr.setRootContext(Node.EMPTY);
         }
-        setBusy(false);
     }
 
     @Override
     public ExplorerManager getExplorerManager() {
         return explorerMgr;
-    }
-
-    protected void setBusy(boolean busy) {
-        dataPanel.removeAll();
-        if (busy) {
-            dataPanel.add(busyLabel, BorderLayout.CENTER);
-        } else {
-            dataPanel.add(view, BorderLayout.CENTER);
-        }
-        topPanel.setVisible(!busy);
-        dataPanel.revalidate();
-        dataPanel.repaint();
     }
 
     @Override

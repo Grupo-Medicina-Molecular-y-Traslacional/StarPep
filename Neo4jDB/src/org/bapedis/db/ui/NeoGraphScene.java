@@ -38,39 +38,25 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
     private MultiViewElementCallback callback;
     private final JToolBar toolbar = new JToolBar();
     private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(20, 20));
-    private final JPanel refreshPanel = new JPanel();
     private final JPanel graphPanel = new JPanel();
 
     public NeoGraphScene() {
         initComponents();
-        setRefresh(true);
-        //Request component activation and therefore initialize JOGL2 component
-//        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
-//            @Override
-//            public void run() {
-//                SwingUtilities.invokeLater(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        GraphDrawable drawable = VizController.getInstance().getDrawable();
-//                        graphPanel.add(drawable.getGraphComponent(), BorderLayout.CENTER);
-//                        setRefresh(false);
-//                    }
-//                });
-//            }
-//        });
+        setBusy(true);
 
-        SwingWorker worker = new SwingWorker<GraphDrawable, Void>() {
+        SwingWorker worker = new SwingWorker<Void, Void>() {
             @Override
-            protected GraphDrawable doInBackground() throws Exception {
-                return VizController.getInstance().getDrawable();
+            protected Void doInBackground() throws Exception {
+                GraphDrawable drawable = VizController.getInstance().getDrawable();
+                graphPanel.add(drawable.getGraphComponent(), BorderLayout.CENTER);
+                return null;
             }
 
             @Override
             protected void done() {
                 try {
-                    GraphDrawable drawable = get();
-                    graphPanel.add(drawable.getGraphComponent(), BorderLayout.CENTER);
-                    setRefresh(false);
+                    get();            
+                    setBusy(false);
                 } catch (InterruptedException ex) {
                     Exceptions.printStackTrace(ex);
                 } catch (ExecutionException ex) {
@@ -85,25 +71,18 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
     private void initComponents() {
         setLayout(new CardLayout());
 
-        refreshPanel.setLayout(new BorderLayout());
-        refreshPanel.add(busyLabel, BorderLayout.CENTER);
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         Mnemonics.setLocalizedText(busyLabel, org.openide.util.NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.busyLabel.text")); // NOI18N
-        add(refreshPanel, "refreshCard");
+        add(busyLabel, "busyCard");
 
         graphPanel.setLayout(new BorderLayout());
         add(graphPanel, "graphCard");
     }
 
-    private void setRefresh(final boolean refresh) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                CardLayout cl = (CardLayout) getLayout();
-                cl.show(NeoGraphScene.this, refresh ? "refreshCard" : "graphCard");
-                ((JXBusyLabel) busyLabel).setBusy(refresh);
-            }
-        });
+    private void setBusy(boolean busy) {
+        CardLayout cl = (CardLayout) getLayout();
+        cl.show(NeoGraphScene.this, busy ? "busyCard" : "graphCard");
+        busyLabel.setBusy(busy);
     }
 
     @Override

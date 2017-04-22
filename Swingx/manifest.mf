@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+AutoUpdate-Show-In-Client: true
+OpenIDE-Module: org.bapedis.lib.swingx
+OpenIDE-Module-Localizing-Bundle: org/bapedis/lib/swingx/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+

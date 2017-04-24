@@ -77,10 +77,10 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
     private boolean inited;
     private final boolean isRetina;
 
-    public PreviewSketch(G2DTarget target) {
+    public PreviewSketch(G2DTarget target, boolean isRetina) {
         this.target = target;
         previewController = Lookup.getDefault().lookup(PreviewController.class);
-        isRetina = PreviewTopComponent.isRetina();
+        this.isRetina = isRetina;
     }
 
     @Override

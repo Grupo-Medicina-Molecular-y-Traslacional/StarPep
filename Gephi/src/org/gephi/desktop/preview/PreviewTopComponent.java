@@ -149,12 +149,12 @@ public final class PreviewTopComponent extends TopComponent implements PropertyC
             this.model = m;
             initTarget(model);
         }
-        
+
         // Collapse panel
         initCollapsePanel();
-        
+
     }
-    
+
     private void initCollapsePanel() {
         vizBarController = new VizBarController();
         collapsePanel = new CollapsePanel();
@@ -163,7 +163,7 @@ public final class PreviewTopComponent extends TopComponent implements PropertyC
         } else {
             collapsePanel.setVisible(false);
         }
-    }    
+    }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -214,27 +214,22 @@ public final class PreviewTopComponent extends TopComponent implements PropertyC
 
     public void initTarget(PreviewUIModel previewUIModel) {
         // inits the preview applet
-        if (previewUIModel != null && target == null) {
-            PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-            PreviewModel previewModel = previewUIModel.getPreviewModel();
+        PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+        PreviewModel previewModel = previewUIModel.getPreviewModel();
 
-            Color background = previewModel.getProperties().getColorValue(PreviewProperty.BACKGROUND_COLOR);
-            if (background != null) {
-                setBackgroundColor(background);
-            }
+        Color background = previewModel.getProperties().getColorValue(PreviewProperty.BACKGROUND_COLOR);
+        if (background != null) {
+            setBackgroundColor(background);
+        }
 
-            Dimension dimensions = getSketchDimensions();
-            previewModel.getProperties().putValue("width", (int) dimensions.getWidth());
-            previewModel.getProperties().putValue("height", (int) dimensions.getHeight());
+        Dimension dimensions = getSketchDimensions();
+        previewModel.getProperties().putValue("width", (int) dimensions.getWidth());
+        previewModel.getProperties().putValue("height", (int) dimensions.getHeight());
 
-            target = (G2DTarget) previewController.getRenderTarget(RenderTarget.G2D_TARGET);
-            if (target != null) {
-                sketch = new PreviewSketch(target);
-                sketchPanel.add(sketch, BorderLayout.CENTER);
-            }
-        } else if (previewUIModel == null) {
-            sketchPanel.remove(sketch);
-            target = null;
+        target = (G2DTarget) previewController.getRenderTarget(RenderTarget.G2D_TARGET);
+        if (target != null) {
+            sketch = new PreviewSketch(target, isRetina());
+            sketchPanel.add(sketch, BorderLayout.CENTER);
         }
     }
 
@@ -436,7 +431,7 @@ public final class PreviewTopComponent extends TopComponent implements PropertyC
      *
      * @return true if retina, false otherwise
      */
-    protected static boolean isRetina() {
+    private boolean isRetina() {
 
         boolean isRetina = false;
         try {

@@ -14,7 +14,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import org.gephi.visualization.VizController;
 import org.gephi.visualization.apiimpl.GraphDrawable;
@@ -27,7 +26,6 @@ import org.openide.awt.UndoRedo;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.Lookups;
-import org.openide.windows.WindowManager;
 
 /**
  *
@@ -79,7 +77,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         add(graphPanel, "graphCard");
     }
 
-    private void setBusy(boolean busy) {
+    public void setBusy(boolean busy) {
         CardLayout cl = (CardLayout) getLayout();
         cl.show(NeoGraphScene.this, busy ? "busyCard" : "graphCard");
         busyLabel.setBusy(busy);

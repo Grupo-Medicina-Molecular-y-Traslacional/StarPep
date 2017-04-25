@@ -56,8 +56,6 @@ public interface Scheduler {
 
     public boolean isAnimating();
 
-    public void updatePosition();
-
     public void updateWorld();
 
     public void display(GL2 gl, GLU glu);

@@ -59,6 +59,7 @@ import org.gephi.visualization.opengl.CompatibilityEngine;
 import org.gephi.visualization.scheduler.CompatibilityScheduler;
 import org.gephi.visualization.screenshot.ScreenshotMaker;
 import org.gephi.visualization.swing.GLAbstractListener;
+import org.gephi.visualization.swing.GraphCanvas;
 import org.gephi.visualization.swing.GraphPanel;
 import org.gephi.visualization.swing.NewtGraphCanvas;
 import org.gephi.visualization.swing.StandardGraphIO;
@@ -115,16 +116,15 @@ public class VizController implements VisualizationController {
         currentModel = new VizModel(true);
         selectionManager = new SelectionManager();
 
-//        if (vizConfig.isUseGLJPanel()) {
-//            //No more supported
-//              drawable = new GraphPanel();
-//        } else if (Utilities.isMac()) {
-//            drawable = new GraphCanvas();
-//        } else {
-//            drawable = new NewtGraphCanvas();
-//        }
+        if (vizConfig.isUseGLJPanel()) {
+            //No more supported. But it was neccesary for me.
+              drawable = new GraphPanel();
+        } else if (Utilities.isMac()) {
+            drawable = new GraphCanvas();
+        } else {
+            drawable = new NewtGraphCanvas();
+        }
 
-        drawable = new GraphPanel();
         drawable.initArchitecture();
         engine.initArchitecture();
         ((CompatibilityScheduler) scheduler).initArchitecture();
@@ -135,37 +135,6 @@ public class VizController implements VisualizationController {
         vizEventManager.initArchitecture();
         selectionManager.initArchitecture();
 
-        //Todo
-//        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-//        pc.addWorkspaceListener(new WorkspaceListener() {
-//            @Override
-//            public void initialize(Workspace workspace) {
-//                if (workspace.getLookup().lookup(VizModel.class) == null) {
-//                    workspace.add(new VizModel(workspace));
-//                }
-//            }
-//
-//            @Override
-//            public void select(Workspace workspace) {
-//                engine.reinit();
-//            }
-//
-//            @Override
-//            public void unselect(Workspace workspace) {
-//            }
-//
-//            @Override
-//            public void close(Workspace workspace) {
-//            }
-//
-//            @Override
-//            public void disable() {
-//                engine.reinit();
-//            }
-//        });
-//        if (pc.getCurrentWorkspace() != null) {
-//            engine.reinit();
-//        }
         engine.reinit();
     }
 
@@ -194,15 +163,20 @@ public class VizController implements VisualizationController {
 
     public void destroy() {
         engine.stopDisplay();
+        scheduler.stop();
         drawable.destroy();
         engine = null;
         scheduler = null;
+        vizConfig = null;
+        limits = null;
         graphIO = null;
         vizEventManager = null;
         dataBridge = null;
         textManager = null;
         screenshotMaker = null;
         selectionManager = null;
+        currentModel = null;
+        instance = null;
     }
 
     public void resetSelection() {

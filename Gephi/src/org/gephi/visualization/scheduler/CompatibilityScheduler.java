@@ -97,8 +97,7 @@ public class CompatibilityScheduler implements Scheduler, VizArchitecture {
                 graphDrawable.display();
             }
         }, worldLock, "DisplayAnimator", displayFpsLimit);
-//        displayAnimator.start();
-        displayAnimator.execute();
+        displayAnimator.start();
 
         updateAnimator = new BasicFPSAnimator(new Runnable() {
             @Override
@@ -106,8 +105,7 @@ public class CompatibilityScheduler implements Scheduler, VizArchitecture {
                 updateWorld();
             }
         }, worldLock, "UpdateAnimator", updateFpsLimit);
-//        updateAnimator.start();
-        updateAnimator.execute();
+        updateAnimator.start();
     }
 
     @Override
@@ -181,13 +179,6 @@ public class CompatibilityScheduler implements Scheduler, VizArchitecture {
         }
     }
 
-    @Override
-    public void updatePosition() {
-//        if (objectsMoved.getAndSet(false)) {
-//            engine.updateObjectsPosition();
-//            cameraMoved.set(true);
-//        }
-    }
 
     @Override
     public void requireUpdateVisible() {

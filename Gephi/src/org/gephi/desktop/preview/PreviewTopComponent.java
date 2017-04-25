@@ -64,7 +64,6 @@ import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
 import org.gephi.ui.components.JColorButton;
 import org.gephi.ui.utils.UIUtils;
-import org.gephi.visualization.VizController;
 import org.gephi.visualization.ui.CollapsePanel;
 import org.gephi.visualization.ui.VizBarController;
 import org.jdesktop.swingx.JXBusyLabel;
@@ -150,20 +149,8 @@ public final class PreviewTopComponent extends TopComponent implements PropertyC
             initTarget(model);
         }
 
-        // Collapse panel
-        initCollapsePanel();
-
     }
 
-    private void initCollapsePanel() {
-        vizBarController = new VizBarController();
-        collapsePanel = new CollapsePanel();
-        if (VizController.getInstance().getVizConfig().isShowVizVar()) {
-            collapsePanel.init(vizBarController.getToolbar(), vizBarController.getExtendedBar(), false);
-        } else {
-            collapsePanel.setVisible(false);
-        }
-    }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {

@@ -18,12 +18,12 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import org.gephi.desktop.preview.PreviewSketch;
-import org.gephi.desktop.preview.api.PreviewUIModel;
 import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
@@ -33,7 +33,6 @@ import org.jdesktop.swingx.JXBusyLabel;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
-import org.openide.awt.Mnemonics;
 import org.openide.awt.UndoRedo;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
@@ -47,7 +46,7 @@ import org.openide.util.lookup.Lookups;
 public class NeoGraphPreView extends JPanel implements MultiViewElement {
 
     private final PreviewController previewController;
-    private G2DTarget target;
+    private final G2DTarget target;
     private PreviewSketch sketch;
     private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(20, 20));
     private final JPanel graphPanel = new JPanel();
@@ -58,21 +57,27 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
     public NeoGraphPreView() {
         initComponents();
         previewController = Lookup.getDefault().lookup(PreviewController.class);
-        initTarget(previewController.getModel());
+        target = (G2DTarget) previewController.getRenderTarget(RenderTarget.G2D_TARGET);
     }
 
     private void initComponents() {
         setLayout(new CardLayout());
 
+        JLabel info = new JLabel(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/info.png")));
+        info.setHorizontalAlignment(SwingConstants.CENTER);
+        info.setText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.infoLabel.text"));
+        add(info, "infoCard");
+
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        Mnemonics.setLocalizedText(busyLabel, org.openide.util.NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.busyLabel.text")); // NOI18N
+        busyLabel.setText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.busyLabel.text"));
         add(busyLabel, "busyCard");
 
         graphPanel.setLayout(new BorderLayout());
         add(graphPanel, "graphCard");
 
+        // Tool bar
         JButton refreshButton = new JButton(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/refresh.png")));
-        refreshButton.setText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.refreshButton.text"));
+        refreshButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.refreshButton.text"));
         refreshButton.addActionListener(new ActionListener() {
 
             @Override
@@ -81,7 +86,9 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
 
                     @Override
                     protected Void doInBackground() throws Exception {
+                        previewController.getModel().getProperties().putValue(PreviewProperty.VISIBILITY_RATIO, 1f);
                         previewController.refreshPreview();
+                        target.refresh();
                         return null;
                     }
 
@@ -101,29 +108,9 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
                 worker.execute();
             }
         });
-        
+
         toolbar.add(refreshButton);
-
     }
-
-    private void initTarget(PreviewModel previewModel) {
-        // inits the preview applet
-        Color background = previewModel.getProperties().getColorValue(PreviewProperty.BACKGROUND_COLOR);
-        if (background != null) {
-//                graphPanel.setBackgroundColor(background);
-        }
-
-        Dimension dimensions = getSketchDimensions();
-        previewModel.getProperties().putValue("width", (int) dimensions.getWidth());
-        previewModel.getProperties().putValue("height", (int) dimensions.getHeight());
-
-        target = (G2DTarget) previewController.getRenderTarget(RenderTarget.G2D_TARGET);
-        if (target != null) {
-            sketch = new PreviewSketch(target, isRetina());
-            graphPanel.add(sketch, BorderLayout.CENTER);
-        }
-    }
-    
 
     public void setBusy(boolean busy) {
         CardLayout cl = (CardLayout) getLayout();
@@ -156,6 +143,24 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
 
     @Override
     public void componentOpened() {
+        PreviewModel previewModel = previewController.getModel();
+        Color background = previewModel.getProperties().getColorValue(PreviewProperty.BACKGROUND_COLOR);
+        if (background != null) {
+//                graphPanel.setBackgroundColor(background);
+        }
+
+        Dimension dimensions = getSketchDimensions();
+        int width = (int) dimensions.getWidth();
+        int height = (int) dimensions.getHeight();
+        previewModel.getProperties().putValue("width", width);
+        previewModel.getProperties().putValue("height", height);
+
+        if (target.getWidth() != width || target.getHeight() != height) {
+            target.resize(width, height);
+        }
+
+        sketch = new PreviewSketch(target, isRetina());
+        graphPanel.add(sketch, BorderLayout.CENTER);
     }
 
     @Override
@@ -175,6 +180,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
 
     @Override
     public void componentActivated() {
+
     }
 
     @Override
@@ -222,8 +228,8 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
     }
 
     protected Dimension getSketchDimensions() {
-        int width = graphPanel.getWidth();
-        int height = graphPanel.getHeight();
+        int width = getWidth();
+        int height = getHeight();
         if (width > 1 && height > 1) {
             if (isRetina()) {
                 width = (int) (width * 2.0);

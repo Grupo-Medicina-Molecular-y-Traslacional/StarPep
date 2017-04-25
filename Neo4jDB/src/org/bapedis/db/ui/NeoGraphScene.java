@@ -21,10 +21,10 @@ import org.jdesktop.swingx.JXBusyLabel;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
-import org.openide.awt.Mnemonics;
 import org.openide.awt.UndoRedo;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.Lookups;
 
 /**
@@ -40,37 +40,14 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
 
     public NeoGraphScene() {
         initComponents();
-        setBusy(true);
 
-        SwingWorker worker = new SwingWorker<Void, Void>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                GraphDrawable drawable = VizController.getInstance().getDrawable();
-                graphPanel.add(drawable.getGraphComponent(), BorderLayout.CENTER);
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    get();            
-                    setBusy(false);
-                } catch (InterruptedException ex) {
-                    Exceptions.printStackTrace(ex);
-                } catch (ExecutionException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
-            }
-
-        };
-        worker.execute();
     }
 
     private void initComponents() {
         setLayout(new CardLayout());
 
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        Mnemonics.setLocalizedText(busyLabel, org.openide.util.NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.busyLabel.text")); // NOI18N
+        busyLabel.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.busyLabel.text"));
         add(busyLabel, "busyCard");
 
         graphPanel.setLayout(new BorderLayout());
@@ -108,10 +85,35 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
 
     @Override
     public void componentOpened() {
+        setBusy(true);
+
+        SwingWorker worker = new SwingWorker<GraphDrawable, Void>() {
+            @Override
+            protected GraphDrawable doInBackground() throws Exception {
+                return VizController.getInstance().getDrawable();
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    GraphDrawable drawable = get();
+                    graphPanel.add(drawable.getGraphComponent(), BorderLayout.CENTER);
+                    setBusy(false);
+                } catch (InterruptedException ex) {
+                    Exceptions.printStackTrace(ex);
+                } catch (ExecutionException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            }
+
+        };
+        worker.execute();
     }
 
     @Override
     public void componentClosed() {
+        // Destroy JOGL
+//        VizController.getInstance().destroy();
     }
 
     @Override

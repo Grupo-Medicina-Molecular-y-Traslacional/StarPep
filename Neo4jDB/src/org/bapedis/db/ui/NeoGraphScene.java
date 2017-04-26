@@ -113,7 +113,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
     @Override
     public void componentClosed() {
         // Destroy JOGL
-//        VizController.getInstance().destroy();
+        VizController.getInstance().destroy();
     }
 
     @Override

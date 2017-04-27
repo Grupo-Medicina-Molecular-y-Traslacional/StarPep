@@ -158,24 +158,17 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
             wheelTimer.stop();
             wheelTimer = null;
         }
-//        wheelTimer = new Timer();
-//        wheelTimer.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                setMoving(false);
-//                refreshLoop.refreshSketch();
-//                wheelTimer = null;
-//            }
-//        }, WHEEL_TIMER);
         ActionListener wheelTask = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setMoving(false);
                 refreshLoop.refreshSketch();
                 wheelTimer = null;
+                System.out.println("wheel task");
             }
         };
         wheelTimer = new Timer(WHEEL_TIMER, wheelTask);
+        wheelTimer.setRepeats(false);
         wheelTimer.start();
         refreshLoop.refreshSketch();
     }
@@ -252,6 +245,7 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
         private int timeout = DELAY * 10;
 //        private Timer timer;
         private Timer timer;
+        private SwingWorker worker;
 
         public RefreshLoop() {
             super();
@@ -266,28 +260,27 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
 
         private void startTimer() {
             ActionListener refreshingTask = new ActionListener() {
-                SwingWorker worker;
-                
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (refresh.getAndSet(false)) {
-//                        if (worker.isDone())
+                        if (worker != null) {
+                            worker.cancel(true);
+                        }
                         worker = new SwingWorker() {
                             @Override
                             protected Object doInBackground() throws Exception {
+                                System.out.println("refresh task");
                                 target.refresh();
                                 return null;
                             }
 
                             @Override
                             protected void done() {
-                                try {
-                                    get();
+                                if (!isCancelled()) {
                                     repaint();
-                                } catch (InterruptedException ex) {
-                                    Exceptions.printStackTrace(ex);
-                                } catch (ExecutionException ex) {
-                                    Exceptions.printStackTrace(ex);
+                                    System.out.println("repaint");
+                                } else {
+                                    System.out.println("cancelled");
                                 }
                             }
                         };
@@ -301,6 +294,7 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
                 }
             };
             timer = new Timer(DELAY, refreshingTask);
+            timer.setInitialDelay(0);
             timer.start();
         }
 

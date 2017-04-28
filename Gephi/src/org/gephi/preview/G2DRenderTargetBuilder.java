@@ -49,6 +49,8 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
+import org.bapedis.core.task.Progress;
+import org.bapedis.core.task.ProgressTicketProvider;
 import org.gephi.preview.api.CanvasSize;
 import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.PreviewController;
@@ -57,7 +59,9 @@ import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
 import org.gephi.preview.api.Vector;
 import org.gephi.preview.spi.RenderTargetBuilder;
+import org.openide.util.Cancellable;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -74,10 +78,12 @@ public class G2DRenderTargetBuilder implements RenderTargetBuilder {
         if (width != null && height != null) {
             width = Math.max(1, width);
             height = Math.max(1, height);
-            return new G2DTargetImpl(previewModel, width, height);
+
         } else {
-            return new G2DTargetImpl(previewModel, 1, 1);
+            width = 1;
+            height = 1;
         }
+        return new G2DTargetImpl(previewModel, width, height);
     }
 
     @Override
@@ -151,7 +157,20 @@ public class G2DRenderTargetBuilder implements RenderTargetBuilder {
         @Override
         public synchronized void refresh() {
             if (graphics != null) {
+                init();
+                ProgressTicketProvider progressProvider = Lookup.getDefault().lookup(ProgressTicketProvider.class);
+                if (progressProvider != null) {
+                    String msg = NbBundle.getMessage(G2DRenderTargetBuilder.class, "G2DRenderTargetBuilder.rendering.task");
+                    progressTicket = progressProvider.createTicket(msg, new Cancellable() {
+                        @Override
+                        public boolean cancel() {
+                            return G2DTargetImpl.this.cancel();
+                        }
+                    });
+                }
+                Progress.start(progressTicket);
                 graphics.refresh(previewModel, this);
+                Progress.finish(progressTicket);
             }
         }
     }

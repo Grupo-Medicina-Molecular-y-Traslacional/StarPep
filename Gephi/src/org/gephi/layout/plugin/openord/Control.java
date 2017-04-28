@@ -42,8 +42,8 @@ Portions Copyrighted 2011 Gephi Consortium.
 package org.gephi.layout.plugin.openord;
 
 import java.util.logging.Logger;
-import org.gephi.utils.progress.Progress;
-import org.gephi.utils.progress.ProgressTicket;
+import org.bapedis.core.task.Progress;
+import org.bapedis.core.task.ProgressTicket;
 
 /**
  *

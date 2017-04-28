@@ -23,6 +23,15 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.netbeans.api.progress</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.38.1</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.netbeans.modules.settings</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -115,11 +124,14 @@
             <public-packages>
                 <package>org.bapedis.core</package>
                 <package>org.bapedis.core.events</package>
+                <package>org.bapedis.core.io</package>
                 <package>org.bapedis.core.model</package>
                 <package>org.bapedis.core.services</package>
                 <package>org.bapedis.core.spi</package>
                 <package>org.bapedis.core.spi.filters</package>
                 <package>org.bapedis.core.spi.filters.impl</package>
+                <package>org.bapedis.core.task</package>
+                <package>org.bapedis.core.task.spi</package>
                 <package>org.bapedis.core.ui</package>
                 <package>org.bapedis.core.ui.actions</package>
                 <package>org.bapedis.core.ui.components</package>

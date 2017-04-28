@@ -51,8 +51,8 @@ import org.gephi.layout.plugin.AbstractLayout;
 import org.gephi.layout.spi.Layout;
 import org.gephi.layout.spi.LayoutBuilder;
 import org.gephi.layout.spi.LayoutProperty;
-import org.gephi.utils.longtask.spi.LongTask;
-import org.gephi.utils.progress.ProgressTicket;
+import org.bapedis.core.task.spi.LongTask;
+import org.bapedis.core.task.ProgressTicket;
 
 /**
  *

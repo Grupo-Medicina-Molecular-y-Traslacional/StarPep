@@ -39,22 +39,15 @@ Contributor(s):
 
 Portions Copyrighted 2011 Gephi Consortium.
 */
-package org.gephi.desktop.progress;
-
-import org.gephi.utils.progress.ProgressTicket;
-import org.gephi.utils.progress.ProgressTicketProvider;
-import org.openide.util.Cancellable;
-import org.openide.util.lookup.ServiceProvider;
+package org.bapedis.core.task;
 
 /**
+ * Notify interface that can catch <code>Exception</code> thrown during an
+ * asynchronous task execution.
  *
  * @author Mathieu Bastian
  */
-@ServiceProvider(service = ProgressTicketProvider.class, position = 10)
-public class ProgressTicketProviderImpl implements ProgressTicketProvider {
+public interface LongTaskErrorHandler {
 
-    @Override
-    public ProgressTicket createTicket(String taskName, Cancellable cancellable) {
-        return new ProgressTicketImpl(taskName, cancellable);
-    }
+    public void fatalError(Throwable t);
 }

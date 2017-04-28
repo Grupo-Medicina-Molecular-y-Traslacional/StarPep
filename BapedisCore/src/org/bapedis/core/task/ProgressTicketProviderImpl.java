@@ -39,15 +39,20 @@ Contributor(s):
 
 Portions Copyrighted 2011 Gephi Consortium.
 */
-package org.gephi.utils.longtask.api;
+package org.bapedis.core.task;
+
+import org.openide.util.Cancellable;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
- * Notify interface that can catch <code>Exception</code> thrown during an
- * asynchronous task execution.
  *
  * @author Mathieu Bastian
  */
-public interface LongTaskErrorHandler {
+@ServiceProvider(service = ProgressTicketProvider.class, position = 10)
+public class ProgressTicketProviderImpl implements ProgressTicketProvider {
 
-    public void fatalError(Throwable t);
+    @Override
+    public ProgressTicket createTicket(String taskName, Cancellable cancellable) {
+        return new ProgressTicketImpl(taskName, cancellable);
+    }
 }

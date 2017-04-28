@@ -50,8 +50,8 @@ import org.gephi.graph.api.*;
 import org.gephi.preview.api.*;
 import org.gephi.preview.spi.*;
 
-import org.gephi.utils.progress.Progress;
-import org.gephi.utils.progress.ProgressTicket;
+import org.bapedis.core.task.Progress;
+import org.bapedis.core.task.ProgressTicket;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
@@ -207,7 +207,7 @@ public class PreviewControllerImpl implements PreviewController {
             PreviewProperties properties = previewModel.getProperties();
 
             //Progress
-            ProgressTicket progressTicket = null;
+            ProgressTicket progressTicket = target instanceof AbstractRenderTarget?((AbstractRenderTarget) target).getProgressTicket():null;
             if (target instanceof AbstractRenderTarget) {
                 int tasks = 0;
                 for (Renderer r : renderers) {
@@ -221,7 +221,6 @@ public class PreviewControllerImpl implements PreviewController {
                         }
                     }
                 }
-                progressTicket = ((AbstractRenderTarget) target).getProgressTicket();
                 Progress.switchToDeterminate(progressTicket, tasks);
             }
 

@@ -41,8 +41,8 @@ Portions Copyrighted 2011 Gephi Consortium.
  */
 package org.gephi.preview;
 
-import org.gephi.utils.longtask.spi.LongTask;
-import org.gephi.utils.progress.ProgressTicket;
+import org.bapedis.core.task.spi.LongTask;
+import org.bapedis.core.task.ProgressTicket;
 
 /**
  *
@@ -52,6 +52,10 @@ public class AbstractRenderTarget implements LongTask {
 
     protected boolean cancel = false;
     protected ProgressTicket progressTicket;
+    
+    protected void init(){
+        cancel = false;
+    }
 
     public boolean isCancelled() {
         return cancel;

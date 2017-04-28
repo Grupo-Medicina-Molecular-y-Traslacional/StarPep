@@ -62,10 +62,10 @@ import org.gephi.layout.spi.Layout;
 import org.gephi.layout.spi.LayoutBuilder;
 import org.gephi.layout.spi.LayoutProperty;
 import org.gephi.utils.Serialization;
-import org.gephi.utils.longtask.api.LongTaskErrorHandler;
-import org.gephi.utils.longtask.api.LongTaskExecutor;
-import org.gephi.utils.longtask.api.LongTaskListener;
-import org.gephi.utils.longtask.spi.LongTask;
+import org.bapedis.core.task.LongTaskErrorHandler;
+import org.bapedis.core.task.LongTaskExecutor;
+import org.bapedis.core.task.LongTaskListener;
+import org.bapedis.core.task.spi.LongTask;
 import org.openide.util.Lookup;
 
 /**

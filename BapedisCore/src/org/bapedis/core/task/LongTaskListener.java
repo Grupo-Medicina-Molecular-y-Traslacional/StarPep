@@ -39,26 +39,16 @@ Contributor(s):
 
 Portions Copyrighted 2011 Gephi Consortium.
 */
-package org.gephi.utils.longtask.spi;
+package org.bapedis.core.task;
 
-import org.gephi.utils.progress.ProgressTicket;
+import org.bapedis.core.task.spi.LongTask;
 
 /**
- * Interface that any class can implement to support progress and cancellation.
- * 
+ * Basic listener to be notified when a long task terminates.
+ *
  * @author Mathieu Bastian
  */
-public interface LongTask {
+public interface LongTaskListener {
 
-    /**
-     * Cancel the task. Returns <code>true</code> if the task has been sucessfully cancelled, <code>false</code> otherwise.
-     * @return  <code>true</code> if the task has been sucessfully cancelled, <code>false</code> otherwise
-     */
-    public boolean cancel();
-
-    /**
-     * Set the progress ticket for the long task. Can't be null.
-     * @param progressTicket the progress ticket for this task
-     */
-    public void setProgressTicket(ProgressTicket progressTicket);
+    public void taskFinished(LongTask task);
 }

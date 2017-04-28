@@ -43,9 +43,9 @@ package org.gephi.desktop.io.export;
 
 import org.gephi.io.exporter.api.ExportController;
 import org.gephi.io.exporter.spi.Exporter;
-import org.gephi.utils.longtask.api.LongTaskErrorHandler;
-import org.gephi.utils.longtask.api.LongTaskExecutor;
-import org.gephi.utils.longtask.spi.LongTask;
+import org.bapedis.core.task.LongTaskErrorHandler;
+import org.bapedis.core.task.LongTaskExecutor;
+import org.bapedis.core.task.spi.LongTask;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.StatusDisplayer;

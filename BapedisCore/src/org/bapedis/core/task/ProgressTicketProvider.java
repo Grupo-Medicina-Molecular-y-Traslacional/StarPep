@@ -40,7 +40,7 @@ Contributor(s):
 Portions Copyrighted 2011 Gephi Consortium.
 */
 
-package org.gephi.utils.progress;
+package org.bapedis.core.task;
 
 import org.openide.util.Cancellable;
 

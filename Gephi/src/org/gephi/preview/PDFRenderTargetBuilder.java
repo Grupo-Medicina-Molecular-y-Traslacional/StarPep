@@ -51,7 +51,7 @@ import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.RenderTarget;
 import org.gephi.preview.spi.RenderTargetBuilder;
-import org.gephi.utils.progress.Progress;
+import org.bapedis.core.task.Progress;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;

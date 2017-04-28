@@ -39,7 +39,7 @@
 
  Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.utils.longtask.api;
+package org.bapedis.core.task;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -50,9 +50,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.gephi.utils.longtask.spi.LongTask;
-import org.gephi.utils.progress.ProgressTicket;
-import org.gephi.utils.progress.ProgressTicketProvider;
+import org.bapedis.core.task.spi.LongTask;
 import org.openide.util.Cancellable;
 import org.openide.util.Lookup;
 
@@ -252,13 +250,13 @@ public final class LongTaskExecutor {
             this.errorHandler = errorHandler;
             ProgressTicketProvider progressProvider = Lookup.getDefault().lookup(ProgressTicketProvider.class);
             if (progressProvider != null) {
-                this.progress = progressProvider.createTicket(taskName, new Cancellable() {
-                    @Override
-                    public boolean cancel() {
-                        LongTaskExecutor.this.cancel();
-                        return true;
-                    }
-                });
+//                this.progress = progressProvider.createTicket(taskName, new Cancellable() {
+//                    @Override
+//                    public boolean cancel() {
+//                        LongTaskExecutor.this.cancel();
+//                        return true;
+//                    }
+//                });
                 if (task != null) {
                     task.setProgressTicket(progress);
                 } else {

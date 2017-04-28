@@ -42,24 +42,20 @@
 package org.gephi.desktop.preview;
 
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.concurrent.ExecutionException;
-import javax.swing.Timer;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewMouseEvent;
 import org.gephi.preview.api.Vector;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 /**
@@ -69,7 +65,6 @@ import org.openide.util.Lookup;
 public class PreviewSketch extends JPanel implements MouseListener, MouseWheelListener, MouseMotionListener {
 
     private static final int WHEEL_TIMER = 500;
-    private Timer wheelTimer;
     //Data
     private final PreviewController previewController;
     private final G2DTarget target;
@@ -78,6 +73,7 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
     private final Vector lastMove = new Vector();
     //Utils
     private final RefreshLoop refreshLoop = new RefreshLoop();
+    private Timer wheelTimer;
     private boolean inited;
     private final boolean isRetina;
 
@@ -115,9 +111,9 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (previewController.sendMouseEvent(buildPreviewMouseEvent(e, PreviewMouseEvent.Type.CLICKED))) {
+//        if (previewController.sendMouseEvent(buildPreviewMouseEvent(e, PreviewMouseEvent.Type.CLICKED))) {
             refreshLoop.refreshSketch();
-        }
+//        }
     }
 
     @Override
@@ -131,9 +127,9 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (!previewController.sendMouseEvent(buildPreviewMouseEvent(e, PreviewMouseEvent.Type.RELEASED))) {
+//        if (!previewController.sendMouseEvent(buildPreviewMouseEvent(e, PreviewMouseEvent.Type.RELEASED))) {
             setMoving(false);
-        }
+//        }
 
         refreshLoop.refreshSketch();
     }
@@ -155,27 +151,24 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
         target.setScaling(target.getScaling() * (way > 0 ? 2f : 0.5f));
         setMoving(true);
         if (wheelTimer != null) {
-            wheelTimer.stop();
+            wheelTimer.cancel();
             wheelTimer = null;
         }
-        ActionListener wheelTask = new ActionListener() {
+        wheelTimer = new Timer();
+        wheelTimer.schedule(new TimerTask() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void run() {
                 setMoving(false);
                 refreshLoop.refreshSketch();
                 wheelTimer = null;
-                System.out.println("wheel task");
             }
-        };
-        wheelTimer = new Timer(WHEEL_TIMER, wheelTask);
-        wheelTimer.setRepeats(false);
-        wheelTimer.start();
+        }, WHEEL_TIMER);
         refreshLoop.refreshSketch();
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (!previewController.sendMouseEvent(buildPreviewMouseEvent(e, PreviewMouseEvent.Type.DRAGGED))) {
+//        if (!previewController.sendMouseEvent(buildPreviewMouseEvent(e, PreviewMouseEvent.Type.DRAGGED))) {
             setMoving(true);
             Vector trans = target.getTranslate();
             trans.set(e.getX(), e.getY());
@@ -185,7 +178,7 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
             trans.add(lastMove);
 
             refreshLoop.refreshSketch();
-        }
+//        }
     }
 
     @Override
@@ -238,14 +231,11 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
 
     private class RefreshLoop {
 
-        private final int DELAY = 100;
+        private final long DELAY = 100;
         private final AtomicBoolean running = new AtomicBoolean();
         private final AtomicBoolean refresh = new AtomicBoolean();
-        //Timer
-        private int timeout = DELAY * 10;
-//        private Timer timer;
+        private long timeout = DELAY * 10;
         private Timer timer;
-        private SwingWorker worker;
 
         public RefreshLoop() {
             super();
@@ -259,32 +249,13 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
         }
 
         private void startTimer() {
-            ActionListener refreshingTask = new ActionListener() {
+            timer = new Timer("PreviewRefreshLoop", true);
+            timer.schedule(new TimerTask() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void run() {
                     if (refresh.getAndSet(false)) {
-                        if (worker != null) {
-                            worker.cancel(true);
-                        }
-                        worker = new SwingWorker() {
-                            @Override
-                            protected Object doInBackground() throws Exception {
-                                System.out.println("refresh task");
-                                target.refresh();
-                                return null;
-                            }
-
-                            @Override
-                            protected void done() {
-                                if (!isCancelled()) {
-                                    repaint();
-                                    System.out.println("repaint");
-                                } else {
-                                    System.out.println("cancelled");
-                                }
-                            }
-                        };
-                        worker.execute();
+                        target.refresh();
+                        repaint();
                     } else if (timeout == 0) {
                         timeout = DELAY * 10;
                         stopTimer();
@@ -292,15 +263,36 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
                         timeout -= DELAY;
                     }
                 }
-            };
-            timer = new Timer(DELAY, refreshingTask);
-            timer.setInitialDelay(0);
-            timer.start();
+            }, 0, DELAY);
         }
 
         private void stopTimer() {
-            timer.stop();
+            timer.cancel();
             running.set(false);
         }
+        
+//                                if (worker != null) {
+//                            worker.cancel(true);
+//                        }
+//                        worker = new SwingWorker() {
+//                            @Override
+//                            protected Object doInBackground() throws Exception {
+//                                System.out.println("refresh task");
+//                                target.refresh();
+//                                return null;
+//                            }
+//
+//                            @Override
+//                            protected void done() {
+//                                if (!isCancelled()) {
+//                                    repaint();
+//                                    System.out.println("repaint");
+//                                } else {
+//                                    System.out.println("cancelled");
+//                                }
+//                            }
+//                        };
+//                        worker.execute();
+
     }
 }

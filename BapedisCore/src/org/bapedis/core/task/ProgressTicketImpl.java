@@ -39,9 +39,8 @@ Contributor(s):
 
 Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.desktop.progress;
+package org.bapedis.core.task;
 
-import org.gephi.utils.progress.ProgressTicket;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.StatusDisplayer;

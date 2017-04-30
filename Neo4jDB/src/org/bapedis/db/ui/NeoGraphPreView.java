@@ -9,6 +9,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
@@ -19,6 +20,7 @@ import java.lang.reflect.Field;
 import java.text.NumberFormat;
 import java.util.concurrent.ExecutionException;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -96,24 +98,35 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
         });
         toolbar.add(backgroundButton);
 
+        toolbar.addSeparator();
         // Visibility Ratio
+        float val = previewController.getModel().getProperties().getValue(PreviewProperty.VISIBILITY_RATIO);
         final NumberFormat formatter = NumberFormat.getPercentInstance();
+
+        final JLabel ratioLabel = new JLabel();
+        ratioLabel.setPreferredSize(new Dimension(30, 15));
+        ratioLabel.setMaximumSize(ratioLabel.getPreferredSize());
+        ratioLabel.setMinimumSize(ratioLabel.getPreferredSize());
+
         final JSlider ratioSlider = new JSlider();
-        float val = previewController.getModel().getProperties().getValue(PreviewProperty.VISIBILITY_RATIO); 
-        ratioSlider.setValue( Math.round(val) * 100);
-        ratioSlider.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.visibilityRatio.text", formatter.format(val)));
+        ratioSlider.setMaximum(100);
+        ratioSlider.setMinimum(1);
         ratioSlider.setPreferredSize(new Dimension(240, 23));
-        ratioSlider.setMaximumSize(new Dimension(240, 23));
+        ratioSlider.setMaximumSize(ratioSlider.getPreferredSize());
         ratioSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 float val = ratioSlider.getValue() / 100f;
                 ratioSlider.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.visibilityRatio.text", formatter.format(val)));
+                ratioLabel.setText(formatter.format(val));
+                ratioLabel.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.visibilityRatio.text", formatter.format(val)));
                 previewController.getModel().getProperties().putValue(PreviewProperty.VISIBILITY_RATIO, val);
             }
         });
+        ratioSlider.setValue(Math.round(val) * 100);
         toolbar.add(ratioSlider);
-        
+        toolbar.add(ratioLabel);
+
         // Refresh button
         JButton refreshButton = new JButton(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/refresh.png")));
         refreshButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.refreshButton.text"));
@@ -152,6 +165,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
 
         toolbar.add(refreshButton);
 
+        toolbar.addSeparator();
         // Reset Zoom 
         JButton resetZoomButton = new JButton();
         resetZoomButton.setText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.resetZoomButton.text"));

@@ -127,7 +127,6 @@
                 <package>org.gephi.desktop.preview</package>
                 <package>org.gephi.desktop.preview.api</package>
                 <package>org.gephi.desktop.preview.propertyeditors</package>
-                <package>org.gephi.desktop.progress</package>
                 <package>org.gephi.graph.api</package>
                 <package>org.gephi.io.exporter.api</package>
                 <package>org.gephi.io.exporter.impl</package>
@@ -172,14 +171,12 @@
                 <package>org.gephi.ui.components.splineeditor.equation</package>
                 <package>org.gephi.ui.utils</package>
                 <package>org.gephi.utils</package>
-                <package>org.gephi.utils.longtask.api</package>
-                <package>org.gephi.utils.longtask.spi</package>
-                <package>org.gephi.utils.progress</package>
                 <package>org.gephi.visualization</package>
                 <package>org.gephi.visualization.api</package>
                 <package>org.gephi.visualization.api.selection</package>
                 <package>org.gephi.visualization.apiimpl</package>
                 <package>org.gephi.visualization.bridge</package>
+                <package>org.gephi.visualization.component</package>
                 <package>org.gephi.visualization.events</package>
                 <package>org.gephi.visualization.model</package>
                 <package>org.gephi.visualization.model.edge</package>
@@ -191,7 +188,6 @@
                 <package>org.gephi.visualization.selection</package>
                 <package>org.gephi.visualization.swing</package>
                 <package>org.gephi.visualization.text</package>
-                <package>org.gephi.visualization.ui</package>
             </public-packages>
             <class-path-extension>
                 <runtime-relative-path>ext/batik-svg-dom-1.7.jar</runtime-relative-path>

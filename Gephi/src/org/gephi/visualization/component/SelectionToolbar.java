@@ -39,7 +39,7 @@ Contributor(s):
 
 Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.visualization.ui;
+package org.gephi.visualization.component;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -76,7 +76,7 @@ public class SelectionToolbar extends JToolBar {
     private void initContent() {
 
         //Mouse
-        final JToggleButton mouseButton = new JToggleButton(new ImageIcon(getClass().getResource("/org/gephi/visualization/component/mouse.png")));
+        final JToggleButton mouseButton = new JToggleButton(new ImageIcon(getClass().getResource("/org/gephi/visualization/component/resources/mouse.png")));
         mouseButton.setToolTipText(NbBundle.getMessage(SelectionToolbar.class, "SelectionToolbar.mouse.tooltip"));
         mouseButton.addActionListener(new ActionListener() {
 
@@ -90,7 +90,7 @@ public class SelectionToolbar extends JToolBar {
         add(mouseButton);
 
         //Rectangle
-        final JToggleButton rectangleButton = new JToggleButton(new ImageIcon(getClass().getResource("/org/gephi/visualization/component/rectangle.png")));
+        final JToggleButton rectangleButton = new JToggleButton(new ImageIcon(getClass().getResource("/org/gephi/visualization/component/resources/rectangle.png")));
         rectangleButton.setToolTipText(NbBundle.getMessage(SelectionToolbar.class, "SelectionToolbar.rectangle.tooltip"));
         rectangleButton.addActionListener(new ActionListener() {
 
@@ -104,7 +104,7 @@ public class SelectionToolbar extends JToolBar {
         add(rectangleButton);
 
         //Drag
-        final JToggleButton dragButton = new JToggleButton(new ImageIcon(getClass().getResource("/org/gephi/visualization/component/hand.png")));
+        final JToggleButton dragButton = new JToggleButton(new ImageIcon(getClass().getResource("/org/gephi/visualization/component/resources/hand.png")));
         dragButton.setToolTipText(NbBundle.getMessage(SelectionToolbar.class, "SelectionToolbar.drag.tooltip"));
         dragButton.addActionListener(new ActionListener() {
 

@@ -39,61 +39,17 @@ Contributor(s):
 
 Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.visualization.ui;
+package org.gephi.visualization.component;
 
-import java.awt.Component;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import org.gephi.ui.utils.UIUtils;
+import javax.swing.JPanel;
 
 /**
  *
  * @author Mathieu Bastian
  */
-public class VizToolbar extends JToolBar {
+public class SelectionPanel extends JPanel {
 
-    public VizToolbar(VizToolbarGroup[] groups) {
-        initDesign();
+    public SelectionPanel() {
 
-        for (VizToolbarGroup g : groups) {
-            addSeparator();
-            for (JComponent c : g.getToolbarComponents()) {
-                add(c);
-            }
-        }
-    }
-
-    private void initDesign() {
-        setFloatable(false);
-        putClientProperty("JToolBar.isRollover", Boolean.TRUE); //NOI18N
-        setBorder(BorderFactory.createEmptyBorder(2, 0, 4, 0));
-        if (UIUtils.isAquaLookAndFeel()) {
-            setBackground(UIManager.getColor("NbExplorerView.background"));
-        }
-    }
-
-    public void setEnable(final boolean enabled) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                for (Component c : getComponents()) {
-                    c.setEnabled(enabled);
-                }
-            }
-        });
-    }
-
-    @Override
-    public Component add(Component comp) {
-        if (comp instanceof JButton) {
-            UIUtils.fixButtonUI((JButton) comp);
-        }
-
-        return super.add(comp);
     }
 }

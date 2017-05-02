@@ -39,7 +39,7 @@
 
  Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.visualization.ui;
+package org.gephi.visualization.component;
 
 import java.awt.BorderLayout;
 import javax.swing.JComponent;

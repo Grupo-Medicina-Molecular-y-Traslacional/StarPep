@@ -39,7 +39,7 @@ Contributor(s):
 
 Portions Copyrighted 2011 Gephi Consortium.
 */
-package org.gephi.visualization.ui;
+package org.gephi.visualization.component;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

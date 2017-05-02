@@ -39,7 +39,7 @@
 
  Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.visualization.ui;
+package org.gephi.visualization.component;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -189,7 +189,6 @@ public class LabelAttributesPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         elementButtonGroup = new javax.swing.ButtonGroup();
         controlPanel = new javax.swing.JPanel();
@@ -210,7 +209,7 @@ public class LabelAttributesPanel extends javax.swing.JPanel {
         edgesToggleButton.setText(org.openide.util.NbBundle.getMessage(LabelAttributesPanel.class, "LabelAttributesPanel.edgesToggleButton.text")); // NOI18N
         controlPanel.add(edgesToggleButton);
 
-        contentPanel.setLayout(new java.awt.GridLayout());
+        contentPanel.setLayout(new java.awt.GridLayout(1, 0));
         contentScrollPane.setViewportView(contentPanel);
 
         labelComment.setText(org.openide.util.NbBundle.getMessage(LabelAttributesPanel.class, "LabelAttributesPanel.labelComment.text")); // NOI18N
@@ -227,7 +226,7 @@ public class LabelAttributesPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(contentScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
+                    .addComponent(contentScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(controlPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 94, Short.MAX_VALUE)

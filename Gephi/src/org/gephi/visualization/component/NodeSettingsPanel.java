@@ -39,7 +39,7 @@
 
  Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.visualization.ui;
+package org.gephi.visualization.component;
 
 import org.gephi.visualization.VizController;
 import org.gephi.visualization.VizModel;

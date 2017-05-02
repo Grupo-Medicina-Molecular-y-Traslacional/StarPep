@@ -39,7 +39,7 @@ Contributor(s):
 
 Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.visualization.ui;
+package org.gephi.visualization.component;
 
 import org.gephi.ui.components.JColorButton;
 import com.connectina.swing.fontchooser.JFontChooser;
@@ -501,7 +501,7 @@ public class LabelSettingsPanel extends javax.swing.JPanel {
         hideNonSelectedCheckbox.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         hideNonSelectedCheckbox.setMargin(new java.awt.Insets(2, 0, 2, 2));
 
-        configureLabelsButton.setFont(new java.awt.Font("Tahoma", 0, 10));
+        configureLabelsButton.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         configureLabelsButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/gephi/visualization/component/configureLabels.png"))); // NOI18N
         configureLabelsButton.setText(org.openide.util.NbBundle.getMessage(LabelSettingsPanel.class, "LabelSettingsPanel.configureLabelsButton.text")); // NOI18N
         configureLabelsButton.setBorder(null);

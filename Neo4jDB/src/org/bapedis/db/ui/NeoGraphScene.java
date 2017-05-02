@@ -15,8 +15,11 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
+import org.gephi.ui.components.JColorButton;
 import org.gephi.visualization.VizController;
+import org.gephi.visualization.VizModel;
 import org.gephi.visualization.apiimpl.GraphDrawable;
+import org.gephi.visualization.component.VizBarController;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
@@ -40,7 +43,6 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
 
     public NeoGraphScene() {
         initComponents();
-
     }
 
     private void initComponents() {
@@ -58,6 +60,11 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         CardLayout cl = (CardLayout) getLayout();
         cl.show(NeoGraphScene.this, busy ? "busyCard" : "graphCard");
         busyLabel.setBusy(busy);
+    }
+
+    private void createToolBarComponent() {
+        VizModel vizModel = VizController.getInstance().getVizModel();
+//        JColorButton backgroundButton = new JColorButton
     }
 
     @Override

@@ -26,6 +26,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.gephi.ui.components.JColorButton;
@@ -75,6 +76,10 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
     final JSlider edgeSizeSlider = new JSlider();
 
     final PropertyChangeListener initListener;
+    
+    static{
+        UIManager.put("Slider.paintValue", false);
+    }
 
     public NeoGraphScene() {
         initComponents();
@@ -162,6 +167,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
                 Font font = JFontChooser.showDialog(WindowManager.getDefault().getMainWindow(), model.getNodeFont());
                 if (font != null && font != model.getNodeFont()) {
                     model.setNodeFont(font);
+                    nodeFontButton.setText(font.getFontName() + ", " + font.getSize());
                 }
             }
         });
@@ -182,8 +188,9 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
 //        toolbar.add(nodeColorButton);
 
         //Font Size
-        nodeSizeSlider.setPreferredSize(new Dimension(100, 23));
+        nodeSizeSlider.setPreferredSize(new Dimension(100, 20));
         nodeSizeSlider.setMaximumSize(nodeSizeSlider.getPreferredSize());
+        nodeSizeSlider.setMinimumSize(nodeSizeSlider.getPreferredSize());
         nodeSizeSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -285,6 +292,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
                 Font font = JFontChooser.showDialog(WindowManager.getDefault().getMainWindow(), model.getEdgeFont());
                 if (font != null && font != model.getEdgeFont()) {
                     model.setEdgeFont(font);
+                    edgeFontButton.setText(font.getFontName() + ", " + font.getSize());
                 }
             }
         });

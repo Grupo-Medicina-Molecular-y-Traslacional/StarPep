@@ -9,6 +9,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
@@ -27,6 +28,7 @@ import javax.swing.JSlider;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.gephi.desktop.preview.PreviewSketch;
@@ -83,7 +85,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
 
         // Tool bar
         toolbar.addSeparator();
-        
+
         // Background button
         JColorButton backgroundButton = new JColorButton((Color) previewController.getModel().getProperties().getValue(PreviewProperty.BACKGROUND_COLOR));
         backgroundButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreView.backgroundButton.toolTipText"));
@@ -104,6 +106,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
         final NumberFormat formatter = NumberFormat.getPercentInstance();
 
         final JLabel ratioLabel = new JLabel();
+        ratioLabel.setFont(new Font("Serif", Font.PLAIN, 11));
         ratioLabel.setPreferredSize(new Dimension(30, 15));
         ratioLabel.setMaximumSize(ratioLabel.getPreferredSize());
         ratioLabel.setMinimumSize(ratioLabel.getPreferredSize());
@@ -113,6 +116,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
         ratioSlider.setMinimum(1);
         ratioSlider.setPreferredSize(new Dimension(120, 23));
         ratioSlider.setMaximumSize(ratioSlider.getPreferredSize());
+
         ratioSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -234,7 +238,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
     @Override
     public void componentOpened() {
         PreviewModel previewModel = previewController.getModel();
- 
+
         Dimension dimensions = getSketchDimensions();
         int width = (int) dimensions.getWidth();
         int height = (int) dimensions.getHeight();

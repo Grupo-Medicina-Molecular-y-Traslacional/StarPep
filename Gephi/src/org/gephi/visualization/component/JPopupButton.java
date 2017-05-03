@@ -92,6 +92,10 @@ public class JPopupButton extends JButton {
         }
         return menu;
     }
+    
+    public void removeItems(){
+        items.clear();
+    }
 
     public void addItem(Object object, Icon icon) {
         items.add(new JPopupButtonItem(object, icon));

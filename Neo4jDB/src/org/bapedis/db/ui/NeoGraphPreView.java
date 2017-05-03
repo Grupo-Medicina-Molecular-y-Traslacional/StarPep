@@ -86,8 +86,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
         
         // Background button
         JColorButton backgroundButton = new JColorButton((Color) previewController.getModel().getProperties().getValue(PreviewProperty.BACKGROUND_COLOR));
-        backgroundButton.setBackground((Color)previewController.getModel().getProperties().getValue(PreviewProperty.BACKGROUND_COLOR));
-        backgroundButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreView.backgroundButton.tooltipText"));
+        backgroundButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreView.backgroundButton.toolTipText"));
         backgroundButton.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -112,7 +111,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
         final JSlider ratioSlider = new JSlider();
         ratioSlider.setMaximum(100);
         ratioSlider.setMinimum(1);
-        ratioSlider.setPreferredSize(new Dimension(240, 23));
+        ratioSlider.setPreferredSize(new Dimension(120, 23));
         ratioSlider.setMaximumSize(ratioSlider.getPreferredSize());
         ratioSlider.addChangeListener(new ChangeListener() {
             @Override

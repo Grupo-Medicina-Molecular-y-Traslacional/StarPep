@@ -448,7 +448,10 @@ public class VizBarController {
                 public void stateChanged(ChangeEvent e) {
                     TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
                     if (model.getSizeMode() != labelSizeModeButton.getSelectedItem()) {
-                        labelSizeModeButton.setSelectedItem(model.getSizeMode());
+                        try {
+                            labelSizeModeButton.setSelectedItem(model.getSizeMode());
+                        } catch (Exception ex) {
+                        }
                     }
                 }
             });

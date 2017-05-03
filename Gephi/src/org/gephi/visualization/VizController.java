@@ -41,6 +41,8 @@
  */
 package org.gephi.visualization;
 
+import org.bapedis.core.events.WorkspaceEventListener;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.Edge;
@@ -73,7 +75,7 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Mathieu Bastian
  */
 @ServiceProvider(service = VisualizationController.class)
-public class VizController implements VisualizationController {
+public class VizController implements VisualizationController, WorkspaceEventListener {
 
     //Singleton
     private static VizController instance;
@@ -118,7 +120,7 @@ public class VizController implements VisualizationController {
 
         if (vizConfig.isUseGLJPanel()) {
             //No more supported. But it was neccesary for me.
-              drawable = new GraphPanel();
+            drawable = new GraphPanel();
         } else if (Utilities.isMac()) {
             drawable = new GraphCanvas();
         } else {
@@ -135,21 +137,20 @@ public class VizController implements VisualizationController {
         vizEventManager.initArchitecture();
         selectionManager.initArchitecture();
 
+        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
+        pm.addWorkspaceEventListener(this);
+        Workspace currentWS = pm.getCurrentWorkspace();
+        currentWS.add(currentModel);
         engine.reinit();
     }
 
     public void refreshWorkspace() {
         ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-        VizModel model = null;
-        if (pc.getCurrentWorkspace() == null) {
-            model = new VizModel(true);
-        } else {
-            model = pc.getCurrentWorkspace().getLookup().lookup(VizModel.class);
-            if (model == null) {
-                model = new VizModel(pc.getCurrentWorkspace());
-                pc.getCurrentWorkspace().add(model);
+        VizModel model = pc.getCurrentWorkspace().getLookup().lookup(VizModel.class);
+        if (model == null) {
+            model = new VizModel(pc.getCurrentWorkspace());
+            pc.getCurrentWorkspace().add(model);
 
-            }
         }
         if (model != currentModel) {
             model.setListeners(currentModel.getListeners());
@@ -287,4 +288,9 @@ public class VizController implements VisualizationController {
 //        }
 //        return new AttributeColumn[0];
 //    }
+
+    @Override
+    public void workspaceChanged(Workspace oldWs, Workspace newWs) {
+        engine.reinit();
+    }
 }

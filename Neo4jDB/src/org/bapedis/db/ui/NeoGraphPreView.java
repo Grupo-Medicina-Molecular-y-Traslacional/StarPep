@@ -82,9 +82,12 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
         add(graphPanel, "graphCard");
 
         // Tool bar
+        toolbar.addSeparator();
+        
         // Background button
-        //background color
         JColorButton backgroundButton = new JColorButton((Color) previewController.getModel().getProperties().getValue(PreviewProperty.BACKGROUND_COLOR));
+        backgroundButton.setBackground((Color)previewController.getModel().getProperties().getValue(PreviewProperty.BACKGROUND_COLOR));
+        backgroundButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreView.backgroundButton.tooltipText"));
         backgroundButton.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -232,11 +235,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
     @Override
     public void componentOpened() {
         PreviewModel previewModel = previewController.getModel();
-        Color background = previewModel.getProperties().getColorValue(PreviewProperty.BACKGROUND_COLOR);
-        if (background != null) {
-//                graphPanel.setBackgroundColor(background);
-        }
-
+ 
         Dimension dimensions = getSketchDimensions();
         int width = (int) dimensions.getWidth();
         int height = (int) dimensions.getHeight();

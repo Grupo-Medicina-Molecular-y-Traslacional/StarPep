@@ -107,9 +107,9 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
 
         final JLabel ratioLabel = new JLabel();
         ratioLabel.setFont(new Font("Serif", Font.PLAIN, 11));
-        ratioLabel.setPreferredSize(new Dimension(30, 15));
+        ratioLabel.setPreferredSize(new Dimension(35, 20));
+        ratioLabel.setHorizontalAlignment(SwingConstants.CENTER);
         ratioLabel.setMaximumSize(ratioLabel.getPreferredSize());
-        ratioLabel.setMinimumSize(ratioLabel.getPreferredSize());
 
         final JSlider ratioSlider = new JSlider();
         ratioSlider.setMaximum(100);
@@ -172,7 +172,8 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
         toolbar.addSeparator();
         // Reset Zoom 
         JButton resetZoomButton = new JButton();
-        resetZoomButton.setText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.resetZoomButton.text"));
+        resetZoomButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/centerOnGraph.png")));
+        resetZoomButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.resetZoomButton.toolTipText"));
         resetZoomButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

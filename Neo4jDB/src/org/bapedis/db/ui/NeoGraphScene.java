@@ -20,6 +20,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
@@ -33,6 +34,7 @@ import org.gephi.ui.components.JColorButton;
 import org.gephi.visualization.VizController;
 import org.gephi.visualization.VizModel;
 import org.gephi.visualization.apiimpl.GraphDrawable;
+import org.gephi.visualization.apiimpl.GraphIO;
 import org.gephi.visualization.component.JPopupButton;
 import org.gephi.visualization.text.SizeMode;
 import org.gephi.visualization.text.TextManager;
@@ -62,22 +64,22 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
     final JColorButton backgroundButton = new JColorButton(Color.BLACK);
     //Node
     final JToggleButton showNodeLabelsButton = new JToggleButton();
-    final JButton nodeFontButton = new JButton();
-    final JColorButton nodeColorButton = new JColorButton(Color.BLACK);
+//    final JButton nodeFontButton = new JButton();
+//    final JColorButton nodeColorButton = new JColorButton(Color.BLACK);
     final JPopupButton labelSizeModeButton = new JPopupButton();
     final JSlider nodeSizeSlider = new JSlider();
     //Edge
     final JToggleButton showEdgeButton = new JToggleButton();
     final JToggleButton edgeHasNodeColorButton = new JToggleButton();
-    final JColorButton edgeColorButton = new JColorButton(Color.BLACK);
+//    final JColorButton edgeColorButton = new JColorButton(Color.BLACK);
     final JSlider edgeScaleSlider = new JSlider();
     final JToggleButton showEdgeLabelsButton = new JToggleButton();
-    final JButton edgeFontButton = new JButton();
+//    final JButton edgeFontButton = new JButton();
     final JSlider edgeSizeSlider = new JSlider();
 
     final PropertyChangeListener initListener;
-    
-    static{
+
+    static {
         UIManager.put("Slider.paintValue", false);
     }
 
@@ -131,15 +133,17 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         //Show node labels
         showNodeLabelsButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.showNodeLabelsButton.toolTipText"));
         showNodeLabelsButton.setIcon(new ImageIcon(getClass().getResource("/org/bapedis/db/resources/showNodeLabels.png")));
-        showNodeLabelsButton.addActionListener(new ActionListener() {
+        showNodeLabelsButton.addChangeListener(new ChangeListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void stateChanged(ChangeEvent e) {
                 VizModel vizModel = VizController.getInstance().getVizModel();
                 if (vizModel.getTextModel().isShowNodeLabels() != showNodeLabelsButton.isSelected()) {
                     vizModel.getTextModel().setShowNodeLabels(showNodeLabelsButton.isSelected());
                 }
+                setNodeLabelButton(showNodeLabelsButton.isSelected());
             }
         });
+        setNodeLabelButton(showNodeLabelsButton.isSelected());
         toolbar.add(showNodeLabelsButton);
 
         // Label size mode
@@ -158,35 +162,33 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         toolbar.add(labelSizeModeButton);
 
         // Node Font
-        nodeFontButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.nodeFontButton.ToolTipText"));
-        nodeFontButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
-                Font font = JFontChooser.showDialog(WindowManager.getDefault().getMainWindow(), model.getNodeFont());
-                if (font != null && font != model.getNodeFont()) {
-                    model.setNodeFont(font);
-                    nodeFontButton.setText(font.getFontName() + ", " + font.getSize());
-                }
-            }
-        });
-        toolbar.add(nodeFontButton);
-
+//        nodeFontButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.nodeFontButton.ToolTipText"));
+//        nodeFontButton.addActionListener(new ActionListener() {
+//
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
+//                Font font = JFontChooser.showDialog(WindowManager.getDefault().getMainWindow(), model.getNodeFont());
+//                if (font != null && font != model.getNodeFont()) {
+//                    model.setNodeFont(font);
+//                    nodeFontButton.setText(font.getFontName() + ", " + font.getSize());
+//                }
+//            }
+//        });
+//        toolbar.add(nodeFontButton);
         //Node color
-        nodeColorButton.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
-
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
-                if (!model.getNodeColor().equals(nodeColorButton.getColor())) {
-                    model.setNodeColor(nodeColorButton.getColor());
-                }
-
-            }
-        });
+//        nodeColorButton.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
+//
+//            @Override
+//            public void propertyChange(PropertyChangeEvent evt) {
+//                TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
+//                if (!model.getNodeColor().equals(nodeColorButton.getColor())) {
+//                    model.setNodeColor(nodeColorButton.getColor());
+//                }
+//
+//            }
+//        });
 //        toolbar.add(nodeColorButton);
-
         //Font Size
         nodeSizeSlider.setPreferredSize(new Dimension(100, 20));
         nodeSizeSlider.setMaximumSize(nodeSizeSlider.getPreferredSize());
@@ -208,23 +210,25 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         //Show edges
         showEdgeButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.showEdgeButton.toolTipText"));
         showEdgeButton.setIcon(new ImageIcon(getClass().getResource("/org/bapedis/db/resources/showEdges.png")));
-        showEdgeButton.addActionListener(new ActionListener() {
+        showEdgeButton.addChangeListener(new ChangeListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void stateChanged(ChangeEvent e) {
                 VizModel vizModel = VizController.getInstance().getVizModel();
                 if (vizModel.isShowEdges() != showEdgeButton.isSelected()) {
                     vizModel.setShowEdges(showEdgeButton.isSelected());
                 }
+                setEdgeButton(showEdgeButton.isSelected());
             }
         });
+        setEdgeButton(showEdgeButton.isSelected());
         toolbar.add(showEdgeButton);
 
         //Edge color mode
         edgeHasNodeColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeHasNodeColorButton.ToolTipText"));
         edgeHasNodeColorButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/edgeNodeColor.png")));
-        edgeHasNodeColorButton.addActionListener(new ActionListener() {
+        edgeHasNodeColorButton.addChangeListener(new ChangeListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void stateChanged(ChangeEvent e) {
                 VizModel vizModel = VizController.getInstance().getVizModel();
                 if (vizModel.isEdgeHasUniColor() == edgeHasNodeColorButton.isSelected()) {
                     vizModel.setEdgeHasUniColor(!edgeHasNodeColorButton.isSelected());
@@ -234,23 +238,22 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         toolbar.add(edgeHasNodeColorButton);
 
         //Edge color
-        edgeColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeColorButton.ToolTipText"));
-        edgeColorButton.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-//                float[] edgeColorArray = edgeColorButton.getColorArray();
-//                VizModel vizModel = VizController.getInstance().getVizModel();
-//                if (!Arrays.equals(vizModel.getEdgeUniColor(), edgeColorArray)) {
-//                    vizModel.setEdgeUniColor(edgeColorArray);
+//        edgeColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeColorButton.ToolTipText"));
+//        edgeColorButton.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
+//            @Override
+//            public void propertyChange(PropertyChangeEvent evt) {
+////                float[] edgeColorArray = edgeColorButton.getColorArray();
+////                VizModel vizModel = VizController.getInstance().getVizModel();
+////                if (!Arrays.equals(vizModel.getEdgeUniColor(), edgeColorArray)) {
+////                    vizModel.setEdgeUniColor(edgeColorArray);
+////                }
+//                TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
+//                if (!model.getEdgeColor().equals(edgeColorButton.getColor())) {
+//                    model.setEdgeColor(edgeColorButton.getColor());
 //                }
-                TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
-                if (!model.getEdgeColor().equals(edgeColorButton.getColor())) {
-                    model.setEdgeColor(edgeColorButton.getColor());
-                }
-            }
-        });
+//            }
+//        });
 //        toolbar.add(edgeColorButton);
-
         //EdgeScale slider
         edgeScaleSlider.setMinimum(0);
         edgeScaleSlider.setMaximum(100);
@@ -271,33 +274,34 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         //Show edge labels
         showEdgeLabelsButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.showEdgeLabelsButton.toolTipText"));
         showEdgeLabelsButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/showEdgeLabels.png")));
-        showEdgeLabelsButton.addActionListener(new ActionListener() {
+        showEdgeLabelsButton.addChangeListener(new ChangeListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void stateChanged(ChangeEvent e) {
                 VizModel vizModel = VizController.getInstance().getVizModel();
                 if (vizModel.getTextModel().isShowEdgeLabels() != showEdgeLabelsButton.isSelected()) {
                     vizModel.getTextModel().setShowEdgeLabels(showEdgeLabelsButton.isSelected());
                 }
+                setEdgeLabelButton(showEdgeLabelsButton.isSelected());
             }
         });
+        setEdgeLabelButton(showEdgeLabelsButton.isSelected());
         toolbar.add(showEdgeLabelsButton);
 
         //Edge Font
-        edgeFontButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeFontButton.ToolTipText"));
-        edgeFontButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
-                Font font = JFontChooser.showDialog(WindowManager.getDefault().getMainWindow(), model.getEdgeFont());
-                if (font != null && font != model.getEdgeFont()) {
-                    model.setEdgeFont(font);
-                    edgeFontButton.setText(font.getFontName() + ", " + font.getSize());
-                }
-            }
-        });
-        toolbar.add(edgeFontButton);
-
+//        edgeFontButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeFontButton.ToolTipText"));
+//        edgeFontButton.addActionListener(new ActionListener() {
+//
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
+//                Font font = JFontChooser.showDialog(WindowManager.getDefault().getMainWindow(), model.getEdgeFont());
+//                if (font != null && font != model.getEdgeFont()) {
+//                    model.setEdgeFont(font);
+//                    edgeFontButton.setText(font.getFontName() + ", " + font.getSize());
+//                }
+//            }
+//        });
+//        toolbar.add(edgeFontButton);
         // Edge size slider       
         edgeSizeSlider.setPreferredSize(new Dimension(100, 23));
         edgeSizeSlider.setMaximumSize(nodeSizeSlider.getPreferredSize());
@@ -311,6 +315,85 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
             }
         });
         toolbar.add(edgeSizeSlider);
+
+        //Zoom
+        toolbar.addSeparator();
+        // Reset Zoom 
+        JButton resetZoomButton = new JButton();
+        resetZoomButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/centerOnGraph.png")));
+        resetZoomButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.resetZoomButton.toolTipText"));
+        resetZoomButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GraphIO io = VizController.getInstance().getGraphIO();
+                io.centerOnGraph();
+            }
+        });
+        toolbar.add(resetZoomButton);
+
+        // Plus Zoom
+        JButton plusButton = new JButton();
+        plusButton.setText("+");
+        plusButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.plusButton.toolTipText"));
+        plusButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int cameraDistance = (int) VizController.getInstance().getVizModel().getCameraDistance();
+                GraphIO io = VizController.getInstance().getGraphIO();
+                io.setCameraDistance(cameraDistance - 1000);
+            }
+        });
+        toolbar.add(plusButton);
+
+        // Minus Zoom
+        JButton minusButton = new JButton();
+        minusButton.setText("-");
+        minusButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.minusButton.toolTipText"));
+        minusButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int cameraDistance = (int) VizController.getInstance().getVizModel().getCameraDistance();
+                GraphIO io = VizController.getInstance().getGraphIO();
+                io.setCameraDistance(cameraDistance + 1000);
+            }
+        });
+        toolbar.add(minusButton);
+
+        //Advaced button
+        toolbar.addSeparator();
+
+        final ExtendedBar extendedPanel = new ExtendedBar();
+//        extendedPanel.setLayout(new BorderLayout());
+//        extendedPanel.add(new JLabel("Hello"), BorderLayout.CENTER);
+        graphPanel.add(extendedPanel, BorderLayout.PAGE_START);
+
+        final JToggleButton extendButton = new JToggleButton();
+        extendButton.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.extendButton.text"));
+        if (extendButton.isSelected()) {
+            extendButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowDown.png"))); // NOI18N
+            extendButton.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowDown_rollover.png"))); // NOI18N
+
+        } else {
+            extendButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowUp.png"))); // NOI18N
+            extendButton.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowUp_rollover.png"))); // NOI18N
+        }
+        extendButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (extendButton.isSelected()) {
+                    extendButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowDown.png"))); // NOI18N
+                    extendButton.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowDown_rollover.png"))); // NOI18N
+                } else {
+                    extendButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowUp.png"))); // NOI18N
+                    extendButton.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowUp_rollover.png"))); // NOI18N
+                }
+                extendedPanel.setVisible(extendButton.isSelected());
+            }
+        });
+        extendedPanel.setVisible(extendButton.isSelected());
+        toolbar.add(extendButton);
+
     }
 
     public void setBusy(boolean busy) {
@@ -338,12 +421,10 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         labelSizeModeButton.setSelectedItem(textModel.getSizeMode());
 
         //Font
-        Font nodeFont = textModel.getNodeFont();
-        nodeFontButton.setText(nodeFont.getFontName() + ", " + nodeFont.getSize());
-
+//        Font nodeFont = textModel.getNodeFont();
+//        nodeFontButton.setText(nodeFont.getFontName() + ", " + nodeFont.getSize());
         //Node color
-        nodeColorButton.setColor(textModel.getNodeColor());
-
+//        nodeColorButton.setColor(textModel.getNodeColor());
         //Font Size
         if (nodeSizeSlider.getValue() / 100f != textModel.getNodeSizeFactor()) {
             nodeSizeSlider.setValue((int) (textModel.getNodeSizeFactor() * 100f));
@@ -358,8 +439,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         //Edge color
 //        float[] edgeColorArray = vizModel.getEdgeUniColor();
 //        edgeColorButton.setColor(new Color(edgeColorArray[0], edgeColorArray[1], edgeColorArray[2], edgeColorArray[3]));
-        edgeColorButton.setColor(textModel.getEdgeColor());
-
+//        edgeColorButton.setColor(textModel.getEdgeColor());
         //EdgeScale slider
         if (vizModel.getEdgeScale() != (edgeScaleSlider.getValue() / 10f + 0.1f)) {
             edgeScaleSlider.setValue((int) ((vizModel.getEdgeScale() - 0.1f) * 10));
@@ -369,13 +449,28 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         showEdgeLabelsButton.setSelected(textModel.isShowEdgeLabels());
 
         //Edge font
-        Font edgeFont = textModel.getEdgeFont();
-        edgeFontButton.setText(edgeFont.getFontName() + ", " + edgeFont.getSize());
-
+//        Font edgeFont = textModel.getEdgeFont();
+//        edgeFontButton.setText(edgeFont.getFontName() + ", " + edgeFont.getSize());
         //Edge size slider
         if (edgeSizeSlider.getValue() / 100f != textModel.getEdgeSizeFactor()) {
             edgeSizeSlider.setValue((int) (textModel.getEdgeSizeFactor() * 100f));
         }
+    }
+
+    private void setNodeLabelButton(boolean enabled) {
+        labelSizeModeButton.setEnabled(enabled);
+        nodeSizeSlider.setEnabled(enabled);
+    }
+
+    private void setEdgeButton(boolean enabled) {
+        edgeHasNodeColorButton.setEnabled(enabled);
+        edgeScaleSlider.setEnabled(enabled);
+        showEdgeLabelsButton.setEnabled(enabled);
+        edgeSizeSlider.setEnabled(showEdgeLabelsButton.isSelected() && enabled);
+    }
+
+    private void setEdgeLabelButton(boolean enabled) {
+        edgeSizeSlider.setEnabled(showEdgeButton.isSelected() && enabled);
     }
 
     @Override

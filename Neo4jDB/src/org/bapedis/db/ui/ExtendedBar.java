@@ -41,25 +41,65 @@ Portions Copyrighted 2011 Gephi Consortium.
  */
 package org.bapedis.db.ui;
 
-import javax.swing.JComponent;
+import java.awt.BorderLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.beans.PropertyChangeEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import org.gephi.appearance.api.AttributeFunction;
+import org.gephi.appearance.api.Function;
+import org.gephi.appearance.spi.TransformerUI;
+import org.gephi.desktop.appearance.AppearanceToolbar;
+import org.gephi.desktop.appearance.AppearanceUIController;
+import org.gephi.desktop.appearance.AppearanceUIModel;
+import org.gephi.desktop.appearance.AppearanceUIModelEvent;
+import org.gephi.desktop.appearance.AppearanceUIModelListener;
+import org.gephi.desktop.appearance.AutoAppyTransformer;
+import org.gephi.graph.api.Column;
 import org.gephi.ui.utils.UIUtils;
+import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Mathieu Bastian
  */
-public class ExtendedBar extends javax.swing.JPanel {
+public class ExtendedBar extends javax.swing.JPanel implements AppearanceUIModelListener {
+
+    private transient final AppearanceToolbar toolbar;
+    private transient final AppearanceUIController controller;
+    private transient AppearanceUIModel model;
+    private transient ItemListener attributeListener;
+    private final String NO_SELECTION = NbBundle.getMessage(ExtendedBar.class, "ExtendedBar.choose.text");
 
     /**
      * Creates new form VizExtendedBar
      */
     public ExtendedBar() {
+        controller = Lookup.getDefault().lookup(AppearanceUIController.class);
+        model = controller.getModel();
+        controller.addPropertyChangeListener(this);
+        toolbar = new AppearanceToolbar(controller);
+
         initComponents();
         if (UIUtils.isAquaLookAndFeel()) {
             setBackground(UIManager.getColor("NbExplorerView.background"));
         }
 
+        setup();
+    }
+
+    private void setup() {
+        categoryPanel.add(toolbar.getCategoryToolbar(), BorderLayout.CENTER);
+//        transformerPanel.add(toolbar.getTransformerToolbar(), BorderLayout.CENTER);
+//        controlPanel.add(toolbar.getControlToolbar(), BorderLayout.CENTER);
     }
 
     /**
@@ -72,25 +112,248 @@ public class ExtendedBar extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        separator = new javax.swing.JSeparator();
-        tabbedPane = new javax.swing.JTabbedPane();
+        categoryPanel = new javax.swing.JPanel();
+        transformerPanel = new javax.swing.JPanel();
+        attributePanel = new javax.swing.JPanel();
+        attibuteBox = new javax.swing.JComboBox();
+        centerPanel = new javax.swing.JPanel();
+        controlPanel = new javax.swing.JPanel();
+        bottomPanel = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
+
+        categoryPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        add(separator, gridBagConstraints);
+        add(categoryPanel, gridBagConstraints);
+
+        transformerPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        add(transformerPanel, gridBagConstraints);
+
+        attributePanel.setLayout(new java.awt.BorderLayout());
+
+        attributePanel.add(attibuteBox, java.awt.BorderLayout.CENTER);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        add(attributePanel, gridBagConstraints);
+
+        centerPanel.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        add(tabbedPane, gridBagConstraints);
+        add(centerPanel, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        add(controlPanel, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        add(bottomPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JSeparator separator;
-    private javax.swing.JTabbedPane tabbedPane;
+    private javax.swing.JComboBox attibuteBox;
+    private javax.swing.JPanel attributePanel;
+    private javax.swing.JPanel bottomPanel;
+    private javax.swing.JPanel categoryPanel;
+    private javax.swing.JPanel centerPanel;
+    private javax.swing.JPanel controlPanel;
+    private javax.swing.JPanel transformerPanel;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(AppearanceUIModelEvent.MODEL)) {
+            refreshModel((AppearanceUIModel) evt.getNewValue());
+        } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_CATEGORY)
+                || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_ELEMENT_CLASS)
+                || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_TRANSFORMER_UI)) {
+            refreshCenterPanel();
+            refreshCombo();
+            refreshControls();
+        } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_FUNCTION)) {
+            refreshCenterPanel();
+            refreshCombo();
+            refreshControls();
+        } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.SET_AUTO_APPLY)) {
+            refreshControls();
+        } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.START_STOP_AUTO_APPLY)) {
+            refreshControls();
+        }
+    }
+
+    public void refreshModel(AppearanceUIModel model) {
+        this.model = model;
+        refreshCenterPanel();
+        refreshCombo();
+        refreshControls();
+    }
+
+    private void refreshCenterPanel() {
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                centerPanel.removeAll();
+                JPanel panel = null;
+                if (model != null) {
+                    TransformerUI ui = model.getSelectedTransformerUI();
+                    if (ui != null) {
+                        boolean attribute = model.isAttributeTransformerUI(ui);
+
+                        attributePanel.setVisible(attribute);
+                        if (attribute) {
+                            Function function = model.getSelectedFunction();
+                            if (function != null) {
+                                ui = function.getUI();
+                                panel = ui.getPanel(function);
+                            }
+                        } else {
+                            Function function = model.getSelectedFunction();
+                            panel = ui.getPanel(function);
+                        }
+
+                        if (panel != null) {
+                            panel.setOpaque(false);
+                            centerPanel.add(panel, BorderLayout.CENTER);
+                        }
+
+                        centerPanel.repaint();
+
+                    }
+                } else {
+                    attributePanel.setVisible(false);
+                }
+            }
+        });
+    }
+
+    private void refreshCombo() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                final DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
+                if (model != null) {
+                    TransformerUI ui = model.getSelectedTransformerUI();
+                    if (ui != null && model.isAttributeTransformerUI(ui)) {
+
+                        //Ranking
+                        Function selectedColumn = model.getSelectedFunction();
+                        attibuteBox.removeItemListener(attributeListener);
+
+                        comboBoxModel.addElement(NO_SELECTION);
+                        comboBoxModel.setSelectedItem(NO_SELECTION);
+
+                        List<Function> rows = new ArrayList<>();
+                        rows.addAll(model.getFunctions());
+
+                        Collections.sort(rows, new Comparator<Function>() {
+                            @Override
+                            public int compare(Function o1, Function o2) {
+                                return o1.getUI().getDisplayName().compareTo(o2.getUI().getDisplayName());
+                            }
+                        });
+                        for (Function r : rows) {
+                            comboBoxModel.addElement(r);
+                            if (selectedColumn != null && selectedColumn.equals(r)) {
+                                comboBoxModel.setSelectedItem(r);
+                            }
+                        }
+                        attributeListener = new ItemListener() {
+                            @Override
+                            public void itemStateChanged(ItemEvent e) {
+                                if (model != null) {
+                                    if (!attibuteBox.getSelectedItem().equals(NO_SELECTION)) {
+                                        Function selectedItem = (Function) attibuteBox.getSelectedItem();
+                                        Function selectedFunction = model.getSelectedFunction();
+                                        if (selectedFunction != selectedItem) {
+                                            controller.setSelectedFunction(selectedItem);
+                                        }
+                                    } else {
+                                        controller.setSelectedFunction(null);
+                                    }
+                                }
+                            }
+                        };
+                        attibuteBox.addItemListener(attributeListener);
+                    }
+                }
+                attibuteBox.setModel(comboBoxModel);
+            }
+        });
+    }
+
+    private void refreshControls() {
+//        SwingUtilities.invokeLater(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (model != null) {
+//                    if (model.getSelectedFunction() != null) {
+//                        enableAutoButton.setEnabled(true);
+//                        if (model.getAutoAppyTransformer() != null) {
+//                            applyButton.setVisible(false);
+//                            enableAutoButton.setSelected(true);
+//                            AutoAppyTransformer aat = model.getAutoAppyTransformer();
+//                            if (aat.isRunning()) {
+//                                autoApplyButton.setVisible(false);
+//                                stopAutoApplyButton.setVisible(true);
+//                                stopAutoApplyButton.setSelected(true);
+//                            } else {
+//                                autoApplyButton.setVisible(true);
+//                                autoApplyButton.setSelected(false);
+//                                stopAutoApplyButton.setVisible(false);
+//                            }
+//                        } else {
+//                            autoApplyButton.setVisible(false);
+//                            stopAutoApplyButton.setVisible(false);
+//                            enableAutoButton.setSelected(false);
+//                            applyButton.setVisible(true);
+//                            applyButton.setEnabled(true);
+//                        }
+//
+//                        Function func = model.getSelectedFunction();
+//                        rankingButton.setEnabled(true);
+//                        partitionButton.setEnabled(true);
+//                        if (func.isPartition()) {
+//                            if (!func.isAttribute()) {
+//                                rankingButton.setEnabled(false);
+//                            } else {
+//                                AttributeFunction af = (AttributeFunction) func;
+//                                Column col = af.getColumn();
+//                                if (!col.isNumber()) {
+//                                    rankingButton.setEnabled(false);
+//                                }
+//                            }
+//                        } else if (func.isRanking()) {
+//                            if (!func.isAttribute()) {
+//                                partitionButton.setEnabled(false);
+//                            }
+//                        }
+//                    }
+//                    localScaleButton.setSelected(model.isLocalScale());
+//                    return;
+//                }
+//                //Disable
+//                stopAutoApplyButton.setVisible(false);
+//                autoApplyButton.setVisible(false);
+//                applyButton.setVisible(true);
+//                applyButton.setEnabled(false);
+//                enableAutoButton.setEnabled(false);
+//            }
+//        });
+    }
 }

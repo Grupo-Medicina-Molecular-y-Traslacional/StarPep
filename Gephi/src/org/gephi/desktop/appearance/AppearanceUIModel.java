@@ -287,7 +287,7 @@ public class AppearanceUIModel {
         }
     }
 
-    protected boolean isAttributeTransformerUI(TransformerUI ui) {
+    public boolean isAttributeTransformerUI(TransformerUI ui) {
         Class transformerClass = ui.getTransformerClass();
         if (RankingTransformer.class.isAssignableFrom(transformerClass) || PartitionTransformer.class.isAssignableFrom(transformerClass)) {
             return true;

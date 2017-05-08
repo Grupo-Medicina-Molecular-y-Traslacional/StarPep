@@ -667,7 +667,7 @@ public class AppearanceTopComponent extends TopComponent implements Lookup.Provi
         autoApplyToolbar.add(enableAutoButton);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
@@ -681,7 +681,7 @@ public class AppearanceTopComponent extends TopComponent implements Lookup.Provi
         autoApplyButton.setMargin(new java.awt.Insets(0, 7, 0, 7));
         autoApplyButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHEAST;
         gridBagConstraints.insets = new java.awt.Insets(0, 3, 3, 5);

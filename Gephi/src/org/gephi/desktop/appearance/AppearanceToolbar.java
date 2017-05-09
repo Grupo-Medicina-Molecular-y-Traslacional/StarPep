@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -57,15 +58,23 @@ import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
 import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import org.gephi.appearance.api.Function;
 import org.gephi.appearance.spi.TransformerCategory;
 import org.gephi.appearance.spi.TransformerUI;
+import org.openide.awt.DropDownButtonFactory;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
 /**
@@ -95,15 +104,15 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
         }
     }
 
-    public JToolBar getCategoryToolbar() {
+    public CategoryToolbar getCategoryToolbar() {
         return categoryToolbar;
     }
 
-    public JToolBar getTransformerToolbar() {
+    public TransformerToolbar getTransformerToolbar() {
         return transformerToolbar;
     }
 
-    public JToolBar getControlToolbar() {
+    public ControlToolbar getControlToolbar() {
         return controlToolbar;
     }
 
@@ -232,39 +241,63 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
         }
     }
 
-    private class CategoryToolbar extends AbstractToolbar {
+    public class CategoryToolbar extends AbstractToolbar {
 
         private final List<ButtonGroup> buttonGroups = new ArrayList<>();
-
+        private final List<ActionListener> actionListener = new LinkedList<>();
+        private final ButtonGroup popupGroup;
+        
         public CategoryToolbar() {
             //Init components
-            elementGroup = new javax.swing.ButtonGroup();
+            popupGroup = new ButtonGroup();
+            final JPopupMenu popup = new JPopupMenu();
+            JCheckBoxMenuItem item;
             for (final String elmtType : AppearanceUIController.ELEMENT_CLASSES) {
-
-                JToggleButton btn = new JToggleButton();
-                btn.setFocusPainted(false);
+                item = new JCheckBoxMenuItem();
                 String btnLabel = elmtType;
                 try {
                     btnLabel = NbBundle.getMessage(AppearanceToolbar.class, "AppearanceToolbar." + elmtType + ".label");
                 } catch (MissingResourceException e) {
                 }
-                btn.setText(btnLabel);
-                btn.setEnabled(false);
-                btn.addActionListener(new ActionListener() {
+                item.setText(btnLabel);
+                item.setSelected(false);
+                item.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         controller.setSelectedElementClass(elmtType);
                     }
                 });
-                elementGroup.add(btn);
-                add(btn);
+                popup.add(item);
+                popupGroup.add(item);
             }
-//            box = new javax.swing.JLabel();
+            final JButton btn = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("/org/gephi/desktop/appearance/resources/chain.png", false), popup);
+            btn.setToolTipText(NbBundle.getMessage(AppearanceToolbar.class, "AppearanceToolbar.chain.toolTipText"));
+            btn.setFocusPainted(false);
+            btn.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    popup.show(btn, 0, btn.getHeight());
+                }
+            });
 
+            popup.addPopupMenuListener(new PopupMenuListener() {
+
+                @Override
+                public void popupMenuCanceled(PopupMenuEvent e) {
+                    btn.setSelected(false);
+                }
+
+                @Override
+                public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                    btn.setSelected(false);
+                }
+
+                @Override
+                public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                }
+            });
+            add(btn);
             addSeparator();
-
-//            box.setMaximumSize(new java.awt.Dimension(32767, 32767));
-//            add(box);
         }
 
         private void clear() {
@@ -289,13 +322,16 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
                         Icon icon = c.getIcon();
 //                        DecoratedIcon decoratedIcon = getDecoratedIcon(icon, t);
 //                        JToggleButton btn = new JToggleButton(decoratedIcon);
-                        JToggleButton btn = new JToggleButton(icon);
+                        JButton btn = new JButton(icon);
 
                         btn.setToolTipText(c.getDisplayName());
                         btn.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 controller.setSelectedCategory(c);
+                                for(ActionListener action: actionListener){
+                                    action.actionPerformed(e);
+                                }
                             }
                         });
                         btn.setName(c.getDisplayName());
@@ -307,7 +343,7 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
                     buttonGroups.add(buttonGroup);
                 }
             } else {
-                elementGroup.clearSelection();
+                popupGroup.clearSelection();
             }
         }
 
@@ -319,14 +355,9 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
                     ButtonGroup g = buttonGroups.get(index);
                     boolean active = model.getSelectedElementClass().equals(elmtType);
                     g.clearSelection();
-                    TransformerCategory c = model.getSelectedCategory();
-                    String selected = c.getDisplayName();
                     for (Enumeration<AbstractButton> btns = g.getElements(); btns.hasMoreElements();) {
                         AbstractButton btn = btns.nextElement();
                         btn.setVisible(active);
-                        if (active && btn.getName().equals(selected)) {
-                            g.setSelected(btn.getModel(), true);
-                        }
                     }
                     index++;
                 }
@@ -335,22 +366,29 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
 
         protected void refreshSelectedElmntGroup() {
             String selected = model == null ? null : model.getSelectedElementClass();
-            ButtonModel buttonModel = null;
-            Enumeration<AbstractButton> en = elementGroup.getElements();
+            JCheckBoxMenuItem item = null;
+            Enumeration<AbstractButton> items = popupGroup.getElements();
             for (String elmtType : AppearanceUIController.ELEMENT_CLASSES) {
                 if (selected == null || elmtType.equals(selected)) {
-                    buttonModel = en.nextElement().getModel();
+                    item = (JCheckBoxMenuItem) items.nextElement();
+                    item.setSelected(true);
                     break;
                 }
-                en.nextElement();
+                items.nextElement();
             }
-            elementGroup.setSelected(buttonModel, true);
         }
-        private javax.swing.JLabel box;
-        private javax.swing.ButtonGroup elementGroup;
+        
+        public void addActionListener(ActionListener listener){
+            actionListener.add(listener);
+        }
+        
+        public void removeActionListener(ActionListener listener){
+            actionListener.remove(listener);
+        }
+
     }
 
-    private class TransformerToolbar extends AbstractToolbar {
+    public class TransformerToolbar extends AbstractToolbar {
 
         private final List<ButtonGroup> buttonGroups = new ArrayList<>();
 
@@ -433,7 +471,7 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
         }
     }
 
-    private class ControlToolbar extends AbstractToolbar {
+    public class ControlToolbar extends AbstractToolbar {
 
         private transient final Set<AbstractButton> rankingSouthControls;
         private transient final Set<AbstractButton> partitionSouthControls;

@@ -362,10 +362,10 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         //Advaced button
         toolbar.addSeparator();
 
-        final ExtendedBar extendedPanel = new ExtendedBar();
+        final ExtendedBar extendedBar = new ExtendedBar();
 //        extendedPanel.setLayout(new BorderLayout());
 //        extendedPanel.add(new JLabel("Hello"), BorderLayout.CENTER);
-        graphPanel.add(extendedPanel, BorderLayout.PAGE_START);
+        graphPanel.add(extendedBar, BorderLayout.PAGE_START);
 
         final JToggleButton extendButton = new JToggleButton();
         extendButton.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.extendButton.text"));
@@ -388,10 +388,10 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
                     extendButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowUp.png"))); // NOI18N
                     extendButton.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowUp_rollover.png"))); // NOI18N
                 }
-                extendedPanel.setVisible(extendButton.isSelected());
+                extendedBar.setVisible(extendButton.isSelected());
             }
         });
-        extendedPanel.setVisible(extendButton.isSelected());
+        extendedBar.setVisible(extendButton.isSelected());
         toolbar.add(extendButton);
 
     }

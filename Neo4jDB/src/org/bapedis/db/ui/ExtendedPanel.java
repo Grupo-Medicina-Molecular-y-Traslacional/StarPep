@@ -82,12 +82,12 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
     /**
      * Creates new form VizExtendedBar
      */
-    public ExtendedPanel(AppearanceToolbar toolbar) {
-        controller = Lookup.getDefault().lookup(AppearanceUIController.class);
+    public ExtendedPanel(AppearanceUIController controller, AppearanceToolbar toolbar) {
+        this.controller = controller;
+        this.toolbar = toolbar;
         model = controller.getModel();
         controller.addPropertyChangeListener(this);
-        this.toolbar = toolbar;
-        
+
         initComponents();
         if (UIUtils.isAquaLookAndFeel()) {
             setBackground(UIManager.getColor("NbExplorerView.background"));
@@ -173,6 +173,8 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
         } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.START_STOP_AUTO_APPLY)) {
             refreshControls();
         }
+        revalidate();
+        repaint();
     }
 
     public void refreshModel(AppearanceUIModel model) {

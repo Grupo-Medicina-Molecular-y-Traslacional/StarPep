@@ -6,29 +6,31 @@
 package org.bapedis.db.ui;
 
 import java.awt.BorderLayout;
-import java.beans.PropertyChangeEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.UIManager;
+import org.gephi.appearance.spi.TransformerCategory;
 import org.gephi.desktop.appearance.AppearanceToolbar;
 import org.gephi.desktop.appearance.AppearanceUIController;
 import org.gephi.desktop.appearance.AppearanceUIModel;
-import org.gephi.desktop.appearance.AppearanceUIModelEvent;
-import org.gephi.desktop.appearance.AppearanceUIModelListener;
 import org.gephi.ui.utils.UIUtils;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Home
  */
-public class ExtendedBar extends javax.swing.JPanel implements AppearanceUIModelListener {
+public class ExtendedBar extends javax.swing.JPanel implements ActionListener {
 
     private transient final AppearanceToolbar toolbar;
     private transient final AppearanceUIController controller;
+    private transient final ExtendedPanel extendedPanel;
+    private transient final DialogDescriptor dd;
     private transient AppearanceUIModel model;
-    private transient ExtendedPanel extendedPanel;
 
     /**
      * Creates new form ExtendedBar
@@ -36,15 +38,17 @@ public class ExtendedBar extends javax.swing.JPanel implements AppearanceUIModel
     public ExtendedBar() {
         controller = Lookup.getDefault().lookup(AppearanceUIController.class);
         model = controller.getModel();
-        controller.addPropertyChangeListener(this);
         toolbar = new AppearanceToolbar(controller);
         initComponents();
         if (UIUtils.isAquaLookAndFeel()) {
             setBackground(UIManager.getColor("NbExplorerView.background"));
         }
 
-        add(toolbar.getCategoryToolbar(), BorderLayout.CENTER);
-        extendedPanel = new ExtendedPanel(toolbar);
+        AppearanceToolbar.CategoryToolbar ctb = toolbar.getCategoryToolbar();
+        ctb.addActionListener(this);
+        add(ctb, BorderLayout.CENTER);
+        extendedPanel = new ExtendedPanel(controller, toolbar);
+        dd = new DialogDescriptor(extendedPanel, "");
     }
 
     /**
@@ -60,12 +64,12 @@ public class ExtendedBar extends javax.swing.JPanel implements AppearanceUIModel
     }// </editor-fold>//GEN-END:initComponents
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_CATEGORY)) {
-            DialogDescriptor dd = new DialogDescriptor(extendedPanel, "title");
-            if (DialogDisplayer.getDefault().notify(dd).equals(NotifyDescriptor.OK_OPTION)) {
-                System.out.println("ok - extended panel");
-            }
+    public void actionPerformed(ActionEvent e) {
+        TransformerCategory c = model.getSelectedCategory();
+        String elementLabel = NbBundle.getMessage(ExtendedBar.class, "ExtendedBar." + model.getSelectedElementClass() + ".label");
+        dd.setTitle(elementLabel + ": " + c.getDisplayName());
+        if (DialogDisplayer.getDefault().notify(dd).equals(NotifyDescriptor.OK_OPTION)) {
+            System.out.println("ok - extended panel");
         }
     }
 

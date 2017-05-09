@@ -91,6 +91,9 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
 
         transformerPanel.add(toolbar.getTransformerToolbar(), BorderLayout.CENTER);
         controlPanel.add(toolbar.getControlToolbar(), BorderLayout.CENTER);
+        refreshCenterPanel();
+        refreshCombo();
+        refreshControls();
     }
 
     /**
@@ -164,7 +167,7 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
             refreshCenterPanel();
             refreshCombo();
             refreshControls();
-        } 
+        }
 //        else if (evt.getPropertyName().equals(AppearanceUIModelEvent.SET_AUTO_APPLY)) {
 //            refreshControls();
 //        } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.START_STOP_AUTO_APPLY)) {
@@ -180,7 +183,6 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
     }
 
     private void refreshCenterPanel() {
-
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -207,12 +209,12 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
                             panel.setOpaque(false);
                             centerPanel.add(panel, BorderLayout.CENTER);
                         }
-                        centerPanel.revalidate();
-                        centerPanel.repaint();
                     }
                 } else {
                     attributePanel.setVisible(false);
                 }
+                centerPanel.revalidate();
+                centerPanel.repaint();
             }
         });
     }

@@ -259,12 +259,12 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
                 elementGroup.add(btn);
                 add(btn);
             }
-            box = new javax.swing.JLabel();
+//            box = new javax.swing.JLabel();
 
             addSeparator();
 
-            box.setMaximumSize(new java.awt.Dimension(32767, 32767));
-            add(box);
+//            box.setMaximumSize(new java.awt.Dimension(32767, 32767));
+//            add(box);
         }
 
         private void clear() {

@@ -1,4 +1,4 @@
-/*
+ /*
  Copyright 2008-2013 Gephi
  Authors : Mathieu Bastian <mathieu.bastian@gephi.org>
  Website : http://www.gephi.org

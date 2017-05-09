@@ -56,7 +56,7 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
     protected JPopupMenu popup;
     protected JMenu menu;
     protected ButtonGroup popupGroup;
-    protected ButtonGroup menuGroup;
+//    protected ButtonGroup menuGroup;
     protected HashMap<Integer, JCheckBoxMenuItem> popupMap;
     protected HashMap<Integer, JCheckBoxMenuItem> menuMap;
     protected ProjectManager pc;
@@ -71,7 +71,7 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
         popupGroup = new ButtonGroup();
         popupMap = new HashMap<>();
         menu = new JMenu(NbBundle.getMessage(SelectWorkspace.class, "CTL_SelectWorkspace"));
-        menuGroup = new ButtonGroup();
+//        menuGroup = new ButtonGroup();
         menuMap = new HashMap<>();
         populateMenuItems(pc.getWorkspaces());
         pc.getCurrentWorkspace().addPropertyChangeListener(this);
@@ -151,7 +151,7 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
             popupMap.put(ws.getId(), item);
             item = createJMenuItem(ws);
             menu.add(item);
-            menuGroup.add(item);
+//            menuGroup.add(item);
             menuMap.put(ws.getId(), item);
         }
     }
@@ -162,7 +162,7 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
         popup.removeAll();
         menu.removeAll();
         popupGroup = new ButtonGroup();
-        menuGroup = new ButtonGroup();
+//        menuGroup = new ButtonGroup();
         popupMap.clear();
         menuMap.clear();
         populateMenuItems(workspaces.toArray(new Workspace[0]));

@@ -53,7 +53,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import org.gephi.appearance.api.AttributeFunction;
 import org.gephi.appearance.api.Function;
 import org.gephi.appearance.spi.TransformerUI;
 import org.gephi.desktop.appearance.AppearanceToolbar;
@@ -61,10 +60,7 @@ import org.gephi.desktop.appearance.AppearanceUIController;
 import org.gephi.desktop.appearance.AppearanceUIModel;
 import org.gephi.desktop.appearance.AppearanceUIModelEvent;
 import org.gephi.desktop.appearance.AppearanceUIModelListener;
-import org.gephi.desktop.appearance.AutoAppyTransformer;
-import org.gephi.graph.api.Column;
 import org.gephi.ui.utils.UIUtils;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
@@ -113,6 +109,7 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
         centerPanel = new javax.swing.JPanel();
         controlPanel = new javax.swing.JPanel();
 
+        setPreferredSize(new java.awt.Dimension(640, 480));
         setLayout(new java.awt.GridBagLayout());
 
         transformerPanel.setLayout(new java.awt.BorderLayout());
@@ -159,7 +156,6 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
         if (evt.getPropertyName().equals(AppearanceUIModelEvent.MODEL)) {
             refreshModel((AppearanceUIModel) evt.getNewValue());
         } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_CATEGORY)
-                || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_ELEMENT_CLASS)
                 || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_TRANSFORMER_UI)) {
             refreshCenterPanel();
             refreshCombo();
@@ -168,13 +164,12 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
             refreshCenterPanel();
             refreshCombo();
             refreshControls();
-        } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.SET_AUTO_APPLY)) {
-            refreshControls();
-        } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.START_STOP_AUTO_APPLY)) {
-            refreshControls();
-        }
-        revalidate();
-        repaint();
+        } 
+//        else if (evt.getPropertyName().equals(AppearanceUIModelEvent.SET_AUTO_APPLY)) {
+//            refreshControls();
+//        } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.START_STOP_AUTO_APPLY)) {
+//            refreshControls();
+//        }
     }
 
     public void refreshModel(AppearanceUIModel model) {
@@ -212,9 +207,8 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
                             panel.setOpaque(false);
                             centerPanel.add(panel, BorderLayout.CENTER);
                         }
-
+                        centerPanel.revalidate();
                         centerPanel.repaint();
-
                     }
                 } else {
                     attributePanel.setVisible(false);

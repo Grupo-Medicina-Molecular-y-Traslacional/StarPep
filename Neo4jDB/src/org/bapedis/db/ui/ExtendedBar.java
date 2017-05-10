@@ -69,7 +69,7 @@ public class ExtendedBar extends javax.swing.JPanel implements ActionListener {
         String elementLabel = NbBundle.getMessage(ExtendedBar.class, "ExtendedBar." + model.getSelectedElementClass() + ".label");
         dd.setTitle(elementLabel + ": " + c.getDisplayName());
         if (DialogDisplayer.getDefault().notify(dd).equals(NotifyDescriptor.OK_OPTION)) {
-            System.out.println("ok - extended panel");
+            controller.getAppearanceController().transform(model.getSelectedFunction());
         }
     }
 

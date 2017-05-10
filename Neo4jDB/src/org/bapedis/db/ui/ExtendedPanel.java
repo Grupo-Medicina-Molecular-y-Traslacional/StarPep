@@ -91,9 +91,7 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
 
         transformerPanel.add(toolbar.getTransformerToolbar(), BorderLayout.CENTER);
         controlPanel.add(toolbar.getControlToolbar(), BorderLayout.CENTER);
-        refreshCenterPanel();
-        refreshCombo();
-        refreshControls();
+        refreshModel(model);
     }
 
     /**

@@ -42,14 +42,11 @@
 package org.gephi.ui.appearance.plugin;
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import net.java.dev.colorchooser.ColorChooser;
 import org.gephi.appearance.api.SimpleFunction;
 import org.gephi.appearance.plugin.AbstractUniqueColorTransformer;
-import org.gephi.ui.components.JColorButton;
 
 /**
  *
@@ -73,21 +70,10 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
                 }
             }
         });
-
-        colorSwatchButton.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                Color newColor = (Color) evt.getNewValue();
-                if (!colorChooser.getColor().equals(newColor)) {
-                    colorChooser.setColor(newColor);
-                }
-            }
-        });
     }
 
     public void setup(SimpleFunction function) {
         transformer = (AbstractUniqueColorTransformer) function.getTransformer();
-        ((JColorButton) colorSwatchButton).setColor(transformer.getColor());
         colorChooser.setColor(transformer.getColor());
         colorLabel.setText(getHex(transformer.getColor()));
     }
@@ -104,53 +90,9 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
-        colorLabel = new javax.swing.JLabel();
-        labelColor = new javax.swing.JLabel();
-        colorSwatchToolbar = new javax.swing.JToolBar();
-        jSeparator1 = new javax.swing.JToolBar.Separator();
-        colorSwatchButton = new JColorButton(Color.BLACK);
         colorChooser = new net.java.dev.colorchooser.ColorChooser();
-
-        setLayout(new java.awt.GridBagLayout());
-
-        colorLabel.setText(org.openide.util.NbBundle.getMessage(UniqueColorTransformerPanel.class, "UniqueColorTransformerPanel.colorLabel.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 0);
-        add(colorLabel, gridBagConstraints);
-
-        labelColor.setText(org.openide.util.NbBundle.getMessage(UniqueColorTransformerPanel.class, "UniqueColorTransformerPanel.labelColor.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 0);
-        add(labelColor, gridBagConstraints);
-
-        colorSwatchToolbar.setFloatable(false);
-        colorSwatchToolbar.setRollover(true);
-        colorSwatchToolbar.setOpaque(false);
-        colorSwatchToolbar.add(jSeparator1);
-
-        colorSwatchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/gephi/ui/appearance/plugin/resources/color-swatch.png"))); // NOI18N
-        colorSwatchButton.setToolTipText(org.openide.util.NbBundle.getMessage(UniqueColorTransformerPanel.class, "UniqueColorTransformerPanel.colorSwatchButton.toolTipText")); // NOI18N
-        colorSwatchButton.setFocusable(false);
-        colorSwatchButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        colorSwatchButton.setIconTextGap(0);
-        colorSwatchButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        colorSwatchToolbar.add(colorSwatchButton);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        add(colorSwatchToolbar, gridBagConstraints);
+        colorLabel = new javax.swing.JLabel();
 
         colorChooser.setMinimumSize(new java.awt.Dimension(14, 14));
         colorChooser.setPreferredSize(new java.awt.Dimension(14, 14));
@@ -167,20 +109,29 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
             .addGap(0, 12, Short.MAX_VALUE)
         );
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 0);
-        add(colorChooser, gridBagConstraints);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(colorChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(colorLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(colorLabel)
+                    .addComponent(colorChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(278, 278, 278))
+        );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private net.java.dev.colorchooser.ColorChooser colorChooser;
     private javax.swing.JLabel colorLabel;
-    private javax.swing.JButton colorSwatchButton;
-    private javax.swing.JToolBar colorSwatchToolbar;
-    private javax.swing.JToolBar.Separator jSeparator1;
-    private javax.swing.JLabel labelColor;
     // End of variables declaration//GEN-END:variables
 }

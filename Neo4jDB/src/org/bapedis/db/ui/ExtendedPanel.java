@@ -90,7 +90,6 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
         }
 
         transformerPanel.add(toolbar.getTransformerToolbar(), BorderLayout.CENTER);
-        controlPanel.add(toolbar.getControlToolbar(), BorderLayout.CENTER);
         refreshModel(model);
     }
 
@@ -108,9 +107,15 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
         attributePanel = new javax.swing.JPanel();
         attibuteBox = new javax.swing.JComboBox();
         centerPanel = new javax.swing.JPanel();
-        controlPanel = new javax.swing.JPanel();
+        controlToolbar = new javax.swing.JToolBar();
+        resetButton = new org.jdesktop.swingx.JXHyperlink();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
+        jLabelInterpo = new javax.swing.JLabel();
+        jComboBoxInterpo = new javax.swing.JComboBox<>();
+        splineButton1 = new org.jdesktop.swingx.JXHyperlink();
 
-        setPreferredSize(new java.awt.Dimension(640, 480));
+        setMinimumSize(new java.awt.Dimension(368, 107));
+        setPreferredSize(new java.awt.Dimension(380, 220));
         setLayout(new java.awt.GridBagLayout());
 
         transformerPanel.setLayout(new java.awt.BorderLayout());
@@ -138,17 +143,54 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(centerPanel, gridBagConstraints);
+
+        controlToolbar.setFloatable(false);
+        controlToolbar.setRollover(true);
+        controlToolbar.setMargin(new java.awt.Insets(0, 4, 0, 0));
+        controlToolbar.setOpaque(false);
+
+        resetButton.setText(org.openide.util.NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.resetButton.text")); // NOI18N
+        resetButton.setToolTipText(org.openide.util.NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.resetButton.toolTipText")); // NOI18N
+        resetButton.setClickedColor(new java.awt.Color(0, 51, 255));
+        resetButton.setFocusPainted(false);
+        resetButton.setFocusable(false);
+        resetButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        controlToolbar.add(resetButton);
+        controlToolbar.add(jSeparator1);
+
+        jLabelInterpo.setText(org.openide.util.NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.jLabelInterpo.text")); // NOI18N
+        controlToolbar.add(jLabelInterpo);
+
+        jComboBoxInterpo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Linear", "Log2", "Bezier" }));
+        controlToolbar.add(jComboBoxInterpo);
+
+        splineButton1.setText(org.openide.util.NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.splineButton1.text")); // NOI18N
+        splineButton1.setToolTipText(org.openide.util.NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.splineButton1.toolTipText")); // NOI18N
+        splineButton1.setClickedColor(new java.awt.Color(0, 51, 255));
+        splineButton1.setFocusPainted(false);
+        splineButton1.setFocusable(false);
+        splineButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        splineButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        controlToolbar.add(splineButton1);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        add(controlPanel, gridBagConstraints);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        add(controlToolbar, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox attibuteBox;
     private javax.swing.JPanel attributePanel;
     private javax.swing.JPanel centerPanel;
-    private javax.swing.JPanel controlPanel;
+    private javax.swing.JToolBar controlToolbar;
+    private javax.swing.JComboBox<String> jComboBoxInterpo;
+    private javax.swing.JLabel jLabelInterpo;
+    private javax.swing.JToolBar.Separator jSeparator1;
+    private org.jdesktop.swingx.JXHyperlink resetButton;
+    private org.jdesktop.swingx.JXHyperlink splineButton1;
     private javax.swing.JPanel transformerPanel;
     // End of variables declaration//GEN-END:variables
 

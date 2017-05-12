@@ -314,20 +314,27 @@ public class AppearanceModelImpl implements AppearanceModel {
             }
 
             // Degree functions
+            RankingImpl degreeRanking = rankings.get(getIdStr(GraphFunction.NODE_DEGREE.getId()));
+            degreeRanking.refresh();
+
+            RankingImpl indegreeRanking = rankings.get(getIdStr(GraphFunction.NODE_INDEGREE.getId()));
+            RankingImpl outdegreeRanking = rankings.get(getIdStr(GraphFunction.NODE_OUTDEGREE.getId()));
+            if (indegreeRanking != null && outdegreeRanking != null) {
+                indegreeRanking.refresh();
+                outdegreeRanking.refresh();
+            }
+
             for (Transformer t : getRankingTransformers()) {
                 String degreeId = getId(t, GraphFunction.NODE_DEGREE.getId());
-                RankingImpl degreeRanking = rankings.get(getIdStr(GraphFunction.NODE_DEGREE.getId()));
+
                 if (!graphFunctions.containsKey(degreeId)) {
                     String name = NbBundle.getMessage(AppearanceModelImpl.class, "NodeGraphFunction.Degree.name");
                     graphFunctions.put(degreeId, new GraphFunctionImpl(degreeId, name, Node.class, graph, t, getTransformerUI(t), degreeRanking, defaultInterpolator));
                 }
-                degreeRanking.refresh();
 
                 String indegreeId = getId(t, GraphFunction.NODE_INDEGREE.getId());
                 String outdegreeId = getId(t, GraphFunction.NODE_OUTDEGREE.getId());
 
-                RankingImpl indegreeRanking = rankings.get(getIdStr(GraphFunction.NODE_INDEGREE.getId()));
-                RankingImpl outdegreeRanking = rankings.get(getIdStr(GraphFunction.NODE_OUTDEGREE.getId()));
                 if (indegreeRanking != null && outdegreeRanking != null) {
                     if (!graphFunctions.containsKey(indegreeId)) {
                         String inDegreeName = NbBundle.getMessage(AppearanceModelImpl.class, "NodeGraphFunction.InDegree.name");
@@ -335,8 +342,7 @@ public class AppearanceModelImpl implements AppearanceModel {
                         graphFunctions.put(indegreeId, new GraphFunctionImpl(indegreeId, inDegreeName, Node.class, graph, t, getTransformerUI(t), indegreeRanking, defaultInterpolator));
                         graphFunctions.put(outdegreeId, new GraphFunctionImpl(outdegreeId, outDegreeName, Node.class, graph, t, getTransformerUI(t), outdegreeRanking, defaultInterpolator));
                     }
-                    indegreeRanking.refresh();
-                    outdegreeRanking.refresh();
+
                 } else {
                     graphFunctions.remove(indegreeId);
                     graphFunctions.remove(outdegreeId);

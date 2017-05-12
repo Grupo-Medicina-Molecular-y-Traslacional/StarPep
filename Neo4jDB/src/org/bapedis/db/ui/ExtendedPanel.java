@@ -111,7 +111,7 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
         resetButton = new org.jdesktop.swingx.JXHyperlink();
         jSeparator1 = new javax.swing.JToolBar.Separator();
         jLabelInterpo = new javax.swing.JLabel();
-        jComboBoxInterpo = new javax.swing.JComboBox<>();
+        jComboBoxInterpo = new javax.swing.JComboBox<String>();
         splineButton1 = new org.jdesktop.swingx.JXHyperlink();
 
         setMinimumSize(new java.awt.Dimension(368, 107));
@@ -161,7 +161,7 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
         jLabelInterpo.setText(org.openide.util.NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.jLabelInterpo.text")); // NOI18N
         controlToolbar.add(jLabelInterpo);
 
-        jComboBoxInterpo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Linear", "Log2", "Bezier" }));
+        jComboBoxInterpo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Linear", "Log2", "Bezier" }));
         controlToolbar.add(jComboBoxInterpo);
 
         splineButton1.setText(org.openide.util.NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.splineButton1.text")); // NOI18N
@@ -176,7 +176,6 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         add(controlToolbar, gridBagConstraints);
@@ -218,8 +217,6 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
     public void refreshModel(AppearanceUIModel model) {
         this.model = model;
         refreshCenterPanel();
-        refreshCombo();
-        refreshControls();
     }
 
     private void refreshCenterPanel() {

@@ -8,11 +8,14 @@ package org.bapedis.db.ui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
 import javax.swing.UIManager;
 import org.gephi.appearance.spi.TransformerCategory;
 import org.gephi.desktop.appearance.AppearanceToolbar;
 import org.gephi.desktop.appearance.AppearanceUIController;
 import org.gephi.desktop.appearance.AppearanceUIModel;
+import org.gephi.desktop.appearance.AppearanceUIModelEvent;
+import org.gephi.desktop.appearance.AppearanceUIModelListener;
 import org.gephi.ui.utils.UIUtils;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -24,7 +27,7 @@ import org.openide.util.NbBundle;
  *
  * @author Home
  */
-public class ExtendedBar extends javax.swing.JPanel implements ActionListener {
+public class ExtendedBar extends javax.swing.JPanel implements ActionListener, AppearanceUIModelListener {
 
     private transient final AppearanceToolbar toolbar;
     private transient final AppearanceUIController controller;
@@ -43,7 +46,7 @@ public class ExtendedBar extends javax.swing.JPanel implements ActionListener {
         if (UIUtils.isAquaLookAndFeel()) {
             setBackground(UIManager.getColor("NbExplorerView.background"));
         }
-
+        controller.addPropertyChangeListener(this);
         AppearanceToolbar.CategoryToolbar ctb = toolbar.getCategoryToolbar();
         ctb.addActionListener(this);
         add(ctb, BorderLayout.CENTER);
@@ -63,6 +66,7 @@ public class ExtendedBar extends javax.swing.JPanel implements ActionListener {
         setLayout(new java.awt.BorderLayout());
     }// </editor-fold>//GEN-END:initComponents
 
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         TransformerCategory c = model.getSelectedCategory();
@@ -70,6 +74,15 @@ public class ExtendedBar extends javax.swing.JPanel implements ActionListener {
         dd.setTitle(elementLabel + ": " + c.getDisplayName());
         if (DialogDisplayer.getDefault().notify(dd).equals(NotifyDescriptor.OK_OPTION)) {
             controller.getAppearanceController().transform(model.getSelectedFunction());
+        }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_CATEGORY)
+                || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_TRANSFORMER_UI)
+                || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_FUNCTION)){
+            dd.setValid(model.getSelectedFunction() != null);
         }
     }
 

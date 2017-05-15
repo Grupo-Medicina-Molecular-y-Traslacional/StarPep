@@ -145,7 +145,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
                         @Override
                         protected Object doInBackground() throws Exception {
                             previewController.refreshPreview();
-                            target.refresh();
+                            target.refresh();                            
                             return null;
                         }
 

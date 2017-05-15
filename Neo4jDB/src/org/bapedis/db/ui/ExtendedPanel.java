@@ -44,6 +44,7 @@ package org.bapedis.db.ui;
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,12 +55,16 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import org.gephi.appearance.api.Function;
+import org.gephi.appearance.api.Interpolator;
+import org.gephi.appearance.api.RankingFunction;
 import org.gephi.appearance.spi.TransformerUI;
 import org.gephi.desktop.appearance.AppearanceToolbar;
+import org.gephi.desktop.appearance.AppearanceTopComponent;
 import org.gephi.desktop.appearance.AppearanceUIController;
 import org.gephi.desktop.appearance.AppearanceUIModel;
 import org.gephi.desktop.appearance.AppearanceUIModelEvent;
 import org.gephi.desktop.appearance.AppearanceUIModelListener;
+import org.gephi.ui.components.splineeditor.SplineEditor;
 import org.gephi.ui.utils.UIUtils;
 import org.openide.util.NbBundle;
 
@@ -73,6 +78,7 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
     private transient final AppearanceUIController controller;
     private transient AppearanceUIModel model;
     private transient ItemListener attributeListener;
+    private transient SplineEditor splineEditor;
     private final String NO_SELECTION = NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.choose.text");
 
     /**
@@ -90,6 +96,9 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
         }
 
         transformerPanel.add(toolbar.getTransformerToolbar(), BorderLayout.CENTER);
+        splineEditor = new SplineEditor(NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.splineEditor.title"));
+        splineEditor.setControl1(new Point2D.Float(0, 0));
+        splineEditor.setControl2(new Point2D.Float(1, 1));
         refreshModel(model);
     }
 
@@ -107,11 +116,9 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
         attributePanel = new javax.swing.JPanel();
         attibuteBox = new javax.swing.JComboBox();
         centerPanel = new javax.swing.JPanel();
-        controlToolbar = new javax.swing.JToolBar();
-        resetButton = new org.jdesktop.swingx.JXHyperlink();
-        jSeparator1 = new javax.swing.JToolBar.Separator();
+        controlPanel = new javax.swing.JPanel();
         jLabelInterpo = new javax.swing.JLabel();
-        jComboBoxInterpo = new javax.swing.JComboBox<String>();
+        jComboBoxInterpo = new javax.swing.JComboBox<>();
         splineButton1 = new org.jdesktop.swingx.JXHyperlink();
 
         setMinimumSize(new java.awt.Dimension(368, 107));
@@ -144,25 +151,18 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
         gridBagConstraints.weighty = 1.0;
         add(centerPanel, gridBagConstraints);
 
-        controlToolbar.setFloatable(false);
-        controlToolbar.setRollover(true);
-        controlToolbar.setMargin(new java.awt.Insets(0, 4, 0, 0));
-        controlToolbar.setOpaque(false);
-
-        resetButton.setText(org.openide.util.NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.resetButton.text")); // NOI18N
-        resetButton.setToolTipText(org.openide.util.NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.resetButton.toolTipText")); // NOI18N
-        resetButton.setClickedColor(new java.awt.Color(0, 51, 255));
-        resetButton.setFocusPainted(false);
-        resetButton.setFocusable(false);
-        resetButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        controlToolbar.add(resetButton);
-        controlToolbar.add(jSeparator1);
+        controlPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jLabelInterpo.setText(org.openide.util.NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.jLabelInterpo.text")); // NOI18N
-        controlToolbar.add(jLabelInterpo);
+        controlPanel.add(jLabelInterpo);
 
-        jComboBoxInterpo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Linear", "Log2", "Bezier" }));
-        controlToolbar.add(jComboBoxInterpo);
+        jComboBoxInterpo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Linear", "Log2", "Bezier" }));
+        jComboBoxInterpo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxInterpoActionPerformed(evt);
+            }
+        });
+        controlPanel.add(jComboBoxInterpo);
 
         splineButton1.setText(org.openide.util.NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.splineButton1.text")); // NOI18N
         splineButton1.setToolTipText(org.openide.util.NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.splineButton1.toolTipText")); // NOI18N
@@ -171,24 +171,68 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
         splineButton1.setFocusable(false);
         splineButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         splineButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        controlToolbar.add(splineButton1);
+        splineButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                splineButton1ActionPerformed(evt);
+            }
+        });
+        controlPanel.add(splineButton1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        add(controlToolbar, gridBagConstraints);
+        add(controlPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jComboBoxInterpoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxInterpoActionPerformed
+        if (model != null && model.getSelectedFunction() != null && model.getSelectedFunction().isRanking()) {
+            RankingFunction function = (RankingFunction) model.getSelectedFunction();
+            switch (jComboBoxInterpo.getSelectedIndex()) {
+                case 0:
+                    function.setInterpolator(Interpolator.LINEAR);
+                    splineButton1.setVisible(false);
+                    break;
+                case 1:
+                    function.setInterpolator(Interpolator.LOG2);
+                    splineButton1.setVisible(false);
+                    break;
+                case 2:
+                    if (!(function.getInterpolator() instanceof Interpolator.BezierInterpolator)) {
+                        splineEditor.setVisible(true);
+                        function.setInterpolator(
+                                new Interpolator.BezierInterpolator(
+                                        (float) splineEditor.getControl1().getX(), (float) splineEditor.getControl1().getY(),
+                                        (float) splineEditor.getControl2().getX(), (float) splineEditor.getControl2().getY()));
+                    }
+                    splineButton1.setVisible(true);
+                    break;
+            }
+        }
+    }//GEN-LAST:event_jComboBoxInterpoActionPerformed
+
+    private void splineButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_splineButton1ActionPerformed
+        if (model != null && model.getSelectedFunction() != null && model.getSelectedFunction().isRanking()) {
+            RankingFunction function = (RankingFunction) model.getSelectedFunction();
+            Interpolator.BezierInterpolator bezierInterpolator = (Interpolator.BezierInterpolator) function.getInterpolator();
+            splineEditor.setControl1(bezierInterpolator.getControl1());
+            splineEditor.setControl2(bezierInterpolator.getControl2());
+            splineEditor.setVisible(true);
+            function.setInterpolator(
+                    new Interpolator.BezierInterpolator(
+                            (float) splineEditor.getControl1().getX(), (float) splineEditor.getControl1().getY(),
+                            (float) splineEditor.getControl2().getX(), (float) splineEditor.getControl2().getY()));
+        }
+    }//GEN-LAST:event_splineButton1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox attibuteBox;
     private javax.swing.JPanel attributePanel;
     private javax.swing.JPanel centerPanel;
-    private javax.swing.JToolBar controlToolbar;
+    private javax.swing.JPanel controlPanel;
     private javax.swing.JComboBox<String> jComboBoxInterpo;
     private javax.swing.JLabel jLabelInterpo;
-    private javax.swing.JToolBar.Separator jSeparator1;
-    private org.jdesktop.swingx.JXHyperlink resetButton;
     private org.jdesktop.swingx.JXHyperlink splineButton1;
     private javax.swing.JPanel transformerPanel;
     // End of variables declaration//GEN-END:variables
@@ -197,177 +241,123 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(AppearanceUIModelEvent.MODEL)) {
             refreshModel((AppearanceUIModel) evt.getNewValue());
-        } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_CATEGORY)
-                || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_TRANSFORMER_UI)) {
-            refreshCenterPanel();
-            refreshCombo();
-            refreshControls();
-        } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_FUNCTION)) {
+        } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_ELEMENT_CLASS) 
+                || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_CATEGORY)
+                || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_TRANSFORMER_UI)
+                || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_FUNCTION)) {
             refreshCenterPanel();
             refreshCombo();
             refreshControls();
         }
-//        else if (evt.getPropertyName().equals(AppearanceUIModelEvent.SET_AUTO_APPLY)) {
-//            refreshControls();
-//        } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.START_STOP_AUTO_APPLY)) {
-//            refreshControls();
-//        }
     }
 
     public void refreshModel(AppearanceUIModel model) {
         this.model = model;
         refreshCenterPanel();
+        refreshCombo();
+        refreshControls();
     }
 
     private void refreshCenterPanel() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                centerPanel.removeAll();
-                JPanel panel = null;
-                if (model != null) {
-                    TransformerUI ui = model.getSelectedTransformerUI();
-                    if (ui != null) {
-                        boolean attribute = model.isAttributeTransformerUI(ui);
+        centerPanel.removeAll();
+        JPanel panel = null;
+        if (model != null) {
+            TransformerUI ui = model.getSelectedTransformerUI();
+            if (ui != null) {
+                boolean attribute = model.isAttributeTransformerUI(ui);
 
-                        attributePanel.setVisible(attribute);
-                        if (attribute) {
-                            Function function = model.getSelectedFunction();
-                            if (function != null) {
-                                ui = function.getUI();
-                                panel = ui.getPanel(function);
-                            }
-                        } else {
-                            Function function = model.getSelectedFunction();
-                            panel = ui.getPanel(function);
-                        }
-
-                        if (panel != null) {
-                            panel.setOpaque(false);
-                            centerPanel.add(panel, BorderLayout.CENTER);
-                        }
+                attributePanel.setVisible(attribute);
+                if (attribute) {
+                    Function function = model.getSelectedFunction();
+                    if (function != null) {
+                        ui = function.getUI();
+                        panel = ui.getPanel(function);
                     }
                 } else {
-                    attributePanel.setVisible(false);
+                    Function function = model.getSelectedFunction();
+                    panel = ui.getPanel(function);
                 }
-                centerPanel.revalidate();
-                centerPanel.repaint();
+
+                if (panel != null) {
+                    panel.setOpaque(false);
+                    centerPanel.add(panel, BorderLayout.CENTER);
+                }
             }
-        });
+        } else {
+            attributePanel.setVisible(false);
+        }
+        centerPanel.revalidate();
+        centerPanel.repaint();
     }
 
     private void refreshCombo() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
-                if (model != null) {
-                    TransformerUI ui = model.getSelectedTransformerUI();
-                    if (ui != null && model.isAttributeTransformerUI(ui)) {
+        final DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
+        if (model != null) {
+            TransformerUI ui = model.getSelectedTransformerUI();
+            if (ui != null && model.isAttributeTransformerUI(ui)) {
 
-                        //Ranking
-                        Function selectedColumn = model.getSelectedFunction();
-                        attibuteBox.removeItemListener(attributeListener);
+                //Ranking
+                Function selectedColumn = model.getSelectedFunction();
+                attibuteBox.removeItemListener(attributeListener);
 
-                        comboBoxModel.addElement(NO_SELECTION);
-                        comboBoxModel.setSelectedItem(NO_SELECTION);
+                comboBoxModel.addElement(NO_SELECTION);
+                comboBoxModel.setSelectedItem(NO_SELECTION);
 
-                        List<Function> rows = new ArrayList<>();
-                        rows.addAll(model.getFunctions());
+                List<Function> rows = new ArrayList<>();
+                rows.addAll(model.getFunctions());
 
-                        Collections.sort(rows, new Comparator<Function>() {
-                            @Override
-                            public int compare(Function o1, Function o2) {
-                                return o1.getUI().getDisplayName().compareTo(o2.getUI().getDisplayName());
-                            }
-                        });
-                        for (Function r : rows) {
-                            comboBoxModel.addElement(r);
-                            if (selectedColumn != null && selectedColumn.equals(r)) {
-                                comboBoxModel.setSelectedItem(r);
-                            }
-                        }
-                        attributeListener = new ItemListener() {
-                            @Override
-                            public void itemStateChanged(ItemEvent e) {
-                                if (model != null) {
-                                    if (!attibuteBox.getSelectedItem().equals(NO_SELECTION)) {
-                                        Function selectedItem = (Function) attibuteBox.getSelectedItem();
-                                        Function selectedFunction = model.getSelectedFunction();
-                                        if (selectedFunction != selectedItem) {
-                                            controller.setSelectedFunction(selectedItem);
-                                        }
-                                    } else {
-                                        controller.setSelectedFunction(null);
-                                    }
-                                }
-                            }
-                        };
-                        attibuteBox.addItemListener(attributeListener);
+                Collections.sort(rows, new Comparator<Function>() {
+                    @Override
+                    public int compare(Function o1, Function o2) {
+                        return o1.getUI().getDisplayName().compareTo(o2.getUI().getDisplayName());
+                    }
+                });
+                for (Function r : rows) {
+                    comboBoxModel.addElement(r);
+                    if (selectedColumn != null && selectedColumn.equals(r)) {
+                        comboBoxModel.setSelectedItem(r);
                     }
                 }
-                attibuteBox.setModel(comboBoxModel);
+                attributeListener = new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        if (model != null) {
+                            if (!attibuteBox.getSelectedItem().equals(NO_SELECTION)) {
+                                Function selectedItem = (Function) attibuteBox.getSelectedItem();
+                                Function selectedFunction = model.getSelectedFunction();
+                                if (selectedFunction != selectedItem) {
+                                    controller.setSelectedFunction(selectedItem);
+                                }
+                            } else {
+                                controller.setSelectedFunction(null);
+                            }
+                        }
+                    }
+                };
+                attibuteBox.addItemListener(attributeListener);
             }
-        });
+        }
+        attibuteBox.setModel(comboBoxModel);
     }
 
     private void refreshControls() {
-//        SwingUtilities.invokeLater(new Runnable() {
-//            @Override
-//            public void run() {
-//                if (model != null) {
-//                    if (model.getSelectedFunction() != null) {
-//                        enableAutoButton.setEnabled(true);
-//                        if (model.getAutoAppyTransformer() != null) {
-//                            applyButton.setVisible(false);
-//                            enableAutoButton.setSelected(true);
-//                            AutoAppyTransformer aat = model.getAutoAppyTransformer();
-//                            if (aat.isRunning()) {
-//                                autoApplyButton.setVisible(false);
-//                                stopAutoApplyButton.setVisible(true);
-//                                stopAutoApplyButton.setSelected(true);
-//                            } else {
-//                                autoApplyButton.setVisible(true);
-//                                autoApplyButton.setSelected(false);
-//                                stopAutoApplyButton.setVisible(false);
-//                            }
-//                        } else {
-//                            autoApplyButton.setVisible(false);
-//                            stopAutoApplyButton.setVisible(false);
-//                            enableAutoButton.setSelected(false);
-//                            applyButton.setVisible(true);
-//                            applyButton.setEnabled(true);
-//                        }
-//
-//                        Function func = model.getSelectedFunction();
-//                        rankingButton.setEnabled(true);
-//                        partitionButton.setEnabled(true);
-//                        if (func.isPartition()) {
-//                            if (!func.isAttribute()) {
-//                                rankingButton.setEnabled(false);
-//                            } else {
-//                                AttributeFunction af = (AttributeFunction) func;
-//                                Column col = af.getColumn();
-//                                if (!col.isNumber()) {
-//                                    rankingButton.setEnabled(false);
-//                                }
-//                            }
-//                        } else if (func.isRanking()) {
-//                            if (!func.isAttribute()) {
-//                                partitionButton.setEnabled(false);
-//                            }
-//                        }
-//                    }
-//                    localScaleButton.setSelected(model.isLocalScale());
-//                    return;
-//                }
-//                //Disable
-//                stopAutoApplyButton.setVisible(false);
-//                autoApplyButton.setVisible(false);
-//                applyButton.setVisible(true);
-//                applyButton.setEnabled(false);
-//                enableAutoButton.setEnabled(false);
-//            }
-//        });
+        if (model != null) {
+            if (model.getSelectedFunction() != null && model.getSelectedFunction().isRanking()) {
+                controlPanel.setVisible(true);
+                RankingFunction function = (RankingFunction) model.getSelectedFunction();
+                Interpolator interpolator = function.getInterpolator();
+                splineButton1.setVisible(false);
+                if (interpolator == Interpolator.LINEAR) {
+                    jComboBoxInterpo.setSelectedIndex(0);
+                } else if (interpolator == Interpolator.LOG2) {
+                    jComboBoxInterpo.setSelectedIndex(1);
+                } else if (interpolator instanceof Interpolator.BezierInterpolator) {
+                    jComboBoxInterpo.setSelectedIndex(2);
+                }
+            } else {
+                controlPanel.setVisible(false);
+                jComboBoxInterpo.setSelectedIndex(-1);
+            }
+        }
     }
 }

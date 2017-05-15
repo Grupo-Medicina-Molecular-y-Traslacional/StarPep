@@ -64,7 +64,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
     final JColorButton backgroundButton = new JColorButton(Color.BLACK);
     //Node
     final JToggleButton showNodeLabelsButton = new JToggleButton();
-//    final JButton nodeFontButton = new JButton();
+    final JButton nodeFontButton = new JButton();
 //    final JColorButton nodeColorButton = new JColorButton(Color.BLACK);
     final JPopupButton labelSizeModeButton = new JPopupButton();
     final JSlider nodeSizeSlider = new JSlider();
@@ -74,7 +74,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
 //    final JColorButton edgeColorButton = new JColorButton(Color.BLACK);
     final JSlider edgeScaleSlider = new JSlider();
     final JToggleButton showEdgeLabelsButton = new JToggleButton();
-//    final JButton edgeFontButton = new JButton();
+    final JButton edgeFontButton = new JButton();
     final JSlider edgeSizeSlider = new JSlider();
 
     final PropertyChangeListener initListener;
@@ -162,20 +162,20 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         toolbar.add(labelSizeModeButton);
 
         // Node Font
-//        nodeFontButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.nodeFontButton.ToolTipText"));
-//        nodeFontButton.addActionListener(new ActionListener() {
-//
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
-//                Font font = JFontChooser.showDialog(WindowManager.getDefault().getMainWindow(), model.getNodeFont());
-//                if (font != null && font != model.getNodeFont()) {
-//                    model.setNodeFont(font);
-//                    nodeFontButton.setText(font.getFontName() + ", " + font.getSize());
-//                }
-//            }
-//        });
-//        toolbar.add(nodeFontButton);
+        nodeFontButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/font.png")));
+        nodeFontButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
+                Font font = JFontChooser.showDialog(WindowManager.getDefault().getMainWindow(), model.getNodeFont());
+                if (font != null && font != model.getNodeFont()) {
+                    model.setNodeFont(font);
+                    nodeFontButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.nodeFontButton.ToolTipText", font.getFontName() + ", " + font.getSize()));
+                }
+            }
+        });
+        toolbar.add(nodeFontButton);
         //Node color
 //        nodeColorButton.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
 //
@@ -288,20 +288,20 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         toolbar.add(showEdgeLabelsButton);
 
         //Edge Font
-//        edgeFontButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeFontButton.ToolTipText"));
-//        edgeFontButton.addActionListener(new ActionListener() {
-//
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
-//                Font font = JFontChooser.showDialog(WindowManager.getDefault().getMainWindow(), model.getEdgeFont());
-//                if (font != null && font != model.getEdgeFont()) {
-//                    model.setEdgeFont(font);
-//                    edgeFontButton.setText(font.getFontName() + ", " + font.getSize());
-//                }
-//            }
-//        });
-//        toolbar.add(edgeFontButton);
+        edgeFontButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/font.png")));
+        edgeFontButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
+                Font font = JFontChooser.showDialog(WindowManager.getDefault().getMainWindow(), model.getEdgeFont());
+                if (font != null && font != model.getEdgeFont()) {
+                    model.setEdgeFont(font);
+                    edgeFontButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeFontButton.ToolTipText", font.getFontName() + ", " + font.getSize()));
+                }
+            }
+        });
+        toolbar.add(edgeFontButton);
         // Edge size slider       
         edgeSizeSlider.setPreferredSize(new Dimension(100, 23));
         edgeSizeSlider.setMaximumSize(nodeSizeSlider.getPreferredSize());
@@ -421,8 +421,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         labelSizeModeButton.setSelectedItem(textModel.getSizeMode());
 
         //Font
-//        Font nodeFont = textModel.getNodeFont();
-//        nodeFontButton.setText(nodeFont.getFontName() + ", " + nodeFont.getSize());
+        Font nodeFont = textModel.getNodeFont();
+        nodeFontButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.nodeFontButton.ToolTipText", nodeFont.getFontName() + ", " + nodeFont.getSize()));
         //Node color
 //        nodeColorButton.setColor(textModel.getNodeColor());
         //Font Size
@@ -449,8 +449,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         showEdgeLabelsButton.setSelected(textModel.isShowEdgeLabels());
 
         //Edge font
-//        Font edgeFont = textModel.getEdgeFont();
-//        edgeFontButton.setText(edgeFont.getFontName() + ", " + edgeFont.getSize());
+        Font edgeFont = textModel.getEdgeFont();
+        edgeFontButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeFontButton.ToolTipText", edgeFont.getFontName() + ", " + edgeFont.getSize()));
         //Edge size slider
         if (edgeSizeSlider.getValue() / 100f != textModel.getEdgeSizeFactor()) {
             edgeSizeSlider.setValue((int) (textModel.getEdgeSizeFactor() * 100f));
@@ -459,6 +459,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
 
     private void setNodeLabelButton(boolean enabled) {
         labelSizeModeButton.setEnabled(enabled);
+        nodeFontButton.setEnabled(enabled);
         nodeSizeSlider.setEnabled(enabled);
     }
 
@@ -470,6 +471,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
     }
 
     private void setEdgeLabelButton(boolean enabled) {
+        edgeFontButton.setEnabled(showEdgeButton.isSelected() && enabled);
         edgeSizeSlider.setEnabled(showEdgeButton.isSelected() && enabled);
     }
 

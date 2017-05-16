@@ -236,7 +236,6 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
 //            }
 //        });
 //        toolbar.add(edgeHasNodeColorButton);
-
         //Edge color
 //        edgeColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeColorButton.ToolTipText"));
 //        edgeColorButton.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
@@ -435,7 +434,6 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
 
         //Edge color mode
 //        edgeHasNodeColorButton.setSelected(!vizModel.isEdgeHasUniColor());
-
         //Edge color
 //        float[] edgeColorArray = vizModel.getEdgeUniColor();
 //        edgeColorButton.setColor(new Color(edgeColorArray[0], edgeColorArray[1], edgeColorArray[2], edgeColorArray[3]));
@@ -507,7 +505,6 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
             protected GraphDrawable doInBackground() throws Exception {
                 GraphDrawable drawable = VizController.getInstance().getDrawable();
                 VizController.getInstance().getVizModel().addPropertyChangeListener(initListener);
-                initToolBarComponents();
                 return drawable;
             }
 
@@ -530,6 +527,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
     @Override
     public void componentClosed() {
         // Destroy JOGL
+        VizController.getInstance().getVizModel().removePropertyChangeListener(initListener);
         VizController.getInstance().destroy();
     }
 

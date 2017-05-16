@@ -139,6 +139,8 @@ public class VizController implements VisualizationController, WorkspaceEventLis
 
         ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
         pm.addWorkspaceEventListener(this);
+        Workspace currentWS = pm.getCurrentWorkspace();
+        currentWS.add(currentModel);
 
         engine.reinit();
     }

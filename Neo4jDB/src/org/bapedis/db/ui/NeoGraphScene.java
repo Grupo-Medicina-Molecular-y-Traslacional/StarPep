@@ -70,7 +70,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
     final JSlider nodeSizeSlider = new JSlider();
     //Edge
     final JToggleButton showEdgeButton = new JToggleButton();
-    final JToggleButton edgeHasNodeColorButton = new JToggleButton();
+//    final JToggleButton edgeHasNodeColorButton = new JToggleButton();
 //    final JColorButton edgeColorButton = new JColorButton(Color.BLACK);
     final JSlider edgeScaleSlider = new JSlider();
     final JToggleButton showEdgeLabelsButton = new JToggleButton();
@@ -224,18 +224,18 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         toolbar.add(showEdgeButton);
 
         //Edge color mode
-        edgeHasNodeColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeHasNodeColorButton.ToolTipText"));
-        edgeHasNodeColorButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/edgeNodeColor.png")));
-        edgeHasNodeColorButton.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                VizModel vizModel = VizController.getInstance().getVizModel();
-                if (vizModel.isEdgeHasUniColor() == edgeHasNodeColorButton.isSelected()) {
-                    vizModel.setEdgeHasUniColor(!edgeHasNodeColorButton.isSelected());
-                }
-            }
-        });
-        toolbar.add(edgeHasNodeColorButton);
+//        edgeHasNodeColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeHasNodeColorButton.ToolTipText"));
+//        edgeHasNodeColorButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/edgeNodeColor.png")));
+//        edgeHasNodeColorButton.addChangeListener(new ChangeListener() {
+//            @Override
+//            public void stateChanged(ChangeEvent e) {
+//                VizModel vizModel = VizController.getInstance().getVizModel();
+//                if (vizModel.isEdgeHasUniColor() == edgeHasNodeColorButton.isSelected()) {
+//                    vizModel.setEdgeHasUniColor(!edgeHasNodeColorButton.isSelected());
+//                }
+//            }
+//        });
+//        toolbar.add(edgeHasNodeColorButton);
 
         //Edge color
 //        edgeColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeColorButton.ToolTipText"));
@@ -434,7 +434,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         showEdgeButton.setSelected(vizModel.isShowEdges());
 
         //Edge color mode
-        edgeHasNodeColorButton.setSelected(!vizModel.isEdgeHasUniColor());
+//        edgeHasNodeColorButton.setSelected(!vizModel.isEdgeHasUniColor());
 
         //Edge color
 //        float[] edgeColorArray = vizModel.getEdgeUniColor();
@@ -464,7 +464,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
     }
 
     private void setEdgeButton(boolean enabled) {
-        edgeHasNodeColorButton.setEnabled(enabled);
+//        edgeHasNodeColorButton.setEnabled(enabled);
         edgeScaleSlider.setEnabled(enabled);
         showEdgeLabelsButton.setEnabled(enabled);
         edgeSizeSlider.setEnabled(showEdgeLabelsButton.isSelected() && enabled);

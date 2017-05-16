@@ -52,14 +52,12 @@ import java.util.Comparator;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import org.gephi.appearance.api.Function;
 import org.gephi.appearance.api.Interpolator;
 import org.gephi.appearance.api.RankingFunction;
 import org.gephi.appearance.spi.TransformerUI;
 import org.gephi.desktop.appearance.AppearanceToolbar;
-import org.gephi.desktop.appearance.AppearanceTopComponent;
 import org.gephi.desktop.appearance.AppearanceUIController;
 import org.gephi.desktop.appearance.AppearanceUIModel;
 import org.gephi.desktop.appearance.AppearanceUIModelEvent;
@@ -78,7 +76,7 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
     private transient final AppearanceUIController controller;
     private transient AppearanceUIModel model;
     private transient ItemListener attributeListener;
-    private transient SplineEditor splineEditor;
+    private final transient SplineEditor splineEditor;
     private final String NO_SELECTION = NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.choose.text");
 
     /**

@@ -256,7 +256,7 @@ public class RankingColorTransformerPanel extends javax.swing.JPanel {
         colorSwatchToolbar.setOpaque(false);
         colorSwatchToolbar.add(jSeparator1);
 
-        colorSwatchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/gephi/ui/appearance/plugin/resources/color-swatch.png"))); // NOI18N
+        colorSwatchButton.setText(org.openide.util.NbBundle.getMessage(RankingColorTransformerPanel.class, "RankingColorTransformerPanel.colorSwatchButton.text")); // NOI18N
         colorSwatchButton.setToolTipText(org.openide.util.NbBundle.getMessage(RankingColorTransformerPanel.class, "RankingColorTransformerPanel.colorSwatchButton.toolTipText")); // NOI18N
         colorSwatchButton.setFocusable(false);
         colorSwatchButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);

@@ -42,14 +42,11 @@
 package org.gephi.ui.appearance.plugin;
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import net.java.dev.colorchooser.ColorChooser;
 import org.gephi.appearance.api.SimpleFunction;
 import org.gephi.appearance.plugin.AbstractUniqueColorTransformer;
-import org.gephi.ui.components.JColorButton;
 
 /**
  *
@@ -58,6 +55,7 @@ import org.gephi.ui.components.JColorButton;
 public class UniqueColorTransformerPanel extends javax.swing.JPanel {
 
     private AbstractUniqueColorTransformer transformer;
+    private Color defaultColor = new Color(0f, 0f, 0f, 1f);
 
     public UniqueColorTransformerPanel() {
         initComponents();
@@ -74,20 +72,10 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
             }
         });
 
-        colorSwatchButton.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                Color newColor = (Color) evt.getNewValue();
-                if (!colorChooser.getColor().equals(newColor)) {
-                    colorChooser.setColor(newColor);
-                }
-            }
-        });
     }
 
     public void setup(SimpleFunction function) {
         transformer = (AbstractUniqueColorTransformer) function.getTransformer();
-        ((JColorButton) colorSwatchButton).setColor(transformer.getColor());
         colorChooser.setColor(transformer.getColor());
         colorLabel.setText(getHex(transformer.getColor()));
     }
@@ -110,12 +98,13 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
         labelColor = new javax.swing.JLabel();
         colorSwatchToolbar = new javax.swing.JToolBar();
         jSeparator1 = new javax.swing.JToolBar.Separator();
-        colorSwatchButton = new JColorButton(Color.BLACK);
+        jButtonReset = new javax.swing.JButton();
         colorChooser = new net.java.dev.colorchooser.ColorChooser();
 
         setLayout(new java.awt.GridBagLayout());
 
         colorLabel.setText(org.openide.util.NbBundle.getMessage(UniqueColorTransformerPanel.class, "UniqueColorTransformerPanel.colorLabel.text")); // NOI18N
+        colorLabel.setToolTipText(org.openide.util.NbBundle.getMessage(UniqueColorTransformerPanel.class, "UniqueColorTransformerPanel.colorLabel.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
@@ -137,13 +126,17 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
         colorSwatchToolbar.setOpaque(false);
         colorSwatchToolbar.add(jSeparator1);
 
-        colorSwatchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/gephi/ui/appearance/plugin/resources/color-swatch.png"))); // NOI18N
-        colorSwatchButton.setToolTipText(org.openide.util.NbBundle.getMessage(UniqueColorTransformerPanel.class, "UniqueColorTransformerPanel.colorSwatchButton.toolTipText")); // NOI18N
-        colorSwatchButton.setFocusable(false);
-        colorSwatchButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        colorSwatchButton.setIconTextGap(0);
-        colorSwatchButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        colorSwatchToolbar.add(colorSwatchButton);
+        jButtonReset.setText(org.openide.util.NbBundle.getMessage(UniqueColorTransformerPanel.class, "UniqueColorTransformerPanel.jButtonReset.text")); // NOI18N
+        jButtonReset.setToolTipText(org.openide.util.NbBundle.getMessage(UniqueColorTransformerPanel.class, "UniqueColorTransformerPanel.jButtonReset.toolTipText")); // NOI18N
+        jButtonReset.setFocusable(false);
+        jButtonReset.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonReset.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButtonReset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonResetActionPerformed(evt);
+            }
+        });
+        colorSwatchToolbar.add(jButtonReset);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -154,18 +147,18 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
         add(colorSwatchToolbar, gridBagConstraints);
 
         colorChooser.setMinimumSize(new java.awt.Dimension(14, 14));
-        colorChooser.setPreferredSize(new java.awt.Dimension(14, 14));
+        colorChooser.setPreferredSize(new java.awt.Dimension(16, 16));
         colorChooser.setToolTipText(org.openide.util.NbBundle.getMessage(UniqueColorTransformerPanel.class, "UniqueColorTransformerPanel.colorChooser.toolTipText")); // NOI18N
 
         javax.swing.GroupLayout colorChooserLayout = new javax.swing.GroupLayout(colorChooser);
         colorChooser.setLayout(colorChooserLayout);
         colorChooserLayout.setHorizontalGroup(
             colorChooserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 12, Short.MAX_VALUE)
+            .addGap(0, 14, Short.MAX_VALUE)
         );
         colorChooserLayout.setVerticalGroup(
             colorChooserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 12, Short.MAX_VALUE)
+            .addGap(0, 14, Short.MAX_VALUE)
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -176,11 +169,17 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 0);
         add(colorChooser, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButtonResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResetActionPerformed
+        colorChooser.setColor(defaultColor);
+        colorLabel.setText(getHex(defaultColor));
+    }//GEN-LAST:event_jButtonResetActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private net.java.dev.colorchooser.ColorChooser colorChooser;
     private javax.swing.JLabel colorLabel;
-    private javax.swing.JButton colorSwatchButton;
     private javax.swing.JToolBar colorSwatchToolbar;
+    private javax.swing.JButton jButtonReset;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JLabel labelColor;
     // End of variables declaration//GEN-END:variables

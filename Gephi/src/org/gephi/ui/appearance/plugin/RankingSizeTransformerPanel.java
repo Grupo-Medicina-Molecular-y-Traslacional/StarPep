@@ -102,6 +102,9 @@ public class RankingSizeTransformerPanel extends javax.swing.JPanel {
         minSize = new javax.swing.JSpinner();
         labelMaxSize = new javax.swing.JLabel();
         maxSize = new javax.swing.JSpinner();
+        jToolBar1 = new javax.swing.JToolBar();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
+        jButtonReset = new javax.swing.JButton();
 
         setPreferredSize(new java.awt.Dimension(225, 114));
         setLayout(new java.awt.GridBagLayout());
@@ -109,7 +112,7 @@ public class RankingSizeTransformerPanel extends javax.swing.JPanel {
         labelMinSize.setText(org.openide.util.NbBundle.getMessage(RankingSizeTransformerPanel.class, "RankingSizeTransformerPanel.labelMinSize.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 0);
         add(labelMinSize, gridBagConstraints);
@@ -118,7 +121,7 @@ public class RankingSizeTransformerPanel extends javax.swing.JPanel {
         minSize.setPreferredSize(new java.awt.Dimension(90, 30));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 0);
         add(minSize, gridBagConstraints);
@@ -126,7 +129,7 @@ public class RankingSizeTransformerPanel extends javax.swing.JPanel {
         labelMaxSize.setText(org.openide.util.NbBundle.getMessage(RankingSizeTransformerPanel.class, "RankingSizeTransformerPanel.labelMaxSize.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 0);
         add(labelMaxSize, gridBagConstraints);
@@ -135,14 +138,46 @@ public class RankingSizeTransformerPanel extends javax.swing.JPanel {
         maxSize.setPreferredSize(new java.awt.Dimension(90, 30));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 0);
         add(maxSize, gridBagConstraints);
+
+        jToolBar1.setRollover(true);
+        jToolBar1.add(jSeparator1);
+
+        jButtonReset.setText(org.openide.util.NbBundle.getMessage(RankingSizeTransformerPanel.class, "RankingSizeTransformerPanel.jButtonReset.text")); // NOI18N
+        jButtonReset.setToolTipText(org.openide.util.NbBundle.getMessage(RankingSizeTransformerPanel.class, "RankingSizeTransformerPanel.jButtonReset.toolTipText")); // NOI18N
+        jButtonReset.setFocusable(false);
+        jButtonReset.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonReset.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButtonReset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonResetActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButtonReset);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        add(jToolBar1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButtonResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResetActionPerformed
+        minSize.setValue(10f);
+        maxSize.setValue(100f);
+    }//GEN-LAST:event_jButtonResetActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonReset;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JToolBar jToolBar1;
     private javax.swing.JLabel labelMaxSize;
     private javax.swing.JLabel labelMinSize;
     private javax.swing.JSpinner maxSize;

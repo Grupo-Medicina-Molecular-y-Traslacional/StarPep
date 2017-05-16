@@ -45,6 +45,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.gephi.appearance.api.SimpleFunction;
 import org.gephi.appearance.plugin.AbstractUniqueSizeTransformer;
+import org.gephi.appearance.plugin.UniqueLabelSizeTransformer;
+import org.gephi.appearance.plugin.UniqueNodeSizeTransformer;
 
 /**
  *
@@ -82,13 +84,16 @@ public class UniqueSizeTransformerPanel extends javax.swing.JPanel {
 
         jLabel1 = new javax.swing.JLabel();
         sizeSpinner = new javax.swing.JSpinner();
+        jToolBar1 = new javax.swing.JToolBar();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
+        jButtonReset = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
         jLabel1.setText(org.openide.util.NbBundle.getMessage(UniqueSizeTransformerPanel.class, "UniqueSizeTransformerPanel.jLabel1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 0);
         add(jLabel1, gridBagConstraints);
@@ -97,15 +102,50 @@ public class UniqueSizeTransformerPanel extends javax.swing.JPanel {
         sizeSpinner.setPreferredSize(new java.awt.Dimension(90, 30));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 0);
         add(sizeSpinner, gridBagConstraints);
+
+        jToolBar1.setRollover(true);
+        jToolBar1.add(jSeparator1);
+
+        jButtonReset.setText(org.openide.util.NbBundle.getMessage(UniqueSizeTransformerPanel.class, "UniqueSizeTransformerPanel.jButtonReset.text")); // NOI18N
+        jButtonReset.setToolTipText(org.openide.util.NbBundle.getMessage(UniqueSizeTransformerPanel.class, "UniqueSizeTransformerPanel.jButtonReset.toolTipText")); // NOI18N
+        jButtonReset.setFocusable(false);
+        jButtonReset.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonReset.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButtonReset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonResetActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButtonReset);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        add(jToolBar1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButtonResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResetActionPerformed
+        if (transformer instanceof UniqueLabelSizeTransformer){
+            sizeSpinner.setValue(1f);
+        } else if (transformer instanceof UniqueNodeSizeTransformer){
+            sizeSpinner.setValue(10f);
+        }
+    }//GEN-LAST:event_jButtonResetActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonReset;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JToolBar jToolBar1;
     private javax.swing.JSpinner sizeSpinner;
     // End of variables declaration//GEN-END:variables
 }

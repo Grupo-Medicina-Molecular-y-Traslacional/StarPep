@@ -56,8 +56,8 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service = Transformer.class)
 public class RankingNodeSizeTransformer implements RankingTransformer<Element> {
 
-    protected float minSize = 1f;
-    protected float maxSize = 4f;
+    protected float minSize = 10f;
+    protected float maxSize = 100f;
 
     @Override
     public void transform(Element element, Ranking ranking, Interpolator interpolator, Number value) {

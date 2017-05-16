@@ -247,22 +247,21 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
         
         public CategoryToolbar() {
             //Init components
+            final JLabel elementClassLabel = new JLabel(NbBundle.getMessage(AppearanceToolbar.class, "AppearanceToolbar." + AppearanceUIController.ELEMENT_CLASSES[0] + ".label") + ": ");
             popupGroup = new ButtonGroup();
             final JPopupMenu popup = new JPopupMenu();
             JCheckBoxMenuItem item;
             for (final String elmtType : AppearanceUIController.ELEMENT_CLASSES) {
                 item = new JCheckBoxMenuItem();
-                String btnLabel = elmtType;
-                try {
-                    btnLabel = NbBundle.getMessage(AppearanceToolbar.class, "AppearanceToolbar." + elmtType + ".label");
-                } catch (MissingResourceException e) {
-                }
+                final String btnLabel = NbBundle.getMessage(AppearanceToolbar.class, "AppearanceToolbar." + elmtType + ".label");
+                
                 item.setText(btnLabel);
                 item.setSelected(false);
                 item.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         controller.setSelectedElementClass(elmtType);
+                        elementClassLabel.setText(btnLabel + ": ");
                     }
                 });
                 popup.add(item);
@@ -296,6 +295,7 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
             });
             add(btn);
             addSeparator();
+            add(elementClassLabel);
         }
 
         private void clear() {

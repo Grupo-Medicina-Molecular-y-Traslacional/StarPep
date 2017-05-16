@@ -139,8 +139,7 @@ public class VizController implements VisualizationController, WorkspaceEventLis
 
         ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
         pm.addWorkspaceEventListener(this);
-        Workspace currentWS = pm.getCurrentWorkspace();
-        currentWS.add(currentModel);
+
         engine.reinit();
     }
 
@@ -158,14 +157,18 @@ public class VizController implements VisualizationController, WorkspaceEventLis
             currentModel.setListeners(null);
             currentModel.getTextModel().setListeners(null);
             currentModel = model;
-            currentModel.init();
         }
+        currentModel.init();
     }
 
     public void destroy() {
         engine.stopDisplay();
         scheduler.stop();
         drawable.destroy();
+        
+        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
+        pm.removeWorkspaceEventListener(this);        
+        
         engine = null;
         scheduler = null;
         vizConfig = null;
@@ -288,7 +291,6 @@ public class VizController implements VisualizationController, WorkspaceEventLis
 //        }
 //        return new AttributeColumn[0];
 //    }
-
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
         engine.reinit();

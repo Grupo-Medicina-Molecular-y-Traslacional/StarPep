@@ -43,7 +43,7 @@
         </Constraint>
       </Constraints>
     </Component>
-    <Container class="javax.swing.JToolBar" name="colorSwatchToolbar">
+    <Container class="javax.swing.JToolBar" name="colorToolbar">
       <Properties>
         <Property name="floatable" type="boolean" value="false"/>
         <Property name="rollover" type="boolean" value="true"/>

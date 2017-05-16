@@ -55,7 +55,7 @@ import org.gephi.appearance.plugin.AbstractUniqueColorTransformer;
 public class UniqueColorTransformerPanel extends javax.swing.JPanel {
 
     private AbstractUniqueColorTransformer transformer;
-    private Color defaultColor = new Color(0f, 0f, 0f, 1f);
+    private final Color defaultColor = new Color(0f, 0f, 0f, 1f);
 
     public UniqueColorTransformerPanel() {
         initComponents();
@@ -96,7 +96,7 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
 
         colorLabel = new javax.swing.JLabel();
         labelColor = new javax.swing.JLabel();
-        colorSwatchToolbar = new javax.swing.JToolBar();
+        colorToolbar = new javax.swing.JToolBar();
         jSeparator1 = new javax.swing.JToolBar.Separator();
         jButtonReset = new javax.swing.JButton();
         colorChooser = new net.java.dev.colorchooser.ColorChooser();
@@ -121,10 +121,10 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 0);
         add(labelColor, gridBagConstraints);
 
-        colorSwatchToolbar.setFloatable(false);
-        colorSwatchToolbar.setRollover(true);
-        colorSwatchToolbar.setOpaque(false);
-        colorSwatchToolbar.add(jSeparator1);
+        colorToolbar.setFloatable(false);
+        colorToolbar.setRollover(true);
+        colorToolbar.setOpaque(false);
+        colorToolbar.add(jSeparator1);
 
         jButtonReset.setText(org.openide.util.NbBundle.getMessage(UniqueColorTransformerPanel.class, "UniqueColorTransformerPanel.jButtonReset.text")); // NOI18N
         jButtonReset.setToolTipText(org.openide.util.NbBundle.getMessage(UniqueColorTransformerPanel.class, "UniqueColorTransformerPanel.jButtonReset.toolTipText")); // NOI18N
@@ -136,7 +136,7 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
                 jButtonResetActionPerformed(evt);
             }
         });
-        colorSwatchToolbar.add(jButtonReset);
+        colorToolbar.add(jButtonReset);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -144,7 +144,7 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        add(colorSwatchToolbar, gridBagConstraints);
+        add(colorToolbar, gridBagConstraints);
 
         colorChooser.setMinimumSize(new java.awt.Dimension(14, 14));
         colorChooser.setPreferredSize(new java.awt.Dimension(16, 16));
@@ -178,7 +178,7 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private net.java.dev.colorchooser.ColorChooser colorChooser;
     private javax.swing.JLabel colorLabel;
-    private javax.swing.JToolBar colorSwatchToolbar;
+    private javax.swing.JToolBar colorToolbar;
     private javax.swing.JButton jButtonReset;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JLabel labelColor;

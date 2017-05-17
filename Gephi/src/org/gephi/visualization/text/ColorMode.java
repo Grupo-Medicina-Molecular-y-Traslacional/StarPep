@@ -52,6 +52,8 @@ import org.gephi.visualization.text.TextManager.Renderer;
  */
 public interface ColorMode {
 
+    public void init();
+    
     public String getName();
 
     public ImageIcon getIcon();

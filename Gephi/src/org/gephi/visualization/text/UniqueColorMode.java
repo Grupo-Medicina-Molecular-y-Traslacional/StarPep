@@ -56,12 +56,9 @@ import org.openide.util.NbBundle;
  */
 public class UniqueColorMode implements ColorMode {
 
-    private final VizConfig vizConfig;
+    private VizConfig vizConfig;
     private float[] color;
 
-    public UniqueColorMode() {
-        this.vizConfig = VizController.getInstance().getVizConfig();
-    }
 
     @Override
     public void defaultNodeColor(Renderer renderer) {
@@ -111,5 +108,10 @@ public class UniqueColorMode implements ColorMode {
     @Override
     public String toString() {
         return getName();
+    }
+
+    @Override
+    public void init() {
+        vizConfig = VizController.getInstance().getVizConfig();
     }
 }

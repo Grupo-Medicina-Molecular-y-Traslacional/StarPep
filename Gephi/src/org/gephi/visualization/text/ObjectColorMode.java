@@ -56,11 +56,7 @@ import org.openide.util.NbBundle;
  */
 public class ObjectColorMode implements ColorMode {
 
-    private final VizConfig vizConfig;
-
-    public ObjectColorMode() {
-        this.vizConfig = VizController.getInstance().getVizConfig();
-    }
+    private VizConfig vizConfig;
 
     @Override
     public void defaultEdgeColor(Renderer renderer) {
@@ -107,5 +103,10 @@ public class ObjectColorMode implements ColorMode {
     @Override
     public String toString() {
         return getName();
+    }
+
+    @Override
+    public void init() {
+        vizConfig = VizController.getInstance().getVizConfig();
     }
 }

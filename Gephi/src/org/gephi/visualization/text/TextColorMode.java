@@ -56,12 +56,8 @@ import org.openide.util.NbBundle;
  */
 public class TextColorMode implements ColorMode {
 
-    private final VizConfig vizConfig;
+    private VizConfig vizConfig;
     private float[] color;
-
-    public TextColorMode() {
-        this.vizConfig = VizController.getInstance().getVizConfig();
-    }
 
     @Override
     public void defaultNodeColor(Renderer renderer) {
@@ -120,5 +116,10 @@ public class TextColorMode implements ColorMode {
     @Override
     public String toString() {
         return getName();
+    }
+
+    @Override
+    public void init() {
+        vizConfig = VizController.getInstance().getVizConfig();
     }
 }

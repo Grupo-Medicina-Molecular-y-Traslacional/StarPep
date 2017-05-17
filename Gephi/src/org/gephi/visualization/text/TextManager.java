@@ -72,8 +72,8 @@ public class TextManager implements VizArchitecture {
     private VizConfig vizConfig;
     private GraphDrawable drawable;
     //Configuration
-    private final SizeMode[] sizeModes;
-    private final ColorMode[] colorModes;
+    private static final SizeMode[] sizeModes;
+    private static final ColorMode[] colorModes;
     //Processing
     private Renderer nodeRenderer;
     private Renderer edgeRenderer;
@@ -87,8 +87,7 @@ public class TextManager implements VizArchitecture {
     private boolean fractionalMetrics;
     private boolean antialised;
 
-    public TextManager() {
-        //SizeMode init
+    static {
         sizeModes = new SizeMode[3];
         sizeModes[0] = new FixedSizeMode();
         sizeModes[1] = new ScaledSizeMode();
@@ -101,11 +100,24 @@ public class TextManager implements VizArchitecture {
         colorModes[2] = new TextColorMode();
     }
 
+    public TextManager() {
+    }
+
     @Override
     public void initArchitecture() {
         model = VizController.getInstance().getVizModel().getTextModel();
         vizConfig = VizController.getInstance().getVizConfig();
         drawable = VizController.getInstance().getDrawable();
+
+        //SizeMode init
+        sizeModes[0].init();
+        sizeModes[1].init();
+        sizeModes[2].init();
+
+        //ColorMode init
+        colorModes[0].init();
+        colorModes[1].init();
+        colorModes[2].init();
 
         //Settings
         antialised = vizConfig.isLabelAntialiased();

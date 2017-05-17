@@ -88,8 +88,8 @@ public class AppearanceUIController {
     //Model
     private AppearanceUIModel model;
     //Observer
-    private TableChangeObserver tableObserver;
-    private GraphChangeObserver graphObserver;
+//    private TableChangeObserver tableObserver;
+//    private GraphChangeObserver graphObserver;
 
     public AppearanceUIController() {
         final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
@@ -155,8 +155,8 @@ public class AppearanceUIController {
                 model = new AppearanceUIModel(this, appearanceModel);
                 pc.getCurrentWorkspace().add(model);
                 model.select();
-                tableObserver = new TableChangeObserver(pc.getCurrentWorkspace());
-                tableObserver.start();
+//                tableObserver = new TableChangeObserver(pc.getCurrentWorkspace());
+//                tableObserver.start();
             }
         }
 
@@ -220,10 +220,10 @@ public class AppearanceUIController {
     }
 
     public void setSelectedElementClass(String elementClass) {
-        if (graphObserver != null) {
-            graphObserver.destroy();
-            graphObserver = null;
-        }
+//        if (graphObserver != null) {
+//            graphObserver.destroy();
+//            graphObserver = null;
+//        }
         if (!elementClass.equals(NODE_ELEMENT) && !elementClass.equals(EDGE_ELEMENT)) {
             throw new RuntimeException("Element class has to be " + NODE_ELEMENT + " or " + EDGE_ELEMENT);
         }
@@ -232,14 +232,14 @@ public class AppearanceUIController {
             if (!oldValue.equals(elementClass)) {
                 model.setSelectedElementClass(elementClass);
 
-                Function function = model.getSelectedFunction();
-                if (function != null) {
-                    model.refreshSelectedFunction();
-                    if (!function.isSimple()) {
-                        graphObserver = new GraphChangeObserver(function.getGraph(), function instanceof AttributeFunction ? ((AttributeFunction) function).getColumn() : null);
-                        graphObserver.start();
-                    }
-                }
+//                Function function = model.getSelectedFunction();
+//                if (function != null) {
+//                    model.refreshSelectedFunction();
+//                    if (!function.isSimple()) {
+//                        graphObserver = new GraphChangeObserver(function.getGraph(), function instanceof AttributeFunction ? ((AttributeFunction) function).getColumn() : null);
+//                        graphObserver.start();
+//                    }
+//                }
 
                 firePropertyChangeEvent(AppearanceUIModelEvent.SELECTED_ELEMENT_CLASS, oldValue, elementClass);
             }
@@ -247,23 +247,23 @@ public class AppearanceUIController {
     }
 
     public void setSelectedCategory(TransformerCategory category) {
-        if (graphObserver != null) {
-            graphObserver.destroy();
-            graphObserver = null;
-        }
+//        if (graphObserver != null) {
+//            graphObserver.destroy();
+//            graphObserver = null;
+//        }
         if (model != null) {
             TransformerCategory oldValue = model.getSelectedCategory();
             if (!oldValue.equals(category)) {
                 model.setSelectedCategory(category);
 
-                Function function = model.getSelectedFunction();
-                if (function != null) {
-                    model.refreshSelectedFunction();
-                    if (!function.isSimple()) {
-                        graphObserver = new GraphChangeObserver(function.getGraph(), function instanceof AttributeFunction ? ((AttributeFunction) function).getColumn() : null);
-                        graphObserver.start();
-                    }
-                }
+//                Function function = model.getSelectedFunction();
+//                if (function != null) {
+//                    model.refreshSelectedFunction();
+//                    if (!function.isSimple()) {
+//                        graphObserver = new GraphChangeObserver(function.getGraph(), function instanceof AttributeFunction ? ((AttributeFunction) function).getColumn() : null);
+//                        graphObserver.start();
+//                    }
+//                }
 
                 firePropertyChangeEvent(AppearanceUIModelEvent.SELECTED_CATEGORY, oldValue, category);
             }
@@ -271,24 +271,24 @@ public class AppearanceUIController {
     }
 
     public void setSelectedTransformerUI(TransformerUI ui) {
-        if (graphObserver != null) {
-            graphObserver.destroy();
-            graphObserver = null;
-        }
+//        if (graphObserver != null) {
+//            graphObserver.destroy();
+//            graphObserver = null;
+//        }
         if (model != null) {
             TransformerUI oldValue = model.getSelectedTransformerUI();
             if (!oldValue.equals(ui)) {
                 model.setAutoApply(false);
                 model.setSelectedTransformerUI(ui);
 
-                Function function = model.getSelectedFunction();
-                if (function != null) {
-                    model.refreshSelectedFunction();
-                    if (!function.isSimple()) {
-                        graphObserver = new GraphChangeObserver(function.getGraph(), function instanceof AttributeFunction ? ((AttributeFunction) function).getColumn() : null);
-                        graphObserver.start();
-                    }
-                }
+//                Function function = model.getSelectedFunction();
+//                if (function != null) {
+//                    model.refreshSelectedFunction();
+//                    if (!function.isSimple()) {
+//                        graphObserver = new GraphChangeObserver(function.getGraph(), function instanceof AttributeFunction ? ((AttributeFunction) function).getColumn() : null);
+//                        graphObserver.start();
+//                    }
+//                }
 
                 firePropertyChangeEvent(AppearanceUIModelEvent.SELECTED_TRANSFORMER_UI, oldValue, ui);
             }
@@ -296,10 +296,10 @@ public class AppearanceUIController {
     }
 
     public void setSelectedFunction(Function function) {
-        if (graphObserver != null) {
-            graphObserver.destroy();
-            graphObserver = null;
-        }
+//        if (graphObserver != null) {
+//            graphObserver.destroy();
+//            graphObserver = null;
+//        }
         if (model != null) {
             Function oldValue = model.getSelectedFunction();
             if ((oldValue == null && function != null) || (oldValue != null && function == null) || (function != null && oldValue != null && !oldValue.equals(function))) {
@@ -307,10 +307,10 @@ public class AppearanceUIController {
                 model.setSelectedFunction(function);
                 firePropertyChangeEvent(AppearanceUIModelEvent.SELECTED_FUNCTION, oldValue, function);
 
-                if (function != null && !function.isSimple()) {
-                    graphObserver = new GraphChangeObserver(function.getGraph(), function instanceof AttributeFunction ? ((AttributeFunction) function).getColumn() : null);
-                    graphObserver.start();
-                }
+//                if (function != null && !function.isSimple()) {
+//                    graphObserver = new GraphChangeObserver(function.getGraph(), function instanceof AttributeFunction ? ((AttributeFunction) function).getColumn() : null);
+//                    graphObserver.start();
+//                }
             }
         }
     }

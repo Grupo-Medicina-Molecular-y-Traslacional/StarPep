@@ -75,6 +75,7 @@ public final class GraphControllerImpl implements GraphController, WorkspaceEven
     protected final ProjectManager pm;
     protected Lookup.Result<NeoPeptideModel> peptideLkpResult;
     protected Lookup.Result<FilterModel> filterLkpResult;
+    private GraphView emptyView;
 
     public GraphControllerImpl() {
         pm = Lookup.getDefault().lookup(ProjectManager.class);
@@ -94,7 +95,12 @@ public final class GraphControllerImpl implements GraphController, WorkspaceEven
         if (peptideModel != null) {
             return peptideModel.getGraph().getModel();
         }
-        return GraphModel.Factory.newInstance();
+        GraphModel model = pm.getLookup().lookup(GraphModel.class);
+        if (emptyView == null) {
+            emptyView = model.createView();
+        }
+        model.setVisibleView(emptyView);
+        return model;
     }
 
     private void removeLookupListener() {
@@ -157,9 +163,9 @@ public final class GraphControllerImpl implements GraphController, WorkspaceEven
         if (peptideModel != null) {
             Peptide[] peptides = peptideModel.getPeptides();
             Graph graph = peptideModel.getGraph();
-            GraphModel model = graph.getModel();
             GraphView graphView = graph.getView();
 
+            GraphModel model = graph.getModel();
             GraphView oldView = peptideModel.getCurrentView();
             if (!oldView.isMainView() && oldView != graphView) {
                 model.destroyView(oldView);

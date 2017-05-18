@@ -11,6 +11,7 @@ import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.db.Neo4jDB;
 import org.bapedis.db.model.BioCategory;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.db.model.AnnotationType;
 import org.bapedis.db.model.NeoPeptideModel;
 import org.bapedis.db.model.NeoPeptide;
@@ -31,6 +32,7 @@ import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.Uniqueness;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -52,6 +54,8 @@ public class NeoPeptideDAO {
     public NeoPeptideDAO() {
         graphDb = Neo4jDB.getDbService();
         graphModel = GraphModel.Factory.newInstance();
+        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
+        pm.add(graphModel);
         
 //        Table nodeTable = graphModel.getNodeTable();
 //        nodeTable.addColumn(PRO_ID, long.class);

@@ -13,3 +13,5 @@
 /BapedisCore/build/
 /build/
 /Neo4jDB/build/
+/BapedisCore/nbproject/private/
+/Neo4jDB/nbproject/private/

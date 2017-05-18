@@ -105,6 +105,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         add(graphPanel, "graphCard");
 
         // Toolbar setup
+        toolbar.setFloatable(false);
+
         // Global settings
         toolbar.addSeparator();
 
@@ -391,7 +393,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         });
         extendedBar.setVisible(extendButton.isSelected());
         toolbar.add(extendButton);
-
+        
     }
 
     public void setBusy(boolean busy) {

@@ -32,6 +32,14 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.netbeans.api.progress.nb</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.47.1</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.netbeans.modules.settings</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -53,7 +61,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>7.62.1</specification-version>
+                        <specification-version>7.67.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -101,7 +109,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>8.39.1</specification-version>
+                        <specification-version>9.7.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -110,6 +118,14 @@
                     <compile-dependency/>
                     <run-dependency>
                         <specification-version>8.25.1</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.openide.util.ui</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>9.6.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>

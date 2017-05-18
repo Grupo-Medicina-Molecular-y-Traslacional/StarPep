@@ -279,10 +279,6 @@
                 <binary-origin>release/modules/ext/batik-dom-1.7.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/fontchooser-1.0.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/fontchooser-1.0.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
                 <runtime-relative-path>ext/jogl-all-natives-linux-i586.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/jogl-all-natives-linux-i586.jar</binary-origin>
             </class-path-extension>

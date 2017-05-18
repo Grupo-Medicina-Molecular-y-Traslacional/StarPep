@@ -42,7 +42,7 @@
 package org.gephi.visualization.component;
 
 import org.gephi.ui.components.JColorButton;
-import com.connectina.swing.fontchooser.JFontChooser;
+//import com.connectina.swing.fontchooser.JFontChooser;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -491,10 +491,10 @@ public class VizBarController {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
-                    Font font = JFontChooser.showDialog(WindowManager.getDefault().getMainWindow(), model.getNodeFont());
-                    if (font != null && font != model.getNodeFont()) {
-                        model.setNodeFont(font);
-                    }
+//                    Font font = JFontChooser.showDialog(WindowManager.getDefault().getMainWindow(), model.getNodeFont());
+//                    if (font != null && font != model.getNodeFont()) {
+//                        model.setNodeFont(font);
+//                    }
                 }
             });
             model.addChangeListener(new ChangeListener() {

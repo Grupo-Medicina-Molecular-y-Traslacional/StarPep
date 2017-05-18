@@ -42,7 +42,7 @@ Portions Copyrighted 2011 Gephi Consortium.
 package org.gephi.visualization.component;
 
 import org.gephi.ui.components.JColorButton;
-import com.connectina.swing.fontchooser.JFontChooser;
+//import com.connectina.swing.fontchooser.JFontChooser;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -112,10 +112,10 @@ public class LabelSettingsPanel extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
-                Font font = JFontChooser.showDialog(WindowManager.getDefault().getMainWindow(), model.getNodeFont());
-                if (font != null && font != model.getNodeFont()) {
-                    model.setNodeFont(font);
-                }
+//                Font font = JFontChooser.showDialog(WindowManager.getDefault().getMainWindow(), model.getNodeFont());
+//                if (font != null && font != model.getNodeFont()) {
+//                    model.setNodeFont(font);
+//                }
             }
         });
         ((JColorButton) nodeColorButton).addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
@@ -158,10 +158,10 @@ public class LabelSettingsPanel extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
-                Font font = JFontChooser.showDialog(WindowManager.getDefault().getMainWindow(), model.getEdgeFont());
-                if (font != null && font != model.getEdgeFont()) {
-                    model.setEdgeFont(font);
-                }
+//                Font font = JFontChooser.showDialog(WindowManager.getDefault().getMainWindow(), model.getEdgeFont());
+//                if (font != null && font != model.getEdgeFont()) {
+//                    model.setEdgeFont(font);
+//                }
             }
         });
         ((JColorButton) edgeColorButton).addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {

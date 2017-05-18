@@ -93,9 +93,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 previewController.getModel().getProperties().putValue(PreviewProperty.BACKGROUND_COLOR, (Color) evt.getNewValue());
-                if (sketch != null) {
-                    sketch.refresh();
-                }
+                sketch.refresh();
             }
         });
         toolbar.add(backgroundButton);
@@ -145,7 +143,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
                         @Override
                         protected Object doInBackground() throws Exception {
                             previewController.refreshPreview();
-                            target.refresh();                            
+                            target.refresh();
                             return null;
                         }
 

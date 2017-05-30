@@ -70,6 +70,8 @@ public interface G2DTarget extends RenderTarget {
     public void resize(int width, int height);
 
     public void setMoving(boolean moving);
+    
+    public boolean isMoving();
 
     public Vector getTranslate();
 

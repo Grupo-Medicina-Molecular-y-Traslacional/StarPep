@@ -150,6 +150,15 @@ public class G2DRenderTargetBuilder implements RenderTargetBuilder {
         }
 
         @Override
+        public boolean isMoving() {
+            Boolean moving = previewModel.getProperties().getValue(PreviewProperty.MOVING);
+            if ( moving == null) {
+                return false;
+            }
+            return moving;
+        }
+
+        @Override
         public void reset() {
             graphics.reset();
         }

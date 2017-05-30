@@ -66,6 +66,7 @@ import org.openide.util.Lookup;
 public class PreviewSketch extends JPanel implements MouseListener, MouseWheelListener, MouseMotionListener {
 
     private static final int WHEEL_TIMER = 500;
+    private static final int DRAGGED_TIMER = 500;
     //Data
     private final PreviewController previewController;
     private final G2DTarget target;
@@ -75,6 +76,7 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
     //Utils
     private final RefreshLoop refreshLoop = new RefreshLoop();
     private Timer wheelTimer;
+    private Timer draggedTimer;
     private boolean inited;
     private final boolean isRetina;
 
@@ -112,27 +114,16 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
 
     @Override
     public void mouseClicked(MouseEvent e) {
-//        if (previewController.sendMouseEvent(buildPreviewMouseEvent(e, PreviewMouseEvent.Type.CLICKED))) {
-        refreshLoop.refreshSketch();
-//        }
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        previewController.sendMouseEvent(buildPreviewMouseEvent(e, PreviewMouseEvent.Type.PRESSED));
         ref.set(e.getX(), e.getY());
         lastMove.set(target.getTranslate());
-
-        refreshLoop.refreshSketch();
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-//        if (!previewController.sendMouseEvent(buildPreviewMouseEvent(e, PreviewMouseEvent.Type.RELEASED))) {
-        setMoving(false);
-//        }
-
-        refreshLoop.refreshSketch();
     }
 
     @Override
@@ -169,7 +160,6 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
 
     @Override
     public void mouseDragged(MouseEvent e) {
-//        if (!previewController.sendMouseEvent(buildPreviewMouseEvent(e, PreviewMouseEvent.Type.DRAGGED))) {
         setMoving(true);
         Vector trans = target.getTranslate();
         trans.set(e.getX(), e.getY());
@@ -178,8 +168,20 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
         trans.div(target.getScaling()); // ensure const. moving speed whatever the zoom is
         trans.add(lastMove);
 
+        if (draggedTimer != null) {
+            draggedTimer.cancel();
+            draggedTimer = null;
+        }
+        draggedTimer = new Timer();
+        draggedTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                setMoving(false);
+                refreshLoop.refreshSketch();
+                draggedTimer = null;
+            }
+        }, DRAGGED_TIMER);
         refreshLoop.refreshSketch();
-//        }
     }
 
     @Override
@@ -200,8 +202,8 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
         target.reset();
         refreshLoop.refreshSketch();
     }
-    
-    public void refresh(){
+
+    public void refresh() {
         refreshLoop.refreshSketch();
     }
 
@@ -271,7 +273,7 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
                     }
                     return null;
                 }
-                
+
                 @Override
                 protected void done() {
                     running.set(false);
@@ -279,11 +281,5 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
             };
             worker.execute();
         }
-        
-//        private void stop(){
-//            if (worker != null && !worker.isDone()){
-//                worker.cancel(true);
-//            }
-//        }
     }
 }

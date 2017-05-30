@@ -47,6 +47,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -205,7 +207,7 @@ public class PreviewSketch extends JPanel implements MouseListener, MouseWheelLi
 
     public void refresh() {
         refreshLoop.refreshSketch();
-    }
+    }    
 
     private Vector screenPositionToModelPosition(Vector screenPos) {
         Vector center = new Vector(getWidth() / 2f, getHeight() / 2f);

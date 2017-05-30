@@ -18,7 +18,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
 import java.text.NumberFormat;
-import java.util.concurrent.ExecutionException;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -27,8 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
-import javax.swing.SwingWorker;
-import javax.swing.UIManager;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.gephi.desktop.preview.PreviewSketch;
@@ -55,17 +53,13 @@ import org.openide.util.lookup.Lookups;
 public class NeoGraphPreView extends JPanel implements MultiViewElement {
 
     private final PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
-    private final G2DTarget target;
     private PreviewSketch sketch;
-    private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(20, 20));
-    private final JPanel graphPanel = new JPanel();
 
     private MultiViewElementCallback callback;
     private final JToolBar toolbar = new JToolBar();
 
     public NeoGraphPreView() {
         initComponents();
-        target = (G2DTarget) previewController.getRenderTarget(RenderTarget.G2D_TARGET);
     }
 
     private void initComponents() {
@@ -75,13 +69,6 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
         info.setHorizontalAlignment(SwingConstants.CENTER);
         info.setText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.infoLabel.text"));
         add(info, "infoCard");
-
-        busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        busyLabel.setText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.busyLabel.text"));
-        add(busyLabel, "busyCard");
-
-        graphPanel.setLayout(new BorderLayout());
-        add(graphPanel, "graphCard");
 
         // Tool bar
         toolbar.addSeparator();
@@ -133,82 +120,71 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
         JButton refreshButton = new JButton(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/refresh.png")));
         refreshButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.refreshButton.text"));
         refreshButton.addActionListener(new ActionListener() {
-            SwingWorker worker;
-
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (worker == null || worker.isDone()) {
-                    worker = new SwingWorker() {
-
-                        @Override
-                        protected Object doInBackground() throws Exception {
-                            previewController.refreshPreview();
-                            target.refresh();
-                            return null;
-                        }
-
-                        @Override
-                        protected void done() {
-                            try {
-                                get();
-                                setBusy(false);
-                            } catch (InterruptedException ex) {
-                                Exceptions.printStackTrace(ex);
-                            } catch (ExecutionException ex) {
-                                Exceptions.printStackTrace(ex);
-                            }
-                        }
-                    };
-                    setBusy(true);
-                    worker.execute();
-                }
+                CardLayout cl = (CardLayout) getLayout();
+                cl.show(NeoGraphPreView.this, "graphCard");
+                previewController.refreshPreview();
+                sketch.refresh();
             }
-        });
+        }
+        );
 
         toolbar.add(refreshButton);
 
         toolbar.addSeparator();
         // Reset Zoom 
         JButton resetZoomButton = new JButton();
-        resetZoomButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/centerOnGraph.png")));
-        resetZoomButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.resetZoomButton.toolTipText"));
-        resetZoomButton.addActionListener(new ActionListener() {
+
+        resetZoomButton.setIcon(
+                new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/centerOnGraph.png")));
+        resetZoomButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class,
+                "NeoGraphPreview.resetZoomButton.toolTipText"));
+        resetZoomButton.addActionListener(
+                new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sketch.resetZoom();
             }
-        });
+        }
+        );
         toolbar.add(resetZoomButton);
 
         // Plus Zoom
         JButton plusButton = new JButton();
-        plusButton.setText("+");
-        plusButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.plusButton.toolTipText"));
-        plusButton.addActionListener(new ActionListener() {
+
+        plusButton.setText(
+                "+");
+        plusButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class,
+                "NeoGraphPreview.plusButton.toolTipText"));
+        plusButton.addActionListener(
+                new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e
+            ) {
                 sketch.zoomPlus();
             }
-        });
+        }
+        );
         toolbar.add(plusButton);
 
         // Minus Zoom
         JButton minusButton = new JButton();
-        minusButton.setText("-");
-        minusButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.minusButton.toolTipText"));
-        minusButton.addActionListener(new ActionListener() {
+
+        minusButton.setText(
+                "-");
+        minusButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class,
+                "NeoGraphPreview.minusButton.toolTipText"));
+        minusButton.addActionListener(
+                new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e
+            ) {
                 sketch.zoomMinus();
             }
-        });
+        }
+        );
         toolbar.add(minusButton);
-    }
-
-    public void setBusy(boolean busy) {
-        CardLayout cl = (CardLayout) getLayout();
-        cl.show(NeoGraphPreView.this, busy ? "busyCard" : "graphCard");
-        busyLabel.setBusy(busy);
     }
 
     @Override
@@ -244,12 +220,13 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
         previewModel.getProperties().putValue("width", width);
         previewModel.getProperties().putValue("height", height);
 
-        if (target.getWidth() != width || target.getHeight() != height) {
-            target.resize(width, height);
-        }
+        G2DTarget target = (G2DTarget) previewController.getRenderTarget(RenderTarget.G2D_TARGET);
 
+//        if (target.getWidth() != width || target.getHeight() != height) {
+//            target.resize(width, height);
+//        }
         sketch = new PreviewSketch(target, isRetina());
-        graphPanel.add(sketch, BorderLayout.CENTER);
+        add(sketch, "graphCard");
     }
 
     @Override

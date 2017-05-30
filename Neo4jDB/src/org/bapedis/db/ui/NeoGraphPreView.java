@@ -25,6 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.gephi.desktop.preview.PreviewSketch;
@@ -120,8 +121,13 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
             public void actionPerformed(ActionEvent e) {
                 CardLayout cl = (CardLayout) getLayout();
                 cl.show(NeoGraphPreView.this, "graphCard");
-                previewController.refreshPreview();
-                sketch.refresh();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        previewController.refreshPreview();
+                        sketch.refresh();
+                    }
+                });
             }
         }
         );
@@ -218,9 +224,9 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
 
         G2DTarget target = (G2DTarget) previewController.getRenderTarget(RenderTarget.G2D_TARGET);
 
-//        if (target.getWidth() != width || target.getHeight() != height) {
-//            target.resize(width, height);
-//        }
+        if (target.getWidth() != width || target.getHeight() != height) {
+            target.resize(width, height);
+        }
         sketch = new PreviewSketch(target, isRetina());
         add(sketch, "graphCard");
     }

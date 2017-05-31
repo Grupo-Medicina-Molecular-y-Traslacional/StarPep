@@ -10,8 +10,6 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.db.dao.NeoPeptideDAO;
 import org.bapedis.db.model.BioCategory;
 import org.bapedis.db.model.NeoPeptideModel;
-import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
 import org.openide.util.lookup.ServiceProvider;
 

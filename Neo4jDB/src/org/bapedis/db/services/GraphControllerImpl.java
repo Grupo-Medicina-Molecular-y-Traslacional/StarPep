@@ -72,13 +72,14 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service = GraphController.class)
 public final class GraphControllerImpl implements GraphController, WorkspaceEventListener, LookupListener, PropertyChangeListener {
 
-    protected final ProjectManager pm;
     protected Lookup.Result<NeoPeptideModel> peptideLkpResult;
     protected Lookup.Result<FilterModel> filterLkpResult;
-    private GraphView emptyView;
+    protected final GraphModel graphModel;
+    protected GraphView emptyView;
 
     public GraphControllerImpl() {
-        pm = Lookup.getDefault().lookup(ProjectManager.class);
+        graphModel = GraphModel.Factory.newInstance();
+        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
         pm.addWorkspaceEventListener(this);
         workspaceChanged(null, pm.getCurrentWorkspace());
     }
@@ -94,13 +95,12 @@ public final class GraphControllerImpl implements GraphController, WorkspaceEven
         NeoPeptideModel peptideModel = workspace.getLookup().lookup(NeoPeptideModel.class);
         if (peptideModel != null) {
             return peptideModel.getGraph().getModel();
-        }
-        GraphModel model = pm.getLookup().lookup(GraphModel.class);
+        }        
         if (emptyView == null) {
-            emptyView = model.createView();
+            emptyView = graphModel.createView();
         }
-        model.setVisibleView(emptyView);
-        return model;
+        graphModel.setVisibleView(emptyView);
+        return graphModel;
     }
 
     private void removeLookupListener() {

@@ -10,6 +10,8 @@ import org.bapedis.core.services.ProjectManager;
 import org.bapedis.db.model.BioCategory;
 import org.bapedis.db.services.BioCategoryManager;
 import org.bapedis.db.services.NeoPeptideManager;
+import org.gephi.graph.api.GraphController;
+import org.gephi.graph.api.GraphModel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.openide.modules.ModuleInstall;
 import org.openide.util.Lookup;
@@ -22,8 +24,11 @@ public class Installer extends ModuleInstall {
             Neo4jDB.extractDatabase();
             Neo4jDB.loadDatabase();
             //Load all peptides into the default workspace
-            ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-            Workspace currentWorkspace = pc.getCurrentWorkspace();
+            ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
+            Workspace currentWorkspace = pm.getCurrentWorkspace();
+            GraphController gc = Lookup.getDefault().lookup(GraphController.class);
+            GraphModel graphModel = gc.getGraphModel(currentWorkspace);
+            pm.add(graphModel);
             BioCategoryManager bcManager = Lookup.getDefault().lookup(BioCategoryManager.class);
             NeoPeptideManager npManager = Lookup.getDefault().lookup(NeoPeptideManager.class);
             bcManager.setSelectedCategoriesTo(currentWorkspace, new BioCategory[]{bcManager.getRootCategory()});

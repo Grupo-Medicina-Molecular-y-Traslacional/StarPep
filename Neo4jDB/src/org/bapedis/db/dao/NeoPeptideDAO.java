@@ -53,9 +53,9 @@ public class NeoPeptideDAO {
 
     public NeoPeptideDAO() {
         graphDb = Neo4jDB.getDbService();
-        graphModel = GraphModel.Factory.newInstance();
+        
         ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
-        pm.add(graphModel);
+        graphModel = pm.getLookup().lookup(GraphModel.class);
         
 //        Table nodeTable = graphModel.getNodeTable();
 //        nodeTable.addColumn(PRO_ID, long.class);

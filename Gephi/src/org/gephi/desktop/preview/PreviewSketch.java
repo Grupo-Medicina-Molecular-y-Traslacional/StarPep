@@ -41,6 +41,7 @@
  */
 package org.gephi.desktop.preview;
 
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;

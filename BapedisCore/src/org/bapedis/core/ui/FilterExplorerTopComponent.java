@@ -127,12 +127,13 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         add(filterToolBar1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void restrictiveComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restrictiveComboBoxActionPerformed
-        FilterModel filterModel = getFilterModel();
+        FilterModel filterModel = pc.getFilterModel();
         if (filterModel != null) {
             filterModel.setRestriction((FilterModel.RestrictionLevel) restrictiveComboBox.getSelectedItem());
         }
@@ -194,10 +195,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         return dropDownButton;
     }
 
-    private FilterModel getFilterModel() {
-        Workspace currentWs = pc.getCurrentWorkspace();
-        return currentWs.getLookup().lookup(FilterModel.class);
-    }
+
 
     private void setFilterModel(FilterModel filterModel) {
         if (filterModel != null) {

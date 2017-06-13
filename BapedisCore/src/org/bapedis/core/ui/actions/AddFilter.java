@@ -33,27 +33,15 @@ public class AddFilter extends WorkspaceContextSensitiveAction<AttributesModel> 
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Workspace currentWs = pc.getCurrentWorkspace();
-        FilterModel filterModel = currentWs.getLookup().lookup(FilterModel.class);
-        boolean added = true;
-        if (filterModel == null) {
-            filterModel = new FilterModel();
-            added = false;
-        }
+        FilterModel filterModel = pc.getFilterModel();
         Filter filter = filterFactory.createFilter();
         FilterSetupUI setupUI = filterFactory.getSetupUI();
         if (setupUI == null) {
             filterModel.addFilter(filter);
-            if (!added) {
-                currentWs.add(filterModel);
-            }
         } else {
             String title = NbBundle.getMessage(AddFilter.class, "FilterSetupDialog.title", filterFactory.getName());
             if (dialog.setup(setupUI.getEditPanel(filter), setupUI, title)) {
                 filterModel.addFilter(filter);
-                if (!added) {
-                    currentWs.add(filterModel);
-                }
             }
         }
     }

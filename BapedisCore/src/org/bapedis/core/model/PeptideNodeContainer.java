@@ -41,12 +41,12 @@ public class PeptideNodeContainer extends Index.ArrayChildren {
 
     public List<Peptide> getPeptides() {
         ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
-        FilterModel filterModel = pm.getCurrentWorkspace().getLookup().lookup(FilterModel.class);
+        FilterModel filterModel = pm.getFilterModel();
         List<Peptide> peptides = new LinkedList<>();
         Peptide peptide;
         for (PeptideNode pNode : list) {
             peptide = pNode.getLookup().lookup(Peptide.class);
-            if (filterModel == null || filterModel.accept(peptide)) {
+            if (filterModel.accept(peptide)) {
                 peptides.add(peptide);
             }
         }

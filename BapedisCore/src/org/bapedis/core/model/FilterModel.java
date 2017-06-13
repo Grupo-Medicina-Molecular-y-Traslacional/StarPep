@@ -38,43 +38,45 @@ public class FilterModel {
     protected Node rootContext;
 
     public boolean accept(Peptide peptide) {
-        switch (restriction) {
-            case MATCH_ALL:
-                for (Filter filter : filters) {
-                    if (!filter.accept(peptide)) {
-                        return false;
+        if (!filters.isEmpty()) {
+            switch (restriction) {
+                case MATCH_ALL:
+                    for (Filter filter : filters) {
+                        if (!filter.accept(peptide)) {
+                            return false;
+                        }
                     }
-                }
-                return true;
-            case MATCH_ANY:
-                for (Filter filter : filters) {
-                    if (filter.accept(peptide)) {
-                        return true;
+                    return true;
+                case MATCH_ANY:
+                    for (Filter filter : filters) {
+                        if (filter.accept(peptide)) {
+                            return true;
+                        }
                     }
-                }
-                return false;
+                    return false;
+            }
         }
-        return false;
+        return true;
     }
 
     public enum RestrictionLevel {
 
         MATCH_ALL {
 
-                    @Override
-                    public String toString() {
-                        return NbBundle.getMessage(FilterModel.class, "FilterModel.restrictiveMode.matchAll");
-                    }
+            @Override
+            public String toString() {
+                return NbBundle.getMessage(FilterModel.class, "FilterModel.restrictiveMode.matchAll");
+            }
 
-                },
+        },
         MATCH_ANY {
 
-                    @Override
-                    public String toString() {
-                        return NbBundle.getMessage(FilterModel.class, "FilterModel.restrictiveMode.matchAny");
-                    }
+            @Override
+            public String toString() {
+                return NbBundle.getMessage(FilterModel.class, "FilterModel.restrictiveMode.matchAny");
+            }
 
-                };
+        };
 
     }
 
@@ -166,8 +168,8 @@ public class FilterModel {
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
-    
-    public void fireEditedEvent(Filter filter){
+
+    public void fireEditedEvent(Filter filter) {
         propertyChangeSupport.firePropertyChange(EDITED_FILTER, null, filter);
     }
 

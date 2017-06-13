@@ -53,8 +53,7 @@ public class RemoveFilter extends GlobalContextSensitiveAction<Filter> {
         Collection<? extends Filter> context = lkpResult.allInstances();
         if (!context.isEmpty()){
             Filter filter = context.iterator().next();
-            Workspace workspace = pc.getCurrentWorkspace();
-            FilterModel filterModel = workspace.getLookup().lookup(FilterModel.class);
+            FilterModel filterModel = pc.getFilterModel();
             filterModel.removeFilter(filter);
         }
     }

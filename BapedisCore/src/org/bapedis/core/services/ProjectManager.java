@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.events.WorkspaceEventListener;
+import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.openide.util.Lookup;
@@ -114,10 +115,20 @@ public class ProjectManager implements Lookup.Provider {
         }
         setCurrentWorkspace(defaultWorkspace);
     }
-    
-    public FilterFactory[] getFilterFactories(){
+
+    public FilterFactory[] getFilterFactories() {
         Collection<? extends FilterFactory> factories = Lookup.getDefault().lookupAll(FilterFactory.class);
         return factories.toArray(new FilterFactory[0]);
+    }
+
+    public FilterModel getFilterModel() {
+        Workspace currentWs = getCurrentWorkspace();
+        FilterModel filterModel = currentWs.getLookup().lookup(FilterModel.class);
+        if (filterModel == null) {
+            filterModel = new FilterModel();
+            currentWs.add(filterModel);
+        }
+        return filterModel;
     }
 
     /**

@@ -251,12 +251,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         if (attr != null && operator != null) {
             if (operator.isValid(jValueTextField.getText())) {
                 Filter filter = new AttributeFilter(attr, operator, jValueTextField.getText());
-                Workspace currentWs = pc.getCurrentWorkspace();
-                FilterModel filterModel = currentWs.getLookup().lookup(FilterModel.class);
-                if (filterModel == null) {
-                    filterModel = new FilterModel();
-                    currentWs.add(filterModel);
-                }
+                FilterModel filterModel = pc.getFilterModel();
                 filterModel.addFilter(filter);
                 jValueTextField.setText("");
                 TopComponent tc = WindowManager.getDefault().findTopComponent("FilterExplorerTopComponent");
@@ -345,10 +340,8 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     public void componentClosed() {
         removeLookupListener();
         pc.removeWorkspaceEventListener(this);
-        FilterModel filterModel = pc.getCurrentWorkspace().getLookup().lookup(FilterModel.class);
-        if (filterModel != null) {
-            filterModel.removePropertyChangeListener(this);
-        }
+        FilterModel filterModel = pc.getFilterModel();
+        filterModel.removePropertyChangeListener(this);
     }
 
     void writeProperties(java.util.Properties p) {

@@ -79,8 +79,7 @@ public class EditFilter extends GlobalContextSensitiveAction<Filter> {
                         break;
                     }
                 }
-                Workspace currentWs = pm.getCurrentWorkspace();
-                FilterModel filterModel = currentWs.getLookup().lookup(FilterModel.class);
+                FilterModel filterModel = pm.getFilterModel();
                 filterModel.fireEditedEvent(filter);
             }
         }

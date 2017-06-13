@@ -11,12 +11,10 @@ import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
@@ -30,7 +28,6 @@ import org.bapedis.core.spi.filters.impl.AttributeFilter;
 import org.bapedis.core.spi.filters.impl.FilterHelper;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
 import org.netbeans.api.settings.ConvertAsProperties;
-import org.netbeans.swing.etable.ETable;
 import org.netbeans.swing.etable.ETableColumn;
 import org.netbeans.swing.etable.ETableColumnModel;
 import org.netbeans.swing.etable.QuickFilter;
@@ -53,7 +50,6 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.openide.awt.Mnemonics;
-import org.openide.util.Exceptions;
 
 /**
  * Top component which displays something.

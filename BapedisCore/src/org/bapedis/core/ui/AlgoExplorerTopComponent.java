@@ -10,6 +10,8 @@ import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
+import org.openide.explorer.propertysheet.PropertySheet;
+import org.openide.util.NbBundle;
 
 /**
  * Top component which displays something.
@@ -36,12 +38,14 @@ import org.openide.util.NbBundle.Messages;
     "HINT_AlgoExplorerTopComponent=This is a AlgoExplorer window"
 })
 public final class AlgoExplorerTopComponent extends TopComponent {
+    private final String NO_SELECTION;
 
     public AlgoExplorerTopComponent() {
         initComponents();
         setName(Bundle.CTL_AlgoExplorerTopComponent());
         setToolTipText(Bundle.HINT_AlgoExplorerTopComponent());
-
+        
+        NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text");
     }
 
     /**
@@ -56,6 +60,11 @@ public final class AlgoExplorerTopComponent extends TopComponent {
         algoComboBox = new javax.swing.JComboBox<>();
         infoLabel = new javax.swing.JLabel();
         runButton = new javax.swing.JButton();
+        algoProvidedPanel = new javax.swing.JPanel();
+        propSheetPanel = new PropertySheet();
+        algoToolBar = new javax.swing.JToolBar();
+        presetsButton = new javax.swing.JButton();
+        resetButton = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -86,11 +95,61 @@ public final class AlgoExplorerTopComponent extends TopComponent {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 5);
         add(runButton, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(algoProvidedPanel, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(propSheetPanel, gridBagConstraints);
+
+        algoToolBar.setFloatable(false);
+        algoToolBar.setRollover(true);
+        algoToolBar.setOpaque(false);
+
+        presetsButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/preset.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(presetsButton, org.openide.util.NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.text")); // NOI18N
+        presetsButton.setFocusable(false);
+        presetsButton.setIconTextGap(0);
+        presetsButton.setMaximumSize(new java.awt.Dimension(93, 29));
+        presetsButton.setMinimumSize(new java.awt.Dimension(93, 29));
+        presetsButton.setPreferredSize(new java.awt.Dimension(93, 29));
+        algoToolBar.add(presetsButton);
+
+        org.openide.awt.Mnemonics.setLocalizedText(resetButton, org.openide.util.NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.resetButton.text")); // NOI18N
+        resetButton.setFocusable(false);
+        resetButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        resetButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        algoToolBar.add(resetButton);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        add(algoToolBar, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> algoComboBox;
+    private javax.swing.JPanel algoProvidedPanel;
+    private javax.swing.JToolBar algoToolBar;
     private javax.swing.JLabel infoLabel;
+    private javax.swing.JButton presetsButton;
+    private javax.swing.JPanel propSheetPanel;
+    private javax.swing.JButton resetButton;
     private javax.swing.JButton runButton;
     // End of variables declaration//GEN-END:variables
     @Override

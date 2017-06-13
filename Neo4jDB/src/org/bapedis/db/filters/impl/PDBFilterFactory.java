@@ -30,7 +30,7 @@ public class PDBFilterFactory implements FilterFactory {
 
     @Override
     public Filter createFilter() {
-        return new PDBFilter();
+        return new PDBFilter(this);
     }
 
     @Override

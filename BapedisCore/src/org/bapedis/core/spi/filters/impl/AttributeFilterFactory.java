@@ -28,7 +28,7 @@ public class AttributeFilterFactory implements FilterFactory {
     
     @Override
     public Filter createFilter() {
-        return new AttributeFilter();
+        return new AttributeFilter(this);
     }
 
     @Override

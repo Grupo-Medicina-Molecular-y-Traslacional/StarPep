@@ -65,30 +65,25 @@ public class EditFilter extends GlobalContextSensitiveAction<Filter> {
         Collection<? extends Filter> context = lkpResult.allInstances();
         if (!context.isEmpty()) {
             Filter filter = context.iterator().next();
-            FilterSetupUI setupUI;
-            for (FilterFactory filterFactory : pm.getFilterFactories()) {
-                if (filterFactory.createFilter().getClass().equals(filter.getClass())) {
-                    String title = NbBundle.getMessage(EditFilter.class, "FilterSetupDialog.title", filterFactory.getName());
-                    setupUI = filterFactory.getSetupUI();
-                    if (setupUI != null && dialog.setup(setupUI.getEditPanel(filter), setupUI, title)) {
-                        FilterExplorerTopComponent tc = (FilterExplorerTopComponent) WindowManager.getDefault().findTopComponent("FilterExplorerTopComponent");
-                        ExplorerManager manager = tc.getExplorerManager();
-                        Node[] nodes = manager.getRootContext().getChildren().getNodes();
-                        for (Node node : nodes) {
-                            FilterNode filterNode = (FilterNode) node;
-                            if (filterNode.getFilter().equals(filter)) {
-                                filterNode.refresh();
-                                break;
-                            }
-                        }
-                        Workspace currentWs = pm.getCurrentWorkspace();
-                        FilterModel filterModel = currentWs.getLookup().lookup(FilterModel.class);
-                        filterModel.fireEditedEvent(filter);
+            FilterFactory filterFactory = filter.getFactory();
+            String title = NbBundle.getMessage(EditFilter.class, "FilterSetupDialog.title", filterFactory.getName());
+            FilterSetupUI setupUI = filterFactory.getSetupUI();
+            if (setupUI != null && dialog.setup(setupUI.getEditPanel(filter), setupUI, title)) {
+                FilterExplorerTopComponent tc = (FilterExplorerTopComponent) WindowManager.getDefault().findTopComponent("FilterExplorerTopComponent");
+                ExplorerManager manager = tc.getExplorerManager();
+                Node[] nodes = manager.getRootContext().getChildren().getNodes();
+                for (Node node : nodes) {
+                    FilterNode filterNode = (FilterNode) node;
+                    if (filterNode.getFilter().equals(filter)) {
+                        filterNode.refresh();
+                        break;
                     }
-                    break;
                 }
+                Workspace currentWs = pm.getCurrentWorkspace();
+                FilterModel filterModel = currentWs.getLookup().lookup(FilterModel.class);
+                filterModel.fireEditedEvent(filter);
             }
         }
-    }    
+    }
 
 }

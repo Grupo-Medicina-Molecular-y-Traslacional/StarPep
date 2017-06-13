@@ -7,7 +7,10 @@ package org.bapedis.core.spi.filters.impl;
 
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.filters.Filter;
+import org.bapedis.core.spi.filters.FilterFactory;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -15,21 +18,32 @@ import org.bapedis.core.spi.filters.Filter;
  */
 public class AttributeFilter implements Filter {
 
+    protected final AttributeFilterFactory factory;
     protected boolean negative;
     protected PeptideAttribute attr;
     protected FilterOperator operator;
     protected String value;
     protected boolean matchCase;
 
-    public AttributeFilter() {
+    public AttributeFilter(AttributeFilterFactory factory) {
+        this.factory = factory;
         matchCase = false;
     }
 
     public AttributeFilter(PeptideAttribute attr, FilterOperator operator, String value) {
+        AttributeFilterFactory foundFactory = null;
+        for (FilterFactory f : Lookup.getDefault().lookup(ProjectManager.class).getFilterFactories()) {
+            if (f instanceof AttributeFilterFactory) {
+                foundFactory = (AttributeFilterFactory) f;
+                break;
+            }
+        }
+        this.factory = foundFactory;
         this.attr = attr;
         this.operator = operator;
         this.value = value;
         matchCase = false;
+
     }
 
     public PeptideAttribute getAttribute() {
@@ -95,6 +109,11 @@ public class AttributeFilter implements Filter {
         }
 //        accepted = (matchCase) ? operator.applyTo(objValue, value) : operator.applyTo(objValue.toString().toUpperCase(), value.toUpperCase());
         return negative ? !accepted : accepted;
+    }
+
+    @Override
+    public FilterFactory getFactory() {
+        return factory;
     }
 
 }

@@ -8,6 +8,7 @@ package org.bapedis.db.filters.impl;
 import java.util.StringTokenizer;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.filters.Filter;
+import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.db.model.AnnotationType;
 import org.bapedis.db.model.NeoPeptide;
 import org.openide.util.NbBundle;
@@ -17,10 +18,12 @@ import org.openide.util.NbBundle;
  * @author loge
  */
 public class PDBFilter implements Filter {
+    protected final PDBFilterFactory factory;
 
     protected boolean negative;
 
-    public PDBFilter() {
+    public PDBFilter(PDBFilterFactory factory) {
+        this.factory = factory;
         negative = false;
     }
 
@@ -54,6 +57,11 @@ public class PDBFilter implements Filter {
             }
         }
         return negative ? !accepted : accepted;
+    }
+
+    @Override
+    public FilterFactory getFactory() {
+        return factory;
     }
 
 }

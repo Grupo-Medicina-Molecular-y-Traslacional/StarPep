@@ -7,15 +7,21 @@ package org.bapedis.db.filters.impl;
 
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.filters.Filter;
+import org.bapedis.core.spi.filters.FilterFactory;
 
 /**
  *
  * @author loge
  */
 public class SimilarityFilter implements Filter {
+    protected final SimilarityFilterFactory factory;
     private String seq;
     private int k;
-    
+
+    public SimilarityFilter(SimilarityFilterFactory factory) {
+        this.factory = factory;
+    }
+        
     @Override
     public String getDisplayName() {
         return "SimilarityFilter";
@@ -40,6 +46,11 @@ public class SimilarityFilter implements Filter {
 
     public void setK(int k) {
         this.k = k;
+    }
+
+    @Override
+    public FilterFactory getFactory() {
+        return factory;
     }
     
 }

@@ -14,4 +14,5 @@ import org.bapedis.core.model.Peptide;
 public interface Filter {
     String getDisplayName();
     boolean accept(Peptide peptide);
+    public FilterFactory getFactory(); 
 }

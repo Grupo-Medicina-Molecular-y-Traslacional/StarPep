@@ -29,7 +29,7 @@ public class SimilarityFilterFactory implements FilterFactory  {
 
     @Override
     public Filter createFilter() {
-        return new SimilarityFilter();
+        return new SimilarityFilter(this);
     }
 
 

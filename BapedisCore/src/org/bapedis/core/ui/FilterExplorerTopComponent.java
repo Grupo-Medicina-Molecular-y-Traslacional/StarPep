@@ -61,11 +61,10 @@ import org.openide.util.Utilities;
     "CTL_FilterExplorerTopComponent=Filter Explorer",
     "HINT_FilterExplorerTopComponent=This is a FilterExplorer window"
 })
-public final class FilterExplorerTopComponent extends TopComponent implements WorkspaceEventListener, LookupListener, ExplorerManager.Provider {
+public final class FilterExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener, ExplorerManager.Provider {
 
     protected final ExplorerManager explorerMgr;
     protected final ProjectManager pc;
-    protected Lookup.Result<FilterModel> filterModelkpResult;
 
     public FilterExplorerTopComponent() {
         initComponents();
@@ -134,9 +133,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 
     private void restrictiveComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restrictiveComboBoxActionPerformed
         FilterModel filterModel = pc.getFilterModel();
-        if (filterModel != null) {
-            filterModel.setRestriction((FilterModel.RestrictionLevel) restrictiveComboBox.getSelectedItem());
-        }
+        filterModel.setRestriction((FilterModel.RestrictionLevel) restrictiveComboBox.getSelectedItem());
     }//GEN-LAST:event_restrictiveComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -155,14 +152,6 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     @Override
     public void componentClosed() {
         pc.removeWorkspaceEventListener(this);
-        removeFilterModelListener();
-    }
-
-    private void removeFilterModelListener() {
-        if (filterModelkpResult != null) {
-            filterModelkpResult.removeLookupListener(this);
-            filterModelkpResult = null;
-        }
     }
 
     void writeProperties(java.util.Properties p) {
@@ -195,30 +184,20 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         return dropDownButton;
     }
 
-
-
-    private void setFilterModel(FilterModel filterModel) {
-        if (filterModel != null) {
-            restrictiveComboBox.setSelectedItem(filterModel.getRestriction());
-            restrictiveComboBox.setEnabled(true);
-            explorerMgr.setRootContext(filterModel.getRootContext());
-        } else {
-            restrictiveComboBox.setSelectedItem(null);
-            restrictiveComboBox.setEnabled(false);
-            explorerMgr.setRootContext(Node.EMPTY);
-        }
-    }
-
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
-        if (filterModelkpResult != null) {
-            filterModelkpResult.removeLookupListener(this);
-            filterModelkpResult = null;
+        if (oldWs != null) {
+            FilterModel oldModel = pc.getFilterModel(oldWs);
+            oldModel.removePropertyChangeListener(this);
         }
-        filterModelkpResult = newWs.getLookup().lookupResult(FilterModel.class);
-        filterModelkpResult.addLookupListener(this);
-        FilterModel filterModel = newWs.getLookup().lookup(FilterModel.class);
-        setFilterModel(filterModel);
+        FilterModel filterModel = pc.getFilterModel(newWs);
+        filterModel.addPropertyChangeListener(this);
+        restrictiveComboBox.setSelectedItem(filterModel.getRestriction());
+        if (filterModel.isEmpty()) {
+            explorerMgr.setRootContext(Node.EMPTY);
+        } else {
+            explorerMgr.setRootContext(filterModel.getRootContext());
+        }
     }
 
     @Override
@@ -227,13 +206,15 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     }
 
     @Override
-    public void resultChanged(LookupEvent le) {
-        if (le.getSource().equals(filterModelkpResult)) {
-            Collection<? extends FilterModel> filterModels = filterModelkpResult.allInstances();
-            if (!filterModels.isEmpty()) {
-                FilterModel filterModel = filterModels.iterator().next();
-                setFilterModel(filterModel);
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getSource() instanceof FilterModel) {
+            FilterModel filterModel = (FilterModel) evt.getSource();
+            if (filterModel.isEmpty()) {
+                explorerMgr.setRootContext(Node.EMPTY);
+            } else {
+                explorerMgr.setRootContext(filterModel.getRootContext());
             }
         }
     }
+
 }

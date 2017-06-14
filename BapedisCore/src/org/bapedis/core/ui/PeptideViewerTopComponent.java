@@ -80,7 +80,6 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
     protected final ProjectManager pc;
     protected Lookup.Result<AttributesModel> peptideLkpResult;
-    protected Lookup.Result<FilterModel> filterLkpResult;
     protected final ExplorerManager explorerMgr;
     protected final OutlineView view;
 
@@ -316,10 +315,6 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             peptideLkpResult.removeLookupListener(this);
             peptideLkpResult = null;
         }
-        if (filterLkpResult != null) {
-            filterLkpResult.removeLookupListener(this);
-            filterLkpResult = null;
-        }
     }
 
     public void setBusyLabel(boolean busy) {
@@ -360,21 +355,19 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
         removeLookupListener();
         if (oldWs != null) {
-            FilterModel oldFilterModel = oldWs.getLookup().lookup(FilterModel.class);
+            FilterModel oldFilterModel = pc.getFilterModel(oldWs);
             if (oldFilterModel != null) {
                 oldFilterModel.removePropertyChangeListener(this);
             }
         }
         peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
         peptideLkpResult.addLookupListener(this);
-        filterLkpResult = newWs.getLookup().lookupResult(FilterModel.class);
-        filterLkpResult.addLookupListener(this);
+        
+
         AttributesModel peptidesModel = newWs.getLookup().lookup(AttributesModel.class);
         setData(peptidesModel);
-        FilterModel filterModel = newWs.getLookup().lookup(FilterModel.class);
-        if (filterModel != null) {
-            filterModel.addPropertyChangeListener(this);
-        }
+        FilterModel filterModel = pc.getFilterModel(newWs);
+        filterModel.addPropertyChangeListener(this);
     }
 
     @Override
@@ -385,24 +378,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
                 AttributesModel attrModel = attrModels.iterator().next();
                 setData(attrModel);
             }
-        } else if (le.getSource().equals(filterLkpResult)) {
-            Collection<? extends FilterModel> filterModels = filterLkpResult.allInstances();
-            if (!filterModels.isEmpty()) {
-                final FilterModel filterModel = filterModels.iterator().next();
-                filterModel.addPropertyChangeListener(this);
-                if (!filterModel.isEmpty()) {
-                    view.getOutline().setQuickFilter(0, new QuickFilter() {
-
-                        @Override
-                        public boolean accept(Object o) {
-                            PeptideNode node = ((PeptideNode) o);
-                            Peptide peptide = node.getPeptide();
-                            return filterModel.accept(peptide);
-                        }
-                    });
-                }
-            }
-        }
+        } 
     }
 
     protected void setData(AttributesModel attrModel) {

@@ -71,15 +71,14 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service = GraphController.class)
 public final class GraphControllerImpl implements GraphController, WorkspaceEventListener, LookupListener, PropertyChangeListener {
-
+    protected final ProjectManager pm;
     protected Lookup.Result<NeoPeptideModel> peptideLkpResult;
-    protected Lookup.Result<FilterModel> filterLkpResult;
     protected final GraphModel graphModel;
     protected GraphView emptyView;
 
     public GraphControllerImpl() {
         graphModel = GraphModel.Factory.newInstance();
-        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
+        pm = Lookup.getDefault().lookup(ProjectManager.class);
         pm.addWorkspaceEventListener(this);
         workspaceChanged(null, pm.getCurrentWorkspace());
     }
@@ -108,17 +107,13 @@ public final class GraphControllerImpl implements GraphController, WorkspaceEven
             peptideLkpResult.removeLookupListener(this);
             peptideLkpResult = null;
         }
-        if (filterLkpResult != null) {
-            filterLkpResult.removeLookupListener(this);
-            filterLkpResult = null;
-        }
     }
 
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
         removeLookupListener();
         if (oldWs != null) {
-            FilterModel oldFilterModel = oldWs.getLookup().lookup(FilterModel.class);
+            FilterModel oldFilterModel = pm.getFilterModel(oldWs);
             if (oldFilterModel != null) {
                 oldFilterModel.removePropertyChangeListener(this);
             }
@@ -126,12 +121,10 @@ public final class GraphControllerImpl implements GraphController, WorkspaceEven
 
         peptideLkpResult = newWs.getLookup().lookupResult(NeoPeptideModel.class);
         peptideLkpResult.addLookupListener(this);
-        filterLkpResult = newWs.getLookup().lookupResult(FilterModel.class);
-        filterLkpResult.addLookupListener(this);
-        FilterModel filterModel = newWs.getLookup().lookup(FilterModel.class);
-        if (filterModel != null) {
-            filterModel.addPropertyChangeListener(this);
-        }
+
+        FilterModel filterModel = pm.getFilterModel(newWs);
+        filterModel.addPropertyChangeListener(this);
+        
         NeoPeptideModel peptideModel = newWs.getLookup().lookup(NeoPeptideModel.class);
         if (peptideModel != null) {
             GraphView graphView = peptideModel.getCurrentView();
@@ -145,20 +138,13 @@ public final class GraphControllerImpl implements GraphController, WorkspaceEven
     public void resultChanged(LookupEvent le) {
         if (le.getSource().equals(peptideLkpResult)) {
             updateView();
-        } else if (le.getSource().equals(filterLkpResult)) {
-            Collection<? extends FilterModel> filterModels = filterLkpResult.allInstances();
-            if (!filterModels.isEmpty()) {
-                FilterModel filterModel = filterModels.iterator().next();
-                filterModel.addPropertyChangeListener(this);
-                updateView();
-            }
-        }
+        } 
     }
 
     private void updateView() {
-        Workspace workspace = Lookup.getDefault().lookup(ProjectManager.class).getCurrentWorkspace();
+        Workspace workspace = pm.getCurrentWorkspace();
         NeoPeptideModel peptideModel = workspace.getLookup().lookup(NeoPeptideModel.class);
-        FilterModel filterModel = workspace.getLookup().lookup(FilterModel.class);
+        FilterModel filterModel = pm.getFilterModel();
 
         if (peptideModel != null) {
             Peptide[] peptides = peptideModel.getPeptides();
@@ -171,7 +157,7 @@ public final class GraphControllerImpl implements GraphController, WorkspaceEven
                 model.destroyView(oldView);
             }
 
-            if (filterModel == null || filterModel.isEmpty()) {
+            if (filterModel.isEmpty()) {
                 model.setVisibleView(graphView);
                 peptideModel.setCurrentView(graphView);
             } else {

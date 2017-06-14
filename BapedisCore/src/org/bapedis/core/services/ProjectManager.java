@@ -120,13 +120,16 @@ public class ProjectManager implements Lookup.Provider {
         Collection<? extends FilterFactory> factories = Lookup.getDefault().lookupAll(FilterFactory.class);
         return factories.toArray(new FilterFactory[0]);
     }
+    
+    public FilterModel getFilterModel(){
+        return getFilterModel(getCurrentWorkspace());
+    }    
 
-    public FilterModel getFilterModel() {
-        Workspace currentWs = getCurrentWorkspace();
-        FilterModel filterModel = currentWs.getLookup().lookup(FilterModel.class);
+    public FilterModel getFilterModel(Workspace workspace) {
+        FilterModel filterModel = workspace.getLookup().lookup(FilterModel.class);
         if (filterModel == null) {
             filterModel = new FilterModel();
-            currentWs.add(filterModel);
+            workspace.add(filterModel);
         }
         return filterModel;
     }

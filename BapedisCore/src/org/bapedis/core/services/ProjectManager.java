@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.events.WorkspaceEventListener;
+import org.bapedis.core.model.AlgorithmModel;
 import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.filters.FilterFactory;
@@ -122,16 +123,29 @@ public class ProjectManager implements Lookup.Provider {
     }
     
     public FilterModel getFilterModel(){
-        return getFilterModel(getCurrentWorkspace());
+        return getFilterModel(currentWS);
     }    
 
     public FilterModel getFilterModel(Workspace workspace) {
-        FilterModel filterModel = workspace.getLookup().lookup(FilterModel.class);
-        if (filterModel == null) {
-            filterModel = new FilterModel();
-            workspace.add(filterModel);
+        FilterModel model = workspace.getLookup().lookup(FilterModel.class);
+        if (model == null) {
+            model = new FilterModel();
+            workspace.add(model);
         }
-        return filterModel;
+        return model;
+    }
+    
+    public AlgorithmModel getAlgorithmModel(){
+        return getAlgorithmModel(currentWS);
+    }
+    
+    public AlgorithmModel getAlgorithmModel(Workspace workspace){
+        AlgorithmModel model = workspace.getLookup().lookup(AlgorithmModel.class);
+        if (model == null){
+            model = new AlgorithmModel();
+            workspace.add(model);
+        }
+        return model;
     }
 
     /**

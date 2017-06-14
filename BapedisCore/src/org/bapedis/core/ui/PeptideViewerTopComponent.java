@@ -384,8 +384,9 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     protected void setData(AttributesModel attrModel) {
         populateFilterFields(attrModel);
         if (attrModel != null) {
-            explorerMgr.setRootContext(attrModel.getRootNode());
+            explorerMgr.setRootContext(attrModel.getRootNode());            
         } else {
+            view.getOutline().unsetQuickFilter();
             explorerMgr.setRootContext(Node.EMPTY);
         }
     }

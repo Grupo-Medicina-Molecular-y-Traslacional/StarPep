@@ -5,12 +5,19 @@
  */
 package org.bapedis.core.ui;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import org.bapedis.core.events.WorkspaceEventListener;
+import org.bapedis.core.model.AlgorithmModel;
+import org.bapedis.core.model.Workspace;
+import org.bapedis.core.services.ProjectManager;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.explorer.propertysheet.PropertySheet;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
@@ -37,14 +44,16 @@ import org.openide.util.NbBundle;
     "CTL_AlgoExplorerTopComponent=AlgoExplorer Window",
     "HINT_AlgoExplorerTopComponent=This is a AlgoExplorer window"
 })
-public final class AlgoExplorerTopComponent extends TopComponent {
+public final class AlgoExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener {
+
+    protected final ProjectManager pc;
     private final String NO_SELECTION;
 
     public AlgoExplorerTopComponent() {
         initComponents();
         setName(Bundle.CTL_AlgoExplorerTopComponent());
         setToolTipText(Bundle.HINT_AlgoExplorerTopComponent());
-        
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
         NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text");
     }
 
@@ -154,7 +163,9 @@ public final class AlgoExplorerTopComponent extends TopComponent {
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {
-        // TODO add custom code on component opening
+        pc.addWorkspaceEventListener(this);
+        Workspace currentWs = pc.getCurrentWorkspace();
+        workspaceChanged(null, currentWs);
     }
 
     @Override
@@ -172,5 +183,25 @@ public final class AlgoExplorerTopComponent extends TopComponent {
     void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
+    }
+
+    @Override
+    public void workspaceChanged(Workspace oldWs, Workspace newWs) {
+        if (oldWs != null){
+            AlgorithmModel oldModel = pc.getAlgorithmModel();
+            oldModel.removePropertyChangeListener(this);
+        }
+        AlgorithmModel algoModel = pc.getAlgorithmModel(newWs);
+        algoModel.addPropertyChangeListener(this);
+        setAlgoModel(algoModel);
+    }
+    
+    private void setAlgoModel(AlgorithmModel algoModel){
+    
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        
     }
 }

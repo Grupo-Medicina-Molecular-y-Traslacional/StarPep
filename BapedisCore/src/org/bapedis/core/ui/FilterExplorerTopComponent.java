@@ -193,6 +193,10 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         FilterModel filterModel = pc.getFilterModel(newWs);
         filterModel.addPropertyChangeListener(this);
         restrictiveComboBox.setSelectedItem(filterModel.getRestriction());
+        setFilterModel(filterModel);
+    }
+
+    private void setFilterModel(FilterModel filterModel) {
         if (filterModel.isEmpty()) {
             explorerMgr.setRootContext(Node.EMPTY);
         } else {
@@ -209,11 +213,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof FilterModel) {
             FilterModel filterModel = (FilterModel) evt.getSource();
-            if (filterModel.isEmpty()) {
-                explorerMgr.setRootContext(Node.EMPTY);
-            } else {
-                explorerMgr.setRootContext(filterModel.getRootContext());
-            }
+            setFilterModel(filterModel);
         }
     }
 

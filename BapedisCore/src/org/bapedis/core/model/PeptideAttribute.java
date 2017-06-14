@@ -15,12 +15,19 @@ public class PeptideAttribute {
     protected String id;
     protected String displayName;
     protected Class<?> type;
+    protected boolean visible;
     
     public PeptideAttribute(String id, String displayName, Class<?> type) {
+        this(id, displayName, type, true);
+        
+    }
+
+    public PeptideAttribute(String id, String displayName, Class<?> type, boolean visible) {
         this.id = id;
         this.displayName = displayName;
         this.type = type;
-    }    
+        this.visible = visible;
+    }     
     
     public String getId() {
         return id;
@@ -33,6 +40,14 @@ public class PeptideAttribute {
     public Class<?> getType() {
         return type;
     }
+    
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }    
 
     @Override
     public boolean equals(Object obj) {

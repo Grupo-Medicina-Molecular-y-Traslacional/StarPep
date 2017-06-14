@@ -5,6 +5,8 @@
  */
 package org.bapedis.core.model;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import org.bapedis.core.spi.algo.Algorithm;
 
 /**
@@ -14,7 +16,11 @@ import org.bapedis.core.spi.algo.Algorithm;
 public class AlgorithmModel {
     protected Class algoClassFactory;
     protected Algorithm selectedAlgorithm;
-    
+    protected transient final PropertyChangeSupport propertyChangeSupport;
+
+    public AlgorithmModel() {
+        propertyChangeSupport = new PropertyChangeSupport(this);
+    }
 
     public Class getAlgoClassFactory() {
         return algoClassFactory;
@@ -30,6 +36,14 @@ public class AlgorithmModel {
 
     public void setSelectedAlgorithm(Algorithm selectedAlgorithm) {
         this.selectedAlgorithm = selectedAlgorithm;
-    }        
+    }  
+    
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }    
     
 }

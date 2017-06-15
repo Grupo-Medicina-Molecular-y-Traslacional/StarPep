@@ -13,10 +13,13 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JPanel;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AlgorithmModel;
+import org.bapedis.core.model.AlgorithmNode;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -24,6 +27,7 @@ import org.openide.awt.ActionReference;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.explorer.propertysheet.PropertySheet;
+import org.openide.nodes.Node;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -54,14 +58,12 @@ import org.openide.util.NbBundle;
 public final class AlgoExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener {
 
     protected final ProjectManager pc;
-    private final String NO_SELECTION;
 
     public AlgoExplorerTopComponent() {
         initComponents();
         setName(Bundle.CTL_AlgoExplorerTopComponent());
         setToolTipText(Bundle.HINT_AlgoExplorerTopComponent());
         pc = Lookup.getDefault().lookup(ProjectManager.class);
-        NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text");
     }
 
     /**
@@ -84,6 +86,11 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
         setLayout(new java.awt.GridBagLayout());
 
+        algoComboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                algoComboBoxItemStateChanged(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -138,9 +145,6 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         org.openide.awt.Mnemonics.setLocalizedText(presetsButton, org.openide.util.NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.text")); // NOI18N
         presetsButton.setFocusable(false);
         presetsButton.setIconTextGap(0);
-        presetsButton.setMaximumSize(new java.awt.Dimension(93, 29));
-        presetsButton.setMinimumSize(new java.awt.Dimension(93, 29));
-        presetsButton.setPreferredSize(new java.awt.Dimension(93, 29));
         algoToolBar.add(presetsButton);
 
         org.openide.awt.Mnemonics.setLocalizedText(resetButton, org.openide.util.NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.resetButton.text")); // NOI18N
@@ -157,6 +161,10 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         gridBagConstraints.weightx = 1.0;
         add(algoToolBar, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void algoComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_algoComboBoxItemStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_algoComboBoxItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> algoComboBox;
@@ -203,11 +211,17 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         setAlgoModel(algoModel);
     }
 
-    private void setAlgoModel(AlgorithmModel algoModel) {
-        refreshComboBox(algoModel);
+    private void setSelectedLayout(AlgorithmFactory factory) {
+        AlgorithmModel algoModel = pc.getAlgorithmModel();
+        algoModel.setSelectedAlgorithm(factory.createAlgorithm());
     }
 
-    private void refreshComboBox(AlgorithmModel algoModel) {
+    private void setAlgoModel(AlgorithmModel algoModel) {
+        refreshAlgChooser(algoModel);
+    }
+
+    private void refreshAlgChooser(AlgorithmModel algoModel) {
+        String NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text", algoModel.getCategory().getDisplayName());
         DefaultComboBoxModel comboBoxModel = (DefaultComboBoxModel) algoComboBox.getModel();
         comboBoxModel.removeAllElements();
         comboBoxModel.addElement(NO_SELECTION);
@@ -235,11 +249,41 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         }
     }
 
+    private void refreshProperties(AlgorithmModel algoModel) {
+        if (algoModel == null || algoModel.getSelectedAlgorithm() == null) {
+            ((PropertySheet) propSheetPanel).setNodes(new Node[0]);
+            algoProvidedPanel.removeAll();
+            algoProvidedPanel.setVisible(false);
+            propSheetPanel.setVisible(true);
+        } else {
+            Algorithm selectedAlgorithm = algoModel.getSelectedAlgorithm();
+            AlgorithmNode algoNode = new AlgorithmNode(selectedAlgorithm);
+
+            if (selectedAlgorithm.getFactory().getSetupUI() != null) {
+                JPanel editPanel = selectedAlgorithm.getFactory().getSetupUI().getEditPanel(selectedAlgorithm);
+                propSheetPanel.setVisible(false);
+                algoProvidedPanel.removeAll();
+                algoProvidedPanel.add(editPanel);
+                algoProvidedPanel.setVisible(true);
+            } else {
+                algoProvidedPanel.removeAll();
+                algoProvidedPanel.setVisible(false);
+                ((PropertySheet) propSheetPanel).setNodes(new Node[]{algoNode});
+                propSheetPanel.setVisible(true);
+            }
+        }
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof AlgorithmModel) {
-            AlgorithmModel algoModel = (AlgorithmModel) evt.getSource();
-            setAlgoModel(algoModel);
+            if (evt.getPropertyName().equals(AlgorithmModel.CHANGED_CATEGORY)) {
+                AlgorithmModel algoModel = (AlgorithmModel) evt.getSource();
+                refreshAlgChooser(algoModel);
+            } else if (evt.getPropertyName().equals(AlgorithmModel.CHANGED_ALGORITHM)) {
+                AlgorithmModel algoModel = (AlgorithmModel) evt.getSource();
+                refreshProperties(algoModel);
+            }
         }
     }
 

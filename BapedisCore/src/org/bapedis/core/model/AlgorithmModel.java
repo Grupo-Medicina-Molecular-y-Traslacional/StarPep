@@ -21,6 +21,7 @@ public class AlgorithmModel {
     public static final String CHANGED_ALGORITHM = "ALGORITHM";
 
     public AlgorithmModel() {
+        category = AlgorithmCategory.GraphLayout;
         propertyChangeSupport = new PropertyChangeSupport(this);
     }
 

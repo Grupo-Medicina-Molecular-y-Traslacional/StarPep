@@ -45,20 +45,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 import org.gephi.layout.plugin.AbstractLayout;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
-import org.gephi.layout.spi.LayoutProperty;
-import org.bapedis.core.task.spi.LongTask;
-import org.bapedis.core.task.ProgressTicket;
 
 /**
  *
  * @author Mathieu Jacomy
  */
-public class NoverlapLayout extends AbstractLayout implements Layout, LongTask {
+public class NoverlapLayout extends AbstractLayout {
 
     protected boolean cancel;
     protected Graph graph;
@@ -70,7 +67,7 @@ public class NoverlapLayout extends AbstractLayout implements Layout, LongTask {
     private double ymin;
     private double ymax;
 
-    public NoverlapLayout(LayoutBuilder layoutBuilder) {
+    public NoverlapLayout(AlgorithmFactory layoutBuilder) {
         super(layoutBuilder);
     }
 
@@ -229,28 +226,28 @@ public class NoverlapLayout extends AbstractLayout implements Layout, LongTask {
     }
 
     @Override
-    public LayoutProperty[] getProperties() {
-        List<LayoutProperty> properties = new ArrayList<>();
+    public AlgorithmProperty[] getProperties() {
+        List<AlgorithmProperty> properties = new ArrayList<>();
         final String NOVERLAP_CATEGORY = "Noverlap";
         try {
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Double.class, "speed", NOVERLAP_CATEGORY, "speed", "getSpeed", "setSpeed"));
         } catch (Exception e) {
             e.printStackTrace();
         }
         try {
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Double.class, "ratio", NOVERLAP_CATEGORY, "ratio", "getRatio", "setRatio"));
         } catch (Exception e) {
             e.printStackTrace();
         }
         try {
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Double.class, "margin", NOVERLAP_CATEGORY, "margin", "getMargin", "setMargin"));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return properties.toArray(new LayoutProperty[0]);
+        return properties.toArray(new AlgorithmProperty[0]);
     }
 
     @Override
@@ -284,15 +281,6 @@ public class NoverlapLayout extends AbstractLayout implements Layout, LongTask {
         this.margin = margin;
     }
 
-    @Override
-    public boolean cancel() {
-        cancel = true;
-        return cancel;
-    }
-
-    @Override
-    public void setProgressTicket(ProgressTicket progressTicket) {
-    }
 
     private class SpatialGrid {
 

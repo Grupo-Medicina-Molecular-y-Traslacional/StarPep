@@ -26,7 +26,6 @@ public class FilterModel {
 
     protected int id;
     protected String name;
-    protected AttributeFilter onlineFilter;
     protected final List<Filter> filters;
     protected transient final PropertyChangeSupport propertyChangeSupport;
     public static final String ADDED_FILTER = "ADD";
@@ -107,18 +106,6 @@ public class FilterModel {
 
     public Node getRootContext() {
         return rootContext;
-    }
-
-    public AttributeFilter getOnlineFilter() {
-        return onlineFilter;
-    }
-
-    public void setOnlineFilter(AttributeFilter onlineFilter) {
-        if (this.onlineFilter != null) {
-            removeFilter(this.onlineFilter);
-        }
-        this.onlineFilter = onlineFilter;
-        addFilter(onlineFilter);
     }
 
     public void addFilter(Filter filter) {

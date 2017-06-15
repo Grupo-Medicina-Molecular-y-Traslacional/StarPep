@@ -1,6 +1,6 @@
 /*
  Copyright 2008-2010 Gephi
- Authors : Helder Suzuki <heldersuzuki@gephi.org>
+ Authors : Mathieu Bastian <mathieu.bastian@gephi.org>
  Website : http://www.gephi.org
 
  This file is part of Gephi.
@@ -39,67 +39,43 @@
 
  Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.layout.plugin.force.yifanHu;
+package org.gephi.layout.plugin.fruchterman;
 
-import javax.swing.Icon;
-import javax.swing.JPanel;
-import org.gephi.layout.plugin.force.StepDisplacement;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
-import org.gephi.layout.spi.LayoutUI;
+import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.gephi.layout.plugin.AbstractLayoutFactory;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
- * @author Helder Suzuki <heldersuzuki@gephi.org>
+ * @author Mathieu Bastian
  */
-@ServiceProvider(service = LayoutBuilder.class)
-public class YifanHu implements LayoutBuilder {
-
-    private YifanHuLayoutUI ui = new YifanHuLayoutUI();
-
-    @Override
-    public YifanHuLayout buildLayout() {
-        YifanHuLayout layout = new YifanHuLayout(this, new StepDisplacement(1f));
-        return layout;
-    }
+@ServiceProvider(service = AlgorithmFactory.class)
+public class FruchtermanReingoldFactory extends AbstractLayoutFactory {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(YifanHu.class, "YifanHu.name");
+        return NbBundle.getMessage(FruchtermanReingoldFactory.class, "name");
     }
 
     @Override
-    public LayoutUI getUI() {
-        return ui;
+    public Algorithm createAlgorithm() {
+        return new FruchtermanReingold(this);
     }
 
-    private static class YifanHuLayoutUI implements LayoutUI {
+    @Override
+    public String getDescription() {
+        return NbBundle.getMessage(FruchtermanReingold.class, "description");
+    }
 
-        @Override
-        public String getDescription() {
-            return NbBundle.getMessage(YifanHu.class, "YifanHu.description");
-        }
+    @Override
+    public int getQualityRank() {
+        return 2;
+    }
 
-        @Override
-        public Icon getIcon() {
-            return null;
-        }
-
-        @Override
-        public JPanel getSimplePanel(Layout layout) {
-            return null;
-        }
-
-        @Override
-        public int getQualityRank() {
-            return 3;
-        }
-
-        @Override
-        public int getSpeedRank() {
-            return 4;
-        }
+    @Override
+    public int getSpeedRank() {
+        return 3;
     }
 }

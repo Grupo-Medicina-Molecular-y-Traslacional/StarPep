@@ -1,6 +1,6 @@
 /*
- Copyright 2008-2011 Gephi
- Authors : Mathieu Jacomy <mathieu.jacomy@gmail.com>
+ Copyright 2008-2010 Gephi
+ Authors : Mathieu Bastian <mathieu.bastian@gephi.org>
  Website : http://www.gephi.org
 
  This file is part of Gephi.
@@ -39,65 +39,43 @@
 
  Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.layout.plugin.noverlap;
+package org.gephi.layout.plugin.labelAdjust;
 
-import javax.swing.Icon;
-import javax.swing.JPanel;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
-import org.gephi.layout.spi.LayoutUI;
+import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.gephi.layout.plugin.AbstractLayoutFactory;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
- * @author Mathieu Jacomy
+ * @author Mathieu Bastian
  */
-@ServiceProvider(service = LayoutBuilder.class)
-public class NoverlapLayoutBuilder implements LayoutBuilder {
-
-    private final NoverlapLayoutUI ui = new NoverlapLayoutUI();
+@ServiceProvider(service = AlgorithmFactory.class)
+public class LabelAdjustFactory extends AbstractLayoutFactory {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(NoverlapLayoutBuilder.class, "name");
+        return NbBundle.getMessage(LabelAdjustFactory.class, "name");
     }
 
     @Override
-    public LayoutUI getUI() {
-        return ui;
+    public Algorithm createAlgorithm() {
+        return new LabelAdjust(this);
     }
 
     @Override
-    public Layout buildLayout() {
-        return new NoverlapLayout(this);
+    public String getDescription() {
+        return NbBundle.getMessage(LabelAdjustFactory.class, "description");
     }
 
-    private static class NoverlapLayoutUI implements LayoutUI {
+    @Override
+    public int getQualityRank() {
+        return -1;
+    }
 
-        @Override
-        public String getDescription() {
-            return NbBundle.getMessage(NoverlapLayoutBuilder.class, "description");
-        }
-
-        @Override
-        public Icon getIcon() {
-            return null;
-        }
-
-        @Override
-        public JPanel getSimplePanel(Layout layout) {
-            return null;
-        }
-
-        @Override
-        public int getQualityRank() {
-            return -1;
-        }
-
-        @Override
-        public int getSpeedRank() {
-            return -1;
-        }
+    @Override
+    public int getSpeedRank() {
+        return -1;
     }
 }

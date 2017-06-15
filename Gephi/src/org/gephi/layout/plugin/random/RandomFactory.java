@@ -39,14 +39,11 @@
 
  Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.layout.plugin.force.yifanHu;
+package org.gephi.layout.plugin.random;
 
-import javax.swing.Icon;
-import javax.swing.JPanel;
-import org.gephi.layout.plugin.force.ProportionalDisplacement;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
-import org.gephi.layout.spi.LayoutUI;
+import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.gephi.layout.plugin.AbstractLayoutFactory;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -54,52 +51,31 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Helder Suzuki <heldersuzuki@gephi.org>
  */
-@ServiceProvider(service = LayoutBuilder.class)
-public class YifanHuProportional implements LayoutBuilder {
-
-    private YifanHuProportionalLayoutUI ui = new YifanHuProportionalLayoutUI();
-
-    @Override
-    public YifanHuLayout buildLayout() {
-        YifanHuLayout layout = new YifanHuLayout(this, new ProportionalDisplacement(1f));
-        return layout;
-    }
+@ServiceProvider(service = AlgorithmFactory.class)
+public class RandomFactory extends AbstractLayoutFactory {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(YifanHuProportional.class, "YifanHuProportional.name");
+        return NbBundle.getMessage(RandomFactory.class, "Random.name");
     }
 
     @Override
-    public LayoutUI getUI() {
-        return ui;
+    public Algorithm createAlgorithm() {
+        return new RandomLayout(this, 50);
     }
 
-    private static class YifanHuProportionalLayoutUI implements LayoutUI {
+    @Override
+    public String getDescription() {
+        return NbBundle.getMessage(RandomFactory.class, "Random.description");
+    }
 
-        @Override
-        public String getDescription() {
-            return NbBundle.getMessage(YifanHuProportional.class, "YifanHuProportional.description");
-        }
+    @Override
+    public int getQualityRank() {
+        return -1;
+    }
 
-        @Override
-        public Icon getIcon() {
-            return null;
-        }
-
-        @Override
-        public JPanel getSimplePanel(Layout layout) {
-            return null;
-        }
-
-        @Override
-        public int getQualityRank() {
-            return 3;
-        }
-
-        @Override
-        public int getSpeedRank() {
-            return 4;
-        }
+    @Override
+    public int getSpeedRank() {
+        return -1;
     }
 }

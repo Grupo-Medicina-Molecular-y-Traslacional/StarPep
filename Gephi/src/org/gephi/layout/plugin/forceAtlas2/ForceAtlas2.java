@@ -47,15 +47,16 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
+import org.gephi.layout.plugin.AbstractLayout;
 import org.gephi.layout.plugin.forceAtlas2.ForceFactory.AttractionForce;
 import org.gephi.layout.plugin.forceAtlas2.ForceFactory.RepulsionForce;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
-import org.gephi.layout.spi.LayoutProperty;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
@@ -64,11 +65,9 @@ import org.openide.util.NbBundle;
  *
  * @author Mathieu Jacomy
  */
-public class ForceAtlas2 implements Layout {
+public class ForceAtlas2 extends AbstractLayout {
 
-    private GraphModel graphModel;
     private Graph graph;
-    private final ForceAtlas2Builder layoutBuilder;
     private double edgeWeightInfluence;
     private double jitterTolerance;
     private double scalingRatio;
@@ -87,8 +86,8 @@ public class ForceAtlas2 implements Layout {
     double outboundAttCompensation = 1;
     private ExecutorService pool;
 
-    public ForceAtlas2(ForceAtlas2Builder layoutBuilder) {
-        this.layoutBuilder = layoutBuilder;
+    public ForceAtlas2(ForceAtlas2Factory layoutBuilder) {
+        super(layoutBuilder);
         this.threadCount = Math.min(4, Math.max(1, Runtime.getRuntime().availableProcessors() - 1));
     }
 
@@ -306,15 +305,15 @@ public class ForceAtlas2 implements Layout {
     }
 
     @Override
-    public LayoutProperty[] getProperties() {
-        List<LayoutProperty> properties = new ArrayList<>();
+    public AlgorithmProperty[] getProperties() {
+        List<AlgorithmProperty> properties = new ArrayList<>();
         final String FORCEATLAS2_TUNING = NbBundle.getMessage(getClass(), "ForceAtlas2.tuning");
         final String FORCEATLAS2_BEHAVIOR = NbBundle.getMessage(getClass(), "ForceAtlas2.behavior");
         final String FORCEATLAS2_PERFORMANCE = NbBundle.getMessage(getClass(), "ForceAtlas2.performance");
         final String FORCEATLAS2_THREADS = NbBundle.getMessage(getClass(), "ForceAtlas2.threads");
 
         try {
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Double.class,
                     NbBundle.getMessage(getClass(), "ForceAtlas2.scalingRatio.name"),
                     FORCEATLAS2_TUNING,
@@ -322,7 +321,7 @@ public class ForceAtlas2 implements Layout {
                     NbBundle.getMessage(getClass(), "ForceAtlas2.scalingRatio.desc"),
                     "getScalingRatio", "setScalingRatio"));
 
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Boolean.class,
                     NbBundle.getMessage(getClass(), "ForceAtlas2.strongGravityMode.name"),
                     FORCEATLAS2_TUNING,
@@ -330,7 +329,7 @@ public class ForceAtlas2 implements Layout {
                     NbBundle.getMessage(getClass(), "ForceAtlas2.strongGravityMode.desc"),
                     "isStrongGravityMode", "setStrongGravityMode"));
 
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Double.class,
                     NbBundle.getMessage(getClass(), "ForceAtlas2.gravity.name"),
                     FORCEATLAS2_TUNING,
@@ -338,7 +337,7 @@ public class ForceAtlas2 implements Layout {
                     NbBundle.getMessage(getClass(), "ForceAtlas2.gravity.desc"),
                     "getGravity", "setGravity"));
 
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Boolean.class,
                     NbBundle.getMessage(getClass(), "ForceAtlas2.distributedAttraction.name"),
                     FORCEATLAS2_BEHAVIOR,
@@ -346,7 +345,7 @@ public class ForceAtlas2 implements Layout {
                     NbBundle.getMessage(getClass(), "ForceAtlas2.distributedAttraction.desc"),
                     "isOutboundAttractionDistribution", "setOutboundAttractionDistribution"));
 
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Boolean.class,
                     NbBundle.getMessage(getClass(), "ForceAtlas2.linLogMode.name"),
                     FORCEATLAS2_BEHAVIOR,
@@ -354,7 +353,7 @@ public class ForceAtlas2 implements Layout {
                     NbBundle.getMessage(getClass(), "ForceAtlas2.linLogMode.desc"),
                     "isLinLogMode", "setLinLogMode"));
 
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Boolean.class,
                     NbBundle.getMessage(getClass(), "ForceAtlas2.adjustSizes.name"),
                     FORCEATLAS2_BEHAVIOR,
@@ -362,7 +361,7 @@ public class ForceAtlas2 implements Layout {
                     NbBundle.getMessage(getClass(), "ForceAtlas2.adjustSizes.desc"),
                     "isAdjustSizes", "setAdjustSizes"));
 
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Double.class,
                     NbBundle.getMessage(getClass(), "ForceAtlas2.edgeWeightInfluence.name"),
                     FORCEATLAS2_BEHAVIOR,
@@ -370,7 +369,7 @@ public class ForceAtlas2 implements Layout {
                     NbBundle.getMessage(getClass(), "ForceAtlas2.edgeWeightInfluence.desc"),
                     "getEdgeWeightInfluence", "setEdgeWeightInfluence"));
 
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Double.class,
                     NbBundle.getMessage(getClass(), "ForceAtlas2.jitterTolerance.name"),
                     FORCEATLAS2_PERFORMANCE,
@@ -378,7 +377,7 @@ public class ForceAtlas2 implements Layout {
                     NbBundle.getMessage(getClass(), "ForceAtlas2.jitterTolerance.desc"),
                     "getJitterTolerance", "setJitterTolerance"));
 
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Boolean.class,
                     NbBundle.getMessage(getClass(), "ForceAtlas2.barnesHutOptimization.name"),
                     FORCEATLAS2_PERFORMANCE,
@@ -386,7 +385,7 @@ public class ForceAtlas2 implements Layout {
                     NbBundle.getMessage(getClass(), "ForceAtlas2.barnesHutOptimization.desc"),
                     "isBarnesHutOptimize", "setBarnesHutOptimize"));
 
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Double.class,
                     NbBundle.getMessage(getClass(), "ForceAtlas2.barnesHutTheta.name"),
                     FORCEATLAS2_PERFORMANCE,
@@ -394,7 +393,7 @@ public class ForceAtlas2 implements Layout {
                     NbBundle.getMessage(getClass(), "ForceAtlas2.barnesHutTheta.desc"),
                     "getBarnesHutTheta", "setBarnesHutTheta"));
 
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Integer.class,
                     NbBundle.getMessage(getClass(), "ForceAtlas2.threads.name"),
                     FORCEATLAS2_THREADS,
@@ -406,7 +405,7 @@ public class ForceAtlas2 implements Layout {
             e.printStackTrace();
         }
 
-        return properties.toArray(new LayoutProperty[0]);
+        return properties.toArray(new AlgorithmProperty[0]);
     }
 
     @Override
@@ -441,11 +440,6 @@ public class ForceAtlas2 implements Layout {
         }
         setBarnesHutTheta(1.2);
         setThreadsCount(Math.max(1, Runtime.getRuntime().availableProcessors() - 1));
-    }
-
-    @Override
-    public LayoutBuilder getBuilder() {
-        return layoutBuilder;
     }
 
     @Override

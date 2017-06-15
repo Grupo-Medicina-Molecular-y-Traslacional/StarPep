@@ -41,11 +41,9 @@
  */
 package org.gephi.layout.plugin.scale;
 
-import javax.swing.Icon;
-import javax.swing.JPanel;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
-import org.gephi.layout.spi.LayoutUI;
+import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.gephi.layout.plugin.AbstractLayoutFactory;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -53,51 +51,32 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Helder Suzuki <heldersuzuki@gephi.org>>
  */
-@ServiceProvider(service = LayoutBuilder.class)
-public class Expand implements LayoutBuilder {
-
-    private ExpandLayoutUI ui = new ExpandLayoutUI();
+@ServiceProvider(service = AlgorithmFactory.class)
+public class ExpandFactory extends AbstractLayoutFactory {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(Expand.class, "expand.name");
+        return NbBundle.getMessage(ExpandFactory.class, "expand.name");
     }
 
     @Override
-    public ScaleLayout buildLayout() {
+    public Algorithm createAlgorithm() {
         return new ScaleLayout(this, 1.2);
     }
 
+
     @Override
-    public LayoutUI getUI() {
-        return ui;
+    public String getDescription() {
+        return NbBundle.getMessage(ExpandFactory.class, "expand.description");
     }
 
-    private static class ExpandLayoutUI implements LayoutUI {
+    @Override
+    public int getQualityRank() {
+        return -1;
+    }
 
-        @Override
-        public String getDescription() {
-            return NbBundle.getMessage(Expand.class, "expand.description");
-        }
-
-        @Override
-        public Icon getIcon() {
-            return null;
-        }
-
-        @Override
-        public JPanel getSimplePanel(Layout layout) {
-            return null;
-        }
-
-        @Override
-        public int getQualityRank() {
-            return -1;
-        }
-
-        @Override
-        public int getSpeedRank() {
-            return -1;
-        }
+    @Override
+    public int getSpeedRank() {
+        return -1;
     }
 }

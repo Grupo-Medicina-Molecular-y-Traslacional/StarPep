@@ -43,12 +43,11 @@ package org.gephi.layout.plugin.scale;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 import org.gephi.layout.plugin.AbstractLayout;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
-import org.gephi.layout.spi.LayoutProperty;
 import org.openide.util.NbBundle;
 
 /**
@@ -56,12 +55,12 @@ import org.openide.util.NbBundle;
  *
  * @author Helder Suzuki <heldersuzuki@gephi.org>
  */
-public class ScaleLayout extends AbstractLayout implements Layout {
+public class ScaleLayout extends AbstractLayout{
 
     private double scale;
     private Graph graph;
 
-    public ScaleLayout(LayoutBuilder layoutBuilder, double scale) {
+    public ScaleLayout(AlgorithmFactory layoutBuilder, double scale) {
         super(layoutBuilder);
         this.scale = scale;
     }
@@ -97,10 +96,10 @@ public class ScaleLayout extends AbstractLayout implements Layout {
     }
 
     @Override
-    public LayoutProperty[] getProperties() {
-        List<LayoutProperty> properties = new ArrayList<>();
+    public AlgorithmProperty[] getProperties() {
+        List<AlgorithmProperty> properties = new ArrayList<>();
         try {
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Double.class,
                     NbBundle.getMessage(getClass(), "ScaleLayout.scaleFactor.name"),
                     null,
@@ -110,7 +109,7 @@ public class ScaleLayout extends AbstractLayout implements Layout {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return properties.toArray(new LayoutProperty[0]);
+        return properties.toArray(new AlgorithmProperty[0]);
     }
 
     @Override

@@ -43,6 +43,9 @@ package org.gephi.layout.plugin.force.yifanHu;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
@@ -53,9 +56,6 @@ import org.gephi.layout.plugin.force.Displacement;
 import org.gephi.layout.plugin.force.ForceVector;
 import org.gephi.layout.plugin.force.quadtree.BarnesHut;
 import org.gephi.layout.plugin.force.quadtree.QuadTree;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
-import org.gephi.layout.spi.LayoutProperty;
 import org.openide.util.NbBundle;
 
 /**
@@ -63,7 +63,7 @@ import org.openide.util.NbBundle;
  *
  * @author Helder Suzuki <heldersuzuki@gephi.org>
  */
-public class YifanHuLayout extends AbstractLayout implements Layout {
+public class YifanHuLayout extends AbstractLayout implements Algorithm {
 
     private float optimalDistance;
     private float relativeStrength;
@@ -80,7 +80,7 @@ public class YifanHuLayout extends AbstractLayout implements Layout {
     private double energy;
     private Graph graph;
 
-    public YifanHuLayout(LayoutBuilder layoutBuilder, Displacement displacement) {
+    public YifanHuLayout(AlgorithmFactory layoutBuilder, Displacement displacement) {
         super(layoutBuilder);
         this.displacement = displacement;
     }
@@ -153,20 +153,20 @@ public class YifanHuLayout extends AbstractLayout implements Layout {
     }
 
     @Override
-    public LayoutProperty[] getProperties() {
-        List<LayoutProperty> properties = new ArrayList<>();
+    public AlgorithmProperty[] getProperties() {
+        List<AlgorithmProperty> properties = new ArrayList<>();
         final String YIFANHU_CATEGORY = "Yifan Hu's properties";
         final String BARNESHUT_CATEGORY = "Barnes-Hut's properties";
 
         try {
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Float.class,
                     NbBundle.getMessage(getClass(), "YifanHu.optimalDistance.name"),
                     YIFANHU_CATEGORY,
                     "YifanHu.optimalDistance.name",
                     NbBundle.getMessage(getClass(), "YifanHu.optimalDistance.desc"),
                     "getOptimalDistance", "setOptimalDistance"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Float.class,
                     NbBundle.getMessage(getClass(), "YifanHu.relativeStrength.name"),
                     YIFANHU_CATEGORY,
@@ -174,42 +174,42 @@ public class YifanHuLayout extends AbstractLayout implements Layout {
                     NbBundle.getMessage(getClass(), "YifanHu.relativeStrength.desc"),
                     "getRelativeStrength", "setRelativeStrength"));
 
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Float.class,
                     NbBundle.getMessage(getClass(), "YifanHu.initialStepSize.name"),
                     YIFANHU_CATEGORY,
                     "YifanHu.initialStepSize.name",
                     NbBundle.getMessage(getClass(), "YifanHu.initialStepSize.desc"),
                     "getInitialStep", "setInitialStep"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Float.class,
                     NbBundle.getMessage(getClass(), "YifanHu.stepRatio.name"),
                     YIFANHU_CATEGORY,
                     "YifanHu.stepRatio.name",
                     NbBundle.getMessage(getClass(), "YifanHu.stepRatio.desc"),
                     "getStepRatio", "setStepRatio"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Boolean.class,
                     NbBundle.getMessage(getClass(), "YifanHu.adaptativeCooling.name"),
                     YIFANHU_CATEGORY,
                     "YifanHu.adaptativeCooling.name",
                     NbBundle.getMessage(getClass(), "YifanHu.adaptativeCooling.desc"),
                     "isAdaptiveCooling", "setAdaptiveCooling"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Float.class,
                     NbBundle.getMessage(getClass(), "YifanHu.convergenceThreshold.name"),
                     YIFANHU_CATEGORY,
                     "YifanHu.convergenceThreshold.name",
                     NbBundle.getMessage(getClass(), "YifanHu.convergenceThreshold.desc"),
                     "getConvergenceThreshold", "setConvergenceThreshold"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Integer.class,
                     NbBundle.getMessage(getClass(), "YifanHu.quadTreeMaxLevel.name"),
                     BARNESHUT_CATEGORY,
                     "YifanHu.quadTreeMaxLevel.name",
                     NbBundle.getMessage(getClass(), "YifanHu.quadTreeMaxLevel.desc"),
                     "getQuadTreeMaxLevel", "setQuadTreeMaxLevel"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Float.class,
                     NbBundle.getMessage(getClass(), "YifanHu.theta.name"),
                     BARNESHUT_CATEGORY,
@@ -220,7 +220,7 @@ public class YifanHuLayout extends AbstractLayout implements Layout {
             e.printStackTrace();
         }
 
-        return properties.toArray(new LayoutProperty[0]);
+        return properties.toArray(new AlgorithmProperty[0]);
     }
 
     @Override

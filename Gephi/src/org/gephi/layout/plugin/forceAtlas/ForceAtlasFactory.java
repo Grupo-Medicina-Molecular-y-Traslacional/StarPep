@@ -39,13 +39,11 @@
 
  Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.layout.plugin.random;
+package org.gephi.layout.plugin.forceAtlas;
 
-import javax.swing.Icon;
-import javax.swing.JPanel;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
-import org.gephi.layout.spi.LayoutUI;
+import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.gephi.layout.plugin.AbstractLayoutFactory;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -53,51 +51,31 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Helder Suzuki <heldersuzuki@gephi.org>
  */
-@ServiceProvider(service = LayoutBuilder.class)
-public class Random implements LayoutBuilder {
-
-    private RandomLayoutUI ui = new RandomLayoutUI();
+@ServiceProvider(service = AlgorithmFactory.class)
+public class ForceAtlasFactory extends AbstractLayoutFactory {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(Random.class, "Random.name");
+        return NbBundle.getMessage(ForceAtlasLayout.class, "name");
     }
 
     @Override
-    public Layout buildLayout() {
-        return new RandomLayout(this, 50);
+    public Algorithm createAlgorithm() {
+        return new ForceAtlasLayout(this);
     }
 
     @Override
-    public LayoutUI getUI() {
-        return ui;
+    public String getDescription() {
+        return NbBundle.getMessage(ForceAtlasFactory.class, "description");
     }
 
-    private static class RandomLayoutUI implements LayoutUI {
+    @Override
+    public int getQualityRank() {
+        return 5;
+    }
 
-        @Override
-        public String getDescription() {
-            return NbBundle.getMessage(Random.class, "Random.description");
-        }
-
-        @Override
-        public Icon getIcon() {
-            return null;
-        }
-
-        @Override
-        public JPanel getSimplePanel(Layout layout) {
-            return null;
-        }
-
-        @Override
-        public int getQualityRank() {
-            return -1;
-        }
-
-        @Override
-        public int getSpeedRank() {
-            return -1;
-        }
+    @Override
+    public int getSpeedRank() {
+        return 3;
     }
 }

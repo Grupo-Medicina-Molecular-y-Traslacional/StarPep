@@ -1,6 +1,6 @@
 /*
  Copyright 2008-2010 Gephi
- Authors : Mathieu Bastian <mathieu.bastian@gephi.org>
+ Authors : Helder Suzuki <heldersuzuki@gephi.org>
  Website : http://www.gephi.org
 
  This file is part of Gephi.
@@ -39,65 +39,46 @@
 
  Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.layout.plugin.labelAdjust;
+package org.gephi.layout.plugin.scale;
 
 import javax.swing.Icon;
 import javax.swing.JPanel;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
-import org.gephi.layout.spi.LayoutUI;
+import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+import org.gephi.layout.plugin.AbstractLayoutFactory;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
- * @author Mathieu Bastian
+ * @author Helder Suzuki <heldersuzuki@gephi.org>>
  */
-@ServiceProvider(service = LayoutBuilder.class)
-public class LabelAdjustBuilder implements LayoutBuilder {
-
-    private final LabelAdjustLayoutUI ui = new LabelAdjustLayoutUI();
+@ServiceProvider(service = AlgorithmFactory.class)
+public class ContractFactory extends AbstractLayoutFactory {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(LabelAdjustBuilder.class, "name");
+        return NbBundle.getMessage(ContractFactory.class, "contract.name");
     }
 
     @Override
-    public LabelAdjust buildLayout() {
-        return new LabelAdjust(this);
+    public Algorithm createAlgorithm() {
+        return new ScaleLayout(this, 0.8);
     }
 
     @Override
-    public LayoutUI getUI() {
-        return ui;
+    public String getDescription() {
+        return NbBundle.getMessage(ContractFactory.class, "contract.description");
     }
 
-    private static class LabelAdjustLayoutUI implements LayoutUI {
+    @Override
+    public int getQualityRank() {
+        return -1;
+    }
 
-        @Override
-        public String getDescription() {
-            return NbBundle.getMessage(LabelAdjustBuilder.class, "description");
-        }
-
-        @Override
-        public Icon getIcon() {
-            return null;
-        }
-
-        @Override
-        public JPanel getSimplePanel(Layout layout) {
-            return null;
-        }
-
-        @Override
-        public int getQualityRank() {
-            return -1;
-        }
-
-        @Override
-        public int getSpeedRank() {
-            return -1;
-        }
+    @Override
+    public int getSpeedRank() {
+        return -1;
     }
 }

@@ -44,26 +44,25 @@ package org.gephi.layout.plugin.random;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 import org.gephi.layout.plugin.AbstractLayout;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
-import org.gephi.layout.spi.LayoutProperty;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author Helder Suzuki <heldersuzuki@gephi.org>
  */
-public class RandomLayout extends AbstractLayout implements Layout {
+public class RandomLayout extends AbstractLayout{
 
     private Random random;
     private Graph graph;
     private boolean converged;
     private double size;
 
-    public RandomLayout(LayoutBuilder layoutBuilder, double size) {
+    public RandomLayout(AlgorithmFactory layoutBuilder, double size) {
         super(layoutBuilder);
         this.size = size;
         random = new Random();
@@ -95,10 +94,10 @@ public class RandomLayout extends AbstractLayout implements Layout {
     }
 
     @Override
-    public LayoutProperty[] getProperties() {
-        List<LayoutProperty> properties = new ArrayList<>();
+    public AlgorithmProperty[] getProperties() {
+        List<AlgorithmProperty> properties = new ArrayList<>();
         try {
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Double.class,
                     NbBundle.getMessage(getClass(), "Random.spaceSize.name"),
                     null,
@@ -108,7 +107,7 @@ public class RandomLayout extends AbstractLayout implements Layout {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return properties.toArray(new LayoutProperty[0]);
+        return properties.toArray(new AlgorithmProperty[0]);
     }
 
     @Override

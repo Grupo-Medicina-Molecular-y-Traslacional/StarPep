@@ -1,6 +1,6 @@
 /*
- Copyright 2008-2010 Gephi
- Authors : Mathieu Bastian <mathieu.bastian@gephi.org>
+ Copyright 2008-2011 Gephi
+ Authors : Mathieu Jacomy <mathieu.jacomy@gmail.com>
  Website : http://www.gephi.org
 
  This file is part of Gephi.
@@ -39,65 +39,43 @@
 
  Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.layout.plugin.fruchterman;
+package org.gephi.layout.plugin.noverlap;
 
-import javax.swing.Icon;
-import javax.swing.JPanel;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
-import org.gephi.layout.spi.LayoutUI;
+import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.gephi.layout.plugin.AbstractLayoutFactory;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
- * @author Mathieu Bastian
+ * @author Mathieu Jacomy
  */
-@ServiceProvider(service = LayoutBuilder.class)
-public class FruchtermanReingoldBuilder implements LayoutBuilder {
-
-    private FruchtermanReingoldLayoutUI ui = new FruchtermanReingoldLayoutUI();
+@ServiceProvider(service = AlgorithmFactory.class)
+public class NoverlapLayoutFactory extends AbstractLayoutFactory {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(FruchtermanReingoldBuilder.class, "name");
+        return NbBundle.getMessage(NoverlapLayoutFactory.class, "name");
     }
 
     @Override
-    public FruchtermanReingold buildLayout() {
-        return new FruchtermanReingold(this);
+    public Algorithm createAlgorithm() {
+        return new NoverlapLayout(this);
     }
 
     @Override
-    public LayoutUI getUI() {
-        return ui;
+    public String getDescription() {
+        return NbBundle.getMessage(NoverlapLayoutFactory.class, "description");
     }
 
-    private static class FruchtermanReingoldLayoutUI implements LayoutUI {
+    @Override
+    public int getQualityRank() {
+        return -1;
+    }
 
-        @Override
-        public String getDescription() {
-            return NbBundle.getMessage(FruchtermanReingold.class, "description");
-        }
-
-        @Override
-        public Icon getIcon() {
-            return null;
-        }
-
-        @Override
-        public JPanel getSimplePanel(Layout layout) {
-            return null;
-        }
-
-        @Override
-        public int getQualityRank() {
-            return 2;
-        }
-
-        @Override
-        public int getSpeedRank() {
-            return 3;
-        }
+    @Override
+    public int getSpeedRank() {
+        return -1;
     }
 }

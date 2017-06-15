@@ -7,10 +7,17 @@ package org.bapedis.core.ui;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import javax.swing.DefaultComboBoxModel;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AlgorithmModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -170,7 +177,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
     @Override
     public void componentClosed() {
-        // TODO add custom code on component closing
+        pc.removeWorkspaceEventListener(this);
     }
 
     void writeProperties(java.util.Properties p) {
@@ -187,7 +194,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
-        if (oldWs != null){
+        if (oldWs != null) {
             AlgorithmModel oldModel = pc.getAlgorithmModel();
             oldModel.removePropertyChangeListener(this);
         }
@@ -195,13 +202,62 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         algoModel.addPropertyChangeListener(this);
         setAlgoModel(algoModel);
     }
-    
-    private void setAlgoModel(AlgorithmModel algoModel){
-    
+
+    private void setAlgoModel(AlgorithmModel algoModel) {
+        refreshComboBox(algoModel);
+    }
+
+    private void refreshComboBox(AlgorithmModel algoModel) {
+        DefaultComboBoxModel comboBoxModel = (DefaultComboBoxModel) algoComboBox.getModel();
+        comboBoxModel.removeAllElements();
+        comboBoxModel.addElement(NO_SELECTION);
+        comboBoxModel.setSelectedItem(NO_SELECTION);
+
+        List<? extends AlgorithmFactory> factories = new ArrayList<>(Lookup.getDefault().lookupAll(AlgorithmFactory.class));
+        for (Iterator<? extends AlgorithmFactory> it = factories.iterator(); it.hasNext();) {
+            AlgorithmFactory f = it.next();
+            if (f.getCategory() != algoModel.getCategory()) {
+                it.remove();
+            }
+        }
+        Collections.sort(factories, new Comparator() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                return ((AlgorithmFactory) o1).getName().compareTo(((AlgorithmFactory) o2).getName());
+            }
+        });
+        for (AlgorithmFactory factory : factories) {
+            AlgorithmFactoryItem item = new AlgorithmFactoryItem(factory);
+            comboBoxModel.addElement(item);
+            if (algoModel.getSelectedAlgorithm() != null && algoModel.getSelectedAlgorithm().getFactory() == factory) {
+                comboBoxModel.setSelectedItem(item);
+            }
+        }
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        
+        if (evt.getSource() instanceof AlgorithmModel) {
+            AlgorithmModel algoModel = (AlgorithmModel) evt.getSource();
+            setAlgoModel(algoModel);
+        }
+    }
+
+    private static class AlgorithmFactoryItem {
+
+        private final AlgorithmFactory factory;
+
+        public AlgorithmFactoryItem(AlgorithmFactory factory) {
+            this.factory = factory;
+        }
+
+        public AlgorithmFactory getFactory() {
+            return factory;
+        }
+
+        @Override
+        public String toString() {
+            return factory.getName();
+        }
     }
 }

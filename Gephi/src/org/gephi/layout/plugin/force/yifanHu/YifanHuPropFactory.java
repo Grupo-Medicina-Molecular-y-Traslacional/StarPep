@@ -39,13 +39,11 @@
 
  Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.layout.plugin.forceAtlas;
+package org.gephi.layout.plugin.force.yifanHu;
 
-import javax.swing.Icon;
-import javax.swing.JPanel;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
-import org.gephi.layout.spi.LayoutUI;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.gephi.layout.plugin.AbstractLayoutFactory;
+import org.gephi.layout.plugin.force.ProportionalDisplacement;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -53,51 +51,32 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Helder Suzuki <heldersuzuki@gephi.org>
  */
-@ServiceProvider(service = LayoutBuilder.class)
-public class ForceAtlas implements LayoutBuilder {
+@ServiceProvider(service = AlgorithmFactory.class)
+public class YifanHuPropFactory extends AbstractLayoutFactory {
 
-    private final ForceAtlasLayoutUI ui = new ForceAtlasLayoutUI();
+    @Override
+    public YifanHuLayout createAlgorithm() {
+        YifanHuLayout layout = new YifanHuLayout(this, new ProportionalDisplacement(1f));
+        return layout;
+    }
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(ForceAtlasLayout.class, "name");
+        return NbBundle.getMessage(YifanHuPropFactory.class, "YifanHuProportional.name");
     }
 
     @Override
-    public ForceAtlasLayout buildLayout() {
-        return new ForceAtlasLayout(this);
+    public String getDescription() {
+        return NbBundle.getMessage(YifanHuPropFactory.class, "YifanHuProportional.description");
     }
 
     @Override
-    public LayoutUI getUI() {
-        return ui;
+    public int getQualityRank() {
+        return 3;
     }
 
-    private static class ForceAtlasLayoutUI implements LayoutUI {
-
-        @Override
-        public String getDescription() {
-            return NbBundle.getMessage(ForceAtlas.class, "description");
-        }
-
-        @Override
-        public Icon getIcon() {
-            return null;
-        }
-
-        @Override
-        public JPanel getSimplePanel(Layout layout) {
-            return null;
-        }
-
-        @Override
-        public int getQualityRank() {
-            return 5;
-        }
-
-        @Override
-        public int getSpeedRank() {
-            return 3;
-        }
+    @Override
+    public int getSpeedRank() {
+        return 4;
     }
 }

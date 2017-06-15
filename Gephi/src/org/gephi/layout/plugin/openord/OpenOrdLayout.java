@@ -49,25 +49,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CyclicBarrier;
+import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.algo.AlgorithmSetupUI;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
-import org.gephi.layout.spi.LayoutProperty;
 import org.bapedis.core.task.spi.LongTask;
 import org.bapedis.core.task.ProgressTicket;
+import org.gephi.layout.plugin.AbstractLayout;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author Mathieu Bastian
  */
-public class OpenOrdLayout implements Layout, LongTask {
+public class OpenOrdLayout extends AbstractLayout implements LongTask {
 
     //Architecture
-    private final LayoutBuilder builder;
-    private GraphModel graphModel;
     private boolean running = true;
     private ProgressTicket progressTicket;
     //Settings
@@ -85,8 +84,8 @@ public class OpenOrdLayout implements Layout, LongTask {
     private Graph graph;
     private boolean firstIteration = true;
 
-    public OpenOrdLayout(LayoutBuilder builder) {
-        this.builder = builder;
+    public OpenOrdLayout(AlgorithmFactory builder) {
+        super(builder);
     }
 
     @Override
@@ -286,67 +285,67 @@ public class OpenOrdLayout implements Layout, LongTask {
     }
 
     @Override
-    public LayoutProperty[] getProperties() {
-        List<LayoutProperty> properties = new ArrayList<>();
+    public AlgorithmProperty[] getProperties() {
+        List<AlgorithmProperty> properties = new ArrayList<>();
         final String OPENORD = "OpenOrd";
         final String STAGE = "Stages";
 
         try {
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Float.class,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.edgecut.name"),
                     OPENORD,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.edgecut.description"),
                     "getEdgeCut", "setEdgeCut"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Integer.class,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.numthreads.name"),
                     OPENORD,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.numthreads.description"),
                     "getNumThreads", "setNumThreads"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Integer.class,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.numiterations.name"),
                     OPENORD,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.numiterations.description"),
                     "getNumIterations", "setNumIterations"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Float.class,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.realtime.name"),
                     OPENORD,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.realtime.description"),
                     "getRealTime", "setRealTime"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Long.class,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.seed.name"),
                     OPENORD,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.seed.description"),
                     "getRandSeed", "setRandSeed"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Integer.class,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.liquid.name"),
                     STAGE,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.liquid.description"),
                     "getLiquidStage", "setLiquidStage"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Integer.class,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.expansion.name"),
                     STAGE,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.expansion.description"),
                     "getExpansionStage", "setExpansionStage"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Integer.class,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.cooldown.name"),
                     STAGE,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.cooldown.description"),
                     "getCooldownStage", "setCooldownStage"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Integer.class,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.crunch.name"),
                     STAGE,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.crunch.description"),
                     "getCrunchStage", "setCrunchStage"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Integer.class,
                     NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.simmer.name"),
                     STAGE,
@@ -357,7 +356,7 @@ public class OpenOrdLayout implements Layout, LongTask {
             e.printStackTrace();
         }
 
-        return properties.toArray(new LayoutProperty[0]);
+        return properties.toArray(new AlgorithmProperty[0]);
     }
 
     public Float getEdgeCut() {
@@ -458,11 +457,6 @@ public class OpenOrdLayout implements Layout, LongTask {
         int v = Math.min(100, value);
         v = Math.max(0, v);
         param.getSimmer().setIterations(v / 100f);
-    }
-
-    @Override
-    public LayoutBuilder getBuilder() {
-        return builder;
     }
 
     public Worker[] getWorkers() {

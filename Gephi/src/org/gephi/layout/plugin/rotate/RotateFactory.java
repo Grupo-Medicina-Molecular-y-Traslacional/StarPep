@@ -39,65 +39,43 @@
 
  Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.layout.plugin.scale;
+package org.gephi.layout.plugin.rotate;
 
-import javax.swing.Icon;
-import javax.swing.JPanel;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
-import org.gephi.layout.spi.LayoutUI;
+import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.gephi.layout.plugin.AbstractLayoutFactory;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
- * @author Helder Suzuki <heldersuzuki@gephi.org>>
+ * @author Helder Suzuki <heldersuzuki@gephi.org>
  */
-@ServiceProvider(service = LayoutBuilder.class)
-public class Contract implements LayoutBuilder {
+@ServiceProvider(service = AlgorithmFactory.class)
+public class RotateFactory extends AbstractLayoutFactory {
 
-    private ContractLayoutUI ui = new ContractLayoutUI();
+    @Override
+    public Algorithm createAlgorithm() {
+        return new RotateLayout(this, 90);
+    }
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(Contract.class, "contract.name");
+        return NbBundle.getMessage(RotateFactory.class, "rotate.name");
     }
 
     @Override
-    public ScaleLayout buildLayout() {
-        return new ScaleLayout(this, 0.8);
+    public String getDescription() {
+        return NbBundle.getMessage(RotateFactory.class, "rotate.description");
     }
 
     @Override
-    public LayoutUI getUI() {
-        return ui;
+    public int getQualityRank() {
+        return -1;
     }
 
-    private static class ContractLayoutUI implements LayoutUI {
-
-        @Override
-        public String getDescription() {
-            return NbBundle.getMessage(Contract.class, "contract.description");
-        }
-
-        @Override
-        public Icon getIcon() {
-            return null;
-        }
-
-        @Override
-        public JPanel getSimplePanel(Layout layout) {
-            return null;
-        }
-
-        @Override
-        public int getQualityRank() {
-            return -1;
-        }
-
-        @Override
-        public int getSpeedRank() {
-            return -1;
-        }
+    @Override
+    public int getSpeedRank() {
+        return -1;
     }
 }

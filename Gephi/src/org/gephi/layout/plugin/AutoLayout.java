@@ -44,9 +44,8 @@ package org.gephi.layout.plugin;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.bapedis.core.model.AlgorithmProperty;
 import org.gephi.graph.api.GraphModel;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutProperty;
 import org.openide.nodes.Node.Property;
 
 /**
@@ -95,14 +94,14 @@ public class AutoLayout {
         this.layouts = new ArrayList<>();
     }
 
-    public void addLayout(Layout layout, float ratio) {
+    public void addLayout(AbstractLayout layout, float ratio) {
         layouts.add(new LayoutScenario(layout, ratio));
     }
 
-    public void addLayout(Layout layout, float ratio, DynamicProperty[] properties) {
+    public void addLayout(AbstractLayout layout, float ratio, DynamicProperty[] properties) {
         for (int i = 0; i < properties.length; i++) {
             AbstractDynamicProperty property = (AbstractDynamicProperty) properties[i];
-            for (LayoutProperty lp : layout.getProperties()) {
+            for (AlgorithmProperty lp : layout.getProperties()) {
                 if (lp.getCanonicalName().equalsIgnoreCase(property.getCanonicalName()) ) {
                     property.setProperty(lp.getProperty());
                     break;
@@ -346,17 +345,17 @@ public class AutoLayout {
 
     private static class LayoutScenario {
 
-        private final Layout layout;
+        private final AbstractLayout layout;
         private final float ratio;
         private final DynamicProperty[] properties;
 
-        public LayoutScenario(Layout layout, float ratio, DynamicProperty[] properties) {
+        public LayoutScenario(AbstractLayout layout, float ratio, DynamicProperty[] properties) {
             this.layout = layout;
             this.ratio = ratio;
             this.properties = properties;
         }
 
-        public LayoutScenario(Layout layout, float ratio) {
+        public LayoutScenario(AbstractLayout layout, float ratio) {
             this(layout, ratio, new DynamicProperty[0]);
         }
     }

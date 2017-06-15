@@ -14,20 +14,24 @@ import org.bapedis.core.spi.algo.Algorithm;
  * @author loge
  */
 public class AlgorithmModel {
-    protected Class algoClassFactory;
+    protected AlgorithmCategory category;
     protected Algorithm selectedAlgorithm;
     protected transient final PropertyChangeSupport propertyChangeSupport;
+    public static final String CHANGED_CATEGORY = "CATEGORY";
+    public static final String CHANGED_ALGORITHM = "ALGORITHM";
 
     public AlgorithmModel() {
         propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
-    public Class getAlgoClassFactory() {
-        return algoClassFactory;
+    public AlgorithmCategory getCategory() {
+        return category;
     }
 
-    public void setAlgoClassFactory(Class algoClassFactory) {
-        this.algoClassFactory = algoClassFactory;
+    public void setCategory(AlgorithmCategory category) {
+        AlgorithmCategory oldValue = this.category;
+        this.category = category;
+        propertyChangeSupport.firePropertyChange(CHANGED_CATEGORY, oldValue, category);
     }
 
     public Algorithm getSelectedAlgorithm() {
@@ -35,7 +39,9 @@ public class AlgorithmModel {
     }
 
     public void setSelectedAlgorithm(Algorithm selectedAlgorithm) {
+        Algorithm oldAlgo = this.selectedAlgorithm;
         this.selectedAlgorithm = selectedAlgorithm;
+        propertyChangeSupport.firePropertyChange(CHANGED_ALGORITHM, oldAlgo, selectedAlgorithm);
     }  
     
     public void addPropertyChangeListener(PropertyChangeListener listener) {

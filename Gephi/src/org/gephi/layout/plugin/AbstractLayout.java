@@ -41,31 +41,30 @@
  */
 package org.gephi.layout.plugin;
 
+import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.gephi.graph.api.GraphModel;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
 
 /**
  * Base class for layout algorithms.
  *
  * @author Helder Suzuki <heldersuzuki@gephi.org>
  */
-public abstract class AbstractLayout implements Layout {
+public abstract class AbstractLayout implements Algorithm {
 
-    private final LayoutBuilder layoutBuilder;
+    private final AlgorithmFactory layoutBuilder;
     protected GraphModel graphModel;
     private boolean converged;
 
-    public AbstractLayout(LayoutBuilder layoutBuilder) {
+    public AbstractLayout(AlgorithmFactory layoutBuilder) {
         this.layoutBuilder = layoutBuilder;
-    }
+    }        
 
     @Override
-    public LayoutBuilder getBuilder() {
+    public AlgorithmFactory getFactory() {
         return layoutBuilder;
     }
 
-    @Override
     public void setGraphModel(GraphModel graphModel) {
         this.graphModel = graphModel;
     }

@@ -39,57 +39,43 @@ Contributor(s):
 
 Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.layout.api;
+package org.gephi.layout.plugin.openord;
 
-import org.gephi.layout.spi.Layout;
+import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.gephi.layout.plugin.AbstractLayoutFactory;
+import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
- * A LayoutController is the one responsible for controlling the states of
- * the {@link LayoutModel}. It always controls the current workspace model.
- * <p>
- * This controller is a singleton and can therefore be found in Lookup:
- * <pre>LayoutController lc = Lookup.getDefault().lookup(LayoutController.class);</pre>
+ *
  * @author Mathieu Bastian
  */
-public interface LayoutController {
+@ServiceProvider(service = AlgorithmFactory.class)
+public class OpenOrdLayoutFactory extends AbstractLayoutFactory {
 
-    /**
-     * Returns the model of the currently selected {@link Workspace}.
-     */
-    public LayoutModel getModel();
+    @Override
+    public String getName() {
+        return NbBundle.getMessage(OpenOrdLayoutFactory.class, "OpenOrd.name");
+    }
 
-    /**
-     * Sets the Layout to execute.
-     * @param layout the layout that is to be selected
-     */
-    public void setLayout(Layout layout);
+    @Override
+    public Algorithm createAlgorithm() {
+        return new OpenOrdLayout(this);
+    }
 
-    /**
-     * Executes the current Layout.
-     */
-    public void executeLayout();
+    @Override
+    public String getDescription() {
+        return NbBundle.getMessage(OpenOrdLayoutFactory.class, "OpenOrd.description");
+    }
 
-    /**
-     * Executes the current layout for <code>numIterations</code> iterations.
-     * @param numIterations the number of iterations of the algorithm
-     */
-    public void executeLayout(int numIterations);
+    @Override
+    public int getQualityRank() {
+        return 3;
+    }
 
-    /**
-     * Determine if the current Layout can be executed.
-     * @return <code>true</code> if the layout is executable.
-     */
-    public boolean canExecute();
-
-    /**
-     * Stop the Layout's execution.
-     */
-    public void stopLayout();
-
-    /**
-     * Determine if the current Layout execution can be stopped.
-     * If the current Layout is not running, it generally cannot be stopped.
-     * @return <code>true</code> if the layout can be stopped.
-     */
-    public boolean canStop();
+    @Override
+    public int getSpeedRank() {
+        return 5;
+    }
 }

@@ -43,20 +43,19 @@ package org.gephi.layout.plugin.labelAdjust;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.TextProperties;
 import org.gephi.layout.plugin.AbstractLayout;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
-import org.gephi.layout.spi.LayoutProperty;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author Mathieu Jacomy
  */
-public class LabelAdjust extends AbstractLayout implements Layout {
+public class LabelAdjust extends AbstractLayout{
 
     //Graph
     protected Graph graph;
@@ -70,7 +69,7 @@ public class LabelAdjust extends AbstractLayout implements Layout {
     private float ymin;
     private float ymax;
 
-    public LabelAdjust(LayoutBuilder layoutBuilder) {
+    public LabelAdjust(AlgorithmFactory layoutBuilder) {
         super(layoutBuilder);
     }
 
@@ -268,18 +267,18 @@ public class LabelAdjust extends AbstractLayout implements Layout {
     }
 
     @Override
-    public LayoutProperty[] getProperties() {
-        List<LayoutProperty> properties = new ArrayList<>();
+    public AlgorithmProperty[] getProperties() {
+        List<AlgorithmProperty> properties = new ArrayList<>();
         final String LABELADJUST_CATEGORY = "LabelAdjust";
         try {
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Double.class,
                     NbBundle.getMessage(getClass(), "LabelAdjust.speed.name"),
                     LABELADJUST_CATEGORY,
                     "LabelAdjust.speed.name",
                     NbBundle.getMessage(getClass(), "LabelAdjust.speed.desc"),
                     "getSpeed", "setSpeed"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Boolean.class,
                     NbBundle.getMessage(getClass(), "LabelAdjust.adjustBySize.name"),
                     LABELADJUST_CATEGORY,
@@ -289,7 +288,7 @@ public class LabelAdjust extends AbstractLayout implements Layout {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return properties.toArray(new LayoutProperty[0]);
+        return properties.toArray(new AlgorithmProperty[0]);
     }
 
     public Double getSpeed() {

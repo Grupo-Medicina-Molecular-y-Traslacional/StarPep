@@ -43,21 +43,20 @@ package org.gephi.layout.plugin.fruchterman;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 import org.gephi.layout.plugin.AbstractLayout;
 import org.gephi.layout.plugin.ForceVectorNodeLayoutData;
-import org.gephi.layout.spi.Layout;
-import org.gephi.layout.spi.LayoutBuilder;
-import org.gephi.layout.spi.LayoutProperty;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author Mathieu Jacomy
  */
-public class FruchtermanReingold extends AbstractLayout implements Layout {
+public class FruchtermanReingold extends AbstractLayout {
 
     private static final float SPEED_DIVISOR = 800;
     private static final float AREA_MULTIPLICATOR = 10000;
@@ -68,7 +67,7 @@ public class FruchtermanReingold extends AbstractLayout implements Layout {
     private double gravity;
     private double speed;
 
-    public FruchtermanReingold(LayoutBuilder layoutBuilder) {
+    public FruchtermanReingold(AlgorithmFactory layoutBuilder) {
         super(layoutBuilder);
     }
 
@@ -182,26 +181,26 @@ public class FruchtermanReingold extends AbstractLayout implements Layout {
     }
 
     @Override
-    public LayoutProperty[] getProperties() {
-        List<LayoutProperty> properties = new ArrayList<>();
+    public AlgorithmProperty[] getProperties() {
+        List<AlgorithmProperty> properties = new ArrayList<>();
         final String FRUCHTERMAN_REINGOLD = "Fruchterman Reingold";
 
         try {
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Float.class,
                     NbBundle.getMessage(FruchtermanReingold.class, "fruchtermanReingold.area.name"),
                     FRUCHTERMAN_REINGOLD,
                     "fruchtermanReingold.area.name",
                     NbBundle.getMessage(FruchtermanReingold.class, "fruchtermanReingold.area.desc"),
                     "getArea", "setArea"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Double.class,
                     NbBundle.getMessage(FruchtermanReingold.class, "fruchtermanReingold.gravity.name"),
                     FRUCHTERMAN_REINGOLD,
                     "fruchtermanReingold.gravity.name",
                     NbBundle.getMessage(FruchtermanReingold.class, "fruchtermanReingold.gravity.desc"),
                     "getGravity", "setGravity"));
-            properties.add(LayoutProperty.createProperty(
+            properties.add(AlgorithmProperty.createProperty(
                     this, Double.class,
                     NbBundle.getMessage(FruchtermanReingold.class, "fruchtermanReingold.speed.name"),
                     FRUCHTERMAN_REINGOLD,
@@ -212,7 +211,7 @@ public class FruchtermanReingold extends AbstractLayout implements Layout {
             e.printStackTrace();
         }
 
-        return properties.toArray(new LayoutProperty[0]);
+        return properties.toArray(new AlgorithmProperty[0]);
     }
 
     public Float getArea() {

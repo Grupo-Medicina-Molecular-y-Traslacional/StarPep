@@ -5,13 +5,20 @@
  */
 package org.bapedis.core.ui;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.ItemEvent;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import org.bapedis.core.events.WorkspaceEventListener;
@@ -21,6 +28,7 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -28,6 +36,7 @@ import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.explorer.propertysheet.PropertySheet;
 import org.openide.nodes.Node;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -58,6 +67,7 @@ import org.openide.util.NbBundle;
 public final class AlgoExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener {
 
     protected final ProjectManager pc;
+    private RichTooltip richTooltip;
 
     public AlgoExplorerTopComponent() {
         initComponents();
@@ -103,6 +113,14 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
         infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(infoLabel, org.openide.util.NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.infoLabel.text")); // NOI18N
+        infoLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                infoLabelMouseExited(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                infoLabelMouseEntered(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -151,6 +169,11 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         resetButton.setFocusable(false);
         resetButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         resetButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        resetButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetButtonActionPerformed(evt);
+            }
+        });
         algoToolBar.add(resetButton);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -162,17 +185,60 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         add(algoToolBar, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void infoLabelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_infoLabelMouseEntered
+        if (richTooltip == null) {
+            AlgorithmModel algoModel = pc.getAlgorithmModel();
+            if (infoLabel.isEnabled() && algoModel.getSelectedAlgorithm() != null) {
+                richTooltip = buildTooltip(algoModel.getSelectedAlgorithm().getFactory());
+            }
+        }
+        if (richTooltip != null) {
+            richTooltip.showTooltip(infoLabel, evt.getLocationOnScreen());
+        }
+    }//GEN-LAST:event_infoLabelMouseEntered
+
+    private void infoLabelMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_infoLabelMouseExited
+        if (richTooltip != null) {
+            richTooltip.hideTooltip();
+        }
+    }//GEN-LAST:event_infoLabelMouseExited
+
     private void algoComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_algoComboBoxItemStateChanged
-        AlgorithmModel algoModel = pc.getAlgorithmModel();
-        if (algoComboBox.getSelectedItem() instanceof AlgorithmFactoryItem) {
-            AlgorithmFactory factory = ((AlgorithmFactoryItem) algoComboBox.getSelectedItem()).getFactory();
-            Algorithm algorithm = factory.createAlgorithm();
-            algorithm.resetPropertiesValues();
-            algoModel.setSelectedAlgorithm(algorithm);
-        } else {
-            algoModel.setSelectedAlgorithm(null);
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            AlgorithmModel algoModel = pc.getAlgorithmModel();
+            if (algoComboBox.getSelectedItem() instanceof AlgorithmFactoryItem) {
+                AlgorithmFactory factory = ((AlgorithmFactoryItem) algoComboBox.getSelectedItem()).getFactory();
+                Workspace currentWs = pc.getCurrentWorkspace();
+                Collection<? extends Algorithm> savedAlgo = currentWs.getLookup().lookupAll(Algorithm.class);
+                Algorithm algorithm = null;
+                for (Algorithm algo : savedAlgo) {
+                    if (algo.getFactory() == factory) {
+                        algorithm = algo;
+                        break;
+                    }
+                }
+                if (algorithm == null) {
+                    algorithm = factory.createAlgorithm();
+                    algorithm.resetPropertiesValues();
+                    currentWs.add(algorithm);
+                }
+                algoModel.setSelectedAlgorithm(algorithm);
+            } else {
+                algoModel.setSelectedAlgorithm(null);
+            }
+        } else if (evt.getStateChange() == ItemEvent.DESELECTED) {
+            richTooltip = null;
         }
     }//GEN-LAST:event_algoComboBoxItemStateChanged
+
+    private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
+        AlgorithmModel algoModel = pc.getAlgorithmModel();
+        Algorithm algo = algoModel.getSelectedAlgorithm();
+        if (algo != null) {
+            algo.resetPropertiesValues();
+            refreshProperties(algoModel);
+        }
+    }//GEN-LAST:event_resetButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> algoComboBox;
@@ -226,8 +292,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
     private void refreshAlgChooser(AlgorithmModel algoModel) {
         String NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text", algoModel.getCategory().getDisplayName());
-        DefaultComboBoxModel comboBoxModel = (DefaultComboBoxModel) algoComboBox.getModel();
-        comboBoxModel.removeAllElements();
+        DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
         comboBoxModel.addElement(NO_SELECTION);
         comboBoxModel.setSelectedItem(NO_SELECTION);
 
@@ -251,6 +316,8 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 comboBoxModel.setSelectedItem(item);
             }
         }
+        algoComboBox.setModel(comboBoxModel);
+//        algoComboBox.setEnabled(!algoModel.isRunning());
     }
 
     private void refreshProperties(AlgorithmModel algoModel) {
@@ -291,6 +358,18 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         }
     }
 
+    private RichTooltip buildTooltip(AlgorithmFactory factory) {
+        String description = factory.getDescription();
+        RichTooltip tooltip = new RichTooltip(factory.getName(), description);
+        int qualityRank = factory.getQualityRank();
+        int speedRank = factory.getSpeedRank();
+        if (qualityRank > 0 && qualityRank <= 5 && speedRank > 0 && speedRank <= 5) {
+            LayoutDescriptionImage layoutDescriptionImage = new LayoutDescriptionImage(factory);
+            tooltip.setMainImage(layoutDescriptionImage.getImage());
+        }
+        return tooltip;
+    }
+
     private static class AlgorithmFactoryItem {
 
         private final AlgorithmFactory factory;
@@ -306,6 +385,65 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         @Override
         public String toString() {
             return factory.getName();
+        }
+    }
+
+    private static class LayoutDescriptionImage {
+
+        private static final int STAR_WIDTH = 16;
+        private static final int STAR_HEIGHT = 16;
+        private static final int STAR_MAX = 5;
+        private static final int TEXT_GAP = 5;
+        private static final int LINE_GAP = 4;
+        private static final int Y_BEGIN = 10;
+        private static final int IMAGE_RIGHT_MARIN = 10;
+        private final Image greenIcon;
+        private final Image grayIcon;
+        private Graphics g;
+        private final String qualityStr;
+        private final String speedStr;
+        private int textMaxSize;
+        private final AlgorithmFactory factory;
+
+        public LayoutDescriptionImage(AlgorithmFactory factory) {
+            this.factory = factory;
+            greenIcon = ImageUtilities.loadImage("org/bapedis/core/resources/yellow.png");
+            grayIcon = ImageUtilities.loadImage("org/bapedis/core/resources/grey.png");
+            qualityStr = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.tooltip.quality");
+            speedStr = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.tooltip.speed");
+        }
+
+        public void paint(Graphics g) {
+            g.setColor(Color.BLACK);
+            g.drawString(qualityStr, 0, STAR_HEIGHT + Y_BEGIN - 2);
+            paintStarPanel(g, textMaxSize + TEXT_GAP, Y_BEGIN, STAR_MAX, factory.getQualityRank());
+            g.drawString(speedStr, 0, STAR_HEIGHT * 2 + LINE_GAP + Y_BEGIN - 2);
+            paintStarPanel(g, textMaxSize + TEXT_GAP, STAR_HEIGHT + LINE_GAP + Y_BEGIN, STAR_MAX, factory.getSpeedRank());
+        }
+
+        public Image getImage() {
+            //Image size
+            BufferedImage im = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+            textMaxSize = 0;
+            textMaxSize = Math.max(im.getGraphics().getFontMetrics().stringWidth(qualityStr), textMaxSize);
+            textMaxSize = Math.max(im.getGraphics().getFontMetrics().stringWidth(speedStr), textMaxSize);
+            int imageWidth = STAR_MAX * STAR_WIDTH + TEXT_GAP + textMaxSize + IMAGE_RIGHT_MARIN;
+
+            //Paint
+            BufferedImage img = new BufferedImage(imageWidth, 100, BufferedImage.TYPE_INT_ARGB);
+            this.g = img.getGraphics();
+            paint(g);
+            return img;
+        }
+
+        public void paintStarPanel(Graphics g, int x, int y, int max, int value) {
+            for (int i = 0; i < max; i++) {
+                if (i < value) {
+                    g.drawImage(greenIcon, x + i * 16, y, null);
+                } else {
+                    g.drawImage(grayIcon, x + i * 16, y, null);
+                }
+            }
         }
     }
 }

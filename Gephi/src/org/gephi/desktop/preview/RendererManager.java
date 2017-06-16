@@ -62,7 +62,7 @@ import org.gephi.preview.api.ManagedRenderer;
 import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.spi.Renderer;
-import org.gephi.ui.components.richtooltip.RichTooltip;
+import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.gephi.ui.utils.UIUtils;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;

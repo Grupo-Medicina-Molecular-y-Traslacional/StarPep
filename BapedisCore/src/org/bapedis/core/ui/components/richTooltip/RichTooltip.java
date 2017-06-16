@@ -39,7 +39,7 @@ Contributor(s):
 
 Portions Copyrighted 2011 Gephi Consortium.
 */
-package org.gephi.ui.components.richtooltip;
+package org.bapedis.core.ui.components.richTooltip;
 
 import java.awt.Dimension;
 import java.awt.GraphicsConfiguration;

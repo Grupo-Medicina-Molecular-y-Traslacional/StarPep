@@ -145,7 +145,12 @@
                 <package>org.bapedis.core.ui</package>
                 <package>org.bapedis.core.ui.actions</package>
                 <package>org.bapedis.core.ui.components</package>
+                <package>org.bapedis.core.ui.components.richTooltip</package>
             </public-packages>
+            <class-path-extension>
+                <runtime-relative-path>ext/flamingo-5.0-gephi.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/flamingo-5.0-gephi.jar</binary-origin>
+            </class-path-extension>
         </data>
     </configuration>
 </project>

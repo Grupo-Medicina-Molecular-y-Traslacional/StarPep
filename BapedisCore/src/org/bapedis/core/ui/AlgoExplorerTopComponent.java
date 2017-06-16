@@ -163,7 +163,15 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     }// </editor-fold>//GEN-END:initComponents
 
     private void algoComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_algoComboBoxItemStateChanged
-        // TODO add your handling code here:
+        AlgorithmModel algoModel = pc.getAlgorithmModel();
+        if (algoComboBox.getSelectedItem() instanceof AlgorithmFactoryItem) {
+            AlgorithmFactory factory = ((AlgorithmFactoryItem) algoComboBox.getSelectedItem()).getFactory();
+            Algorithm algorithm = factory.createAlgorithm();
+            algorithm.resetPropertiesValues();
+            algoModel.setSelectedAlgorithm(algorithm);
+        } else {
+            algoModel.setSelectedAlgorithm(null);
+        }
     }//GEN-LAST:event_algoComboBoxItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -211,13 +219,9 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         setAlgoModel(algoModel);
     }
 
-    private void setSelectedLayout(AlgorithmFactory factory) {
-        AlgorithmModel algoModel = pc.getAlgorithmModel();
-        algoModel.setSelectedAlgorithm(factory.createAlgorithm());
-    }
-
     private void setAlgoModel(AlgorithmModel algoModel) {
         refreshAlgChooser(algoModel);
+        refreshProperties(algoModel);
     }
 
     private void refreshAlgChooser(AlgorithmModel algoModel) {

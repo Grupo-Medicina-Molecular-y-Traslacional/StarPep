@@ -8,37 +8,68 @@ package org.bapedis.core.ui;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
+import org.openide.filesystems.FileObject;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AlgorithmModel;
 import org.bapedis.core.model.AlgorithmNode;
+import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.awt.StatusDisplayer;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.explorer.propertysheet.PropertySheet;
+import org.openide.filesystems.FileUtil;
 import org.openide.nodes.Node;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * Top component which displays something.
@@ -68,12 +99,14 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
     protected final ProjectManager pc;
     private RichTooltip richTooltip;
+    private final AlgoPresetPersistence algoPresetPersistence;
 
     public AlgoExplorerTopComponent() {
         initComponents();
         setName(Bundle.CTL_AlgoExplorerTopComponent());
         setToolTipText(Bundle.HINT_AlgoExplorerTopComponent());
         pc = Lookup.getDefault().lookup(ProjectManager.class);
+        algoPresetPersistence = new AlgoPresetPersistence();
     }
 
     /**
@@ -163,6 +196,11 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         org.openide.awt.Mnemonics.setLocalizedText(presetsButton, org.openide.util.NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.text")); // NOI18N
         presetsButton.setFocusable(false);
         presetsButton.setIconTextGap(0);
+        presetsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                presetsButtonActionPerformed(evt);
+            }
+        });
         algoToolBar.add(presetsButton);
 
         org.openide.awt.Mnemonics.setLocalizedText(resetButton, org.openide.util.NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.resetButton.text")); // NOI18N
@@ -239,6 +277,53 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             refreshProperties(algoModel);
         }
     }//GEN-LAST:event_resetButtonActionPerformed
+
+    private void presetsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_presetsButtonActionPerformed
+        final AlgorithmModel algoModel = pc.getAlgorithmModel();
+        if (algoModel.getSelectedAlgorithm() != null) {
+            JPopupMenu menu = new JPopupMenu();
+            List<AlgoPresetPersistence.Preset> presets = algoPresetPersistence.getPresets(algoModel.getSelectedAlgorithm());
+            if (presets != null && !presets.isEmpty()) {
+                for (final AlgoPresetPersistence.Preset p : presets) {
+                    JMenuItem item = new JMenuItem(p.toString());
+                    item.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            algoPresetPersistence.loadPreset(p, algoModel.getSelectedAlgorithm());
+                            refreshProperties(algoModel);
+                            StatusDisplayer.getDefault().setStatusText(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.status.loadPreset", algoModel.getSelectedAlgorithm().getFactory().getName(), p.toString()));
+                        }
+                    });
+                    menu.add(item);
+                }
+            } else {
+                menu.add("<html><i>" + NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.nopreset") + "</i></html>");
+            }
+
+            JMenuItem saveItem = new JMenuItem(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.savePreset"));
+            saveItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String lastPresetName = NbPreferences.forModule(AlgoExplorerTopComponent.class).get("AlgoExplorerTopComponent.lastPresetName", "");
+                    NotifyDescriptor.InputLine question = new NotifyDescriptor.InputLine(
+                            NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.savePreset.input"),
+                            NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.savePreset.input.name"));
+                    question.setInputText(lastPresetName);
+                    if (DialogDisplayer.getDefault().notify(question) == NotifyDescriptor.OK_OPTION) {
+                        String input = question.getInputText();
+                        if (input != null && !input.isEmpty()) {
+                            algoPresetPersistence.savePreset(input, algoModel.getSelectedAlgorithm());
+                            StatusDisplayer.getDefault().setStatusText(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.status.savePreset", algoModel.getSelectedAlgorithm().getFactory().getName(), input));
+                            NbPreferences.forModule(AlgoExplorerTopComponent.class).put("AlgoExplorerTopComponent.lastPresetName", input);
+                        }
+                    }
+                }
+            });
+            menu.add(new JSeparator());
+            menu.add(saveItem);
+            menu.show(algoToolBar, 0, -menu.getPreferredSize().height);
+        }
+    }//GEN-LAST:event_presetsButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> algoComboBox;
@@ -364,8 +449,8 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         int qualityRank = factory.getQualityRank();
         int speedRank = factory.getSpeedRank();
         if (qualityRank > 0 && qualityRank <= 5 && speedRank > 0 && speedRank <= 5) {
-            LayoutDescriptionImage layoutDescriptionImage = new LayoutDescriptionImage(factory);
-            tooltip.setMainImage(layoutDescriptionImage.getImage());
+            AlgoDescriptionImage algoDescriptionImage = new AlgoDescriptionImage(factory);
+            tooltip.setMainImage(algoDescriptionImage.getImage());
         }
         return tooltip;
     }
@@ -388,7 +473,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         }
     }
 
-    private static class LayoutDescriptionImage {
+    private static class AlgoDescriptionImage {
 
         private static final int STAR_WIDTH = 16;
         private static final int STAR_HEIGHT = 16;
@@ -405,7 +490,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         private int textMaxSize;
         private final AlgorithmFactory factory;
 
-        public LayoutDescriptionImage(AlgorithmFactory factory) {
+        public AlgoDescriptionImage(AlgorithmFactory factory) {
             this.factory = factory;
             greenIcon = ImageUtilities.loadImage("org/bapedis/core/resources/yellow.png");
             grayIcon = ImageUtilities.loadImage("org/bapedis/core/resources/grey.png");
@@ -444,6 +529,236 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                     g.drawImage(grayIcon, x + i * 16, y, null);
                 }
             }
+        }
+    }
+}
+
+class AlgoPresetPersistence {
+
+    private Map<String, List<Preset>> presets = new HashMap<>();
+
+    public AlgoPresetPersistence() {
+        loadPresets();
+    }
+
+    public void savePreset(String name, Algorithm algorithm) {
+        Preset preset = addPreset(new Preset(name, algorithm));
+
+        FileOutputStream fos = null;
+        try {
+            //Create file if dont exist
+            FileObject folder = FileUtil.getConfigFile("algortihmpresets");
+            if (folder == null) {
+                folder = FileUtil.getConfigRoot().createFolder("algorithmpresets");
+            }
+            File presetFile = new File(FileUtil.toFile(folder), name + ".xml");
+
+            //Create doc
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+            final Document document = documentBuilder.newDocument();
+            document.setXmlVersion("1.0");
+            document.setXmlStandalone(true);
+
+            //Write doc
+            preset.writeXML(document);
+
+            //Write XML file
+            fos = new FileOutputStream(presetFile);
+            Source source = new DOMSource(document);
+            Result result = new StreamResult(fos);
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.transform(source, result);
+        } catch (Exception e) {
+            Logger.getLogger("").log(Level.SEVERE, "Error while writing preset file", e);
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException ex) {
+                }
+            }
+        }
+    }
+
+    public void loadPreset(Preset preset, Algorithm algorithm) {
+        for (AlgorithmProperty p : algorithm.getProperties()) {
+            for (int i = 0; i < preset.propertyNames.size(); i++) {
+                if (p.getCanonicalName().equalsIgnoreCase(preset.propertyNames.get(i))
+                        || p.getProperty().getName().equalsIgnoreCase(preset.propertyNames.get(i))) {//Also compare with property name to maintain compatibility with old presets
+                    try {
+                        p.getProperty().setValue(preset.propertyValues.get(i));
+                    } catch (Exception e) {
+                        Logger.getLogger("").log(Level.SEVERE, "Error while setting preset property", e);
+                    }
+                }
+            }
+        }
+    }
+
+    public List<Preset> getPresets(Algorithm algorithm) {
+        return presets.get(algorithm.getClass().getName());
+    }
+
+    private void loadPresets() {
+        FileObject folder = FileUtil.getConfigFile("algorithmpresets");
+        if (folder != null) {
+            for (FileObject child : folder.getChildren()) {
+                if (child.isValid() && child.hasExt("xml")) {
+                    try {
+                        InputStream stream = child.getInputStream();
+                        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                        DocumentBuilder builder = factory.newDocumentBuilder();
+                        Document document = builder.parse(stream);
+                        Preset preset = new Preset(document);
+                        addPreset(preset);
+                    } catch (Exception e) {
+                        Logger.getLogger("").log(Level.SEVERE, "Error while reading preset file", e);
+                    }
+                }
+            }
+        }
+    }
+
+    private Preset addPreset(Preset preset) {
+        List<Preset> algoPresets = presets.get(preset.algorithmClassName);
+        if (algoPresets == null) {
+            algoPresets = new ArrayList<>();
+            presets.put(preset.algorithmClassName, algoPresets);
+        }
+        for (Preset p : algoPresets) {
+            if (p.equals(preset)) {
+                return p;
+            }
+        }
+        algoPresets.add(preset);
+        return preset;
+    }
+
+    public static class Preset {
+
+        private List<String> propertyNames = new ArrayList<>();
+        private List<Object> propertyValues = new ArrayList<>();
+        private String algorithmClassName;
+        private String name;
+
+        private Preset(String name, Algorithm algorithm) {
+            this.name = name;
+            this.algorithmClassName = algorithm.getClass().getName();
+            for (AlgorithmProperty p : algorithm.getProperties()) {
+                try {
+                    Object value = p.getProperty().getValue();
+                    if (value != null) {
+                        propertyNames.add(p.getCanonicalName());
+                        propertyValues.add(value);
+                    }
+                } catch (Exception e) {
+                }
+            }
+        }
+
+        private Preset(Document document) {
+            readXML(document);
+        }
+
+        public void readXML(Document document) {
+            NodeList propertiesList = document.getDocumentElement().getElementsByTagName("properties");
+            if (propertiesList.getLength() > 0) {
+                for (int j = 0; j < propertiesList.getLength(); j++) {
+                    org.w3c.dom.Node m = propertiesList.item(j);
+                    if (m.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+                        Element propertiesE = (Element) m;
+                        algorithmClassName = propertiesE.getAttribute("algorithmClassName");
+                        name = propertiesE.getAttribute("name");
+                        NodeList propertyList = propertiesE.getElementsByTagName("property");
+                        for (int i = 0; i < propertyList.getLength(); i++) {
+                            org.w3c.dom.Node n = propertyList.item(i);
+                            if (n.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+                                Element propertyE = (Element) n;
+                                String propStr = propertyE.getAttribute("property");
+                                String classStr = propertyE.getAttribute("class");
+                                String valStr = propertyE.getTextContent();
+                                Object value = parse(classStr, valStr);
+                                if (value != null) {
+                                    propertyNames.add(propStr);
+                                    propertyValues.add(value);
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        private Object parse(String classStr, String str) {
+            try {
+                Class c = Class.forName(classStr);
+                if (c.equals(Boolean.class)) {
+                    return new Boolean(str);
+                } else if (c.equals(Integer.class)) {
+                    return new Integer(str);
+                } else if (c.equals(Float.class)) {
+                    return new Float(str);
+                } else if (c.equals(Double.class)) {
+                    return new Double(str);
+                } else if (c.equals(Long.class)) {
+                    return new Long(str);
+                } else if (c.equals(String.class)) {
+                    return str;
+                }
+            } catch (ClassNotFoundException ex) {
+                return null;
+            }
+            return null;
+        }
+
+        public void writeXML(Document document) {
+            Element rootE = document.createElement("algorithmproperties");
+
+            //Properties
+            Element propertiesE = document.createElement("properties");
+            propertiesE.setAttribute("algorithmClassName", algorithmClassName);
+            propertiesE.setAttribute("name", name);
+            propertiesE.setAttribute("version", "0.7");
+            for (int i = 0; i < propertyNames.size(); i++) {
+                Element propertyE = document.createElement("property");
+                propertyE.setAttribute("property", propertyNames.get(i));
+                propertyE.setAttribute("class", propertyValues.get(i).getClass().getName());
+                propertyE.setTextContent(propertyValues.get(i).toString());
+                propertiesE.appendChild(propertyE);
+            }
+            rootE.appendChild(propertiesE);
+            document.appendChild(rootE);
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final Preset other = (Preset) obj;
+            if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 37 * hash + (this.name != null ? this.name.hashCode() : 0);
+            return hash;
         }
     }
 }

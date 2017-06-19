@@ -19,10 +19,12 @@ public class AlgorithmModel {
     protected transient final PropertyChangeSupport propertyChangeSupport;
     public static final String CHANGED_CATEGORY = "CATEGORY";
     public static final String CHANGED_ALGORITHM = "ALGORITHM";
+    protected boolean running;
 
     public AlgorithmModel() {
         category = AlgorithmCategory.GraphLayout;
         propertyChangeSupport = new PropertyChangeSupport(this);
+        running = false;
     }
 
     public AlgorithmCategory getCategory() {
@@ -44,7 +46,15 @@ public class AlgorithmModel {
         this.selectedAlgorithm = selectedAlgorithm;
         propertyChangeSupport.firePropertyChange(CHANGED_ALGORITHM, oldAlgo, selectedAlgorithm);
     }  
-    
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
+        
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }

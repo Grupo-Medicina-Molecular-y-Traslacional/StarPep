@@ -442,13 +442,6 @@ public class ForceAtlas2 extends AbstractLayout {
         setThreadsCount(Math.max(1, Runtime.getRuntime().availableProcessors() - 1));
     }
 
-    @Override
-    public void setGraphModel(GraphModel graphModel) {
-        this.graphModel = graphModel;
-        // Trick: reset here to take the profile of the graph in account for default values
-        resetPropertiesValues();
-    }
-
     public Double getBarnesHutTheta() {
         return barnesHutTheta;
     }

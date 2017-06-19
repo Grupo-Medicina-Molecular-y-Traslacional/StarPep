@@ -51,12 +51,9 @@ import java.util.Random;
 import java.util.concurrent.CyclicBarrier;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.bapedis.core.spi.algo.AlgorithmSetupUI;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
-import org.bapedis.core.task.LongTask;
-import org.bapedis.core.task.ProgressTicket;
 import org.gephi.layout.plugin.AbstractLayout;
 import org.openide.util.NbBundle;
 
@@ -64,11 +61,10 @@ import org.openide.util.NbBundle;
  *
  * @author Mathieu Bastian
  */
-public class OpenOrdLayout extends AbstractLayout implements LongTask {
+public class OpenOrdLayout extends AbstractLayout{
 
     //Architecture
     private boolean running = true;
-    private ProgressTicket progressTicket;
     //Settings
     private Params param;
     private float edgeCut;
@@ -280,11 +276,6 @@ public class OpenOrdLayout extends AbstractLayout implements LongTask {
     }
 
     @Override
-    public void setGraphModel(GraphModel graphModel) {
-        this.graphModel = graphModel;
-    }
-
-    @Override
     public AlgorithmProperty[] getProperties() {
         List<AlgorithmProperty> properties = new ArrayList<>();
         final String OPENORD = "OpenOrd";
@@ -469,15 +460,5 @@ public class OpenOrdLayout extends AbstractLayout implements LongTask {
 
     public Control getControl() {
         return control;
-    }
-
-    @Override
-    public boolean cancel() {
-        return true;
-    }
-
-    @Override
-    public void setProgressTicket(ProgressTicket progressTicket) {
-        this.progressTicket = progressTicket;
     }
 }

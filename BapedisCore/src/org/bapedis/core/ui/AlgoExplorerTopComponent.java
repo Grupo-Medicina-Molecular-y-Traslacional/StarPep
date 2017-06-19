@@ -51,6 +51,7 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.task.TaskExecutor;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.DialogDisplayer;
@@ -163,6 +164,11 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
         runButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/run.gif"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(runButton, org.openide.util.NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.runButton.text")); // NOI18N
+        runButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                runButtonActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -325,6 +331,21 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         }
     }//GEN-LAST:event_presetsButtonActionPerformed
 
+    private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
+        AlgorithmModel algoModel = pc.getAlgorithmModel();
+//        if (algoModel.isRunning()) {
+//            stop();
+//        } else {
+//            run();
+//        }
+        Algorithm algo = algoModel.getSelectedAlgorithm();
+        if (algo != null) {
+            TaskExecutor executor = pc.getExecutor();
+            executor.execute(algo, algo.getFactory().getName(), null);
+            algoModel.setRunning(true);
+        }
+    }//GEN-LAST:event_runButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> algoComboBox;
     private javax.swing.JPanel algoProvidedPanel;
@@ -373,6 +394,22 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     private void setAlgoModel(AlgorithmModel algoModel) {
         refreshAlgChooser(algoModel);
         refreshProperties(algoModel);
+
+//        if (model == null || !model.isRunning()) {
+//            runButton.setText(NbBundle.getMessage(LayoutPanel.class, "LayoutPanel.runButton.text"));
+//            runButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/layout/resources/run.gif", false));
+//            runButton.setToolTipText(NbBundle.getMessage(LayoutPanel.class, "LayoutPanel.runButton.tooltip"));
+//        } else if (model.isRunning()) {
+//            runButton.setText(NbBundle.getMessage(LayoutPanel.class, "LayoutPanel.stopButton.text"));
+//            runButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/layout/resources/stop.png", false));
+//            runButton.setToolTipText(NbBundle.getMessage(LayoutPanel.class, "LayoutPanel.stopButton.tooltip"));
+//        }  
+//        boolean enabled = model != null && model.getSelectedLayout() != null;
+//        runButton.setEnabled(enabled);
+//        resetButton.setEnabled(enabled);
+//        infoLabel.setEnabled(enabled);
+//        propertySheet.setEnabled(enabled);
+//        presetsButton.setEnabled(enabled);
     }
 
     private void refreshAlgChooser(AlgorithmModel algoModel) {
@@ -440,6 +477,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 AlgorithmModel algoModel = (AlgorithmModel) evt.getSource();
                 refreshProperties(algoModel);
             }
+//            layoutCombobox.setEnabled(!model.isRunning());
         }
     }
 

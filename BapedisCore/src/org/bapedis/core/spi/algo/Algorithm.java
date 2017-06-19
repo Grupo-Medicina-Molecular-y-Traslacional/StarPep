@@ -11,31 +11,8 @@ import org.bapedis.core.model.AlgorithmProperty;
  *
  * @author loge
  */
-public interface Algorithm {
-     /**
-     * initAlgo() is called to initialize the algorithm (prepare to run).
-     */
-    public void initAlgo();
+public interface Algorithm extends Runnable {    
     
-    /**
-     * Run a step in the algorithm, should be called only if canAlgo() returns
-     * true.
-     */
-    public void goAlgo();
-    
-    /**
-     * Tests if the algorithm can run, called before each pass.
-     * @return              <code>true</code> if the algorithm can run, <code>
-     *                      false</code> otherwise
-     */
-    public boolean canAlgo();
-
-    /**
-     * Called when the algorithm is finished (canAlgo() returns false).
-     */
-    public void endAlgo();
-
-
     /**
      * The properties for this algorithm.
      * @return              the algorithm properties

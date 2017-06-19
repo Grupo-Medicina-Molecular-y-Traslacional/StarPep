@@ -174,7 +174,6 @@ public class AutoLayout {
         if (currentLayout != layout) {
             innerStart = currentRatio;
             innerIteration = 0;
-            layout.layout.setGraphModel(graphModel);
             layout.layout.resetPropertiesValues();
             layout.layout.initAlgo();
         } else {

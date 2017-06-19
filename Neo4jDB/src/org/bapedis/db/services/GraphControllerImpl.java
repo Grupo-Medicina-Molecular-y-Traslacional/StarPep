@@ -43,7 +43,6 @@ package org.bapedis.db.services;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.events.WorkspaceEventListener;

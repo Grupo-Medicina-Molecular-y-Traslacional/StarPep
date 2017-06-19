@@ -41,35 +41,103 @@
  */
 package org.gephi.layout.plugin;
 
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.task.LongTask;
+import org.bapedis.core.task.Progress;
+import org.bapedis.core.task.ProgressTicket;
+import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
+import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 /**
  * Base class for layout algorithms.
  *
  * @author Helder Suzuki <heldersuzuki@gephi.org>
  */
-public abstract class AbstractLayout implements Algorithm {
+public abstract class AbstractLayout implements Algorithm, LongTask {
 
     private final AlgorithmFactory layoutBuilder;
     protected GraphModel graphModel;
-    private boolean converged;
+    protected boolean converged;
+    protected Integer iterations;
+    protected boolean stopRun = false;
+    protected ProgressTicket progressTicket;
 
     public AbstractLayout(AlgorithmFactory layoutBuilder) {
         this.layoutBuilder = layoutBuilder;
-    }        
+        GraphController gc = Lookup.getDefault().lookup(GraphController.class);
+        graphModel = gc.getGraphModel();
+    }
+
+    public Integer getIterations() {
+        return iterations;
+    }
+
+    public void setIterations(Integer iterations) {
+        this.iterations = iterations;
+    }
 
     @Override
     public AlgorithmFactory getFactory() {
         return layoutBuilder;
     }
+    
+     /**
+     * initAlgo() is called to initialize the algorithm (prepare to run).
+     */
+    public abstract void initAlgo();  
+    
+    /**
+     * Run a step in the algorithm, should be called only if canAlgo() returns
+     * true.
+     */
+    public abstract void goAlgo();
+    
 
-    public void setGraphModel(GraphModel graphModel) {
-        this.graphModel = graphModel;
+    /**
+     * Called when the algorithm is finished (canAlgo() returns false).
+     */
+    public abstract void endAlgo();    
+
+    @Override
+    public void run() {
+        initAlgo();
+        long i = 0;
+        while (canAlgo() && !stopRun) {
+            goAlgo();
+            i++;
+            if (iterations != null && iterations.longValue() == i) {
+                break;
+            }
+        }
+        endAlgo();
+//        if (i > 1) {
+//            Progress.finish(progressTicket, NbBundle.getMessage(LayoutControllerImpl.class, "LayoutRun.end", layout.getBuilder().getName(), i));
+//        } else {
+//            Progress.finish(progressTicket);
+//        }
     }
 
     @Override
+    public boolean cancel() {
+        stopRun = true;
+        return true;
+    }
+
+    @Override
+    public void setProgressTicket(ProgressTicket progressTicket) {
+        this.progressTicket = progressTicket;
+    }
+
+    /**
+     * Tests if the algorithm can run, called before each pass.
+     *
+     * @return              <code>true</code> if the algorithm can run, <code>
+     *                      false</code> otherwise
+     */
     public boolean canAlgo() {
         return !isConverged() && graphModel != null;
     }

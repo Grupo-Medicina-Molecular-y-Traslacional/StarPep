@@ -67,7 +67,6 @@ public final class TaskExecutor {
 
     private final long interruptDelay = 500;
     private final ThreadPoolExecutor executor;
-    private Timer cancelTimer;
     private LongTaskListener listener;
     private LongTaskErrorHandler defaultErrorHandler;
 
@@ -143,12 +142,10 @@ public final class TaskExecutor {
         }
     }
 
-    private synchronized void finished(RunningLongTask runningLongTask) {
-        if (cancelTimer != null) {
-            cancelTimer.cancel();
-        }
-        LongTask task = (LongTask) runningLongTask.runnable;
+    private synchronized void finished(RunningLongTask runningLongTask) {        
+        runningLongTask.progress.finish();
         if (listener != null) {
+            LongTask task = (LongTask) runningLongTask.runnable;
             listener.taskFinished(task);
         }
     }
@@ -181,19 +178,14 @@ public final class TaskExecutor {
 
         @Override
         public void run() {
+            progress.setDisplayName(taskName);
             progress.start();
             try {
                 runnable.run();
                 finished(this);
-                if (progress != null) {
-                    progress.finish();
-                }
             } catch (Exception e) {
                 LongTaskErrorHandler err = errorHandler;
                 finished(this);
-                if (progress != null) {
-                    progress.finish();
-                }
                 if (err != null) {
                     err.fatalError(e);
                 } else if (defaultErrorHandler != null) {
@@ -207,13 +199,11 @@ public final class TaskExecutor {
         public void cancel() {
             boolean isCancelled = ((LongTask) runnable).cancel();
             if (isCancelled) {
-                if (progress != null) {
-                    progress.finish();
-                }
                 finished(this);
             } else {
-                cancelTimer = new Timer(taskName + "_cancelTimer");
-                cancelTimer.schedule(new InterruptTimerTask(this), interruptDelay);
+                Timer cancelTimer = new Timer(taskName + "_cancelTimer");
+                cancelTimer.schedule(new InterruptTimerTask(cancelTimer, this), interruptDelay);
+                cancelTimer = null;
             }
         }
     }
@@ -237,10 +227,11 @@ public final class TaskExecutor {
     }
 
     private class InterruptTimerTask extends TimerTask {
-
+        Timer cancelTimer;
         private final RunningLongTask runningLongTask;
 
-        public InterruptTimerTask(RunningLongTask runningLongTask) {
+        public InterruptTimerTask(Timer cancelTimer, RunningLongTask runningLongTask) {
+            this.cancelTimer = cancelTimer;
             this.runningLongTask = runningLongTask;
         }
 
@@ -249,12 +240,9 @@ public final class TaskExecutor {
             if (runningLongTask.future != null) {
                 runningLongTask.future.cancel(true);
             }
+            finished(runningLongTask);
             cancelTimer.cancel();
             cancelTimer = null;
-            if (runningLongTask.progress != null) {
-                runningLongTask.progress.finish();
-            }
-            finished(runningLongTask);
         }
     }
 }

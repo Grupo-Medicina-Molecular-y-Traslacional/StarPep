@@ -55,7 +55,7 @@ import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
-import org.bapedis.core.task.spi.LongTask;
+import org.bapedis.core.task.LongTask;
 import org.bapedis.core.task.Progress;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.util.Lookup;

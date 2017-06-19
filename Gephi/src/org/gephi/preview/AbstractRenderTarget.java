@@ -41,7 +41,7 @@ Portions Copyrighted 2011 Gephi Consortium.
  */
 package org.gephi.preview;
 
-import org.bapedis.core.task.spi.LongTask;
+import org.bapedis.core.task.LongTask;
 import org.bapedis.core.task.ProgressTicket;
 
 /**

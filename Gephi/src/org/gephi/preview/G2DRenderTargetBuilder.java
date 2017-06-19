@@ -50,7 +50,7 @@ import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import org.bapedis.core.task.Progress;
-import org.bapedis.core.task.ProgressTicketProvider;
+import org.bapedis.core.task.ProgressTicket;
 import org.gephi.preview.api.CanvasSize;
 import org.gephi.preview.api.G2DTarget;
 import org.gephi.preview.api.PreviewController;
@@ -152,7 +152,7 @@ public class G2DRenderTargetBuilder implements RenderTargetBuilder {
         @Override
         public boolean isMoving() {
             Boolean moving = previewModel.getProperties().getValue(PreviewProperty.MOVING);
-            if ( moving == null) {
+            if (moving == null) {
                 return false;
             }
             return moving;
@@ -167,16 +167,13 @@ public class G2DRenderTargetBuilder implements RenderTargetBuilder {
         public synchronized void refresh() {
             if (graphics != null) {
                 init();
-                ProgressTicketProvider progressProvider = Lookup.getDefault().lookup(ProgressTicketProvider.class);
-                if (progressProvider != null) {
-                    String msg = NbBundle.getMessage(G2DRenderTargetBuilder.class, "G2DRenderTargetBuilder.rendering.task");
-                    progressTicket = progressProvider.createTicket(msg, new Cancellable() {
-                        @Override
-                        public boolean cancel() {
-                            return G2DTargetImpl.this.cancel();
-                        }
-                    });
-                }
+                String msg = NbBundle.getMessage(G2DRenderTargetBuilder.class, "G2DRenderTargetBuilder.rendering.task");
+                progressTicket = new ProgressTicket(msg, new Cancellable() {
+                    @Override
+                    public boolean cancel() {
+                        return G2DTargetImpl.this.cancel();
+                    }
+                });
                 Progress.start(progressTicket);
                 graphics.refresh(previewModel, this);
                 Progress.finish(progressTicket);

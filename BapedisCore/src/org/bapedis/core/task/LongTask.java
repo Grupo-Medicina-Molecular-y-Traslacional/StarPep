@@ -39,9 +39,7 @@ Contributor(s):
 
 Portions Copyrighted 2011 Gephi Consortium.
 */
-package org.bapedis.core.task.spi;
-
-import org.bapedis.core.task.ProgressTicket;
+package org.bapedis.core.task;
 
 /**
  * Interface that any class can implement to support progress and cancellation.

@@ -50,9 +50,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.bapedis.core.task.spi.LongTask;
 import org.openide.util.Cancellable;
-import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 /**
  * Portable long-task executor, that supports synchronous and asynchronous
@@ -63,54 +62,22 @@ import org.openide.util.Lookup;
  * @author Mathieu Bastian
  * @see LongTask
  */
-public final class LongTaskExecutor {
+public final class TaskExecutor {
+//    number of seconds to wait after a cancel request    
 
-    private final boolean inBackground;
-    private boolean interruptCancel;
-    private final long interruptDelay;
-    private final String name;
-    private ThreadPoolExecutor executor;
-    private RunningLongTask currentTask;
+    private final long interruptDelay = 500;
+    private final ThreadPoolExecutor executor;
     private Timer cancelTimer;
     private LongTaskListener listener;
     private LongTaskErrorHandler defaultErrorHandler;
 
     /**
-     * Creates a new long task executor.
+     * Creates a new task executor.
      *
-     * @param doInBackground when <code>true</code>, the task will be executed
-     * in a separate thread
-     * @param name the name of the executor, used to recognize threads by names
-     * @param interruptDelay number of seconds to wait before * calling
-     * <code>Thread.interrupt()</code> after a cancel request
      */
-    public LongTaskExecutor(boolean doInBackground, String name, int interruptDelay) {
-        this.inBackground = doInBackground;
-        this.name = name;
-        this.interruptCancel = true;
-        this.interruptDelay = interruptDelay * 1000;
-    }
-
-    /**
-     * Creates a new long task executor.
-     *
-     * @param doInBackground doInBackground when <code>true</code>, the task
-     * will be executed in a separate thread
-     * @param name the name of the executor, used to recognize threads by names
-     */
-    public LongTaskExecutor(boolean doInBackground, String name) {
-        this(doInBackground, name, 0);
-        this.interruptCancel = false;
-    }
-
-    /**
-     * Creates a new long task executor.
-     *
-     * @param doInBackground doInBackground when <code>true</code>, the task
-     * will be executed in a separate thread
-     */
-    public LongTaskExecutor(boolean doInBackground) {
-        this(doInBackground, "LongTaskExecutor");
+    public TaskExecutor() {
+        int numberOfCPUs = Runtime.getRuntime().availableProcessors();
+        this.executor = new ThreadPoolExecutor(0, numberOfCPUs + 1, 15, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new NamedThreadFactory());
     }
 
     /**
@@ -118,7 +85,6 @@ public final class LongTaskExecutor {
      * <code>null</code>. In this case <code>runnable</code> will be executed
      * normally, but without cancel and progress support.
      *
-     * @param task the task to be executed, can be <code>null</code>.
      * @param runnable the runnable to be executed
      * @param taskName the name of the task, is displayed in the status bar if
      * available
@@ -128,21 +94,18 @@ public final class LongTaskExecutor {
      * <code>taskName</code> is null
      * @throws IllegalStateException if a task is still executing at this time
      */
-    public synchronized void execute(LongTask task, final Runnable runnable, String taskName, LongTaskErrorHandler errorHandler) {
+    public synchronized void execute(final Runnable runnable, String taskName, LongTaskErrorHandler errorHandler) {
         if (runnable == null || taskName == null) {
             throw new NullPointerException();
         }
-        if (executor == null) {
-            this.executor = new ThreadPoolExecutor(0, 1, 15, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new NamedThreadFactory());
-        }
 
-        RunningLongTask runningLongtask = new RunningLongTask(task, runnable, taskName, errorHandler);
-        if (inBackground) {
+        if (runnable instanceof LongTask) {
+            RunningLongTask runningLongtask = new RunningLongTask(runnable, taskName, errorHandler);
             runningLongtask.future = executor.submit(runningLongtask);
         } else {
-            currentTask = runningLongtask;
-            runningLongtask.run();
+            executor.submit(runnable);
         }
+
     }
 
     /**
@@ -150,54 +113,12 @@ public final class LongTaskExecutor {
      * <code>null</code>. In this case <code>runnable</code> will be executed
      * normally, but without cancel and progress support.
      *
-     * @param task the task to be executed, can be <code>null</code>.
      * @param runnable the runnable to be executed
      * @throws NullPointerException if <code>runnable</code> is null
      * @throws IllegalStateException if a task is still executing at this time
      */
-    public synchronized void execute(LongTask task, Runnable runnable) {
-        execute(task, runnable, "", null);
-    }
-
-    /**
-     * Cancel the current task. If the task fails to cancel itself and if an
-     * <code>interruptDelay</code> has been specified, the task will be
-     * <b>interrupted</b> after <code>interruptDelay</code>. Using
-     * <code>Thread.interrupt()</code> may cause hazardous behaviors and should
-     * be avoided. Therefore any task should be cancelable.
-     */
-    public synchronized void cancel() {
-        if (inBackground) {
-            if (executor != null) {
-                RunningLongTask rlt = (RunningLongTask) currentTask;
-                if (rlt != null) {
-                    boolean res = rlt.cancel();
-                    if (interruptCancel && !res) {
-                        cancelTimer = new Timer(name + "_cancelTimer");
-                        cancelTimer.schedule(new InterruptTimerTask(rlt), interruptDelay);
-                    }
-                }
-            }
-        } else {
-            RunningLongTask rlt = (RunningLongTask) currentTask;
-            if (rlt != null) {
-                boolean res = rlt.cancel();
-                if (interruptCancel && !res) {
-                    cancelTimer = new Timer(name + "_cancelTimer");
-                    cancelTimer.schedule(new InterruptTimerTask(rlt), interruptDelay);
-                }
-            }
-        }
-    }
-
-    /**
-     * Returns <code>true</code> if the executor is executing a task.
-     *
-     * @return <code>true</code> if a task is running, <code>false</code>
-     * otherwise
-     */
-    public boolean isRunning() {
-        return currentTask != null;
+    public synchronized void execute(Runnable runnable) {
+        execute(runnable, "", null);
     }
 
     /**
@@ -226,8 +147,7 @@ public final class LongTaskExecutor {
         if (cancelTimer != null) {
             cancelTimer.cancel();
         }
-        LongTask task = runningLongTask.task;
-        currentTask = null;
+        LongTask task = (LongTask) runningLongTask.runnable;
         if (listener != null) {
             listener.taskFinished(task);
         }
@@ -238,38 +158,36 @@ public final class LongTaskExecutor {
      */
     private class RunningLongTask implements Runnable {
 
-        private final LongTask task;
+        private final String taskName;
         private final Runnable runnable;
         private Future<?> future;
-        private ProgressTicket progress;
+        private final ProgressTicket progress;
         private LongTaskErrorHandler errorHandler;
 
-        public RunningLongTask(LongTask task, Runnable runnable, String taskName, LongTaskErrorHandler errorHandler) {
-            this.task = task;
+        public RunningLongTask(Runnable runnable, String taskName, LongTaskErrorHandler errorHandler) {
             this.runnable = runnable;
+            this.taskName = taskName;
             this.errorHandler = errorHandler;
-            ProgressTicketProvider progressProvider = Lookup.getDefault().lookup(ProgressTicketProvider.class);
-            if (progressProvider != null) {
-//                this.progress = progressProvider.createTicket(taskName, new Cancellable() {
-//                    @Override
-//                    public boolean cancel() {
-//                        LongTaskExecutor.this.cancel();
-//                        return true;
-//                    }
-//                });
-                if (task != null) {
-                    task.setProgressTicket(progress);
-                } else {
-                    progress.start();
+            this.progress = new ProgressTicket(taskName, new Cancellable() {
+                @Override
+                public boolean cancel() {
+                    RunningLongTask.this.cancel();
+                    return true;
                 }
-            }
+
+            });
+            ((LongTask) runnable).setProgressTicket(progress);
         }
 
         @Override
         public void run() {
-            currentTask = this;
+            progress.start();
             try {
                 runnable.run();
+                finished(this);
+                if (progress != null) {
+                    progress.finish();
+                }
             } catch (Exception e) {
                 LongTaskErrorHandler err = errorHandler;
                 finished(this);
@@ -284,19 +202,19 @@ public final class LongTaskExecutor {
                     Logger.getLogger("").log(Level.SEVERE, "", e);
                 }
             }
-            currentTask = null;
-
-            finished(this);
-            if (progress != null) {
-                progress.finish();
-            }
         }
 
-        public boolean cancel() {
-            if (task != null) {
-                return task.cancel();
+        public void cancel() {
+            boolean isCancelled = ((LongTask) runnable).cancel();
+            if (isCancelled) {
+                if (progress != null) {
+                    progress.finish();
+                }
+                finished(this);
+            } else {
+                cancelTimer = new Timer(taskName + "_cancelTimer");
+                cancelTimer.schedule(new InterruptTimerTask(this), interruptDelay);
             }
-            return false;
         }
     }
 
@@ -304,6 +222,13 @@ public final class LongTaskExecutor {
      * Inner class for naming the executor service thread
      */
     private class NamedThreadFactory implements ThreadFactory {
+//        the name of the executor, used to recognize threads by names
+
+        private final String name;
+
+        private NamedThreadFactory() {
+            this.name = NbBundle.getMessage(TaskExecutor.class, "TaskExecutor.name");
+        }
 
         @Override
         public Thread newThread(Runnable r) {
@@ -313,29 +238,23 @@ public final class LongTaskExecutor {
 
     private class InterruptTimerTask extends TimerTask {
 
-        private final RunningLongTask task;
+        private final RunningLongTask runningLongTask;
 
         public InterruptTimerTask(RunningLongTask runningLongTask) {
-            this.task = runningLongTask;
+            this.runningLongTask = runningLongTask;
         }
 
         @Override
         public void run() {
-            if (task != null) {
-                if (task.future != null) {
-                    task.future.cancel(interruptCancel);
-                }
-                cancelTimer.cancel();
-                cancelTimer = null;
-                if (task.progress != null) {
-                    task.progress.finish();
-                }
-                finished(task);
-
-                if (!inBackground) {
-                    Thread.currentThread().interrupt();
-                }
+            if (runningLongTask.future != null) {
+                runningLongTask.future.cancel(true);
             }
+            cancelTimer.cancel();
+            cancelTimer = null;
+            if (runningLongTask.progress != null) {
+                runningLongTask.progress.finish();
+            }
+            finished(runningLongTask);
         }
     }
 }

@@ -59,9 +59,10 @@ import java.util.Calendar;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import org.bapedis.core.services.ProjectManager;
 import org.gephi.ui.utils.DialogFileFilter;
-import org.bapedis.core.task.LongTaskExecutor;
-import org.bapedis.core.task.spi.LongTask;
+import org.bapedis.core.task.TaskExecutor;
+import org.bapedis.core.task.LongTask;
 import org.bapedis.core.task.Progress;
 import org.bapedis.core.task.ProgressTicket;
 import org.gephi.visualization.VizArchitecture;
@@ -70,6 +71,7 @@ import org.gephi.visualization.apiimpl.VizConfig;
 import org.gephi.visualization.opengl.*;
 import org.gephi.visualization.text.TextManager;
 import org.openide.awt.StatusDisplayer;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 import org.openide.windows.WindowManager;
@@ -94,7 +96,7 @@ public class ScreenshotMaker implements VizArchitecture, LongTask, Runnable {
     private VizConfig vizConfig;
     private TextManager textManager;
     //Executor
-    private final LongTaskExecutor executor;
+    private final TaskExecutor executor;
     private ProgressTicket progressTicket;
     private boolean cancel;
     //Settings
@@ -121,7 +123,9 @@ public class ScreenshotMaker implements VizArchitecture, LongTask, Runnable {
         autoSave = NbPreferences.forModule(ScreenshotMaker.class).getBoolean(AUTOSAVE_DEFAULT, autoSave);
         finishedMessage = NbPreferences.forModule(ScreenshotMaker.class).getBoolean(SHOW_MESSAGE, finishedMessage);
 
-        executor = new LongTaskExecutor(true, "Screenshot Maker");
+        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
+//        executor = new TaskExecutor("Screenshot Maker");
+        executor = pm.getExecutor();
 
         tileWidth = width / 16;
         tileHeight = height / 12;
@@ -135,7 +139,7 @@ public class ScreenshotMaker implements VizArchitecture, LongTask, Runnable {
     }
 
     public void takeScreenshot() {
-        executor.execute(this, this, NbBundle.getMessage(ScreenshotMaker.class, "ScreenshotMaker.progress.message"), null);
+        executor.execute(this, NbBundle.getMessage(ScreenshotMaker.class, "ScreenshotMaker.progress.message"), null);
     }
 
     @Override

@@ -41,8 +41,6 @@ Portions Copyrighted 2011 Gephi Consortium.
 */
 package org.bapedis.core.task;
 
-import org.bapedis.core.task.spi.LongTask;
-
 /**
  * Basic listener to be notified when a long task terminates.
  *

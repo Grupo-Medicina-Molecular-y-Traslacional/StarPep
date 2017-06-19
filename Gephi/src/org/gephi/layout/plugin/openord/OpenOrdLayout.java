@@ -55,7 +55,7 @@ import org.bapedis.core.spi.algo.AlgorithmSetupUI;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
-import org.bapedis.core.task.spi.LongTask;
+import org.bapedis.core.task.LongTask;
 import org.bapedis.core.task.ProgressTicket;
 import org.gephi.layout.plugin.AbstractLayout;
 import org.openide.util.NbBundle;

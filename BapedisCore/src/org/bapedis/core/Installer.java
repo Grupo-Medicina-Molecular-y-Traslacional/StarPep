@@ -23,6 +23,7 @@ public class Installer extends ModuleInstall implements WorkspaceEventListener, 
     @Override
     public void restored() {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
+        pc.newProject();
         pc.addWorkspaceEventListener(this);
         workspaceChanged(null, pc.getCurrentWorkspace());
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {

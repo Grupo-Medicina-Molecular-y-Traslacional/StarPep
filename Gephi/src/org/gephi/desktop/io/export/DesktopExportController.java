@@ -38,14 +38,15 @@ made subject to such option by the copyright holder.
 Contributor(s):
 
 Portions Copyrighted 2011 Gephi Consortium.
-*/
+ */
 package org.gephi.desktop.io.export;
 
+import org.bapedis.core.services.ProjectManager;
 import org.gephi.io.exporter.api.ExportController;
 import org.gephi.io.exporter.spi.Exporter;
 import org.bapedis.core.task.LongTaskErrorHandler;
-import org.bapedis.core.task.LongTaskExecutor;
-import org.bapedis.core.task.spi.LongTask;
+import org.bapedis.core.task.TaskExecutor;
+import org.bapedis.core.task.LongTask;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.StatusDisplayer;
@@ -62,7 +63,7 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service = ExportControllerUI.class)
 public class DesktopExportController implements ExportControllerUI {
 
-    private final LongTaskExecutor executor;
+    private final TaskExecutor executor;
     private final LongTaskErrorHandler errorHandler;
     private final ExportController controller;
 
@@ -82,7 +83,9 @@ public class DesktopExportController implements ExportControllerUI {
                 //Logger.getLogger("").log(Level.WARNING, "", t.getCause());
             }
         };
-        executor = new LongTaskExecutor(true, "Exporter", 10);
+        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
+//        executor = new TaskExecutor("Exporter", 10);
+        executor = pm.getExecutor();
     }
 
     @Override
@@ -97,7 +100,7 @@ public class DesktopExportController implements ExportControllerUI {
         }
 
         String taskmsg = NbBundle.getMessage(DesktopExportController.class, "DesktopExportController.exportTaskName", fileObject.getNameExt());
-        executor.execute(task, new Runnable() {
+        executor.execute(new Runnable() {
 
             @Override
             public void run() {

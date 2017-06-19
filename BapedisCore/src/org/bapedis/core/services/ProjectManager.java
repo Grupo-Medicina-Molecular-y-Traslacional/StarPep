@@ -14,6 +14,7 @@ import org.bapedis.core.model.AlgorithmModel;
 import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.filters.FilterFactory;
+import org.bapedis.core.task.TaskExecutor;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
@@ -32,9 +33,10 @@ public class ProjectManager implements Lookup.Provider {
     protected InstanceContent content;
     protected Workspace currentWS;
     protected List<WorkspaceEventListener> wsListeners;
+    protected final TaskExecutor executor;
 
     public ProjectManager() {
-        newProject();
+        executor = new TaskExecutor();
     }
 
     public void newProject() {
@@ -101,6 +103,10 @@ public class ProjectManager implements Lookup.Provider {
         Collection<? extends Workspace> workspaces = lookup.lookupAll(Workspace.class);
         return workspaces.toArray(new Workspace[0]);
     }
+
+    public TaskExecutor getExecutor() {
+        return executor;
+    }            
 
     public void clean() {
         Workspace.resetDefault();

@@ -41,14 +41,13 @@ Portions Copyrighted 2011 Gephi Consortium.
  */
 package org.gephi.preview;
 
-import org.bapedis.core.task.LongTask;
 import org.bapedis.core.task.ProgressTicket;
 
 /**
  *
  * @author Mathieu Bastian
  */
-public class AbstractRenderTarget implements LongTask {
+public class AbstractRenderTarget {
 
     protected boolean cancel = false;
     protected ProgressTicket progressTicket;
@@ -61,13 +60,11 @@ public class AbstractRenderTarget implements LongTask {
         return cancel;
     }
 
-    @Override
     public boolean cancel() {
         this.cancel = true;
         return true;
     }
 
-    @Override
     public void setProgressTicket(ProgressTicket progressTicket) {
         this.progressTicket = progressTicket;
     }

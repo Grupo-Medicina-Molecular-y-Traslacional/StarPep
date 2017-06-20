@@ -61,8 +61,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.bapedis.core.services.ProjectManager;
 import org.gephi.ui.utils.DialogFileFilter;
-import org.bapedis.core.task.TaskExecutor;
-import org.bapedis.core.task.LongTask;
+import org.bapedis.core.task.AlgorithmExecutor;
 import org.bapedis.core.task.Progress;
 import org.bapedis.core.task.ProgressTicket;
 import org.gephi.visualization.VizArchitecture;
@@ -80,7 +79,7 @@ import org.openide.windows.WindowManager;
  *
  * @author Mathieu Bastian
  */
-public class ScreenshotMaker implements VizArchitecture, LongTask, Runnable {
+public class ScreenshotMaker implements VizArchitecture, Runnable {
 
     //Const
     private final String LAST_PATH = "ScreenshotMaker_Last_Path";
@@ -96,7 +95,7 @@ public class ScreenshotMaker implements VizArchitecture, LongTask, Runnable {
     private VizConfig vizConfig;
     private TextManager textManager;
     //Executor
-    private final TaskExecutor executor;
+    private final AlgorithmExecutor executor;
     private ProgressTicket progressTicket;
     private boolean cancel;
     //Settings
@@ -139,7 +138,7 @@ public class ScreenshotMaker implements VizArchitecture, LongTask, Runnable {
     }
 
     public void takeScreenshot() {
-        executor.execute(this, NbBundle.getMessage(ScreenshotMaker.class, "ScreenshotMaker.progress.message"), null);
+//        executor.execute(this, NbBundle.getMessage(ScreenshotMaker.class, "ScreenshotMaker.progress.message"), null);
     }
 
     @Override
@@ -397,12 +396,10 @@ public class ScreenshotMaker implements VizArchitecture, LongTask, Runnable {
         }
     }
 
-    @Override
     public void setProgressTicket(ProgressTicket progressTicket) {
         this.progressTicket = progressTicket;
     }
 
-    @Override
     public boolean cancel() {
         cancel = true;
         return true;

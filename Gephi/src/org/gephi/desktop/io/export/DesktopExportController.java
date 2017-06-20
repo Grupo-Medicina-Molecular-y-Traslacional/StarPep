@@ -44,9 +44,7 @@ package org.gephi.desktop.io.export;
 import org.bapedis.core.services.ProjectManager;
 import org.gephi.io.exporter.api.ExportController;
 import org.gephi.io.exporter.spi.Exporter;
-import org.bapedis.core.task.LongTaskErrorHandler;
-import org.bapedis.core.task.TaskExecutor;
-import org.bapedis.core.task.LongTask;
+import org.bapedis.core.task.AlgorithmExecutor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.StatusDisplayer;
@@ -55,6 +53,7 @@ import org.openide.filesystems.FileUtil;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+import org.bapedis.core.task.AlgorithmErrorHandler;
 
 /**
  *
@@ -63,13 +62,13 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service = ExportControllerUI.class)
 public class DesktopExportController implements ExportControllerUI {
 
-    private final TaskExecutor executor;
-    private final LongTaskErrorHandler errorHandler;
+    private final AlgorithmExecutor executor;
+    private final AlgorithmErrorHandler errorHandler;
     private final ExportController controller;
 
     public DesktopExportController() {
         controller = Lookup.getDefault().lookup(ExportController.class);
-        errorHandler = new LongTaskErrorHandler() {
+        errorHandler = new AlgorithmErrorHandler() {
 
             @Override
             public void fatalError(Throwable t) {
@@ -94,24 +93,24 @@ public class DesktopExportController implements ExportControllerUI {
             throw new RuntimeException(NbBundle.getMessage(getClass(), "error_no_matching_file_exporter"));
         }
         //Export Task
-        LongTask task = null;
-        if (exporter instanceof LongTask) {
-            task = (LongTask) exporter;
-        }
-
-        String taskmsg = NbBundle.getMessage(DesktopExportController.class, "DesktopExportController.exportTaskName", fileObject.getNameExt());
-        executor.execute(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    controller.exportFile(FileUtil.toFile(fileObject), exporter);
-                    StatusDisplayer.getDefault().setStatusText(NbBundle.getMessage(DesktopExportController.class, "DesktopExportController.status.exportSuccess", fileObject.getNameExt()));
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-        }, taskmsg, errorHandler);
+//        LongTask task = null;
+//        if (exporter instanceof LongTask) {
+//            task = (LongTask) exporter;
+//        }
+//
+//        String taskmsg = NbBundle.getMessage(DesktopExportController.class, "DesktopExportController.exportTaskName", fileObject.getNameExt());
+//        executor.execute(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                try {
+//                    controller.exportFile(FileUtil.toFile(fileObject), exporter);
+//                    StatusDisplayer.getDefault().setStatusText(NbBundle.getMessage(DesktopExportController.class, "DesktopExportController.status.exportSuccess", fileObject.getNameExt()));
+//                } catch (Exception ex) {
+//                    throw new RuntimeException(ex);
+//                }
+//            }
+//        }, taskmsg, errorHandler);
     }
 
     @Override

@@ -41,23 +41,19 @@
  */
 package org.gephi.layout.plugin;
 
-import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.bapedis.core.task.LongTask;
-import org.bapedis.core.task.Progress;
 import org.bapedis.core.task.ProgressTicket;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
 import org.openide.util.Lookup;
-import org.openide.util.NbBundle;
 
 /**
  * Base class for layout algorithms.
  *
  * @author Helder Suzuki <heldersuzuki@gephi.org>
  */
-public abstract class AbstractLayout implements Algorithm, LongTask {
+public abstract class AbstractLayout implements Algorithm {
 
     private final AlgorithmFactory layoutBuilder;
     protected GraphModel graphModel;

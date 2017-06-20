@@ -59,7 +59,6 @@ import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
-import org.bapedis.core.task.LongTask;
 import org.bapedis.core.task.Progress;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.util.Exceptions;
@@ -71,7 +70,7 @@ import org.openide.util.Lookup;
  * @author Jérémy Subtil
  * @author Mathieu Bastian
  */
-public class PDFExporter implements ByteExporter, VectorExporter, LongTask {
+public class PDFExporter implements ByteExporter, VectorExporter {
 
     private ProgressTicket progress;
     private Workspace workspace;
@@ -124,15 +123,15 @@ public class PDFExporter implements ByteExporter, VectorExporter, LongTask {
         props.putValue(PDFTarget.MARGIN_RIGHT, new Float((float) marginRight));
         props.putValue(PDFTarget.PDF_CONTENT_BYTE, cb);
         target = (PDFTarget) controller.getRenderTarget(RenderTarget.PDF_TARGET, workspace);
-        if (target instanceof LongTask) {
-            ((LongTask) target).setProgressTicket(progress);
-        }
-
-        try {
-            controller.render(target, workspace);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+//        if (target instanceof LongTask) {
+//            ((LongTask) target).setProgressTicket(progress);
+//        }
+//
+//        try {
+//            controller.render(target, workspace);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
 
         cb.restoreState();
         document.close();
@@ -208,17 +207,17 @@ public class PDFExporter implements ByteExporter, VectorExporter, LongTask {
         return workspace;
     }
 
-    @Override
-    public boolean cancel() {
-        this.cancel = true;
-        if (target instanceof LongTask) {
-            ((LongTask) target).cancel();
-        }
-        return true;
-    }
-
-    @Override
-    public void setProgressTicket(ProgressTicket progressTicket) {
-        this.progress = progressTicket;
-    }
+//    @Override
+//    public boolean cancel() {
+//        this.cancel = true;
+//        if (target instanceof LongTask) {
+//            ((LongTask) target).cancel();
+//        }
+//        return true;
+//    }
+//
+//    @Override
+//    public void setProgressTicket(ProgressTicket progressTicket) {
+//        this.progress = progressTicket;
+//    }
 }

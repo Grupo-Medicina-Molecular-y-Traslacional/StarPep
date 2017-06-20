@@ -51,7 +51,7 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.bapedis.core.task.TaskExecutor;
+import org.bapedis.core.task.AlgorithmExecutor;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.DialogDisplayer;
@@ -267,8 +267,10 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                     currentWs.add(algorithm);
                 }
                 algoModel.setSelectedAlgorithm(algorithm);
+                setEnableState(true);
             } else {
                 algoModel.setSelectedAlgorithm(null);
+                setEnableState(false);
             }
         } else if (evt.getStateChange() == ItemEvent.DESELECTED) {
             richTooltip = null;
@@ -333,17 +335,16 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
     private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
         AlgorithmModel algoModel = pc.getAlgorithmModel();
-//        if (algoModel.isRunning()) {
-//            stop();
-//        } else {
-//            run();
-//        }
         Algorithm algo = algoModel.getSelectedAlgorithm();
         if (algo != null) {
-            TaskExecutor executor = pc.getExecutor();
-            executor.execute(algo, algo.getFactory().getName(), null);
-            algoModel.setRunning(true);
+            if (algoModel.isRunning()) {
+
+            } else {
+                AlgorithmExecutor executor = pc.getExecutor();
+                executor.execute(algo);
+            }
         }
+        algoModel.setRunning(!algoModel.isRunning());
     }//GEN-LAST:event_runButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -388,28 +389,9 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         }
         AlgorithmModel algoModel = pc.getAlgorithmModel(newWs);
         algoModel.addPropertyChangeListener(this);
-        setAlgoModel(algoModel);
-    }
-
-    private void setAlgoModel(AlgorithmModel algoModel) {
         refreshAlgChooser(algoModel);
         refreshProperties(algoModel);
-
-//        if (model == null || !model.isRunning()) {
-//            runButton.setText(NbBundle.getMessage(LayoutPanel.class, "LayoutPanel.runButton.text"));
-//            runButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/layout/resources/run.gif", false));
-//            runButton.setToolTipText(NbBundle.getMessage(LayoutPanel.class, "LayoutPanel.runButton.tooltip"));
-//        } else if (model.isRunning()) {
-//            runButton.setText(NbBundle.getMessage(LayoutPanel.class, "LayoutPanel.stopButton.text"));
-//            runButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/layout/resources/stop.png", false));
-//            runButton.setToolTipText(NbBundle.getMessage(LayoutPanel.class, "LayoutPanel.stopButton.tooltip"));
-//        }  
-//        boolean enabled = model != null && model.getSelectedLayout() != null;
-//        runButton.setEnabled(enabled);
-//        resetButton.setEnabled(enabled);
-//        infoLabel.setEnabled(enabled);
-//        propertySheet.setEnabled(enabled);
-//        presetsButton.setEnabled(enabled);
+        setRunningState(algoModel.isRunning());
     }
 
     private void refreshAlgChooser(AlgorithmModel algoModel) {
@@ -439,7 +421,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             }
         }
         algoComboBox.setModel(comboBoxModel);
-//        algoComboBox.setEnabled(!algoModel.isRunning());
+        setEnableState(!comboBoxModel.getSelectedItem().equals(NO_SELECTION));
     }
 
     private void refreshProperties(AlgorithmModel algoModel) {
@@ -467,6 +449,28 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         }
     }
 
+    private void setEnableState(boolean enabled) {
+        runButton.setEnabled(enabled);
+        propSheetPanel.setEnabled(enabled);
+        algoProvidedPanel.setEnabled(enabled);
+        resetButton.setEnabled(enabled);
+        presetsButton.setEnabled(enabled);
+    }
+
+    private void setRunningState(boolean running) {
+        setEnableState(!running);
+        algoComboBox.setEnabled(!running);
+//        if (model == null || !model.isRunning()) {
+//            runButton.setText(NbBundle.getMessage(LayoutPanel.class, "LayoutPanel.runButton.text"));
+//            runButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/layout/resources/run.gif", false));
+//            runButton.setToolTipText(NbBundle.getMessage(LayoutPanel.class, "LayoutPanel.runButton.tooltip"));
+//        } else if (model.isRunning()) {
+//            runButton.setText(NbBundle.getMessage(LayoutPanel.class, "LayoutPanel.stopButton.text"));
+//            runButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/layout/resources/stop.png", false));
+//            runButton.setToolTipText(NbBundle.getMessage(LayoutPanel.class, "LayoutPanel.stopButton.tooltip"));
+//        }          
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof AlgorithmModel) {
@@ -476,8 +480,10 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             } else if (evt.getPropertyName().equals(AlgorithmModel.CHANGED_ALGORITHM)) {
                 AlgorithmModel algoModel = (AlgorithmModel) evt.getSource();
                 refreshProperties(algoModel);
+            } else if (evt.getPropertyName().equals(AlgorithmModel.RUNNING)) {
+                AlgorithmModel algoModel = (AlgorithmModel) evt.getSource();
+                setRunningState(algoModel.isRunning());
             }
-//            layoutCombobox.setEnabled(!model.isRunning());
         }
     }
 

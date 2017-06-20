@@ -102,7 +102,7 @@ public final class ProgressTicket {
 
     /**
      * Notify the user about completed workunits.
-     * @param a cumulative number of workunits completed so far
+     * @param workunit a cumulative number of workunits completed so far
      */
     public void progress(int workunit) {
         this.currentUnit = workunit;
@@ -117,7 +117,7 @@ public final class ProgressTicket {
 
     /**
      * Notify the user about progress by showing message with details.
-     * @param details about the status of the task
+     * @param message about the status of the task
      */
     public void progress(String message) {
         if (handle != null) {

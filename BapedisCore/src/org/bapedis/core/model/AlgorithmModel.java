@@ -19,6 +19,7 @@ public class AlgorithmModel {
     protected transient final PropertyChangeSupport propertyChangeSupport;
     public static final String CHANGED_CATEGORY = "CATEGORY";
     public static final String CHANGED_ALGORITHM = "ALGORITHM";
+    public static final String RUNNING = "RUNNING";
     protected boolean running;
 
     public AlgorithmModel() {
@@ -52,7 +53,9 @@ public class AlgorithmModel {
     }
 
     public void setRunning(boolean running) {
+        boolean oldValue = this.running;
         this.running = running;
+        propertyChangeSupport.firePropertyChange(RUNNING, oldValue, running);
     }
         
     public void addPropertyChangeListener(PropertyChangeListener listener) {

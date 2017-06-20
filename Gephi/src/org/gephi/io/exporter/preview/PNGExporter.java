@@ -55,7 +55,6 @@ import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
-import org.bapedis.core.task.LongTask;
 import org.bapedis.core.task.Progress;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.util.Lookup;
@@ -64,7 +63,7 @@ import org.openide.util.Lookup;
  *
  * @author Mathieu Bastian
  */
-public class PNGExporter implements VectorExporter, ByteExporter, LongTask {
+public class PNGExporter implements VectorExporter, ByteExporter {
 
     private ProgressTicket progress;
     private boolean cancel = false;
@@ -91,9 +90,9 @@ public class PNGExporter implements VectorExporter, ByteExporter, LongTask {
         target = (G2DTarget) ctrl.getRenderTarget(
                 RenderTarget.G2D_TARGET,
                 workspace);
-        if (target instanceof LongTask) {
-            ((LongTask) target).setProgressTicket(progress);
-        }
+//        if (target instanceof LongTask) {
+//            ((LongTask) target).setProgressTicket(progress);
+//        }
 
         try {
             target.refresh();
@@ -163,19 +162,19 @@ public class PNGExporter implements VectorExporter, ByteExporter, LongTask {
         this.stream = stream;
     }
 
-    @Override
-    public boolean cancel() {
-        cancel = true;
-        if (target instanceof LongTask) {
-            ((LongTask) target).cancel();
-        }
-        return true;
-    }
-
-    @Override
-    public void setProgressTicket(ProgressTicket progressTicket) {
-        this.progress = progressTicket;
-    }
+//    @Override
+//    public boolean cancel() {
+//        cancel = true;
+//        if (target instanceof LongTask) {
+//            ((LongTask) target).cancel();
+//        }
+//        return true;
+//    }
+//
+//    @Override
+//    public void setProgressTicket(ProgressTicket progressTicket) {
+//        this.progress = progressTicket;
+//    }
 
     private synchronized void setExportProperties(PreviewModel m) {
         PreviewProperties props = m.getProperties();

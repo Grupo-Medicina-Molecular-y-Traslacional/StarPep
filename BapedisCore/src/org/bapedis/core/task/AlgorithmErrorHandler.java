@@ -42,11 +42,12 @@ Portions Copyrighted 2011 Gephi Consortium.
 package org.bapedis.core.task;
 
 /**
- * Basic listener to be notified when a long task terminates.
+ * Notify interface that can catch <code>Exception</code> thrown during an
+ * asynchronous task execution.
  *
  * @author Mathieu Bastian
  */
-public interface LongTaskListener {
+public interface AlgorithmErrorHandler {
 
-    public void taskFinished(LongTask task);
+    public void fatalError(Throwable t);
 }

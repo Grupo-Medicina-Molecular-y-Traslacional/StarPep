@@ -53,7 +53,6 @@ import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
 import org.gephi.preview.api.SVGTarget;
-import org.bapedis.core.task.LongTask;
 import org.bapedis.core.task.Progress;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.util.Lookup;
@@ -64,7 +63,7 @@ import org.w3c.dom.Document;
  *
  * @author Jérémy Subtil
  */
-public class SVGExporter implements CharacterExporter, VectorExporter, LongTask {
+public class SVGExporter implements CharacterExporter, VectorExporter {
 
     //Architecture
     private Document doc;
@@ -87,9 +86,9 @@ public class SVGExporter implements CharacterExporter, VectorExporter, LongTask 
         props.putValue(SVGTarget.SCALE_STROKES, scaleStrokes);
         props.putValue(PreviewProperty.MARGIN, new Float((float) margin));
         target = (SVGTarget) controller.getRenderTarget(RenderTarget.SVG_TARGET, workspace);
-        if (target instanceof LongTask) {
-            ((LongTask) target).setProgressTicket(progress);
-        }
+//        if (target instanceof LongTask) {
+//            ((LongTask) target).setProgressTicket(progress);
+//        }
 
         try {
             controller.render(target, workspace);
@@ -118,19 +117,19 @@ public class SVGExporter implements CharacterExporter, VectorExporter, LongTask 
         return !cancel;
     }
 
-    @Override
-    public boolean cancel() {
-        cancel = true;
-        if (target instanceof LongTask) {
-            ((LongTask) target).cancel();
-        }
-        return true;
-    }
-
-    @Override
-    public void setProgressTicket(ProgressTicket progressTicket) {
-        this.progress = progressTicket;
-    }
+//    @Override
+//    public boolean cancel() {
+//        cancel = true;
+//        if (target instanceof LongTask) {
+//            ((LongTask) target).cancel();
+//        }
+//        return true;
+//    }
+//
+//    @Override
+//    public void setProgressTicket(ProgressTicket progressTicket) {
+//        this.progress = progressTicket;
+//    }
 
     @Override
     public void setWriter(Writer writer) {

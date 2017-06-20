@@ -6,12 +6,19 @@
 package org.bapedis.core.spi.algo;
 
 import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.task.ProgressTicket;
 
 /**
  *
  * @author loge
  */
 public interface Algorithm extends Runnable {    
+    
+    /**
+     * Cancel the algorithm while it is running. Returns <code>true</code> if the algorithm has been sucessfully cancelled, <code>false</code> otherwise.
+     * @return  <code>true</code> if the algorithm has been sucessfully cancelled, <code>false</code> otherwise
+     */
+    public boolean cancel();
     
     /**
      * The properties for this algorithm.
@@ -30,5 +37,11 @@ public interface Algorithm extends Runnable {
      * @return              the reference to the factory that create this instance
      */
     public AlgorithmFactory getFactory();    
+    
+    /**
+     * Set the progress ticket for the algorithm. Can't be null.
+     * @param progressTicket the progress ticket for this algorithm
+     */
+    public void setProgressTicket(ProgressTicket progressTicket);    
     
 }

@@ -266,7 +266,6 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 }
                 if (algorithm == null) {
                     algorithm = factory.createAlgorithm();
-                    algorithm.resetPropertiesValues();
                     currentWs.add(algorithm);
                 }
                 algoModel.setSelectedAlgorithm(algorithm);
@@ -284,7 +283,6 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         AlgorithmModel algoModel = pc.getAlgorithmModel();
         Algorithm algo = algoModel.getSelectedAlgorithm();
         if (algo != null) {
-            algo.resetPropertiesValues();
             refreshProperties(algoModel);
         }
     }//GEN-LAST:event_resetButtonActionPerformed

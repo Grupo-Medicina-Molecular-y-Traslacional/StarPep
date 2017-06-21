@@ -59,7 +59,7 @@ public abstract class AbstractLayout implements Algorithm {
 
     private final AlgorithmFactory layoutBuilder;
     protected GraphModel graphModel;
-    private Graph graph;
+    protected Graph graph;
     protected Integer iterations;
     protected ProgressTicket progressTicket;
     private boolean stopRun;

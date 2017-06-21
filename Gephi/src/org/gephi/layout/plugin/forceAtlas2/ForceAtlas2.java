@@ -82,10 +82,13 @@ public class ForceAtlas2 extends AbstractLayout {
     private ExecutorService pool;
     private Node[] nodes;
     private Edge[] edges;
+    private List<AlgorithmProperty> properties;
 
     public ForceAtlas2(ForceAtlas2Factory layoutBuilder) {
         super(layoutBuilder);
         this.threadCount = Math.min(4, Math.max(1, Runtime.getRuntime().availableProcessors() - 1));
+        resetPropertiesValues();
+        createProperties();
     }
 
     @Override
@@ -281,10 +284,9 @@ public class ForceAtlas2 extends AbstractLayout {
         nodes = null;
         edges = null;
     }
-
-    @Override
-    public AlgorithmProperty[] getProperties() {
-        List<AlgorithmProperty> properties = new ArrayList<>();
+    
+    private void createProperties(){
+        properties = new ArrayList<>();
         final String FORCEATLAS2_TUNING = NbBundle.getMessage(getClass(), "ForceAtlas2.tuning");
         final String FORCEATLAS2_BEHAVIOR = NbBundle.getMessage(getClass(), "ForceAtlas2.behavior");
         final String FORCEATLAS2_PERFORMANCE = NbBundle.getMessage(getClass(), "ForceAtlas2.performance");
@@ -381,13 +383,16 @@ public class ForceAtlas2 extends AbstractLayout {
 
         } catch (Exception e) {
             e.printStackTrace();
-        }
-
-        return properties.toArray(new AlgorithmProperty[0]);
+        }    
     }
 
     @Override
-    public void resetPropertiesValues() {
+    public AlgorithmProperty[] getProperties() {
+        return properties.toArray(new AlgorithmProperty[0]);
+    }
+    
+    @override
+    private void resetPropertiesValues() {
         int nodesCount = 0;
 
         if (graphModel != null) {

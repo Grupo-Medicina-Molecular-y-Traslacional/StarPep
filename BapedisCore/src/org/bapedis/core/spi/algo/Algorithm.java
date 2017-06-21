@@ -42,11 +42,6 @@ public interface Algorithm extends Runnable {
     public AlgorithmProperty[] getProperties();
 
     /**
-     * Resets the properties values to the default values.
-     */
-    public void resetPropertiesValues();
-
-    /**
      * The reference to the Factory that instanciated this algorithm.
      *
      * @return the reference to the factory that create this instance

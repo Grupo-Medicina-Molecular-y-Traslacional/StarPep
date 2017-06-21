@@ -79,82 +79,29 @@ public class YifanHuLayout extends AbstractLayout {
     private double energy0;
     private double energy;
     private Node[] nodes;
+    private List<AlgorithmProperty> properties;
 
     public YifanHuLayout(AlgorithmFactory layoutBuilder, Displacement displacement) {
         super(layoutBuilder);
         this.displacement = displacement;
+        resetPropertiesValues();
+        createProperties();
+    }
+    
+    private void resetPropertiesValues(){
+        this.stepRatio = 0.95f;
+        this.relativeStrength = 0.2f;
+        this.optimalDistance = -1;
+        this.initialStep = (optimalDistance / 5);
+        this.step = initialStep;
+        this.quadTreeMaxLevel = 10;
+        this.barnesHutTheta = 1.2f;
+        this.adaptiveCooling = true;
+        this.convergenceThreshold = 1e-4f;    
     }
 
-    protected void postAlgo() {
-        updateStep();
-        if (Math.abs((energy - energy0) / energy) < getConvergenceThreshold()) {
-            setConverged(true);
-        }
-    }
-
-    private Displacement getDisplacement() {
-        displacement.setStep(step);
-        return displacement;
-    }
-
-    private AbstractForce getEdgeForce() {
-        return new SpringForce(getOptimalDistance());
-    }
-
-    private AbstractForce getNodeForce() {
-        return new ElectricalForce(getRelativeStrength(), getOptimalDistance());
-    }
-
-    private void updateStep() {
-        if (isAdaptiveCooling()) {
-            if (energy < energy0) {
-                progress++;
-                if (progress >= 5) {
-                    progress = 0;
-                    setStep(step / getStepRatio());
-                }
-            } else {
-                progress = 0;
-                setStep(step * getStepRatio());
-            }
-        } else {
-            setStep(step * getStepRatio());
-        }
-    }
-
-    @Override
-    public void resetPropertiesValues() {
-        setStepRatio((float) 0.95);
-        setRelativeStrength((float) 0.2);
-        if (graph != null) {
-            setOptimalDistance((float) (Math.pow(getRelativeStrength(), 1.0 / 3) * getAverageEdgeLength(graph)));
-        } else {
-            setOptimalDistance(100.0f);
-        }
-
-        setInitialStep(optimalDistance / 5);
-        setStep(initialStep);
-        setQuadTreeMaxLevel(10);
-        setBarnesHutTheta(1.2f);
-        setAdaptiveCooling(true);
-        setConvergenceThreshold(1e-4f);
-    }
-
-    public float getAverageEdgeLength(Graph graph) {
-        float edgeLength = 0;
-        int count = 1;
-        for (Edge e : graph.getEdges()) {
-            edgeLength += ForceVectorUtils.distance(
-                    e.getSource(), e.getTarget());
-            count++;
-        }
-
-        return edgeLength / count;
-    }
-
-    @Override
-    public AlgorithmProperty[] getProperties() {
-        List<AlgorithmProperty> properties = new ArrayList<>();
+    private void createProperties() {
+        properties = new ArrayList<>();
         final String YIFANHU_CATEGORY = "Yifan Hu's properties";
         final String BARNESHUT_CATEGORY = "Barnes-Hut's properties";
 
@@ -220,11 +167,67 @@ public class YifanHuLayout extends AbstractLayout {
             e.printStackTrace();
         }
 
+    }
+
+    protected void postAlgo() {
+        updateStep();
+        if (Math.abs((energy - energy0) / energy) < getConvergenceThreshold()) {
+            setConverged(true);
+        }
+    }
+
+    private Displacement getDisplacement() {
+        displacement.setStep(step);
+        return displacement;
+    }
+
+    private AbstractForce getEdgeForce() {
+        return new SpringForce(getOptimalDistance());
+    }
+
+    private AbstractForce getNodeForce() {
+        return new ElectricalForce(getRelativeStrength(), getOptimalDistance());
+    }
+
+    private void updateStep() {
+        if (isAdaptiveCooling()) {
+            if (energy < energy0) {
+                progress++;
+                if (progress >= 5) {
+                    progress = 0;
+                    setStep(step / getStepRatio());
+                }
+            } else {
+                progress = 0;
+                setStep(step * getStepRatio());
+            }
+        } else {
+            setStep(step * getStepRatio());
+        }
+    }
+
+    private float getAverageEdgeLength(Graph graph) {
+        float edgeLength = 0;
+        int count = 1;
+        for (Edge e : graph.getEdges()) {
+            edgeLength += ForceVectorUtils.distance(
+                    e.getSource(), e.getTarget());
+            count++;
+        }
+
+        return edgeLength / count;
+    }
+
+    @Override
+    public AlgorithmProperty[] getProperties() {
         return properties.toArray(new AlgorithmProperty[0]);
     }
 
     @Override
     public void initLayout() {
+        if (optimalDistance < 0) {
+            setOptimalDistance((float)Math.pow(relativeStrength, 1.0 / 3) * getAverageEdgeLength(graphModel.getGraphVisible()));
+        }
         energy = Float.POSITIVE_INFINITY;
         nodes = graph.getNodes().toArray();
         for (Node n : nodes) {

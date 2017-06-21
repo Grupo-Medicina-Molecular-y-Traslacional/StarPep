@@ -52,6 +52,7 @@ import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.task.AlgorithmExecutor;
+import org.bapedis.core.task.AlgorithmListener;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.DialogDisplayer;
@@ -101,6 +102,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     protected final ProjectManager pc;
     private RichTooltip richTooltip;
     private final AlgoPresetPersistence algoPresetPersistence;
+    private final AlgorithmListener algoListener;
 
     public AlgoExplorerTopComponent() {
         initComponents();
@@ -108,6 +110,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         setToolTipText(Bundle.HINT_AlgoExplorerTopComponent());
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         algoPresetPersistence = new AlgoPresetPersistence();
+        algoListener = new AlgorithmListenerImpl();
     }
 
     /**
@@ -336,15 +339,15 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
         AlgorithmModel algoModel = pc.getAlgorithmModel();
         Algorithm algo = algoModel.getSelectedAlgorithm();
+        AlgorithmExecutor executor = pc.getExecutor();
         if (algo != null) {
             if (algoModel.isRunning()) {
-
+                executor.cancel(algo);
             } else {
-                AlgorithmExecutor executor = pc.getExecutor();
-                executor.execute(algo);
+                algoModel.setRunning(true);
+                executor.execute(algo, algoListener, null);
             }
         }
-        algoModel.setRunning(!algoModel.isRunning());
     }//GEN-LAST:event_runButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -460,15 +463,16 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     private void setRunningState(boolean running) {
         setEnableState(!running);
         algoComboBox.setEnabled(!running);
-//        if (model == null || !model.isRunning()) {
-//            runButton.setText(NbBundle.getMessage(LayoutPanel.class, "LayoutPanel.runButton.text"));
-//            runButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/layout/resources/run.gif", false));
-//            runButton.setToolTipText(NbBundle.getMessage(LayoutPanel.class, "LayoutPanel.runButton.tooltip"));
-//        } else if (model.isRunning()) {
-//            runButton.setText(NbBundle.getMessage(LayoutPanel.class, "LayoutPanel.stopButton.text"));
-//            runButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/layout/resources/stop.png", false));
-//            runButton.setToolTipText(NbBundle.getMessage(LayoutPanel.class, "LayoutPanel.stopButton.tooltip"));
-//        }          
+        runButton.setEnabled(true);
+        if (running) {
+            runButton.setText(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.stopButton.text"));
+            runButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/stop.png", false));
+            runButton.setToolTipText(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.stopButton.tooltip"));
+        } else {
+            runButton.setText(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.runButton.text"));
+            runButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/run.gif", false));
+            runButton.setToolTipText(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.runButton.tooltip"));
+        }
     }
 
     @Override
@@ -574,6 +578,24 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 }
             }
         }
+    }
+
+    private static class AlgorithmListenerImpl implements AlgorithmListener {
+
+        private final ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
+
+        @Override
+        public void algorithmFinished(Algorithm algo) {
+            Workspace[] workspaces = pm.getWorkspaces();
+            AlgorithmModel algoModel;
+            for (Workspace workspace : workspaces) {
+                algoModel = pm.getAlgorithmModel(workspace);
+                if (algoModel.getSelectedAlgorithm().equals(algo)) {
+                    algoModel.setRunning(false);
+                }
+            }
+        }
+
     }
 }
 
@@ -805,4 +827,5 @@ class AlgoPresetPersistence {
             return hash;
         }
     }
+
 }

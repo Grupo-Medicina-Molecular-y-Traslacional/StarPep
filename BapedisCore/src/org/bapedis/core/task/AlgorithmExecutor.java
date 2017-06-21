@@ -146,11 +146,10 @@ public final class AlgorithmExecutor {
     }
 
     private synchronized void finished(AlgoExecutor runnable) {
-        runnable.progress.finish();
+        taskList.remove(runnable);
         if (runnable.listener != null) {
             runnable.listener.algorithmFinished(runnable.algorithm);
         }
-        taskList.remove(runnable);
     }
 
     /**
@@ -178,7 +177,7 @@ public final class AlgorithmExecutor {
 
             });
             algorithm.setProgressTicket(progress);
-            progress.start();            
+            progress.start();
             progress.setDisplayName(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.submitted", taskName));
         }
 
@@ -194,6 +193,7 @@ public final class AlgorithmExecutor {
                     Logger.getLogger("").log(Level.SEVERE, "", e);
                 }
             } finally {
+                progress.finish();
                 finished(this);
             }
         }

@@ -121,7 +121,7 @@ public class AutoLayout {
         LayoutScenario layout;
         while (!cancel && (layout = setLayout()) != null) {
             setProperties();
-            layout.layout.goAlgo();
+            layout.layout.runLayout();
         }
         //System.out.println("finished");
     }

@@ -46,7 +46,6 @@ import java.util.List;
 import java.util.Random;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 import org.gephi.layout.plugin.AbstractLayout;
 import org.openide.util.NbBundle;
@@ -57,9 +56,7 @@ import org.openide.util.NbBundle;
  */
 public class RandomLayout extends AbstractLayout{
 
-    private Random random;
-    private Graph graph;
-    private boolean converged;
+    private final Random random;
     private double size;
 
     public RandomLayout(AlgorithmFactory layoutBuilder, double size) {
@@ -69,28 +66,20 @@ public class RandomLayout extends AbstractLayout{
     }
 
     @Override
-    public void initAlgo() {
-        converged = false;
+    public void initLayout() {
     }
 
     @Override
-    public void goAlgo() {
-        graph = graphModel.getGraphVisible();
+    public void runLayout() {
         for (Node n : graph.getNodes()) {
             n.setX((float) (-size / 2 + size * random.nextDouble()));
             n.setY((float) (-size / 2 + size * random.nextDouble()));
         }
-        converged = true;
+        setConverged(true);
     }
 
     @Override
-    public boolean canAlgo() {
-        return !converged;
-    }
-
-    @Override
-    public void endAlgo() {
-        graph = null;
+    public void endLayout() {        
     }
 
     @Override

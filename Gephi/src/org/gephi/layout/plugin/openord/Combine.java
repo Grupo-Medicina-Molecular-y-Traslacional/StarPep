@@ -135,11 +135,11 @@ public class Combine implements Runnable {
         }
 
         //Finish
-        if (!layout.canAlgo() || done) {
+        if (done) {
             for (Worker w : layout.getWorkers()) {
                 w.setDone(true);
             }
-            layout.setRunning(false);
+            layout.setConverged(true);
         }
 
         //Synchronize with layout goAlgo()

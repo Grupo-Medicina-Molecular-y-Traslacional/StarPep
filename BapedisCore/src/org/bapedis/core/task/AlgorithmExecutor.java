@@ -45,7 +45,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -175,8 +174,9 @@ public final class AlgorithmExecutor {
                     return AlgoExecutor.this.cancel();
                 }
 
-            });
+            });            
             algorithm.setProgressTicket(progress);
+            algorithm.initAlgo();
             progress.start();
             progress.setDisplayName(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.submitted", taskName));
         }
@@ -193,6 +193,7 @@ public final class AlgorithmExecutor {
                     Logger.getLogger("").log(Level.SEVERE, "", e);
                 }
             } finally {
+                algorithm.endAlgo();
                 progress.finish();
                 finished(this);
             }

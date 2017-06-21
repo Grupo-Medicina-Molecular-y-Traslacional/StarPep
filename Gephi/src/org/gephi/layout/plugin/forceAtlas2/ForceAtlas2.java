@@ -48,11 +48,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import org.bapedis.core.model.AlgorithmProperty;
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.layout.plugin.AbstractLayout;
 import org.gephi.layout.plugin.forceAtlas2.ForceFactory.AttractionForce;
@@ -67,7 +63,6 @@ import org.openide.util.NbBundle;
  */
 public class ForceAtlas2 extends AbstractLayout {
 
-    private Graph graph;
     private double edgeWeightInfluence;
     private double jitterTolerance;
     private double scalingRatio;
@@ -85,6 +80,8 @@ public class ForceAtlas2 extends AbstractLayout {
     private Region rootRegion;
     double outboundAttCompensation = 1;
     private ExecutorService pool;
+    private Node[] nodes;
+    private Edge[] edges;
 
     public ForceAtlas2(ForceAtlas2Factory layoutBuilder) {
         super(layoutBuilder);
@@ -92,14 +89,12 @@ public class ForceAtlas2 extends AbstractLayout {
     }
 
     @Override
-    public void initAlgo() {
+    public void initLayout() {
         speed = 1.;
         speedEfficiency = 1.;
 
-        graph = graphModel.getGraphVisible();
-
-        graph.readLock();
-        Node[] nodes = graph.getNodes().toArray();
+        nodes = graph.getNodes().toArray();
+        edges = graph.getEdges().toArray();
 
         // Initialise layout data
         for (Node n : nodes) {
@@ -120,17 +115,7 @@ public class ForceAtlas2 extends AbstractLayout {
     }
 
     @Override
-    public void goAlgo() {
-        // Initialize graph data
-        if (graphModel == null) {
-            return;
-        }
-        graph = graphModel.getGraphVisible();
-
-        graph.readLock();
-        Node[] nodes = graph.getNodes().toArray();
-        Edge[] edges = graph.getEdges().toArray();
-
+    public void runLayout() {
         // Initialise layout data
         for (Node n : nodes) {
             if (n.getLayoutData() == null || !(n.getLayoutData() instanceof ForceAtlas2LayoutData)) {
@@ -287,21 +272,14 @@ public class ForceAtlas2 extends AbstractLayout {
                 }
             }
         }
-        graph.readUnlockAll();
     }
 
     @Override
-    public boolean canAlgo() {
-        return graphModel != null;
-    }
-
-    @Override
-    public void endAlgo() {
-        for (Node n : graph.getNodes()) {
-            n.setLayoutData(null);
-        }
+    public void endLayout() {
         pool.shutdown();
-        graph.readUnlockAll();
+        pool = null;
+        nodes = null;
+        edges = null;
     }
 
     @Override

@@ -52,8 +52,6 @@ import java.util.concurrent.CyclicBarrier;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphModel;
 import org.gephi.layout.plugin.AbstractLayout;
 import org.openide.util.NbBundle;
 
@@ -64,7 +62,6 @@ import org.openide.util.NbBundle;
 public class OpenOrdLayout extends AbstractLayout{
 
     //Architecture
-    private boolean running = true;
     //Settings
     private Params param;
     private float edgeCut;
@@ -77,7 +74,6 @@ public class OpenOrdLayout extends AbstractLayout{
     private Combine combine;
     private Control control;
     private CyclicBarrier barrier;
-    private Graph graph;
     private boolean firstIteration = true;
 
     public OpenOrdLayout(AlgorithmFactory builder) {
@@ -91,22 +87,18 @@ public class OpenOrdLayout extends AbstractLayout{
         numThreads = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
         Random r = new Random();
         randSeed = r.nextLong();
-        running = true;
         realTime = 0.2f;
         param = Params.DEFAULT;
     }
 
     @Override
-    public void initAlgo() {
+    public void initLayout() {
         //Verify param
         if (param.getIterationsSum() != 1f) {
             param = Params.DEFAULT;
             //throw new RuntimeException("The sum of the time for each stage must be equal to 1");
         }
 
-        //Get graph
-        graph = graphModel.getUndirectedGraphVisible();
-        graph.readLock();
         int numNodes = graph.getNodeCount();
 
         //Prepare data structure - nodes and neighbors map
@@ -238,14 +230,11 @@ public class OpenOrdLayout extends AbstractLayout{
                 }
             }
         }
-        graph.readUnlock();
-
-        running = true;
         firstIteration = true;
     }
 
     @Override
-    public void goAlgo() {
+    public void runLayout() {
         if (firstIteration) {
             for (int i = 0; i < numThreads; ++i) {
                 Thread t = new Thread(workers[i]);
@@ -259,8 +248,7 @@ public class OpenOrdLayout extends AbstractLayout{
     }
 
     @Override
-    public void endAlgo() {
-        running = false;
+    public void endLayout() {
         combine = null;
     }
 
@@ -270,10 +258,6 @@ public class OpenOrdLayout extends AbstractLayout{
         return weight;
     }
 
-    @Override
-    public boolean canAlgo() {
-        return running;
-    }
 
     @Override
     public AlgorithmProperty[] getProperties() {
@@ -377,10 +361,6 @@ public class OpenOrdLayout extends AbstractLayout{
         this.randSeed = randSeed;
     }
 
-    public void setRunning(Boolean running) {
-        this.running = running;
-    }
-
     public Integer getNumIterations() {
         return numIterations;
     }
@@ -452,10 +432,6 @@ public class OpenOrdLayout extends AbstractLayout{
 
     public Worker[] getWorkers() {
         return workers;
-    }
-
-    public Graph getGraph() {
-        return graph;
     }
 
     public Control getControl() {

@@ -47,7 +47,6 @@ import java.util.List;
 import java.util.Map;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 import org.gephi.layout.plugin.AbstractLayout;
 
@@ -57,8 +56,6 @@ import org.gephi.layout.plugin.AbstractLayout;
  */
 public class NoverlapLayout extends AbstractLayout {
 
-    protected boolean cancel;
-    protected Graph graph;
     private double speed;
     private double ratio;
     private double margin;
@@ -66,26 +63,23 @@ public class NoverlapLayout extends AbstractLayout {
     private double xmax;
     private double ymin;
     private double ymax;
+    private Node[] nodes;
 
     public NoverlapLayout(AlgorithmFactory layoutBuilder) {
         super(layoutBuilder);
     }
 
     @Override
-    public void initAlgo() {
-        this.graph = graphModel.getGraphVisible();
-        setConverged(false);
-        cancel = false;
+    public void initLayout() {
+        nodes = graph.getNodes().toArray();
     }
 
     @Override
-    public void goAlgo() {
+    public void runLayout() {
         setConverged(true);
-        this.graph = graphModel.getGraphVisible();
-        graph.readLock();
 
         //Reset Layout Data
-        for (Node n : graph.getNodes()) {
+        for (Node n : nodes) {
             if (n.getLayoutData() == null || !(n.getLayoutData() instanceof NoverlapLayoutData)) {
                 n.setLayoutData(new NoverlapLayoutData());
             }
@@ -101,7 +95,7 @@ public class NoverlapLayout extends AbstractLayout {
         this.ymin = Double.MAX_VALUE;
         this.ymax = Double.MIN_VALUE;
 
-        for (Node n : graph.getNodes()) {
+        for (Node n : nodes) {
             float x = n.x();
             float y = n.y();
             float radius = n.size();
@@ -133,7 +127,7 @@ public class NoverlapLayout extends AbstractLayout {
         SpatialGrid grid = new SpatialGrid();
 
         // Put nodes in their boxes
-        for (Node n : graph.getNodes()) {
+        for (Node n : nodes) {
             grid.add(n);
         }
 
@@ -141,8 +135,8 @@ public class NoverlapLayout extends AbstractLayout {
         // But they are not repulsed several times, even if they are in several cells...
         // So we build a relation of proximity between nodes.
         // Build proximities
-        for (int row = 0; row < grid.countRows() && !cancel; row++) {
-            for (int col = 0; col < grid.countColumns() && !cancel; col++) {
+        for (int row = 0; row < grid.countRows(); row++) {
+            for (int col = 0; col < grid.countColumns(); col++) {
                 for (Node n : grid.getContent(row, col)) {
                     NoverlapLayoutData lald = n.getLayoutData();
 
@@ -163,7 +157,7 @@ public class NoverlapLayout extends AbstractLayout {
 
         // Proximities are built !
         // Apply repulsion force - along proximities...
-        for (Node n1 : graph.getNodes()) {
+        for (Node n1 : nodes) {
             NoverlapLayoutData lald = n1.getLayoutData();
             for (Node n2 : lald.neighbours) {
                 float n1x = n1.x();
@@ -192,17 +186,11 @@ public class NoverlapLayout extends AbstractLayout {
                         layoutData.dy += 0.01 * (0.5 - Math.random());
                     }
                 }
-                if (cancel) {
-                    break;
-                }
-            }
-            if (cancel) {
-                break;
             }
         }
 
         // apply forces
-        for (Node n : graph.getNodes()) {
+        for (Node n : nodes) {
             NoverlapLayoutData layoutData = n.getLayoutData();
             if (!n.isFixed()) {
                 layoutData.dx *= 0.1 * speed;
@@ -214,15 +202,11 @@ public class NoverlapLayout extends AbstractLayout {
                 n.setY(y);
             }
         }
-
-        graph.readUnlock();
     }
 
     @Override
-    public void endAlgo() {
-        for (Node n : graph.getNodes()) {
-            n.setLayoutData(null);
-        }
+    public void endLayout() {
+        nodes = null;
     }
 
     @Override
@@ -280,7 +264,6 @@ public class NoverlapLayout extends AbstractLayout {
     public void setMargin(Double margin) {
         this.margin = margin;
     }
-
 
     private class SpatialGrid {
 

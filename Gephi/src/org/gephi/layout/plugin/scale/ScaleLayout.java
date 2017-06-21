@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 import org.gephi.layout.plugin.AbstractLayout;
 import org.openide.util.NbBundle;
@@ -58,7 +57,7 @@ import org.openide.util.NbBundle;
 public class ScaleLayout extends AbstractLayout{
 
     private double scale;
-    private Graph graph;
+    private Node[] nodes;    
 
     public ScaleLayout(AlgorithmFactory layoutBuilder, double scale) {
         super(layoutBuilder);
@@ -66,22 +65,21 @@ public class ScaleLayout extends AbstractLayout{
     }
 
     @Override
-    public void initAlgo() {
-        setConverged(false);
+    public void initLayout() {
+        nodes = graph.getNodes().toArray();
     }
 
     @Override
-    public void goAlgo() {
-        graph = graphModel.getGraphVisible();
+    public void runLayout() {
         double xMean = 0, yMean = 0;
-        for (Node n : graph.getNodes()) {
+        for (Node n : nodes) {
             xMean += n.x();
             yMean += n.y();
         }
-        xMean /= graph.getNodeCount();
-        yMean /= graph.getNodeCount();
+        xMean /= nodes.length;
+        yMean /= nodes.length;
 
-        for (Node n : graph.getNodes()) {
+        for (Node n : nodes) {
             double dx = (n.x() - xMean) * getScale();
             double dy = (n.y() - yMean) * getScale();
 
@@ -92,7 +90,8 @@ public class ScaleLayout extends AbstractLayout{
     }
 
     @Override
-    public void endAlgo() {
+    public void endLayout() {
+        nodes = null;
     }
 
     @Override

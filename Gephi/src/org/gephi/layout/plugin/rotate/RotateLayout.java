@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 import org.gephi.layout.plugin.AbstractLayout;
 import org.openide.util.NbBundle;
@@ -58,7 +57,6 @@ import org.openide.util.NbBundle;
 public class RotateLayout extends AbstractLayout{
 
     private double angle;
-    private Graph graph;
 
     public RotateLayout(AlgorithmFactory layoutBuilder, double angle) {
         super(layoutBuilder);
@@ -66,13 +64,11 @@ public class RotateLayout extends AbstractLayout{
     }
 
     @Override
-    public void initAlgo() {
-        setConverged(false);
+    public void initLayout() {
     }
 
     @Override
-    public void goAlgo() {
-        graph = graphModel.getGraphVisible();
+    public void runLayout() {
         double sin = Math.sin(-getAngle() * Math.PI / 180);
         double cos = Math.cos(-getAngle() * Math.PI / 180);
         double px = 0f;
@@ -89,7 +85,7 @@ public class RotateLayout extends AbstractLayout{
     }
 
     @Override
-    public void endAlgo() {
+    public void endLayout() {
     }
 
     @Override

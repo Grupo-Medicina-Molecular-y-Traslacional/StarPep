@@ -46,7 +46,6 @@ import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 import org.gephi.layout.plugin.AbstractLayout;
 import org.gephi.layout.plugin.ForceVectorNodeLayoutData;
@@ -59,8 +58,6 @@ import org.openide.util.NbBundle;
  */
 public class ForceAtlasLayout extends AbstractLayout {
 
-    //Graph
-    protected Graph graph;
     //Properties
     public double inertia;
     private double repulsionStrength;
@@ -74,6 +71,8 @@ public class ForceAtlasLayout extends AbstractLayout {
     private double cooling;
     private boolean outboundAttractionDistribution;
     private boolean adjustSizes;
+    private Node[] nodes;
+    private Edge[] edges;
 
     public ForceAtlasLayout(AlgorithmFactory layoutBuilder) {
         super(layoutBuilder);
@@ -96,16 +95,17 @@ public class ForceAtlasLayout extends AbstractLayout {
     }
 
     @Override
-    public void initAlgo() {
+    public void initLayout() {
+        nodes = graph.getNodes().toArray();
+        edges = graph.getEdges().toArray();
+
+        for (Node n : nodes) {
+            n.setLayoutData(new ForceVectorNodeLayoutData());
+        }
     }
 
     @Override
-    public void goAlgo() {
-        this.graph = graphModel.getGraphVisible();
-        graph.readLock();
-        Node[] nodes = graph.getNodes().toArray();
-        Edge[] edges = graph.getEdges().toArray();
-
+    public void runLayout() {
         for (Node n : nodes) {
             if (n.getLayoutData() == null || !(n.getLayoutData() instanceof ForceVectorNodeLayoutData)) {
                 n.setLayoutData(new ForceVectorNodeLayoutData());
@@ -221,19 +221,12 @@ public class ForceAtlasLayout extends AbstractLayout {
                 n.setY(y);
             }
         }
-        graph.readUnlock();
     }
 
     @Override
-    public void endAlgo() {
-        for (Node n : graph.getNodes()) {
-            n.setLayoutData(null);
-        }
-    }
-
-    @Override
-    public boolean canAlgo() {
-        return true;
+    public void endLayout() {
+        nodes = null;
+        edges = null;
     }
 
     @Override

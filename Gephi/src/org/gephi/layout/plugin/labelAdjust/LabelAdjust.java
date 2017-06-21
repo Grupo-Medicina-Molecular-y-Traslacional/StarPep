@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.TextProperties;
 import org.gephi.layout.plugin.AbstractLayout;
@@ -55,10 +54,8 @@ import org.openide.util.NbBundle;
  *
  * @author Mathieu Jacomy
  */
-public class LabelAdjust extends AbstractLayout{
+public class LabelAdjust extends AbstractLayout {
 
-    //Graph
-    protected Graph graph;
     //Settings
     private double speed = 1;
     private boolean adjustBySize = true;
@@ -68,6 +65,7 @@ public class LabelAdjust extends AbstractLayout{
     private float xmax;
     private float ymin;
     private float ymax;
+    private Node[] nodes;
 
     public LabelAdjust(AlgorithmFactory layoutBuilder) {
         super(layoutBuilder);
@@ -81,16 +79,19 @@ public class LabelAdjust extends AbstractLayout{
     }
 
     @Override
-    public void initAlgo() {
-        setConverged(false);
+    public void initLayout() {
+        nodes = graph.getNodes().toArray();
+        for (Node n : nodes) {
+            n.setLayoutData(new LabelAdjustLayoutData());
+            LabelAdjustLayoutData layoutData = n.getLayoutData();
+            layoutData.freeze = 0;
+            layoutData.dx = 0;
+            layoutData.dy = 0;
+        }
     }
 
     @Override
-    public void goAlgo() {
-        this.graph = graphModel.getGraphVisible();
-        graph.readLock();
-        Node[] nodes = graph.getNodes().toArray();
-
+    public void runLayout() {
         //Reset Layout Data
         for (Node n : nodes) {
             if (n.getLayoutData() == null || !(n.getLayoutData() instanceof LabelAdjustLayoutData)) {
@@ -135,7 +136,6 @@ public class LabelAdjust extends AbstractLayout{
         }
 
         if (correctNodes.isEmpty() || xmin == xmax || ymin == ymax) {
-            graph.readUnlock();
             return;
         }
 
@@ -182,8 +182,6 @@ public class LabelAdjust extends AbstractLayout{
                 }
             }
         }
-
-        graph.readUnlock();
     }
 
     private boolean repulse(Node n1, Node n2) {
@@ -260,10 +258,8 @@ public class LabelAdjust extends AbstractLayout{
     }
 
     @Override
-    public void endAlgo() {
-        for (Node n : graph.getNodes()) {
-            n.setLayoutData(null);
-        }
+    public void endLayout() {
+        nodes = null;
     }
 
     @Override

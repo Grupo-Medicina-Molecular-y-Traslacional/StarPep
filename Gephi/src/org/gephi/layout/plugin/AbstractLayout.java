@@ -44,8 +44,10 @@ package org.gephi.layout.plugin;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
+import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.Node;
 import org.openide.util.Lookup;
 
 /**
@@ -57,15 +59,20 @@ public abstract class AbstractLayout implements Algorithm {
 
     private final AlgorithmFactory layoutBuilder;
     protected GraphModel graphModel;
-    protected boolean converged;
+    private Graph graph;
     protected Integer iterations;
-    protected boolean stopRun = false;
     protected ProgressTicket progressTicket;
+    private boolean stopRun;
+    private boolean converged;
 
     public AbstractLayout(AlgorithmFactory layoutBuilder) {
         this.layoutBuilder = layoutBuilder;
         GraphController gc = Lookup.getDefault().lookup(GraphController.class);
         graphModel = gc.getGraphModel();
+    }
+
+    public Graph getGraph() {
+        return graph;
     }
 
     public Integer getIterations() {
@@ -80,41 +87,65 @@ public abstract class AbstractLayout implements Algorithm {
     public AlgorithmFactory getFactory() {
         return layoutBuilder;
     }
-    
-     /**
-     * initAlgo() is called to initialize the algorithm (prepare to run).
+
+    /**
+     * Called to initialize the layout (prepare to run).
      */
-    public abstract void initAlgo();  
-    
+    public abstract void initLayout();
+
     /**
      * Run a step in the algorithm, should be called only if canAlgo() returns
      * true.
      */
-    public abstract void goAlgo();
-    
+    public abstract void runLayout();
 
     /**
-     * Called when the algorithm is finished (canAlgo() returns false).
+     * Called to release resources when the layout is finished
      */
-    public abstract void endAlgo();    
+    public abstract void endLayout();
 
     @Override
-    public void run() {
-        initAlgo();
+    public final void initAlgo() {
+        graph = graphModel.getGraphVisible();
+        graph.readLock();
+        try {
+            initLayout();
+        } finally {
+            graph.readUnlock();
+        }
+        stopRun = false;
+        converged = false;
+    }
+
+    @Override
+    public final void run() {
         long i = 0;
         while (canAlgo() && !stopRun) {
-            goAlgo();
+            graph.readLock();
+            try {
+                runLayout();
+            } finally {
+                graph.readUnlock();
+            }
             i++;
             if (iterations != null && iterations.longValue() == i) {
                 break;
             }
         }
-        endAlgo();
-//        if (i > 1) {
-//            Progress.finish(progressTicket, NbBundle.getMessage(LayoutControllerImpl.class, "LayoutRun.end", layout.getBuilder().getName(), i));
-//        } else {
-//            Progress.finish(progressTicket);
-//        }
+    }
+
+    @Override
+    public final void endAlgo() {
+        graph.readLock();
+        try {
+            endLayout();
+            for (Node n : graph.getNodes()) {
+                n.setLayoutData(null);
+            }
+        } finally {
+            graph.readUnlock();
+        }
+        graph = null;
     }
 
     @Override
@@ -134,7 +165,7 @@ public abstract class AbstractLayout implements Algorithm {
      * @return              <code>true</code> if the algorithm can run, <code>
      *                      false</code> otherwise
      */
-    public boolean canAlgo() {
+    private boolean canAlgo() {
         return !isConverged() && graphModel != null;
     }
 

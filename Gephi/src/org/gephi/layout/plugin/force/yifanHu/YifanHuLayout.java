@@ -63,7 +63,7 @@ import org.openide.util.NbBundle;
  *
  * @author Helder Suzuki <heldersuzuki@gephi.org>
  */
-public class YifanHuLayout extends AbstractLayout implements Algorithm {
+public class YifanHuLayout extends AbstractLayout {
 
     private float optimalDistance;
     private float relativeStrength;
@@ -75,10 +75,10 @@ public class YifanHuLayout extends AbstractLayout implements Algorithm {
     private float barnesHutTheta;
     private float convergenceThreshold;
     private boolean adaptiveCooling;
-    private Displacement displacement;
+    private final Displacement displacement;
     private double energy0;
     private double energy;
-    private Graph graph;
+    private Node[] nodes;
 
     public YifanHuLayout(AlgorithmFactory layoutBuilder, Displacement displacement) {
         super(layoutBuilder);
@@ -224,32 +224,24 @@ public class YifanHuLayout extends AbstractLayout implements Algorithm {
     }
 
     @Override
-    public void initAlgo() {
-        if (graphModel == null) {
-            return;
-        }
-        graph = graphModel.getGraphVisible();
+    public void initLayout() {
         energy = Float.POSITIVE_INFINITY;
-        for (Node n : graph.getNodes()) {
+        nodes = graph.getNodes().toArray();
+        for (Node n : nodes) {
             n.setLayoutData(new ForceVector());
         }
         progress = 0;
-        setConverged(false);
         setStep(initialStep);
+
     }
 
     @Override
-    public void endAlgo() {
-        for (Node n : graph.getNodes()) {
-            n.setLayoutData(null);
-        }
+    public void endLayout() {
+        nodes = null;
     }
 
     @Override
-    public void goAlgo() {
-        graph = graphModel.getGraphVisible();
-        graph.readLock();
-        Node[] nodes = graph.getNodes().toArray();
+    public void runLayout() {
         for (Node n : nodes) {
             if (n.getLayoutData() == null || !(n.getLayoutData() instanceof ForceVector)) {
                 n.setLayoutData(new ForceVector());
@@ -272,7 +264,6 @@ public class YifanHuLayout extends AbstractLayout implements Algorithm {
         }
 
         // Apply edge forces.
-
         for (Edge e : graph.getEdges()) {
             if (!e.getSource().equals(e.getTarget())) {
                 Node n1 = e.getSource();
@@ -310,7 +301,6 @@ public class YifanHuLayout extends AbstractLayout implements Algorithm {
 //        springEnergy = energy - electricEnergy;
 //        System.out.println("electric: " + electricEnergy + "    spring: " + springEnergy);
 //        System.out.println("energy0 = " + energy0 + "   energy = " + energy);
-        graph.readUnlock();
     }
 
 

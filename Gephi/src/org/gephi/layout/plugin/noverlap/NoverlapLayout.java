@@ -71,8 +71,8 @@ public class NoverlapLayout extends AbstractLayout {
         resetPropertiesValues();
         createProperties();
     }
-    
-    private void createProperties(){
+
+    private void createProperties() {
         properties = new ArrayList<>();
         final String NOVERLAP_CATEGORY = "Noverlap";
         try {
@@ -92,7 +92,7 @@ public class NoverlapLayout extends AbstractLayout {
                     this, Double.class, "margin", NOVERLAP_CATEGORY, "margin", "getMargin", "setMargin"));
         } catch (Exception e) {
             e.printStackTrace();
-        }    
+        }
     }
 
     @Override
@@ -102,10 +102,13 @@ public class NoverlapLayout extends AbstractLayout {
 
     @Override
     public void runLayout() {
-        setConverged(true);
+        boolean converged = true;
 
         //Reset Layout Data
         for (Node n : nodes) {
+            if (!canLayout()) {
+                return;
+            }
             if (n.getLayoutData() == null || !(n.getLayoutData() instanceof NoverlapLayoutData)) {
                 n.setLayoutData(new NoverlapLayoutData());
             }
@@ -122,6 +125,9 @@ public class NoverlapLayout extends AbstractLayout {
         this.ymax = Double.MIN_VALUE;
 
         for (Node n : nodes) {
+            if (!canLayout()) {
+                return;
+            }
             float x = n.x();
             float y = n.y();
             float radius = n.size();
@@ -154,6 +160,9 @@ public class NoverlapLayout extends AbstractLayout {
 
         // Put nodes in their boxes
         for (Node n : nodes) {
+            if (!canLayout()) {
+                return;
+            }
             grid.add(n);
         }
 
@@ -161,15 +170,15 @@ public class NoverlapLayout extends AbstractLayout {
         // But they are not repulsed several times, even if they are in several cells...
         // So we build a relation of proximity between nodes.
         // Build proximities
-        for (int row = 0; row < grid.countRows(); row++) {
-            for (int col = 0; col < grid.countColumns(); col++) {
+        for (int row = 0; row < grid.countRows() && canLayout(); row++) {
+            for (int col = 0; col < grid.countColumns() && canLayout(); col++) {
                 for (Node n : grid.getContent(row, col)) {
                     NoverlapLayoutData lald = n.getLayoutData();
 
                     // For node n in the box "box"...
                     // We search nodes that are in the boxes that are adjacent or the same.
-                    for (int row2 = Math.max(0, row - 1); row2 <= Math.min(row + 1, grid.countRows() - 1); row2++) {
-                        for (int col2 = Math.max(0, col - 1); col2 <= Math.min(col + 1, grid.countColumns() - 1); col2++) {
+                    for (int row2 = Math.max(0, row - 1); row2 <= Math.min(row + 1, grid.countRows() - 1) && canLayout(); row2++) {
+                        for (int col2 = Math.max(0, col - 1); col2 <= Math.min(col + 1, grid.countColumns() - 1) && canLayout(); col2++) {
                             for (Node n2 : grid.getContent(row2, col2)) {
                                 if (n2 != n && !lald.neighbours.contains(n2)) {
                                     lald.neighbours.add(n2);
@@ -186,6 +195,9 @@ public class NoverlapLayout extends AbstractLayout {
         for (Node n1 : nodes) {
             NoverlapLayoutData lald = n1.getLayoutData();
             for (Node n2 : lald.neighbours) {
+                if (!canLayout()) {
+                    return;
+                }
                 float n1x = n1.x();
                 float n1y = n1.y();
                 float n2x = n2.x();
@@ -199,7 +211,7 @@ public class NoverlapLayout extends AbstractLayout {
                 double dist = Math.sqrt(xDist * xDist + yDist * yDist);
                 boolean collision = dist < (n1radius * ratio + margin) + (n2radius * ratio + margin);
                 if (collision) {
-                    setConverged(false);
+                    converged = false;
                     // n1 repulses n2, as strongly as it is big
                     NoverlapLayoutData layoutData = n2.getLayoutData();
                     double f = 1. + n1.size();
@@ -217,6 +229,9 @@ public class NoverlapLayout extends AbstractLayout {
 
         // apply forces
         for (Node n : nodes) {
+            if (!canLayout()) {
+                return;
+            }            
             NoverlapLayoutData layoutData = n.getLayoutData();
             if (!n.isFixed()) {
                 layoutData.dx *= 0.1 * speed;
@@ -228,6 +243,7 @@ public class NoverlapLayout extends AbstractLayout {
                 n.setY(y);
             }
         }
+        setConverged(converged);
     }
 
     @Override

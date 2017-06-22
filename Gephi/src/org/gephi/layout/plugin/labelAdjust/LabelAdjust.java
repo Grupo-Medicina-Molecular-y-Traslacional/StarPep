@@ -66,16 +66,41 @@ public class LabelAdjust extends AbstractLayout {
     private float ymin;
     private float ymax;
     private Node[] nodes;
+    private List<AlgorithmProperty> properties;
 
     public LabelAdjust(AlgorithmFactory layoutBuilder) {
         super(layoutBuilder);
+        resetPropertiesValues();
+        createProperties();
     }
 
-    @Override
-    public void resetPropertiesValues() {
+    private void resetPropertiesValues() {
         speed = 1;
         radiusScale = 1.1f;
         adjustBySize = true;
+    }
+
+    private void createProperties() {
+        properties = new ArrayList<>();
+        final String LABELADJUST_CATEGORY = "LabelAdjust";
+        try {
+            properties.add(AlgorithmProperty.createProperty(
+                    this, Double.class,
+                    NbBundle.getMessage(getClass(), "LabelAdjust.speed.name"),
+                    LABELADJUST_CATEGORY,
+                    "LabelAdjust.speed.name",
+                    NbBundle.getMessage(getClass(), "LabelAdjust.speed.desc"),
+                    "getSpeed", "setSpeed"));
+            properties.add(AlgorithmProperty.createProperty(
+                    this, Boolean.class,
+                    NbBundle.getMessage(getClass(), "LabelAdjust.adjustBySize.name"),
+                    LABELADJUST_CATEGORY,
+                    "LabelAdjust.adjustBySize.name",
+                    NbBundle.getMessage(getClass(), "LabelAdjust.adjustBySize.desc"),
+                    "isAdjustBySize", "setAdjustBySize"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -94,6 +119,9 @@ public class LabelAdjust extends AbstractLayout {
     public void runLayout() {
         //Reset Layout Data
         for (Node n : nodes) {
+            if (!canLayout()) {
+                return;
+            }
             if (n.getLayoutData() == null || !(n.getLayoutData() instanceof LabelAdjustLayoutData)) {
                 n.setLayoutData(new LabelAdjustLayoutData());
             }
@@ -111,6 +139,9 @@ public class LabelAdjust extends AbstractLayout {
 
         List<Node> correctNodes = new ArrayList<>();
         for (Node n : nodes) {
+            if (!canLayout()) {
+                return;
+            }
             float x = n.x();
             float y = n.y();
             TextProperties t = n.getTextProperties();
@@ -150,12 +181,18 @@ public class LabelAdjust extends AbstractLayout {
 
         //Compute repulsion - with neighbours in the 8 quadnodes around the node
         for (Node n : correctNodes) {
+            if (!canLayout()) {
+                return;
+            }
             timeStamp++;
             LabelAdjustLayoutData layoutData = n.getLayoutData();
             QuadNode quad = quadTree.getQuadNode(layoutData.labelAdjustQuadNode);
 
             //Repulse with adjacent quad - but only one per pair of nodes, timestamp is guaranteeing that
             for (Node neighbour : quadTree.getAdjacentNodes(quad.row, quad.col)) {
+                if (!canLayout()) {
+                    return;
+                }
                 LabelAdjustLayoutData neighborLayoutData = neighbour.getLayoutData();
                 if (neighbour != n && neighborLayoutData.freeze < timeStamp) {
                     boolean collision = repulse(n, neighbour);
@@ -170,6 +207,9 @@ public class LabelAdjust extends AbstractLayout {
         } else {
             // apply forces
             for (Node n : correctNodes) {
+                if (!canLayout()) {
+                    return;
+                }
                 LabelAdjustLayoutData layoutData = n.getLayoutData();
                 if (!n.isFixed()) {
                     layoutData.dx *= speed;
@@ -264,26 +304,6 @@ public class LabelAdjust extends AbstractLayout {
 
     @Override
     public AlgorithmProperty[] getProperties() {
-        List<AlgorithmProperty> properties = new ArrayList<>();
-        final String LABELADJUST_CATEGORY = "LabelAdjust";
-        try {
-            properties.add(AlgorithmProperty.createProperty(
-                    this, Double.class,
-                    NbBundle.getMessage(getClass(), "LabelAdjust.speed.name"),
-                    LABELADJUST_CATEGORY,
-                    "LabelAdjust.speed.name",
-                    NbBundle.getMessage(getClass(), "LabelAdjust.speed.desc"),
-                    "getSpeed", "setSpeed"));
-            properties.add(AlgorithmProperty.createProperty(
-                    this, Boolean.class,
-                    NbBundle.getMessage(getClass(), "LabelAdjust.adjustBySize.name"),
-                    LABELADJUST_CATEGORY,
-                    "LabelAdjust.adjustBySize.name",
-                    NbBundle.getMessage(getClass(), "LabelAdjust.adjustBySize.desc"),
-                    "isAdjustBySize", "setAdjustBySize"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return properties.toArray(new AlgorithmProperty[0]);
     }
 

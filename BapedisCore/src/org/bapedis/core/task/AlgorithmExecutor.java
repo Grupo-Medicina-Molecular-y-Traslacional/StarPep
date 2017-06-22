@@ -47,6 +47,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bapedis.core.spi.algo.Algorithm;
@@ -95,6 +96,7 @@ public final class AlgorithmExecutor {
             throw new NullPointerException();
         }
         AlgoExecutor runnable = new AlgoExecutor(algorithm, taskName, listener, errorHandler);
+        runnable.progress.start();
         runnable.future = executor.submit(runnable);
         taskList.add(runnable);
     }
@@ -145,9 +147,12 @@ public final class AlgorithmExecutor {
     }
 
     private synchronized void finished(AlgoExecutor runnable) {
-        taskList.remove(runnable);
-        if (runnable.listener != null) {
-            runnable.listener.algorithmFinished(runnable.algorithm);
+        if (taskList.remove(runnable)) {
+            runnable.algorithm.endAlgo();
+            runnable.progress.finish();
+            if (runnable.listener != null) {
+                runnable.listener.algorithmFinished(runnable.algorithm);
+            }
         }
     }
 
@@ -162,27 +167,29 @@ public final class AlgorithmExecutor {
         private final ProgressTicket progress;
         private final AlgorithmListener listener;
         private final AlgorithmErrorHandler errorHandler;
+        private final AtomicBoolean running;
 
         public AlgoExecutor(Algorithm algorithm, String taskName, AlgorithmListener listener, AlgorithmErrorHandler errorHandler) {
             this.algorithm = algorithm;
             this.taskName = taskName;
             this.listener = listener;
             this.errorHandler = errorHandler;
+            this.running = new AtomicBoolean(false);
             this.progress = new ProgressTicket(taskName, new Cancellable() {
                 @Override
                 public boolean cancel() {
                     return AlgoExecutor.this.cancel();
                 }
 
-            });            
+            });
+            progress.setDisplayName(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.submitted", taskName));
             algorithm.setProgressTicket(progress);
             algorithm.initAlgo();
-            progress.start();
-            progress.setDisplayName(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.submitted", taskName));
         }
 
         @Override
         public void run() {
+            running.set(true);
             progress.setDisplayName(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.running", taskName));
             try {
                 algorithm.run();
@@ -193,17 +200,17 @@ public final class AlgorithmExecutor {
                     Logger.getLogger("").log(Level.SEVERE, "", e);
                 }
             } finally {
-                algorithm.endAlgo();
-                progress.finish();
                 finished(this);
             }
         }
 
         public boolean cancel() {
+            progress.setDisplayName(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.canceling", taskName));
             boolean isCancelled = algorithm.cancel();
-            if (!isCancelled) {
-                if (future != null) {
-                    isCancelled = future.cancel(true);
+            if (!running.get()) {
+                isCancelled = future.cancel(true);
+                if (isCancelled) {
+                    finished(this);
                 }
             }
             return isCancelled;

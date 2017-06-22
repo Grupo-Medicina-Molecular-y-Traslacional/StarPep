@@ -54,37 +54,20 @@ import org.openide.util.NbBundle;
  *
  * @author Helder Suzuki <heldersuzuki@gephi.org>
  */
-public class RandomLayout extends AbstractLayout{
+public class RandomLayout extends AbstractLayout {
 
-    private final Random random;
+    private Random random;
     private double size;
+    private List<AlgorithmProperty> properties;
 
     public RandomLayout(AlgorithmFactory layoutBuilder, double size) {
         super(layoutBuilder);
         this.size = size;
-        random = new Random();
+        createProperties();
     }
 
-    @Override
-    public void initLayout() {
-    }
-
-    @Override
-    public void runLayout() {
-        for (Node n : graph.getNodes()) {
-            n.setX((float) (-size / 2 + size * random.nextDouble()));
-            n.setY((float) (-size / 2 + size * random.nextDouble()));
-        }
-        setConverged(true);
-    }
-
-    @Override
-    public void endLayout() {        
-    }
-
-    @Override
-    public AlgorithmProperty[] getProperties() {
-        List<AlgorithmProperty> properties = new ArrayList<>();
+    private void createProperties() {
+        properties = new ArrayList<>();
         try {
             properties.add(AlgorithmProperty.createProperty(
                     this, Double.class,
@@ -96,11 +79,33 @@ public class RandomLayout extends AbstractLayout{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return properties.toArray(new AlgorithmProperty[0]);
     }
 
     @Override
-    public void resetPropertiesValues() {
+    public void initLayout() {
+        random = new Random();
+    }
+
+    @Override
+    public void runLayout() {
+        for (Node n : graph.getNodes()) {
+            if (!canLayout()) {
+                return;
+            }              
+            n.setX((float) (-size / 2 + size * random.nextDouble()));
+            n.setY((float) (-size / 2 + size * random.nextDouble()));
+        }
+        setConverged(true);
+    }
+
+    @Override
+    public void endLayout() {
+        random = null;
+    }
+
+    @Override
+    public AlgorithmProperty[] getProperties() {
+        return properties.toArray(new AlgorithmProperty[0]);
     }
 
     public void setSize(Double size) {

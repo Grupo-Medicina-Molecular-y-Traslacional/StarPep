@@ -42,6 +42,7 @@ Portions Copyrighted 2011 Gephi Consortium.
 package org.gephi.layout.plugin.forceAtlas2;
 
 import org.gephi.graph.api.Node;
+import org.gephi.layout.plugin.AbstractLayout;
 import org.gephi.layout.plugin.forceAtlas2.ForceFactory.RepulsionForce;
 
 /**
@@ -49,7 +50,7 @@ import org.gephi.layout.plugin.forceAtlas2.ForceFactory.RepulsionForce;
  * @author Mathieu Jacomy
  */
 public class NodesThread implements Runnable {
-
+    private final AbstractLayout layout;
     private final Node[] nodes;
     private final int from;
     private final int to;
@@ -61,7 +62,8 @@ public class NodesThread implements Runnable {
     private final RepulsionForce GravityForce;
     private final double scaling;
 
-    public NodesThread(Node[] nodes, int from, int to, boolean barnesHutOptimize, double barnesHutTheta, double gravity, RepulsionForce GravityForce, double scaling, Region rootRegion, RepulsionForce Repulsion) {
+    public NodesThread(AbstractLayout layout, Node[] nodes, int from, int to, boolean barnesHutOptimize, double barnesHutTheta, double gravity, RepulsionForce GravityForce, double scaling, Region rootRegion, RepulsionForce Repulsion) {
+        this.layout = layout;
         this.nodes = nodes;
         this.from = from;
         this.to = to;
@@ -78,14 +80,14 @@ public class NodesThread implements Runnable {
     public void run() {
         // Repulsion
         if (barnesHutOptimize) {
-            for (int nIndex = from; nIndex < to; nIndex++) {
+            for (int nIndex = from; nIndex < to && layout.canLayout(); nIndex++) {
                 Node n = nodes[nIndex];
                 rootRegion.applyForce(n, Repulsion, barnesHutTheta);
             }
         } else {
-            for (int n1Index = from; n1Index < to; n1Index++) {
+            for (int n1Index = from; n1Index < to && layout.canLayout(); n1Index++) {
                 Node n1 = nodes[n1Index];
-                for (int n2Index = 0; n2Index < n1Index; n2Index++) {
+                for (int n2Index = 0; n2Index < n1Index && layout.canLayout(); n2Index++) {
                     Node n2 = nodes[n2Index];
                     Repulsion.apply(n1, n2);
                 }
@@ -93,7 +95,7 @@ public class NodesThread implements Runnable {
         }
 
         // Gravity
-        for (int nIndex = from; nIndex < to; nIndex++) {
+        for (int nIndex = from; nIndex < to && layout.canLayout(); nIndex++) {
             Node n = nodes[nIndex];
             GravityForce.apply(n, gravity / scaling);
         }

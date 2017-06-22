@@ -120,7 +120,7 @@ public abstract class AbstractLayout implements Algorithm {
     @Override
     public final void run() {
         long i = 0;
-        while (canAlgo() && !stopRun) {
+        while (canLayout()) {
             graph.readLock();
             try {
                 runLayout();
@@ -149,7 +149,7 @@ public abstract class AbstractLayout implements Algorithm {
     }
 
     @Override
-    public boolean cancel() {
+    public synchronized boolean cancel() {
         stopRun = true;
         return true;
     }
@@ -165,8 +165,8 @@ public abstract class AbstractLayout implements Algorithm {
      * @return              <code>true</code> if the algorithm can run, <code>
      *                      false</code> otherwise
      */
-    private boolean canAlgo() {
-        return !isConverged() && graphModel != null;
+    public synchronized boolean canLayout() {
+        return !isConverged() && !stopRun && !graph.getView().isDestroyed();
     }
 
     public void setConverged(boolean converged) {

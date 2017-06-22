@@ -57,11 +57,28 @@ import org.openide.util.NbBundle;
 public class ScaleLayout extends AbstractLayout{
 
     private double scale;
-    private Node[] nodes;    
+    private Node[] nodes;
+    private List<AlgorithmProperty> properties;
 
     public ScaleLayout(AlgorithmFactory layoutBuilder, double scale) {
         super(layoutBuilder);
         this.scale = scale;
+        createProperties();
+    }
+    
+    private void createProperties(){
+        properties = new ArrayList<>();
+        try {
+            properties.add(AlgorithmProperty.createProperty(
+                    this, Double.class,
+                    NbBundle.getMessage(getClass(), "ScaleLayout.scaleFactor.name"),
+                    null,
+                    "ScaleLayout.scaleFactor.name",
+                    NbBundle.getMessage(getClass(), "ScaleLayout.scaleFactor.desc"),
+                    "getScale", "setScale"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }    
     }
 
     @Override
@@ -80,6 +97,9 @@ public class ScaleLayout extends AbstractLayout{
         yMean /= nodes.length;
 
         for (Node n : nodes) {
+            if (!canLayout()) {
+                return;
+            }             
             double dx = (n.x() - xMean) * getScale();
             double dy = (n.y() - yMean) * getScale();
 
@@ -96,23 +116,7 @@ public class ScaleLayout extends AbstractLayout{
 
     @Override
     public AlgorithmProperty[] getProperties() {
-        List<AlgorithmProperty> properties = new ArrayList<>();
-        try {
-            properties.add(AlgorithmProperty.createProperty(
-                    this, Double.class,
-                    NbBundle.getMessage(getClass(), "ScaleLayout.scaleFactor.name"),
-                    null,
-                    "ScaleLayout.scaleFactor.name",
-                    NbBundle.getMessage(getClass(), "ScaleLayout.scaleFactor.desc"),
-                    "getScale", "setScale"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return properties.toArray(new AlgorithmProperty[0]);
-    }
-
-    @Override
-    public void resetPropertiesValues() {
     }
 
     /**

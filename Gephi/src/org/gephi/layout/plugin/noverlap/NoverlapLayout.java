@@ -64,9 +64,35 @@ public class NoverlapLayout extends AbstractLayout {
     private double ymin;
     private double ymax;
     private Node[] nodes;
+    private List<AlgorithmProperty> properties;
 
     public NoverlapLayout(AlgorithmFactory layoutBuilder) {
         super(layoutBuilder);
+        resetPropertiesValues();
+        createProperties();
+    }
+    
+    private void createProperties(){
+        properties = new ArrayList<>();
+        final String NOVERLAP_CATEGORY = "Noverlap";
+        try {
+            properties.add(AlgorithmProperty.createProperty(
+                    this, Double.class, "speed", NOVERLAP_CATEGORY, "speed", "getSpeed", "setSpeed"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            properties.add(AlgorithmProperty.createProperty(
+                    this, Double.class, "ratio", NOVERLAP_CATEGORY, "ratio", "getRatio", "setRatio"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            properties.add(AlgorithmProperty.createProperty(
+                    this, Double.class, "margin", NOVERLAP_CATEGORY, "margin", "getMargin", "setMargin"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }    
     }
 
     @Override
@@ -211,31 +237,10 @@ public class NoverlapLayout extends AbstractLayout {
 
     @Override
     public AlgorithmProperty[] getProperties() {
-        List<AlgorithmProperty> properties = new ArrayList<>();
-        final String NOVERLAP_CATEGORY = "Noverlap";
-        try {
-            properties.add(AlgorithmProperty.createProperty(
-                    this, Double.class, "speed", NOVERLAP_CATEGORY, "speed", "getSpeed", "setSpeed"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            properties.add(AlgorithmProperty.createProperty(
-                    this, Double.class, "ratio", NOVERLAP_CATEGORY, "ratio", "getRatio", "setRatio"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            properties.add(AlgorithmProperty.createProperty(
-                    this, Double.class, "margin", NOVERLAP_CATEGORY, "margin", "getMargin", "setMargin"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return properties.toArray(new AlgorithmProperty[0]);
     }
 
-    @Override
-    public void resetPropertiesValues() {
+    private void resetPropertiesValues() {
         setSpeed(3.);
         setRatio(1.2);
         setMargin(5.);

@@ -75,13 +75,15 @@ public class OpenOrdLayout extends AbstractLayout{
     private Control control;
     private CyclicBarrier barrier;
     private boolean firstIteration = true;
+    private List<AlgorithmProperty> properties;
 
     public OpenOrdLayout(AlgorithmFactory builder) {
         super(builder);
+        resetPropertiesValues();
+        createProperties();
     }
 
-    @Override
-    public void resetPropertiesValues() {
+    private void resetPropertiesValues() {
         edgeCut = 0.8f;
         numIterations = 750;
         numThreads = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
@@ -91,6 +93,78 @@ public class OpenOrdLayout extends AbstractLayout{
         param = Params.DEFAULT;
     }
 
+    private void createProperties(){
+        properties = new ArrayList<>();
+        final String OPENORD = "OpenOrd";
+        final String STAGE = "Stages";
+
+        try {
+            properties.add(AlgorithmProperty.createProperty(
+                    this, Float.class,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.edgecut.name"),
+                    OPENORD,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.edgecut.description"),
+                    "getEdgeCut", "setEdgeCut"));
+            properties.add(AlgorithmProperty.createProperty(
+                    this, Integer.class,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.numthreads.name"),
+                    OPENORD,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.numthreads.description"),
+                    "getNumThreads", "setNumThreads"));
+            properties.add(AlgorithmProperty.createProperty(
+                    this, Integer.class,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.numiterations.name"),
+                    OPENORD,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.numiterations.description"),
+                    "getNumIterations", "setNumIterations"));
+            properties.add(AlgorithmProperty.createProperty(
+                    this, Float.class,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.realtime.name"),
+                    OPENORD,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.realtime.description"),
+                    "getRealTime", "setRealTime"));
+            properties.add(AlgorithmProperty.createProperty(
+                    this, Long.class,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.seed.name"),
+                    OPENORD,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.seed.description"),
+                    "getRandSeed", "setRandSeed"));
+            properties.add(AlgorithmProperty.createProperty(
+                    this, Integer.class,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.liquid.name"),
+                    STAGE,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.liquid.description"),
+                    "getLiquidStage", "setLiquidStage"));
+            properties.add(AlgorithmProperty.createProperty(
+                    this, Integer.class,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.expansion.name"),
+                    STAGE,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.expansion.description"),
+                    "getExpansionStage", "setExpansionStage"));
+            properties.add(AlgorithmProperty.createProperty(
+                    this, Integer.class,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.cooldown.name"),
+                    STAGE,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.cooldown.description"),
+                    "getCooldownStage", "setCooldownStage"));
+            properties.add(AlgorithmProperty.createProperty(
+                    this, Integer.class,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.crunch.name"),
+                    STAGE,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.crunch.description"),
+                    "getCrunchStage", "setCrunchStage"));
+            properties.add(AlgorithmProperty.createProperty(
+                    this, Integer.class,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.simmer.name"),
+                    STAGE,
+                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.simmer.description"),
+                    "getSimmerStage", "setSimmerStage"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }    
+    }
+    
     @Override
     public void initLayout() {
         //Verify param
@@ -193,7 +267,7 @@ public class OpenOrdLayout extends AbstractLayout{
 
         workers = new Worker[numThreads];
         for (int i = 0; i < numThreads; ++i) {
-            workers[i] = new Worker(i, numThreads, barrier);
+            workers[i] = new Worker(this, i, numThreads, barrier);
             workers[i].setRandom(new Random(randSeed));
             control.initWorker(workers[i]);
         }
@@ -236,7 +310,7 @@ public class OpenOrdLayout extends AbstractLayout{
     @Override
     public void runLayout() {
         if (firstIteration) {
-            for (int i = 0; i < numThreads; ++i) {
+            for (int i = 0; i < numThreads && canLayout(); ++i) {
                 Thread t = new Thread(workers[i]);
                 t.setDaemon(true);
                 t.start();
@@ -261,76 +335,6 @@ public class OpenOrdLayout extends AbstractLayout{
 
     @Override
     public AlgorithmProperty[] getProperties() {
-        List<AlgorithmProperty> properties = new ArrayList<>();
-        final String OPENORD = "OpenOrd";
-        final String STAGE = "Stages";
-
-        try {
-            properties.add(AlgorithmProperty.createProperty(
-                    this, Float.class,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.edgecut.name"),
-                    OPENORD,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.edgecut.description"),
-                    "getEdgeCut", "setEdgeCut"));
-            properties.add(AlgorithmProperty.createProperty(
-                    this, Integer.class,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.numthreads.name"),
-                    OPENORD,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.numthreads.description"),
-                    "getNumThreads", "setNumThreads"));
-            properties.add(AlgorithmProperty.createProperty(
-                    this, Integer.class,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.numiterations.name"),
-                    OPENORD,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.numiterations.description"),
-                    "getNumIterations", "setNumIterations"));
-            properties.add(AlgorithmProperty.createProperty(
-                    this, Float.class,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.realtime.name"),
-                    OPENORD,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.realtime.description"),
-                    "getRealTime", "setRealTime"));
-            properties.add(AlgorithmProperty.createProperty(
-                    this, Long.class,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.seed.name"),
-                    OPENORD,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.seed.description"),
-                    "getRandSeed", "setRandSeed"));
-            properties.add(AlgorithmProperty.createProperty(
-                    this, Integer.class,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.liquid.name"),
-                    STAGE,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.liquid.description"),
-                    "getLiquidStage", "setLiquidStage"));
-            properties.add(AlgorithmProperty.createProperty(
-                    this, Integer.class,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.expansion.name"),
-                    STAGE,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.expansion.description"),
-                    "getExpansionStage", "setExpansionStage"));
-            properties.add(AlgorithmProperty.createProperty(
-                    this, Integer.class,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.cooldown.name"),
-                    STAGE,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.cooldown.description"),
-                    "getCooldownStage", "setCooldownStage"));
-            properties.add(AlgorithmProperty.createProperty(
-                    this, Integer.class,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.crunch.name"),
-                    STAGE,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.crunch.description"),
-                    "getCrunchStage", "setCrunchStage"));
-            properties.add(AlgorithmProperty.createProperty(
-                    this, Integer.class,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.simmer.name"),
-                    STAGE,
-                    NbBundle.getMessage(OpenOrdLayout.class, "OpenOrd.properties.stage.simmer.description"),
-                    "getSimmerStage", "setSimmerStage"));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         return properties.toArray(new AlgorithmProperty[0]);
     }
 

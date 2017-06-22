@@ -81,7 +81,6 @@ public class ForceAtlasLayout extends AbstractLayout {
         createProperties();
     }
 
-
     private void resetPropertiesValues() {
         inertia = 0.1;
         setRepulsionStrength(200d);
@@ -97,7 +96,7 @@ public class ForceAtlasLayout extends AbstractLayout {
         setCooling(1d);
     }
 
-    private void createProperties(){
+    private void createProperties() {
         properties = new ArrayList<>();
         final String FORCE_ATLAS = "Force Atlas";
 
@@ -181,9 +180,9 @@ public class ForceAtlasLayout extends AbstractLayout {
                     "getSpeed", "setSpeed"));
         } catch (Exception e) {
             e.printStackTrace();
-        }    
+        }
     }
-    
+
     @Override
     public void initLayout() {
         nodes = graph.getNodes().toArray();
@@ -197,12 +196,18 @@ public class ForceAtlasLayout extends AbstractLayout {
     @Override
     public void runLayout() {
         for (Node n : nodes) {
+            if (!canLayout()) {
+                return;
+            }
             if (n.getLayoutData() == null || !(n.getLayoutData() instanceof ForceVectorNodeLayoutData)) {
                 n.setLayoutData(new ForceVectorNodeLayoutData());
             }
         }
 
         for (Node n : nodes) {
+            if (!canLayout()) {
+                return;
+            }
             ForceVectorNodeLayoutData layoutData = n.getLayoutData();
             layoutData.old_dx = layoutData.dx;
             layoutData.old_dy = layoutData.dy;
@@ -213,6 +218,9 @@ public class ForceAtlasLayout extends AbstractLayout {
         if (isAdjustSizes()) {
             for (Node n1 : nodes) {
                 for (Node n2 : nodes) {
+                    if (!canLayout()) {
+                        return;
+                    }
                     if (n1 != n2) {
                         ForceVectorUtils.fcBiRepulsor_noCollide(n1, n2, getRepulsionStrength() * (1 + graph.getDegree(n1)) * (1 + graph.getDegree(n2)));
                     }
@@ -221,6 +229,9 @@ public class ForceAtlasLayout extends AbstractLayout {
         } else {
             for (Node n1 : nodes) {
                 for (Node n2 : nodes) {
+                    if (!canLayout()) {
+                        return;
+                    }
                     if (n1 != n2) {
                         ForceVectorUtils.fcBiRepulsor(n1, n2, getRepulsionStrength() * (1 + graph.getDegree(n1)) * (1 + graph.getDegree(n2)));
                     }
@@ -231,6 +242,9 @@ public class ForceAtlasLayout extends AbstractLayout {
         if (isAdjustSizes()) {
             if (isOutboundAttractionDistribution()) {
                 for (Edge e : edges) {
+                    if (!canLayout()) {
+                        return;
+                    }
                     Node nf = e.getSource();
                     Node nt = e.getTarget();
                     double bonus = (nf.isFixed() || nt.isFixed()) ? (100) : (1);
@@ -239,6 +253,9 @@ public class ForceAtlasLayout extends AbstractLayout {
                 }
             } else {
                 for (Edge e : edges) {
+                    if (!canLayout()) {
+                        return;
+                    }
                     Node nf = e.getSource();
                     Node nt = e.getTarget();
                     double bonus = (nf.isFixed() || nt.isFixed()) ? (100) : (1);
@@ -249,6 +266,9 @@ public class ForceAtlasLayout extends AbstractLayout {
         } else {
             if (isOutboundAttractionDistribution()) {
                 for (Edge e : edges) {
+                    if (!canLayout()) {
+                        return;
+                    }
                     Node nf = e.getSource();
                     Node nt = e.getTarget();
                     double bonus = (nf.isFixed() || nt.isFixed()) ? (100) : (1);
@@ -257,6 +277,9 @@ public class ForceAtlasLayout extends AbstractLayout {
                 }
             } else {
                 for (Edge e : edges) {
+                    if (!canLayout()) {
+                        return;
+                    }
                     Node nf = e.getSource();
                     Node nt = e.getTarget();
                     double bonus = (nf.isFixed() || nt.isFixed()) ? (100) : (1);
@@ -267,7 +290,9 @@ public class ForceAtlasLayout extends AbstractLayout {
         }
         // gravity
         for (Node n : nodes) {
-
+            if (!canLayout()) {
+                return;
+            }
             float nx = n.x();
             float ny = n.y();
             double d = 0.0001 + Math.sqrt(nx * nx + ny * ny);
@@ -279,12 +304,18 @@ public class ForceAtlasLayout extends AbstractLayout {
         // speed
         if (isFreezeBalance()) {
             for (Node n : nodes) {
+                if (!canLayout()) {
+                    return;
+                }
                 ForceVectorNodeLayoutData layoutData = n.getLayoutData();
                 layoutData.dx *= getSpeed() * 10f;
                 layoutData.dy *= getSpeed() * 10f;
             }
         } else {
             for (Node n : nodes) {
+                if (!canLayout()) {
+                    return;
+                }
                 ForceVectorNodeLayoutData layoutData = n.getLayoutData();
                 layoutData.dx *= getSpeed();
                 layoutData.dy *= getSpeed();
@@ -292,6 +323,9 @@ public class ForceAtlasLayout extends AbstractLayout {
         }
         // apply forces
         for (Node n : nodes) {
+            if (!canLayout()) {
+                return;
+            }
             ForceVectorNodeLayoutData nLayout = n.getLayoutData();
             if (!n.isFixed()) {
                 double d = 0.0001 + Math.sqrt(nLayout.dx * nLayout.dx + nLayout.dy * nLayout.dy);

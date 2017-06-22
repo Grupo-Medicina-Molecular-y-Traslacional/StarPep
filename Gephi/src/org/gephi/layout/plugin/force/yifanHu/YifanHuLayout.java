@@ -44,7 +44,6 @@ package org.gephi.layout.plugin.force.yifanHu;
 import java.util.ArrayList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
-import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
@@ -80,6 +79,8 @@ public class YifanHuLayout extends AbstractLayout {
     private double energy;
     private Node[] nodes;
     private List<AlgorithmProperty> properties;
+    private SpringForce edgeForce;
+    private BarnesHut barnes;
 
     public YifanHuLayout(AlgorithmFactory layoutBuilder, Displacement displacement) {
         super(layoutBuilder);
@@ -87,17 +88,17 @@ public class YifanHuLayout extends AbstractLayout {
         resetPropertiesValues();
         createProperties();
     }
-    
-    private void resetPropertiesValues(){
-        this.stepRatio = 0.95f;
-        this.relativeStrength = 0.2f;
-        this.optimalDistance = -1;
-        this.initialStep = (optimalDistance / 5);
-        this.step = initialStep;
-        this.quadTreeMaxLevel = 10;
-        this.barnesHutTheta = 1.2f;
-        this.adaptiveCooling = true;
-        this.convergenceThreshold = 1e-4f;    
+
+    private void resetPropertiesValues() {
+        setStepRatio((float) 0.95);
+        setRelativeStrength((float) 0.2);
+        setOptimalDistance(-1f);
+        setInitialStep(-1f);
+        setStep(0.1f);
+        setQuadTreeMaxLevel(10);
+        setBarnesHutTheta(1.2f);
+        setAdaptiveCooling(true);
+        setConvergenceThreshold(1e-4f);
     }
 
     private void createProperties() {
@@ -181,14 +182,6 @@ public class YifanHuLayout extends AbstractLayout {
         return displacement;
     }
 
-    private AbstractForce getEdgeForce() {
-        return new SpringForce(getOptimalDistance());
-    }
-
-    private AbstractForce getNodeForce() {
-        return new ElectricalForce(getRelativeStrength(), getOptimalDistance());
-    }
-
     private void updateStep() {
         if (isAdaptiveCooling()) {
             if (energy < energy0) {
@@ -225,27 +218,42 @@ public class YifanHuLayout extends AbstractLayout {
 
     @Override
     public void initLayout() {
-        if (optimalDistance < 0) {
-            setOptimalDistance((float)Math.pow(relativeStrength, 1.0 / 3) * getAverageEdgeLength(graphModel.getGraphVisible()));
+        float optDist = optimalDistance;
+        if (optDist < 0) {
+            optDist = (float) Math.pow(relativeStrength, 1.0 / 3) * getAverageEdgeLength(graphModel.getGraphVisible());
         }
+        edgeForce = new SpringForce(optDist);
+        barnes = new BarnesHut(new ElectricalForce(getRelativeStrength(), optDist));
+        barnes.setTheta(getBarnesHutTheta());
+
         energy = Float.POSITIVE_INFINITY;
         nodes = graph.getNodes().toArray();
         for (Node n : nodes) {
             n.setLayoutData(new ForceVector());
         }
         progress = 0;
-        setStep(initialStep);
+        
+        if (initialStep < 0) {
+            setStep(optDist * 0.1f);
+        } else {
+            setStep(initialStep);
+        }
 
     }
 
     @Override
     public void endLayout() {
         nodes = null;
+        edgeForce = null;
+        barnes = null;
     }
 
     @Override
     public void runLayout() {
         for (Node n : nodes) {
+            if (!canLayout()){
+                return;
+            }            
             if (n.getLayoutData() == null || !(n.getLayoutData() instanceof ForceVector)) {
                 n.setLayoutData(new ForceVector());
             }
@@ -256,9 +264,10 @@ public class YifanHuLayout extends AbstractLayout {
 
 //        double electricEnergy = 0; ///////////////////////
 //        double springEnergy = 0; ///////////////////////
-        BarnesHut barnes = new BarnesHut(getNodeForce());
-        barnes.setTheta(getBarnesHutTheta());
         for (Node node : nodes) {
+            if (!canLayout()){
+                return;
+            }              
             ForceVector layoutData = node.getLayoutData();
 
             ForceVector f = barnes.calculateForce(node, tree);
@@ -268,13 +277,16 @@ public class YifanHuLayout extends AbstractLayout {
 
         // Apply edge forces.
         for (Edge e : graph.getEdges()) {
+            if (!canLayout()){
+                return;
+            }              
             if (!e.getSource().equals(e.getTarget())) {
                 Node n1 = e.getSource();
                 Node n2 = e.getTarget();
                 ForceVector f1 = n1.getLayoutData();
                 ForceVector f2 = n2.getLayoutData();
 
-                ForceVector f = getEdgeForce().calculateForce(n1, n2);
+                ForceVector f = edgeForce.calculateForce(n1, n2);
                 f1.add(f);
                 f2.subtract(f);
             }
@@ -285,6 +297,9 @@ public class YifanHuLayout extends AbstractLayout {
         energy = 0;
         double maxForce = 1;
         for (Node n : nodes) {
+            if (!canLayout()){
+                return;
+            }              
             ForceVector force = n.getLayoutData();
 
             energy += force.getNorm();
@@ -293,6 +308,9 @@ public class YifanHuLayout extends AbstractLayout {
 
         // Apply displacements on nodes.
         for (Node n : nodes) {
+            if (!canLayout()){
+                return;
+            }              
             if (!n.isFixed()) {
                 ForceVector force = n.getLayoutData();
 
@@ -423,7 +441,7 @@ public class YifanHuLayout extends AbstractLayout {
      */
     public class SpringForce extends AbstractForce {
 
-        private float optimalDistance;
+        private final float optimalDistance;
 
         public SpringForce(float optimalDistance) {
             this.optimalDistance = optimalDistance;
@@ -438,10 +456,6 @@ public class YifanHuLayout extends AbstractLayout {
             return f;
         }
 
-        public void setOptimalDistance(Float optimalDistance) {
-            this.optimalDistance = optimalDistance;
-        }
-
         public Float getOptimalDistance() {
             return optimalDistance;
         }
@@ -454,8 +468,8 @@ public class YifanHuLayout extends AbstractLayout {
      */
     public class ElectricalForce extends AbstractForce {
 
-        private float relativeStrength;
-        private float optimalDistance;
+        private final float relativeStrength;
+        private final float optimalDistance;
 
         public ElectricalForce(float relativeStrength, float optimalDistance) {
             this.relativeStrength = relativeStrength;
@@ -475,5 +489,14 @@ public class YifanHuLayout extends AbstractLayout {
             f.multiply(scale);
             return f;
         }
+
+        public float getRelativeStrength() {
+            return relativeStrength;
+        }
+
+        public float getOptimalDistance() {
+            return optimalDistance;
+        }
+                
     }
 }

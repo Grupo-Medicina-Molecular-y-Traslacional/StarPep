@@ -280,11 +280,17 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     }//GEN-LAST:event_algoComboBoxItemStateChanged
 
     private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
+        Workspace currentWs = pc.getCurrentWorkspace();
         AlgorithmModel algoModel = pc.getAlgorithmModel();
-        Algorithm algo = algoModel.getSelectedAlgorithm();
-        if (algo != null) {
-            refreshProperties(algoModel);
-        }
+        Algorithm oldAlgo = algoModel.getSelectedAlgorithm();
+        AlgorithmFactory factory;
+        if (algoComboBox.getSelectedItem() instanceof AlgorithmFactoryItem){
+            factory = ((AlgorithmFactoryItem) algoComboBox.getSelectedItem()).getFactory();
+            Algorithm newAlgo = factory.createAlgorithm();
+            currentWs.remove(oldAlgo);
+            currentWs.add(newAlgo);
+            algoModel.setSelectedAlgorithm(newAlgo);
+        }        
     }//GEN-LAST:event_resetButtonActionPerformed
 
     private void presetsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_presetsButtonActionPerformed

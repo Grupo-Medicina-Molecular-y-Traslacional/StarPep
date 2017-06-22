@@ -83,6 +83,9 @@ public class ForceAtlas2 extends AbstractLayout {
     private Node[] nodes;
     private Edge[] edges;
     private List<AlgorithmProperty> properties;
+    private RepulsionForce repulsion;
+    private RepulsionForce gravityForce;
+    private AttractionForce attraction;
 
     public ForceAtlas2(ForceAtlas2Factory layoutBuilder) {
         super(layoutBuilder);
@@ -98,6 +101,21 @@ public class ForceAtlas2 extends AbstractLayout {
 
         nodes = graph.getNodes().toArray();
         edges = graph.getEdges().toArray();
+
+        // Repulsion (and gravity)
+        double scaling = scalingRatio;
+        if (scaling < 0) {
+            if (nodes.length >= 100) {
+                scaling = 2.0;
+            } else {
+                scaling = 10.0;
+            }
+        }
+        repulsion = ForceFactory.builder.buildRepulsion(isAdjustSizes(), scaling);
+        gravityForce = ForceFactory.builder.getStrongGravity(scaling);
+
+        // Attraction
+        attraction = ForceFactory.builder.buildAttraction(isLinLogMode(), isOutboundAttractionDistribution(), isAdjustSizes(), 1 * ((isOutboundAttractionDistribution()) ? (outboundAttCompensation) : (1)));
 
         // Initialise layout data
         for (Node n : nodes) {
@@ -121,6 +139,9 @@ public class ForceAtlas2 extends AbstractLayout {
     public void runLayout() {
         // Initialise layout data
         for (Node n : nodes) {
+            if (!canLayout()) {
+                return;
+            }
             if (n.getLayoutData() == null || !(n.getLayoutData() instanceof ForceAtlas2LayoutData)) {
                 ForceAtlas2LayoutData nLayout = new ForceAtlas2LayoutData();
                 n.setLayoutData(nLayout);
@@ -143,23 +164,23 @@ public class ForceAtlas2 extends AbstractLayout {
         if (isOutboundAttractionDistribution()) {
             outboundAttCompensation = 0;
             for (Node n : nodes) {
+                if (!canLayout()) {
+                    return;
+                }
                 ForceAtlas2LayoutData nLayout = n.getLayoutData();
                 outboundAttCompensation += nLayout.mass;
             }
             outboundAttCompensation /= nodes.length;
         }
 
-        // Repulsion (and gravity)
         // NB: Muti-threaded
-        RepulsionForce Repulsion = ForceFactory.builder.buildRepulsion(isAdjustSizes(), getScalingRatio());
-
         int taskCount = 8 * currentThreadCount;  // The threadPool Executor Service will manage the fetching of tasks and threads.
         // We make more tasks than threads because some tasks may need more time to compute.
         ArrayList<Future> threads = new ArrayList();
-        for (int t = taskCount; t > 0; t--) {
+        for (int t = taskCount; t > 0 && canLayout(); t--) {
             int from = (int) Math.floor(nodes.length * (t - 1) / taskCount);
             int to = (int) Math.floor(nodes.length * t / taskCount);
-            Future future = pool.submit(new NodesThread(nodes, from, to, isBarnesHutOptimize(), getBarnesHutTheta(), getGravity(), (isStrongGravityMode()) ? (ForceFactory.builder.getStrongGravity(getScalingRatio())) : (Repulsion), getScalingRatio(), rootRegion, Repulsion));
+            Future future = pool.submit(new NodesThread(this, nodes, from, to, isBarnesHutOptimize(), getBarnesHutTheta(), getGravity(), (isStrongGravityMode() ? gravityForce : repulsion), repulsion.getCoefficient(), rootRegion, repulsion));
             threads.add(future);
         }
         for (Future future : threads) {
@@ -173,18 +194,26 @@ public class ForceAtlas2 extends AbstractLayout {
         }
 
         // Attraction
-        AttractionForce Attraction = ForceFactory.builder.buildAttraction(isLinLogMode(), isOutboundAttractionDistribution(), isAdjustSizes(), 1 * ((isOutboundAttractionDistribution()) ? (outboundAttCompensation) : (1)));
         if (getEdgeWeightInfluence() == 0) {
             for (Edge e : edges) {
-                Attraction.apply(e.getSource(), e.getTarget(), 1);
+                if (!canLayout()) {
+                    return;
+                }
+                attraction.apply(e.getSource(), e.getTarget(), 1);
             }
         } else if (getEdgeWeightInfluence() == 1) {
             for (Edge e : edges) {
-                Attraction.apply(e.getSource(), e.getTarget(), e.getWeight());
+                if (!canLayout()) {
+                    return;
+                }
+                attraction.apply(e.getSource(), e.getTarget(), e.getWeight());
             }
         } else {
             for (Edge e : edges) {
-                Attraction.apply(e.getSource(), e.getTarget(), Math.pow(e.getWeight(), getEdgeWeightInfluence()));
+                if (!canLayout()) {
+                    return;
+                }
+                attraction.apply(e.getSource(), e.getTarget(), Math.pow(e.getWeight(), getEdgeWeightInfluence()));
             }
         }
 
@@ -192,6 +221,9 @@ public class ForceAtlas2 extends AbstractLayout {
         double totalSwinging = 0d;  // How much irregular movement
         double totalEffectiveTraction = 0d;  // Hom much useful movement
         for (Node n : nodes) {
+            if (!canLayout()) {
+                return;
+            }
             ForceAtlas2LayoutData nLayout = n.getLayoutData();
             if (!n.isFixed()) {
                 double swinging = Math.sqrt(Math.pow(nLayout.old_dx - nLayout.dx, 2) + Math.pow(nLayout.old_dy - nLayout.dy, 2));
@@ -238,6 +270,9 @@ public class ForceAtlas2 extends AbstractLayout {
         if (isAdjustSizes()) {
             // If nodes overlap prevention is active, it's not possible to trust the swinging mesure.
             for (Node n : nodes) {
+                if (!canLayout()) {
+                    return;
+                }
                 ForceAtlas2LayoutData nLayout = n.getLayoutData();
                 if (!n.isFixed()) {
 
@@ -258,6 +293,9 @@ public class ForceAtlas2 extends AbstractLayout {
             }
         } else {
             for (Node n : nodes) {
+                if (!canLayout()) {
+                    return;
+                }
                 ForceAtlas2LayoutData nLayout = n.getLayoutData();
                 if (!n.isFixed()) {
 
@@ -283,9 +321,12 @@ public class ForceAtlas2 extends AbstractLayout {
         pool = null;
         nodes = null;
         edges = null;
+        repulsion = null;
+        gravityForce = null;
+        attraction = null;
     }
-    
-    private void createProperties(){
+
+    private void createProperties() {
         properties = new ArrayList<>();
         final String FORCEATLAS2_TUNING = NbBundle.getMessage(getClass(), "ForceAtlas2.tuning");
         final String FORCEATLAS2_BEHAVIOR = NbBundle.getMessage(getClass(), "ForceAtlas2.behavior");
@@ -383,28 +424,16 @@ public class ForceAtlas2 extends AbstractLayout {
 
         } catch (Exception e) {
             e.printStackTrace();
-        }    
+        }
     }
 
     @Override
     public AlgorithmProperty[] getProperties() {
         return properties.toArray(new AlgorithmProperty[0]);
     }
-    
-    @override
+
     private void resetPropertiesValues() {
-        int nodesCount = 0;
-
-        if (graphModel != null) {
-            nodesCount = graphModel.getGraphVisible().getNodeCount();
-        }
-
-        // Tuning
-        if (nodesCount >= 100) {
-            setScalingRatio(2.0);
-        } else {
-            setScalingRatio(10.0);
-        }
+        setScalingRatio(-1.0);
         setStrongGravityMode(false);
         setGravity(1.);
 
@@ -416,11 +445,7 @@ public class ForceAtlas2 extends AbstractLayout {
 
         // Performance
         setJitterTolerance(1d);
-        if (nodesCount >= 1000) {
-            setBarnesHutOptimize(true);
-        } else {
-            setBarnesHutOptimize(false);
-        }
+        setBarnesHutOptimize(true);
         setBarnesHutTheta(1.2);
         setThreadsCount(Math.max(1, Runtime.getRuntime().availableProcessors() - 1));
     }

@@ -93,6 +93,14 @@ public class BarnesHut {
         return f;
     }
 
+    public AbstractForce getForce() {
+        return force;
+    }
+
+    public void setForce(AbstractForce force) {
+        this.force = force;
+    }
+    
     public void setTheta(float theta) {
         this.theta = theta;
     }

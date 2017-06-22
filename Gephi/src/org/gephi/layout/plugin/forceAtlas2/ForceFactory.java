@@ -58,55 +58,75 @@ public class ForceFactory {
 
     public RepulsionForce buildRepulsion(boolean adjustBySize, double coefficient) {
         if (adjustBySize) {
-            return new linRepulsion_antiCollision(coefficient);
+            return new LinRepulsionAntiCollision(coefficient);
         } else {
-            return new linRepulsion(coefficient);
+            return new LinRepulsion(coefficient);
         }
     }
 
     public RepulsionForce getStrongGravity(double coefficient) {
-        return new strongGravity(coefficient);
+        return new StrongGravity(coefficient);
     }
 
     public AttractionForce buildAttraction(boolean logAttraction, boolean distributedAttraction, boolean adjustBySize, double coefficient) {
         if (adjustBySize) {
             if (logAttraction) {
                 if (distributedAttraction) {
-                    return new logAttraction_degreeDistributed_antiCollision(coefficient);
+                    return new LogAttractionDegreeDistributedAntiCollision(coefficient);
                 } else {
-                    return new logAttraction_antiCollision(coefficient);
+                    return new LogAttractionAntiCollision(coefficient);
                 }
             } else {
                 if (distributedAttraction) {
-                    return new linAttraction_degreeDistributed_antiCollision(coefficient);
+                    return new LinAttractionDegreeDistributedAntiCollision(coefficient);
                 } else {
-                    return new linAttraction_antiCollision(coefficient);
+                    return new LinAttractionAntiCollision(coefficient);
                 }
             }
         } else {
             if (logAttraction) {
                 if (distributedAttraction) {
-                    return new logAttraction_degreeDistributed(coefficient);
+                    return new LogAttractionDegreeDistributed(coefficient);
                 } else {
-                    return new logAttraction(coefficient);
+                    return new LogAttraction(coefficient);
                 }
             } else {
                 if (distributedAttraction) {
-                    return new linAttraction_massDistributed(coefficient);
+                    return new LinAttractionMassDistributed(coefficient);
                 } else {
-                    return new linAttraction(coefficient);
+                    return new LinAttraction(coefficient);
                 }
             }
         }
     }
 
     public abstract class AttractionForce {
+        
+        protected final double coefficient;
 
+        public AttractionForce(double coefficient) {
+            this.coefficient = coefficient;
+        }
+
+        public double getCoefficient() {
+            return coefficient;
+        }
+                
         public abstract void apply(Node n1, Node n2, double e); // Model for node-node attraction (e is for edge weight if needed)
     }
 
     public abstract class RepulsionForce {
 
+        protected final double coefficient;
+
+        public RepulsionForce(double coefficient) {
+            this.coefficient = coefficient;
+        }
+
+        public double getCoefficient() {
+            return coefficient;
+        }
+                
         public abstract void apply(Node n1, Node n2);           // Model for node-node repulsion
 
         public abstract void apply(Node n, Region r);           // Model for Barnes Hut approximation
@@ -117,12 +137,10 @@ public class ForceFactory {
     /*
      * Repulsion force: Linear
      */
-    private class linRepulsion extends RepulsionForce {
+    private class LinRepulsion extends RepulsionForce {
 
-        private double coefficient;
-
-        public linRepulsion(double c) {
-            coefficient = c;
+        public LinRepulsion(double c) {
+            super(c);
         }
 
         @Override
@@ -187,12 +205,10 @@ public class ForceFactory {
     /*
      * Repulsion force: Strong Gravity (as a Repulsion Force because it is easier)
      */
-    private class linRepulsion_antiCollision extends RepulsionForce {
+    private class LinRepulsionAntiCollision extends RepulsionForce {
 
-        private double coefficient;
-
-        public linRepulsion_antiCollision(double c) {
-            coefficient = c;
+        public LinRepulsionAntiCollision(double c) {
+            super(c);
         }
 
         @Override
@@ -268,12 +284,10 @@ public class ForceFactory {
         }
     }
 
-    private class strongGravity extends RepulsionForce {
+    private class StrongGravity extends RepulsionForce {
 
-        private double coefficient;
-
-        public strongGravity(double c) {
-            coefficient = c;
+        public StrongGravity(double c) {
+            super(c);
         }
 
         @Override
@@ -308,12 +322,10 @@ public class ForceFactory {
     /*
      * Attraction force: Linear
      */
-    private class linAttraction extends AttractionForce {
-
-        private double coefficient;
-
-        public linAttraction(double c) {
-            coefficient = c;
+    private class LinAttraction extends AttractionForce {
+        
+        public LinAttraction(double c) {
+            super(c);
         }
 
         @Override
@@ -339,12 +351,10 @@ public class ForceFactory {
     /*
      * Attraction force: Linear, distributed by mass (typically, degree)
      */
-    private class linAttraction_massDistributed extends AttractionForce {
+    private class LinAttractionMassDistributed extends AttractionForce {
 
-        private double coefficient;
-
-        public linAttraction_massDistributed(double c) {
-            coefficient = c;
+        public LinAttractionMassDistributed(double c) {
+            super(c);
         }
 
         @Override
@@ -370,12 +380,10 @@ public class ForceFactory {
     /*
      * Attraction force: Logarithmic
      */
-    private class logAttraction extends AttractionForce {
+    private class LogAttraction extends AttractionForce {
 
-        private double coefficient;
-
-        public logAttraction(double c) {
-            coefficient = c;
+        public LogAttraction(double c) {
+            super(c);
         }
 
         @Override
@@ -405,12 +413,10 @@ public class ForceFactory {
     /*
      * Attraction force: Linear, distributed by Degree
      */
-    private class logAttraction_degreeDistributed extends AttractionForce {
+    private class LogAttractionDegreeDistributed extends AttractionForce {
 
-        private double coefficient;
-
-        public logAttraction_degreeDistributed(double c) {
-            coefficient = c;
+        public LogAttractionDegreeDistributed(double c) {
+            super(c);
         }
 
         @Override
@@ -440,12 +446,10 @@ public class ForceFactory {
     /*
      * Attraction force: Linear, with Anti-Collision
      */
-    private class linAttraction_antiCollision extends AttractionForce {
+    private class LinAttractionAntiCollision extends AttractionForce {
 
-        private double coefficient;
-
-        public linAttraction_antiCollision(double c) {
-            coefficient = c;
+        public LinAttractionAntiCollision(double c) {
+            super(c);
         }
 
         @Override
@@ -474,12 +478,10 @@ public class ForceFactory {
     /*
      * Attraction force: Linear, distributed by Degree, with Anti-Collision
      */
-    private class linAttraction_degreeDistributed_antiCollision extends AttractionForce {
+    private class LinAttractionDegreeDistributedAntiCollision extends AttractionForce {
 
-        private double coefficient;
-
-        public linAttraction_degreeDistributed_antiCollision(double c) {
-            coefficient = c;
+        public LinAttractionDegreeDistributedAntiCollision(double c) {
+            super(c);
         }
 
         @Override
@@ -508,12 +510,10 @@ public class ForceFactory {
     /*
      * Attraction force: Logarithmic, with Anti-Collision
      */
-    private class logAttraction_antiCollision extends AttractionForce {
+    private class LogAttractionAntiCollision extends AttractionForce {
 
-        private double coefficient;
-
-        public logAttraction_antiCollision(double c) {
-            coefficient = c;
+        public LogAttractionAntiCollision(double c) {
+            super(c);
         }
 
         @Override
@@ -543,12 +543,10 @@ public class ForceFactory {
     /*
      * Attraction force: Linear, distributed by Degree, with Anti-Collision
      */
-    private class logAttraction_degreeDistributed_antiCollision extends AttractionForce {
+    private class LogAttractionDegreeDistributedAntiCollision extends AttractionForce {
 
-        private double coefficient;
-
-        public logAttraction_degreeDistributed_antiCollision(double c) {
-            coefficient = c;
+        public LogAttractionDegreeDistributedAntiCollision(double c) {
+            super(c);
         }
 
         @Override

@@ -57,10 +57,27 @@ import org.openide.util.NbBundle;
 public class RotateLayout extends AbstractLayout{
 
     private double angle;
+    private List<AlgorithmProperty> properties;
 
     public RotateLayout(AlgorithmFactory layoutBuilder, double angle) {
         super(layoutBuilder);
         this.angle = angle;
+        createProperties();
+    }
+    
+    private void createProperties(){
+        properties = new ArrayList<>();
+        try {
+            properties.add(AlgorithmProperty.createProperty(
+                    this, Double.class,
+                    NbBundle.getMessage(getClass(), "rotate.angle.name"),
+                    null,
+                    "clockwise.angle.name",
+                    NbBundle.getMessage(getClass(), "rotate.angle.desc"),
+                    "getAngle", "setAngle"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }    
     }
 
     @Override
@@ -75,6 +92,9 @@ public class RotateLayout extends AbstractLayout{
         double py = 0f;
 
         for (Node n : graph.getNodes()) {
+            if (!canLayout()) {
+                return;
+            }              
             double dx = n.x() - px;
             double dy = n.y() - py;
 
@@ -88,24 +108,9 @@ public class RotateLayout extends AbstractLayout{
     public void endLayout() {
     }
 
-    @Override
-    public void resetPropertiesValues() {
-    }
 
     @Override
     public AlgorithmProperty[] getProperties() {
-        List<AlgorithmProperty> properties = new ArrayList<>();
-        try {
-            properties.add(AlgorithmProperty.createProperty(
-                    this, Double.class,
-                    NbBundle.getMessage(getClass(), "rotate.angle.name"),
-                    null,
-                    "clockwise.angle.name",
-                    NbBundle.getMessage(getClass(), "rotate.angle.desc"),
-                    "getAngle", "setAngle"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return properties.toArray(new AlgorithmProperty[0]);
     }
 

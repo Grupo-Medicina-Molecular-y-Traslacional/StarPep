@@ -46,6 +46,7 @@ import gnu.trove.TIntFloatIterator;
 import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import org.gephi.layout.plugin.AbstractLayout;
 
 /**
  *
@@ -74,8 +75,10 @@ public class Worker implements Runnable {
     private float cutOffLength;
     private boolean fineDensity;
     protected Random random;
+    private final AbstractLayout layout;
 
-    public Worker(int id, int numThreads, CyclicBarrier barrier) {
+    public Worker(AbstractLayout layout, int id, int numThreads, CyclicBarrier barrier) {
+        this.layout = layout;
         this.barrier = barrier;
         this.id = id;
         this.numThreads = numThreads;
@@ -85,7 +88,7 @@ public class Worker implements Runnable {
 
     @Override
     public void run() {
-        while (!isDone()) {
+        while (!isDone() && layout.canLayout()) {
             //System.out.println("Execute worker " + id);
 
             //Updates nodes

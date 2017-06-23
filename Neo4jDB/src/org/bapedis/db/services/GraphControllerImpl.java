@@ -54,7 +54,6 @@ import org.bapedis.db.model.NeoPeptide;
 import org.bapedis.db.model.NeoPeptideModel;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
 import org.gephi.graph.api.Node;
@@ -62,14 +61,12 @@ import org.gephi.graph.api.Subgraph;
 import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author mbastian
  */
-@ServiceProvider(service = GraphController.class)
-public final class GraphControllerImpl implements GraphController, WorkspaceEventListener, LookupListener, PropertyChangeListener {
+public final class GraphControllerImpl implements WorkspaceEventListener, LookupListener, PropertyChangeListener {
     protected final ProjectManager pm;
     protected Lookup.Result<NeoPeptideModel> peptideLkpResult;
     protected final GraphModel graphModel;
@@ -82,13 +79,11 @@ public final class GraphControllerImpl implements GraphController, WorkspaceEven
         workspaceChanged(null, pm.getCurrentWorkspace());
     }
 
-    @Override
     public synchronized GraphModel getGraphModel() {
         Workspace currentWorkspace = Lookup.getDefault().lookup(ProjectManager.class).getCurrentWorkspace();
         return getGraphModel(currentWorkspace);
     }
 
-    @Override
     public synchronized GraphModel getGraphModel(Workspace workspace) {
         NeoPeptideModel peptideModel = workspace.getLookup().lookup(NeoPeptideModel.class);
         if (peptideModel != null) {

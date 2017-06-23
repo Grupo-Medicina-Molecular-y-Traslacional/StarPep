@@ -15,6 +15,8 @@ import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.task.AlgorithmExecutor;
+import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.GraphView;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
@@ -127,6 +129,22 @@ public class ProjectManager implements Lookup.Provider {
         Collection<? extends FilterFactory> factories = Lookup.getDefault().lookupAll(FilterFactory.class);
         return factories.toArray(new FilterFactory[0]);
     }
+    
+    // Data Models
+    public GraphModel getGraphModel(){
+        return getGraphModel(currentWS);
+    }    
+
+    public GraphModel getGraphModel(Workspace workspace) {
+        GraphModel model = workspace.getLookup().lookup(GraphModel.class);
+        if (model == null) {
+            model = GraphModel.Factory.newInstance();
+            GraphView emptyView = model.createView();
+            model.setVisibleView(emptyView);
+            workspace.add(model);
+        }
+        return model;
+    }    
     
     public FilterModel getFilterModel(){
         return getFilterModel(currentWS);

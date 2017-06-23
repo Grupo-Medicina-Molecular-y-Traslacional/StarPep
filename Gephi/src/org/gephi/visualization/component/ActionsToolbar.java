@@ -50,9 +50,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+import org.bapedis.core.services.ProjectManager;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.ui.utils.UIUtils;
@@ -107,8 +107,7 @@ public class ActionsToolbar extends JToolBar {
             @Override
             public void actionPerformed(ActionEvent evt) {
                 color = resetColorButton.getColor();
-                GraphController gc = Lookup.getDefault().lookup(GraphController.class);
-                GraphModel gm = gc.getGraphModel();
+                GraphModel gm = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();
                 Graph graph = gm.getGraphVisible();
                 for (Node n : graph.getNodes()) {
                     n.setR(color.getRed() / 255f);
@@ -134,8 +133,7 @@ public class ActionsToolbar extends JToolBar {
         resetLabelColorButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                GraphController gc = Lookup.getDefault().lookup(GraphController.class);
-                GraphModel gm = gc.getGraphModel();
+                GraphModel gm = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();
                 Graph graph = gm.getGraphVisible();
                 for (Node n : graph.getNodes().toArray()) {
                     n.getTextProperties().setColor(Color.BLACK);
@@ -156,8 +154,7 @@ public class ActionsToolbar extends JToolBar {
         resetLabelVisibleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                GraphController gc = Lookup.getDefault().lookup(GraphController.class);
-                GraphModel gm = gc.getGraphModel();
+                GraphModel gm = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();
                 Graph graph = gm.getGraphVisible();
                 for (Node n : graph.getNodes()) {
                     n.getTextProperties().setVisible(true);

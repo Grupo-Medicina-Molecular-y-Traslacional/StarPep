@@ -51,8 +51,9 @@ import java.util.List;
 import javax.swing.ButtonModel;
 import javax.swing.JCheckBox;
 import net.miginfocom.swing.MigLayout;
+import org.bapedis.core.services.ProjectManager;
 import org.gephi.graph.api.Column;
-import org.gephi.graph.api.GraphController;
+import org.gephi.graph.api.GraphModel;
 import org.gephi.visualization.text.TextModelImpl;
 import org.openide.util.Lookup;
 
@@ -111,13 +112,13 @@ public class LabelAttributesPanel extends javax.swing.JPanel {
     }
 
     private void refresh() {
-        GraphController graphController = Lookup.getDefault().lookup(GraphController.class);
+        GraphModel graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();
 
         List<Column> availableColumns = new ArrayList<>();
         List<Column> selectedColumns = new ArrayList<>();
         AttributesCheckBox[] target;
         if (elementButtonGroup.getSelection() == nodesToggleButton.getModel()) {
-            for (Column c : graphController.getGraphModel().getNodeTable()) {
+            for (Column c : graphModel.getNodeTable()) {
                 if (!c.isProperty()) {
                     availableColumns.add(c);
                 } else if (showProperties && c.isProperty() && !c.getId().equals("timeset")) {
@@ -131,7 +132,7 @@ public class LabelAttributesPanel extends javax.swing.JPanel {
             nodeCheckBoxs = new AttributesCheckBox[availableColumns.size()];
             target = nodeCheckBoxs;
         } else {
-            for (Column c : graphController.getGraphModel().getEdgeTable()) {
+            for (Column c : graphModel.getEdgeTable()) {
                 if (!c.isProperty()) {
                     availableColumns.add(c);
                 } else if (showProperties) {

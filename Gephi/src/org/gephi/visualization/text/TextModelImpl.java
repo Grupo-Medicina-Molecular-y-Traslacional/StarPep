@@ -51,8 +51,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import org.bapedis.core.model.Workspace;
+import org.bapedis.core.services.ProjectManager;
 import org.gephi.graph.api.Column;
-import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.ui.utils.ColorUtils;
 import org.gephi.visualization.VizController;
@@ -245,8 +245,7 @@ public class TextModelImpl {
     }
 
     public void readXML(XMLStreamReader reader, Workspace workspace) throws XMLStreamException {
-        GraphController graphController = Lookup.getDefault().lookup(GraphController.class);
-        GraphModel graphModel = graphController != null ? graphController.getGraphModel(workspace) : null;
+        GraphModel graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel(workspace);
         List<Column> nodeCols = new ArrayList<>();
         List<Column> edgeCols = new ArrayList<>();
 

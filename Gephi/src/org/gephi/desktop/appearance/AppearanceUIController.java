@@ -55,7 +55,6 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.gephi.appearance.api.AppearanceController;
 import org.gephi.appearance.api.AppearanceModel;
-import org.gephi.appearance.api.AttributeFunction;
 import org.gephi.appearance.api.Function;
 import org.gephi.appearance.spi.Transformer;
 import org.gephi.appearance.spi.TransformerCategory;
@@ -63,7 +62,6 @@ import org.gephi.appearance.spi.TransformerUI;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.ColumnObserver;
 import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphObserver;
 import org.gephi.graph.api.TableObserver;
 import org.openide.util.Lookup;
@@ -418,7 +416,7 @@ public class AppearanceUIController {
 
     private class TableChangeObserver extends TimerTask {
 
-        private final GraphController gc = Lookup.getDefault().lookup(GraphController.class);
+        private final ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
         private static final int INTERVAL = 500;
         private final Timer timer;
         private final TableObserver nodeObserver;
@@ -426,8 +424,8 @@ public class AppearanceUIController {
 
         public TableChangeObserver(Workspace workspace) {
             timer = new Timer("AppearanceColumnObserver", true);
-            nodeObserver = gc.getGraphModel(workspace).getNodeTable().createTableObserver(false);
-            edgeObserver = gc.getGraphModel(workspace).getEdgeTable().createTableObserver(false);
+            nodeObserver = pm.getGraphModel(workspace).getNodeTable().createTableObserver(false);
+            edgeObserver = pm.getGraphModel(workspace).getEdgeTable().createTableObserver(false);
         }
 
         @Override

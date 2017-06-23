@@ -42,11 +42,11 @@
 package org.gephi.visualization.bridge;
 
 import java.util.Arrays;
+import org.bapedis.core.services.ProjectManager;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.ColumnObserver;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphObserver;
 import org.gephi.graph.api.Node;
@@ -74,7 +74,7 @@ public class DataBridge implements VizArchitecture {
     protected static final long ONEOVERPHI = 106039;
     //Architecture
     protected AbstractEngine engine;
-    protected GraphController controller;
+    protected ProjectManager pm;
     protected TextManager textManager;
     protected ColumnObserver[] nodeColumnObservers;
     protected ColumnObserver[] edgeColumnObservers;
@@ -94,7 +94,7 @@ public class DataBridge implements VizArchitecture {
     @Override
     public void initArchitecture() {
         this.engine = VizController.getInstance().getEngine();
-        this.controller = Lookup.getDefault().lookup(GraphController.class);
+        this.pm = Lookup.getDefault().lookup(ProjectManager.class);
         this.vizConfig = VizController.getInstance().getVizConfig();
         this.limits = VizController.getInstance().getLimits();
         this.textManager = VizController.getInstance().getTextManager();
@@ -248,7 +248,7 @@ public class DataBridge implements VizArchitecture {
     }
 
     public synchronized void reset() {
-        graphModel = controller.getGraphModel();
+        graphModel = pm.getGraphModel();
         if (graphModel != null) {
             graph = graphModel.getGraphVisible();
         }

@@ -41,11 +41,11 @@
  */
 package org.gephi.layout.plugin;
 
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.openide.util.Lookup;
@@ -67,8 +67,6 @@ public abstract class AbstractLayout implements Algorithm {
 
     public AbstractLayout(AlgorithmFactory layoutBuilder) {
         this.layoutBuilder = layoutBuilder;
-        GraphController gc = Lookup.getDefault().lookup(GraphController.class);
-        graphModel = gc.getGraphModel();
     }
 
     public Graph getGraph() {
@@ -106,6 +104,7 @@ public abstract class AbstractLayout implements Algorithm {
 
     @Override
     public final void initAlgo() {
+        graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();        
         graph = graphModel.getGraphVisible();
         graph.readLock();
         try {
@@ -146,6 +145,7 @@ public abstract class AbstractLayout implements Algorithm {
             graph.readUnlock();
         }
         graph = null;
+        graphModel = null;
     }
 
     @Override

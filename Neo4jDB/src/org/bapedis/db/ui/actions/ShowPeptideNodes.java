@@ -71,7 +71,7 @@ public class ShowPeptideNodes extends AbstractAction {
                 }
                 bcManager.setSelectedCategoriesTo(currentWorkspace, selectedCategories);
                 NeoPeptideManager npManager = Lookup.getDefault().lookup(NeoPeptideManager.class);
-                npManager.setNeoPeptidesTo(currentWorkspace);
+                npManager.loadNeoPeptides(currentWorkspace);
                 return null;
             }
 

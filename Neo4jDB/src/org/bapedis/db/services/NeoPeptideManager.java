@@ -27,7 +27,7 @@ public class NeoPeptideManager {
     }
 
 
-    public void setNeoPeptidesTo(final Workspace workspace) {
+    public void loadNeoPeptides(final Workspace workspace) {
         Collection<? extends BioCategory> categories = workspace.getLookup().lookupAll(BioCategory.class);
         NeoPeptideModel oldModel = workspace.getLookup().lookup(NeoPeptideModel.class);
         if (oldModel != null) {

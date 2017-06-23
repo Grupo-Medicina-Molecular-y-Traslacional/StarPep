@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.bapedis.core.model.Workspace;
+import org.bapedis.core.services.ProjectManager;
 import org.gephi.appearance.api.AppearanceModel;
 import org.gephi.appearance.api.AttributeFunction;
 import org.gephi.appearance.api.Function;
@@ -67,7 +68,6 @@ import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Element;
 import org.gephi.graph.api.ElementIterable;
 import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphObserver;
 import org.gephi.graph.api.Index;
@@ -104,7 +104,7 @@ public class AppearanceModelImpl implements AppearanceModel {
 
     public AppearanceModelImpl(Workspace workspace) {
         this.workspace = workspace;
-        this.graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
+        this.graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel(workspace);
         this.defaultInterpolator = Interpolator.LINEAR;
         this.functionLock = new Object();
         this.transformerUIs = initTransformerUIs();

@@ -58,7 +58,6 @@ import org.gephi.desktop.preview.api.PreviewUIModel;
 import org.gephi.desktop.preview.propertyeditors.DependantColorPropertyEditor;
 import org.gephi.desktop.preview.propertyeditors.DependantOriginalColorPropertyEditor;
 import org.gephi.desktop.preview.propertyeditors.EdgeColorPropertyEditor;
-import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
@@ -88,7 +87,7 @@ public class PreviewUIControllerImpl implements PreviewUIController {
 
     private final List<PropertyChangeListener> listeners;
     private final PreviewController previewController;
-    private final GraphController graphController;
+    private final ProjectManager pm;
     private final PresetUtils presetUtils = new PresetUtils();
     private PreviewUIModelImpl model = null;
     private GraphModel graphModel = null;
@@ -96,9 +95,8 @@ public class PreviewUIControllerImpl implements PreviewUIController {
     public PreviewUIControllerImpl() {
         previewController = Lookup.getDefault().lookup(PreviewController.class);
         listeners = new ArrayList<>();
-        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
+        pm = Lookup.getDefault().lookup(ProjectManager.class);
         Workspace workspace = pm.getCurrentWorkspace();
-        graphController = Lookup.getDefault().lookup(GraphController.class);
 
         model = workspace.getLookup().lookup(PreviewUIModelImpl.class);
         PreviewModel previewModel = previewController.getModel(workspace);
@@ -111,7 +109,7 @@ public class PreviewUIControllerImpl implements PreviewUIController {
         if (visibilityRatio != null) {
             ((PreviewUIModelImpl) model).setVisibilityRatio(visibilityRatio);
         }
-        graphModel = graphController.getGraphModel(pm.getCurrentWorkspace());
+        graphModel = pm.getGraphModel();
 
 //        pc.addWorkspaceListener(new WorkspaceListener() {
 //            @Override

@@ -65,13 +65,13 @@ public class PreviewControllerImpl implements PreviewController {
 
     private PreviewModelImpl model;
     //Other controllers
-    private final GraphController graphController;
+    private final ProjectManager pm;
     //Registered renderers
     private Renderer[] registeredRenderers = null;
     private Boolean anyPluginRendererRegistered = null;
 
     public PreviewControllerImpl() {
-        graphController = Lookup.getDefault().lookup(GraphController.class);
+        pm = Lookup.getDefault().lookup(ProjectManager.class);
 
         //Workspace events
         ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
@@ -103,7 +103,7 @@ public class PreviewControllerImpl implements PreviewController {
 
     @Override
     public synchronized void refreshPreview(Workspace workspace) {
-        GraphModel graphModel = graphController.getGraphModel(workspace);
+        GraphModel graphModel = pm.getGraphModel(workspace);
         PreviewModelImpl previewModel = getModel(workspace);
         previewModel.clear();
 

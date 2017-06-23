@@ -75,7 +75,7 @@ public final class AlgorithmExecutor {
     public AlgorithmExecutor() {
         int numberOfCPUs = Runtime.getRuntime().availableProcessors();
         int maximumPoolSize = numberOfCPUs + 1;
-        this.executor = new ThreadPoolExecutor(0, maximumPoolSize, 15, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+        this.executor = new ThreadPoolExecutor(0, 1, 15, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
         taskList = new LinkedList<>();
     }
 
@@ -97,6 +97,18 @@ public final class AlgorithmExecutor {
         }
         AlgoExecutor runnable = new AlgoExecutor(algorithm, taskName, listener, errorHandler);
         runnable.progress.start();
+        runnable.progress.progress(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.submitted"));
+        try {
+            algorithm.initAlgo();
+        } catch (Throwable e) {
+            if (errorHandler != null) {
+                errorHandler.fatalError(e);
+            } else {
+                Logger.getLogger("").log(Level.SEVERE, "", e);
+            }
+            runnable.progress.finish();
+            return;
+        }
         runnable.future = executor.submit(runnable);
         taskList.add(runnable);
     }
@@ -182,15 +194,13 @@ public final class AlgorithmExecutor {
                 }
 
             });
-            progress.setDisplayName(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.submitted", taskName));
             algorithm.setProgressTicket(progress);
-            algorithm.initAlgo();
         }
 
         @Override
         public void run() {
             running.set(true);
-            progress.setDisplayName(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.running", taskName));
+            progress.progress(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.running"));
             try {
                 algorithm.run();
             } catch (Throwable e) {
@@ -205,7 +215,7 @@ public final class AlgorithmExecutor {
         }
 
         public boolean cancel() {
-            progress.setDisplayName(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.canceling", taskName));
+            progress.progress(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.canceling"));
             boolean isCancelled = algorithm.cancel();
             if (!running.get()) {
                 isCancelled = future.cancel(true);

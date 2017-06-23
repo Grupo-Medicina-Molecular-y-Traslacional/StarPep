@@ -106,9 +106,9 @@ public class ForceAtlas2 extends AbstractLayout {
         double scaling = scalingRatio;
         if (scaling < 0) {
             if (nodes.length >= 100) {
-                scaling = 2.0;
-            } else {
                 scaling = 10.0;
+            } else {
+                scaling = 100.0;
             }
         }
         repulsion = ForceFactory.builder.buildRepulsion(isAdjustSizes(), scaling);

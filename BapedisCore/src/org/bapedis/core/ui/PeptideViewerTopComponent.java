@@ -364,7 +364,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         peptideLkpResult.addLookupListener(this);
         
 
-        AttributesModel peptidesModel = newWs.getLookup().lookup(AttributesModel.class);
+        AttributesModel peptidesModel = pc.getAttributesModel(newWs);
         setData(peptidesModel);
         FilterModel filterModel = pc.getFilterModel(newWs);
         filterModel.addPropertyChangeListener(this);

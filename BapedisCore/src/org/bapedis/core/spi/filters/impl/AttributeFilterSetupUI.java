@@ -233,7 +233,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
     
     protected void initAttrComboBox(Workspace workspace) {
         attrComboBox.removeAllItems();
-        AttributesModel attrModel = workspace.getLookup().lookup(AttributesModel.class);
+        AttributesModel attrModel = pc.getAttributesModel(workspace);
         if (attrModel != null) {
             for (PeptideAttribute attr : attrModel.getAttributes()) {
                 attrComboBox.addItem(attr);

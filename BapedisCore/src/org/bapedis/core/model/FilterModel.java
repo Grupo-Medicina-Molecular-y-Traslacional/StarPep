@@ -11,7 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.bapedis.core.spi.filters.Filter;
-import org.bapedis.core.spi.filters.impl.AttributeFilter;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;

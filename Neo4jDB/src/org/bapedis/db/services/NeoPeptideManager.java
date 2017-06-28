@@ -6,11 +6,14 @@
 package org.bapedis.db.services;
 
 import java.util.Collection;
+import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Workspace;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.db.dao.NeoPeptideDAO;
 import org.bapedis.db.model.BioCategory;
 import org.bapedis.db.model.NeoPeptideModel;
 import org.gephi.graph.api.GraphView;
+import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -21,24 +24,26 @@ import org.openide.util.lookup.ServiceProvider;
 public class NeoPeptideManager {
 
     protected final NeoPeptideDAO neoModelDAO;
+    protected final ProjectManager pm;
 
     public NeoPeptideManager() {
         neoModelDAO = new NeoPeptideDAO();
+        pm = Lookup.getDefault().lookup(ProjectManager.class);
     }
-
 
     public void loadNeoPeptides(final Workspace workspace) {
         Collection<? extends BioCategory> categories = workspace.getLookup().lookupAll(BioCategory.class);
-        NeoPeptideModel oldModel = workspace.getLookup().lookup(NeoPeptideModel.class);
-        if (oldModel != null) {
+        AttributesModel attrModel = pm.getAttributesModel(workspace);
+        if (attrModel != null && attrModel instanceof NeoPeptideModel) {
+            NeoPeptideModel oldModel = (NeoPeptideModel) attrModel;
             workspace.remove(oldModel);
             GraphView oldView = oldModel.getCurrentView();
-            if (!oldView.isMainView())
+            if (!oldView.isMainView()) {
                 neoModelDAO.getGraphModel().destroyView(oldView);
+            }
         }
         NeoPeptideModel neoModel = neoModelDAO.getNeoPeptidesBy(categories.toArray(new BioCategory[0]));
         workspace.add(neoModel);
     }
-
 
 }

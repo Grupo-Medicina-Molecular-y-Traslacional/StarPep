@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AlgorithmModel;
+import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.filters.FilterFactory;
@@ -131,6 +132,14 @@ public class ProjectManager implements Lookup.Provider {
     }
     
     // Data Models
+    public AttributesModel getAttributesModel(){
+        return getAttributesModel(currentWS);
+    }
+    
+    public AttributesModel getAttributesModel(Workspace workspace){
+        return workspace.getLookup().lookup(AttributesModel.class);
+    }
+    
     public GraphModel getGraphModel(){
         return getGraphModel(currentWS);
     }    

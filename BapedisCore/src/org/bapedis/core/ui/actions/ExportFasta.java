@@ -44,7 +44,7 @@ public final class ExportFasta extends WorkspaceContextSensitiveAction<Attribute
     @Override
     public void actionPerformed(ActionEvent e) {
         ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
-        AttributesModel attrModel = pm.getCurrentWorkspace().getLookup().lookup(AttributesModel.class);
+        AttributesModel attrModel = pm.getAttributesModel();
         Peptide[] peptides = attrModel.getPeptides();
         FastaExporterUI ui = new FastaExporterUI(attrModel.getAttributes());
         if (dialog.setup(ui.getPanel(), ui, NbBundle.getMessage(ExportFasta.class, "ExportFasta.dialogTitle"))) {

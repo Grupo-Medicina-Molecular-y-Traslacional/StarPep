@@ -80,9 +80,9 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
     protected final ProjectManager pc;
     protected Lookup.Result<AttributesModel> peptideLkpResult;
+    protected AttributesModel currentModel;
     protected final ExplorerManager explorerMgr;
     protected final OutlineView view;
-
     protected final JXBusyLabel busyLabel;
     protected final JLabel errorLabel;
 
@@ -241,21 +241,22 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }// </editor-fold>//GEN-END:initComponents
 
     private void jAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jAddButtonActionPerformed
-        applyFilter();
+        addNewFilter();
     }//GEN-LAST:event_jAddButtonActionPerformed
 
-    private void applyFilter() {
+    private void addNewFilter() {
         FilterOperator operator = (FilterOperator) jOperatorComboBox.getSelectedItem();
         PeptideAttribute attr = (PeptideAttribute) jFieldComboBox.getSelectedItem();
         if (attr != null && operator != null) {
             if (operator.isValid(jValueTextField.getText())) {
+                TopComponent tc = WindowManager.getDefault().findTopComponent("FilterExplorerTopComponent");
+                tc.open();
+                tc.requestActive();
+
                 Filter filter = new AttributeFilter(attr, operator, jValueTextField.getText());
                 FilterModel filterModel = pc.getFilterModel();
                 filterModel.addFilter(filter);
                 jValueTextField.setText("");
-                TopComponent tc = WindowManager.getDefault().findTopComponent("FilterExplorerTopComponent");
-                tc.open();
-                tc.requestActive();
             } else {
                 String errorMsg = NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jValueTextField.badinput", attr.getDisplayName());
                 DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(errorMsg, NotifyDescriptor.ERROR_MESSAGE));
@@ -265,7 +266,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
 
     private void jValueTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jValueTextFieldActionPerformed
-        applyFilter();
+        addNewFilter();
     }//GEN-LAST:event_jValueTextFieldActionPerformed
 
     private void jValueTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jValueTextFieldKeyTyped
@@ -335,8 +336,10 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     public void componentClosed() {
         removeLookupListener();
         pc.removeWorkspaceEventListener(this);
-        FilterModel filterModel = pc.getFilterModel();
-        filterModel.removePropertyChangeListener(this);
+        AttributesModel attrModel = pc.getAttributesModel();
+        if (attrModel != null) {
+            attrModel.removeQuickFilterChangeListener(this);
+        }
     }
 
     void writeProperties(java.util.Properties p) {
@@ -355,19 +358,16 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
         removeLookupListener();
         if (oldWs != null) {
-            FilterModel oldFilterModel = pc.getFilterModel(oldWs);
-            if (oldFilterModel != null) {
-                oldFilterModel.removePropertyChangeListener(this);
+            AttributesModel oldAttrModel = pc.getAttributesModel(oldWs);
+            if (oldAttrModel != null) {
+                oldAttrModel.removeQuickFilterChangeListener(this);
             }
         }
         peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
         peptideLkpResult.addLookupListener(this);
-        
 
         AttributesModel peptidesModel = pc.getAttributesModel(newWs);
         setData(peptidesModel);
-        FilterModel filterModel = pc.getFilterModel(newWs);
-        filterModel.addPropertyChangeListener(this);
     }
 
     @Override
@@ -378,16 +378,28 @@ public final class PeptideViewerTopComponent extends TopComponent implements
                 AttributesModel attrModel = attrModels.iterator().next();
                 setData(attrModel);
             }
-        } 
+        }
     }
 
-    protected void setData(AttributesModel attrModel) {
+    private void setData(AttributesModel attrModel) {
         populateFilterFields(attrModel);
-        if (attrModel != null) {
-            explorerMgr.setRootContext(attrModel.getRootNode());            
+        if (currentModel != null) {
+            currentModel.removeQuickFilterChangeListener(this);
+        }
+        this.currentModel = attrModel;
+        explorerMgr.setRootContext(currentModel == null ? Node.EMPTY : currentModel.getRootNode());
+        setQuickFilter();
+        if (currentModel != null){
+            currentModel.addQuickFilterChangeListener(this);
+        }
+    }
+
+    private void setQuickFilter() {
+        QuickFilter quickFilter = currentModel == null ? null : currentModel.getQuickFilter();
+        if (quickFilter != null) {
+            view.getOutline().setQuickFilter(0, quickFilter);
         } else {
             view.getOutline().unsetQuickFilter();
-            explorerMgr.setRootContext(Node.EMPTY);
         }
     }
 
@@ -398,21 +410,9 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource() instanceof FilterModel) {
-            final FilterModel filterModel = (FilterModel) evt.getSource();
-            if (filterModel.isEmpty()) {
-                view.getOutline().unsetQuickFilter();
-            } else {
-                view.getOutline().setQuickFilter(0, new QuickFilter() {
-
-                    @Override
-                    public boolean accept(Object o) {
-                        PeptideNode node = ((PeptideNode) o);
-                        Peptide peptide = node.getPeptide();
-                        return filterModel.accept(peptide);
-                    }
-                });
-            }
+        if (evt.getSource().equals(currentModel)
+                && evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
+            setQuickFilter();
         }
     }
 

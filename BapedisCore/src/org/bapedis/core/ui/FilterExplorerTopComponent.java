@@ -9,18 +9,31 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingWorker;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
+import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.model.FilterModel;
+import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.PeptideNode;
+import org.bapedis.core.spi.filters.Filter;
+import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.core.ui.actions.AddFilter;
+import org.gephi.graph.api.Edge;
+import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.GraphView;
+import org.gephi.graph.api.Subgraph;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.netbeans.swing.etable.QuickFilter;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.DropDownButtonFactory;
@@ -28,13 +41,14 @@ import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
 import org.openide.explorer.view.ListView;
 import org.openide.nodes.Node;
+import org.openide.util.Cancellable;
+import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
-import org.openide.util.LookupEvent;
-import org.openide.util.LookupListener;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
+import org.openide.util.NbPreferences;
 import org.openide.util.Utilities;
 
 /**
@@ -65,6 +79,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 
     protected final ExplorerManager explorerMgr;
     protected final ProjectManager pc;
+    private static final String AUTO_APPLY = "AUTO_APPLY";
 
     public FilterExplorerTopComponent() {
         initComponents();
@@ -85,6 +100,8 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
             filterToolBar1.add(action);
         }
         viewerScrollPane.setViewportView(new ListView());
+
+        applyCheckBox.setSelected(NbPreferences.forModule(FilterModel.class).getBoolean(AUTO_APPLY, true));
     }
 
     /**
@@ -97,6 +114,8 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         java.awt.GridBagConstraints gridBagConstraints;
 
         viewerScrollPane = new javax.swing.JScrollPane();
+        runButton = new javax.swing.JButton();
+        applyCheckBox = new javax.swing.JCheckBox();
         filterToolBar1 = new javax.swing.JToolBar();
         restrictiveComboBox = new javax.swing.JComboBox();
         jSeparator1 = new javax.swing.JToolBar.Separator();
@@ -107,10 +126,41 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(viewerScrollPane, gridBagConstraints);
+
+        runButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/run.gif"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(runButton, org.openide.util.NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.runButton.text")); // NOI18N
+        runButton.setFocusable(false);
+        runButton.setPreferredSize(new java.awt.Dimension(68, 29));
+        runButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        runButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                runButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
+        add(runButton, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(applyCheckBox, org.openide.util.NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.applyCheckBox.text")); // NOI18N
+        applyCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                applyCheckBoxActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        add(applyCheckBox, gridBagConstraints);
 
         filterToolBar1.setFloatable(false);
         filterToolBar1.setRollover(true);
@@ -136,10 +186,20 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         filterModel.setRestriction((FilterModel.RestrictionLevel) restrictiveComboBox.getSelectedItem());
     }//GEN-LAST:event_restrictiveComboBoxActionPerformed
 
+    private void applyCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyCheckBoxActionPerformed
+        NbPreferences.forModule(FilterModel.class).putBoolean(AUTO_APPLY, applyCheckBox.isSelected());
+    }//GEN-LAST:event_applyCheckBoxActionPerformed
+
+    private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_runButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox applyCheckBox;
     private javax.swing.JToolBar filterToolBar1;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JComboBox restrictiveComboBox;
+    private javax.swing.JButton runButton;
     private javax.swing.JScrollPane viewerScrollPane;
     // End of variables declaration//GEN-END:variables
     @Override
@@ -215,6 +275,126 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
             FilterModel filterModel = (FilterModel) evt.getSource();
             setFilterModel(filterModel);
         }
+    }
+
+}
+
+class FilterWorker extends SwingWorker<Void, Void> {
+
+    private final FilterModel filterModel;
+    private final AttributesModel attrModel;
+    private final GraphModel graphModel;
+    private TreeSet<String> set;
+    private GraphView newView;
+    private final ProgressTicket progress;
+
+    public FilterWorker(AttributesModel attrModel, GraphModel graphModel, FilterModel filterModel) {
+        this.attrModel = attrModel;
+        this.graphModel = graphModel;
+        this.filterModel = filterModel;
+        
+        progress = new ProgressTicket(NbBundle.getMessage(FilterWorker.class, "FilterWorker.name"), new Cancellable() {
+            @Override
+            public boolean cancel() {
+                return FilterWorker.this.cancel(true);
+            }
+        });
+    }
+
+    @Override
+    protected Void doInBackground() throws Exception {
+        List<PeptideNode> nodeList = attrModel.getNodeList();        
+        
+        set = new TreeSet<>();
+        newView = graphModel.createView();
+        Subgraph subGraph = graphModel.getGraph(newView);
+        
+        progress.start(nodeList.size());
+        
+        Peptide peptide;
+        org.gephi.graph.api.Node graphNode;
+        List<org.gephi.graph.api.Node> graphNeighbors;
+        List<Edge> graphEdges;
+        for (PeptideNode node : nodeList) {
+            peptide = node.getPeptide();
+            if (!isCancelled() && isAccepted(peptide)) {
+                set.add(peptide.getId());
+                
+                // Add graph node
+                graphNode = peptide.getGraphNode();
+                subGraph.addNode(graphNode);
+                
+                // Add neighbors
+                graphNeighbors = new LinkedList<>();                
+                for (org.gephi.graph.api.Node neighbor : peptide.getGraph().getNeighbors(graphNode)) {
+                    graphNeighbors.add(neighbor);
+                }
+                subGraph.addAllNodes(graphNeighbors);
+                
+                // Add edges
+                graphEdges = new LinkedList<>();                
+                for (Edge edge : peptide.getGraph().getEdges(graphNode)) {
+                    graphEdges.add(edge);
+                }
+                subGraph.addAllEdges(graphEdges);
+            }
+            progress.progress();
+        }
+        return null;
+    }
+
+    @Override
+    protected void done() {
+        try {
+            get();
+            attrModel.setQuickFilter(new QuickFilterImpl(set));
+            graphModel.setVisibleView(newView);
+        } catch (InterruptedException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (ExecutionException ex) {
+            Exceptions.printStackTrace(ex);
+        } finally {
+            progress.finish();
+        }
+    }
+
+    private boolean isAccepted(Peptide peptide) {
+        if (!filterModel.isEmpty()) {
+            switch (filterModel.getRestriction()) {
+                case MATCH_ALL:
+                    for (Filter filter : filterModel.getFilters()) {
+                        if (!filter.accept(peptide)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                case MATCH_ANY:
+                    for (Filter filter : filterModel.getFilters()) {
+                        if (filter.accept(peptide)) {
+                            return true;
+                        }
+                    }
+                    return false;
+            }
+        }
+        return true;
+    }
+
+}
+
+class QuickFilterImpl implements QuickFilter {
+
+    private final TreeSet<String> set;
+
+    public QuickFilterImpl(TreeSet<String> set) {
+        this.set = set;
+    }
+
+    @Override
+    public boolean accept(Object obj) {
+        PeptideNode node = ((PeptideNode) obj);
+        Peptide peptide = node.getPeptide();
+        return set.contains(peptide.getId());
     }
 
 }

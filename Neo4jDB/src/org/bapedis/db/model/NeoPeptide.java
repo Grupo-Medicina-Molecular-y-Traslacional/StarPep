@@ -27,35 +27,27 @@ import org.openide.util.NbBundle;
 public class NeoPeptide extends Peptide {
 
     protected final long neoId;
-    protected Node graphNode;
-    protected Graph graph;
 
     public static String getPrefixName() {
         return NbBundle.getMessage(NeoPeptide.class, "NeoPeptide.prefix");
     }
 
     public NeoPeptide(long neoId, Node graphNode, Graph graph) {
+        super(graphNode, graph);
         this.neoId = neoId;
-        this.graphNode = graphNode;
-        this.graph = graph;
     }
 
     public long getNeoId() {
         return neoId;
     }
 
-    public Node getGraphNode() {
-        return graphNode;
-    }
+
 
     public NodeIterable getNeighbors(AnnotationType aType) {
         int relType = graph.getModel().getEdgeType(aType.getRelationType());
         return relType != -1 ? graph.getNeighbors(graphNode, relType): new NodeIterable.NodeIterableEmpty();
     }
-    
-    public NodeIterable getNeighbors(){
-        return graph.getNeighbors(graphNode);
-    }
+   
 
     public String[] getAnnotationValues(AnnotationType aType) {
         NodeIterable neighbors = getNeighbors(aType);

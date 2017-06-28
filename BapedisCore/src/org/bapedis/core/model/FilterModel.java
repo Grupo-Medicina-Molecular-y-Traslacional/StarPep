@@ -35,28 +35,6 @@ public class FilterModel {
     protected RestrictionLevel restriction;
     protected Node rootContext;
 
-    public boolean accept(Peptide peptide) {
-        if (!filters.isEmpty()) {
-            switch (restriction) {
-                case MATCH_ALL:
-                    for (Filter filter : filters) {
-                        if (!filter.accept(peptide)) {
-                            return false;
-                        }
-                    }
-                    return true;
-                case MATCH_ANY:
-                    for (Filter filter : filters) {
-                        if (filter.accept(peptide)) {
-                            return true;
-                        }
-                    }
-                    return false;
-            }
-        }
-        return true;
-    }
-
     public enum RestrictionLevel {
 
         MATCH_ALL {

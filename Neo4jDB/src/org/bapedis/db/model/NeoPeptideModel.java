@@ -30,7 +30,7 @@ public class NeoPeptideModel extends AttributesModel {
 
     @Override
     public void addPeptide(Peptide peptide) {
-        container.addPeptideNode(new NeoPeptideNode((NeoPeptide) peptide));
+        nodeList.add(new NeoPeptideNode((NeoPeptide) peptide));
     }
     
     public GraphView getCurrentView() {

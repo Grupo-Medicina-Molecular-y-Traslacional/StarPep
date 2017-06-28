@@ -7,6 +7,7 @@ package org.bapedis.core.model;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.bapedis.core.spi.algo.Algorithm;
 
 /**
@@ -20,12 +21,12 @@ public class AlgorithmModel {
     public static final String CHANGED_CATEGORY = "CATEGORY";
     public static final String CHANGED_ALGORITHM = "ALGORITHM";
     public static final String RUNNING = "RUNNING";
-    protected boolean running;
+    protected final AtomicBoolean running;
 
     public AlgorithmModel() {
         category = AlgorithmCategory.GraphLayout;
         propertyChangeSupport = new PropertyChangeSupport(this);
-        running = false;
+        running = new AtomicBoolean(false);
     }
 
     public AlgorithmCategory getCategory() {
@@ -49,12 +50,12 @@ public class AlgorithmModel {
     }  
 
     public boolean isRunning() {
-        return running;
+        return running.get();
     }
 
     public void setRunning(boolean running) {
-        boolean oldValue = this.running;
-        this.running = running;
+        boolean oldValue = this.running.get();
+        this.running.set(running);
         propertyChangeSupport.firePropertyChange(RUNNING, oldValue, running);
     }
         

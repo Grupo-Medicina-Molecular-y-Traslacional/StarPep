@@ -9,7 +9,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.bapedis.core.spi.filters.Filter;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
@@ -23,15 +23,14 @@ import org.openide.util.lookup.Lookups;
  */
 public class FilterModel {
 
-    protected int id;
-    protected String name;
     protected final List<Filter> filters;
     protected transient final PropertyChangeSupport propertyChangeSupport;
     public static final String ADDED_FILTER = "ADD";
     public static final String EDITED_FILTER = "EDITED";
     public static final String REMOVED_FILTER = "REMOVE";
     public static final String CHANGED_RESTRICTION = "RESTRICTION";
-    protected static final AtomicInteger counter = new AtomicInteger(1);
+    public static final String RUNNING = "RUNNING";
+    protected final AtomicBoolean running;
     protected RestrictionLevel restriction;
     protected Node rootContext;
 
@@ -56,29 +55,12 @@ public class FilterModel {
 
     }
 
-    public static String getPrefixName() {
-        return NbBundle.getMessage(FilterModel.class, "FilterModel.prefix");
-    }
-
-    public static int getCount() {
-        return counter.get();
-    }
-
     public FilterModel() {
-        this(counter.getAndIncrement(), NbBundle.getMessage(FilterModel.class, "FilterModel.prefix") + " " + (counter.get() - 1));
-    }
-
-    public FilterModel(String name) {
-        this(counter.getAndIncrement(), name);
-    }
-
-    private FilterModel(int id, String name) {
-        this.id = id;
-        this.name = name;
-        this.restriction = RestrictionLevel.MATCH_ALL;
+        restriction = RestrictionLevel.MATCH_ALL;
         filters = new LinkedList<>();
         propertyChangeSupport = new PropertyChangeSupport(this);
         rootContext = new AbstractNode(Children.create(new FilterModelChildFactory(this), true), Lookups.singleton(this));
+        running = new AtomicBoolean(false);
     }
 
     public Node getRootContext() {
@@ -103,18 +85,6 @@ public class FilterModel {
         return filters.toArray(new Filter[0]);
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public RestrictionLevel getRestriction() {
         return restriction;
     }
@@ -123,6 +93,16 @@ public class FilterModel {
         RestrictionLevel old = this.restriction;
         this.restriction = restriction;
         propertyChangeSupport.firePropertyChange(CHANGED_RESTRICTION, old, restriction);
+    }
+
+    public boolean isRunning() {
+        return running.get();
+    }
+
+    public void setRunning(boolean running) {
+        boolean oldValue = this.running.get();
+        this.running.set(running);
+        propertyChangeSupport.firePropertyChange(RUNNING, oldValue, running);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -135,30 +115,6 @@ public class FilterModel {
 
     public void fireEditedEvent(Filter filter) {
         propertyChangeSupport.firePropertyChange(EDITED_FILTER, null, filter);
-    }
-
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 61 * hash + this.id;
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final FilterModel other = (FilterModel) obj;
-        return id == other.id;
     }
 
 }

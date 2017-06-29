@@ -13,7 +13,6 @@ import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.model.FilterNode;
-import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.filters.FilterSetupUI;
 import org.bapedis.core.ui.FilterExplorerTopComponent;

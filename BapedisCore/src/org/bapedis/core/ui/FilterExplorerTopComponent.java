@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.ui;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -17,6 +18,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingWorker;
 import org.bapedis.core.services.ProjectManager;
@@ -252,7 +254,9 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         dropDownButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                popup.show(dropDownButton, 0, dropDownButton.getHeight());
+                if (dropDownButton.isEnabled()) {
+                    popup.show(dropDownButton, 0, dropDownButton.getHeight());
+                }
             }
         });
         return dropDownButton;
@@ -276,7 +280,10 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     }
 
     private void refreshRunningState(boolean running) {
-        filterToolBar1.setEnabled(!running);
+        restrictiveComboBox.setEnabled(!running);
+        for (Component c : filterToolBar1.getComponents()) {
+            c.setEnabled(!running);
+        }
         applyCheckBox.setEnabled(!running);
         viewerScrollPane.setEnabled(!running);
         if (running) {
@@ -291,7 +298,6 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     }
 
     private void runFilter() {
-
         AttributesModel atrrModel = pc.getAttributesModel();
         FilterModel filterModel = pc.getFilterModel();
         GraphModel graphModel = pc.getGraphModel();
@@ -390,7 +396,7 @@ class FilterWorker extends SwingWorker<Void, Void> {
     @Override
     protected Void doInBackground() throws Exception {
         ticket.progress(NbBundle.getMessage(FilterWorker.class, "FilterWorker.running"));
-        
+
         List<PeptideNode> nodeList = attrModel.getNodeList();
 
         set = new TreeSet<>();

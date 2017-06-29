@@ -7,7 +7,6 @@ package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.spi.filters.FilterSetupUI;

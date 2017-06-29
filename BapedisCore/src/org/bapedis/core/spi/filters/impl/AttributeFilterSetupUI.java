@@ -101,7 +101,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         notCheckBox = new javax.swing.JCheckBox();
 
         setMinimumSize(new java.awt.Dimension(126, 90));
-        setPreferredSize(new java.awt.Dimension(300, 150));
+        setPreferredSize(new java.awt.Dimension(340, 170));
         setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(attrLabel, org.openide.util.NbBundle.getMessage(AttributeFilterSetupUI.class, "AttributeFilterSetupUI.attrLabel.text")); // NOI18N
@@ -148,7 +148,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         add(valueLabel, gridBagConstraints);
 
         valueTextField.setText(org.openide.util.NbBundle.getMessage(AttributeFilterSetupUI.class, "AttributeFilterSetupUI.valueTextField.text")); // NOI18N
-        valueTextField.setPreferredSize(new java.awt.Dimension(150, 20));
+        valueTextField.setPreferredSize(new java.awt.Dimension(150, 27));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
@@ -163,6 +163,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 3, 0);
         add(errorLabel, gridBagConstraints);
 

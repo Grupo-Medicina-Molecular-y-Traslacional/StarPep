@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JPopupMenu;
@@ -290,16 +291,18 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     }
 
     private void runFilter() {
-        
+
         AttributesModel atrrModel = pc.getAttributesModel();
         FilterModel filterModel = pc.getFilterModel();
         GraphModel graphModel = pc.getGraphModel();
 
         Workspace workspace = pc.getCurrentWorkspace();
-        FilterWorker worker = new FilterWorker(workspace, atrrModel, graphModel, filterModel);        
+        FilterWorker worker = new FilterWorker(workspace, atrrModel, graphModel, filterModel);
         workspace.add(worker);
 
         filterModel.setRunning(true);
+        ProgressTicket progress = worker.getTicket();
+        progress.start(worker.getTotalProgress());
         worker.execute();
     }
 
@@ -308,7 +311,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         Collection<? extends FilterWorker> savedWorker = workspace.getLookup().lookupAll(FilterWorker.class);
         if (!savedWorker.isEmpty()) {
             FilterWorker worker = savedWorker.iterator().next();
-            worker.cancel(true);
+            worker.setStopRun(true);
         }
     }
 
@@ -359,6 +362,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 }
 
 class FilterWorker extends SwingWorker<Void, Void> {
+
     private final Workspace workspace;
     private final FilterModel filterModel;
     private final AttributesModel attrModel;
@@ -366,37 +370,43 @@ class FilterWorker extends SwingWorker<Void, Void> {
     private TreeSet<String> set;
     private GraphView newView;
     private final ProgressTicket ticket;
+    private final AtomicBoolean stopRun;
 
     public FilterWorker(Workspace workspace, AttributesModel attrModel, GraphModel graphModel, FilterModel filterModel) {
         this.workspace = workspace;
         this.attrModel = attrModel;
         this.graphModel = graphModel;
         this.filterModel = filterModel;
-
+        stopRun = new AtomicBoolean(false);
         ticket = new ProgressTicket(NbBundle.getMessage(FilterWorker.class, "FilterWorker.name"), new Cancellable() {
             @Override
             public boolean cancel() {
-                return FilterWorker.this.cancel(true);
+                stopRun.set(true);
+                return true;
             }
         });
     }
 
     @Override
     protected Void doInBackground() throws Exception {
+        ticket.progress(NbBundle.getMessage(FilterWorker.class, "FilterWorker.running"));
+        
         List<PeptideNode> nodeList = attrModel.getNodeList();
 
         set = new TreeSet<>();
         newView = graphModel.createView();
         Subgraph subGraph = graphModel.getGraph(newView);
 
-        ticket.start(nodeList.size());
         Peptide peptide;
         org.gephi.graph.api.Node graphNode;
         List<org.gephi.graph.api.Node> graphNeighbors;
         List<Edge> graphEdges;
         for (PeptideNode node : nodeList) {
+            if (stopRun.get()) {
+                break;
+            }
             peptide = node.getPeptide();
-            if (!isCancelled() && isAccepted(peptide)) {
+            if (isAccepted(peptide)) {
                 set.add(peptide.getId());
 
                 // Add graph node
@@ -468,6 +478,18 @@ class FilterWorker extends SwingWorker<Void, Void> {
             }
         }
         return true;
+    }
+
+    public ProgressTicket getTicket() {
+        return ticket;
+    }
+
+    public void setStopRun(boolean stopRun) {
+        this.stopRun.set(stopRun);
+    }
+
+    public int getTotalProgress() {
+        return attrModel.getNodeList().size();
     }
 
 }

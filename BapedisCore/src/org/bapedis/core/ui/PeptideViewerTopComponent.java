@@ -15,6 +15,7 @@ import java.util.Collection;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
@@ -375,8 +376,14 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         if (le.getSource().equals(peptideLkpResult)) {
             Collection<? extends AttributesModel> attrModels = peptideLkpResult.allInstances();
             if (!attrModels.isEmpty()) {
-                AttributesModel attrModel = attrModels.iterator().next();
-                setData(attrModel);
+                final AttributesModel attrModel = attrModels.iterator().next();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        setData(attrModel);
+                    }
+                });
+                
             }
         }
     }

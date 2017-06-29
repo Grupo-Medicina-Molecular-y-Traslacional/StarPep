@@ -118,8 +118,8 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         viewerScrollPane = new javax.swing.JScrollPane();
         runButton = new javax.swing.JButton();
         applyCheckBox = new javax.swing.JCheckBox();
-        filterToolBar1 = new javax.swing.JToolBar();
         restrictiveComboBox = new javax.swing.JComboBox();
+        filterToolBar1 = new javax.swing.JToolBar();
         jSeparator1 = new javax.swing.JToolBar.Separator();
 
         setLayout(new java.awt.GridBagLayout());
@@ -128,16 +128,16 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(viewerScrollPane, gridBagConstraints);
 
         runButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/run.gif"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(runButton, org.openide.util.NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.runButton.text")); // NOI18N
         runButton.setFocusable(false);
-        runButton.setPreferredSize(new java.awt.Dimension(68, 29));
         runButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         runButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -145,10 +145,10 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
         add(runButton, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(applyCheckBox, org.openide.util.NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.applyCheckBox.text")); // NOI18N
@@ -160,23 +160,30 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 2, 0);
         add(applyCheckBox, gridBagConstraints);
-
-        filterToolBar1.setFloatable(false);
-        filterToolBar1.setRollover(true);
 
         restrictiveComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 restrictiveComboBoxActionPerformed(evt);
             }
         });
-        filterToolBar1.add(restrictiveComboBox);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.ipady = 5;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
+        add(restrictiveComboBox, gridBagConstraints);
+
+        filterToolBar1.setFloatable(false);
+        filterToolBar1.setRollover(true);
         filterToolBar1.add(jSeparator1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
@@ -264,11 +271,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     }
 
     private void setFilterModel(FilterModel filterModel) {
-        if (filterModel.isEmpty()) {
-            explorerMgr.setRootContext(Node.EMPTY);
-        } else {
-            explorerMgr.setRootContext(filterModel.getRootContext());
-        }
+        explorerMgr.setRootContext(filterModel.getRootContext());
         setRunningState(filterModel.isRunning());
     }
 
@@ -328,11 +331,10 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
                 setRunningState(filterModel.isRunning());
             } else if (!filterModel.isRunning()) {
                 if (evt.getPropertyName().equals(FilterModel.ADDED_FILTER)
-                        || evt.equals(FilterModel.CHANGED_RESTRICTION)
-                        || evt.equals(FilterModel.EDITED_FILTER)) {
+                        || evt.getPropertyName().equals(FilterModel.CHANGED_RESTRICTION)
+                        || evt.getPropertyName().equals(FilterModel.EDITED_FILTER)) {
                     runFilter();
-
-                } else if (evt.equals(FilterModel.REMOVED_FILTER)) {
+                } else if (evt.getPropertyName().equals(FilterModel.REMOVED_FILTER)) {
                     if (filterModel.isEmpty()) {
                         AttributesModel attr = pc.getAttributesModel();
                         attr.setQuickFilter(null);

@@ -141,11 +141,10 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipady = 10;
+        gridBagConstraints.ipady = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(algoComboBox, gridBagConstraints);
 
         infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
@@ -159,29 +158,30 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 7, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(infoLabel, gridBagConstraints);
 
         runButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/run.gif"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(runButton, org.openide.util.NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.runButton.text")); // NOI18N
+        runButton.setPreferredSize(new java.awt.Dimension(77, 25));
         runButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 runButtonActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 5);
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
         add(runButton, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -189,8 +189,8 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         add(algoProvidedPanel, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -225,10 +225,11 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         add(algoToolBar, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -284,13 +285,13 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         AlgorithmModel algoModel = pc.getAlgorithmModel();
         Algorithm oldAlgo = algoModel.getSelectedAlgorithm();
         AlgorithmFactory factory;
-        if (algoComboBox.getSelectedItem() instanceof AlgorithmFactoryItem){
+        if (algoComboBox.getSelectedItem() instanceof AlgorithmFactoryItem) {
             factory = ((AlgorithmFactoryItem) algoComboBox.getSelectedItem()).getFactory();
             Algorithm newAlgo = factory.createAlgorithm();
             currentWs.remove(oldAlgo);
             currentWs.add(newAlgo);
             algoModel.setSelectedAlgorithm(newAlgo);
-        }        
+        }
     }//GEN-LAST:event_resetButtonActionPerformed
 
     private void presetsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_presetsButtonActionPerformed
@@ -398,7 +399,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         algoModel.addPropertyChangeListener(this);
         refreshAlgChooser(algoModel);
         refreshProperties(algoModel);
-        setRunningState(algoModel.isRunning());
+        refreshRunning(algoModel.isRunning());
     }
 
     private void refreshAlgChooser(AlgorithmModel algoModel) {
@@ -457,6 +458,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     }
 
     private void setEnableState(boolean enabled) {
+        infoLabel.setEnabled(enabled);
         runButton.setEnabled(enabled);
         propSheetPanel.setEnabled(enabled);
         algoProvidedPanel.setEnabled(enabled);
@@ -464,10 +466,12 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         presetsButton.setEnabled(enabled);
     }
 
-    private void setRunningState(boolean running) {
-        setEnableState(!running);
+    private void refreshRunning(boolean running) {
+        propSheetPanel.setEnabled(!running);
+        algoProvidedPanel.setEnabled(!running);
+        resetButton.setEnabled(!running);
+        presetsButton.setEnabled(!running);
         algoComboBox.setEnabled(!running);
-        runButton.setEnabled(true);
         if (running) {
             runButton.setText(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.stopButton.text"));
             runButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/stop.png", false));
@@ -490,7 +494,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 refreshProperties(algoModel);
             } else if (evt.getPropertyName().equals(AlgorithmModel.RUNNING)) {
                 AlgorithmModel algoModel = (AlgorithmModel) evt.getSource();
-                setRunningState(algoModel.isRunning());
+                refreshRunning(algoModel.isRunning());
             }
         }
     }

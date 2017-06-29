@@ -30,7 +30,6 @@ import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.core.ui.actions.AddFilter;
 import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
 import org.gephi.graph.api.Subgraph;
@@ -42,7 +41,6 @@ import org.openide.awt.DropDownButtonFactory;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
 import org.openide.explorer.view.ListView;
-import org.openide.nodes.Node;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
@@ -124,6 +122,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 
         setLayout(new java.awt.GridBagLayout());
 
+        viewerScrollPane.setBorder(null);
         viewerScrollPane.setPreferredSize(new java.awt.Dimension(100, 177));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -272,18 +271,13 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 
     private void setFilterModel(FilterModel filterModel) {
         explorerMgr.setRootContext(filterModel.getRootContext());
-        setRunningState(filterModel.isRunning());
+        refreshRunningState(filterModel.isRunning());
     }
 
-    private void setEnableState(boolean enabled) {
-        runButton.setEnabled(enabled);
-        filterToolBar1.setEnabled(enabled);
-        applyCheckBox.setEnabled(enabled);
-        viewerScrollPane.setEnabled(enabled);
-    }
-
-    private void setRunningState(boolean running) {
-        setEnableState(!running);
+    private void refreshRunningState(boolean running) {
+        filterToolBar1.setEnabled(!running);
+        applyCheckBox.setEnabled(!running);
+        viewerScrollPane.setEnabled(!running);
         if (running) {
             runButton.setText(NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.stopButton.text"));
             runButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/stop.png", false));
@@ -296,13 +290,13 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     }
 
     private void runFilter() {
+        
         AttributesModel atrrModel = pc.getAttributesModel();
         FilterModel filterModel = pc.getFilterModel();
         GraphModel graphModel = pc.getGraphModel();
 
-        FilterWorker worker = new FilterWorker(atrrModel, graphModel, filterModel);
-
         Workspace workspace = pc.getCurrentWorkspace();
+        FilterWorker worker = new FilterWorker(workspace, atrrModel, graphModel, filterModel);        
         workspace.add(worker);
 
         filterModel.setRunning(true);
@@ -326,29 +320,38 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof FilterModel) {
-            FilterModel filterModel = (FilterModel) evt.getSource();            
+            FilterModel filterModel = (FilterModel) evt.getSource();
             if (evt.getPropertyName().equals(FilterModel.RUNNING)) {
-                setRunningState(filterModel.isRunning());
-            } else if (!filterModel.isRunning()) {
-                if (evt.getPropertyName().equals(FilterModel.ADDED_FILTER)
-                        || evt.getPropertyName().equals(FilterModel.CHANGED_RESTRICTION)
-                        || evt.getPropertyName().equals(FilterModel.EDITED_FILTER)) {
-                    runFilter();
-                } else if (evt.getPropertyName().equals(FilterModel.REMOVED_FILTER)) {
-                    if (filterModel.isEmpty()) {
-                        AttributesModel attr = pc.getAttributesModel();
-                        attr.setQuickFilter(null);
-                        GraphModel graphModel = pc.getGraphModel();
-                        GraphView graphView = graphModel.getGraph().getView();
-                        
-                        GraphView oldView = graphModel.getVisibleView();
-                        if (!oldView.isMainView()) {
-                            graphModel.destroyView(oldView);
-                        }
-                        graphModel.setVisibleView(graphView);
-                    } else {
+                refreshRunningState(filterModel.isRunning());
+            } else if (!filterModel.isRunning() && applyCheckBox.isSelected()) {
+                switch (evt.getPropertyName()) {
+                    case FilterModel.ADDED_FILTER:
+                    case FilterModel.EDITED_FILTER:
                         runFilter();
-                    }
+                        break;
+                    case FilterModel.REMOVED_FILTER:
+                        if (filterModel.isEmpty()) {
+                            AttributesModel attr = pc.getAttributesModel();
+                            attr.setQuickFilter(null);
+                            GraphModel graphModel = pc.getGraphModel();
+                            GraphView graphView = graphModel.getGraph().getView();
+
+                            GraphView oldView = graphModel.getVisibleView();
+                            if (!oldView.isMainView()) {
+                                graphModel.destroyView(oldView);
+                            }
+                            graphModel.setVisibleView(graphView);
+                        } else {
+                            runFilter();
+                        }
+                        break;
+                    case FilterModel.CHANGED_RESTRICTION:
+                        if (!filterModel.isEmpty()) {
+                            runFilter();
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -356,20 +359,21 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 }
 
 class FilterWorker extends SwingWorker<Void, Void> {
-
+    private final Workspace workspace;
     private final FilterModel filterModel;
     private final AttributesModel attrModel;
     private final GraphModel graphModel;
     private TreeSet<String> set;
     private GraphView newView;
-    private final ProgressTicket progress;
+    private final ProgressTicket ticket;
 
-    public FilterWorker(AttributesModel attrModel, GraphModel graphModel, FilterModel filterModel) {
+    public FilterWorker(Workspace workspace, AttributesModel attrModel, GraphModel graphModel, FilterModel filterModel) {
+        this.workspace = workspace;
         this.attrModel = attrModel;
         this.graphModel = graphModel;
         this.filterModel = filterModel;
 
-        progress = new ProgressTicket(NbBundle.getMessage(FilterWorker.class, "FilterWorker.name"), new Cancellable() {
+        ticket = new ProgressTicket(NbBundle.getMessage(FilterWorker.class, "FilterWorker.name"), new Cancellable() {
             @Override
             public boolean cancel() {
                 return FilterWorker.this.cancel(true);
@@ -385,8 +389,7 @@ class FilterWorker extends SwingWorker<Void, Void> {
         newView = graphModel.createView();
         Subgraph subGraph = graphModel.getGraph(newView);
 
-        progress.start(nodeList.size());
-
+        ticket.start(nodeList.size());
         Peptide peptide;
         org.gephi.graph.api.Node graphNode;
         List<org.gephi.graph.api.Node> graphNeighbors;
@@ -419,7 +422,7 @@ class FilterWorker extends SwingWorker<Void, Void> {
                 subGraph.addAllNodes(graphNeighbors);
                 subGraph.addAllEdges(graphEdges);
             }
-            progress.progress();
+            ticket.progress();
         }
         return null;
     }
@@ -439,7 +442,8 @@ class FilterWorker extends SwingWorker<Void, Void> {
         } catch (ExecutionException ex) {
             Exceptions.printStackTrace(ex);
         } finally {
-            progress.finish();
+            ticket.finish();
+            workspace.remove(this);
             filterModel.setRunning(false);
         }
     }

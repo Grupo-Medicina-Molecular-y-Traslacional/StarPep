@@ -13,12 +13,15 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.db.services.BioCategoryManager;
 import org.bapedis.db.model.BioCategory;
 import org.bapedis.db.model.BioCategoryNode;
+import org.bapedis.db.model.LibraryChildFactory;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
 import org.openide.explorer.view.BeanTreeView;
+import org.openide.nodes.AbstractNode;
+import org.openide.nodes.Children;
 import org.openide.util.Lookup;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
@@ -27,41 +30,43 @@ import org.openide.util.NbBundle.Messages;
  * Top component which displays something.
  */
 @ConvertAsProperties(
-        dtd = "-//org.bapedis.db.ui//BioCategoryExplorer//EN",
+        dtd = "-//org.bapedis.db.ui//LibraryExplorer//EN",
         autostore = false
 )
 @TopComponent.Description(
-        preferredID = "BioCategoryExplorerTopComponent",
+        preferredID = "LibraryExplorerTopComponent",
         //iconBase="SET/PATH/TO/ICON/HERE", 
         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
 @TopComponent.Registration(mode = "explorer", openAtStartup = true)
-@ActionID(category = "Window", id = "org.bapedis.db.ui.BioCategoryExplorerTopComponent")
+@ActionID(category = "Window", id = "org.bapedis.db.ui.LibraryExplorerTopComponent")
 @ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.OpenActionRegistration(
-        displayName = "#CTL_BioCategoryExplorerAction",
-        preferredID = "BioCategoryExplorerTopComponent"
+        displayName = "#CTL_LibraryExplorerAction",
+        preferredID = "LibraryExplorerTopComponent"
 )
 @Messages({
-    "CTL_BioCategoryExplorerAction= Explorer",
-    "CTL_BioCategoryExplorerTopComponent=Explorer",
-    "HINT_BioCategoryExplorerTopComponent=This is a Explorer window"
+    "CTL_LibraryExplorerAction= My Library",
+    "CTL_LibraryExplorerTopComponent=My Library",
+    "HINT_LibraryExplorerTopComponent=My Library window"
 })
-public final class BioCategoryExplorerTopComponent extends TopComponent implements ExplorerManager.Provider, WorkspaceEventListener {
+public final class LibraryExplorerTopComponent extends TopComponent implements ExplorerManager.Provider, WorkspaceEventListener {
 
     private final ExplorerManager explorerMgr = new ExplorerManager();
 
-    public BioCategoryExplorerTopComponent() {
+    public LibraryExplorerTopComponent() {
         initComponents();
-        setName(Bundle.CTL_BioCategoryExplorerTopComponent());
-        setToolTipText(Bundle.HINT_BioCategoryExplorerTopComponent());
-
-        add(new BeanTreeView(), BorderLayout.CENTER);
-
+        setName(Bundle.CTL_LibraryExplorerTopComponent());
+        setToolTipText(Bundle.HINT_LibraryExplorerTopComponent());
+        BeanTreeView view = new BeanTreeView();
+        add(view, BorderLayout.CENTER);
+        view.setRootVisible(false);
+        
         associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));
 
-        BioCategoryManager bcc = Lookup.getDefault().lookup(BioCategoryManager.class);
-        explorerMgr.setRootContext(new BioCategoryNode(bcc.getRootCategory()));
+//        BioCategoryManager bcc = Lookup.getDefault().lookup(BioCategoryManager.class);
+//        explorerMgr.setRootContext(new BioCategoryNode(bcc.getRootCategory()));
+        explorerMgr.setRootContext(new AbstractNode(Children.create(new LibraryChildFactory(), false)));        
         ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
         pc.addWorkspaceEventListener(this);
     }

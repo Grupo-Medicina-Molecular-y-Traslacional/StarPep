@@ -3,26 +3,30 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.model;
+package org.bapedis.db.model;
 
+import org.neo4j.graphdb.Label;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author loge
  */
-public enum AlgorithmCategory {
-    
-    GraphLayout("graphLayout");
+
+public enum MyLabels implements Label{
+    All("all"), 
+    Aded("added"), 
+    Favorites("favorites"), 
+    Tags("tags");
     
     private final String displayName;
 
-    private AlgorithmCategory(String name) {
-        displayName = NbBundle.getMessage(AlgorithmCategory.class, "AlgorithmCategory." + name);
+    private MyLabels(String name) {
+        displayName = NbBundle.getMessage(MyLabels.class, "MyLabels." + name);
     }
 
     public String getDisplayName() {
         return displayName;
-    }            
-    
+    }
+        
 }

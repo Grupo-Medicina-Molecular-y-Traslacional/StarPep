@@ -21,7 +21,7 @@ import org.openide.util.lookup.Lookups;
 public class BioCategoryNode extends AbstractNode implements PropertyChangeListener {
     
     public BioCategoryNode(BioCategory category) {
-        super(category.hasChild() ? Children.create(new BioCategoryChildFactory(category), true) : Children.LEAF, Lookups.singleton(category));
+        super(category.hasChild() ? Children.create(new BioCategoryChildFactory(category), false) : Children.LEAF, Lookups.singleton(category));
         category.addPropertyChangeListener(this);
         setDisplayName(category.getName());  
     }

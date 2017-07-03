@@ -6,9 +6,11 @@
 package org.bapedis.db.ui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.Collection;
-import org.bapedis.core.ui.actions.WorkspaceContextSensitiveAction;
-import org.bapedis.db.model.NeoPeptideModel;
+import java.util.List;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import org.bapedis.db.ui.NeoGraphSceneDescription;
 import org.bapedis.db.ui.NeoGraphPreViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
@@ -17,10 +19,11 @@ import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
-import org.openide.util.LookupEvent;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
+import org.openide.util.actions.Presenter;
+import org.openide.util.Utilities;
 
 /**
  *
@@ -36,11 +39,12 @@ import org.openide.windows.WindowManager;
 )
 @ActionReferences({
     @ActionReference(path = "Menu/View", position = 310)
+    ,
+    @ActionReference(path = "Actions/ShowDataFromLibrary/Peptides", position = 200)
 })
-public class ShowGraph extends WorkspaceContextSensitiveAction<NeoPeptideModel> {
+public class ShowGraph extends AbstractAction implements Presenter.Popup {
 
     public ShowGraph() {
-        super(NeoPeptideModel.class);
         String name = NbBundle.getMessage(ShowGraph.class, "CTL_ShowGraph");
         putValue(NAME, name);
     }
@@ -61,9 +65,13 @@ public class ShowGraph extends WorkspaceContextSensitiveAction<NeoPeptideModel> 
     }
 
     @Override
-    public void resultChanged(LookupEvent le) {
-        Collection<? extends NeoPeptideModel> context = lkpResult.allInstances();
-        setEnabled(context.size() == 1);
+    public JMenuItem getPopupPresenter() {
+        JMenu main = new JMenu(NbBundle.getMessage(ShowPeptideNodes.class, "CTL_ShowGraph"));
+        List<? extends Action> actionsForPath = Utilities.actionsForPath("Actions/ShowDataFromLibrary/InWorkspace");
+        for (Action action : actionsForPath) {
+            main.add(action);
+        }
+        return main;
     }
 
 }

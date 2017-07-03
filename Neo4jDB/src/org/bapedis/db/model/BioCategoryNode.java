@@ -7,11 +7,8 @@ package org.bapedis.db.model;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
-import javax.swing.Action;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
-import org.openide.util.Utilities;
 import org.openide.util.lookup.Lookups;
 
 /**
@@ -29,15 +26,6 @@ public class BioCategoryNode extends AbstractNode implements PropertyChangeListe
     public BioCategory getBioCategory(){
         return getLookup().lookup(BioCategory.class);
     }
-
-    @Override
-    public Action[] getActions(boolean context) {
-        List<? extends Action> nodeActions =
-                Utilities.actionsForPath("Actions/ShowPeptidesFromBioCategory");
-        
-        return nodeActions.toArray(new Action[0]);
-    }
-    
     
 
     @Override

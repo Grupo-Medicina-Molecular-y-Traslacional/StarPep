@@ -7,7 +7,11 @@ package org.bapedis.db.ui.actions;
 
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
+import java.util.List;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.SwingWorker;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.Workspace;
@@ -21,8 +25,10 @@ import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.actions.Presenter;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
+import org.openide.util.Utilities;
 
 /**
  *
@@ -37,9 +43,9 @@ import org.openide.windows.WindowManager;
 )
 @ActionReferences({
     @ActionReference(path = "Menu/View", position = 100),
-    @ActionReference(path = "Actions/ShowPeptidesFromBioCategory", position = 100)
+    @ActionReference(path = "Actions/ShowDataFromLibrary/Peptides", position = 100)
 })
-public class ShowPeptideNodes extends AbstractAction {
+public class ShowPeptideNodes extends AbstractAction implements Presenter.Popup {
 
     public ShowPeptideNodes() {
         putValue(NAME, NbBundle.getMessage(ShowPeptideNodes.class, "CTL_ShowPeptideNodes"));
@@ -89,5 +95,15 @@ public class ShowPeptideNodes extends AbstractAction {
             }
         };
         worker.execute();
+    }
+
+    @Override
+    public JMenuItem getPopupPresenter() {
+        JMenu main = new JMenu(NbBundle.getMessage(ShowPeptideNodes.class, "CTL_ShowPeptideNodes"));
+        List<? extends Action> actionsForPath = Utilities.actionsForPath("Actions/ShowDataFromLibrary/InWorkspace");
+        for (Action action : actionsForPath) {
+            main.add(action);
+        }
+        return main;
     }
 }

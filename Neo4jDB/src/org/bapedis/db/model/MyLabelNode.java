@@ -12,15 +12,17 @@ import org.openide.nodes.Children;
  *
  * @author loge
  */
-public class MyTagNode extends AbstractNode {
-    
-    public MyTagNode() {
-        super(Children.create(new MyTagChildFactory(), true));
+public class MyLabelNode extends AbstractNode {
+
+    private final MyLabels label;
+
+    public MyLabelNode(MyLabels label) {
+        super(Children.LEAF);
+        this.label = label;
     }
 
     @Override
     public String getDisplayName() {
-        return MyLabels.Tags.getDisplayName();
+        return label.getDisplayName();
     }
-        
 }

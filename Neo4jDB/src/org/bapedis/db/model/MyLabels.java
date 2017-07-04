@@ -12,11 +12,10 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-
 public enum MyLabels implements Label{
     All("all"), 
-    Aded("added"), 
-    Favorites("favorites"), 
+    Favorites("favorites"),
+    Added("added"), 
     Tags("tags");
     
     private final String displayName;
@@ -27,6 +26,5 @@ public enum MyLabels implements Label{
 
     public String getDisplayName() {
         return displayName;
-    }
-        
+    }      
 }

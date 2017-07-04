@@ -10,9 +10,7 @@ import java.util.Collection;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.db.services.BioCategoryManager;
 import org.bapedis.db.model.BioCategory;
-import org.bapedis.db.model.BioCategoryNode;
 import org.bapedis.db.model.LibraryChildFactory;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -64,8 +62,6 @@ public final class LibraryExplorerTopComponent extends TopComponent implements E
         
         associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));
 
-//        BioCategoryManager bcc = Lookup.getDefault().lookup(BioCategoryManager.class);
-//        explorerMgr.setRootContext(new BioCategoryNode(bcc.getRootCategory()));
         explorerMgr.setRootContext(new AbstractNode(Children.create(new LibraryChildFactory(), false)));        
         ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
         pc.addWorkspaceEventListener(this);

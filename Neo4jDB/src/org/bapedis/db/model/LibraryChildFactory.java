@@ -5,34 +5,45 @@
  */
 package org.bapedis.db.model;
 
-import java.util.Arrays;
 import java.util.List;
-import org.neo4j.graphdb.Label;
+import org.bapedis.db.services.BioCategoryManager;
 import org.openide.nodes.ChildFactory;
-import org.openide.nodes.Children;
 import org.openide.nodes.Node;
+import org.openide.util.Lookup;
 
 /**
  *
  * @author loge
  */
-public class LibraryChildFactory extends ChildFactory<MyLabels>{
-            
+public class LibraryChildFactory extends ChildFactory<String>{
+    private final String ALL= "All";
+    private final String FAVORITES= "Favorites";
+    private final String ADDED= "Added";
+    private final String TAGS= "Tags";
+    private final String CLASS= "Class";
+    
     @Override
-    protected boolean createKeys(List<MyLabels> list) {        
-        list.addAll(Arrays.asList(MyLabels.values()));
+    protected boolean createKeys(List<String> list) {        
+        list.add(ALL);
+        list.add(FAVORITES);
+        list.add(ADDED);
+        list.add(TAGS);
+        list.add(CLASS);
         return true;
     }
 
     @Override
-    protected Node createNodeForKey(MyLabels key) {
+    protected Node createNodeForKey(String key) {
         switch (key){
-            case All:
-            case Aded:
-            case Favorites:
-                return new MyLibraryNode(key);
-            case Tags:
-                return new MyTagNode(key);
+            case ALL:
+            case FAVORITES:
+            case ADDED:
+                return new MyLabelNode(MyLabels.valueOf(key));
+            case TAGS:
+                return new MyTagNode();
+            case CLASS:
+                BioCategoryManager bcc = Lookup.getDefault().lookup(BioCategoryManager.class);
+                return new BioCategoryNode(bcc.getRootCategory());
         }
         return null;
     }
@@ -40,4 +51,6 @@ public class LibraryChildFactory extends ChildFactory<MyLabels>{
     
     
 }
+
+
 

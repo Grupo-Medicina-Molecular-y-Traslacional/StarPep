@@ -8,38 +8,38 @@ package org.bapedis.db.services;
 import java.util.Collection;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.db.dao.BioCategoryDAO;
-import org.bapedis.db.model.BioCategory;
+import org.bapedis.db.model.Metadata;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author loge
  */
-@ServiceProvider(service = BioCategoryManager.class)
-public class BioCategoryManager {
+@ServiceProvider(service = MetadataManager.class)
+public class MetadataManager {
 
     protected final BioCategoryDAO categoryDAO;
-    protected final BioCategory rootCategory;
+    protected final Metadata rootCategory;
 
-    public BioCategoryManager() {
+    public MetadataManager() {
         categoryDAO = new BioCategoryDAO();
         rootCategory = categoryDAO.getRootBioCategory();
     }
 
-    public BioCategory getRootCategory() {
+    public Metadata getBioCategory() {
         return rootCategory;
     }
 
-    public void setSelectedCategoriesTo(Workspace workspace, BioCategory[] selectedCategories) {
-        Collection<? extends BioCategory> oldCategories = workspace.getLookup().lookupAll(BioCategory.class);
+    public void setSelectedCategoriesTo(Workspace workspace, Metadata[] selectedCategories) {
+        Collection<? extends Metadata> oldCategories = workspace.getLookup().lookupAll(Metadata.class);
         if (oldCategories != null) {
-            for (BioCategory oldCategory : oldCategories) {
+            for (Metadata oldCategory : oldCategories) {
                 workspace.remove(oldCategory);
                 oldCategory.setSelected(false);
             }
         }
 
-        for (BioCategory selectedCategory : selectedCategories) {
+        for (Metadata selectedCategory : selectedCategories) {
             workspace.add(selectedCategory);
             selectedCategory.setSelected(true);
         }

@@ -6,7 +6,7 @@
 package org.bapedis.db.dao;
 
 import org.bapedis.db.Neo4jDB;
-import org.bapedis.db.model.BioCategory;
+import org.bapedis.db.model.Metadata;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.DynamicLabel;
@@ -28,22 +28,22 @@ public class BioCategoryDAO{
         graphDb = Neo4jDB.getDbService();
     }
     
-    public BioCategory getRootBioCategory(){
+    public Metadata getRootBioCategory(){
         return getBioCategory(rootName);
     }
     
-    public BioCategory getBioCategory(String name) {
+    public Metadata getBioCategory(String name) {
         try (Transaction tx = graphDb.beginTx()) {
             Label TYPE = DynamicLabel.label("BioCategory");
             Node node = graphDb.findNode(TYPE, "name", name);
-            BioCategory category = getBioCategory(node);
+            Metadata category = getBioCategory(node);
             tx.success();
             return category;            
         }        
     }
     
-    protected BioCategory getBioCategory(Node root) {
-        BioCategory category = new BioCategory(root.getId(), root.getProperty("name").toString());
+    protected Metadata getBioCategory(Node root) {
+        Metadata category = new Metadata(root.getId(), root.getProperty("name").toString());
         DynamicRelationshipType IS_A = DynamicRelationshipType.withName("is_a");
         Iterable<Relationship> rels = root.getRelationships(Direction.INCOMING, IS_A);
         for (Relationship rel : rels) {

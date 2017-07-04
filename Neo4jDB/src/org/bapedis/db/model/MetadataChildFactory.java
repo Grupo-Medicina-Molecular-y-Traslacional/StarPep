@@ -13,22 +13,22 @@ import org.openide.nodes.Node;
  *
  * @author loge
  */
-public class BioCategoryChildFactory extends ChildFactory<BioCategory> {
-    protected BioCategory parent;    
+public class MetadataChildFactory extends ChildFactory<Metadata> {
+    protected Metadata parent;    
 
-    public BioCategoryChildFactory(BioCategory parent) {
+    public MetadataChildFactory(Metadata parent) {
         this.parent = parent;
     }        
     
     @Override
-    protected boolean createKeys(List<BioCategory> list) {
+    protected boolean createKeys(List<Metadata> list) {
         list.addAll(parent.getChilds());
         return true;
     }
 
     @Override
-    protected Node createNodeForKey(BioCategory key) {
-        return new BioCategoryNode(key);
+    protected Node createNodeForKey(Metadata key) {
+        return new MetadataNode(key);
     }
     
     

@@ -5,22 +5,31 @@
  */
 package org.bapedis.db.model;
 
-import org.openide.nodes.AbstractNode;
+import org.neo4j.graphdb.DynamicLabel;
 import org.openide.nodes.Children;
+import org.openide.util.lookup.Lookups;
 
 /**
  *
  * @author loge
  */
-public class MyTagNode extends AbstractNode {
+public class MyTagNode extends MyLibraryNode {
+    
+    private final String tagName;
     
     public MyTagNode() {
         super(Children.create(new MyTagChildFactory(), true));
+        tagName = MyLabels.Tags.getDisplayName();
+    }
+    
+    public MyTagNode(String tagName){
+        super(Children.LEAF, Lookups.singleton(DynamicLabel.label(tagName)));
+        this.tagName = tagName;
     }
 
     @Override
     public String getDisplayName() {
-        return MyLabels.Tags.getDisplayName();
+        return tagName;
     }
         
 }

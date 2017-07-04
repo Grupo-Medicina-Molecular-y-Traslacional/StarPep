@@ -15,16 +15,16 @@ import java.util.Objects;
  *
  * @author loge
  */
-public class BioCategory {
+public class Metadata {
     public static final String SELECTED = "Selected";
     protected boolean selected;
     protected Long underlyingNodeID;
     protected String name;
-    protected List<BioCategory> childs;    
+    protected List<Metadata> childs;    
     private transient final PropertyChangeSupport changeSupport =
             new PropertyChangeSupport(this);
 
-    public BioCategory(Long underlyingNodeID, String name) {
+    public Metadata(Long underlyingNodeID, String name) {
         this.underlyingNodeID = underlyingNodeID;
         this.name = name;
         selected = false;
@@ -42,21 +42,21 @@ public class BioCategory {
     public void setSelected(boolean selected) {
         boolean oldState = this.selected;
         this.selected = selected;      
-        for(BioCategory child: childs){
+        for(Metadata child: childs){
             child.setSelected(selected);
         }
         changeSupport.firePropertyChange(SELECTED, oldState, selected);
     }       
     
-    public void addChild(BioCategory child){
+    public void addChild(Metadata child){
         childs.add(child);
     }
     
-    public void removeChild(BioCategory child){
+    public void removeChild(Metadata child){
         childs.remove(child);
     }
     
-    public  List<BioCategory> getChilds(){
+    public  List<Metadata> getChilds(){
         return childs;
     }
     
@@ -86,8 +86,8 @@ public class BioCategory {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof BioCategory){
-            return name.equals(((BioCategory)obj).name);
+        if (obj instanceof Metadata){
+            return name.equals(((Metadata)obj).name);
         }
         return false;
     }        

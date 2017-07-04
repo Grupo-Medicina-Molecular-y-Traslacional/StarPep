@@ -10,7 +10,7 @@ import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.db.dao.NeoPeptideDAO;
-import org.bapedis.db.model.BioCategory;
+import org.bapedis.db.model.Metadata;
 import org.bapedis.db.model.NeoPeptideModel;
 import org.gephi.graph.api.GraphView;
 import org.openide.util.Lookup;
@@ -32,7 +32,7 @@ public class NeoPeptideManager {
     }
 
     public void loadNeoPeptides(final Workspace workspace) {
-        Collection<? extends BioCategory> categories = workspace.getLookup().lookupAll(BioCategory.class);
+        Collection<? extends Metadata> categories = workspace.getLookup().lookupAll(Metadata.class);
         AttributesModel attrModel = pm.getAttributesModel(workspace);
         if (attrModel != null && attrModel instanceof NeoPeptideModel) {
             NeoPeptideModel oldModel = (NeoPeptideModel) attrModel;
@@ -42,7 +42,7 @@ public class NeoPeptideManager {
                 neoModelDAO.getGraphModel().destroyView(oldView);
             }
         }
-        NeoPeptideModel neoModel = neoModelDAO.getNeoPeptidesBy(categories.toArray(new BioCategory[0]));
+        NeoPeptideModel neoModel = neoModelDAO.getNeoPeptidesBy(categories.toArray(new Metadata[0]));
         workspace.add(neoModel);
     }
 

@@ -9,6 +9,7 @@ import java.util.List;
 import javax.swing.Action;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
+import org.openide.util.Lookup;
 import org.openide.util.Utilities;
 
 /**
@@ -17,16 +18,16 @@ import org.openide.util.Utilities;
  */
 public class MyLibraryNode extends AbstractNode {
 
-    private final MyLabels label;
-
-    public MyLibraryNode(MyLabels label) {
-        super(Children.LEAF);
-        this.label = label;
+    public MyLibraryNode(){
+        super(Children.create(new MyLibraryChildFactory(), false));
     }
-
-    @Override
-    public String getDisplayName() {
-        return label.getDisplayName();
+    
+    public MyLibraryNode(Children children){
+        super(children);
+    }
+    
+    public MyLibraryNode(Children children, Lookup lookup) {
+        super(children, lookup);
     }
 
     @Override

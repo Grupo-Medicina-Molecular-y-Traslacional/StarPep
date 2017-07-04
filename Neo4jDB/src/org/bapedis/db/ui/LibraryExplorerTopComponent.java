@@ -10,8 +10,9 @@ import java.util.Collection;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.db.model.BioCategory;
-import org.bapedis.db.model.LibraryChildFactory;
+import org.bapedis.db.model.Metadata;
+import org.bapedis.db.model.MyLibraryChildFactory;
+import org.bapedis.db.model.MyLibraryNode;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -62,7 +63,7 @@ public final class LibraryExplorerTopComponent extends TopComponent implements E
         
         associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));
 
-        explorerMgr.setRootContext(new AbstractNode(Children.create(new LibraryChildFactory(), false)));        
+        explorerMgr.setRootContext(new MyLibraryNode());        
         ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
         pc.addWorkspaceEventListener(this);
     }
@@ -116,9 +117,9 @@ public final class LibraryExplorerTopComponent extends TopComponent implements E
     }
 
     private void highlightCategoryFor(Workspace ws, boolean flag) {
-        Collection<? extends BioCategory> categories = ws.getLookup().lookupAll(BioCategory.class);
+        Collection<? extends Metadata> categories = ws.getLookup().lookupAll(Metadata.class);
         if (categories != null) {
-            for (BioCategory category : categories) {
+            for (Metadata category : categories) {
                 category.setSelected(flag);
             }
         }

@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.db.Neo4jDB;
-import org.bapedis.db.model.BioCategory;
+import org.bapedis.db.model.Metadata;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.db.model.AnnotationType;
@@ -71,7 +71,7 @@ public class NeoPeptideDAO {
         return graphModel;
     }
 
-    public NeoPeptideModel getNeoPeptidesBy(BioCategory[] categories) {
+    public NeoPeptideModel getNeoPeptidesBy(Metadata[] categories) {
         GraphView gView = graphModel.createView();
         Subgraph graph = graphModel.getGraph(gView);
 
@@ -85,7 +85,7 @@ public class NeoPeptideDAO {
 
         try (Transaction tx = graphDb.beginTx()) {
             List<Node> startNodes = new LinkedList<>();
-            for (BioCategory category : categories) {
+            for (Metadata category : categories) {
                 startNodes.add(graphDb.getNodeById(category.getUnderlyingNodeID()));
             }
 

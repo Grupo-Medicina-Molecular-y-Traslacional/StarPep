@@ -5,19 +5,19 @@
  */
 package org.bapedis.db.model;
 
-import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
+import org.openide.util.lookup.Lookups;
 
 /**
  *
  * @author loge
  */
-public class MyLabelNode extends AbstractNode {
+public class MyLabelNode extends MyLibraryNode {
 
     private final MyLabels label;
 
     public MyLabelNode(MyLabels label) {
-        super(Children.LEAF);
+        super(Children.LEAF,Lookups.singleton(label));
         this.label = label;
     }
 

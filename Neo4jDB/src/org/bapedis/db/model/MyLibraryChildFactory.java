@@ -6,7 +6,7 @@
 package org.bapedis.db.model;
 
 import java.util.List;
-import org.bapedis.db.services.BioCategoryManager;
+import org.bapedis.db.services.MetadataManager;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Node;
 import org.openide.util.Lookup;
@@ -15,7 +15,7 @@ import org.openide.util.Lookup;
  *
  * @author loge
  */
-public class LibraryChildFactory extends ChildFactory<String>{
+public class MyLibraryChildFactory extends ChildFactory<String>{
     private final String ALL= "All";
     private final String FAVORITES= "Favorites";
     private final String ADDED= "Added";
@@ -42,8 +42,8 @@ public class LibraryChildFactory extends ChildFactory<String>{
             case TAGS:
                 return new MyTagNode();
             case CLASS:
-                BioCategoryManager bcc = Lookup.getDefault().lookup(BioCategoryManager.class);
-                return new BioCategoryNode(bcc.getRootCategory());
+                MetadataManager bcc = Lookup.getDefault().lookup(MetadataManager.class);
+                return new MetadataNode(bcc.getBioCategory());
         }
         return null;
     }

@@ -15,9 +15,9 @@ import javax.swing.JMenuItem;
 import javax.swing.SwingWorker;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.db.services.BioCategoryManager;
+import org.bapedis.db.services.MetadataManager;
 import org.bapedis.db.services.NeoPeptideManager;
-import org.bapedis.db.model.BioCategory;
+import org.bapedis.db.model.Metadata;
 import org.bapedis.core.ui.PeptideViewerTopComponent;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -68,12 +68,12 @@ public class ShowPeptideNodes extends AbstractAction implements Presenter.Popup 
                 ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
                 Workspace currentWorkspace = pc.getCurrentWorkspace();
 
-                BioCategoryManager bcManager = Lookup.getDefault().lookup(BioCategoryManager.class);
+                MetadataManager bcManager = Lookup.getDefault().lookup(MetadataManager.class);
 
-                Lookup.Result<BioCategory> lkpInfo = bioCategoryTC.getLookup().lookupResult(BioCategory.class);
-                BioCategory[] selectedCategories = lkpInfo.allInstances().toArray(new BioCategory[]{});
+                Lookup.Result<Metadata> lkpInfo = bioCategoryTC.getLookup().lookupResult(Metadata.class);
+                Metadata[] selectedCategories = lkpInfo.allInstances().toArray(new Metadata[]{});
                 if (selectedCategories.length == 0) {
-                    selectedCategories = new BioCategory[]{bcManager.getRootCategory()};
+                    selectedCategories = new Metadata[]{bcManager.getBioCategory()};
                 }
                 bcManager.setSelectedCategoriesTo(currentWorkspace, selectedCategories);
                 NeoPeptideManager npManager = Lookup.getDefault().lookup(NeoPeptideManager.class);

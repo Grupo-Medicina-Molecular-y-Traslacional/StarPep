@@ -7,11 +7,14 @@ package org.bapedis.db.dao;
 
 import java.util.LinkedList;
 import java.util.List;
+import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.db.Neo4jDB;
-import org.bapedis.db.model.Metadata;
+import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.spi.data.PeptideDAO;
 import org.bapedis.db.model.AnnotationType;
 import org.bapedis.db.model.NeoPeptideModel;
 import org.bapedis.db.model.NeoPeptide;
@@ -33,12 +36,14 @@ import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.Uniqueness;
 import org.openide.util.Lookup;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author loge
  */
-public class NeoPeptideDAO {
+@ServiceProvider(service = PeptideDAO.class)
+public class PeptideDAOImpl implements PeptideDAO {
 
     protected final GraphDatabaseService graphDb;
     protected final GraphModel graphModel;
@@ -51,7 +56,7 @@ public class NeoPeptideDAO {
     public static final float GRAPH_NODE_SIZE = 10f;
     public static final float GRAPH_EDGE_WEIGHT = 1f;
 
-    public NeoPeptideDAO() {
+    public PeptideDAOImpl() {
         graphDb = Neo4jDB.getDbService();
         
         ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
@@ -61,6 +66,11 @@ public class NeoPeptideDAO {
 //        nodeTable.addColumn(PRO_ID, long.class);
         Table edgeTable = graphModel.getEdgeTable();
         edgeTable.addColumn(PRO_XREF, String[].class);
+    }
+
+    @Override
+    public AttributesModel loadModel(QueryModel query) {
+        return null;
     }
 
     private enum RELS implements RelationshipType {

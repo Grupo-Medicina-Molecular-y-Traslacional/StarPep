@@ -3,10 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db.ui.actions;
+package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
-import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -20,22 +19,21 @@ import org.openide.util.Lookup;
  */
 @ActionID(
         category = "View",
-        id = "org.bapedis.db.ui.actions.ShowDataNewWorkspace"
+        id = "org.bapedis.db.ui.actions.ShowDataCurrentWorkspace"
 )
 @ActionRegistration(
-        displayName = "#CTL_ShowDataNewWorkspace"
+        displayName = "#CTL_ShowCurrentWorkspace"
 )
 @ActionReferences({
-    @ActionReference(path = "Actions/ShowDataFromLibrary/InWorkspace", position = 200)
+    @ActionReference(path = "Actions/ShowDataFromLibrary/InWorkspace", position = 100)
 })
-public class ShowDataNewWorkspace extends ShowDataAction {
+public class ShowDataCurrentWorkspace extends ShowDataAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
        ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-       workspace = new Workspace();
+       workspace = pc.getCurrentWorkspace();
        super.actionPerformed(e);
-       pc.add(workspace);
-       pc.setCurrentWorkspace(workspace);
     }
+
 }

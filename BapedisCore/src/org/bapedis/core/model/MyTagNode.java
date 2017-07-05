@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db.model;
+package org.bapedis.core.model;
 
 import org.neo4j.graphdb.DynamicLabel;
 import org.openide.nodes.Children;

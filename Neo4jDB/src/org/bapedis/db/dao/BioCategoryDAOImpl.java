@@ -6,7 +6,7 @@
 package org.bapedis.db.dao;
 
 import org.bapedis.db.Neo4jDB;
-import org.bapedis.db.model.Metadata;
+import org.bapedis.core.model.Metadata;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.DynamicLabel;
@@ -15,24 +15,28 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
+import org.openide.util.lookup.ServiceProvider;
+import org.bapedis.core.spi.data.BioCategoryDAO;
 
 /**
  *
  * @author loge
  */
-public class BioCategoryDAO{
+@ServiceProvider(service = BioCategoryDAO.class)
+public class BioCategoryDAOImpl implements BioCategoryDAO{
     protected final String rootName = "Peptide";
     protected final GraphDatabaseService graphDb;
     
-    public BioCategoryDAO() {
+    public BioCategoryDAOImpl() {
         graphDb = Neo4jDB.getDbService();
     }
     
-    public Metadata getRootBioCategory(){
+    @Override
+    public Metadata getBioCategory(){
         return getBioCategory(rootName);
     }
     
-    public Metadata getBioCategory(String name) {
+    protected Metadata getBioCategory(String name) {
         try (Transaction tx = graphDb.beginTx()) {
             Label TYPE = DynamicLabel.label("BioCategory");
             Node node = graphDb.findNode(TYPE, "name", name);

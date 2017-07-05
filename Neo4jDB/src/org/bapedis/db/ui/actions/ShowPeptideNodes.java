@@ -17,7 +17,7 @@ import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.db.services.MetadataManager;
 import org.bapedis.db.services.NeoPeptideManager;
-import org.bapedis.db.model.Metadata;
+import org.bapedis.core.model.Metadata;
 import org.bapedis.core.ui.PeptideViewerTopComponent;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -34,17 +34,17 @@ import org.openide.util.Utilities;
  *
  * @author loge
  */
-@ActionID(
-        category = "View",
-        id = "org.bapedis.db.ui.actions.ShowPeptideNodes"
-)
-@ActionRegistration(
-        displayName = "#CTL_ShowPeptideNodes"
-)
-@ActionReferences({
-    @ActionReference(path = "Menu/View", position = 100),
-    @ActionReference(path = "Actions/ShowDataFromLibrary/Peptides", position = 100)
-})
+//@ActionID(
+//        category = "View",
+//        id = "org.bapedis.db.ui.actions.ShowPeptideNodes"
+//)
+//@ActionRegistration(
+//        displayName = "#CTL_ShowPeptideNodes"
+//)
+//@ActionReferences({
+//    @ActionReference(path = "Menu/View", position = 100),
+//    @ActionReference(path = "Actions/ShowDataFromLibrary/Peptides", position = 100)
+//})
 public class ShowPeptideNodes extends AbstractAction implements Presenter.Popup {
 
     public ShowPeptideNodes() {

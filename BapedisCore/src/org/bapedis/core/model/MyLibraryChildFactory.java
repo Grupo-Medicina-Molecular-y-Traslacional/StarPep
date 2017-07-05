@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db.model;
+package org.bapedis.core.model;
 
 import java.util.List;
-import org.bapedis.db.services.MetadataManager;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Node;
 import org.openide.util.Lookup;
+import org.bapedis.core.spi.data.BioCategoryDAO;
 
 /**
  *
@@ -42,8 +42,8 @@ public class MyLibraryChildFactory extends ChildFactory<String>{
             case TAGS:
                 return new MyTagNode();
             case CLASS:
-                MetadataManager bcc = Lookup.getDefault().lookup(MetadataManager.class);
-                return new MetadataNode(bcc.getBioCategory());
+                BioCategoryDAO metadataDAO = Lookup.getDefault().lookup(BioCategoryDAO.class);
+                return new MetadataNode(metadataDAO.getBioCategory());
         }
         return null;
     }

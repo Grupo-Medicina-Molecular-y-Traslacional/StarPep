@@ -9,8 +9,8 @@ import java.util.Collection;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
-import org.bapedis.db.dao.NeoPeptideDAO;
-import org.bapedis.db.model.Metadata;
+import org.bapedis.db.dao.PeptideDAOImpl;
+import org.bapedis.core.model.Metadata;
 import org.bapedis.db.model.NeoPeptideModel;
 import org.gephi.graph.api.GraphView;
 import org.openide.util.Lookup;
@@ -23,11 +23,11 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service = NeoPeptideManager.class)
 public class NeoPeptideManager {
 
-    protected final NeoPeptideDAO neoModelDAO;
+    protected final PeptideDAOImpl neoModelDAO;
     protected final ProjectManager pm;
 
     public NeoPeptideManager() {
-        neoModelDAO = new NeoPeptideDAO();
+        neoModelDAO = new PeptideDAOImpl();
         pm = Lookup.getDefault().lookup(ProjectManager.class);
     }
 

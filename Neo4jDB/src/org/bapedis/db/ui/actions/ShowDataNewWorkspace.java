@@ -6,11 +6,13 @@
 package org.bapedis.db.ui.actions;
 
 import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
+import org.bapedis.core.model.Workspace;
+import org.bapedis.core.services.ProjectManager;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -26,11 +28,14 @@ import org.openide.awt.ActionRegistration;
 @ActionReferences({
     @ActionReference(path = "Actions/ShowDataFromLibrary/InWorkspace", position = 200)
 })
-public class ShowDataNewWorkspace extends AbstractAction {
+public class ShowDataNewWorkspace extends ShowDataAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+       workspace = new Workspace();
+       super.actionPerformed(e);
+       pc.add(workspace);
+       pc.setCurrentWorkspace(workspace);
     }
-    
 }

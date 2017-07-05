@@ -6,11 +6,12 @@
 package org.bapedis.db.ui.actions;
 
 import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
+import org.bapedis.core.services.ProjectManager;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -26,11 +27,13 @@ import org.openide.awt.ActionRegistration;
 @ActionReferences({
     @ActionReference(path = "Actions/ShowDataFromLibrary/InWorkspace", position = 100)
 })
-public class ShowDataCurrentWorkspace extends AbstractAction {
+public class ShowDataCurrentWorkspace extends ShowDataAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        
+       ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+       workspace = pc.getCurrentWorkspace();
+       super.actionPerformed(e);
     }
-    
+
 }

@@ -20,6 +20,7 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.spi.data.PeptideDAO;
 import org.openide.util.Lookup;
 
 /**
@@ -62,7 +63,7 @@ public class FastaExporterUI extends javax.swing.JPanel implements ExporterUI {
             c.fill = GridBagConstraints.HORIZONTAL;
             cb = new JCheckBox(attr.getDisplayName());
             cb.setName(attr.getId());
-            if (attr.equals(Peptide.ID) || attr.equals(Peptide.SEQ) ){
+            if (attr.equals(PeptideDAO.ID) || attr.equals(PeptideDAO.SEQ) ){
                 cb.setSelected(true);
                 cb.setEnabled(false);
             }

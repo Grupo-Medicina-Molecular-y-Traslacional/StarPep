@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import org.gephi.graph.api.Graph;
 import org.netbeans.swing.etable.QuickFilter;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Index;
@@ -26,6 +27,7 @@ public class AttributesModel {
 
     protected final HashMap<String, PeptideAttribute> attrsMap;
     protected List<PeptideNode> nodeList;
+    protected Graph graph;
     private final PeptideNodeContainer container;
     protected QuickFilter quickFilter;
     public static final String CHANGED_FILTER = "quickFilter";
@@ -86,6 +88,14 @@ public class AttributesModel {
 
     public List<PeptideNode> getNodeList() {
         return nodeList;
+    }        
+
+    public Graph getGraph() {
+        return graph;
+    }
+
+    public void setGraph(Graph graph) {
+        this.graph = graph;
     }        
 
     public void addPeptide(Peptide peptide) {

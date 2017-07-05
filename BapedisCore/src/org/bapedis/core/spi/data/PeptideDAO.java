@@ -6,12 +6,18 @@
 package org.bapedis.core.spi.data;
 
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.QueryModel;
+import org.gephi.graph.api.GraphModel;
 
 /**
  *
  * @author loge
  */
 public interface PeptideDAO {
-    AttributesModel loadModel(QueryModel query);
+    PeptideAttribute ID = new PeptideAttribute("id", "ID", String.class);
+    PeptideAttribute SEQ = new PeptideAttribute("seq", "Sequence", String.class);
+    PeptideAttribute LENGHT = new PeptideAttribute("length", "Length", Integer.class);
+    
+    AttributesModel loadPeptides(GraphModel graphModel, QueryModel queryModel);
 }

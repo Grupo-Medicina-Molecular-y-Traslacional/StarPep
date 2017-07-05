@@ -148,9 +148,6 @@ public class ProjectManager implements Lookup.Provider {
         GraphModel model = workspace.getLookup().lookup(GraphModel.class);
         if (model == null) {
             model = GraphModel.Factory.newInstance();
-            GraphView emptyView = model.createView();
-            model.setVisibleView(emptyView);
-            workspace.add(model);
         }
         return model;
     }    

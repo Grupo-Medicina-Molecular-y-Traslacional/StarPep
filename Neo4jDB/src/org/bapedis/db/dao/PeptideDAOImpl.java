@@ -26,6 +26,7 @@ import org.gephi.graph.api.Table;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
@@ -45,8 +46,8 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service = PeptideDAO.class)
 public class PeptideDAOImpl implements PeptideDAO {
 
+    protected final ProjectManager pm;
     protected final GraphDatabaseService graphDb;
-    protected final GraphModel graphModel;
     public final String PRO_ID = "id";
     public final String PRO_SEQ = "seq";
     public final String PRO_LENGHT = "length";
@@ -58,48 +59,35 @@ public class PeptideDAOImpl implements PeptideDAO {
 
     public PeptideDAOImpl() {
         graphDb = Neo4jDB.getDbService();
-        
-        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
-        graphModel = pm.getGraphModel();
-        
+        pm = Lookup.getDefault().lookup(ProjectManager.class);
+
 //        Table nodeTable = graphModel.getNodeTable();
 //        nodeTable.addColumn(PRO_ID, long.class);
-        Table edgeTable = graphModel.getEdgeTable();
-        edgeTable.addColumn(PRO_XREF, String[].class);
+//        Table edgeTable = graphModel.getEdgeTable();
+//        edgeTable.addColumn(PRO_XREF, String[].class);
     }
 
     @Override
-    public AttributesModel loadModel(QueryModel query) {
-        return null;
-    }
+    public AttributesModel loadPeptides(GraphModel graphModel, QueryModel queryModel) {
+        AttributesModel attrModel = new AttributesModel();
+        attrModel.addAttribute(ID);
+        attrModel.addAttribute(SEQ);
+        attrModel.addAttribute(LENGHT);
 
-    private enum RELS implements RelationshipType {
-        is_a, instance_of
-    }
+        for (AnnotationType aType : AnnotationType.values()) {
+            attrModel.addAttribute(new PeptideAttribute(aType.name(), aType.getDisplayName(), String.class));
+        }
 
-    public GraphModel getGraphModel() {
-        return graphModel;
-    }
-
-    public NeoPeptideModel getNeoPeptidesBy(Metadata[] categories) {
         GraphView gView = graphModel.createView();
         Subgraph graph = graphModel.getGraph(gView);
 
-        NeoPeptideModel neoModel = new NeoPeptideModel(graph);
-        neoModel.addAttribute(Peptide.ID);
-        neoModel.addAttribute(Peptide.SEQ);
-        neoModel.addAttribute(Peptide.LENGHT);
-        for (AnnotationType aType : AnnotationType.values()) {
-            neoModel.addAttribute(new PeptideAttribute(aType.name(), aType.getDisplayName(), String.class));
-        }
-
         try (Transaction tx = graphDb.beginTx()) {
             List<Node> startNodes = new LinkedList<>();
-            for (Metadata category : categories) {
-                startNodes.add(graphDb.getNodeById(category.getUnderlyingNodeID()));
+            for (Metadata metadata : queryModel.getMetadatas()) {
+                startNodes.add(graphDb.getNodeById(metadata.getUnderlyingNodeID()));
             }
 
-            Iterable<Node> peptideNodes = getPeptides(startNodes);
+            Iterable<Node> peptideNodes = getPeptides(startNodes, queryModel.getLabels());
             NeoPeptide neoPeptide;
             org.gephi.graph.api.Node graphNode, graphNeighborNode;
             org.gephi.graph.api.Edge graphEdge;
@@ -125,35 +113,41 @@ public class PeptideDAOImpl implements PeptideDAO {
 
                 //Fill NeoPeptideModel
                 neoPeptide = new NeoPeptide(neoNode.getId(), graphNode, graph);
-                neoPeptide.setAttributeValue(Peptide.ID, id);
-                neoPeptide.setAttributeValue(Peptide.SEQ, seq);
-                neoPeptide.setAttributeValue(Peptide.LENGHT, seq.length());
+                neoPeptide.setAttributeValue(ID, id);
+                neoPeptide.setAttributeValue(SEQ, seq);
+                neoPeptide.setAttributeValue(LENGHT, seq.length());
 
                 for (String propertyKey : neoNode.getPropertyKeys()) {
                     if (!(propertyKey.equals(PRO_ID) || propertyKey.equals(PRO_SEQ)
                             || propertyKey.equals(PRO_LENGHT))) {
                         Object value = neoNode.getProperty(propertyKey);
-                        if (!neoModel.hasAttribute(propertyKey)) {
-                            attr = neoModel.addAttribute(propertyKey, propertyKey, value.getClass());
+                        if (!attrModel.hasAttribute(propertyKey)) {
+                            attr = attrModel.addAttribute(propertyKey, propertyKey, value.getClass());
                         } else {
-                            attr = neoModel.getAttribute(propertyKey);
+                            attr = attrModel.getAttribute(propertyKey);
                         }
                         neoPeptide.setAttributeValue(attr, value);
                     }
                 }
 
                 for (AnnotationType aType : AnnotationType.values()) {
-                    attr = neoModel.getAttribute(aType.name());
+                    attr = attrModel.getAttribute(aType.name());
                     neoPeptide.setAttributeValue(attr, neoPeptide.getAnnotationValues(aType));
                 }
-                neoModel.addPeptide(neoPeptide);
+                attrModel.addPeptide(neoPeptide);
             }
             tx.success();
         }
-        return neoModel;
+
+        attrModel.setGraph(graph);
+        return attrModel;
     }
 
-    protected Iterable<Node> getPeptides(List<Node> startNodes) {
+    private enum RELS implements RelationshipType {
+        is_a, instance_of
+    }
+
+    protected Iterable<Node> getPeptides(List<Node> startNodes, final Label[] labels) {
         Iterable<Node> nodes = graphDb.traversalDescription()
                 .breadthFirst()
                 .relationships(RELS.is_a, Direction.INCOMING)
@@ -162,11 +156,20 @@ public class PeptideDAOImpl implements PeptideDAO {
 
                     @Override
                     public Evaluation evaluate(Path path) {
+                        boolean accepted = false;
                         if (path.endNode().hasLabel(DynamicLabel.label("Peptide"))) {
-                            return Evaluation.INCLUDE_AND_PRUNE;
-                        } else {
-                            return Evaluation.EXCLUDE_AND_CONTINUE;
+                            accepted = true;
+                            if (labels != null) {
+                                for (Label label : labels) {
+                                    if (!path.endNode().hasLabel(label)) {
+                                        accepted = false;
+                                        break;
+                                    }
+                                }
+                            }
+
                         }
+                        return accepted ? Evaluation.INCLUDE_AND_PRUNE : Evaluation.EXCLUDE_AND_CONTINUE;
                     }
                 })
                 .uniqueness(Uniqueness.NODE_GLOBAL)
@@ -206,7 +209,7 @@ public class PeptideDAOImpl implements PeptideDAO {
             graphNode = factory.newNode(id);
             if (neoNode.hasProperty(PRO_NAME)) {
                 graphNode.setLabel(neoNode.getProperty(PRO_NAME).toString());
-            }else{
+            } else {
                 graphNode.setLabel(id);
             }
             graphNode.setSize(GRAPH_NODE_SIZE);
@@ -231,7 +234,7 @@ public class PeptideDAOImpl implements PeptideDAO {
             graphEdge = factory.newEdge(id, startNode, endNode, relType, GRAPH_EDGE_WEIGHT, false);
             graphEdge.setLabel(relName);
             graphEdge.setAttribute(PRO_XREF, relation.getProperty(PRO_XREF));
-            
+
             graphModel.getGraph().addEdge(graphEdge);
         }
         return graphEdge;

@@ -8,6 +8,7 @@ package org.bapedis.core.model;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import org.bapedis.core.spi.data.PeptideDAO;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 
@@ -16,11 +17,6 @@ import org.gephi.graph.api.Node;
  * @author loge
  */
 public class Peptide {
-
-    public static final PeptideAttribute ID = new PeptideAttribute("id", "ID", String.class);
-    public static final PeptideAttribute SEQ = new PeptideAttribute("seq", "Sequence", String.class);
-    public static final PeptideAttribute LENGHT = new PeptideAttribute("length", "Length", Integer.class);
-
     protected final Node graphNode;
     protected final Graph graph;
     protected HashMap<PeptideAttribute, Object> attrsValue;
@@ -32,15 +28,15 @@ public class Peptide {
     }
 
     public String getId() {
-        return (String) attrsValue.get(ID);
+        return (String) attrsValue.get(PeptideDAO.ID);
     }
 
     public String getSequence() {
-        return (String) attrsValue.get(SEQ);
+        return (String) attrsValue.get(PeptideDAO.SEQ);
     }
 
     public int getLength() {
-        return (int) attrsValue.get(LENGHT);
+        return (int) attrsValue.get(PeptideDAO.LENGHT);
     }
 
     public void setAttributeValue(PeptideAttribute attr, Object value) {

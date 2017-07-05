@@ -32,18 +32,18 @@ public class NeoPeptideManager {
     }
 
     public void loadNeoPeptides(final Workspace workspace) {
-        Collection<? extends Metadata> categories = workspace.getLookup().lookupAll(Metadata.class);
-        AttributesModel attrModel = pm.getAttributesModel(workspace);
-        if (attrModel != null && attrModel instanceof NeoPeptideModel) {
-            NeoPeptideModel oldModel = (NeoPeptideModel) attrModel;
-            workspace.remove(oldModel);
-            GraphView oldView = oldModel.getCurrentView();
-            if (!oldView.isMainView()) {
-                neoModelDAO.getGraphModel().destroyView(oldView);
-            }
-        }
-        NeoPeptideModel neoModel = neoModelDAO.getNeoPeptidesBy(categories.toArray(new Metadata[0]));
-        workspace.add(neoModel);
+//        Collection<? extends Metadata> categories = workspace.getLookup().lookupAll(Metadata.class);
+//        AttributesModel attrModel = pm.getAttributesModel(workspace);
+//        if (attrModel != null && attrModel instanceof NeoPeptideModel) {
+//            NeoPeptideModel oldModel = (NeoPeptideModel) attrModel;
+//            workspace.remove(oldModel);
+//            GraphView oldView = oldModel.getCurrentView();
+//            if (!oldView.isMainView()) {
+//                neoModelDAO.getGraphModel().destroyView(oldView);
+//            }
+//        }
+//        NeoPeptideModel neoModel = neoModelDAO.getNeoPeptidesBy(categories.toArray(new Metadata[0]));
+//        workspace.add(neoModel);
     }
 
 }

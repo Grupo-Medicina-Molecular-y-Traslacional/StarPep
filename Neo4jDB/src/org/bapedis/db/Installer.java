@@ -22,13 +22,13 @@ public class Installer extends ModuleInstall {
             Neo4jDB.extractDatabase();
             Neo4jDB.loadDatabase();
             //Load all peptides into the default workspace
-            ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
-            Workspace currentWorkspace = pm.getCurrentWorkspace();
-
-            MetadataManager bcManager = Lookup.getDefault().lookup(MetadataManager.class);
-            NeoPeptideManager npManager = Lookup.getDefault().lookup(NeoPeptideManager.class);
-            bcManager.setSelectedCategoriesTo(currentWorkspace, new Metadata[]{bcManager.getBioCategory()});
-            npManager.loadNeoPeptides(currentWorkspace);
+//            ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
+//            Workspace currentWorkspace = pm.getCurrentWorkspace();
+//
+//            MetadataManager bcManager = Lookup.getDefault().lookup(MetadataManager.class);
+//            NeoPeptideManager npManager = Lookup.getDefault().lookup(NeoPeptideManager.class);
+//            bcManager.setSelectedCategoriesTo(currentWorkspace, new Metadata[]{bcManager.getBioCategory()});
+//            npManager.loadNeoPeptides(currentWorkspace);
         } catch (Exception ex) {
             System.out.println(ex);
             ex.printStackTrace();

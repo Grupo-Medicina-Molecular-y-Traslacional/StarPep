@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.ui;
 
-import java.awt.BorderLayout;
 import java.util.Collection;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
@@ -55,8 +54,10 @@ public final class LibraryExplorerTopComponent extends TopComponent implements E
         setName(Bundle.CTL_LibraryExplorerTopComponent());
         setToolTipText(Bundle.HINT_LibraryExplorerTopComponent());
         BeanTreeView view = new BeanTreeView();
-        add(view, BorderLayout.CENTER);
         view.setRootVisible(false);
+        splitPane.setDividerLocation(0.6);
+        splitPane.setLeftComponent(view);
+        splitPane.setRightComponent(new QueryPanel());
         
         associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));
 
@@ -73,10 +74,18 @@ public final class LibraryExplorerTopComponent extends TopComponent implements E
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        splitPane = new javax.swing.JSplitPane();
+
         setLayout(new java.awt.BorderLayout());
+
+        splitPane.setBorder(null);
+        splitPane.setDividerLocation(260);
+        splitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        add(splitPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JSplitPane splitPane;
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {

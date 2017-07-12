@@ -5,12 +5,15 @@
  */
 package org.bapedis.core.ui;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.MyLibraryNode;
+import org.bapedis.core.model.QueryModel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -45,25 +48,29 @@ import org.openide.util.NbBundle.Messages;
     "CTL_LibraryExplorerTopComponent=My Library",
     "HINT_LibraryExplorerTopComponent=My Library window"
 })
-public final class LibraryExplorerTopComponent extends TopComponent implements ExplorerManager.Provider, WorkspaceEventListener {
+public final class LibraryExplorerTopComponent extends TopComponent implements ExplorerManager.Provider, WorkspaceEventListener, PropertyChangeListener {
 
-    private final ExplorerManager explorerMgr = new ExplorerManager();
+    protected final ExplorerManager explorerMgr;
+    protected final ProjectManager pc;
+    protected final QueryPanel queryPanel;
 
     public LibraryExplorerTopComponent() {
         initComponents();
+        explorerMgr = new ExplorerManager();
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
+
         setName(Bundle.CTL_LibraryExplorerTopComponent());
         setToolTipText(Bundle.HINT_LibraryExplorerTopComponent());
         BeanTreeView view = new BeanTreeView();
         view.setRootVisible(false);
         splitPane.setDividerLocation(0.6);
         splitPane.setLeftComponent(view);
-        splitPane.setRightComponent(new QueryPanel());
-        
+        queryPanel = new QueryPanel();
+        splitPane.setRightComponent(queryPanel);
+
         associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));
 
-        explorerMgr.setRootContext(new MyLibraryNode());        
-        ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-        pc.addWorkspaceEventListener(this);
+        explorerMgr.setRootContext(new MyLibraryNode());
     }
 
     /**
@@ -89,12 +96,14 @@ public final class LibraryExplorerTopComponent extends TopComponent implements E
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {
-        // TODO add custom code on component opening
+        pc.addWorkspaceEventListener(this);
+        Workspace currentWs = pc.getCurrentWorkspace();
+        workspaceChanged(null, currentWs);
     }
 
     @Override
     public void componentClosed() {
-        // TODO add custom code on component closing
+        pc.removeWorkspaceEventListener(this);
     }
 
     void writeProperties(java.util.Properties p) {
@@ -117,9 +126,14 @@ public final class LibraryExplorerTopComponent extends TopComponent implements E
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
         if (oldWs != null) {
+            QueryModel oldModel = pc.getQueryModel(oldWs);
+            oldModel.removePropertyChangeListener(this);
             highlightCategoryFor(oldWs, false);
         }
-        highlightCategoryFor(newWs, true);
+        QueryModel newModel = pc.getQueryModel(newWs);
+        newModel.addPropertyChangeListener(this);
+        queryPanel.setQueryModel(newModel);
+        highlightCategoryFor(newWs, true);        
     }
 
     private void highlightCategoryFor(Workspace ws, boolean flag) {
@@ -129,6 +143,11 @@ public final class LibraryExplorerTopComponent extends TopComponent implements E
                 category.setSelected(flag);
             }
         }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        
     }
 
 }

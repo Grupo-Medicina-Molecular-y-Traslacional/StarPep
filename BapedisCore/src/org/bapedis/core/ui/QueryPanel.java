@@ -6,25 +6,24 @@
 package org.bapedis.core.ui;
 
 import java.awt.BorderLayout;
-import org.bapedis.core.events.WorkspaceEventListener;
-import org.bapedis.core.model.Workspace;
+import org.bapedis.core.model.QueryModel;
 import org.openide.explorer.ExplorerManager;
-import org.openide.explorer.view.ListView;
+import org.openide.explorer.view.BeanTreeView;
 
 /**
  *
  * @author loge
  */
-public class QueryPanel extends javax.swing.JPanel implements ExplorerManager.Provider, WorkspaceEventListener {
+public class QueryPanel extends javax.swing.JPanel implements ExplorerManager.Provider {
 
-    private final ExplorerManager explorerMgr = new ExplorerManager();
-    
+    protected final ExplorerManager explorerMgr;
     /**
      * Creates new form QueryPanel
      */
     public QueryPanel() {
         initComponents();
-        ListView view = new ListView();
+        explorerMgr = new ExplorerManager();
+        BeanTreeView view = new BeanTreeView();
         centerPanel.add(view, BorderLayout.CENTER);
     }
 
@@ -84,8 +83,8 @@ public class QueryPanel extends javax.swing.JPanel implements ExplorerManager.Pr
         return explorerMgr;
     }
 
-    @Override
-    public void workspaceChanged(Workspace oldWs, Workspace newWs) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setQueryModel(QueryModel model){
+        explorerMgr.setRootContext(model.getRootContext());        
     }
+    
 }

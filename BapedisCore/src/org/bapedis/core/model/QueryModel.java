@@ -10,10 +10,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.LinkedList;
 import java.util.List;
 import org.neo4j.graphdb.Label;
-import org.openide.nodes.AbstractNode;
-import org.openide.nodes.Children;
 import org.openide.nodes.Node;
-import org.openide.util.NbBundle;
 
 /**
  *
@@ -26,16 +23,13 @@ public class QueryModel {
     public static final String REMOVED_NODE = "REMOVE";
     protected transient final PropertyChangeSupport propertyChangeSupport;
     protected final Node rootContext;
-    private final Label[] labels;
-    private final Metadata[] metadatas;
+    private Label[] labels;
+    private Metadata[] metadatas;
 
-    public QueryModel(Label[] labels, Metadata[] metadatas) {
-        this.labels = labels;
-        this.metadatas = metadatas;
-        rootContext = new AbstractNode(Children.LEAF);
-        rootContext.setDisplayName(NbBundle.getMessage(QueryModel.class, "QueryModel.rootContext.name"));
+    public QueryModel() {
         propertyChangeSupport = new PropertyChangeSupport(this);
         nodes = new LinkedList<>();
+        rootContext = new QueryNode(this);
     }
 
     public Label[] getLabels() {
@@ -59,7 +53,7 @@ public class QueryModel {
     public Node getRootContext() {
         return rootContext;
     }
-    
+
     public MyLibraryNode[] getQueryNodes() {
         return nodes.toArray(new MyLibraryNode[0]);
     }

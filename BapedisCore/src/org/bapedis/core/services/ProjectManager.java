@@ -13,6 +13,7 @@ import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AlgorithmModel;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FilterModel;
+import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.task.AlgorithmExecutor;
@@ -151,6 +152,19 @@ public class ProjectManager implements Lookup.Provider {
         }
         return model;
     }    
+    
+    public QueryModel getQueryModel(){
+        return getQueryModel(getCurrentWorkspace());
+    }
+    
+    public QueryModel getQueryModel(Workspace workspace){
+        QueryModel model = workspace.getLookup().lookup(QueryModel.class);
+        if (model == null) {
+            model = new QueryModel();
+            workspace.add(model);
+        }
+        return model;    
+    }
     
     public FilterModel getFilterModel(){
         return getFilterModel(currentWS);

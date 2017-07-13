@@ -32,9 +32,9 @@ public class QueryNode extends AbstractNode {
 
      @Override
     public PasteType getDropType(Transferable t, int action, int index) {
-        if (t.isDataFlavorSupported(MyLibraryNode.DATA_FLAVOR)) {
+        if (t.isDataFlavorSupported(LibraryNode.DATA_FLAVOR)) {
             try {
-                final Object transferData = t.getTransferData(MyLibraryNode.DATA_FLAVOR);
+                final Object transferData = t.getTransferData(LibraryNode.DATA_FLAVOR);
                 if (transferData != null) {
                     return new PasteType() {
                         @Override

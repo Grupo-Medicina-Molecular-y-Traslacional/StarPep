@@ -10,37 +10,34 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import org.bapedis.core.services.ProjectManager;
 import org.neo4j.graphdb.Label;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
-import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 
 /**
  *
  * @author loge
  */
-public class MyLibraryNode extends AbstractNode {
+public class LibraryNode extends AbstractNode {
 
-    public static final DataFlavor DATA_FLAVOR = new DataFlavor(MyLibraryNode.class, "libraryNode");
+    public static final DataFlavor DATA_FLAVOR = new DataFlavor(LibraryNode.class, "libraryNode");
     protected final MyTransferableImpl transferable;
     protected final Action[] actions;
 
-    public MyLibraryNode() {
-        this(Children.create(new MyLibraryChildFactory(), false));
+    public LibraryNode() {
+        this(Children.create(new LibraryChildFactory(), false));
     }
 
-    public MyLibraryNode(Children children) {
+    public LibraryNode(Children children) {
         this(children, null);
     }
 
-    public MyLibraryNode(Children children, Lookup lookup) {
+    public LibraryNode(Children children, Lookup lookup) {
         super(children, lookup);
         transferable = new MyTransferableImpl();
         actions = new Action[]{new AddToQuery(), new RemoveFromQuery()};
@@ -90,7 +87,7 @@ public class MyLibraryNode extends AbstractNode {
     protected class AddToQuery extends AbstractAction {
 
         public AddToQuery() {
-            putValue(NAME, NbBundle.getMessage(MyLibraryNode.class, "MyLibraryNode.action.addToQuery"));
+            putValue(NAME, NbBundle.getMessage(LibraryNode.class, "LibraryNode.action.addToQuery"));
 //            putValue(SMALL_ICON, ImageUtilities.loadImage("org/bapedis/core/resources/add.png", true));
         }                
 
@@ -109,7 +106,7 @@ public class MyLibraryNode extends AbstractNode {
     protected class RemoveFromQuery extends AbstractAction {
 
         public RemoveFromQuery() {
-            putValue(NAME, NbBundle.getMessage(MyLibraryNode.class, "MyLibraryNode.action.removeFromQuery"));
+            putValue(NAME, NbBundle.getMessage(LibraryNode.class, "LibraryNode.action.removeFromQuery"));
 //            putValue(SMALL_ICON, ImageUtilities.loadImage("org/bapedis/core/resources/remove.png", true));
         }
 

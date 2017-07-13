@@ -14,16 +14,16 @@ import org.openide.util.lookup.Lookups;
  *
  * @author loge
  */
-public class MetadataNode extends MyLibraryNode implements PropertyChangeListener {
+public class MetadataNode extends LibraryNode implements PropertyChangeListener {
     
-    public MetadataNode(Metadata category) {
-        super(category.hasChild() ? Children.create(new MetadataChildFactory(category), false) : Children.LEAF, Lookups.singleton(category));
-        category.addPropertyChangeListener(this);
-        setDisplayName(category.getName()); 
-        transferable.setTransferData(category);
+    public MetadataNode(Metadata metadata) {
+        super(metadata.hasChild() ? Children.create(new MetadataChildFactory(metadata), false) : Children.LEAF, Lookups.singleton(metadata));
+        metadata.addPropertyChangeListener(this);
+        setDisplayName(metadata.getName()); 
+        transferable.setTransferData(metadata);
     }
     
-    public Metadata getBioCategory(){
+    public Metadata getMetadata(){
         return getLookup().lookup(Metadata.class);
     }
     

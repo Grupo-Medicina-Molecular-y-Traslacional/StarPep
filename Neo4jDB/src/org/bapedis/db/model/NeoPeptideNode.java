@@ -5,6 +5,7 @@
  */
 package org.bapedis.db.model;
 
+import org.bapedis.core.model.AnnotationType;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import javax.swing.Action;

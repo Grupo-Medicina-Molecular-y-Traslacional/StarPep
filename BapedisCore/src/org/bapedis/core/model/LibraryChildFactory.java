@@ -15,7 +15,7 @@ import org.bapedis.core.spi.data.BioCategoryDAO;
  *
  * @author loge
  */
-public class MyLibraryChildFactory extends ChildFactory<String>{
+public class LibraryChildFactory extends ChildFactory<String>{
     private final String ALL= "All";
     private final String FAVORITES= "Favorites";
     private final String ADDED= "Added";

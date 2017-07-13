@@ -6,27 +6,44 @@
 package org.bapedis.core.ui;
 
 import java.awt.BorderLayout;
-import org.bapedis.core.model.QueryModel;
+import javax.swing.DefaultComboBoxModel;
+import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.model.LibraryNode;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.view.BeanTreeView;
+import org.openide.util.NbBundle;
 
 /**
  *
- * @author loge
+ * @author cicese
  */
-public class QueryPanel extends javax.swing.JPanel implements ExplorerManager.Provider {
+public class LibraryPanel extends javax.swing.JPanel implements ExplorerManager.Provider {
 
     protected final ExplorerManager explorerMgr;
-    protected QueryModel queryModel;
 
     /**
-     * Creates new form QueryPanel
+     * Creates new form LibraryPanel
      */
-    public QueryPanel() {
+    public LibraryPanel() {
         initComponents();
         explorerMgr = new ExplorerManager();
+
         BeanTreeView view = new BeanTreeView();
+        view.setRootVisible(false);
+        
         centerPanel.add(view, BorderLayout.CENTER);
+
+        explorerMgr.setRootContext(new LibraryNode());
+        
+        DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
+        String NO_SELECTION = NbBundle.getMessage(LibraryPanel.class, "LibraryPanel.choose.text");
+        comboBoxModel.addElement(NO_SELECTION);
+        comboBoxModel.setSelectedItem(NO_SELECTION);
+        
+        for (AnnotationType aType : AnnotationType.values()){
+            comboBoxModel.addElement(aType);
+        }
+        comboBox.setModel(comboBoxModel);
     }
 
     /**
@@ -40,20 +57,16 @@ public class QueryPanel extends javax.swing.JPanel implements ExplorerManager.Pr
         java.awt.GridBagConstraints gridBagConstraints;
 
         topPanel = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
+        comboBox = new javax.swing.JComboBox<>();
         centerPanel = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
         topPanel.setPreferredSize(new java.awt.Dimension(400, 30));
-        java.awt.FlowLayout flowLayout1 = new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 0, 0);
-        flowLayout1.setAlignOnBaseline(true);
-        topPanel.setLayout(flowLayout1);
+        topPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/run.gif"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(QueryPanel.class, "QueryPanel.jButton1.text")); // NOI18N
-        jButton1.setToolTipText(org.openide.util.NbBundle.getMessage(QueryPanel.class, "QueryPanel.jButton1.toolTipText")); // NOI18N
-        topPanel.add(jButton1);
+        comboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "--Select", " " }));
+        topPanel.add(comboBox);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -76,18 +89,13 @@ public class QueryPanel extends javax.swing.JPanel implements ExplorerManager.Pr
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JComboBox<String> comboBox;
     private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public ExplorerManager getExplorerManager() {
         return explorerMgr;
-    }
-
-    public void setQueryModel(QueryModel model) {
-        queryModel = model;
-        explorerMgr.setRootContext(model.getRootContext());
     }
 
 }

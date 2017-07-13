@@ -9,7 +9,7 @@ import java.util.StringTokenizer;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
-import org.bapedis.db.model.AnnotationType;
+import org.bapedis.core.model.AnnotationType;
 import org.bapedis.db.model.NeoPeptide;
 import org.openide.util.NbBundle;
 

@@ -13,7 +13,7 @@ import org.openide.util.lookup.Lookups;
  *
  * @author loge
  */
-public class LabelNode extends MyLibraryNode {
+public class LabelNode extends LibraryNode {
 
     private final Label label;
 

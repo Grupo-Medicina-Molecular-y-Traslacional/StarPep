@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db.model;
+package org.bapedis.core.model;
 
 import org.openide.util.NbBundle;
 
@@ -109,4 +109,11 @@ public enum AnnotationType {
     public String getRelationType(){
         return relType;
     }
+
+    @Override
+    public String toString() {
+        return getDisplayName();
+    }
+    
+    
 }

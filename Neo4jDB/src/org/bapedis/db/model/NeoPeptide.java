@@ -5,6 +5,7 @@
  */
 package org.bapedis.db.model;
 
+import org.bapedis.core.model.AnnotationType;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedList;

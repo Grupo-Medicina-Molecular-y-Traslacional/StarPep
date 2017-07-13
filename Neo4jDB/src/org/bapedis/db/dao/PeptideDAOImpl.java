@@ -14,7 +14,7 @@ import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.data.PeptideDAO;
-import org.bapedis.db.model.AnnotationType;
+import org.bapedis.core.model.AnnotationType;
 import org.bapedis.db.model.NeoPeptide;
 import org.gephi.graph.api.GraphFactory;
 import org.gephi.graph.api.GraphModel;

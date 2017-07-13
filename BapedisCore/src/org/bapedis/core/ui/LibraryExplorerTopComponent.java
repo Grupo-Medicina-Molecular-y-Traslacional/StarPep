@@ -12,7 +12,7 @@ import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.model.Metadata;
-import org.bapedis.core.model.MyLibraryNode;
+import org.bapedis.core.model.LibraryNode;
 import org.bapedis.core.model.QueryModel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -44,33 +44,32 @@ import org.openide.util.NbBundle.Messages;
         preferredID = "LibraryExplorerTopComponent"
 )
 @Messages({
-    "CTL_LibraryExplorerAction= My Library",
-    "CTL_LibraryExplorerTopComponent=My Library",
-    "HINT_LibraryExplorerTopComponent=My Library window"
+    "CTL_LibraryExplorerAction= Library",
+    "CTL_LibraryExplorerTopComponent=Library",
+    "HINT_LibraryExplorerTopComponent=Library window"
 })
-public final class LibraryExplorerTopComponent extends TopComponent implements ExplorerManager.Provider, WorkspaceEventListener, PropertyChangeListener {
+public final class LibraryExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener {
 
-    protected final ExplorerManager explorerMgr;
     protected final ProjectManager pc;
     protected final QueryPanel queryPanel;
+    protected final LibraryPanel libraryPanel;
 
     public LibraryExplorerTopComponent() {
         initComponents();
-        explorerMgr = new ExplorerManager();
+
         pc = Lookup.getDefault().lookup(ProjectManager.class);
 
         setName(Bundle.CTL_LibraryExplorerTopComponent());
         setToolTipText(Bundle.HINT_LibraryExplorerTopComponent());
-        BeanTreeView view = new BeanTreeView();
-        view.setRootVisible(false);
-        splitPane.setDividerLocation(0.6);
-        splitPane.setLeftComponent(view);
+
+        libraryPanel = new LibraryPanel();
+        splitPane.setLeftComponent(libraryPanel);
+        
         queryPanel = new QueryPanel();
         splitPane.setRightComponent(queryPanel);
 
-        associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));
-
-        explorerMgr.setRootContext(new MyLibraryNode());
+//        associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));
+        
     }
 
     /**
@@ -86,7 +85,7 @@ public final class LibraryExplorerTopComponent extends TopComponent implements E
         setLayout(new java.awt.BorderLayout());
 
         splitPane.setBorder(null);
-        splitPane.setDividerLocation(260);
+        splitPane.setDividerLocation(460);
         splitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         add(splitPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
@@ -116,11 +115,6 @@ public final class LibraryExplorerTopComponent extends TopComponent implements E
     void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
-    }
-
-    @Override
-    public ExplorerManager getExplorerManager() {
-        return explorerMgr;
     }
 
     @Override

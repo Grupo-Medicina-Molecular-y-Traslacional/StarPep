@@ -14,7 +14,7 @@ import org.openide.util.lookup.Lookups;
  *
  * @author loge
  */
-public class MyTagNode extends MyLibraryNode {
+public class MyTagNode extends LibraryNode {
     
     private final String tagName;
     

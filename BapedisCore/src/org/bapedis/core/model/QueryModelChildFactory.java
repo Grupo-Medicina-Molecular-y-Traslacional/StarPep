@@ -9,6 +9,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 import java.util.List;
+import org.neo4j.graphdb.Label;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Node;
 
@@ -16,7 +17,7 @@ import org.openide.nodes.Node;
  *
  * @author loge
  */
-public class QueryModelChildFactory extends ChildFactory<MyLibraryNode> implements PropertyChangeListener {
+public class QueryModelChildFactory extends ChildFactory<Object> implements PropertyChangeListener {
     protected final QueryModel queryModel;
 
     public QueryModelChildFactory(QueryModel queryModel) {
@@ -25,21 +26,25 @@ public class QueryModelChildFactory extends ChildFactory<MyLibraryNode> implemen
     }
     
     @Override
-    protected boolean createKeys(List<MyLibraryNode> list) {
-        MyLibraryNode[] nodes = queryModel.getQueryNodes();
-        list.addAll(Arrays.asList(nodes));
+    protected boolean createKeys(List<Object> list) {
+        list.addAll(Arrays.asList(queryModel.getLabels()));
+        list.addAll(Arrays.asList(queryModel.getMetadatas()));
         return true;
     }
 
     @Override
-    protected Node createNodeForKey(MyLibraryNode key) {
-        return key;
+    protected Node createNodeForKey(Object key) {
+        if (key instanceof  Label){
+            return new LabelNode((Label) key);
+        } else if (key instanceof Metadata){
+            return new MetadataNode((Metadata) key);
+        }
+        return null;
     }
     
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(QueryModel.ADDED_NODE) ||
-            evt.getPropertyName().equals(QueryModel.REMOVED_NODE)){
+        if (evt.getSource().equals(queryModel)){
             refresh(true);
         }                   
     }

@@ -38,7 +38,7 @@ public class MyLibraryChildFactory extends ChildFactory<String>{
             case ALL:
             case FAVORITES:
             case ADDED:
-                return new MyLabelNode(MyLabels.valueOf(key));
+                return new LabelNode(MyLabels.valueOf(key));
             case TAGS:
                 return new MyTagNode();
             case CLASS:

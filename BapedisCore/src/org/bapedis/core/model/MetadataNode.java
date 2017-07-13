@@ -19,7 +19,8 @@ public class MetadataNode extends MyLibraryNode implements PropertyChangeListene
     public MetadataNode(Metadata category) {
         super(category.hasChild() ? Children.create(new MetadataChildFactory(category), false) : Children.LEAF, Lookups.singleton(category));
         category.addPropertyChangeListener(this);
-        setDisplayName(category.getName());  
+        setDisplayName(category.getName()); 
+        transferable.setTransferData(category);
     }
     
     public Metadata getBioCategory(){

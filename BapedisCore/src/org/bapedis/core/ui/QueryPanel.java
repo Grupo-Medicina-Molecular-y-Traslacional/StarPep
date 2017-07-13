@@ -6,9 +6,20 @@
 package org.bapedis.core.ui;
 
 import java.awt.BorderLayout;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.io.IOException;
+import javax.swing.TransferHandler;
+import org.bapedis.core.model.Metadata;
+import org.bapedis.core.model.MyLibraryNode;
 import org.bapedis.core.model.QueryModel;
+import org.neo4j.graphdb.Label;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.view.BeanTreeView;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -17,6 +28,8 @@ import org.openide.explorer.view.BeanTreeView;
 public class QueryPanel extends javax.swing.JPanel implements ExplorerManager.Provider {
 
     protected final ExplorerManager explorerMgr;
+    protected QueryModel queryModel;
+
     /**
      * Creates new form QueryPanel
      */
@@ -83,8 +96,9 @@ public class QueryPanel extends javax.swing.JPanel implements ExplorerManager.Pr
         return explorerMgr;
     }
 
-    public void setQueryModel(QueryModel model){
-        explorerMgr.setRootContext(model.getRootContext());        
+    public void setQueryModel(QueryModel model) {
+        queryModel = model;
+        explorerMgr.setRootContext(model.getRootContext());
     }
-    
+
 }

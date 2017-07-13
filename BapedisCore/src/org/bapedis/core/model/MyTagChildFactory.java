@@ -17,7 +17,7 @@ public class MyTagChildFactory extends ChildFactory<Label> {
 
     @Override
     protected boolean createKeys(List<Label> list) {
-        return false;
+        return true;
     }
     
 }

@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.model;
 
+import org.neo4j.graphdb.Label;
 import org.openide.nodes.Children;
 import org.openide.util.lookup.Lookups;
 
@@ -12,17 +13,18 @@ import org.openide.util.lookup.Lookups;
  *
  * @author loge
  */
-public class MyLabelNode extends MyLibraryNode {
+public class LabelNode extends MyLibraryNode {
 
-    private final MyLabels label;
+    private final Label label;
 
-    public MyLabelNode(MyLabels label) {
+    public LabelNode(Label label) {
         super(Children.LEAF,Lookups.singleton(label));
         this.label = label;
+        transferable.setTransferData(label);
     }
 
     @Override
     public String getDisplayName() {
-        return label.getDisplayName();
+        return label.name();
     }
 }

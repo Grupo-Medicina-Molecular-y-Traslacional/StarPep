@@ -23,7 +23,6 @@ import org.gephi.graph.api.Subgraph;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
@@ -84,7 +83,7 @@ public class PeptideDAOImpl implements PeptideDAO {
                 startNodes.add(graphDb.getNodeById(metadata.getUnderlyingNodeID()));
             }
 
-            Iterable<Node> peptideNodes = getPeptides(startNodes, queryModel.getLabels());
+            Iterable<Node> peptideNodes = getPeptides(startNodes);
             NeoPeptide neoPeptide;
             org.gephi.graph.api.Node graphNode, graphNeighborNode;
             org.gephi.graph.api.Edge graphEdge;
@@ -144,7 +143,7 @@ public class PeptideDAOImpl implements PeptideDAO {
         is_a, instance_of
     }
 
-    protected Iterable<Node> getPeptides(List<Node> startNodes, final Label[] labels) {
+    protected Iterable<Node> getPeptides(List<Node> startNodes) {
         Iterable<Node> nodes = graphDb.traversalDescription()
                 .breadthFirst()
                 .relationships(RELS.is_a, Direction.INCOMING)
@@ -153,19 +152,7 @@ public class PeptideDAOImpl implements PeptideDAO {
 
                     @Override
                     public Evaluation evaluate(Path path) {
-                        boolean accepted = false;
-                        if (path.endNode().hasLabel(DynamicLabel.label("Peptide"))) {
-                            accepted = true;
-                            if (labels != null) {
-                                for (Label label : labels) {
-                                    if (!path.endNode().hasLabel(label)) {
-                                        accepted = false;
-                                        break;
-                                    }
-                                }
-                            }
-
-                        }
+                        boolean accepted = path.endNode().hasLabel(DynamicLabel.label("Peptide"));
                         return accepted ? Evaluation.INCLUDE_AND_PRUNE : Evaluation.EXCLUDE_AND_CONTINUE;
                     }
                 })

@@ -8,7 +8,6 @@ package org.bapedis.core.ui;
 import java.awt.BorderLayout;
 import javax.swing.DefaultComboBoxModel;
 import org.bapedis.core.model.AnnotationType;
-import org.bapedis.core.model.LibraryNode;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.view.BeanTreeView;
 import org.openide.util.NbBundle;
@@ -33,7 +32,7 @@ public class MetadataPanel extends javax.swing.JPanel implements ExplorerManager
         
         centerPanel.add(view, BorderLayout.CENTER);
 
-        explorerMgr.setRootContext(new LibraryNode());
+//        explorerMgr.setRootContext(new LibraryNode());
         
         DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
         String NO_SELECTION = NbBundle.getMessage(MetadataPanel.class, "MetadataPanel.choose.text");

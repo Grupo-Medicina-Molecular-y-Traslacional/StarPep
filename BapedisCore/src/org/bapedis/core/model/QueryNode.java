@@ -8,6 +8,8 @@ package org.bapedis.core.model;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import javax.swing.Action;
+import org.bapedis.core.ui.actions.RemoveFromQueryModel;
 import org.neo4j.graphdb.Label;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
@@ -22,28 +24,44 @@ import org.openide.util.lookup.Lookups;
  */
 public class QueryNode extends AbstractNode {
 
+    protected final Metadata metadata;
     protected final QueryModel queryModel;
+    protected final Action[] actions;
 
     public QueryNode(QueryModel model) {
-        super(Children.create(new QueryModelChildFactory(model), true), Lookups.singleton(model));
-        this.queryModel = model;
-        setDisplayName(NbBundle.getMessage(QueryNode.class, "QueryNode.rootContext.name"));
+        this(model, null);
     }
 
-     @Override
+    public QueryNode(QueryModel queryModel, Metadata metadata) {
+        super(Children.create(new QueryModelChildFactory(queryModel), true), Lookups.singleton(queryModel));
+        this.metadata = metadata;
+        this.queryModel = queryModel;
+        if (metadata == null) {
+            setDisplayName(NbBundle.getMessage(QueryNode.class, "QueryNode.rootContext.name"));
+        } else {
+            setDisplayName(metadata.getName());
+        }
+        actions = new Action[]{new RemoveFromQueryModel()};
+    }
+
+    @Override
+    public Action[] getActions(boolean context) {
+        for (Action a : actions) {
+            a.setEnabled(metadata != null);
+        }
+        return actions;
+    }
+
+    @Override
     public PasteType getDropType(Transferable t, int action, int index) {
-        if (t.isDataFlavorSupported(LibraryNode.DATA_FLAVOR)) {
+        if (t.isDataFlavorSupported(MetadataNode.DATA_FLAVOR)) {
             try {
-                final Object transferData = t.getTransferData(LibraryNode.DATA_FLAVOR);
+                final Metadata transferData = (Metadata) t.getTransferData(MetadataNode.DATA_FLAVOR);
                 if (transferData != null) {
                     return new PasteType() {
                         @Override
                         public Transferable paste() throws IOException {
-                            if (transferData instanceof Label) {
-                                queryModel.add((Label) transferData);
-                            } else if (transferData instanceof Metadata) {
-                                queryModel.add((Metadata) transferData);
-                            }
+                            queryModel.add((Metadata) transferData);
                             return null;
                         }
                     };

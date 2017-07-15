@@ -23,53 +23,55 @@ import org.openide.explorer.view.BeanTreeView;
 import org.openide.util.Lookup;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
+import org.openide.util.NbPreferences;
 
 /**
  * Top component which displays something.
  */
 @ConvertAsProperties(
-        dtd = "-//org.bapedis.db.ui//LibraryExplorer//EN",
+        dtd = "-//org.bapedis.db.ui//QueryExplorer//EN",
         autostore = false
 )
 @TopComponent.Description(
-        preferredID = "LibraryExplorerTopComponent",
+        preferredID = "QueryExplorerTopComponent",
         //iconBase="SET/PATH/TO/ICON/HERE", 
         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
 @TopComponent.Registration(mode = "explorer", openAtStartup = true)
-@ActionID(category = "Window", id = "org.bapedis.db.ui.LibraryExplorerTopComponent")
+@ActionID(category = "Window", id = "org.bapedis.db.ui.QueryExplorerTopComponent")
 @ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.OpenActionRegistration(
-        displayName = "#CTL_LibraryExplorerAction",
-        preferredID = "LibraryExplorerTopComponent"
+        displayName = "#CTL_QueryExplorerAction",
+        preferredID = "QueryExplorerTopComponent"
 )
 @Messages({
-    "CTL_LibraryExplorerAction= Library",
-    "CTL_LibraryExplorerTopComponent=Library",
-    "HINT_LibraryExplorerTopComponent=Library window"
+    "CTL_QueryExplorerAction= Query",
+    "CTL_QueryExplorerTopComponent=Query",
+    "HINT_QueryExplorerTopComponent=Query window"
 })
-public final class LibraryExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener {
+public final class QueryExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener {
 
     protected final ProjectManager pc;
     protected final QueryPanel queryPanel;
-    protected final LibraryPanel libraryPanel;
+    protected final MetadataPanel metadataPanel;
+    private static final String AUTO_APPLY = "AUTO_APPLY";
 
-    public LibraryExplorerTopComponent() {
+    public QueryExplorerTopComponent() {
         initComponents();
 
         pc = Lookup.getDefault().lookup(ProjectManager.class);
 
-        setName(Bundle.CTL_LibraryExplorerTopComponent());
-        setToolTipText(Bundle.HINT_LibraryExplorerTopComponent());
+        setName(Bundle.CTL_QueryExplorerTopComponent());
+        setToolTipText(Bundle.HINT_QueryExplorerTopComponent());
 
-        libraryPanel = new LibraryPanel();
-        splitPane.setLeftComponent(libraryPanel);
-        
+        metadataPanel = new MetadataPanel();
         queryPanel = new QueryPanel();
-        splitPane.setRightComponent(queryPanel);
+
+        splitPane.setLeftComponent(queryPanel);
+        splitPane.setRightComponent(metadataPanel);
 
 //        associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));
-        
+        applyCheckBox.setSelected(NbPreferences.forModule(QueryModel.class).getBoolean(AUTO_APPLY, true));
     }
 
     /**
@@ -79,18 +81,35 @@ public final class LibraryExplorerTopComponent extends TopComponent implements W
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
+        applyCheckBox = new javax.swing.JCheckBox();
         splitPane = new javax.swing.JSplitPane();
 
-        setLayout(new java.awt.BorderLayout());
+        setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(applyCheckBox, org.openide.util.NbBundle.getMessage(QueryExplorerTopComponent.class, "QueryExplorerTopComponent.applyCheckBox.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 2, 0);
+        add(applyCheckBox, gridBagConstraints);
 
         splitPane.setBorder(null);
         splitPane.setDividerLocation(460);
         splitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-        add(splitPane, java.awt.BorderLayout.CENTER);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(splitPane, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox applyCheckBox;
     private javax.swing.JSplitPane splitPane;
     // End of variables declaration//GEN-END:variables
     @Override
@@ -127,7 +146,7 @@ public final class LibraryExplorerTopComponent extends TopComponent implements W
         QueryModel newModel = pc.getQueryModel(newWs);
         newModel.addPropertyChangeListener(this);
         queryPanel.setQueryModel(newModel);
-        highlightCategoryFor(newWs, true);        
+        highlightCategoryFor(newWs, true);
     }
 
     private void highlightCategoryFor(Workspace ws, boolean flag) {
@@ -141,7 +160,7 @@ public final class LibraryExplorerTopComponent extends TopComponent implements W
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        
+
     }
 
 }

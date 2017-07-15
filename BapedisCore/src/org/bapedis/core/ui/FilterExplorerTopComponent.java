@@ -138,8 +138,8 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 
         runButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/run.gif"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(runButton, org.openide.util.NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.runButton.text")); // NOI18N
+        runButton.setToolTipText(org.openide.util.NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.runButton.toolTipText")); // NOI18N
         runButton.setFocusable(false);
-        runButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         runButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 runButtonActionPerformed(evt);

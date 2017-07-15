@@ -39,29 +39,20 @@ public class QueryPanel extends javax.swing.JPanel implements ExplorerManager.Pr
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        topPanel = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
+        runButton = new javax.swing.JButton();
         centerPanel = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
-        topPanel.setPreferredSize(new java.awt.Dimension(400, 30));
-        java.awt.FlowLayout flowLayout1 = new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 0, 0);
-        flowLayout1.setAlignOnBaseline(true);
-        topPanel.setLayout(flowLayout1);
-
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/run.gif"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(QueryPanel.class, "QueryPanel.jButton1.text")); // NOI18N
-        jButton1.setToolTipText(org.openide.util.NbBundle.getMessage(QueryPanel.class, "QueryPanel.jButton1.toolTipText")); // NOI18N
-        topPanel.add(jButton1);
-
+        runButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/run.gif"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(runButton, org.openide.util.NbBundle.getMessage(QueryPanel.class, "QueryPanel.runButton.text")); // NOI18N
+        runButton.setToolTipText(org.openide.util.NbBundle.getMessage(QueryPanel.class, "QueryPanel.runButton.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 5;
-        gridBagConstraints.ipady = 2;
-        add(topPanel, gridBagConstraints);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
+        add(runButton, gridBagConstraints);
 
         centerPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -70,14 +61,14 @@ public class QueryPanel extends javax.swing.JPanel implements ExplorerManager.Pr
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(centerPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JPanel topPanel;
+    private javax.swing.JButton runButton;
     // End of variables declaration//GEN-END:variables
 
     @Override

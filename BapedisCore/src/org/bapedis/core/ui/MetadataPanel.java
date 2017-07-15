@@ -17,14 +17,14 @@ import org.openide.util.NbBundle;
  *
  * @author cicese
  */
-public class LibraryPanel extends javax.swing.JPanel implements ExplorerManager.Provider {
+public class MetadataPanel extends javax.swing.JPanel implements ExplorerManager.Provider {
 
     protected final ExplorerManager explorerMgr;
 
     /**
      * Creates new form LibraryPanel
      */
-    public LibraryPanel() {
+    public MetadataPanel() {
         initComponents();
         explorerMgr = new ExplorerManager();
 
@@ -36,7 +36,7 @@ public class LibraryPanel extends javax.swing.JPanel implements ExplorerManager.
         explorerMgr.setRootContext(new LibraryNode());
         
         DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
-        String NO_SELECTION = NbBundle.getMessage(LibraryPanel.class, "LibraryPanel.choose.text");
+        String NO_SELECTION = NbBundle.getMessage(MetadataPanel.class, "MetadataPanel.choose.text");
         comboBoxModel.addElement(NO_SELECTION);
         comboBoxModel.setSelectedItem(NO_SELECTION);
         
@@ -56,25 +56,18 @@ public class LibraryPanel extends javax.swing.JPanel implements ExplorerManager.
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        topPanel = new javax.swing.JPanel();
         comboBox = new javax.swing.JComboBox<>();
         centerPanel = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
-        topPanel.setPreferredSize(new java.awt.Dimension(400, 30));
-        topPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        comboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "--Select", " " }));
-        topPanel.add(comboBox);
-
+        comboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 5;
-        gridBagConstraints.ipady = 2;
-        add(topPanel, gridBagConstraints);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
+        add(comboBox, gridBagConstraints);
 
         centerPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -83,6 +76,7 @@ public class LibraryPanel extends javax.swing.JPanel implements ExplorerManager.
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(centerPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -90,7 +84,6 @@ public class LibraryPanel extends javax.swing.JPanel implements ExplorerManager.
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
     private javax.swing.JComboBox<String> comboBox;
-    private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 
     @Override

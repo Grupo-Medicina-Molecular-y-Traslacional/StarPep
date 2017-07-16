@@ -7,7 +7,7 @@ package org.bapedis.db.services;
 
 import java.util.Collection;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.db.dao.BioCategoryDAOImpl;
+import org.bapedis.db.dao.MetadataDAOImpl;
 import org.bapedis.core.model.Metadata;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -17,11 +17,11 @@ import org.openide.util.lookup.ServiceProvider;
  */
 public class MetadataManager {
 
-    protected BioCategoryDAOImpl categoryDAO;
+    protected MetadataDAOImpl categoryDAO;
     protected Metadata rootCategory;
 
     public MetadataManager() {
-        categoryDAO = new BioCategoryDAOImpl();
+        categoryDAO = new MetadataDAOImpl();
     }
 
     public Metadata getBioCategory() {

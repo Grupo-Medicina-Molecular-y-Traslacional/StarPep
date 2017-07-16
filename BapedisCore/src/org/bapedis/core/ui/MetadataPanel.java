@@ -6,10 +6,17 @@
 package org.bapedis.core.ui;
 
 import java.awt.BorderLayout;
+import java.awt.event.ItemEvent;
 import javax.swing.DefaultComboBoxModel;
 import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.model.AnnotationTypeChildFactory;
+import org.bapedis.core.model.MetadataChildFactory;
+import org.biojava.nbio.core.sequence.template.AbstractSequence;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.view.BeanTreeView;
+import org.openide.nodes.AbstractNode;
+import org.openide.nodes.Children;
+import org.openide.nodes.Node;
 import org.openide.util.NbBundle;
 
 /**
@@ -40,7 +47,7 @@ public class MetadataPanel extends javax.swing.JPanel implements ExplorerManager
         comboBoxModel.setSelectedItem(NO_SELECTION);
         
         for (AnnotationType aType : AnnotationType.values()){
-            comboBoxModel.addElement(aType);
+            comboBoxModel.addElement(new AnnotationItem(aType));
         }
         comboBox.setModel(comboBoxModel);
     }
@@ -61,6 +68,11 @@ public class MetadataPanel extends javax.swing.JPanel implements ExplorerManager
         setLayout(new java.awt.GridBagLayout());
 
         comboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
+        comboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                comboBoxItemStateChanged(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -79,6 +91,16 @@ public class MetadataPanel extends javax.swing.JPanel implements ExplorerManager
         add(centerPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void comboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboBoxItemStateChanged
+       if (evt.getStateChange() == ItemEvent.SELECTED){
+           if (comboBox.getSelectedItem() instanceof AnnotationItem){
+               explorerMgr.setRootContext(((AnnotationItem)comboBox.getSelectedItem()).getRootContext());
+           } else{
+               explorerMgr.setRootContext(Node.EMPTY);
+           }
+       }
+    }//GEN-LAST:event_comboBoxItemStateChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
@@ -89,5 +111,30 @@ public class MetadataPanel extends javax.swing.JPanel implements ExplorerManager
     public ExplorerManager getExplorerManager() {
         return explorerMgr;
     }
+    
+    private class AnnotationItem{
+        private final AnnotationType annotationType;
+        private final Node rootContext;
 
+        public AnnotationItem(AnnotationType annotationType) {
+            this.annotationType = annotationType;
+            rootContext = new AbstractNode(Children.create(new AnnotationTypeChildFactory(annotationType), true));
+        }
+
+        public AnnotationType getAnnotationType() {
+            return annotationType;
+        }
+
+        public Node getRootContext() {
+            return rootContext;
+        }
+
+        @Override
+        public String toString() {
+            return annotationType.getDisplayName(); 
+        }
+        
+        
+        
+    }
 }

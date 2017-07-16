@@ -6,26 +6,28 @@
 package org.bapedis.core.model;
 
 import java.util.List;
+import org.bapedis.core.spi.data.MetadataDAO;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Node;
 import org.openide.util.Lookup;
-import org.bapedis.core.spi.data.MetadataDAO;
 
 /**
  *
- * @author loge
+ * @author Home
  */
-public class MetadataChildFactory extends ChildFactory<Metadata> {
+public class AnnotationTypeChildFactory extends ChildFactory<Metadata> {
 
-    protected final Metadata metadata;
+    protected final MetadataDAO metadataDAO;
+    protected final AnnotationType annotationType;
 
-    public MetadataChildFactory(Metadata metadata) {
-        this.metadata = metadata;
+    public AnnotationTypeChildFactory(AnnotationType annotationType) {
+        this.annotationType = annotationType;
+        metadataDAO = Lookup.getDefault().lookup(MetadataDAO.class);
     }
 
     @Override
     protected boolean createKeys(List<Metadata> list) {
-        list.addAll(metadata.getChilds());
+        list.addAll(metadataDAO.getMetadata(annotationType));
         return true;
     }
 

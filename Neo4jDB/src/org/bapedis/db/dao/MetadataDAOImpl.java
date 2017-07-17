@@ -5,7 +5,6 @@
  */
 package org.bapedis.db.dao;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AnnotationType;
@@ -39,24 +38,24 @@ public class MetadataDAOImpl implements MetadataDAO{
     public List<Metadata> getMetadata(AnnotationType type) {
         switch(type){
             case NAME:
-                return getMetadata(DynamicLabel.label("Name"));
+                return getMetadata(type, DynamicLabel.label("Name"));
             case ORIGIN:
-                return getMetadata(DynamicLabel.label("Origin"));
+                return getMetadata(type, DynamicLabel.label("Origin"));
             case TARGET:
-                return getMetadata(DynamicLabel.label("Target"));
+                return getMetadata(type, DynamicLabel.label("Target"));
             case BIOCATEGORY:
                 return getBioCategory();
             case DATABASE:
-                return getMetadata(DynamicLabel.label("Database")); 
+                return getMetadata(type, DynamicLabel.label("Database")); 
             case LITERATURE:
-                return getMetadata(DynamicLabel.label("Literature"));
+                return getMetadata(type, DynamicLabel.label("Literature"));
             case CROSSREF:
-                return getMetadata(DynamicLabel.label("CrossRef"));
+                return getMetadata(type, DynamicLabel.label("CrossRef"));
         }
         return null;
     }
     
-    protected List<Metadata> getMetadata(Label label){
+    protected List<Metadata> getMetadata(AnnotationType type, Label label){
         List<Metadata> list = new LinkedList<>();
         try (Transaction tx = graphDb.beginTx()) {
             ResourceIterator<Node> nodes = graphDb.findNodes(label);
@@ -65,7 +64,7 @@ public class MetadataDAOImpl implements MetadataDAO{
                 Metadata metadata;
                 while(nodes.hasNext()){
                     node = nodes.next();
-                    metadata = new Metadata(node.getId(), node.getProperty("name").toString());
+                    metadata = new Metadata(node.getId(), node.getProperty("name").toString(), type);
                     list.add(metadata);
                 }
                 nodes.close();
@@ -86,7 +85,7 @@ public class MetadataDAOImpl implements MetadataDAO{
     }
     
     protected Metadata getBioCategory(Node root) {
-        Metadata category = new Metadata(root.getId(), root.getProperty("name").toString());
+        Metadata category = new Metadata(root.getId(), root.getProperty("name").toString(), AnnotationType.BIOCATEGORY);
         DynamicRelationshipType IS_A = DynamicRelationshipType.withName("is_a");
         Iterable<Relationship> rels = root.getRelationships(Direction.INCOMING, IS_A);
         for (Relationship rel : rels) {

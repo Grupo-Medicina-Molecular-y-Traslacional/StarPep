@@ -18,15 +18,17 @@ import java.util.Objects;
 public class Metadata {
     public static final String SELECTED = "Selected";
     protected boolean selected;
-    protected Long underlyingNodeID;
-    protected String name;
+    protected final Long underlyingNodeID;
+    protected final String name;
+    protected final AnnotationType annotationType;
     protected List<Metadata> childs;    
     private transient final PropertyChangeSupport changeSupport =
             new PropertyChangeSupport(this);
 
-    public Metadata(Long underlyingNodeID, String name) {
+    public Metadata(Long underlyingNodeID, String name, AnnotationType annotationType) {
         this.underlyingNodeID = underlyingNodeID;
         this.name = name;
+        this.annotationType = annotationType;
         selected = false;
         childs = new LinkedList<>();
     }
@@ -34,6 +36,10 @@ public class Metadata {
     public String getName(){
         return name;
     }
+
+    public AnnotationType getAnnotationType() {
+        return annotationType;
+    }        
 
     public boolean isSelected() {
         return selected;

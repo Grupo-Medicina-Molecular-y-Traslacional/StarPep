@@ -23,10 +23,12 @@ import org.gephi.graph.api.Subgraph;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
@@ -41,9 +43,11 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service = PeptideDAO.class)
 public class PeptideDAOImpl implements PeptideDAO {
-
+ 
     protected final ProjectManager pm;
     protected final GraphDatabaseService graphDb;
+    
+    protected final Label peptideLabel = DynamicLabel.label("Peptide");
     public final String PRO_ID = "id";
     public final String PRO_SEQ = "seq";
     public final String PRO_LENGHT = "length";
@@ -64,7 +68,7 @@ public class PeptideDAOImpl implements PeptideDAO {
     }
 
     @Override
-    public AttributesModel loadPeptides(GraphModel graphModel, QueryModel queryModel) {
+    public AttributesModel loadPeptides(QueryModel queryModel, GraphModel graphModel) {
         AttributesModel attrModel = new AttributesModel();
         attrModel.addAttribute(ID);
         attrModel.addAttribute(SEQ);
@@ -78,18 +82,25 @@ public class PeptideDAOImpl implements PeptideDAO {
         Subgraph graph = graphModel.getGraph(gView);
 
         try (Transaction tx = graphDb.beginTx()) {
-            List<Node> startNodes = new LinkedList<>();
-            for (Metadata metadata : queryModel.getMetadatas()) {
-                startNodes.add(graphDb.getNodeById(metadata.getUnderlyingNodeID()));
+            // Get peptides
+            ResourceIterator<Node> peptideNodes;
+            if (queryModel.countElements() > 0) {
+                List<Node> startNodes = new LinkedList<>();
+                for (Metadata metadata : queryModel.getMetadatas()) {
+                    startNodes.add(graphDb.getNodeById(metadata.getUnderlyingNodeID()));
+                }
+                peptideNodes = getPeptides(startNodes);
+            } else{
+                peptideNodes = getPeptides();
             }
 
-            Iterable<Node> peptideNodes = getPeptides(startNodes);
             NeoPeptide neoPeptide;
             org.gephi.graph.api.Node graphNode, graphNeighborNode;
             org.gephi.graph.api.Edge graphEdge;
             PeptideAttribute attr;
             String id, seq;
-            for (Node neoNode : peptideNodes) {
+            while(peptideNodes.hasNext()) {
+                Node neoNode = peptideNodes.next();
                 id = neoNode.getProperty(PRO_ID).toString();
                 seq = neoNode.getProperty(PRO_SEQ).toString();
                 // Fill graph
@@ -132,19 +143,24 @@ public class PeptideDAOImpl implements PeptideDAO {
                 }
                 attrModel.addPeptide(neoPeptide);
             }
+            peptideNodes.close();
             tx.success();
         }
 
-        attrModel.setGraph(graph);
+        graphModel.setVisibleView(gView);
         return attrModel;
     }
 
     private enum RELS implements RelationshipType {
         is_a, instance_of
     }
+    
+    protected ResourceIterator<Node> getPeptides(){
+        return graphDb.findNodes(peptideLabel);
+    }
 
-    protected Iterable<Node> getPeptides(List<Node> startNodes) {
-        Iterable<Node> nodes = graphDb.traversalDescription()
+    protected ResourceIterator<Node> getPeptides(List<Node> startNodes) {
+        ResourceIterator<Node> nodes = graphDb.traversalDescription()
                 .breadthFirst()
                 .relationships(RELS.is_a, Direction.INCOMING)
                 .relationships(RELS.instance_of, Direction.INCOMING)
@@ -152,13 +168,14 @@ public class PeptideDAOImpl implements PeptideDAO {
 
                     @Override
                     public Evaluation evaluate(Path path) {
-                        boolean accepted = path.endNode().hasLabel(DynamicLabel.label("Peptide"));
+                        boolean accepted = path.endNode().hasLabel(peptideLabel);
                         return accepted ? Evaluation.INCLUDE_AND_PRUNE : Evaluation.EXCLUDE_AND_CONTINUE;
                     }
                 })
                 .uniqueness(Uniqueness.NODE_GLOBAL)
                 .traverse(startNodes)
-                .nodes();
+                .nodes()
+                .iterator();
         return nodes;
     }
 

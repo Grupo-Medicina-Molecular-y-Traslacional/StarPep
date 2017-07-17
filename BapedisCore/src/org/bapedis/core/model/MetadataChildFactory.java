@@ -8,8 +8,6 @@ package org.bapedis.core.model;
 import java.util.List;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Node;
-import org.openide.util.Lookup;
-import org.bapedis.core.spi.data.MetadataDAO;
 
 /**
  *

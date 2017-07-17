@@ -19,5 +19,5 @@ public interface PeptideDAO {
     PeptideAttribute SEQ = new PeptideAttribute("seq", "Sequence", String.class);
     PeptideAttribute LENGHT = new PeptideAttribute("length", "Length", Integer.class);
     
-    AttributesModel loadPeptides(GraphModel graphModel, QueryModel queryModel);
+    AttributesModel loadPeptides(QueryModel queryModel, GraphModel graphModel);
 }

@@ -26,7 +26,7 @@ public class QueryPanel extends javax.swing.JPanel implements ExplorerManager.Pr
         initComponents();
         explorerMgr = new ExplorerManager();
         BeanTreeView view = new BeanTreeView();
-        centerPanel.add(view, BorderLayout.CENTER);
+        add(view, BorderLayout.CENTER);
     }
 
     /**
@@ -37,38 +37,12 @@ public class QueryPanel extends javax.swing.JPanel implements ExplorerManager.Pr
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
-        runButton = new javax.swing.JButton();
-        centerPanel = new javax.swing.JPanel();
-
-        setLayout(new java.awt.GridBagLayout());
-
-        runButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/run.gif"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(runButton, org.openide.util.NbBundle.getMessage(QueryPanel.class, "QueryPanel.runButton.text")); // NOI18N
-        runButton.setToolTipText(org.openide.util.NbBundle.getMessage(QueryPanel.class, "QueryPanel.runButton.toolTipText")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
-        add(runButton, gridBagConstraints);
-
-        centerPanel.setLayout(new java.awt.BorderLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(centerPanel, gridBagConstraints);
+        setLayout(new java.awt.BorderLayout());
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel centerPanel;
-    private javax.swing.JButton runButton;
     // End of variables declaration//GEN-END:variables
 
     @Override

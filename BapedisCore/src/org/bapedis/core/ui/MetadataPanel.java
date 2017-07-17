@@ -10,8 +10,6 @@ import java.awt.event.ItemEvent;
 import javax.swing.DefaultComboBoxModel;
 import org.bapedis.core.model.AnnotationType;
 import org.bapedis.core.model.AnnotationTypeChildFactory;
-import org.bapedis.core.model.MetadataChildFactory;
-import org.biojava.nbio.core.sequence.template.AbstractSequence;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.view.BeanTreeView;
 import org.openide.nodes.AbstractNode;
@@ -38,8 +36,6 @@ public class MetadataPanel extends javax.swing.JPanel implements ExplorerManager
         view.setRootVisible(false);
         
         centerPanel.add(view, BorderLayout.CENTER);
-
-//        explorerMgr.setRootContext(new LibraryNode());
         
         DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
         String NO_SELECTION = NbBundle.getMessage(MetadataPanel.class, "MetadataPanel.choose.text");
@@ -77,7 +73,7 @@ public class MetadataPanel extends javax.swing.JPanel implements ExplorerManager
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 0);
         add(comboBox, gridBagConstraints);
 
         centerPanel.setLayout(new java.awt.BorderLayout());
@@ -87,7 +83,6 @@ public class MetadataPanel extends javax.swing.JPanel implements ExplorerManager
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(centerPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 

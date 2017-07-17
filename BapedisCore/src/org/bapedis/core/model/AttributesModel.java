@@ -27,7 +27,6 @@ public class AttributesModel {
 
     protected final HashMap<String, PeptideAttribute> attrsMap;
     protected List<PeptideNode> nodeList;
-    protected Graph graph;
     private final PeptideNodeContainer container;
     protected QuickFilter quickFilter;
     public static final String CHANGED_FILTER = "quickFilter";
@@ -88,15 +87,7 @@ public class AttributesModel {
 
     public List<PeptideNode> getNodeList() {
         return nodeList;
-    }        
-
-    public Graph getGraph() {
-        return graph;
-    }
-
-    public void setGraph(Graph graph) {
-        this.graph = graph;
-    }        
+    }      
 
     public void addPeptide(Peptide peptide) {
         nodeList.add(new PeptideNode(peptide));

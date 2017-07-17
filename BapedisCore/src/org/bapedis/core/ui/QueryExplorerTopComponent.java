@@ -8,14 +8,21 @@ package org.bapedis.core.ui;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
+import javax.swing.SwingWorker;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
+import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.QueryModel;
+import org.bapedis.core.spi.data.PeptideDAO;
+import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.GraphView;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
@@ -81,31 +88,53 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
 
         applyCheckBox = new javax.swing.JCheckBox();
         splitPane = new javax.swing.JSplitPane();
+        runButton = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(applyCheckBox, org.openide.util.NbBundle.getMessage(QueryExplorerTopComponent.class, "QueryExplorerTopComponent.applyCheckBox.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 2, 0);
         add(applyCheckBox, gridBagConstraints);
 
         splitPane.setBorder(null);
-        splitPane.setDividerLocation(460);
+        splitPane.setDividerLocation(260);
         splitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(splitPane, gridBagConstraints);
+
+        runButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/run.gif"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(runButton, org.openide.util.NbBundle.getMessage(QueryExplorerTopComponent.class, "QueryExplorerTopComponent.runButton.text")); // NOI18N
+        runButton.setToolTipText(org.openide.util.NbBundle.getMessage(QueryExplorerTopComponent.class, "QueryExplorerTopComponent.runButton.toolTipText")); // NOI18N
+        runButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                runButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
+        add(runButton, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
+        runQuery();
+    }//GEN-LAST:event_runButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox applyCheckBox;
+    private javax.swing.JButton runButton;
     private javax.swing.JSplitPane splitPane;
     // End of variables declaration//GEN-END:variables
     @Override
@@ -137,26 +166,59 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         if (oldWs != null) {
             QueryModel oldModel = pc.getQueryModel(oldWs);
             oldModel.removePropertyChangeListener(this);
-            highlightCategoryFor(oldWs, false);
         }
         QueryModel newModel = pc.getQueryModel(newWs);
         newModel.addPropertyChangeListener(this);
         queryPanel.setQueryModel(newModel);
-        highlightCategoryFor(newWs, true);
-    }
-
-    private void highlightCategoryFor(Workspace ws, boolean flag) {
-        Collection<? extends Metadata> categories = ws.getLookup().lookupAll(Metadata.class);
-        if (categories != null) {
-            for (Metadata category : categories) {
-                category.setSelected(flag);
-            }
-        }
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getSource() instanceof QueryModel) {
+            switch (evt.getPropertyName()) {
+                case QueryModel.ADDED_METADATA:
+                case QueryModel.REMOVED_METADATA:
+                    if (applyCheckBox.isSelected()) {
+                        runQuery();
+                    }
+            }
+        }
+    }
 
+    private void runQuery() {
+        SwingWorker<AttributesModel, Void> worker = new SwingWorker<AttributesModel, Void>() {
+            private final Workspace workspace = pc.getCurrentWorkspace();
+            private GraphView oldView;
+
+            @Override
+            protected AttributesModel doInBackground() throws Exception {
+                PeptideDAO dao = Lookup.getDefault().lookup(PeptideDAO.class);
+                QueryModel queryModel = pc.getQueryModel(workspace);
+                GraphModel graphModel = pc.getGraphModel(workspace);
+                oldView = graphModel.getVisibleView();
+                return dao.loadPeptides(queryModel, graphModel);
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    AttributesModel newModel = get();
+                    AttributesModel oldModel = pc.getAttributesModel(workspace);
+                    if (oldModel != null) {
+                        workspace.remove(oldModel);                                                
+                    }
+                    if (!oldView.isMainView()){
+                        pc.getGraphModel(workspace).destroyView(oldView);
+                    }
+                    workspace.add(newModel);
+                } catch (InterruptedException ex) {
+                    Exceptions.printStackTrace(ex);
+                } catch (ExecutionException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            }
+        };
+        worker.execute();
     }
 
 }

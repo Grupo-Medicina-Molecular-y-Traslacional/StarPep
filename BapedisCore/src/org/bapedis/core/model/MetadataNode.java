@@ -26,27 +26,27 @@ public class MetadataNode extends AbstractNode implements Transferable, Property
 
     public static final DataFlavor DATA_FLAVOR = new DataFlavor(MetadataNode.class, "metadataNode");
     protected final Action[] actions;
+    protected final Metadata metadata;
 
     public MetadataNode(Metadata metadata) {
         super(metadata.hasChild() ? Children.create(new MetadataChildFactory(metadata), false) : Children.LEAF, Lookups.singleton(metadata));
         metadata.addPropertyChangeListener(this);
+        this.metadata = metadata;
         setDisplayName(metadata.getName());
-        actions = new Action[]{new AddToQueryModel(), new RemoveFromQueryModel()};
-    }
-
-    public Metadata getMetadata() {
-        return getLookup().lookup(Metadata.class);
+        actions = new Action[]{new AddToQueryModel(metadata), new RemoveFromQueryModel(metadata)};
     }
 
     @Override
     public Action[] getActions(boolean context) {
+        actions[0].setEnabled(!metadata.isSelected());
+        actions[1].setEnabled(metadata.isSelected());
         return actions;
-    }           
+    }
 
     @Override
     public String getHtmlDisplayName() {
-        Metadata category = getLookup().lookup(Metadata.class);
-        if (category.isSelected()) {
+        Metadata metadata = getLookup().lookup(Metadata.class);
+        if (metadata.isSelected()) {
             return "<b>" + getDisplayName() + "</b>";
         }
         return getDisplayName();
@@ -54,16 +54,16 @@ public class MetadataNode extends AbstractNode implements Transferable, Property
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        Metadata category = getLookup().lookup(Metadata.class);
+        Metadata metadata = getLookup().lookup(Metadata.class);
         if (evt.getPropertyName().equals(Metadata.SELECTED)) {
-            fireDisplayNameChange("", category.getName());
+            fireDisplayNameChange("", metadata.getName());
         }
     }
-    
+
     @Override
     public Transferable drag() throws IOException {
         return this;
-    }    
+    }
 
     @Override
     public DataFlavor[] getTransferDataFlavors() {
@@ -78,7 +78,7 @@ public class MetadataNode extends AbstractNode implements Transferable, Property
     @Override
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
         if (flavor == DATA_FLAVOR) {
-            return getMetadata();
+            return metadata;
         } else {
             throw new UnsupportedFlavorException(flavor);
         }

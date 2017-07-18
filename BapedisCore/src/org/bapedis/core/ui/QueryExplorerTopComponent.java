@@ -196,7 +196,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
                 protected AttributesModel doInBackground() throws Exception {
                     PeptideDAO dao = Lookup.getDefault().lookup(PeptideDAO.class);
                     oldView = graphModel.getVisibleView();
-                    return dao.loadPeptides(queryModel, graphModel);
+                    return dao.getPeptides(queryModel, graphModel);
                 }
 
                 @Override

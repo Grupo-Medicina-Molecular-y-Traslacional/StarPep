@@ -110,33 +110,6 @@ public class NeoPeptideNode extends PeptideNode {
             sheet.put(set);
         }
         
-        // Databases
-//        set = Sheet.createPropertiesSet();
-//        set.setName("databases");
-//        set.setDisplayName(NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.databases"));
-//        StringTokenizer tokenizer;
-//        String label, value;
-//        for (String xref : ((NeoPeptide) peptide).getXref()) {
-//            tokenizer = new StringTokenizer(xref, ":");
-//            label = tokenizer.nextToken().trim();
-//            value = tokenizer.nextToken().trim();
-//            PropertySupport.ReadOnly property = createPropertyField(label, label, label, String.class, value);
-//            set.put(property);
-//        }
-//        sheet.put(set);
-        
-        
-        // Descriptors
-//        set = Sheet.createPropertiesSet();
-//        set.setName("attributes");
-//        set.setDisplayName(NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.attributes"));
-//        for (PeptideAttribute attr : peptide.getAttributes()) {
-//            property = createPropertyField(attr.getId(), attr.getId(), attr.getId(), attr.getType(), peptide.getAttributeValue(attr));
-//            set.put(property);
-//        }
-//        set.put(property);
-//        set.setValue("tabName", NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.attributes.tabName"));
-//        sheet.put(set);
         
         return sheet;
     }

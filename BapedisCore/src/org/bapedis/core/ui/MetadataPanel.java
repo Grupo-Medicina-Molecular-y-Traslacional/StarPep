@@ -10,6 +10,7 @@ import java.awt.event.ItemEvent;
 import javax.swing.DefaultComboBoxModel;
 import org.bapedis.core.model.AnnotationType;
 import org.bapedis.core.model.AnnotationTypeChildFactory;
+import org.gephi.graph.api.GraphModel;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.view.BeanTreeView;
 import org.openide.nodes.AbstractNode;

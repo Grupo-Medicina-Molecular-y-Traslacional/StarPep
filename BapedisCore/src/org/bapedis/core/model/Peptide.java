@@ -9,8 +9,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import org.bapedis.core.spi.data.PeptideDAO;
+import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
+import org.gephi.graph.api.NodeIterable;
 
 /**
  *
@@ -57,6 +59,16 @@ public class Peptide {
 
     public Graph getGraph() {
         return graph;
+    }
+    
+    public NodeIterable getNeighbors(AnnotationType aType) {
+        int relType = graph.getModel().getEdgeType(aType.getRelationType());
+        return relType != -1 ? graph.getNeighbors(graphNode, relType): new NodeIterable.NodeIterableEmpty();
+    }    
+    
+    public Edge getEdge(Node neighbor, AnnotationType aType){
+        int relType = graph.getModel().getEdgeType(aType.getRelationType());
+       return relType != -1 ? graph.getEdge(graphNode, neighbor, relType): null;
     }
     
 

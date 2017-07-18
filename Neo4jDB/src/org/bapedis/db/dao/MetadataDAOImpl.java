@@ -28,11 +28,13 @@ import org.neo4j.graphdb.ResourceIterator;
  */
 @ServiceProvider(service = MetadataDAO.class)
 public class MetadataDAOImpl implements MetadataDAO{
-    protected final GraphDatabaseService graphDb;
-    
+    private final String PRO_NAME = "name";
+    private final GraphDatabaseService graphDb;
+
     public MetadataDAOImpl() {
         graphDb = Neo4jDB.getDbService();
     }
+    
     
     @Override
     public List<Metadata> getMetadata(AnnotationType type) {
@@ -64,7 +66,7 @@ public class MetadataDAOImpl implements MetadataDAO{
                 Metadata metadata;
                 while(nodes.hasNext()){
                     node = nodes.next();
-                    metadata = new Metadata(node.getId(), node.getProperty("name").toString(), type);
+                    metadata = new Metadata(node.getId(), node.getProperty(PRO_NAME).toString(), type);
                     list.add(metadata);
                 }
                 nodes.close();
@@ -76,7 +78,7 @@ public class MetadataDAOImpl implements MetadataDAO{
     
     protected List<Metadata> getBioCategory() {
         try (Transaction tx = graphDb.beginTx()) {
-            Node node = graphDb.findNode(MyLabel.BioCategory, "name", "Peptide");
+            Node node = graphDb.findNode(MyLabel.BioCategory, PRO_NAME, "Peptide");
             Metadata category = getBioCategory(node);
             tx.success();
             return category.getChilds();            
@@ -84,7 +86,7 @@ public class MetadataDAOImpl implements MetadataDAO{
     }
     
     protected Metadata getBioCategory(Node root) {
-        Metadata category = new Metadata(root.getId(), root.getProperty("name").toString(), AnnotationType.BIOCATEGORY);
+        Metadata category = new Metadata(root.getId(), root.getProperty(PRO_NAME).toString(), AnnotationType.BIOCATEGORY);
         Iterable<Relationship> rels = root.getRelationships(Direction.INCOMING, MyRelationship.is_a);
         for (Relationship rel : rels) {
             Node startNode = rel.getStartNode();

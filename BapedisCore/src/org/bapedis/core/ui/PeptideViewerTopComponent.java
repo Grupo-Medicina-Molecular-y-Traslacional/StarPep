@@ -22,6 +22,7 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.PeptideAttribute;
+import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.impl.AttributeFilter;
 import org.bapedis.core.spi.filters.impl.FilterHelper;
@@ -317,14 +318,14 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         }
     }
 
-    public void setBusyLabel(boolean busy) {
+    private void setBusyLabel(boolean busy) {
         CardLayout cl = (CardLayout) centerPanel.getLayout();
         busyLabel.setBusy(busy);
         cl.show(centerPanel, busy ? "busyCard" : "dataCard");
         topPanel.setVisible(!busy);
     }
 
-    public void setErrorLabel() {
+    private void setErrorLabel() {
         CardLayout cl = (CardLayout) centerPanel.getLayout();
         busyLabel.setBusy(false);
         cl.show(centerPanel, "errorCard");
@@ -361,10 +362,16 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             if (oldAttrModel != null) {
                 oldAttrModel.removeQuickFilterChangeListener(this);
             }
+            QueryModel oldQueryModel = pc.getQueryModel(oldWs);
+            oldQueryModel.removePropertyChangeListener(this);
         }
         peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
         peptideLkpResult.addLookupListener(this);
 
+        QueryModel queryModel = pc.getQueryModel(newWs);
+        queryModel.addPropertyChangeListener(this);
+        setBusyLabel(queryModel.isRunning());
+        
         AttributesModel peptidesModel = pc.getAttributesModel(newWs);
         setData(peptidesModel);
     }
@@ -381,7 +388,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
                         setData(attrModel);
                     }
                 });
-                
+
             }
         }
     }
@@ -394,7 +401,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         this.currentModel = attrModel;
         explorerMgr.setRootContext(currentModel == null ? Node.EMPTY : currentModel.getRootNode());
         setQuickFilter();
-        if (currentModel != null){
+        if (currentModel != null) {
             currentModel.addQuickFilterChangeListener(this);
         }
     }
@@ -418,6 +425,10 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         if (evt.getSource().equals(currentModel)
                 && evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
             setQuickFilter();
+        } else if (evt.getSource() instanceof QueryModel) {
+            if (evt.getPropertyName().equals(QueryModel.RUNNING)) {
+                setBusyLabel(((QueryModel) evt.getSource()).isRunning());
+            }
         }
     }
 

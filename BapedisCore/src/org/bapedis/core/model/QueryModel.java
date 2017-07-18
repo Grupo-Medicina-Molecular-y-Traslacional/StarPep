@@ -9,6 +9,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.openide.nodes.Node;
 
 /**
@@ -22,11 +23,14 @@ public class QueryModel {
     protected transient final PropertyChangeSupport propertyChangeSupport;
     protected final Node rootContext;
     private final List<Metadata> metadatas;
+    public static final String RUNNING = "RUNNING";
+    protected final AtomicBoolean running;
 
     public QueryModel() {
         propertyChangeSupport = new PropertyChangeSupport(this);
         rootContext = new QueryNode(this);
         metadatas = new LinkedList<>();
+        running = new AtomicBoolean(false);
     }
 
     public Metadata[] getMetadatas() {
@@ -71,5 +75,15 @@ public class QueryModel {
     public int countElements(){
         return metadatas.size();
     }
+    
+    public boolean isRunning() {
+        return running.get();
+    }
+
+    public void setRunning(boolean running) {
+        boolean oldValue = this.running.get();
+        this.running.set(running);
+        propertyChangeSupport.firePropertyChange(RUNNING, oldValue, running);
+    }    
 
 }

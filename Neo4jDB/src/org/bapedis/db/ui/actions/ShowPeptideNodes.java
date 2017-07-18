@@ -54,7 +54,7 @@ public class ShowPeptideNodes extends AbstractAction implements Presenter.Popup 
     @Override
     public void actionPerformed(ActionEvent e) {
         final PeptideViewerTopComponent peptideTC = (PeptideViewerTopComponent) WindowManager.getDefault().findTopComponent("PeptideViewerTopComponent");
-        peptideTC.setBusyLabel(true);
+//        peptideTC.setBusyLabel(true);
         peptideTC.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         peptideTC.open();
         peptideTC.requestActive();
@@ -85,10 +85,10 @@ public class ShowPeptideNodes extends AbstractAction implements Presenter.Popup 
             protected void done() {
                 try {
                     get();
-                    peptideTC.setBusyLabel(false);
+//                    peptideTC.setBusyLabel(false);
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    peptideTC.setErrorLabel();
+//                    peptideTC.setErrorLabel();
                 } finally {
                     peptideTC.setCursor(Cursor.getDefaultCursor());
                 }

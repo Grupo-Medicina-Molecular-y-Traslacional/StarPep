@@ -7,14 +7,12 @@ package org.bapedis.core.ui;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.spi.data.PeptideDAO;
 import org.gephi.graph.api.GraphModel;
@@ -186,39 +184,45 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
     }
 
     private void runQuery() {
-        SwingWorker<AttributesModel, Void> worker = new SwingWorker<AttributesModel, Void>() {
-            private final Workspace workspace = pc.getCurrentWorkspace();
-            private GraphView oldView;
+        final Workspace workspace = pc.getCurrentWorkspace();
+        final QueryModel queryModel = pc.getQueryModel(workspace);
+        final GraphModel graphModel = pc.getGraphModel(workspace);
 
-            @Override
-            protected AttributesModel doInBackground() throws Exception {
-                PeptideDAO dao = Lookup.getDefault().lookup(PeptideDAO.class);
-                QueryModel queryModel = pc.getQueryModel(workspace);
-                GraphModel graphModel = pc.getGraphModel(workspace);
-                oldView = graphModel.getVisibleView();
-                return dao.loadPeptides(queryModel, graphModel);
-            }
+        if (!queryModel.isRunning()) {
+            SwingWorker<AttributesModel, Void> worker = new SwingWorker<AttributesModel, Void>() {
+                private GraphView oldView;
 
-            @Override
-            protected void done() {
-                try {
-                    AttributesModel newModel = get();
-                    AttributesModel oldModel = pc.getAttributesModel(workspace);
-                    if (oldModel != null) {
-                        workspace.remove(oldModel);                                                
-                    }
-                    if (!oldView.isMainView()){
-                        pc.getGraphModel(workspace).destroyView(oldView);
-                    }
-                    workspace.add(newModel);
-                } catch (InterruptedException ex) {
-                    Exceptions.printStackTrace(ex);
-                } catch (ExecutionException ex) {
-                    Exceptions.printStackTrace(ex);
+                @Override
+                protected AttributesModel doInBackground() throws Exception {
+                    PeptideDAO dao = Lookup.getDefault().lookup(PeptideDAO.class);
+                    oldView = graphModel.getVisibleView();
+                    return dao.loadPeptides(queryModel, graphModel);
                 }
-            }
-        };
-        worker.execute();
+
+                @Override
+                protected void done() {
+                    try {
+                        AttributesModel newModel = get();
+                        AttributesModel oldModel = pc.getAttributesModel(workspace);
+                        if (oldModel != null) {
+                            workspace.remove(oldModel);
+                        }
+                        if (!oldView.isMainView()) {
+                            graphModel.destroyView(oldView);
+                        }
+                        workspace.add(newModel);
+                    } catch (InterruptedException ex) {
+                        Exceptions.printStackTrace(ex);
+                    } catch (ExecutionException ex) {
+                        Exceptions.printStackTrace(ex);
+                    } finally {
+                        queryModel.setRunning(false);
+                    }
+                }
+            };
+            queryModel.setRunning(true);
+            worker.execute();
+        }
     }
 
 }

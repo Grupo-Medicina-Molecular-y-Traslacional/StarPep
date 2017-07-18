@@ -20,6 +20,7 @@ import org.gephi.graph.api.GraphFactory;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
 import org.gephi.graph.api.Subgraph;
+import org.gephi.graph.api.Table;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -43,10 +44,10 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service = PeptideDAO.class)
 public class PeptideDAOImpl implements PeptideDAO {
- 
+
     protected final ProjectManager pm;
     protected final GraphDatabaseService graphDb;
-    
+
     protected final Label peptideLabel = DynamicLabel.label("Peptide");
     public final String PRO_ID = "id";
     public final String PRO_SEQ = "seq";
@@ -60,11 +61,6 @@ public class PeptideDAOImpl implements PeptideDAO {
     public PeptideDAOImpl() {
         graphDb = Neo4jDB.getDbService();
         pm = Lookup.getDefault().lookup(ProjectManager.class);
-
-//        Table nodeTable = graphModel.getNodeTable();
-//        nodeTable.addColumn(PRO_ID, long.class);
-//        Table edgeTable = graphModel.getEdgeTable();
-//        edgeTable.addColumn(PRO_XREF, String[].class);
     }
 
     @Override
@@ -73,6 +69,16 @@ public class PeptideDAOImpl implements PeptideDAO {
         attrModel.addAttribute(ID);
         attrModel.addAttribute(SEQ);
         attrModel.addAttribute(LENGHT);
+
+//        Table nodeTable = graphModel.getNodeTable();
+//        if (!nodeTable.hasColumn(PRO_ID)) {
+//            nodeTable.addColumn(PRO_ID, long.class);
+//        }
+
+        Table edgeTable = graphModel.getEdgeTable();
+        if (!edgeTable.hasColumn(PRO_XREF)) {
+            edgeTable.addColumn(PRO_XREF, String[].class);
+        }
 
         for (AnnotationType aType : AnnotationType.values()) {
             attrModel.addAttribute(new PeptideAttribute(aType.name(), aType.getDisplayName(), String.class));
@@ -90,7 +96,7 @@ public class PeptideDAOImpl implements PeptideDAO {
                     startNodes.add(graphDb.getNodeById(metadata.getUnderlyingNodeID()));
                 }
                 peptideNodes = getPeptides(startNodes);
-            } else{
+            } else {
                 peptideNodes = getPeptides();
             }
 
@@ -99,7 +105,7 @@ public class PeptideDAOImpl implements PeptideDAO {
             org.gephi.graph.api.Edge graphEdge;
             PeptideAttribute attr;
             String id, seq;
-            while(peptideNodes.hasNext()) {
+            while (peptideNodes.hasNext()) {
                 Node neoNode = peptideNodes.next();
                 id = neoNode.getProperty(PRO_ID).toString();
                 seq = neoNode.getProperty(PRO_SEQ).toString();
@@ -154,8 +160,8 @@ public class PeptideDAOImpl implements PeptideDAO {
     private enum RELS implements RelationshipType {
         is_a, instance_of
     }
-    
-    protected ResourceIterator<Node> getPeptides(){
+
+    protected ResourceIterator<Node> getPeptides() {
         return graphDb.findNodes(peptideLabel);
     }
 

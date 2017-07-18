@@ -15,6 +15,8 @@ import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.data.PeptideDAO;
 import org.bapedis.core.model.AnnotationType;
+import org.bapedis.db.model.MyLabel;
+import org.bapedis.db.model.MyRelationship;
 import org.bapedis.db.model.NeoPeptide;
 import org.gephi.graph.api.GraphFactory;
 import org.gephi.graph.api.GraphModel;
@@ -22,18 +24,16 @@ import org.gephi.graph.api.GraphView;
 import org.gephi.graph.api.Subgraph;
 import org.gephi.graph.api.Table;
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.graphdb.traversal.Evaluators;
+import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Uniqueness;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
@@ -48,7 +48,6 @@ public class PeptideDAOImpl implements PeptideDAO {
     protected final ProjectManager pm;
     protected final GraphDatabaseService graphDb;
 
-    protected final Label peptideLabel = DynamicLabel.label("Peptide");
     public final String PRO_ID = "id";
     public final String PRO_SEQ = "seq";
     public final String PRO_LENGHT = "length";
@@ -157,24 +156,21 @@ public class PeptideDAOImpl implements PeptideDAO {
         return attrModel;
     }
 
-    private enum RELS implements RelationshipType {
-        is_a, instance_of
-    }
-
     protected ResourceIterator<Node> getPeptides() {
-        return graphDb.findNodes(peptideLabel);
+        return graphDb.findNodes(MyLabel.Peptide);
     }
 
     protected ResourceIterator<Node> getPeptides(List<Node> startNodes) {
-        ResourceIterator<Node> nodes = graphDb.traversalDescription()
-                .breadthFirst()
-                .relationships(RELS.is_a, Direction.INCOMING)
-                .relationships(RELS.instance_of, Direction.INCOMING)
-                .evaluator(new Evaluator() {
+        TraversalDescription td = graphDb.traversalDescription().breadthFirst();
+        for(MyRelationship edge: MyRelationship.values()){
+            td = td.relationships(edge, Direction.INCOMING);
+        }
+        
+        ResourceIterator<Node> nodes = td.evaluator(new Evaluator() {
 
                     @Override
                     public Evaluation evaluate(Path path) {
-                        boolean accepted = path.endNode().hasLabel(peptideLabel);
+                        boolean accepted = path.endNode().hasLabel(MyLabel.Peptide);
                         return accepted ? Evaluation.INCLUDE_AND_PRUNE : Evaluation.EXCLUDE_AND_CONTINUE;
                     }
                 })

@@ -12,14 +12,14 @@ import org.bapedis.db.Neo4jDB;
 import org.bapedis.core.model.Metadata;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.openide.util.lookup.ServiceProvider;
 import org.bapedis.core.spi.data.MetadataDAO;
+import org.bapedis.db.model.MyLabel;
+import org.bapedis.db.model.MyRelationship;
 import org.neo4j.graphdb.ResourceIterator;
 
 /**
@@ -38,19 +38,19 @@ public class MetadataDAOImpl implements MetadataDAO{
     public List<Metadata> getMetadata(AnnotationType type) {
         switch(type){
             case NAME:
-                return getMetadata(type, DynamicLabel.label("Name"));
+                return getMetadata(type, MyLabel.Name);
             case ORIGIN:
-                return getMetadata(type, DynamicLabel.label("Origin"));
+                return getMetadata(type, MyLabel.Origin);
             case TARGET:
-                return getMetadata(type, DynamicLabel.label("Target"));
+                return getMetadata(type, MyLabel.Target);
             case BIOCATEGORY:
                 return getBioCategory();
             case DATABASE:
-                return getMetadata(type, DynamicLabel.label("Database")); 
+                return getMetadata(type, MyLabel.Database); 
             case LITERATURE:
-                return getMetadata(type, DynamicLabel.label("Literature"));
+                return getMetadata(type, MyLabel.Literature);
             case CROSSREF:
-                return getMetadata(type, DynamicLabel.label("CrossRef"));
+                return getMetadata(type, MyLabel.CrossRef);
         }
         return null;
     }
@@ -76,8 +76,7 @@ public class MetadataDAOImpl implements MetadataDAO{
     
     protected List<Metadata> getBioCategory() {
         try (Transaction tx = graphDb.beginTx()) {
-            Label label = DynamicLabel.label("BioCategory");
-            Node node = graphDb.findNode(label, "name", "Peptide");
+            Node node = graphDb.findNode(MyLabel.BioCategory, "name", "Peptide");
             Metadata category = getBioCategory(node);
             tx.success();
             return category.getChilds();            
@@ -86,8 +85,7 @@ public class MetadataDAOImpl implements MetadataDAO{
     
     protected Metadata getBioCategory(Node root) {
         Metadata category = new Metadata(root.getId(), root.getProperty("name").toString(), AnnotationType.BIOCATEGORY);
-        DynamicRelationshipType IS_A = DynamicRelationshipType.withName("is_a");
-        Iterable<Relationship> rels = root.getRelationships(Direction.INCOMING, IS_A);
+        Iterable<Relationship> rels = root.getRelationships(Direction.INCOMING, MyRelationship.is_a);
         for (Relationship rel : rels) {
             Node startNode = rel.getStartNode();
             category.addChild(getBioCategory(startNode));

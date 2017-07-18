@@ -10,7 +10,6 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.model.AnnotationType;
-import org.bapedis.db.model.NeoPeptide;
 import org.openide.util.NbBundle;
 
 /**
@@ -44,8 +43,7 @@ public class PDBFilter implements Filter {
     @Override
     public boolean accept(Peptide peptide) {
         boolean accepted = false;
-        NeoPeptide neoPeptide = (NeoPeptide) peptide;
-        String[] crossRefs = neoPeptide.getAnnotationValues(AnnotationType.CROSSREF);
+        String[] crossRefs = peptide.getAnnotationValues(AnnotationType.CROSSREF);
         StringTokenizer tokenizer;
         String db;
         for (String crossRef : crossRefs) {

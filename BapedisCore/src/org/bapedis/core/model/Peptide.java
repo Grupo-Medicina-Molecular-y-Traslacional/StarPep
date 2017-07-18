@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -70,6 +71,15 @@ public class Peptide {
         int relType = graph.getModel().getEdgeType(aType.getRelationType());
        return relType != -1 ? graph.getEdge(graphNode, neighbor, relType): null;
     }
+    
+    public String[] getAnnotationValues(AnnotationType aType) {
+        NodeIterable neighbors = getNeighbors(aType);
+        ArrayList<String> values = new ArrayList<>();
+        for(Node node: neighbors){
+            values.add((String)node.getAttribute("name"));
+        }
+        return values.toArray(new String[0]);
+    }    
     
 
     @Override

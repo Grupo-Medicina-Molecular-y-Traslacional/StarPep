@@ -5,14 +5,8 @@
  */
 package org.bapedis.db;
 
-import org.bapedis.core.model.Workspace;
-import org.bapedis.core.services.ProjectManager;
-import org.bapedis.core.model.Metadata;
-import org.bapedis.db.services.MetadataManager;
-import org.bapedis.db.services.NeoPeptideManager;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.openide.modules.ModuleInstall;
-import org.openide.util.Lookup;
 
 public class Installer extends ModuleInstall {
 

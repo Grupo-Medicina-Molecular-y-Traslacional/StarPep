@@ -15,14 +15,8 @@ import javax.swing.JMenuItem;
 import javax.swing.SwingWorker;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.db.services.MetadataManager;
-import org.bapedis.db.services.NeoPeptideManager;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.ui.PeptideViewerTopComponent;
-import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
-import org.openide.awt.ActionReferences;
-import org.openide.awt.ActionRegistration;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.Presenter;
@@ -61,40 +55,40 @@ public class ShowPeptideNodes extends AbstractAction implements Presenter.Popup 
 
         final TopComponent bioCategoryTC = WindowManager.getDefault().findTopComponent("BioCategoryExplorerTopComponent");
 
-        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-
-            @Override
-            protected Void doInBackground() throws Exception {
-                ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-                Workspace currentWorkspace = pc.getCurrentWorkspace();
-
-                MetadataManager bcManager = Lookup.getDefault().lookup(MetadataManager.class);
-
-                Lookup.Result<Metadata> lkpInfo = bioCategoryTC.getLookup().lookupResult(Metadata.class);
-                Metadata[] selectedCategories = lkpInfo.allInstances().toArray(new Metadata[]{});
-                if (selectedCategories.length == 0) {
-                    selectedCategories = new Metadata[]{bcManager.getBioCategory()};
-                }
-                bcManager.setSelectedCategoriesTo(currentWorkspace, selectedCategories);
-                NeoPeptideManager npManager = Lookup.getDefault().lookup(NeoPeptideManager.class);
-                npManager.loadNeoPeptides(currentWorkspace);
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    get();
-//                    peptideTC.setBusyLabel(false);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-//                    peptideTC.setErrorLabel();
-                } finally {
-                    peptideTC.setCursor(Cursor.getDefaultCursor());
-                }
-            }
-        };
-        worker.execute();
+//        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+//
+//            @Override
+//            protected Void doInBackground() throws Exception {
+//                ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+//                Workspace currentWorkspace = pc.getCurrentWorkspace();
+//
+//                MetadataManager bcManager = Lookup.getDefault().lookup(MetadataManager.class);
+//
+//                Lookup.Result<Metadata> lkpInfo = bioCategoryTC.getLookup().lookupResult(Metadata.class);
+//                Metadata[] selectedCategories = lkpInfo.allInstances().toArray(new Metadata[]{});
+//                if (selectedCategories.length == 0) {
+//                    selectedCategories = new Metadata[]{bcManager.getBioCategory()};
+//                }
+//                bcManager.setSelectedCategoriesTo(currentWorkspace, selectedCategories);
+//                NeoPeptideManager npManager = Lookup.getDefault().lookup(NeoPeptideManager.class);
+//                npManager.loadNeoPeptides(currentWorkspace);
+//                return null;
+//            }
+//
+//            @Override
+//            protected void done() {
+//                try {
+//                    get();
+////                    peptideTC.setBusyLabel(false);
+//                } catch (Exception ex) {
+//                    ex.printStackTrace();
+////                    peptideTC.setErrorLabel();
+//                } finally {
+//                    peptideTC.setCursor(Cursor.getDefaultCursor());
+//                }
+//            }
+//        };
+//        worker.execute();
     }
 
     @Override

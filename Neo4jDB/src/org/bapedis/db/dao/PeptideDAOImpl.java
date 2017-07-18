@@ -13,11 +13,11 @@ import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.spi.data.PeptideDAO;
 import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.model.Peptide;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.db.Neo4jDB;
 import org.bapedis.db.model.MyLabel;
 import org.bapedis.db.model.MyRelationship;
-import org.bapedis.db.model.NeoPeptide;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphFactory;
 import org.gephi.graph.api.GraphModel;
@@ -92,7 +92,7 @@ public class PeptideDAOImpl implements PeptideDAO {
                 peptideNodes = getPeptides();
             }
 
-            NeoPeptide neoPeptide;
+            Peptide peptide;
             org.gephi.graph.api.Node graphNode, graphNeighborNode;
             org.gephi.graph.api.Edge graphEdge;
             PeptideAttribute attr;
@@ -111,11 +111,11 @@ public class PeptideDAOImpl implements PeptideDAO {
                     subGraph.addEdge(graphEdge);
                 }
 
-                //Fill NeoPeptideModel
-                neoPeptide = new NeoPeptide(neoNode.getId(), graphNode, subGraph);
-                neoPeptide.setAttributeValue(ID, id);
-                neoPeptide.setAttributeValue(SEQ, seq);
-                neoPeptide.setAttributeValue(LENGHT, seq.length());
+                //Fill Attribute Model
+                peptide = new Peptide(graphNode, subGraph);
+                peptide.setAttributeValue(ID, id);
+                peptide.setAttributeValue(SEQ, seq);
+                peptide.setAttributeValue(LENGHT, seq.length());
 
                 for (String propertyKey : neoNode.getPropertyKeys()) {
                     if (!(propertyKey.equals(PRO_ID) || propertyKey.equals(PRO_SEQ)
@@ -126,15 +126,15 @@ public class PeptideDAOImpl implements PeptideDAO {
                         } else {
                             attr = attrModel.getAttribute(propertyKey);
                         }
-                        neoPeptide.setAttributeValue(attr, value);
+                        peptide.setAttributeValue(attr, value);
                     }
                 }
 
                 for (AnnotationType aType : AnnotationType.values()) {
                     attr = attrModel.getAttribute(aType.name());
-                    neoPeptide.setAttributeValue(attr, neoPeptide.getAnnotationValues(aType));
+                    peptide.setAttributeValue(attr, peptide.getAnnotationValues(aType));
                 }
-                attrModel.addPeptide(neoPeptide);
+                attrModel.addPeptide(peptide);
             }
             peptideNodes.close();
             tx.success();

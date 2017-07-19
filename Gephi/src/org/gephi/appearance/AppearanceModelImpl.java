@@ -97,10 +97,6 @@ public class AppearanceModelImpl implements AppearanceModel {
     //
     private final FunctionsModel functionsMain;
     private final Map<Graph, FunctionsModel> functions = new HashMap<>();
-    //Forced
-    private final Set<String> forcedRanking;
-    private final Set<String> forcedPartition;
-    private final List<Column> forcedColumnsRefresh;
 
     public AppearanceModelImpl(Workspace workspace) {
         this.workspace = workspace;
@@ -110,9 +106,6 @@ public class AppearanceModelImpl implements AppearanceModel {
         this.transformerUIs = initTransformerUIs();
         this.nodeTransformers = initNodeTransformers();
         this.edgeTransformers = initEdgeTransformers();
-        this.forcedPartition = new HashSet<>();
-        this.forcedRanking = new HashSet<>();
-        this.forcedColumnsRefresh = new ArrayList<>();
 
         //Functions
         functionsMain = new FunctionsModel(graphModel.getGraph());
@@ -162,7 +155,7 @@ public class AppearanceModelImpl implements AppearanceModel {
     }
 
     @Override
-    public Function getNodeFunction(Graph graph, GraphFunction graphFunction, Class<? extends Transformer> transformer) {
+    public Function getNodeFunction(Graph graph, AppearanceModel.GraphFunction graphFunction, Class<? extends Transformer> transformer) {
         String id = getNodeId(transformer, graphFunction);
         for (Function f : refreshFunctions(graph).getNodeFunctions()) {
             if (((FunctionImpl) f).getId().equals(id) && f.getTransformer().getClass().equals(transformer)) {
@@ -173,7 +166,7 @@ public class AppearanceModelImpl implements AppearanceModel {
     }
 
     @Override
-    public Function getEdgeFunction(Graph graph, GraphFunction graphFunction, Class<? extends Transformer> transformer) {
+    public Function getEdgeFunction(Graph graph, AppearanceModel.GraphFunction graphFunction, Class<? extends Transformer> transformer) {
         String id = getEdgeId(transformer, graphFunction);
         for (Function f : refreshFunctions(graph).getEdgeFunctions()) {
             if (((FunctionImpl) f).getId().equals(id) && f.getTransformer().getClass().equals(transformer)) {
@@ -186,6 +179,7 @@ public class AppearanceModelImpl implements AppearanceModel {
     @Override
     public Partition getNodePartition(Graph graph, Column column) {
         synchronized (functionLock) {
+            refreshFunctions(graph);
             FunctionsModel m;
             if (graph.getView().isMainView()) {
                 m = functionsMain;
@@ -202,6 +196,7 @@ public class AppearanceModelImpl implements AppearanceModel {
     @Override
     public Partition getEdgePartition(Graph graph, Column column) {
         synchronized (functionLock) {
+            refreshFunctions(graph);
             FunctionsModel m;
             if (graph.getView().isMainView()) {
                 m = functionsMain;
@@ -215,29 +210,8 @@ public class AppearanceModelImpl implements AppearanceModel {
         }
     }
 
-    protected void forceRanking(Function function) {
-        if (function instanceof AttributeFunction) {
-            Column col = ((AttributeFunction) function).getColumn();
-            String id = getIdCol(col);
-            forcedColumnsRefresh.add(col);
-            forcedPartition.remove(id);
-            forcedRanking.add(id);
-        }
-    }
-
-    protected void forcePartition(Function function) {
-        if (function instanceof AttributeFunction) {
-            Column col = ((AttributeFunction) function).getColumn();
-            String id = getIdCol(col);
-            forcedColumnsRefresh.add(col);
-            forcedRanking.remove(id);
-            forcedPartition.add(id);
-        }
-    }
-
     private FunctionsModel refreshFunctions(Graph graph) {
         synchronized (functionLock) {
-
             FunctionsModel m;
             if (graph.getView().isMainView()) {
                 m = functionsMain;
@@ -299,42 +273,35 @@ public class AppearanceModelImpl implements AppearanceModel {
 
         @Override
         public void refreshGraphFunctions() {
-            if (!rankings.containsKey(getIdStr(GraphFunction.NODE_DEGREE.getId()))) {
-                rankings.put(getIdStr(GraphFunction.NODE_DEGREE.getId()), new DegreeRankingImpl(graph));
+            if (!rankings.containsKey(getIdStr(AppearanceModel.GraphFunction.NODE_DEGREE.getId()))) {
+                rankings.put(getIdStr(AppearanceModel.GraphFunction.NODE_DEGREE.getId()), new DegreeRankingImpl(graph));
             }
             if (graph.isDirected()) {
-                if (!rankings.containsKey(getIdStr(GraphFunction.NODE_INDEGREE.getId()))) {
+                if (!rankings.containsKey(getIdStr(AppearanceModel.GraphFunction.NODE_INDEGREE.getId()))) {
                     DirectedGraph directedGraph = (DirectedGraph) graph;
-                    rankings.put(getIdStr(GraphFunction.NODE_INDEGREE.getId()), new InDegreeRankingImpl(directedGraph));
-                    rankings.put(getIdStr(GraphFunction.NODE_OUTDEGREE.getId()), new OutDegreeRankingImpl(directedGraph));
+                    rankings.put(getIdStr(AppearanceModel.GraphFunction.NODE_INDEGREE.getId()), new InDegreeRankingImpl(directedGraph));
+                    rankings.put(getIdStr(AppearanceModel.GraphFunction.NODE_OUTDEGREE.getId()), new OutDegreeRankingImpl(directedGraph));
                 }
             } else {
-                rankings.remove(getIdStr(GraphFunction.NODE_INDEGREE.getId()));
-                rankings.remove(getIdStr(GraphFunction.NODE_OUTDEGREE.getId()));
+                rankings.remove(getIdStr(AppearanceModel.GraphFunction.NODE_INDEGREE.getId()));
+                rankings.remove(getIdStr(AppearanceModel.GraphFunction.NODE_OUTDEGREE.getId()));
             }
 
             // Degree functions
-            RankingImpl degreeRanking = rankings.get(getIdStr(GraphFunction.NODE_DEGREE.getId()));
-            degreeRanking.refresh();
-
-            RankingImpl indegreeRanking = rankings.get(getIdStr(GraphFunction.NODE_INDEGREE.getId()));
-            RankingImpl outdegreeRanking = rankings.get(getIdStr(GraphFunction.NODE_OUTDEGREE.getId()));
-            if (indegreeRanking != null && outdegreeRanking != null) {
-                indegreeRanking.refresh();
-                outdegreeRanking.refresh();
-            }
-
             for (Transformer t : getRankingTransformers()) {
-                String degreeId = getId(t, GraphFunction.NODE_DEGREE.getId());
-
+                String degreeId = getId(t, AppearanceModel.GraphFunction.NODE_DEGREE.getId());
+                RankingImpl degreeRanking = rankings.get(getIdStr(AppearanceModel.GraphFunction.NODE_DEGREE.getId()));
                 if (!graphFunctions.containsKey(degreeId)) {
                     String name = NbBundle.getMessage(AppearanceModelImpl.class, "NodeGraphFunction.Degree.name");
                     graphFunctions.put(degreeId, new GraphFunctionImpl(degreeId, name, Node.class, graph, t, getTransformerUI(t), degreeRanking, defaultInterpolator));
                 }
+                degreeRanking.refresh();
 
-                String indegreeId = getId(t, GraphFunction.NODE_INDEGREE.getId());
-                String outdegreeId = getId(t, GraphFunction.NODE_OUTDEGREE.getId());
+                String indegreeId = getId(t, AppearanceModel.GraphFunction.NODE_INDEGREE.getId());
+                String outdegreeId = getId(t, AppearanceModel.GraphFunction.NODE_OUTDEGREE.getId());
 
+                RankingImpl indegreeRanking = rankings.get(getIdStr(AppearanceModel.GraphFunction.NODE_INDEGREE.getId()));
+                RankingImpl outdegreeRanking = rankings.get(getIdStr(AppearanceModel.GraphFunction.NODE_OUTDEGREE.getId()));
                 if (indegreeRanking != null && outdegreeRanking != null) {
                     if (!graphFunctions.containsKey(indegreeId)) {
                         String inDegreeName = NbBundle.getMessage(AppearanceModelImpl.class, "NodeGraphFunction.InDegree.name");
@@ -342,7 +309,8 @@ public class AppearanceModelImpl implements AppearanceModel {
                         graphFunctions.put(indegreeId, new GraphFunctionImpl(indegreeId, inDegreeName, Node.class, graph, t, getTransformerUI(t), indegreeRanking, defaultInterpolator));
                         graphFunctions.put(outdegreeId, new GraphFunctionImpl(outdegreeId, outDegreeName, Node.class, graph, t, getTransformerUI(t), outdegreeRanking, defaultInterpolator));
                     }
-
+                    indegreeRanking.refresh();
+                    outdegreeRanking.refresh();
                 } else {
                     graphFunctions.remove(indegreeId);
                     graphFunctions.remove(outdegreeId);
@@ -389,21 +357,21 @@ public class AppearanceModelImpl implements AppearanceModel {
 
         @Override
         public void refreshGraphFunctions() {
-            if (!rankings.containsKey(getIdStr(GraphFunction.EDGE_WEIGHT.getId()))) {
-                rankings.put(getIdStr(GraphFunction.EDGE_WEIGHT.getId()), new EdgeWeightRankingImpl(graph));
+            if (!rankings.containsKey(getIdStr(AppearanceModel.GraphFunction.EDGE_WEIGHT.getId()))) {
+                rankings.put(getIdStr(AppearanceModel.GraphFunction.EDGE_WEIGHT.getId()), new EdgeWeightRankingImpl(graph));
             }
             if (graph.getModel().isMultiGraph()) {
-                if (!partitions.containsKey(getIdStr(GraphFunction.EDGE_TYPE.getId()))) {
-                    partitions.put(getIdStr(GraphFunction.EDGE_TYPE.getId()), new EdgeTypePartitionImpl(graph));
+                if (!partitions.containsKey(getIdStr(AppearanceModel.GraphFunction.EDGE_TYPE.getId()))) {
+                    partitions.put(getIdStr(AppearanceModel.GraphFunction.EDGE_TYPE.getId()), new EdgeTypePartitionImpl(graph));
                 }
             } else {
-                partitions.remove(getIdStr(GraphFunction.EDGE_TYPE.getId()));
+                partitions.remove(getIdStr(AppearanceModel.GraphFunction.EDGE_TYPE.getId()));
             }
 
             // Weight function
             for (Transformer t : getRankingTransformers()) {
-                String weightId = getId(t, GraphFunction.EDGE_WEIGHT.getId());
-                RankingImpl ranking = rankings.get(getIdStr(GraphFunction.EDGE_WEIGHT.getId()));
+                String weightId = getId(t, AppearanceModel.GraphFunction.EDGE_WEIGHT.getId());
+                RankingImpl ranking = rankings.get(getIdStr(AppearanceModel.GraphFunction.EDGE_WEIGHT.getId()));
                 if (!graphFunctions.containsKey(weightId)) {
                     String name = NbBundle.getMessage(AppearanceModelImpl.class, "EdgeGraphFunction.Weight.name");
                     graphFunctions.put(weightId, new GraphFunctionImpl(weightId, name, Edge.class, graph, t, getTransformerUI(t), ranking, defaultInterpolator));
@@ -413,8 +381,8 @@ public class AppearanceModelImpl implements AppearanceModel {
 
             // Type Function
             for (Transformer t : getPartitionTransformers()) {
-                String typeId = getId(t, GraphFunction.EDGE_TYPE.getId());
-                PartitionImpl partition = partitions.get(getIdStr(GraphFunction.EDGE_TYPE.getId()));
+                String typeId = getId(t, AppearanceModel.GraphFunction.EDGE_TYPE.getId());
+                PartitionImpl partition = partitions.get(getIdStr(AppearanceModel.GraphFunction.EDGE_TYPE.getId()));
                 if (partition != null) {
                     if (!graphFunctions.containsKey(typeId)) {
                         String name = NbBundle.getMessage(AppearanceModelImpl.class, "EdgeGraphFunction.Type.name");
@@ -503,6 +471,7 @@ public class AppearanceModelImpl implements AppearanceModel {
 
         protected void refreshFunctions() {
             graph.readLock();
+
             try {
                 boolean graphHasChanged = graphObserver.isNew() || graphObserver.hasGraphChanged();
                 if (graphHasChanged) {
@@ -528,7 +497,7 @@ public class AppearanceModelImpl implements AppearanceModel {
             //Clean
             for (Iterator<Map.Entry<Column, ColumnObserver>> itr = columnObservers.entrySet().iterator(); itr.hasNext();) {
                 Map.Entry<Column, ColumnObserver> entry = itr.next();
-                if (!columns.contains(entry.getKey()) || forcedColumnsRefresh.contains(entry.getKey())) {
+                if (!columns.contains(entry.getKey())) {
                     rankings.remove(getIdCol(entry.getKey()));
                     partitions.remove(getIdCol(entry.getKey()));
                     for (Transformer t : getTransformers()) {
@@ -542,7 +511,7 @@ public class AppearanceModelImpl implements AppearanceModel {
             }
 
             //Get columns to be refreshed
-            Set<Column> toRefreshColumns = new HashSet<>(forcedColumnsRefresh);
+            Set<Column> toRefreshColumns = new HashSet<>();
             for (Column column : columns) {
                 if (!columnObservers.containsKey(column)) {
                     columnObservers.put(column, column.createColumnObserver(false));
@@ -551,26 +520,25 @@ public class AppearanceModelImpl implements AppearanceModel {
                     toRefreshColumns.add(column);
                 }
             }
-            forcedColumnsRefresh.clear();
 
             //Refresh ranking and partitions
             for (Column column : toRefreshColumns) {
                 RankingImpl ranking = rankings.get(getIdCol(column));
                 PartitionImpl partition = partitions.get(getIdCol(column));
                 if (ranking == null && partition == null) {
-                    String id = getIdCol(column);
-                    if (forcedPartition.contains(id) || (!forcedRanking.contains(id) && isPartition(graph, column))) {
+                    if (isPartition(graph, column)) {
                         if (column.isIndexed()) {
                             partition = new AttributePartitionImpl(column, getIndex(false));
                         } else {
                             partition = new AttributePartitionImpl(column, graph);
                         }
                         partitions.put(getIdCol(column), partition);
-                    } else if (forcedRanking.contains(id) || (!forcedPartition.contains(id) && isRanking(graph, column))) {
+                    }
+                    if (isRanking(graph, column)) {
                         if (column.isIndexed()) {
-                            ranking = new AttributeRankingImpl(column, getIndex(localScale));
+                            ranking = new AttributeRankingImpl(column, graph, getIndex(localScale));
                         } else {
-                            ranking = new AttributeRankingImpl(column, graph);
+                            ranking = new AttributeRankingImpl(column, graph, null);
                         }
                         rankings.put(getIdCol(column), ranking);
                     }
@@ -660,23 +628,19 @@ public class AppearanceModelImpl implements AppearanceModel {
         return (AttributeUtils.isNodeColumn(column) ? "node" : "edge") + "_column_" + column.getId();
     }
 
-    protected String getNodeId(Class<? extends Transformer> transformer, GraphFunction graphFunction) {
+    protected String getNodeId(Class<? extends Transformer> transformer, AppearanceModel.GraphFunction graphFunction) {
         return "node_" + transformer.getSimpleName() + "_" + graphFunction.getId();
     }
 
-    protected String getEdgeId(Class<? extends Transformer> transformer, GraphFunction graphFunction) {
+    protected String getEdgeId(Class<? extends Transformer> transformer, AppearanceModel.GraphFunction graphFunction) {
         return "edge_" + transformer.getSimpleName() + "_" + graphFunction.getId();
     }
 
     private boolean isPartition(Graph graph, Column column) {
-        double ratio;
         if (column.isDynamic()) {
             if (!column.isNumber()) {
                 return true;
             }
-            Set<Object> set = new HashSet<>();
-            boolean hasNullValue = false;
-            int elements = 0;
             ElementIterable<? extends Element> iterable = AttributeUtils.isNodeColumn(column) ? graph.getNodes() : graph.getEdges();
             for (Element el : iterable) {
                 TimeMap val = (TimeMap) el.getAttribute(column);
@@ -684,15 +648,13 @@ public class AppearanceModelImpl implements AppearanceModel {
                     Object[] va = val.toValuesArray();
                     for (Object v : va) {
                         if (v != null) {
-                            set.add(v);
-                        } else {
-                            hasNullValue = true;
+                            return true;
                         }
-                        elements++;
                     }
                 }
             }
-            ratio = set.size() / (double) elements;
+
+            return false;
         } else if (column.isIndexed()) {
             if (!column.isNumber()) {
                 return true;
@@ -703,18 +665,10 @@ public class AppearanceModelImpl implements AppearanceModel {
             } else {
                 index = graphModel.getEdgeIndex(graph.getView());
             }
-            int valueCount = index.countValues(column);
-            int elementCount = index.countElements(column);
-            ratio = valueCount / (double) elementCount;
+            return index.countValues(column) > 0;
         } else {
             return false;
         }
-        Class typeClass = column.getTypeClass();
-        typeClass = column.isDynamic() ? AttributeUtils.getStaticType(typeClass) : typeClass;
-        if (typeClass.equals(Integer.class) || typeClass.equals(Byte.class) || typeClass.equals(Short.class)) {
-            return ratio <= 0.3;
-        }
-        return ratio <= 0.05;
     }
 
     private boolean isRanking(Graph graph, Column column) {
@@ -726,7 +680,7 @@ public class AppearanceModelImpl implements AppearanceModel {
                     return true;
                 }
             }
-        } else if (!column.isDynamic() && column.isIndexed() && column.isNumber()) {
+        } else if (!column.isDynamic() && !column.isArray() && column.isIndexed() && column.isNumber()) {
             Index index;
             if (AttributeUtils.isNodeColumn(column)) {
                 index = localScale ? graphModel.getNodeIndex(graph.getView()) : graphModel.getNodeIndex();

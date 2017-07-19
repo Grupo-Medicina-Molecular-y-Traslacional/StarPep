@@ -79,22 +79,22 @@ public class GraphFileExporterUIPanel extends javax.swing.JPanel {
 
         setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        labelGraph.setText(org.openide.util.NbBundle.getMessage(GraphFileExporterUIPanel.class, "GraphFileExporterUIPanel.labelGraph.text")); // NOI18N
+        labelGraph.setText(org.openide.util.NbBundle.getMessage(GraphFileExporterUIPanel.class, "GraphFileExporterUIPanel.labelGraph.text_1")); // NOI18N
 
         graphButtonGroup.add(fullGraphRadio);
         fullGraphRadio.setSelected(true);
-        fullGraphRadio.setText(org.openide.util.NbBundle.getMessage(GraphFileExporterUIPanel.class, "GraphFileExporterUIPanel.fullGraphRadio.text")); // NOI18N
+        fullGraphRadio.setText(org.openide.util.NbBundle.getMessage(GraphFileExporterUIPanel.class, "GraphFileExporterUIPanel.fullGraphRadio.text_1")); // NOI18N
 
         graphButtonGroup.add(visibleOnlyRadio);
-        visibleOnlyRadio.setText(org.openide.util.NbBundle.getMessage(GraphFileExporterUIPanel.class, "GraphFileExporterUIPanel.visibleOnlyRadio.text")); // NOI18N
+        visibleOnlyRadio.setText(org.openide.util.NbBundle.getMessage(GraphFileExporterUIPanel.class, "GraphFileExporterUIPanel.visibleOnlyRadio.text_1")); // NOI18N
 
         labelFullgraph.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         labelFullgraph.setForeground(new java.awt.Color(102, 102, 102));
-        labelFullgraph.setText(org.openide.util.NbBundle.getMessage(GraphFileExporterUIPanel.class, "GraphFileExporterUIPanel.labelFullgraph.text")); // NOI18N
+        labelFullgraph.setText(org.openide.util.NbBundle.getMessage(GraphFileExporterUIPanel.class, "GraphFileExporterUIPanel.labelFullgraph.text_1")); // NOI18N
 
-        labelVisibleOnly.setFont(new java.awt.Font("Tahoma", 0, 10));
+        labelVisibleOnly.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         labelVisibleOnly.setForeground(new java.awt.Color(102, 102, 102));
-        labelVisibleOnly.setText(org.openide.util.NbBundle.getMessage(GraphFileExporterUIPanel.class, "GraphFileExporterUIPanel.labelVisibleOnly.text")); // NOI18N
+        labelVisibleOnly.setText(org.openide.util.NbBundle.getMessage(GraphFileExporterUIPanel.class, "GraphFileExporterUIPanel.labelVisibleOnly.text_1")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

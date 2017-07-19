@@ -340,8 +340,9 @@ public class EdgeRenderer implements Renderer {
                 final Element edgeElem = svgTarget.createElement("path");
                 edgeElem.setAttribute("class", String.format(
                         "%s %s",
-                        ((Node) h.sourceItem.getSource()).getId(),
-                        ((Node) h.targetItem.getSource()).getId()));
+                        SVGUtils.idAsClassAttribute(((Node) h.sourceItem.getSource()).getId()),
+                        SVGUtils.idAsClassAttribute(((Node) h.targetItem.getSource()).getId())
+                ));
                 edgeElem.setAttribute("d", String.format(
                         Locale.ENGLISH,
                         "M %f,%f L %f,%f",
@@ -472,8 +473,9 @@ public class EdgeRenderer implements Renderer {
                 final Element edgeElem = svgTarget.createElement("path");
                 edgeElem.setAttribute("class", String.format(
                         "%s %s",
-                        ((Node) h.sourceItem.getSource()).getId(),
-                        ((Node) h.targetItem.getSource()).getId()));
+                        SVGUtils.idAsClassAttribute(((Node) h.sourceItem.getSource()).getId()),
+                        SVGUtils.idAsClassAttribute(((Node) h.targetItem.getSource()).getId())
+                ));
                 edgeElem.setAttribute("d", String.format(
                         Locale.ENGLISH,
                         "M %f,%f C %f,%f %f,%f %f,%f",
@@ -611,7 +613,7 @@ public class EdgeRenderer implements Renderer {
                         Locale.ENGLISH,
                         "M %f,%f C %f,%f %f,%f %f,%f",
                         h.x, h.y, h.v1.x, h.v1.y, h.v2.x, h.v2.y, h.x, h.y));
-                selfLoopElem.setAttribute("class", h.node.getId().toString());
+                selfLoopElem.setAttribute("class", SVGUtils.idAsClassAttribute(h.node.getId()));
                 selfLoopElem.setAttribute(
                         "stroke",
                         svgTarget.toHexString(color));

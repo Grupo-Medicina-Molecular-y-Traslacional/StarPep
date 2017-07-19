@@ -34,7 +34,7 @@ import org.gephi.visualization.VizController;
 import org.gephi.visualization.VizModel;
 import org.gephi.visualization.apiimpl.GraphDrawable;
 import org.gephi.visualization.apiimpl.GraphIO;
-import org.gephi.visualization.component.JPopupButton;
+import org.gephi.ui.components.JPopupButton;
 import org.gephi.visualization.text.SizeMode;
 import org.gephi.visualization.text.TextManager;
 import org.gephi.visualization.text.TextModelImpl;

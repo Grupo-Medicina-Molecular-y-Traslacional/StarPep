@@ -64,7 +64,7 @@ public class ContractFactory extends AbstractLayoutFactory {
 
     @Override
     public Algorithm createAlgorithm() {
-        return new ScaleLayout(this, 0.8);
+        return new ContractLayout(this, 0.8);
     }
 
     @Override

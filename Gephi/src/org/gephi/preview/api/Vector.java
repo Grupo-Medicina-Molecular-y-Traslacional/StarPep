@@ -81,7 +81,7 @@ public class Vector {
 
     public void add(float a, float b) {
         x += a;
-        x += b;
+        y += b;
     }
 
     public void sub(Vector v) {
@@ -154,4 +154,9 @@ public class Vector {
         }
         return true;
     }
+    
+    @Override
+    public String toString() {
+        return "Vector{" + "x=" + x + ", y=" + y + '}';
+    }    
 }

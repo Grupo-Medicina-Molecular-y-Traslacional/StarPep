@@ -1,0 +1,15 @@
+Gephi Modules
+VisualizationAPI
+VisualizationImpl
+AppearanceAPI
+AppearancePlugin
+AppearancePluginUI
+UIComponents
+Utils
+UIUtils
+PreviewAPI
+PreviewPlugin
+PreviewExport
+DesktopPreview
+DesktopExport
+DesktopAppearance

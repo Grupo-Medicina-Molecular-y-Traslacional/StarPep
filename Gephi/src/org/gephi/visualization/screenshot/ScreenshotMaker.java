@@ -95,7 +95,7 @@ public class ScreenshotMaker implements VizArchitecture, Runnable {
     private VizConfig vizConfig;
     private TextManager textManager;
     //Executor
-    private final AlgorithmExecutor executor;
+//    private final LongTaskExecutor executor;
     private ProgressTicket progressTicket;
     private boolean cancel;
     //Settings
@@ -122,9 +122,7 @@ public class ScreenshotMaker implements VizArchitecture, Runnable {
         autoSave = NbPreferences.forModule(ScreenshotMaker.class).getBoolean(AUTOSAVE_DEFAULT, autoSave);
         finishedMessage = NbPreferences.forModule(ScreenshotMaker.class).getBoolean(SHOW_MESSAGE, finishedMessage);
 
-        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
-//        executor = new TaskExecutor("Screenshot Maker");
-        executor = pm.getExecutor();
+//        executor = new LongTaskExecutor(true, "Screenshot Maker");
 
         tileWidth = width / 16;
         tileHeight = height / 12;
@@ -138,7 +136,7 @@ public class ScreenshotMaker implements VizArchitecture, Runnable {
     }
 
     public void takeScreenshot() {
-//        executor.execute(this, NbBundle.getMessage(ScreenshotMaker.class, "ScreenshotMaker.progress.message"), null);
+//        executor.execute(this, this, NbBundle.getMessage(ScreenshotMaker.class, "ScreenshotMaker.progress.message"), null);
     }
 
     @Override
@@ -250,19 +248,19 @@ public class ScreenshotMaker implements VizArchitecture, Runnable {
                             File selectedFile = new File(chooser.getCurrentDirectory(), getDefaultFileName() + ".png");
                             chooser.setSelectedFile(selectedFile);
                             int returnFile = chooser.showSaveDialog(null);
-                            if (returnFile != JFileChooser.APPROVE_OPTION) {
-                                return;
+                            if (returnFile == JFileChooser.APPROVE_OPTION) {
+                                ScreenshotMaker.this.file = chooser.getSelectedFile();
+
+                                if (!ScreenshotMaker.this.file.getPath().endsWith(".png")) {
+                                    ScreenshotMaker.this.file = new File(ScreenshotMaker.this.file.getPath() + ".png");
+                                }
+
+                                //Save last path
+                                defaultDirectory = ScreenshotMaker.this.file.getParentFile().getAbsolutePath();
+                                NbPreferences.forModule(ScreenshotMaker.class).put(LAST_PATH, defaultDirectory);
+                            } else {
+                                ScreenshotMaker.this.file = null;
                             }
-                            ScreenshotMaker.this.file = chooser.getSelectedFile();
-
-                            if (!ScreenshotMaker.this.file.getPath().endsWith(".png")) {
-                                ScreenshotMaker.this.file = new File(ScreenshotMaker.this.file.getPath() + ".png");
-                            }
-
-                            //Save last path
-                            defaultDirectory = ScreenshotMaker.this.file.getParentFile().getAbsolutePath();
-                            NbPreferences.forModule(ScreenshotMaker.class).put(LAST_PATH, defaultDirectory);
-
                         } else {
                             ScreenshotMaker.this.file = new File(defaultDirectory, getDefaultFileName() + ".png");
                         }
@@ -332,12 +330,13 @@ public class ScreenshotMaker implements VizArchitecture, Runnable {
     }
 
     public void configure() {
-//        ScreenshotSettingsPanel panel = new ScreenshotSettingsPanel();
-//        panel.setup(this);
+        ScreenshotSettingsPanel panel = new ScreenshotSettingsPanel();
+        panel.setup(this);
 //        ValidationPanel validationPanel = ScreenshotSettingsPanel.createValidationPanel(panel);
 //        if (validationPanel.showOkCancelDialog(NbBundle.getMessage(ScreenshotMaker.class, "ScreenshotMaker.configure.title"))) {
 //            panel.unsetup(this);
 //        }
+
 //        DialogDescriptor dd = new DialogDescriptor(validationPanel, NbBundle.getMessage(ScreenshotMaker.class, "ScreenshotMaker.configure.title"));
 //        Object result = DialogDisplayer.getDefault().notify(dd);
 //        if (result == NotifyDescriptor.OK_OPTION) {
@@ -396,12 +395,14 @@ public class ScreenshotMaker implements VizArchitecture, Runnable {
         }
     }
 
-    public void setProgressTicket(ProgressTicket progressTicket) {
-        this.progressTicket = progressTicket;
-    }
-
-    public boolean cancel() {
-        cancel = true;
-        return true;
-    }
+//    @Override
+//    public void setProgressTicket(ProgressTicket progressTicket) {
+//        this.progressTicket = progressTicket;
+//    }
+//
+//    @Override
+//    public boolean cancel() {
+//        cancel = true;
+//        return true;
+//    }
 }

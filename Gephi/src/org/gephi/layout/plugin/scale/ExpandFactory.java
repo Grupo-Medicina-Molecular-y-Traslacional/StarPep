@@ -61,7 +61,7 @@ public class ExpandFactory extends AbstractLayoutFactory {
 
     @Override
     public Algorithm createAlgorithm() {
-        return new ScaleLayout(this, 1.2);
+        return new ExpandLayout(this, 1.2);
     }
 
 

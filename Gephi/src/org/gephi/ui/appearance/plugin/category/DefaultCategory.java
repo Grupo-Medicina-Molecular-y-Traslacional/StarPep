@@ -100,20 +100,21 @@ public class DefaultCategory {
             return "LABEL_COLOR";
         }
     };
-//    public static TransformerCategory LABEL_SIZE = new TransformerCategory() {
-//        @Override
-//        public String getDisplayName() {
-//            return NbBundle.getMessage(DefaultCategory.class, "Category.LabelSize.name");
-//        }
-//
-//        @Override
-//        public Icon getIcon() {
-//            return new ImageIcon(getClass().getResource("/org/gephi/ui/appearance/plugin/resources/labelsize.png"));
-//        }
-//
-//        @Override
-//        public String toString() {
-//            return "LABEL_SIZE";
-//        }
-//    };
+    public static TransformerCategory LABEL_SIZE = new TransformerCategory() {
+        @Override
+        public String getDisplayName() {
+            return NbBundle.getMessage(DefaultCategory.class, "Category.LabelSize.name");
+        }
+
+        @Override
+        public Icon getIcon() {
+            return new ImageIcon(getClass().getResource("/org/gephi/ui/appearance/plugin/resources/labelsize.png"));
+        }
+
+        @Override
+        public String toString() {
+            return "LABEL_SIZE";
+        }
+    };
+
 }

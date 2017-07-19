@@ -260,10 +260,6 @@
                 <binary-origin>release/modules/ext/batik-gvt-1.9.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/miglayout-3.7.4.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/miglayout-3.7.4.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
                 <runtime-relative-path>ext/jogl-all-2.3.2.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/jogl-all-2.3.2.jar</binary-origin>
             </class-path-extension>
@@ -274,6 +270,10 @@
             <class-path-extension>
                 <runtime-relative-path>ext/colorchooser-1.2.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/colorchooser-1.2.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/miglayout-3.7.4.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/miglayout-3.7.4.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/jogl-all-2.3.2-natives-windows-amd64.jar</runtime-relative-path>

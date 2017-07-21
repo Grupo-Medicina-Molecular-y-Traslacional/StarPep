@@ -39,7 +39,7 @@ Contributor(s):
 
 Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.bapedis.db.ui;
+package org.gephi.desktop.visualization;
 
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;

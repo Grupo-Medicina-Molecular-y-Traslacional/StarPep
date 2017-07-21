@@ -65,6 +65,14 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.openide.actions</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>6.39.1</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.openide.awt</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -165,6 +173,7 @@
                 <package>org.bapedis.core.spi.data</package>
                 <package>org.bapedis.core.spi.filters</package>
                 <package>org.bapedis.core.spi.filters.impl</package>
+                <package>org.bapedis.core.spi.ui</package>
                 <package>org.bapedis.core.task</package>
                 <package>org.bapedis.core.ui</package>
                 <package>org.bapedis.core.ui.actions</package>

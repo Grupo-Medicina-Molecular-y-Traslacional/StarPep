@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db.ui.actions;
+package org.bapedis.core.ui.actions;
 
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
@@ -12,12 +12,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.SwingWorker;
-import org.bapedis.core.services.ProjectManager;
-import org.bapedis.core.model.Workspace;
-import org.bapedis.core.model.Metadata;
 import org.bapedis.core.ui.PeptideViewerTopComponent;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.Presenter;
 import org.openide.windows.TopComponent;

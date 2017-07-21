@@ -31,6 +31,15 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.netbeans.core.multiview</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.44.1</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.netbeans.modules.settings</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -286,6 +295,10 @@
             <class-path-extension>
                 <runtime-relative-path>ext/batik-util-1.9.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/batik-util-1.9.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/fontchooser-1.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/fontchooser-1.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/gluegen-rt-2.3.2-natives-windows-i586.jar</runtime-relative-path>

@@ -10,9 +10,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import javax.swing.Action;
 import org.bapedis.core.ui.actions.AddToQueryModel;
+import org.bapedis.core.ui.actions.SelectNodeOnGraph;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.NodeIterable;
+import org.openide.actions.PropertiesAction;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
@@ -20,6 +22,7 @@ import org.openide.nodes.Sheet;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.actions.SystemAction;
 import org.openide.util.lookup.Lookups;
 
 /**
@@ -29,6 +32,7 @@ import org.openide.util.lookup.Lookups;
 public class PeptideNode extends AbstractNode {
 
     protected Peptide peptide;
+    private final Action[] actions;
 
     public PeptideNode(Peptide peptide) {
         this(peptide, Children.LEAF, Lookups.singleton(peptide));
@@ -37,6 +41,7 @@ public class PeptideNode extends AbstractNode {
     public PeptideNode(Peptide peptide, Children children, Lookup lookup) {
         super(children, lookup);
         this.peptide = peptide;
+        actions = new Action[]{new SelectNodeOnGraph(peptide.getGraphNode())};
     }
 
     @Override
@@ -59,8 +64,9 @@ public class PeptideNode extends AbstractNode {
 
     @Override
     public Action[] getActions(boolean context) {
-        return new Action[]{};
-    }        
+//        SystemAction.get(PropertiesAction.class)
+        return actions;
+    }
 
     @Override
     protected Sheet createSheet() {
@@ -149,11 +155,19 @@ public class PeptideNode extends AbstractNode {
                 return value;
             }
         };
-        String strValue = value.toString();
-        if (value instanceof String[]) {
-            strValue = Arrays.toString((String[]) value);
+        String strValue = "";
+        if (value.getClass().isArray()) {
+            if (value instanceof String[]) {
+                strValue = Arrays.toString((String[]) value);
 //            strValue = strValue.substring(1, strValue.length() - 1);
+            } 
+//            else{
+//                System.out.println(value.getClass());
+//            }
+        } else{
+            strValue = value.toString();
         }
+
         // Set the font color for read only property. Default is a gray color.
         property.setValue("htmlDisplayValue", "<font color='000000'>" + strValue + "</font>");
 //      property.setValue("suppressCustomEditor", true);

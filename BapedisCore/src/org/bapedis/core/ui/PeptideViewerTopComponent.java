@@ -50,6 +50,7 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.openide.awt.Mnemonics;
+import org.openide.explorer.view.NodePopupFactory;
 
 /**
  * Top component which displays something.
@@ -95,7 +96,9 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         view.setPropertyColumns("seq", NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.nodelColumnLabel.seq"),
                 "length", NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.nodelColumnLabel.length"));
         view.setQuickSearchAllowed(false);
-        view.getNodePopupFactory().setShowQuickFilter(false);
+        NodePopupFactory npf = new NodePopupFactory();
+        npf.setShowQuickFilter(false);
+        view.setNodePopupFactory(npf);
         dataPanel.add(view, BorderLayout.CENTER);
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db.filters.impl;
+package org.bapedis.core.spi.filters.impl;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

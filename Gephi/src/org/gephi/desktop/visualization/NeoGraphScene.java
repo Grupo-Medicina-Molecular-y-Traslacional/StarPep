@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db.ui;
+package org.gephi.desktop.visualization;
 
 import com.connectina.swing.fontchooser.JFontChooser;
 import java.awt.BorderLayout;

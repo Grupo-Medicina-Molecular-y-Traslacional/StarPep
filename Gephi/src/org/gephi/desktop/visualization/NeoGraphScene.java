@@ -44,6 +44,7 @@ import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.openide.awt.UndoRedo;
 import org.openide.util.Exceptions;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.Lookups;
@@ -133,7 +134,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
 
         //Show node labels
         showNodeLabelsButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.showNodeLabelsButton.toolTipText"));
-        showNodeLabelsButton.setIcon(new ImageIcon(getClass().getResource("/org/bapedis/db/resources/showNodeLabels.png")));
+        showNodeLabelsButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/showNodeLabels.png", false));        
         showNodeLabelsButton.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -148,7 +149,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         toolbar.add(showNodeLabelsButton);
 
         // Label size mode
-        labelSizeModeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/labelSizeMode.png")));
+        labelSizeModeButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/labelSizeMode.png", false));
         labelSizeModeButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.labelSizeModeButton.toolTipText"));
         labelSizeModeButton.setChangeListener(new ChangeListener() {
             @Override
@@ -163,7 +164,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         toolbar.add(labelSizeModeButton);
 
         // Node Font
-        nodeFontButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/font.png")));
+        nodeFontButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/font.png", false));
         nodeFontButton.addActionListener(new ActionListener() {
 
             @Override
@@ -210,7 +211,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
 
         //Show edges
         showEdgeButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.showEdgeButton.toolTipText"));
-        showEdgeButton.setIcon(new ImageIcon(getClass().getResource("/org/bapedis/db/resources/showEdges.png")));
+        showEdgeButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/showEdges.png", false));
         showEdgeButton.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -226,7 +227,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
 
         //Edge color mode
 //        edgeHasNodeColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeHasNodeColorButton.ToolTipText"));
-//        edgeHasNodeColorButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/edgeNodeColor.png")));
+//        edgeHasNodeColorButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/edgeNodeColor.png", false));
 //        edgeHasNodeColorButton.addChangeListener(new ChangeListener() {
 //            @Override
 //            public void stateChanged(ChangeEvent e) {
@@ -273,7 +274,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
 
         //Show edge labels
         showEdgeLabelsButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.showEdgeLabelsButton.toolTipText"));
-        showEdgeLabelsButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/showEdgeLabels.png")));
+        showEdgeLabelsButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/showEdgeLabels.png", false));
         showEdgeLabelsButton.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -288,7 +289,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         toolbar.add(showEdgeLabelsButton);
 
         //Edge Font
-        edgeFontButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/font.png")));
+        edgeFontButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/font.png", false));
         edgeFontButton.addActionListener(new ActionListener() {
 
             @Override
@@ -320,7 +321,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         toolbar.addSeparator();
         // Reset Zoom 
         JButton resetZoomButton = new JButton();
-        resetZoomButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/centerOnGraph.png")));
+        resetZoomButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/centerOnGraph.png", false));
         resetZoomButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.resetZoomButton.toolTipText"));
         resetZoomButton.addActionListener(new ActionListener() {
             @Override
@@ -370,23 +371,23 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         final JToggleButton extendButton = new JToggleButton();
         extendButton.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.extendButton.text"));
         if (extendButton.isSelected()) {
-            extendButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowDown.png"))); // NOI18N
-            extendButton.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowDown_rollover.png"))); // NOI18N
+            extendButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowDown.png", false)); // NOI18N
+            extendButton.setRolloverIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowDown_rollover.png", false)); // NOI18N
 
         } else {
-            extendButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowUp.png"))); // NOI18N
-            extendButton.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowUp_rollover.png"))); // NOI18N
+            extendButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowUp.png", false)); // NOI18N
+            extendButton.setRolloverIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowUp_rollover.png", false)); // NOI18N
         }
         extendButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (extendButton.isSelected()) {
-                    extendButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowDown.png"))); // NOI18N
-                    extendButton.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowDown_rollover.png"))); // NOI18N
+                    extendButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowDown.png", false)); // NOI18N
+                    extendButton.setRolloverIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowDown_rollover.png", false)); // NOI18N
                 } else {
-                    extendButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowUp.png"))); // NOI18N
-                    extendButton.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/arrowUp_rollover.png"))); // NOI18N
+                    extendButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowUp.png", false)); // NOI18N
+                    extendButton.setRolloverIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowUp_rollover.png", false)); // NOI18N
                 }
                 extendedBar.setVisible(extendButton.isSelected());
             }

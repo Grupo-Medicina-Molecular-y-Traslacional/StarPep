@@ -39,6 +39,7 @@ import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.openide.awt.UndoRedo;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.Lookups;
@@ -62,7 +63,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
     private void initComponents() {
         setLayout(new CardLayout());
 
-        JLabel info = new JLabel(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/info.png")));
+        JLabel info = new JLabel(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/info.png", false));
         info.setHorizontalAlignment(SwingConstants.CENTER);
         info.setText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.infoLabel.text"));
         add(info, "infoCard");
@@ -114,7 +115,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
         toolbar.add(ratioLabel);
 
         // Refresh button
-        JButton refreshButton = new JButton(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/refresh.png")));
+        JButton refreshButton = new JButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/refresh.png", false));
         refreshButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.refreshButton.text"));
         refreshButton.addActionListener(new ActionListener() {
             @Override
@@ -138,8 +139,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
         // Reset Zoom 
         JButton resetZoomButton = new JButton();
 
-        resetZoomButton.setIcon(
-                new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/db/resources/centerOnGraph.png")));
+        resetZoomButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/centerOnGraph.png", false));
         resetZoomButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class,
                 "NeoGraphPreview.resetZoomButton.toolTipText"));
         resetZoomButton.addActionListener(

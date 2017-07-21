@@ -45,6 +45,7 @@ public class GraphWindowControllerImpl implements GraphWindowController {
     public void selectNode(Node node) {
         openGraphWindow();
         VizController.getInstance().getSelectionManager().selectNode(node);
+        VizController.getInstance().getSelectionManager().centerOnNode(node);
     }
 
     @Override

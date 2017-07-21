@@ -9,6 +9,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import javax.swing.Action;
+import org.bapedis.core.ui.actions.RemoveAllFromQueryModel;
 import org.bapedis.core.ui.actions.RemoveFromQueryModel;
 import org.bapedis.core.ui.actions.RemoveOthersFromQueryModel;
 import org.openide.nodes.AbstractNode;
@@ -27,6 +28,7 @@ public class QueryNode extends AbstractNode {
     protected final Metadata metadata;
     protected final QueryModel queryModel;
     protected final Action[] actions;
+    protected static Action removeAll = new RemoveAllFromQueryModel();
 
     public QueryNode(QueryModel model) {
         this(model, null);
@@ -35,16 +37,17 @@ public class QueryNode extends AbstractNode {
     public QueryNode(QueryModel queryModel, Metadata metadata) {
         super(metadata == null ? Children.create(new QueryModelChildFactory(queryModel), false)
                 : Children.LEAF,
-                Lookups.singleton(queryModel));
+                metadata == null? null: Lookups.singleton(metadata));
         this.metadata = metadata;
         this.queryModel = queryModel;
-        actions = new Action[]{new RemoveFromQueryModel(metadata), new RemoveOthersFromQueryModel(metadata)};
+        actions = new Action[]{new RemoveFromQueryModel(metadata), new RemoveOthersFromQueryModel(metadata), removeAll };
     }
 
     @Override
     public Action[] getActions(boolean context) {
         actions[0].setEnabled(metadata != null);        
         actions[1].setEnabled(metadata != null && queryModel.countElements() > 1);
+        actions[2].setEnabled(queryModel.countElements() > 0);
         return actions;
     }
 

@@ -20,11 +20,13 @@ import org.gephi.graph.api.GraphView;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.explorer.ExplorerUtils;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
+import org.openide.util.lookup.ProxyLookup;
 
 /**
  * Top component which displays something.
@@ -71,7 +73,9 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         splitPane.setLeftComponent(queryPanel);
         splitPane.setRightComponent(metadataPanel);
 
-//        associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));
+        associateLookup(new ProxyLookup(ExplorerUtils.createLookup(metadataPanel.getExplorerManager(), getActionMap()),
+                ExplorerUtils.createLookup(queryPanel.getExplorerManager(), getActionMap())));
+
         applyCheckBox.setSelected(NbPreferences.forModule(QueryModel.class).getBoolean(AUTO_APPLY, true));
     }
 

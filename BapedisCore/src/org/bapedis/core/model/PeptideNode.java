@@ -8,6 +8,8 @@ package org.bapedis.core.model;
 import java.awt.Image;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import javax.swing.Action;
+import org.bapedis.core.ui.actions.AddToQueryModel;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.NodeIterable;
@@ -54,6 +56,11 @@ public class PeptideNode extends AbstractNode {
     public Peptide getPeptide() {
         return peptide;
     }
+
+    @Override
+    public Action[] getActions(boolean context) {
+        return new Action[]{};
+    }        
 
     @Override
     protected Sheet createSheet() {

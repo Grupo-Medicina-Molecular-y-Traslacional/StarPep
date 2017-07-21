@@ -10,22 +10,21 @@ import java.awt.event.ItemEvent;
 import javax.swing.DefaultComboBoxModel;
 import org.bapedis.core.model.AnnotationType;
 import org.bapedis.core.model.AnnotationTypeChildFactory;
-import org.gephi.graph.api.GraphModel;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.view.BeanTreeView;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author cicese
  */
-public class MetadataPanel extends javax.swing.JPanel implements ExplorerManager.Provider {
+public class MetadataPanel extends javax.swing.JPanel implements ExplorerManager.Provider{
 
     protected final ExplorerManager explorerMgr;
-
     /**
      * Creates new form LibraryPanel
      */

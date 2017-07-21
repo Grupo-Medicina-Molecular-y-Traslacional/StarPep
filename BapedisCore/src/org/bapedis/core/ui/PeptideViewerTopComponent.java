@@ -95,6 +95,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         view.setPropertyColumns("seq", NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.nodelColumnLabel.seq"),
                 "length", NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.nodelColumnLabel.length"));
         view.setQuickSearchAllowed(false);
+        view.getNodePopupFactory().setShowQuickFilter(false);
         dataPanel.add(view, BorderLayout.CENTER);
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));

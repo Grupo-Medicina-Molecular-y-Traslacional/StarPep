@@ -59,6 +59,14 @@ public class QueryModel {
         metadata.setSelected(false);
         propertyChangeSupport.firePropertyChange(REMOVED_METADATA, metadata, null);
     }
+    
+    public void removeAll(){
+        for (Metadata m : metadatas) {
+            m.setSelected(false);
+        }        
+        metadatas.clear();
+        propertyChangeSupport.firePropertyChange(REMOVED_METADATA, null, null);
+    }
 
     public Node getRootContext() {
         return rootContext;

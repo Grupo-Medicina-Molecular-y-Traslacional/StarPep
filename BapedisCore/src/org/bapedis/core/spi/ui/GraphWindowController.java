@@ -16,6 +16,8 @@ public interface GraphWindowController {
     void openGraphWindow();
 
     void selectNode(Node node);
+    
+    void centerOnNode(Node node);
 
     void closeGraphWindow();
 }

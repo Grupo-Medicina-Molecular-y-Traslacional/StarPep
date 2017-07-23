@@ -86,7 +86,7 @@ public class VizController implements VisualizationController, WorkspaceEventLis
     public synchronized static VizController getInstance() {
         if (instance == null) {
             instance = (VizController) Lookup.getDefault().lookup(VisualizationController.class);
-            instance.initInstances();
+//            instance.initInstances();
         }
         return instance;
     }
@@ -173,6 +173,7 @@ public class VizController implements VisualizationController, WorkspaceEventLis
         
         engine = null;
         scheduler = null;
+        drawable = null;
         vizConfig = null;
         limits = null;
         graphIO = null;

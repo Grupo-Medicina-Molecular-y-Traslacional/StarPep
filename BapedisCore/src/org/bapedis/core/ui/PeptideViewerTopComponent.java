@@ -323,6 +323,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }
 
     private void setBusyLabel(boolean busy) {
+        makeBusy(busy);
         CardLayout cl = (CardLayout) centerPanel.getLayout();
         busyLabel.setBusy(busy);
         cl.show(centerPanel, busy ? "busyCard" : "dataCard");

@@ -8,6 +8,7 @@ package org.gephi.desktop.visualization;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Node;
 import org.gephi.visualization.VizController;
+import org.gephi.visualization.api.selection.SelectionManager;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewFactory;
 import org.openide.util.NbBundle;
@@ -35,17 +36,28 @@ public class GraphWindowControllerImpl implements GraphWindowController {
 
     @Override
     public void openGraphWindow() {
-        createInstance();
-        graphWindow.open();
+        if (graphWindow == null) {
+            createInstance();
+        }
+        if (!graphWindow.isOpened()) {
+            graphWindow.open();
+        }
         graphWindow.requestActive();
-
     }
 
     @Override
     public void selectNode(Node node) {
         openGraphWindow();
-        VizController.getInstance().getSelectionManager().selectNode(node);
-        VizController.getInstance().getSelectionManager().centerOnNode(node);
+        SelectionManager sm = VizController.getInstance().getSelectionManager();
+        sm.selectNode(node);
+//        sm.setDirectMouseSelection();
+    }
+
+    @Override
+    public void centerOnNode(Node node) {
+        openGraphWindow();
+        SelectionManager sm = VizController.getInstance().getSelectionManager();
+        sm.centerOnNode(node);
     }
 
     @Override

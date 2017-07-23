@@ -28,7 +28,7 @@ public class SelectNodeOnGraph extends AbstractAction {
         GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
         if (graphWC != null){
             graphWC.openGraphWindow();
-            graphWC.selectNode(node);
+            graphWC.centerOnNode(node);
         }
     }
     

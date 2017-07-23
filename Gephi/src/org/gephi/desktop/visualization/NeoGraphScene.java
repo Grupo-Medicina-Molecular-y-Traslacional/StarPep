@@ -15,9 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.concurrent.ExecutionException;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -25,10 +23,13 @@ import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
-import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.bapedis.core.events.WorkspaceEventListener;
+import org.bapedis.core.model.QueryModel;
+import org.bapedis.core.model.Workspace;
+import org.bapedis.core.services.ProjectManager;
 import org.gephi.ui.components.JColorButton;
 import org.gephi.visualization.VizController;
 import org.gephi.visualization.VizModel;
@@ -43,7 +44,6 @@ import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.openide.awt.UndoRedo;
-import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -54,8 +54,9 @@ import org.openide.windows.WindowManager;
  *
  * @author loge
  */
-public class NeoGraphScene extends JPanel implements MultiViewElement {
+public class NeoGraphScene extends JPanel implements MultiViewElement, WorkspaceEventListener, PropertyChangeListener {
 
+    protected final ProjectManager pc;
     private MultiViewElementCallback callback;
     private final JToolBar toolbar = new JToolBar();
     private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(20, 20));
@@ -77,22 +78,15 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
     final JButton edgeFontButton = new JButton();
     final JSlider edgeSizeSlider = new JSlider();
 
-    final PropertyChangeListener initListener;
-
     static {
         UIManager.put("Slider.paintValue", false);
     }
 
     public NeoGraphScene() {
         initComponents();
-        initListener = new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals("init")) {
-                    initToolBarComponents();
-                }
-            }
-        };
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
+        GraphDrawable drawable = VizController.getInstance().getDrawable();
+        graphPanel.add(drawable.getGraphComponent(), BorderLayout.CENTER);
     }
 
     private void initComponents() {
@@ -134,7 +128,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
 
         //Show node labels
         showNodeLabelsButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.showNodeLabelsButton.toolTipText"));
-        showNodeLabelsButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/showNodeLabels.png", false));        
+        showNodeLabelsButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/showNodeLabels.png", false));
         showNodeLabelsButton.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -394,13 +388,14 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
         });
         extendedBar.setVisible(extendButton.isSelected());
         toolbar.add(extendButton);
-        
+
     }
 
-    public void setBusy(boolean busy) {
+    public void setBusy(boolean busy) {        
         CardLayout cl = (CardLayout) getLayout();
         cl.show(NeoGraphScene.this, busy ? "busyCard" : "graphCard");
         busyLabel.setBusy(busy);
+        callback.getTopComponent().makeBusy(busy);
     }
 
     private void initToolBarComponents() {
@@ -500,37 +495,17 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
 
     @Override
     public void componentOpened() {
-        setBusy(true);
-
-        SwingWorker worker = new SwingWorker<GraphDrawable, Void>() {
-            @Override
-            protected GraphDrawable doInBackground() throws Exception {
-                GraphDrawable drawable = VizController.getInstance().getDrawable();
-                VizController.getInstance().getVizModel().addPropertyChangeListener(initListener);
-                return drawable;
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    graphPanel.add(get().getGraphComponent(), BorderLayout.CENTER);
-                    setBusy(false);
-                } catch (InterruptedException ex) {
-                    Exceptions.printStackTrace(ex);
-                } catch (ExecutionException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
-            }
-
-        };
-        worker.execute();
+        VizController.getInstance().getVizModel().addPropertyChangeListener(this);
+        pc.addWorkspaceEventListener(this);
+        Workspace currentWorkspace = pc.getCurrentWorkspace();
+        workspaceChanged(null, currentWorkspace);
     }
 
     @Override
     public void componentClosed() {
         // Destroy JOGL
-        VizController.getInstance().getVizModel().removePropertyChangeListener(initListener);
-        VizController.getInstance().destroy();
+        VizController.getInstance().getVizModel().removePropertyChangeListener(this);
+        pc.removeWorkspaceEventListener(this);
     }
 
     @Override
@@ -562,6 +537,31 @@ public class NeoGraphScene extends JPanel implements MultiViewElement {
     @Override
     public CloseOperationState canCloseElement() {
         return CloseOperationState.STATE_OK;
+    }
+
+    @Override
+    public void workspaceChanged(Workspace oldWs, Workspace newWs) {
+        if (oldWs != null) {
+            QueryModel oldQueryModel = pc.getQueryModel(oldWs);
+            oldQueryModel.removePropertyChangeListener(this);
+        }
+
+        QueryModel queryModel = pc.getQueryModel(newWs);
+        queryModel.addPropertyChangeListener(this);
+        setBusy(queryModel.isRunning());
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getSource() instanceof QueryModel) {
+            if (evt.getPropertyName().equals(QueryModel.RUNNING)) {
+                setBusy(((QueryModel) evt.getSource()).isRunning());
+            }
+        } else if (evt.getSource() instanceof VizModel) {
+            if (evt.getPropertyName().equals("init")) {
+                initToolBarComponents();
+            }
+        }
     }
 
 }

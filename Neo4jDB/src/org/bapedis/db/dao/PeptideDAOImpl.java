@@ -5,6 +5,7 @@
  */
 package org.bapedis.db.dao;
 
+import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AttributesModel;
@@ -55,8 +56,9 @@ public class PeptideDAOImpl implements PeptideDAO {
     private final String PRO_NAME = "name";
     private final String PRO_XREF = "xref";
 
-    private static final float GRAPH_NODE_SIZE = 10f;
-    private static final float GRAPH_EDGE_WEIGHT = 1f;
+    private final float GRAPH_NODE_SIZE = 10f;
+    private final float GRAPH_EDGE_WEIGHT = 1f;
+    private final Color color = new Color(0.6f, 0.6f, 0.6f);
 
     public PeptideDAOImpl() {
         graphDb = Neo4jDB.getDbService();
@@ -86,18 +88,18 @@ public class PeptideDAOImpl implements PeptideDAO {
             } else {
                 peptideNodes = getPeptides();
             }
-            
+
             // Write lock
             graphModel.getGraph().writeLock();
             checkColumns(graphModel);
             GraphView gView = graphModel.createView();
             Subgraph subGraph = graphModel.getGraph(gView);
-            
+
             Peptide peptide;
             org.gephi.graph.api.Node graphNode, graphNeighborNode;
             org.gephi.graph.api.Edge graphEdge;
             PeptideAttribute attr;
-            String id, seq;            
+            String id, seq;
             try {
                 while (peptideNodes.hasNext()) {
                     Node neoNode = peptideNodes.next();
@@ -228,6 +230,12 @@ public class PeptideDAOImpl implements PeptideDAO {
             graphNode.setX((float) ((0.01 + Math.random()) * 1000) - 500);
             graphNode.setY((float) ((0.01 + Math.random()) * 1000) - 500);
 
+            //Set color
+            graphNode.setR(color.getRed() / 255f);
+            graphNode.setG(color.getGreen() / 255f);
+            graphNode.setB(color.getBlue() / 255f);
+            graphNode.setAlpha(1f);
+
             mainGraph.addNode(graphNode);
         }
         return graphNode;
@@ -245,6 +253,12 @@ public class PeptideDAOImpl implements PeptideDAO {
             graphEdge = factory.newEdge(id, startNode, endNode, relType, GRAPH_EDGE_WEIGHT, false);
             graphEdge.setLabel(relName);
             graphEdge.setAttribute(PRO_XREF, relation.getProperty(PRO_XREF));
+
+            //Set color
+            graphEdge.setR(color.getRed() / 255f);
+            graphEdge.setG(color.getGreen() / 255f);
+            graphEdge.setB(color.getBlue() / 255f);
+            graphEdge.setAlpha(0f);
 
             mainGraph.addEdge(graphEdge);
         }

@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.model;
 
-import java.awt.Color;
 import java.awt.Image;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -14,7 +13,7 @@ import org.bapedis.core.ui.actions.SelectNodeOnGraph;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.NodeIterable;
-import org.gephi.graph.api.TextProperties;
+import org.openide.actions.PropertiesAction;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
@@ -22,6 +21,7 @@ import org.openide.nodes.Sheet;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.actions.SystemAction;
 import org.openide.util.lookup.Lookups;
 
 /**
@@ -40,7 +40,7 @@ public class PeptideNode extends AbstractNode {
     public PeptideNode(Peptide peptide, Children children, Lookup lookup) {
         super(children, lookup);
         this.peptide = peptide;
-        actions = new Action[]{new SelectNodeOnGraph(peptide.getGraphNode())};
+        actions = new Action[]{new SelectNodeOnGraph(peptide.getGraphNode()), SystemAction.get(PropertiesAction.class)};
     }
 
     @Override
@@ -63,7 +63,6 @@ public class PeptideNode extends AbstractNode {
 
     @Override
     public Action[] getActions(boolean context) {
-//        SystemAction.get(PropertiesAction.class);
         return actions;
     }
 

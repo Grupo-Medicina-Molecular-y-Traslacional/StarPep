@@ -5,6 +5,7 @@
  */
 package org.gephi.visualization.apiimpl.contextmenuitems;
 
+import org.gephi.desktop.visualization.NodePropertiesWrapper;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.Icon;

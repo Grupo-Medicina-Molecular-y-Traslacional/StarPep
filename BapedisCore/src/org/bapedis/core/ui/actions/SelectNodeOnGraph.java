@@ -7,9 +7,11 @@ package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
+import static javax.swing.Action.NAME;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Node;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -21,6 +23,7 @@ public class SelectNodeOnGraph extends AbstractAction {
 
     public SelectNodeOnGraph(Node node) {
         this.node = node;
+        putValue(NAME, NbBundle.getMessage(RemoveFromQueryModel.class, "SelectNodeOnGraph.name"));        
     }    
     
     @Override

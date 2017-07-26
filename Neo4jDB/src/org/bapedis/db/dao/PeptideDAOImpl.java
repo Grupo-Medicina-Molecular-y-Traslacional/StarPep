@@ -54,6 +54,7 @@ public class PeptideDAOImpl implements PeptideDAO {
     private final String PRO_SEQ = "seq";
     private final String PRO_LENGHT = "length";
     private final String PRO_NAME = "name";
+    private final String PRO_TYPE = "type";
     private final String PRO_XREF = "xref";
 
     private final float GRAPH_NODE_SIZE = 10f;
@@ -203,6 +204,11 @@ public class PeptideDAOImpl implements PeptideDAO {
         if (!nodeTable.hasColumn(PRO_NAME)) {
             nodeTable.addColumn(PRO_NAME, String.class);
         }
+        
+        if (!nodeTable.hasColumn(PRO_TYPE)) {
+            nodeTable.addColumn(PRO_TYPE, String.class);
+        }
+        
 
         Table edgeTable = graphModel.getEdgeTable();
         if (!edgeTable.hasColumn(PRO_XREF)) {
@@ -224,6 +230,7 @@ public class PeptideDAOImpl implements PeptideDAO {
             }
             String label = neoNode.getLabels().iterator().next().name();
             graphNode.setLabel(label);
+            graphNode.setAttribute(PRO_TYPE, label);
             graphNode.setSize(GRAPH_NODE_SIZE);
 
             //Set random position

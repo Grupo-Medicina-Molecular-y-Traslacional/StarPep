@@ -22,7 +22,7 @@ import org.openide.windows.TopComponent;
 @ServiceProvider(service = GraphWindowController.class)
 public class GraphWindowControllerImpl implements GraphWindowController {
 
-    private TopComponent graphWindow;
+    private TopComponent graphWindow;    
 
     private void createInstance() {
         if (graphWindow == null) {
@@ -34,6 +34,11 @@ public class GraphWindowControllerImpl implements GraphWindowController {
         }
     }
 
+    @Override
+    public TopComponent getGraphWindow() {
+        return graphWindow;
+    }
+       
     @Override
     public void openGraphWindow() {
         if (graphWindow == null) {

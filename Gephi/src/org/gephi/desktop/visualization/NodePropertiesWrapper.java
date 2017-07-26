@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.gephi.visualization.apiimpl.contextmenuitems;
+package org.gephi.desktop.visualization;
 
 import java.awt.Color;
 import java.lang.reflect.InvocationTargetException;

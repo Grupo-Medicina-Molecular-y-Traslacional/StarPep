@@ -6,12 +6,7 @@
 package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.List;
 import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.LookAndFeel;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -19,8 +14,6 @@ import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.actions.Presenter;
-import org.openide.util.Utilities;
 
 /**
  *

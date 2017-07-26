@@ -15,6 +15,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.LinkedList;
+import java.util.List;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -23,6 +25,7 @@ import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -30,12 +33,15 @@ import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
+import org.gephi.graph.api.Node;
 import org.gephi.ui.components.JColorButton;
 import org.gephi.visualization.VizController;
 import org.gephi.visualization.VizModel;
 import org.gephi.visualization.apiimpl.GraphDrawable;
 import org.gephi.visualization.apiimpl.GraphIO;
 import org.gephi.ui.components.JPopupButton;
+import org.gephi.visualization.apiimpl.VizEvent;
+import org.gephi.visualization.apiimpl.VizEventListener;
 import org.gephi.visualization.text.SizeMode;
 import org.gephi.visualization.text.TextManager;
 import org.gephi.visualization.text.TextModelImpl;
@@ -54,7 +60,7 @@ import org.openide.windows.WindowManager;
  *
  * @author loge
  */
-public class NeoGraphScene extends JPanel implements MultiViewElement, WorkspaceEventListener, PropertyChangeListener {
+public class NeoGraphScene extends JPanel implements MultiViewElement, WorkspaceEventListener, PropertyChangeListener, VizEventListener {
 
     protected final ProjectManager pc;
     private MultiViewElementCallback callback;
@@ -71,7 +77,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     final JSlider nodeSizeSlider = new JSlider();
     //Edge
     final JToggleButton showEdgeButton = new JToggleButton();
-//    final JToggleButton edgeHasNodeColorButton = new JToggleButton();
+    final JToggleButton edgeHasNodeColorButton = new JToggleButton();
 //    final JColorButton edgeColorButton = new JColorButton(Color.BLACK);
     final JSlider edgeScaleSlider = new JSlider();
     final JToggleButton showEdgeLabelsButton = new JToggleButton();
@@ -219,19 +225,20 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         setEdgeButton(showEdgeButton.isSelected());
         toolbar.add(showEdgeButton);
 
-        //Edge color mode
-//        edgeHasNodeColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeHasNodeColorButton.ToolTipText"));
-//        edgeHasNodeColorButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/edgeNodeColor.png", false));
-//        edgeHasNodeColorButton.addChangeListener(new ChangeListener() {
-//            @Override
-//            public void stateChanged(ChangeEvent e) {
-//                VizModel vizModel = VizController.getInstance().getVizModel();
-//                if (vizModel.isEdgeHasUniColor() == edgeHasNodeColorButton.isSelected()) {
-//                    vizModel.setEdgeHasUniColor(!edgeHasNodeColorButton.isSelected());
-//                }
-//            }
-//        });
-//        toolbar.add(edgeHasNodeColorButton);
+//        Edge color mode
+        edgeHasNodeColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeHasNodeColorButton.ToolTipText"));
+        edgeHasNodeColorButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/edgeNodeColor.png", false));
+        edgeHasNodeColorButton.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                VizModel vizModel = VizController.getInstance().getVizModel();
+                if (vizModel.isEdgeHasUniColor() == edgeHasNodeColorButton.isSelected()) {
+                    vizModel.setEdgeHasUniColor(!edgeHasNodeColorButton.isSelected());
+                }
+            }
+        });
+        toolbar.add(edgeHasNodeColorButton);
+
         //Edge color
 //        edgeColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeColorButton.ToolTipText"));
 //        edgeColorButton.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
@@ -249,6 +256,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 //            }
 //        });
 //        toolbar.add(edgeColorButton);
+
         //EdgeScale slider
         edgeScaleSlider.setMinimum(0);
         edgeScaleSlider.setMaximum(100);
@@ -391,7 +399,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
     }
 
-    public void setBusy(boolean busy) {        
+    public void setBusy(boolean busy) {
         CardLayout cl = (CardLayout) getLayout();
         cl.show(NeoGraphScene.this, busy ? "busyCard" : "graphCard");
         busyLabel.setBusy(busy);
@@ -430,7 +438,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         showEdgeButton.setSelected(vizModel.isShowEdges());
 
         //Edge color mode
-//        edgeHasNodeColorButton.setSelected(!vizModel.isEdgeHasUniColor());
+        edgeHasNodeColorButton.setSelected(!vizModel.isEdgeHasUniColor());
+        
         //Edge color
 //        float[] edgeColorArray = vizModel.getEdgeUniColor();
 //        edgeColorButton.setColor(new Color(edgeColorArray[0], edgeColorArray[1], edgeColorArray[2], edgeColorArray[3]));
@@ -496,6 +505,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     @Override
     public void componentOpened() {
         VizController.getInstance().getVizModel().addPropertyChangeListener(this);
+        VizController.getInstance().getVizEventManager().addListener(this);
         pc.addWorkspaceEventListener(this);
         Workspace currentWorkspace = pc.getCurrentWorkspace();
         workspaceChanged(null, currentWorkspace);
@@ -503,8 +513,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
     @Override
     public void componentClosed() {
-        // Destroy JOGL
         VizController.getInstance().getVizModel().removePropertyChangeListener(this);
+        VizController.getInstance().getVizEventManager().removeListener(this);
         pc.removeWorkspaceEventListener(this);
     }
 
@@ -562,6 +572,26 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 initToolBarComponents();
             }
         }
+    }
+
+    @Override
+    public void handleEvent(VizEvent event) {        
+        final List<org.openide.nodes.Node> activeNodes = new LinkedList<>();
+        Node[] selectedNodes = (Node[]) event.getData();
+        for (Node node : selectedNodes) {
+            activeNodes.add(new NodePropertiesWrapper(node));
+        }
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                callback.getTopComponent().setActivatedNodes(activeNodes.toArray(new org.openide.nodes.Node[0]));
+            }
+        });                
+    }
+
+    @Override
+    public VizEvent.Type getType() {
+        return VizEvent.Type.NODE_LEFT_CLICK;
     }
 
 }

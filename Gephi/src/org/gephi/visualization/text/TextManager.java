@@ -247,7 +247,11 @@ public class TextManager implements VizArchitecture {
     private String buildText(Graph graph, Element element, Column[] selectedColumns) {
         String txt;
         if (selectedColumns == null || selectedColumns.length == 0) {
-            txt = element.getLabel();
+            if (element.getTable().hasColumn("name")) {
+                txt = (String) element.getAttribute("name");
+            } else {
+                txt = element.getLabel();
+            }
         } else if (selectedColumns.length == 1) {
             return buildText(graph, element, selectedColumns[0]);
         } else {

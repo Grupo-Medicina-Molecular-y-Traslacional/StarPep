@@ -5,16 +5,16 @@
  */
 package org.bapedis.core.model;
 
+import java.awt.Color;
 import java.awt.Image;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import javax.swing.Action;
-import org.bapedis.core.ui.actions.AddToQueryModel;
 import org.bapedis.core.ui.actions.SelectNodeOnGraph;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.NodeIterable;
-import org.openide.actions.PropertiesAction;
+import org.gephi.graph.api.TextProperties;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
@@ -22,7 +22,6 @@ import org.openide.nodes.Sheet;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.actions.SystemAction;
 import org.openide.util.lookup.Lookups;
 
 /**
@@ -64,7 +63,7 @@ public class PeptideNode extends AbstractNode {
 
     @Override
     public Action[] getActions(boolean context) {
-//        SystemAction.get(PropertiesAction.class)
+//        SystemAction.get(PropertiesAction.class);
         return actions;
     }
 
@@ -118,7 +117,7 @@ public class PeptideNode extends AbstractNode {
             }
             sheet.put(set);
         }
-
+        
         // Databases
 //        set = Sheet.createPropertiesSet();
 //        set.setName("databases");
@@ -160,11 +159,11 @@ public class PeptideNode extends AbstractNode {
             if (value instanceof String[]) {
                 strValue = Arrays.toString((String[]) value);
 //            strValue = strValue.substring(1, strValue.length() - 1);
-            } 
+            }
 //            else{
 //                System.out.println(value.getClass());
 //            }
-        } else{
+        } else {
             strValue = value.toString();
         }
 
@@ -173,5 +172,6 @@ public class PeptideNode extends AbstractNode {
 //      property.setValue("suppressCustomEditor", true);
         return property;
     }
+
 
 }

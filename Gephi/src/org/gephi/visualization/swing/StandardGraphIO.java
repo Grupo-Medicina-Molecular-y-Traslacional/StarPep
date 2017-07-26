@@ -55,6 +55,7 @@ import org.gephi.visualization.GraphLimits;
 import org.gephi.visualization.VizArchitecture;
 import org.gephi.visualization.VizController;
 import org.gephi.visualization.api.selection.SelectionManager;
+import org.gephi.visualization.apiimpl.GraphContextMenu;
 //import org.gephi.visualization.apiimpl.GraphContextMenu;
 import org.gephi.visualization.apiimpl.GraphIO;
 import org.gephi.visualization.apiimpl.VizEventManager;
@@ -235,11 +236,11 @@ public class StandardGraphIO implements GraphIO, VizArchitecture {
                 break;
             case MouseEvent.BUTTON3:
                 if (vizController.getVizConfig().isContextMenu()) {
-//                    GraphContextMenu popupMenu = new GraphContextMenu();
-//                    float globalScale = graphDrawable.getGlobalScale();
-//                    int x = (int) (mousePosition[0] / globalScale);
-//                    int y = (int) ((graphDrawable.viewport.get(3) - mousePosition[1]) / globalScale);
-//                    popupMenu.getMenu().show(graphDrawable.getGraphComponent(), x, y);
+                    GraphContextMenu popupMenu = new GraphContextMenu();
+                    float globalScale = graphDrawable.getGlobalScale();
+                    int x = (int) (mousePosition[0] / globalScale);
+                    int y = (int) ((graphDrawable.viewport.get(3) - mousePosition[1]) / globalScale);
+                    popupMenu.getMenu().show(graphDrawable.getGraphComponent(), x, y);
                 }
                 vizEventManager.mouseRightClick();
                 break;

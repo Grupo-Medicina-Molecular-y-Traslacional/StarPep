@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.Action;
@@ -53,6 +54,8 @@ import org.openide.awt.UndoRedo;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.AbstractLookup;
+import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.Lookups;
 import org.openide.windows.WindowManager;
 
@@ -63,6 +66,8 @@ import org.openide.windows.WindowManager;
 public class NeoGraphScene extends JPanel implements MultiViewElement, WorkspaceEventListener, PropertyChangeListener, VizEventListener {
 
     protected final ProjectManager pc;
+    protected final InstanceContent content;
+    protected final Lookup lookup;
     private MultiViewElementCallback callback;
     private final JToolBar toolbar = new JToolBar();
     private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(20, 20));
@@ -93,6 +98,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         GraphDrawable drawable = VizController.getInstance().getDrawable();
         graphPanel.add(drawable.getGraphComponent(), BorderLayout.CENTER);
+        content = new InstanceContent();
+        lookup = new AbstractLookup(content);
     }
 
     private void initComponents() {
@@ -499,7 +506,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
     @Override
     public Lookup getLookup() {
-        return Lookups.singleton(this);
+        return lookup;
     }
 
     @Override
@@ -576,17 +583,14 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
     @Override
     public void handleEvent(VizEvent event) {        
-        final List<org.openide.nodes.Node> activeNodes = new LinkedList<>();
+        Collection<? extends NodePropertiesWrapper> oldNodes = lookup.lookupAll(NodePropertiesWrapper.class);
+        for(NodePropertiesWrapper node: oldNodes){
+            content.remove(node);
+        }
         Node[] selectedNodes = (Node[]) event.getData();
         for (Node node : selectedNodes) {
-            activeNodes.add(new NodePropertiesWrapper(node));
+            content.add(new NodePropertiesWrapper(node));
         }
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                callback.getTopComponent().setActivatedNodes(activeNodes.toArray(new org.openide.nodes.Node[0]));
-            }
-        });                
     }
 
     @Override

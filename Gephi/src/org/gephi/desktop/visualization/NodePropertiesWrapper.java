@@ -68,24 +68,29 @@ public class NodePropertiesWrapper extends AbstractNode {
         // Name property
         String name = NbBundle.getMessage(NodePropertiesWrapper.class, "PropertySet.name");
         String displayName = NbBundle.getMessage(NodePropertiesWrapper.class, "PropertySet.name.desc");
+        final String nameValue = (String)node.getAttribute("name");
         property = new PropertySupport.ReadOnly("name", String.class, name, displayName) {
 
             @Override
             public Object getValue() throws IllegalAccessException, InvocationTargetException {
-                return node.getAttribute("name");
+                return nameValue;
             }
         };
+        property.setValue("htmlDisplayValue", "<font color='000000'>" + nameValue + "</font>");
         set.put(property);
+        
         // Label property
         name = NbBundle.getMessage(NodePropertiesWrapper.class, "PropertySet.label");
         displayName = NbBundle.getMessage(NodePropertiesWrapper.class, "PropertySet.label.desc");
+        final String labelValue = node.getLabel();
         property = new PropertySupport.ReadOnly("label", String.class, name, displayName) {
 
             @Override
             public Object getValue() throws IllegalAccessException, InvocationTargetException {
-                return node.getLabel();
+                return labelValue;
             }
         };
+        property.setValue("htmlDisplayValue", "<font color='000000'>" + labelValue + "</font>");
         set.put(property);
         sheet.put(set);
         

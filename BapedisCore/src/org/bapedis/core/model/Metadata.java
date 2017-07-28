@@ -10,6 +10,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import org.gephi.graph.api.Node;
 
 /**
  *
@@ -18,20 +19,21 @@ import java.util.Objects;
 public class Metadata {
     public static final String SELECTED = "Selected";
     protected boolean selected;
-    protected final Long underlyingNodeID;
+    protected final String underlyingNodeID;
+    protected Node node;
     protected final String name;
     protected final AnnotationType annotationType;
     protected List<Metadata> childs;    
     private transient final PropertyChangeSupport changeSupport =
             new PropertyChangeSupport(this);
 
-    public Metadata(Long underlyingNodeID, String name, AnnotationType annotationType) {
+    public Metadata(String underlyingNodeID, String name, AnnotationType annotationType) {
         this.underlyingNodeID = underlyingNodeID;
         this.name = name;
         this.annotationType = annotationType;
         selected = false;
         childs = new LinkedList<>();
-    }
+    }    
     
     public String getName(){
         return name;
@@ -71,14 +73,22 @@ public class Metadata {
     }
     
     
-    public Long getUnderlyingNodeID(){
+    public String getUnderlyingNodeID(){
         return underlyingNodeID;
     }
+
+    public Node getNode() {
+        return node;
+    }
+
+    public void setNode(Node node) {
+        this.node = node;
+    }        
     
     public void addPropertyChangeListener(
             final PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);
-    }
+    }    
 
     /**
      * Remove PropertyChangeListener.

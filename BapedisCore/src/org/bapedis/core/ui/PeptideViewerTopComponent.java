@@ -341,9 +341,8 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     public void componentClosed() {
         removeLookupListener();
         pc.removeWorkspaceEventListener(this);
-        AttributesModel attrModel = pc.getAttributesModel();
-        if (attrModel != null) {
-            attrModel.removeQuickFilterChangeListener(this);
+        if (currentModel != null) {
+            currentModel.removeQuickFilterChangeListener(this);
         }
     }
 

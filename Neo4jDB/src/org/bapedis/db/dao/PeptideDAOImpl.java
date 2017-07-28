@@ -83,7 +83,7 @@ public class PeptideDAOImpl implements PeptideDAO {
             if (queryModel.countElements() > 0) {
                 List<Node> startNodes = new LinkedList<>();
                 for (Metadata metadata : queryModel.getMetadatas()) {
-                    startNodes.add(graphDb.getNodeById(metadata.getUnderlyingNodeID()));
+                    startNodes.add(graphDb.getNodeById(Long.valueOf(metadata.getUnderlyingNodeID())));
                 }
                 peptideNodes = getPeptides(startNodes);
             } else {
@@ -218,7 +218,7 @@ public class PeptideDAOImpl implements PeptideDAO {
 
     protected org.gephi.graph.api.Node getGraphNodeFromNeoNode(Node neoNode, GraphModel graphModel) {
         Graph mainGraph = graphModel.getGraph();
-        String id = String.valueOf(neoNode.getId());
+        String id =  String.valueOf(neoNode.getId());
         org.gephi.graph.api.Node graphNode = mainGraph.getNode(id);
         if (graphNode == null) {
             GraphFactory factory = graphModel.factory();

@@ -51,6 +51,7 @@ import org.openide.util.lookup.Lookups;
 public class NeoGraphPreView extends JPanel implements MultiViewElement {
 
     private final PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);
+    protected final Lookup lookup;
     private PreviewSketch sketch;
 
     private MultiViewElementCallback callback;
@@ -58,6 +59,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
 
     public NeoGraphPreView() {
         initComponents();
+        lookup = Lookups.singleton(new PreviewNode());
     }
 
     private void initComponents() {
@@ -209,7 +211,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
 
     @Override
     public Lookup getLookup() {
-        return Lookups.singleton(this);
+        return lookup;
     }
 
     @Override

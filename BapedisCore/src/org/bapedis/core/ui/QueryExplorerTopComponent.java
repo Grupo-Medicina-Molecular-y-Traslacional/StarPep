@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.ui;
 
+import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.concurrent.ExecutionException;
@@ -20,12 +21,15 @@ import org.gephi.graph.api.GraphView;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
+import org.openide.explorer.view.BeanTreeView;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
+import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
 
 /**
@@ -52,11 +56,10 @@ import org.openide.util.lookup.ProxyLookup;
     "CTL_QueryExplorerTopComponent=Query",
     "HINT_QueryExplorerTopComponent=Query window"
 })
-public final class QueryExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener {
+public final class QueryExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener, ExplorerManager.Provider {
 
     protected final ProjectManager pc;
-    protected final QueryPanel queryPanel;
-    protected final MetadataPanel metadataPanel;
+    protected final ExplorerManager explorerMgr;
     private static final String AUTO_APPLY = "AUTO_APPLY";
 
     public QueryExplorerTopComponent() {
@@ -67,14 +70,12 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         setName(Bundle.CTL_QueryExplorerTopComponent());
         setToolTipText(Bundle.HINT_QueryExplorerTopComponent());
 
-        metadataPanel = new MetadataPanel();
-        queryPanel = new QueryPanel();
-
-        splitPane.setLeftComponent(queryPanel);
-        splitPane.setRightComponent(metadataPanel);
-
-        associateLookup(new ProxyLookup(ExplorerUtils.createLookup(metadataPanel.getExplorerManager(), getActionMap()),
-                ExplorerUtils.createLookup(queryPanel.getExplorerManager(), getActionMap())));
+        explorerMgr = new ExplorerManager();
+        BeanTreeView view = new BeanTreeView();        
+        centerPanel.add(view, BorderLayout.CENTER);
+        
+        associateLookup(new ProxyLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()), 
+                        Lookups.singleton(new MetadataNavigatorLookupHint())));
 
         applyCheckBox.setSelected(NbPreferences.forModule(QueryModel.class).getBoolean(AUTO_APPLY, true));
     }
@@ -89,30 +90,23 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         java.awt.GridBagConstraints gridBagConstraints;
 
         applyCheckBox = new javax.swing.JCheckBox();
-        splitPane = new javax.swing.JSplitPane();
         runButton = new javax.swing.JButton();
+        centerPanel = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(applyCheckBox, org.openide.util.NbBundle.getMessage(QueryExplorerTopComponent.class, "QueryExplorerTopComponent.applyCheckBox.text")); // NOI18N
+        applyCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                applyCheckBoxActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 2, 0);
         add(applyCheckBox, gridBagConstraints);
-
-        splitPane.setBorder(null);
-        splitPane.setDividerLocation(260);
-        splitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(splitPane, gridBagConstraints);
 
         runButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/run.gif"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(runButton, org.openide.util.NbBundle.getMessage(QueryExplorerTopComponent.class, "QueryExplorerTopComponent.runButton.text")); // NOI18N
@@ -128,16 +122,30 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
         add(runButton, gridBagConstraints);
+
+        centerPanel.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(centerPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
         runQuery();
     }//GEN-LAST:event_runButtonActionPerformed
 
+    private void applyCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyCheckBoxActionPerformed
+        NbPreferences.forModule(QueryModel.class).putBoolean(AUTO_APPLY, applyCheckBox.isSelected());
+    }//GEN-LAST:event_applyCheckBoxActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox applyCheckBox;
+    private javax.swing.JPanel centerPanel;
     private javax.swing.JButton runButton;
-    private javax.swing.JSplitPane splitPane;
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {
@@ -171,7 +179,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         }
         QueryModel newModel = pc.getQueryModel(newWs);
         newModel.addPropertyChangeListener(this);
-        queryPanel.setQueryModel(newModel);
+        explorerMgr.setRootContext(newModel.getRootContext());
     }
 
     @Override
@@ -227,6 +235,11 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
             queryModel.setRunning(true);
             worker.execute();
         }
+    }
+
+    @Override
+    public ExplorerManager getExplorerManager() {
+        return explorerMgr;
     }
 
 }

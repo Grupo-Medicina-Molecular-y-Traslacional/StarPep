@@ -16,8 +16,6 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -26,7 +24,6 @@ import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -56,7 +53,6 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
-import org.openide.util.lookup.Lookups;
 import org.openide.windows.WindowManager;
 
 /**

@@ -37,15 +37,18 @@ public class QueryNode extends AbstractNode {
     public QueryNode(QueryModel queryModel, Metadata metadata) {
         super(metadata == null ? Children.create(new QueryModelChildFactory(queryModel), false)
                 : Children.LEAF,
-                metadata == null? null: Lookups.singleton(metadata));
+                metadata == null ? null : Lookups.singleton(metadata));
         this.metadata = metadata;
         this.queryModel = queryModel;
-        actions = new Action[]{new RemoveFromQueryModel(metadata), new RemoveOthersFromQueryModel(metadata), removeAll };
+        actions = new Action[]{new RemoveFromQueryModel(metadata), new RemoveOthersFromQueryModel(metadata), removeAll};
+        if (metadata != null) {
+            setDisplayName(metadata.getName());
+        }
     }
 
     @Override
     public Action[] getActions(boolean context) {
-        actions[0].setEnabled(metadata != null);        
+        actions[0].setEnabled(metadata != null);
         actions[1].setEnabled(metadata != null && queryModel.countElements() > 1);
         actions[2].setEnabled(queryModel.countElements() > 0);
         return actions;
@@ -76,12 +79,11 @@ public class QueryNode extends AbstractNode {
 
     @Override
     public String getHtmlDisplayName() {
-        if (metadata != null){
-        return "<font color='AAAAAA'><i>" + metadata.getAnnotationType().getRelationType() +  ":</i></font>" +
-               "<i> " + metadata.getName() + "</i>";
+        if (metadata != null) {
+            return "<font color='AAAAAA'><i>" + metadata.getAnnotationType().getRelationType() + ":</i></font>"
+                    + "<i> " + metadata.getName() + "</i>";
         }
         return NbBundle.getMessage(QueryNode.class, "QueryNode.rootContext.name");
     }
-    
-    
+
 }

@@ -44,7 +44,7 @@ public class AttributesModel {
         return attrsMap.values().toArray(new PeptideAttribute[0]);
     }
 
-    public Peptide[] getPeptides() {
+    public synchronized Peptide[] getPeptides() {
         List<Peptide> peptides = new LinkedList<>();
         boolean accepted;
         for (PeptideNode pNode : nodeList) {

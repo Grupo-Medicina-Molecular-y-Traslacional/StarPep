@@ -66,7 +66,7 @@ public class MetadataDAOImpl implements MetadataDAO{
                 Metadata metadata;
                 while(nodes.hasNext()){
                     node = nodes.next();
-                    metadata = new Metadata(node.getId(), node.getProperty(PRO_NAME).toString(), type);
+                    metadata = new Metadata(String.valueOf(node.getId()), node.getProperty(PRO_NAME).toString(), type);
                     list.add(metadata);
                 }
                 nodes.close();
@@ -86,7 +86,7 @@ public class MetadataDAOImpl implements MetadataDAO{
     }
     
     protected Metadata getBioCategory(Node root) {
-        Metadata category = new Metadata(root.getId(), root.getProperty(PRO_NAME).toString(), AnnotationType.BIOCATEGORY);
+        Metadata category = new Metadata(String.valueOf(root.getId()), root.getProperty(PRO_NAME).toString(), AnnotationType.BIOCATEGORY);
         Iterable<Relationship> rels = root.getRelationships(Direction.INCOMING, MyRelationship.is_a);
         for (Relationship rel : rels) {
             Node startNode = rel.getStartNode();

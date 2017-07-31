@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.ui;
 
+import java.awt.CardLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.ButtonGroup;
@@ -13,12 +14,17 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.GraphElement;
+import org.bapedis.core.model.GraphElementChildFactory;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
+import org.openide.explorer.view.OutlineView;
+import org.openide.nodes.AbstractNode;
+import org.openide.nodes.Children;
 import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
@@ -40,6 +46,8 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
     protected AttributesModel currentModel;
 
     protected final JToggleButton nodesBtn, edgesBtn;
+    protected GraphElement type;
+    protected final AbstractNode[] rootContext;
 
     /**
      * Creates new form GraphElementNavigator
@@ -51,6 +59,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
 
         nodesBtn = new JToggleButton(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.node.name"));
         initToogleButton(nodesBtn);
+
         edgesBtn = new JToggleButton(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.name"));
         initToogleButton(edgesBtn);
 
@@ -58,6 +67,8 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
         elementGroup.add(nodesBtn);
         elementGroup.add(edgesBtn);
 
+        type = GraphElement.Node;
+        nodesBtn.setSelected(true);
         nodesBtn.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -73,10 +84,30 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
 
         toolBar = new JToolBar();
         toolBar.add(nodesBtn);
+        toolBar.addSeparator();
         toolBar.add(edgesBtn);
 
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         lookup = ExplorerUtils.createLookup(explorerMgr, getActionMap());
+
+        rootContext = new AbstractNode[]{new AbstractNode(Children.create(new GraphElementChildFactory(GraphElement.Node), true)),
+            new AbstractNode(Children.create(new GraphElementChildFactory(GraphElement.Edge), true))};
+
+        OutlineView nodeView = new OutlineView(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.node.name"));
+        nodeView.getOutline().setRootVisible(false);
+        nodeView.getOutline().setPopupUsedFromTheCorner(false);
+        nodeView.setPropertyColumns("label", NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.node.label"));
+        centerPanel.add(nodeView, "nodeCard");
+
+        OutlineView edgeView = new OutlineView(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.name"));
+        edgeView.getOutline().setRootVisible(false);
+        edgeView.getOutline().setPopupUsedFromTheCorner(false);
+        edgeView.setPropertyColumns("source", NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.source"),
+                "target", NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.target"));
+        centerPanel.add(edgeView, "edgeCard");
+
+        CardLayout cl = (CardLayout) centerPanel.getLayout();
+        cl.show(centerPanel, "nodeCard");
     }
 
     private void initToogleButton(JToggleButton btn) {
@@ -86,11 +117,22 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
     }
 
     private void nodesButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        
+        if (type != GraphElement.Node) {
+            type = GraphElement.Node;
+            CardLayout cl = (CardLayout) centerPanel.getLayout();
+            cl.show(centerPanel, "nodeCard");
+            refreshData();            
+        }
+
     }
-    
+
     private void edgesButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        
+        if (type != GraphElement.Edge) {
+            type = GraphElement.Edge;
+            CardLayout cl = (CardLayout) centerPanel.getLayout();
+            cl.show(centerPanel, "edgeCard");
+            refreshData();
+        }
     }
 
     /**
@@ -106,17 +148,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
 
         setLayout(new java.awt.BorderLayout());
 
-        javax.swing.GroupLayout centerPanelLayout = new javax.swing.GroupLayout(centerPanel);
-        centerPanel.setLayout(centerPanelLayout);
-        centerPanelLayout.setHorizontalGroup(
-            centerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        centerPanelLayout.setVerticalGroup(
-            centerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
-
+        centerPanel.setLayout(new java.awt.CardLayout());
         add(centerPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -153,8 +185,8 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
         refreshData();
     }
 
-    private void refreshData() {
-
+    private void refreshData() { 
+        explorerMgr.setRootContext(rootContext[type.ordinal()]);
     }
 
     @Override

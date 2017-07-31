@@ -14,6 +14,7 @@ import org.netbeans.core.spi.multiview.MultiViewFactory;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -22,32 +23,34 @@ import org.openide.windows.TopComponent;
 @ServiceProvider(service = GraphWindowController.class)
 public class GraphWindowControllerImpl implements GraphWindowController {
 
-    private TopComponent graphWindow;    
+    private TopComponent graphWindow;
 
-    private void createInstance() {
-        if (graphWindow == null) {
-            MultiViewDescription[] multiviews = new MultiViewDescription[2];
-            multiviews[0] = new NeoGraphSceneDescription();
-            multiviews[1] = new NeoGraphPreViewDescription();
-            graphWindow = MultiViewFactory.createCloneableMultiView(multiviews, multiviews[0]);
-            graphWindow.setDisplayName(NbBundle.getMessage(GraphWindowControllerImpl.class, "CTL_GraphTC"));
-        }
+    public GraphWindowControllerImpl() {
+        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
+            @Override
+            public void run() {
+                MultiViewDescription[] multiviews = new MultiViewDescription[2];
+                multiviews[0] = new NeoGraphSceneDescription();
+                multiviews[1] = new NeoGraphPreViewDescription();
+                graphWindow = MultiViewFactory.createCloneableMultiView(multiviews, multiviews[0]);
+                graphWindow.setDisplayName(NbBundle.getMessage(GraphWindowControllerImpl.class, "CTL_GraphTC"));
+            }
+        });
     }
 
     @Override
     public TopComponent getGraphWindow() {
         return graphWindow;
     }
-       
+
     @Override
     public void openGraphWindow() {
-        if (graphWindow == null) {
-            createInstance();
+        if (graphWindow != null) {
+            if (!graphWindow.isOpened()) {
+                graphWindow.open();
+            }
+            graphWindow.requestActive();
         }
-        if (!graphWindow.isOpened()) {
-            graphWindow.open();
-        }
-        graphWindow.requestActive();
     }
 
     @Override

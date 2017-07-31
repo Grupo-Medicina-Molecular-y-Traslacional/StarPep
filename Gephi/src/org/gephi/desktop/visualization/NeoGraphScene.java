@@ -31,6 +31,7 @@ import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.ui.GraphElementNavigatorLookupHint;
 import org.gephi.graph.api.Node;
 import org.gephi.ui.components.JColorButton;
 import org.gephi.visualization.VizController;
@@ -53,6 +54,8 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
+import org.openide.util.lookup.Lookups;
+import org.openide.util.lookup.ProxyLookup;
 import org.openide.windows.WindowManager;
 
 /**
@@ -95,7 +98,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         GraphDrawable drawable = VizController.getInstance().getDrawable();
         graphPanel.add(drawable.getGraphComponent(), BorderLayout.CENTER);
         content = new InstanceContent();
-        lookup = new AbstractLookup(content);
+        lookup = new ProxyLookup(new AbstractLookup(content), Lookups.singleton(new GraphElementNavigatorLookupHint()));
     }
 
     private void initComponents() {
@@ -136,6 +139,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         toolbar.addSeparator();
 
         //Show node labels
+        showNodeLabelsButton.setFocusable(false);
         showNodeLabelsButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.showNodeLabelsButton.toolTipText"));
         showNodeLabelsButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/showNodeLabels.png", false));
         showNodeLabelsButton.addChangeListener(new ChangeListener() {
@@ -213,6 +217,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         toolbar.addSeparator();
 
         //Show edges
+        showEdgeButton.setFocusable(false);
         showEdgeButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.showEdgeButton.toolTipText"));
         showEdgeButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/showEdges.png", false));
         showEdgeButton.addChangeListener(new ChangeListener() {
@@ -278,6 +283,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         toolbar.add(edgeScaleSlider);
 
         //Show edge labels
+        showEdgeLabelsButton.setFocusable(false);
         showEdgeLabelsButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.showEdgeLabelsButton.toolTipText"));
         showEdgeLabelsButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/showEdgeLabels.png", false));
         showEdgeLabelsButton.addChangeListener(new ChangeListener() {

@@ -20,7 +20,6 @@ import org.bapedis.core.model.AnnotationTypeChildFactory;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
-import org.netbeans.spi.navigator.NavigatorLookupHint;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.view.BeanTreeView;
 import org.openide.nodes.AbstractNode;
@@ -37,7 +36,7 @@ import org.openide.explorer.ExplorerUtils;
 
 /**
  *
- * @author cicese
+ * @author loge
  */
 @NavigatorPanel.Registration(mimeType = "peptide/metadata", displayName = "#MetadataNavigator.name")
 public class MetadataNavigator extends JComponent implements ExplorerManager.Provider,
@@ -301,12 +300,5 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
             return annotationType.getDisplayName();
         }
 
-    }
-}
-
-class MetadataNavigatorLookupHint implements NavigatorLookupHint {
-
-    public String getContentType() {
-        return "peptide/metadata";
     }
 }

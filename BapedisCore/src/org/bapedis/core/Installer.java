@@ -33,7 +33,7 @@ public class Installer extends ModuleInstall implements WorkspaceEventListener, 
                 Toolbar tb = ToolbarPool.getDefault().findToolbar("Memory");
                 if (tb != null) {
                     tb.setVisible(false);
-                }
+                }  
             }
         });
     }

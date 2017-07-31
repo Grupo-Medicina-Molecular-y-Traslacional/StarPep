@@ -8,6 +8,8 @@ package org.bapedis.core.ui;
 import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 import org.bapedis.core.services.ProjectManager;
@@ -19,6 +21,8 @@ import org.bapedis.core.spi.data.PeptideDAO;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.netbeans.spi.navigator.NavigatorHandler;
+import org.netbeans.spi.navigator.NavigatorPanel;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.explorer.ExplorerManager;
@@ -71,11 +75,11 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         setToolTipText(Bundle.HINT_QueryExplorerTopComponent());
 
         explorerMgr = new ExplorerManager();
-        BeanTreeView view = new BeanTreeView();        
+        BeanTreeView view = new BeanTreeView();
         centerPanel.add(view, BorderLayout.CENTER);
-        
-        associateLookup(new ProxyLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()), 
-                        Lookups.singleton(new MetadataNavigatorLookupHint())));
+
+        associateLookup(new ProxyLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()),
+                Lookups.singleton(new MetadataNavigatorLookupHint())));
 
         applyCheckBox.setSelected(NbPreferences.forModule(QueryModel.class).getBoolean(AUTO_APPLY, true));
     }
@@ -152,6 +156,8 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         pc.addWorkspaceEventListener(this);
         Workspace currentWs = pc.getCurrentWorkspace();
         workspaceChanged(null, currentWs);
+//        Collection<? extends MetadataNavigator> panels = Lookups.forPath("Navigator/Panels/peptide/metadata").lookupAll(MetadataNavigator.class);
+//        NavigatorHandler.activatePanel(panels.iterator().next());
     }
 
     @Override

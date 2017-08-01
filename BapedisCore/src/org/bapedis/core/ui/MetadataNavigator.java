@@ -28,11 +28,10 @@ import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
 import org.openide.util.NbBundle;
-import org.openide.util.NbPreferences;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
 import org.openide.explorer.ExplorerUtils;
-import org.openide.explorer.view.OutlineView;
+import org.openide.explorer.view.BeanTreeView;
 
 /**
  *
@@ -60,10 +59,10 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
         initComponents();
         explorerMgr = new ExplorerManager();
 
-        OutlineView view = new OutlineView();
-        view.getOutline().setRootVisible(false);
-
+        BeanTreeView view = new BeanTreeView();
+        view.setRootVisible(false);
         centerPanel.add(view, BorderLayout.CENTER);
+
 
         showAllCheckBox = new JCheckBox();
         showAllCheckBox.setSelected(true);
@@ -108,13 +107,13 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
     private void comboBoxItemStateChanged(java.awt.event.ItemEvent evt) {
         if (evt.getStateChange() == ItemEvent.SELECTED) {
             if (comboBox.getSelectedItem() instanceof AnnotationItem) {
-                AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
-                explorerMgr.setRootContext(item.getRootContext());
+                AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();                
                 showAllCheckBox.setVisible(true);
                 showAllCheckBox.setSelected(item.isShowAll());
                 if (!item.isShowAll() && item.isDirty()) {
-                    item.refresh();
+                    item.reloadRootContext();
                 }
+                explorerMgr.setRootContext(item.getRootContext());
             } else {
                 explorerMgr.setRootContext(Node.EMPTY);
                 showAllCheckBox.setVisible(false);
@@ -125,8 +124,9 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
     private void showAllCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {
         if (comboBox.getSelectedItem() instanceof AnnotationItem) {
             AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
-            item.setShowAll(showAllCheckBox.isSelected());
-            item.refresh();
+            item.setShowAll(showAllCheckBox.isSelected());            
+            item.reloadRootContext();
+            explorerMgr.setRootContext(item.getRootContext());
         }
     }
 
@@ -199,7 +199,8 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
         if (activated && comboBox.getSelectedItem() instanceof AnnotationItem) {
             AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
             if (!item.isShowAll()) {
-                item.refresh();
+                item.reloadRootContext();
+                explorerMgr.setRootContext(item.getRootContext());
             }
         }
     }
@@ -244,7 +245,8 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
         if (comboBox.getSelectedItem() instanceof AnnotationItem) {
             AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
             if (!item.isShowAll() && item.isDirty()) {
-                item.refresh();
+                item.reloadRootContext();
+                explorerMgr.setRootContext(item.getRootContext());
             }
         }
     }
@@ -265,26 +267,26 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
 
     }
 
-    private class AnnotationItem {
+    private class AnnotationItem{
 
         private final AnnotationType annotationType;
-        private final Node rootContext;
-        private final AnnotationTypeChildFactory childFactory;
+        private AbstractNode rootContext;
         private boolean dirty;
+        private boolean showAll;
 
         public AnnotationItem(AnnotationType annotationType, boolean showAll) {
+            rootContext = new AbstractNode(Children.create(new AnnotationTypeChildFactory(annotationType, showAll), true));
             this.annotationType = annotationType;
-            childFactory = new AnnotationTypeChildFactory(annotationType, showAll);
-            rootContext = new AbstractNode(Children.create(childFactory, true));
             dirty = false;
+            this.showAll = showAll;
         }
 
         public boolean isShowAll() {
-            return childFactory.isShowAll();
+            return showAll;
         }
 
         public void setShowAll(boolean showAll) {
-            childFactory.setShowAll(showAll);
+            this.showAll = showAll;
         }
 
         public boolean isDirty() {
@@ -295,8 +297,8 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
             this.dirty = dirty;
         }
 
-        public void refresh() {
-            childFactory.refreshMetadata();
+        public void reloadRootContext() {
+            rootContext = new AbstractNode(Children.create(new AnnotationTypeChildFactory(annotationType, showAll), true));
             if (!isShowAll()) {
                 dirty = false;
             }
@@ -306,9 +308,9 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
             return annotationType;
         }
 
-        public Node getRootContext() {
+        public AbstractNode getRootContext() {
             return rootContext;
-        }
+        }                
 
         @Override
         public String toString() {

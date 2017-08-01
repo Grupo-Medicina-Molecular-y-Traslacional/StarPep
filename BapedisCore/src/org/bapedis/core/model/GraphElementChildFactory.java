@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.model;
 
+import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.services.ProjectManager;
 import org.gephi.graph.api.Edge;
@@ -32,24 +33,25 @@ public class GraphElementChildFactory extends ChildFactory<Element> {
 
     @Override
     protected boolean createKeys(List<Element> list) {
-        list.clear();
         GraphModel model = pc.getGraphModel();
         GraphView view = model.getVisibleView();
         Graph graph = model.getGraph(view);
         graph.readLock();
         try {
+            LinkedList<Element> list2 = new LinkedList();
             switch (type) {
                 case Node:
                     for (Node node : graph.getNodes()) {
-                        list.add(node);
+                        list2.add(node);
                     }
                     break;
                 case Edge:
                     for (Edge edge : graph.getEdges()) {
-                        list.add(edge);
+                        list2.add(edge);
                     }
                     break;
             }
+            list.addAll(list2);
         } finally {
             graph.readUnlock();
         }
@@ -59,10 +61,6 @@ public class GraphElementChildFactory extends ChildFactory<Element> {
     @Override
     protected org.openide.nodes.Node createNodeForKey(Element key) {
         return new GraphElementNode(key);
-    }
-
-    public void refreshData() {
-        refresh(false);
     }
 
 }

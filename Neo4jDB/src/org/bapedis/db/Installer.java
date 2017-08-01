@@ -28,7 +28,7 @@ public class Installer extends ModuleInstall {
             ex.printStackTrace();
         }
     }
-
+        
     @Override
     public void uninstalled() {
         GraphDatabaseService graphDb = Neo4jDB.getDbService();

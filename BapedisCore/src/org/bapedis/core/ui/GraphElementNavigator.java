@@ -22,7 +22,9 @@ import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
+import org.openide.explorer.view.ListView;
 import org.openide.explorer.view.OutlineView;
+import org.openide.explorer.view.TableView;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.util.Lookup;
@@ -92,17 +94,23 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
 
         rootContext = new ElementItem[]{new ElementItem(GraphElement.Node), new ElementItem(GraphElement.Edge)};
 
-        OutlineView nodeView = new OutlineView(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.node.name"));
-        nodeView.getOutline().setRootVisible(false);
-        nodeView.getOutline().setPopupUsedFromTheCorner(false);
-        nodeView.setPropertyColumns("label", NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.node.label"));
-        centerPanel.add(nodeView, "nodeCard");
+//        OutlineView nodeView = new OutlineView(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.node.name"));
+//        nodeView.getOutline().setRootVisible(false);
+//        nodeView.getOutline().setPopupUsedFromTheCorner(false);
+//        nodeView.setPropertyColumns("label", NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.node.label"));
+//        centerPanel.add(nodeView, "nodeCard");
+//
+//        OutlineView edgeView = new OutlineView(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.name"));
+//        edgeView.getOutline().setRootVisible(false);
+//        edgeView.getOutline().setPopupUsedFromTheCorner(false);
+//        edgeView.setPropertyColumns("source", NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.source"),
+//                "target", NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.target"));
+//        centerPanel.add(edgeView, "edgeCard");
 
-        OutlineView edgeView = new OutlineView(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.name"));
-        edgeView.getOutline().setRootVisible(false);
-        edgeView.getOutline().setPopupUsedFromTheCorner(false);
-        edgeView.setPropertyColumns("source", NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.source"),
-                "target", NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.target"));
+        ListView nodeView = new ListView();
+        centerPanel.add(nodeView, "nodeCard");
+        
+        ListView edgeView = new ListView();
         centerPanel.add(edgeView, "edgeCard");
 
         CardLayout cl = (CardLayout) centerPanel.getLayout();
@@ -193,17 +201,18 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
     }
 
     private void refreshData() {
-        explorerMgr.setRootContext(rootContext[type.ordinal()].rootContext);
         if (rootContext[type.ordinal()].isDirty()) {
-            rootContext[type.ordinal()].refresh();
+            rootContext[type.ordinal()].reload();
         }
+        explorerMgr.setRootContext(rootContext[type.ordinal()].rootContext);
     }
 
     private void setDirtyData() {
         rootContext[0].setDirty(true);
         rootContext[1].setDirty(true);
         if (activated) {
-            rootContext[type.ordinal()].refresh();
+            rootContext[type.ordinal()].reload();
+            explorerMgr.setRootContext(rootContext[type.ordinal()].rootContext);
         }
     }
 
@@ -253,7 +262,8 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
     public void panelActivated(Lookup lkp) {
         activated = true;
         if (rootContext[type.ordinal()].isDirty()) {
-            rootContext[type.ordinal()].refresh();
+            rootContext[type.ordinal()].reload();
+            explorerMgr.setRootContext(rootContext[type.ordinal()].rootContext);
         }
     }
 
@@ -269,13 +279,13 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
 
     private class ElementItem {
 
-        private final AbstractNode rootContext;
-        private final GraphElementChildFactory childFactory;
+        private AbstractNode rootContext;
+        private final GraphElement type;
         private boolean dirty;
 
         public ElementItem(GraphElement type) {
-            childFactory = new GraphElementChildFactory(type);
-            rootContext = new AbstractNode(Children.create(childFactory, true));
+            rootContext = new AbstractNode(Children.create(new GraphElementChildFactory(type), true));
+            this.type = type;
             dirty = false;
         }
 
@@ -291,8 +301,8 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
             this.dirty = dirty;
         }
 
-        public void refresh() {
-            childFactory.refreshData();
+        public void reload() {
+            rootContext = new AbstractNode(Children.create(new GraphElementChildFactory(type), true));
             dirty = false;
         }
 

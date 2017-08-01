@@ -43,14 +43,14 @@ public class MetadataNode extends AbstractNode implements Transferable, Property
         return actions;
     }
 
-    @Override
-    public String getHtmlDisplayName() {
-        Metadata metadata = getLookup().lookup(Metadata.class);
-        if (metadata.isSelected()) {
-            return "<b>" + getDisplayName() + "</b>";
-        }
-        return getDisplayName();
-    }
+//    @Override
+//    public String getHtmlDisplayName() {
+//        Metadata metadata = getLookup().lookup(Metadata.class);
+//        if (metadata.isSelected()) {
+//            return "<b>" + getDisplayName() + "</b>";
+//        }
+//        return getDisplayName();
+//    }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {

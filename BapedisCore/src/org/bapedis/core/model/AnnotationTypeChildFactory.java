@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.model;
 
+import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.data.MetadataDAO;
@@ -34,7 +35,6 @@ public class AnnotationTypeChildFactory extends ChildFactory<Metadata> {
 
     @Override
     protected boolean createKeys(List<Metadata> list) {
-        list.clear();
         List<Metadata> metadatas = metadataDAO.getMetadata(annotationType);
         if (showAll) {
             list.addAll(metadatas);
@@ -45,30 +45,20 @@ public class AnnotationTypeChildFactory extends ChildFactory<Metadata> {
             org.gephi.graph.api.Node node;
             graph.readLock();
             try {
+                LinkedList<Metadata> list2 = new LinkedList();
                 for (Metadata m : metadatas) {
                     node = graph.getNode(m.getUnderlyingNodeID());
                     if (node != null) {
                         m.setNode(node);
-                        list.add(m);
+                        list2.add(m);
                     }
                 }
+                list.addAll(list2);
             } finally {
                 graph.readUnlock();
             }
         }
         return true;
-    }
-
-    public boolean isShowAll() {
-        return showAll;
-    }
-
-    public void setShowAll(boolean showAll) {
-        this.showAll = showAll;
-    }
-
-    public void refreshMetadata() {
-        refresh(false);
     }
 
     @Override

@@ -21,7 +21,6 @@ import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.openide.explorer.ExplorerManager;
-import org.openide.explorer.view.BeanTreeView;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
@@ -33,6 +32,7 @@ import org.openide.util.NbPreferences;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
 import org.openide.explorer.ExplorerUtils;
+import org.openide.explorer.view.OutlineView;
 
 /**
  *
@@ -60,8 +60,8 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
         initComponents();
         explorerMgr = new ExplorerManager();
 
-        BeanTreeView view = new BeanTreeView();
-        view.setRootVisible(false);
+        OutlineView view = new OutlineView();
+        view.getOutline().setRootVisible(false);
 
         centerPanel.add(view, BorderLayout.CENTER);
 
@@ -260,27 +260,29 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
         private final AnnotationType annotationType;
         private final Node rootContext;
         private final AnnotationTypeChildFactory childFactory;
+        private boolean dirty;
 
         public AnnotationItem(AnnotationType annotationType, boolean showAll) {
             this.annotationType = annotationType;
             childFactory = new AnnotationTypeChildFactory(annotationType, showAll);
             rootContext = new AbstractNode(Children.create(childFactory, true));
+            dirty = false;
         }
 
         public boolean isShowAll() {
             return childFactory.isShowAll();
         }
 
-        public boolean isDirty() {
-            return childFactory.isDirty();
-        }
-
         public void setShowAll(boolean showAll) {
             childFactory.setShowAll(showAll);
         }
 
+        public boolean isDirty() {
+            return dirty;
+        }
+
         public void setDirty(boolean dirty) {
-            childFactory.setDirty(dirty);
+            this.dirty = dirty;
         }
 
         public void refresh() {

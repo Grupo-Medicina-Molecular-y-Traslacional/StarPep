@@ -47,7 +47,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
 
     protected final JToggleButton nodesBtn, edgesBtn;
     protected GraphElement type;
-    protected final AbstractNode[] rootContext;
+    protected final ElementItem[] rootContext;
 
     /**
      * Creates new form GraphElementNavigator
@@ -90,8 +90,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         lookup = ExplorerUtils.createLookup(explorerMgr, getActionMap());
 
-        rootContext = new AbstractNode[]{new AbstractNode(Children.create(new GraphElementChildFactory(GraphElement.Node), true)),
-            new AbstractNode(Children.create(new GraphElementChildFactory(GraphElement.Edge), true))};
+        rootContext = new ElementItem[]{new ElementItem(GraphElement.Node), new ElementItem(GraphElement.Edge)};
 
         OutlineView nodeView = new OutlineView(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.node.name"));
         nodeView.getOutline().setRootVisible(false);
@@ -108,6 +107,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
 
         CardLayout cl = (CardLayout) centerPanel.getLayout();
         cl.show(centerPanel, "nodeCard");
+        refreshData();
     }
 
     private void initToogleButton(JToggleButton btn) {
@@ -121,7 +121,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
             type = GraphElement.Node;
             CardLayout cl = (CardLayout) centerPanel.getLayout();
             cl.show(centerPanel, "nodeCard");
-            refreshData();            
+            refreshData();
         }
 
     }
@@ -182,25 +182,34 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
         if (currentModel != null) {
             currentModel.addQuickFilterChangeListener(this);
         }
-        refreshData();
+        setDirtyData();
     }
 
-    private void refreshData() { 
-        explorerMgr.setRootContext(rootContext[type.ordinal()]);
+    private void refreshData() {
+        explorerMgr.setRootContext(rootContext[type.ordinal()].rootContext);
+        if (rootContext[type.ordinal()].isDirty()) {
+            rootContext[type.ordinal()].refresh();
+        }
+    }
+
+    private void setDirtyData() {
+        rootContext[0].setDirty(true);
+        rootContext[1].setDirty(true);
+        rootContext[type.ordinal()].refresh();
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource().equals(currentModel)
                 && evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
-            refreshData();
+            setDirtyData();
         }
     }
 
     @Override
     public void resultChanged(LookupEvent le) {
         if (le.getSource().equals(peptideLkpResult)) {
-            refreshData();
+            setDirtyData();
         }
     }
 
@@ -251,5 +260,36 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
     @Override
     public Lookup getLookup() {
         return lookup;
+    }
+
+    private class ElementItem {
+
+        private final AbstractNode rootContext;
+        private final GraphElementChildFactory childFactory;
+        private boolean dirty;
+
+        public ElementItem(GraphElement type) {
+            childFactory = new GraphElementChildFactory(type);
+            rootContext = new AbstractNode(Children.create(childFactory, true));
+            dirty = false;
+        }
+
+        public AbstractNode getRootContext() {
+            return rootContext;
+        }
+
+        public boolean isDirty() {
+            return dirty;
+        }
+
+        public void setDirty(boolean dirty) {
+            this.dirty = dirty;
+        }
+
+        public void refresh() {
+            childFactory.refreshData();
+            dirty = false;
+        }
+
     }
 }

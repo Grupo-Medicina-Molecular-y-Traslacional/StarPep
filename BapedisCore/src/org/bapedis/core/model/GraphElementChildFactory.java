@@ -36,17 +36,22 @@ public class GraphElementChildFactory extends ChildFactory<Element> {
         GraphModel model = pc.getGraphModel();
         GraphView view = model.getVisibleView();
         Graph graph = model.getGraph(view);
-        switch (type) {
-            case Node:
-                for (Node node: graph.getNodes()){
-                    list.add(node);
-                }
-                break;
-            case Edge:
-                for(Edge edge: graph.getEdges()){
-                    list.add(edge);
-                }
-                break;
+        graph.readLock();
+        try {
+            switch (type) {
+                case Node:
+                    for (Node node : graph.getNodes()) {
+                        list.add(node);
+                    }
+                    break;
+                case Edge:
+                    for (Edge edge : graph.getEdges()) {
+                        list.add(edge);
+                    }
+                    break;
+            }
+        } finally {
+            graph.readUnlock();
         }
         return true;
     }
@@ -55,9 +60,9 @@ public class GraphElementChildFactory extends ChildFactory<Element> {
     protected org.openide.nodes.Node createNodeForKey(Element key) {
         return new GraphElementNode(key);
     }
-            
-    public void refreshData(){
+
+    public void refreshData() {
         refresh(false);
-    }    
+    }
 
 }

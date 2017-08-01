@@ -24,13 +24,12 @@ public class AnnotationTypeChildFactory extends ChildFactory<Metadata> {
     protected final MetadataDAO metadataDAO;
     protected final AnnotationType annotationType;
     protected boolean showAll;
-    protected boolean dirty;
 
     public AnnotationTypeChildFactory(AnnotationType annotationType, boolean showAll) {
         this.annotationType = annotationType;
         metadataDAO = Lookup.getDefault().lookup(MetadataDAO.class);
         this.showAll = showAll;
-        dirty = false;
+
     }
 
     @Override
@@ -44,13 +43,18 @@ public class AnnotationTypeChildFactory extends ChildFactory<Metadata> {
             GraphView view = graphModel.getVisibleView();
             Graph graph = graphModel.getGraph(view);
             org.gephi.graph.api.Node node;
-            for(Metadata m: metadatas){
-                node = graph.getNode(m.getUnderlyingNodeID());
-                if (node != null){
-                    m.setNode(node);
-                    list.add(m);
+            graph.readLock();
+            try {
+                for (Metadata m : metadatas) {
+                    node = graph.getNode(m.getUnderlyingNodeID());
+                    if (node != null) {
+                        m.setNode(node);
+                        list.add(m);
+                    }
                 }
-            }            
+            } finally {
+                graph.readUnlock();
+            }
         }
         return true;
     }
@@ -63,15 +67,7 @@ public class AnnotationTypeChildFactory extends ChildFactory<Metadata> {
         this.showAll = showAll;
     }
 
-    public boolean isDirty() {
-        return dirty;
-    }
-
-    public void setDirty(boolean dirty) {
-        this.dirty = dirty;
-    }
-           
-    public void refreshMetadata(){
+    public void refreshMetadata() {
         refresh(false);
     }
 

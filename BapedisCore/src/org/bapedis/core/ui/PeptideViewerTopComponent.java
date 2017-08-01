@@ -51,6 +51,8 @@ import org.openide.windows.WindowManager;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.openide.awt.Mnemonics;
 import org.openide.explorer.view.NodePopupFactory;
+import org.openide.util.lookup.Lookups;
+import org.openide.util.lookup.ProxyLookup;
 
 /**
  * Top component which displays something.
@@ -101,7 +103,8 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         view.setNodePopupFactory(npf);
         dataPanel.add(view, BorderLayout.CENTER);
         pc = Lookup.getDefault().lookup(ProjectManager.class);
-        associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));
+        associateLookup(new ProxyLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()),
+                Lookups.singleton(new MetadataNavigatorLookupHint())));
 
         //Outline configuration
         final Outline outline = view.getOutline();
@@ -375,7 +378,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         QueryModel queryModel = pc.getQueryModel(newWs);
         queryModel.addPropertyChangeListener(this);
         setBusyLabel(queryModel.isRunning());
-        
+
         AttributesModel peptidesModel = pc.getAttributesModel(newWs);
         setData(peptidesModel);
     }

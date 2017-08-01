@@ -43,7 +43,6 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
         WorkspaceEventListener, PropertyChangeListener, LookupListener, NavigatorPanelWithToolbar {
 
     protected final ExplorerManager explorerMgr;
-    private static final String SHOW_ALL = "show_all";
     private final DefaultComboBoxModel comboBoxModel;
     protected final ProjectManager pc;
     protected final Lookup lookup;
@@ -52,6 +51,7 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
     protected final JToolBar toolBar;
     protected final JCheckBox showAllCheckBox;
     protected final JComboBox comboBox;
+    private boolean activated;
 
     /**
      * Creates new form LibraryPanel
@@ -66,7 +66,7 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
         centerPanel.add(view, BorderLayout.CENTER);
 
         showAllCheckBox = new JCheckBox();
-        showAllCheckBox.setSelected(NbPreferences.forModule(MetadataNavigator.class).getBoolean(SHOW_ALL, true));
+        showAllCheckBox.setSelected(true);
         showAllCheckBox.setText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.showAllCheckBox.text"));
         showAllCheckBox.setToolTipText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.showAllCheckBox.toolTipText"));
         showAllCheckBox.addActionListener(new java.awt.event.ActionListener() {
@@ -78,7 +78,6 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
         comboBoxModel = new DefaultComboBoxModel();
         String NO_SELECTION = NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.choose.text");
         comboBoxModel.addElement(NO_SELECTION);
-        comboBoxModel.setSelectedItem(NO_SELECTION);
 
         for (AnnotationType aType : AnnotationType.values()) {
             comboBoxModel.addElement(new AnnotationItem(aType, showAllCheckBox.isSelected()));
@@ -90,12 +89,19 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
                 comboBoxItemStateChanged(evt);
             }
         });
+        comboBoxModel.setSelectedItem(NO_SELECTION);
+        showAllCheckBox.setVisible(false);
 
         toolBar = new JToolBar();
         toolBar.add(comboBox);
         toolBar.add(showAllCheckBox);
 
+        activated = false;
         pc = Lookup.getDefault().lookup(ProjectManager.class);
+        pc.addWorkspaceEventListener(this);
+        Workspace currentWorkspace = pc.getCurrentWorkspace();
+        workspaceChanged(null, currentWorkspace);
+
         lookup = ExplorerUtils.createLookup(explorerMgr, getActionMap());
     }
 
@@ -104,29 +110,23 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
             if (comboBox.getSelectedItem() instanceof AnnotationItem) {
                 AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
                 explorerMgr.setRootContext(item.getRootContext());
-                if (item.isShowAll() != showAllCheckBox.isSelected()
-                        || (!showAllCheckBox.isSelected() && item.isDirty())) {
-                    item.setShowAll(showAllCheckBox.isSelected());
+                showAllCheckBox.setVisible(true);
+                showAllCheckBox.setSelected(item.isShowAll());
+                if (!item.isShowAll() && item.isDirty()) {
                     item.refresh();
-                    if (!showAllCheckBox.isSelected()) {
-                        item.setDirty(false);
-                    }
                 }
             } else {
                 explorerMgr.setRootContext(Node.EMPTY);
+                showAllCheckBox.setVisible(false);
             }
         }
     }
 
     private void showAllCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {
-        NbPreferences.forModule(MetadataNavigator.class).putBoolean(SHOW_ALL, showAllCheckBox.isSelected());
         if (comboBox.getSelectedItem() instanceof AnnotationItem) {
             AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
             item.setShowAll(showAllCheckBox.isSelected());
             item.refresh();
-            if (!showAllCheckBox.isSelected()) {
-                item.setDirty(false);
-            }
         }
     }
 
@@ -171,9 +171,11 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
             AttributesModel oldAttrModel = pc.getAttributesModel(oldWs);
             if (oldAttrModel != null) {
                 oldAttrModel.removeQuickFilterChangeListener(this);
+
             }
         }
-        peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
+        peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class
+        );
         peptideLkpResult.addLookupListener(this);
 
         AttributesModel peptidesModel = pc.getAttributesModel(newWs);
@@ -190,12 +192,15 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
     protected void setDirtyMetadata() {
         for (int i = 1; i < comboBoxModel.getSize(); i++) {
             AnnotationItem item = (AnnotationItem) comboBoxModel.getElementAt(i);
-            item.setDirty(true);
+            if (!item.isShowAll()) {
+                item.setDirty(true);
+            }
         }
-        if (!showAllCheckBox.isSelected() && comboBox.getSelectedItem() instanceof AnnotationItem) {
+        if (activated && comboBox.getSelectedItem() instanceof AnnotationItem) {
             AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
-            item.refresh();
-            item.setDirty(false);
+            if (!item.isShowAll()) {
+                item.refresh();
+            }
         }
     }
 
@@ -215,13 +220,17 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
     }
 
     @Override
-    public String getDisplayName() {
-        return NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.name");
+    public String
+            getDisplayName() {
+        return NbBundle.getMessage(MetadataNavigator.class,
+                "MetadataNavigator.name");
     }
 
     @Override
-    public String getDisplayHint() {
-        return NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.hint");
+    public String
+            getDisplayHint() {
+        return NbBundle.getMessage(MetadataNavigator.class,
+                "MetadataNavigator.hint");
     }
 
     @Override
@@ -231,18 +240,18 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
 
     @Override
     public void panelActivated(Lookup lkp) {
-        pc.addWorkspaceEventListener(this);
-        Workspace currentWorkspace = pc.getCurrentWorkspace();
-        workspaceChanged(null, currentWorkspace);
+        activated = true;
+        if (comboBox.getSelectedItem() instanceof AnnotationItem) {
+            AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
+            if (!item.isShowAll() && item.isDirty()) {
+                item.refresh();
+            }
+        }
     }
 
     @Override
     public void panelDeactivated() {
-        removeLookupListener();
-        pc.removeWorkspaceEventListener(this);
-        if (currentModel != null) {
-            currentModel.removeQuickFilterChangeListener(this);
-        }
+        activated = false;
     }
 
     @Override
@@ -253,6 +262,7 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
     @Override
     public JComponent getToolbarComponent() {
         return toolBar;
+
     }
 
     private class AnnotationItem {
@@ -287,6 +297,9 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
 
         public void refresh() {
             childFactory.refreshMetadata();
+            if (!isShowAll()) {
+                dirty = false;
+            }
         }
 
         public AnnotationType getAnnotationType() {

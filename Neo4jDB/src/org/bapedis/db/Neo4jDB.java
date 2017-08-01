@@ -24,7 +24,7 @@ import org.openide.util.Lookup;
 public class Neo4jDB {
 
     public static final String DB_NAME = "neo4jDB";
-    public static final File DB_DIR = new File (System.getProperty("netbeans.user"), "db");
+    public static final File DB_DIR = new File(System.getProperty("netbeans.user"), "db");
     public static final String ZIP_DB = "org/bapedis/db/resources/neo4jDB.zip";
     private static final int BUFFER_SIZE = 4096;
     private static GraphDatabaseService graphDb;
@@ -32,7 +32,7 @@ public class Neo4jDB {
 //    private static AttributeModelDAO modelDAO;
 
     @SuppressWarnings("empty-statement")
-    public static void extractDatabase() throws IOException {
+    public synchronized static void extractDatabase() throws IOException {
         ClassLoader cl = Lookup.getDefault().lookup(ClassLoader.class);
         try (ZipInputStream zipIn = new ZipInputStream(cl.getResourceAsStream(ZIP_DB))) {
             if (!DB_DIR.exists()) {
@@ -61,7 +61,7 @@ public class Neo4jDB {
         }
     }
 
-    public static GraphDatabaseService loadDatabase() throws IOException {
+    public synchronized static GraphDatabaseService loadDatabase() throws IOException {
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(new File(DB_DIR, DB_NAME))
                 .setConfig(GraphDatabaseSettings.read_only, "true")
                 .newGraphDatabase();
@@ -79,7 +79,6 @@ public class Neo4jDB {
 //            pwIdMatrix = (PairwiseIdentityMatrix) objIn.readObject();
 //        }
 //    }
-
 //    private static ArrayList<String> loadFastaFile(FileReader fr) throws Exception {
 //        ArrayList<String> sequences = new ArrayList<>();
 //        try (BufferedReader br = new BufferedReader(fr)) {
@@ -111,8 +110,7 @@ public class Neo4jDB {
 //        File fileBase = new File("pwidmtx");
 //        allPeptides = loadFastaFile(new FileReader(new File(fileBase, "AMPs.fasta")));
 //    }
-
-    public static GraphDatabaseService getDbService() {
+    public synchronized static GraphDatabaseService getDbService() {
         return graphDb;
     }
 
@@ -127,7 +125,6 @@ public class Neo4jDB {
 //    public static ArrayList<String> getAllPeptides() {
 //        return allPeptides;
 //    }
-
 //    public static AttributeModelDAO getAttributeModelDAO(){
 //        if (modelDAO == null){
 //            modelDAO = new AttributeModelDAO(graphDb);

@@ -48,6 +48,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
     protected final JToggleButton nodesBtn, edgesBtn;
     protected GraphElement type;
     protected final ElementItem[] rootContext;
+    private boolean activated;
 
     /**
      * Creates new form GraphElementNavigator
@@ -87,7 +88,6 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
         toolBar.addSeparator();
         toolBar.add(edgesBtn);
 
-        pc = Lookup.getDefault().lookup(ProjectManager.class);
         lookup = ExplorerUtils.createLookup(explorerMgr, getActionMap());
 
         rootContext = new ElementItem[]{new ElementItem(GraphElement.Node), new ElementItem(GraphElement.Edge)};
@@ -107,7 +107,14 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
 
         CardLayout cl = (CardLayout) centerPanel.getLayout();
         cl.show(centerPanel, "nodeCard");
+
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
+        pc.addWorkspaceEventListener(this);
+        Workspace currentWorkspace = pc.getCurrentWorkspace();
+        workspaceChanged(null, currentWorkspace);
+
         refreshData();
+        activated = false;
     }
 
     private void initToogleButton(JToggleButton btn) {
@@ -195,7 +202,9 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
     private void setDirtyData() {
         rootContext[0].setDirty(true);
         rootContext[1].setDirty(true);
-        rootContext[type.ordinal()].refresh();
+        if (activated) {
+            rootContext[type.ordinal()].refresh();
+        }
     }
 
     @Override
@@ -242,19 +251,15 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
 
     @Override
     public void panelActivated(Lookup lkp) {
-        pc.addWorkspaceEventListener(this);
-        Workspace currentWorkspace = pc.getCurrentWorkspace();
-        workspaceChanged(null, currentWorkspace);
+        activated = true;
+        if (rootContext[type.ordinal()].isDirty()) {
+            rootContext[type.ordinal()].refresh();
+        }
     }
 
     @Override
     public void panelDeactivated() {
-        removeLookupListener();
-        pc.removeWorkspaceEventListener(this);
-        if (currentModel != null) {
-            currentModel.removeQuickFilterChangeListener(this);
-        }
-
+        activated = false;
     }
 
     @Override

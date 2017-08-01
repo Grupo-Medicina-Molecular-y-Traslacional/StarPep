@@ -18,7 +18,6 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.task.AlgorithmExecutor;
 import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.GraphView;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;

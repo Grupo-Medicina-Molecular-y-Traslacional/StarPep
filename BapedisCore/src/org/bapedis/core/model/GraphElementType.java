@@ -9,6 +9,6 @@ package org.bapedis.core.model;
  *
  * @author cicese
  */
-public enum GraphElement {
+public enum GraphElementType {
     Node, Edge;
 }

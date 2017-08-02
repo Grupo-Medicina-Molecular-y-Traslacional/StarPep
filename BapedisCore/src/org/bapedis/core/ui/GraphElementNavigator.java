@@ -18,7 +18,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.GraphElement;
+import org.bapedis.core.model.GraphElementType;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.gephi.graph.api.Edge;
@@ -56,7 +56,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
     protected AttributesModel currentModel;
 
     protected final JToggleButton nodesBtn, edgesBtn;
-    protected GraphElement type;
+    protected GraphElementType type;
     protected final ElementItem[] rootContext;
     protected final JXBusyLabel busyLabel;
     protected final JXTable table;
@@ -80,7 +80,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
         elementGroup.add(nodesBtn);
         elementGroup.add(edgesBtn);
 
-        type = GraphElement.Node;
+        type = GraphElementType.Node;
         nodesBtn.setSelected(true);
         nodesBtn.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -102,7 +102,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
 
         lookup = ExplorerUtils.createLookup(explorerMgr, getActionMap());
 
-        rootContext = new ElementItem[]{new ElementItem(GraphElement.Node), new ElementItem(GraphElement.Edge)};
+        rootContext = new ElementItem[]{new ElementItem(GraphElementType.Node), new ElementItem(GraphElementType.Edge)};
 
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -134,16 +134,16 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
     }
 
     private void nodesButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        if (type != GraphElement.Node) {
-            type = GraphElement.Node;
+        if (type != GraphElementType.Node) {
+            type = GraphElementType.Node;
             rootContext[type.ordinal()].reload();
         }
 
     }
 
     private void edgesButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        if (type != GraphElement.Edge) {
-            type = GraphElement.Edge;
+        if (type != GraphElementType.Edge) {
+            type = GraphElementType.Edge;
             rootContext[type.ordinal()].reload();
         }
     }
@@ -273,10 +273,10 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
 
     private class ElementItem {
 
-        private final GraphElement type;
+        private final GraphElementType type;
         private boolean dirty;
 
-        public ElementItem(GraphElement type) {
+        public ElementItem(GraphElementType type) {
             this.type = type;
             dirty = false;
         }
@@ -292,7 +292,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
         public void reload() {
             setBusyLabel(true);
             GraphModel graphModel = pc.getGraphModel();
-            Table columns = type == GraphElement.Node ? graphModel.getNodeTable() : graphModel.getEdgeTable();
+            Table columns = type == GraphElementType.Node ? graphModel.getNodeTable() : graphModel.getEdgeTable();
             GraphView view = graphModel.getVisibleView();
             final Graph graph = graphModel.getGraph(view);
             final ElementsDataTableModel dataModel = new ElementsDataTableModel(columns.toArray());
@@ -347,3 +347,4 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
 
     }
 }
+

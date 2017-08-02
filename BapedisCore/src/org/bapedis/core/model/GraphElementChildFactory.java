@@ -23,10 +23,10 @@ import org.openide.util.Lookup;
  */
 public class GraphElementChildFactory extends ChildFactory<Element> {
 
-    protected final GraphElement type;
+    protected final GraphElementType type;
     protected final ProjectManager pc;
 
-    public GraphElementChildFactory(GraphElement type) {
+    public GraphElementChildFactory(GraphElementType type) {
         this.type = type;
         pc = Lookup.getDefault().lookup(ProjectManager.class);
     }

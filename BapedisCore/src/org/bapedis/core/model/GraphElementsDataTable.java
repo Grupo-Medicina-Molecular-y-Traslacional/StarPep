@@ -42,10 +42,7 @@
 package org.bapedis.core.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.swing.table.AbstractTableModel;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.Element;
@@ -53,13 +50,13 @@ import org.gephi.graph.api.Element;
 /**
  *
  * @author Eduardo Ramos
- * @param <T>
  */
-public class GraphElementsDataTable<T extends Element> extends AbstractTableModel {
-    private final ArrayList<T> elements;
-    private final GraphElementDataColumn<T>[] columns;
+public class GraphElementsDataTable extends AbstractTableModel {
 
-    public GraphElementsDataTable(int initialCapacity, GraphElementDataColumn<T>[] columns) {
+    private final ArrayList<Element> elements;
+    private final GraphElementDataColumn[] columns;
+
+    public GraphElementsDataTable(int initialCapacity, GraphElementDataColumn[] columns) {
         this.elements = new ArrayList<>(initialCapacity);
         this.columns = columns;
     }
@@ -95,10 +92,10 @@ public class GraphElementsDataTable<T extends Element> extends AbstractTableMode
             return columns[columnIndex].getValueFor(elements.get(rowIndex));
         } catch (Exception e) {
             /**
-             * We need to do this because the JTable might repaint itself 
-             * while datalab still has not detected that the column has been deleted 
-             * (it does so by polling on graph and table observers).
-             * I can't find a better solution...
+             * We need to do this because the JTable might repaint itself while
+             * datalab still has not detected that the column has been deleted
+             * (it does so by polling on graph and table observers). I can't
+             * find a better solution...
              */
             return null;
         }
@@ -108,32 +105,36 @@ public class GraphElementsDataTable<T extends Element> extends AbstractTableMode
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         columns[columnIndex].setValueFor(elements.get(rowIndex), aValue);
     }
-    
-    public void addRow(T row){
-        int rowCount = elements.size();
-        elements.add(row);
-        fireTableRowsInserted(rowCount, rowCount);
-    }
-    
-    public void addRow(List<T> rows){
-        int firstRow = elements.size();
-        elements.addAll(rows);
-        int lastRow = elements.size();
-        fireTableRowsInserted(firstRow, lastRow);
+
+    public void addRow(Element row) {
+        if (row != null) {
+            int rowIndex = elements.size();
+            elements.add(row);
+            fireTableRowsInserted(rowIndex, rowIndex);
+        }
     }
 
-    public T getElementAtRow(int row) {
+    public void addRow(List<Element> rows) {
+        if (rows.size() > 0) {
+            int firstRow = elements.size();
+            elements.addAll(rows);
+            int lastRow = elements.size()-1;
+            fireTableRowsInserted(firstRow, lastRow);
+        }
+    }
+
+    public Element getElementAtRow(int row) {
         return elements.get(row);
     }
 
-    public GraphElementDataColumn<T>[] getColumns() {
+    public GraphElementDataColumn[] getColumns() {
         return columns;
     }
 
-    public List<T> getElements() {
+    public List<Element> getElements() {
         return elements;
     }
-    
+
 //    public void configure(T[] elements, GraphElementDataColumn<T>[] columns) {
 //        Set<GraphElementDataColumn> oldColumns = new HashSet<GraphElementDataColumn>(Arrays.asList(this.columns));
 //        Set<GraphElementDataColumn> newColumns = new HashSet<GraphElementDataColumn>(Arrays.asList(columns));
@@ -148,12 +149,12 @@ public class GraphElementsDataTable<T extends Element> extends AbstractTableMode
 //            fireTableDataChanged();
 //        }
 //    }
-    
     /**
      * Column at index or null if it's a fake column.
-     * @return 
+     *
+     * @return
      */
-    public Column getColumnAtIndex(int i){
+    public Column getColumnAtIndex(int i) {
         if (i >= 0 && i < columns.length) {
             return columns[i].getColumn();
         } else {

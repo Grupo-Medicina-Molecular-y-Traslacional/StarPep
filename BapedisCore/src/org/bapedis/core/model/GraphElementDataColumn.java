@@ -48,15 +48,15 @@ import org.gephi.graph.api.Element;
  *
  * @author Eduardo Ramos
  */
-public interface GraphElementDataColumn<T extends Element> {
+public interface GraphElementDataColumn {
 
     public Class getColumnClass();
 
     public String getColumnName();
 
-    public Object getValueFor(T element);
+    public Object getValueFor(Element element);
 
-    public void setValueFor(T element, Object value);
+    public void setValueFor(Element element, Object value);
 
     public boolean isEditable();
     

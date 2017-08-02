@@ -8,6 +8,7 @@ package org.bapedis.core.ui;
 import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.ButtonGroup;
@@ -18,9 +19,13 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.GraphElementAttributeColumn;
+import org.bapedis.core.model.GraphElementDataColumn;
 import org.bapedis.core.model.GraphElementType;
+import org.bapedis.core.model.GraphElementsDataTable;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
+import org.gephi.graph.api.Column;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Element;
 import org.gephi.graph.api.Graph;
@@ -295,7 +300,8 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
             Table columns = type == GraphElementType.Node ? graphModel.getNodeTable() : graphModel.getEdgeTable();
             GraphView view = graphModel.getVisibleView();
             final Graph graph = graphModel.getGraph(view);
-            final ElementsDataTableModel dataModel = new ElementsDataTableModel(columns.toArray());
+            final GraphElementsDataTable dataModel = type == GraphElementType.Node ? new GraphElementsDataTable(graph.getNodeCount(), getNodeColumns(columns)):
+                                                                                              new GraphElementsDataTable(graph.getEdgeCount(), getEdgeColumns(columns)) ;
             table.setModel(dataModel);
 
             SwingWorker worker = new SwingWorker<Void, Element>() {
@@ -344,6 +350,22 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
             };
             worker.execute();
         }
+        
+        private GraphElementDataColumn[] getEdgeColumns(Table table){
+            List<GraphElementDataColumn> colums = new LinkedList<>();
+            for(Column column: table){
+                colums.add(new GraphElementAttributeColumn(column));
+            }
+            return colums.toArray(new GraphElementDataColumn[0]);
+        } 
+        
+        private GraphElementDataColumn[] getNodeColumns(Table table){
+            List<GraphElementDataColumn> colums = new LinkedList<>();
+            for(Column column: table){
+                colums.add(new GraphElementAttributeColumn(column));
+            }
+            return colums.toArray(new GraphElementDataColumn[0]);
+        }         
 
     }
 }

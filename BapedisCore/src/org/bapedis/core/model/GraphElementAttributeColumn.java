@@ -12,7 +12,7 @@ import org.gephi.graph.api.Element;
  *
  * @author loge
  */
-public class GraphElementAttributeColumn<T extends Element> implements GraphElementDataColumn<T>{
+public class GraphElementAttributeColumn implements GraphElementDataColumn{
     private final Column column;
 
     public GraphElementAttributeColumn(Column column) {
@@ -30,12 +30,12 @@ public class GraphElementAttributeColumn<T extends Element> implements GraphElem
     }
 
     @Override
-    public Object getValueFor(T element) {
+    public Object getValueFor(Element element) {
         return element.getAttribute(column);
     }
 
     @Override
-    public void setValueFor(T element, Object value) {
+    public void setValueFor(Element element, Object value) {
         element.setAttribute(column, value);
     }
 

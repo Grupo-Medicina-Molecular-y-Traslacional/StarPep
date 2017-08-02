@@ -126,7 +126,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        Mnemonics.setLocalizedText(busyLabel, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.busyLabel.text")); // NOI18N
+        busyLabel.setText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.busyLabel.text")); 
         centerPanel.add(busyLabel, "busyCard");
 
         errorLabel = new JLabel(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.errorLabel.text"), new ImageIcon(ImageUtilities.loadImage("org/bapedis/core/resources/sad.png", true)), JLabel.CENTER);

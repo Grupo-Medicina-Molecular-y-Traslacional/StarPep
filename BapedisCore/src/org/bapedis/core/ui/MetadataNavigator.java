@@ -30,8 +30,10 @@ import org.openide.util.LookupListener;
 import org.openide.util.NbBundle;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
+import org.netbeans.swing.outline.Outline;
 import org.openide.explorer.ExplorerUtils;
 import org.openide.explorer.view.BeanTreeView;
+import org.openide.explorer.view.OutlineView;
 
 /**
  *
@@ -62,8 +64,7 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
         BeanTreeView view = new BeanTreeView();
         view.setRootVisible(false);
         centerPanel.add(view, BorderLayout.CENTER);
-
-
+        
         showAllCheckBox = new JCheckBox();
         showAllCheckBox.setSelected(true);
         showAllCheckBox.setText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.showAllCheckBox.text"));

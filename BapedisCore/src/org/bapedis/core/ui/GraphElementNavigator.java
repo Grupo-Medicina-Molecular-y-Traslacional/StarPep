@@ -5,7 +5,7 @@
  */
 package org.bapedis.core.ui;
 
-import java.awt.CardLayout;
+import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.ButtonGroup;
@@ -22,9 +22,7 @@ import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
-import org.openide.explorer.view.ListView;
-import org.openide.explorer.view.OutlineView;
-import org.openide.explorer.view.TableView;
+import org.openide.explorer.view.BeanTreeView;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.util.Lookup;
@@ -94,34 +92,26 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
 
         rootContext = new ElementItem[]{new ElementItem(GraphElement.Node), new ElementItem(GraphElement.Edge)};
 
-//        OutlineView nodeView = new OutlineView(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.node.name"));
-//        nodeView.getOutline().setRootVisible(false);
-//        nodeView.getOutline().setPopupUsedFromTheCorner(false);
-//        nodeView.setPropertyColumns("label", NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.node.label"));
-//        centerPanel.add(nodeView, "nodeCard");
-//
-//        OutlineView edgeView = new OutlineView(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.name"));
-//        edgeView.getOutline().setRootVisible(false);
+//        TreeTableView edgeView = new TreeTableView();
+//        edgeView.setRootVisible(false);
 //        edgeView.getOutline().setPopupUsedFromTheCorner(false);
 //        edgeView.setPropertyColumns("source", NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.source"),
 //                "target", NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.target"));
 //        centerPanel.add(edgeView, "edgeCard");
+//        BeanTreeView nodeView = new BeanTreeView();
+//        nodeView.setRootVisible(false);
+//        centerPanel.add(nodeView, "nodeCard");
+//
 
-        ListView nodeView = new ListView();
-        centerPanel.add(nodeView, "nodeCard");
-        
-        ListView edgeView = new ListView();
-        centerPanel.add(edgeView, "edgeCard");
-
-        CardLayout cl = (CardLayout) centerPanel.getLayout();
-        cl.show(centerPanel, "nodeCard");
+        BeanTreeView view = new BeanTreeView();
+        view.setRootVisible(false);
+        centerPanel.add(view, BorderLayout.CENTER);
 
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         pc.addWorkspaceEventListener(this);
         Workspace currentWorkspace = pc.getCurrentWorkspace();
         workspaceChanged(null, currentWorkspace);
 
-        refreshData();
         activated = false;
     }
 
@@ -134,9 +124,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
     private void nodesButtonActionPerformed(java.awt.event.ActionEvent evt) {
         if (type != GraphElement.Node) {
             type = GraphElement.Node;
-            CardLayout cl = (CardLayout) centerPanel.getLayout();
-            cl.show(centerPanel, "nodeCard");
-            refreshData();
+            setRootContext();
         }
 
     }
@@ -144,9 +132,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
     private void edgesButtonActionPerformed(java.awt.event.ActionEvent evt) {
         if (type != GraphElement.Edge) {
             type = GraphElement.Edge;
-            CardLayout cl = (CardLayout) centerPanel.getLayout();
-            cl.show(centerPanel, "edgeCard");
-            refreshData();
+            setRootContext();      
         }
     }
 
@@ -163,7 +149,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
 
         setLayout(new java.awt.BorderLayout());
 
-        centerPanel.setLayout(new java.awt.CardLayout());
+        centerPanel.setLayout(new java.awt.BorderLayout());
         add(centerPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -184,9 +170,11 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
             AttributesModel oldAttrModel = pc.getAttributesModel(oldWs);
             if (oldAttrModel != null) {
                 oldAttrModel.removeQuickFilterChangeListener(this);
+
             }
         }
-        peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
+        peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class
+        );
         peptideLkpResult.addLookupListener(this);
 
         AttributesModel peptidesModel = pc.getAttributesModel(newWs);
@@ -200,11 +188,11 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
         setDirtyData();
     }
 
-    private void refreshData() {
+    private void setRootContext() {
         if (rootContext[type.ordinal()].isDirty()) {
             rootContext[type.ordinal()].reload();
         }
-        explorerMgr.setRootContext(rootContext[type.ordinal()].rootContext);
+        explorerMgr.setRootContext(rootContext[type.ordinal()].getRootContext());
     }
 
     private void setDirtyData() {
@@ -237,13 +225,17 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
     }
 
     @Override
-    public String getDisplayName() {
-        return NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.name");
+    public String
+            getDisplayName() {
+        return NbBundle.getMessage(GraphElementNavigator.class,
+                "GraphElementNavigator.name");
     }
 
     @Override
-    public String getDisplayHint() {
-        return NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.hint");
+    public String
+            getDisplayHint() {
+        return NbBundle.getMessage(GraphElementNavigator.class,
+                "GraphElementNavigator.hint");
     }
 
     @Override
@@ -263,8 +255,8 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
         activated = true;
         if (rootContext[type.ordinal()].isDirty()) {
             rootContext[type.ordinal()].reload();
-            explorerMgr.setRootContext(rootContext[type.ordinal()].rootContext);
         }
+        explorerMgr.setRootContext(rootContext[type.ordinal()].rootContext);
     }
 
     @Override
@@ -275,6 +267,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
     @Override
     public Lookup getLookup() {
         return lookup;
+
     }
 
     private class ElementItem {

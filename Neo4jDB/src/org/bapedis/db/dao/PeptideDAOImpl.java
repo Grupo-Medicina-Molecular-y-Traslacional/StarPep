@@ -23,6 +23,7 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphFactory;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
+import org.gephi.graph.api.Origin;
 import org.gephi.graph.api.Subgraph;
 import org.gephi.graph.api.Table;
 import org.neo4j.graphdb.Direction;
@@ -38,6 +39,7 @@ import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Uniqueness;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -54,8 +56,9 @@ public class PeptideDAOImpl implements PeptideDAO {
     private final String PRO_SEQ = "seq";
     private final String PRO_LENGHT = "length";
     private final String PRO_NAME = "name";
-    private final String PRO_TYPE = "type";
+    private final String PRO_NAME_TITLE=NbBundle.getMessage(PeptideDAOImpl.class, "NodeTable.column.name.title");
     private final String PRO_XREF = "xref";
+    private final String PRO_XREF_TITLE=NbBundle.getMessage(PeptideDAOImpl.class, "EdgeTable.column.xref.title");
 
     private final float GRAPH_NODE_SIZE = 10f;
     private final float GRAPH_EDGE_WEIGHT = 1f;
@@ -202,17 +205,12 @@ public class PeptideDAOImpl implements PeptideDAO {
     protected void checkColumns(GraphModel graphModel) {
         Table nodeTable = graphModel.getNodeTable();
         if (!nodeTable.hasColumn(PRO_NAME)) {
-            nodeTable.addColumn(PRO_NAME, String.class);
-        }
-        
-        if (!nodeTable.hasColumn(PRO_TYPE)) {
-            nodeTable.addColumn(PRO_TYPE, String.class);
-        }
-        
+            nodeTable.addColumn(PRO_NAME, PRO_NAME_TITLE, String.class, Origin.DATA, "", false);
+        }                
 
         Table edgeTable = graphModel.getEdgeTable();
         if (!edgeTable.hasColumn(PRO_XREF)) {
-            edgeTable.addColumn(PRO_XREF, String[].class);
+            edgeTable.addColumn(PRO_XREF, PRO_XREF_TITLE, String[].class, Origin.DATA, new String[]{}, false);
         }
     }
 
@@ -230,7 +228,6 @@ public class PeptideDAOImpl implements PeptideDAO {
             }
             String label = neoNode.getLabels().iterator().next().name();
             graphNode.setLabel(label);
-            graphNode.setAttribute(PRO_TYPE, label);
             graphNode.setSize(GRAPH_NODE_SIZE);
 
             //Set random position

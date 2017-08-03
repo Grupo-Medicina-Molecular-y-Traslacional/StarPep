@@ -45,7 +45,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
 import net.miginfocom.swing.MigLayout;
-import org.bapedis.core.model.GraphEdgeAttributeColumn;
 import org.bapedis.core.model.GraphElementAttributeColumn;
 import org.bapedis.core.model.GraphElementAvailableColumnsModel;
 import org.bapedis.core.model.GraphElementDataColumn;
@@ -95,7 +94,7 @@ public class AvailableColumnsPanel extends javax.swing.JPanel {
                 cb.setEnabled(enabled);
             }
         }
-        infoLabel.setVisible(enabled);
+        infoLabel.setVisible(!enabled);
     }
 
     class ColumnCheckBoxListener implements ActionListener {
@@ -134,6 +133,8 @@ public class AvailableColumnsPanel extends javax.swing.JPanel {
         contentPanel = new javax.swing.JPanel();
         descriptionLabel = new javax.swing.JLabel();
 
+        setMinimumSize(new java.awt.Dimension(336, 280));
+        setPreferredSize(new java.awt.Dimension(336, 280));
         setLayout(new java.awt.GridBagLayout());
 
         infoLabel.setForeground(new java.awt.Color(255, 0, 0));

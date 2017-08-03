@@ -13,6 +13,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JToolBar;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AnnotationType;
@@ -30,10 +31,9 @@ import org.openide.util.LookupListener;
 import org.openide.util.NbBundle;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
-import org.netbeans.swing.outline.Outline;
 import org.openide.explorer.ExplorerUtils;
 import org.openide.explorer.view.BeanTreeView;
-import org.openide.explorer.view.OutlineView;
+import org.openide.util.ImageUtilities;
 
 /**
  *
@@ -52,6 +52,7 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
     protected final JToolBar toolBar;
     protected final JCheckBox showAllCheckBox;
     protected final JComboBox comboBox;
+    protected final JLabel infoLabel;
     private boolean activated;
 
     /**
@@ -75,6 +76,9 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
             }
         });
 
+        infoLabel = new JLabel(ImageUtilities.loadImageIcon("org/bapedis/core/resources/info.png", false));
+        infoLabel.setToolTipText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.infoLabel.toolTipText"));
+        
         comboBoxModel = new DefaultComboBoxModel();
         String NO_SELECTION = NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.choose.text");
         comboBoxModel.addElement(NO_SELECTION);
@@ -91,10 +95,13 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
         });
         comboBoxModel.setSelectedItem(NO_SELECTION);
         showAllCheckBox.setVisible(false);
-
+        infoLabel.setVisible(false);
+        
         toolBar = new JToolBar();
-        toolBar.add(comboBox);
+        toolBar.add(comboBox);                                
         toolBar.add(showAllCheckBox);
+        toolBar.addSeparator();
+        toolBar.add(infoLabel);
 
         activated = false;
         pc = Lookup.getDefault().lookup(ProjectManager.class);
@@ -109,6 +116,7 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
         if (evt.getStateChange() == ItemEvent.SELECTED) {
             if (comboBox.getSelectedItem() instanceof AnnotationItem) {
                 AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();                
+                infoLabel.setVisible(true);
                 showAllCheckBox.setVisible(true);
                 showAllCheckBox.setSelected(item.isShowAll());
                 if (!item.isShowAll() && item.isDirty()) {
@@ -117,6 +125,7 @@ public class MetadataNavigator extends JComponent implements ExplorerManager.Pro
                 explorerMgr.setRootContext(item.getRootContext());
             } else {
                 explorerMgr.setRootContext(Node.EMPTY);
+                infoLabel.setVisible(false);
                 showAllCheckBox.setVisible(false);
             }
         }

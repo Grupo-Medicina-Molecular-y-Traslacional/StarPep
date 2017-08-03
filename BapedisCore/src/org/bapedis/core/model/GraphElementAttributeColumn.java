@@ -41,7 +41,7 @@ public class GraphElementAttributeColumn implements GraphElementDataColumn{
 
     @Override
     public boolean isEditable() {
-        return !column.isReadOnly();
+        return false;
     }
 
     @Override

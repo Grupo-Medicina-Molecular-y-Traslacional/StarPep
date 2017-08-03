@@ -41,10 +41,9 @@
  */
 package org.bapedis.core.model;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import org.gephi.graph.api.Column;
-import org.gephi.graph.api.Origin;
 import org.gephi.graph.api.Table;
 
 /**
@@ -56,9 +55,11 @@ import org.gephi.graph.api.Table;
  */
 public class GraphElementAvailableColumnsModel {
 
-    private static final int MAX_AVAILABLE_COLUMNS = 20;
-    private final Set<GraphElementDataColumn> availableColumns = new HashSet<>();
-    private final Set<GraphElementDataColumn> allKnownColumns = new HashSet<>();
+    private static final int MAX_AVAILABLE_COLUMNS = 3;
+    private final Set<GraphElementDataColumn> availableColumns = new LinkedHashSet<>();
+    private final Set<GraphElementDataColumn> allKnownColumns = new LinkedHashSet<>();
+    private final String DefaultColumnID = "name";
+    private final String[] IgnoredColumnIDs = new String[]{"timeset"};
 
     public GraphElementAvailableColumnsModel() {
     }
@@ -135,17 +136,22 @@ public class GraphElementAvailableColumnsModel {
 
     public int getAllKnownColumnsCount() {
         return allKnownColumns.size();
-    }    
+    }
+
     /**
      * Syncronizes this AvailableColumnsModel to contain the table current
      * columns, checking for deleted and new columns.
+     *
+     * @param table
      */
     public synchronized void syncronizeTableColumns(Table table) {
-        Set<GraphElementDataColumn> availableColumnsCopy = new HashSet<>(availableColumns);
+        GraphElementDataColumn[] availableColumnsCopy = availableColumns.toArray(new GraphElementDataColumn[0]);
 
         removeAllColumns();
 
-        addAvailableColumn(new GraphElementAttributeColumn(table.getColumn("name")));
+        if (table.getColumn(DefaultColumnID) != null) {
+            addAvailableColumn(new GraphElementAttributeColumn(table.getColumn(DefaultColumnID)));
+        }
 
         //Keep existing available columns as available.
         //Note: We need to remove all columns and add them all again because there could be a new column with the same title but different index 
@@ -154,7 +160,7 @@ public class GraphElementAvailableColumnsModel {
         for (GraphElementDataColumn column : availableColumnsCopy) {
             if (column instanceof GraphElementAttributeColumn) {
                 for (Column c : table) {
-                    if (!c.getId().equals("name") && (c.getId().equals("label") || c.getOrigin() == Origin.DATA) && column.getColumn().equals(c)) {
+                    if (!c.getId().equals(DefaultColumnID) && !isIgnored(c.getId()) && column.getColumn().equals(c)) {
                         addAvailableColumn(new GraphElementAttributeColumn(c));
                         break;
                     }
@@ -167,7 +173,7 @@ public class GraphElementAvailableColumnsModel {
         //!allKnownColumns.contains(column)
         boolean isNew;
         for (Column c : table) {
-            if (c.getId().equals("label") || c.getOrigin() == Origin.DATA) {
+            if (!isIgnored(c.getId())) {
                 isNew = true;
                 for (GraphElementDataColumn column : allKnownColumns) {
                     if (column.getColumn() != null && column.getColumn().equals(c)) {
@@ -179,5 +185,14 @@ public class GraphElementAvailableColumnsModel {
                 }
             }
         }
+    }
+
+    private boolean isIgnored(String id) {
+        for (String iid : IgnoredColumnIDs) {
+            if (iid.equals(id)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

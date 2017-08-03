@@ -8,7 +8,6 @@ package org.bapedis.core.ui;
 import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.ButtonGroup;
@@ -29,17 +28,16 @@ import org.bapedis.core.model.GraphElementsDataTable;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.ui.components.AvailableColumnsPanel;
-import org.gephi.graph.api.Column;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Element;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
 import org.gephi.graph.api.Node;
-import org.gephi.graph.api.Origin;
 import org.gephi.graph.api.Table;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.search.SearchFactory;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
 import org.openide.DialogDescriptor;
@@ -69,6 +67,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
     protected AttributesModel currentModel;
 
     protected final JToggleButton nodesBtn, edgesBtn;
+    protected final JButton availableColumnsButton;
     protected GraphElementType type;
     protected final ElementItem[] rootContext;
     protected final JXBusyLabel busyLabel;
@@ -86,6 +85,13 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
      */
     public GraphElementNavigator() {
         initComponents();
+
+
+        table = new JXTable();
+//        table.setHighlighters(HighlighterFactory.createAlternateStriping());
+//        table.setColumnControlVisible(false);
+//        table.setSortable(true);
+//        table.setAutoCreateRowSorter(true);
 
         explorerMgr = new ExplorerManager();
 
@@ -114,12 +120,22 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
             }
         });
 
+        // Tool bar
         toolBar = new JToolBar();
         toolBar.add(nodesBtn);
         toolBar.add(edgesBtn);
         toolBar.addSeparator();
 
-        JButton availableColumnsButton = new JButton();
+        JButton findButton = new JButton(table.getActionMap().get("find"));
+        findButton.setText("");
+        findButton.setToolTipText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.findButton.toolTipText"));
+        findButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/search.png", false));
+        findButton.setFocusable(false);
+        toolBar.add(findButton);        
+        
+
+        availableColumnsButton = new JButton();
+        availableColumnsButton.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.availableColumnsButton.text"));
         availableColumnsButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/config.png", false));
         availableColumnsButton.setToolTipText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.availableColumnsButton.toolTipText"));
         availableColumnsButton.setFocusable(false);
@@ -130,7 +146,8 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
             }
         });
         toolBar.add(availableColumnsButton);
-
+        //----------
+        
         lookup = ExplorerUtils.createLookup(explorerMgr, getActionMap());
 
         rootContext = new ElementItem[]{new ElementItem(GraphElementType.Node), new ElementItem(GraphElementType.Edge)};
@@ -138,12 +155,6 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         busyLabel.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.busyLabel.text"));
-
-        table = new JXTable();
-//        table.setHighlighters(HighlighterFactory.createAlternateStriping());
-//        table.setColumnControlVisible(false);
-//        table.setSortable(true);
-//        table.setAutoCreateRowSorter(true);
 
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         pc.addWorkspaceEventListener(this);
@@ -168,6 +179,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
         if (type != GraphElementType.Node) {
             type = GraphElementType.Node;
             rootContext[type.ordinal()].reload();
+            availableColumnsButton.setEnabled(true);
         }
 
     }
@@ -176,6 +188,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
         if (type != GraphElementType.Edge) {
             type = GraphElementType.Edge;
             rootContext[type.ordinal()].reload();
+            availableColumnsButton.setEnabled(false);            
         }
     }
 
@@ -276,8 +289,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
     }
 
     @Override
-    public String
-            getDisplayHint() {
+    public String getDisplayHint() {
         return NbBundle.getMessage(GraphElementNavigator.class,
                 "GraphElementNavigator.hint");
     }
@@ -300,7 +312,6 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
         if (rootContext[type.ordinal()].isDirty()) {
             rootContext[type.ordinal()].reload();
         }
-//        explorerMgr.setRootContext(rootContext[type.ordinal()].rootContext);
     }
 
     @Override
@@ -366,16 +377,13 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
 
                 @Override
                 protected void process(List<Element> chunks) {
-                    for (Element element : chunks) {
-                        dataModel.addRow(element);
-                    }
+                    dataModel.addRow(chunks);
                 }
 
                 @Override
                 protected void done() {
                     try {
-                        get();
-                        dirty = false;
+                        get();                        
                     } catch (InterruptedException ex) {
                         Exceptions.printStackTrace(ex);
                     } catch (ExecutionException ex) {
@@ -386,6 +394,7 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
                 }
             };
             worker.execute();
+            dirty = false;
         }
 
         private GraphElementDataColumn[] getEdgeColumns(Table table) {

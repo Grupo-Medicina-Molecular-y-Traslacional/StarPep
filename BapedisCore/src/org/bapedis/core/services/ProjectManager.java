@@ -17,7 +17,9 @@ import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.task.AlgorithmExecutor;
+import org.gephi.graph.api.Configuration;
 import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.TimeRepresentation;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
@@ -109,7 +111,7 @@ public class ProjectManager implements Lookup.Provider {
 
     public AlgorithmExecutor getExecutor() {
         return executor;
-    }            
+    }
 
     public void clean() {
         Workspace.resetDefault();
@@ -130,45 +132,46 @@ public class ProjectManager implements Lookup.Provider {
         Collection<? extends FilterFactory> factories = Lookup.getDefault().lookupAll(FilterFactory.class);
         return factories.toArray(new FilterFactory[0]);
     }
-    
+
     // Data Models
-    public AttributesModel getAttributesModel(){
+    public AttributesModel getAttributesModel() {
         return getAttributesModel(currentWS);
     }
-    
-    public AttributesModel getAttributesModel(Workspace workspace){
+
+    public AttributesModel getAttributesModel(Workspace workspace) {
         return workspace.getLookup().lookup(AttributesModel.class);
     }
-    
-    public GraphModel getGraphModel(){
+
+    public GraphModel getGraphModel() {
         return getGraphModel(currentWS);
-    }    
+    }
 
     public GraphModel getGraphModel(Workspace workspace) {
         GraphModel model = workspace.getLookup().lookup(GraphModel.class);
         if (model == null) {
+            Configuration config = new Configuration();
             model = GraphModel.Factory.newInstance();
             workspace.add(model);
         }
         return model;
-    }    
-    
-    public QueryModel getQueryModel(){
+    }
+
+    public QueryModel getQueryModel() {
         return getQueryModel(getCurrentWorkspace());
     }
-    
-    public QueryModel getQueryModel(Workspace workspace){
+
+    public QueryModel getQueryModel(Workspace workspace) {
         QueryModel model = workspace.getLookup().lookup(QueryModel.class);
         if (model == null) {
             model = new QueryModel();
             workspace.add(model);
         }
-        return model;    
+        return model;
     }
-    
-    public FilterModel getFilterModel(){
+
+    public FilterModel getFilterModel() {
         return getFilterModel(currentWS);
-    }    
+    }
 
     public FilterModel getFilterModel(Workspace workspace) {
         FilterModel model = workspace.getLookup().lookup(FilterModel.class);
@@ -178,14 +181,14 @@ public class ProjectManager implements Lookup.Provider {
         }
         return model;
     }
-    
-    public AlgorithmModel getAlgorithmModel(){
+
+    public AlgorithmModel getAlgorithmModel() {
         return getAlgorithmModel(currentWS);
     }
-    
-    public AlgorithmModel getAlgorithmModel(Workspace workspace){
+
+    public AlgorithmModel getAlgorithmModel(Workspace workspace) {
         AlgorithmModel model = workspace.getLookup().lookup(AlgorithmModel.class);
-        if (model == null){
+        if (model == null) {
             model = new AlgorithmModel();
             workspace.add(model);
         }

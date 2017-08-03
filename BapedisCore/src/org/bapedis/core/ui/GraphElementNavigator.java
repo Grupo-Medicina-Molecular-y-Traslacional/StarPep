@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -21,10 +22,13 @@ import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.GraphElementAttributeColumn;
 import org.bapedis.core.model.GraphElementDataColumn;
+import org.bapedis.core.model.GraphEdgeAttributeColumn;
+import org.bapedis.core.model.GraphElementAvailableColumnsModel;
 import org.bapedis.core.model.GraphElementType;
 import org.bapedis.core.model.GraphElementsDataTable;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.ui.components.AvailableColumnsPanel;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Element;
@@ -32,14 +36,18 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
 import org.gephi.graph.api.Node;
+import org.gephi.graph.api.Origin;
 import org.gephi.graph.api.Table;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTable;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
 import org.openide.util.Exceptions;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
@@ -66,6 +74,12 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
     protected final JXBusyLabel busyLabel;
     protected final JXTable table;
     private boolean activated;
+
+    private final GraphElementDataColumn sourceColumn = new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Source);
+    private final GraphElementDataColumn targetColumn = new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Targe);
+    private final GraphElementDataColumn[] edgeColumns = new GraphElementDataColumn[3];
+
+    private final GraphElementAvailableColumnsModel nodeAvailableColumnsModel = new GraphElementAvailableColumnsModel();
 
     /**
      * Creates new form GraphElementNavigator
@@ -102,8 +116,20 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
 
         toolBar = new JToolBar();
         toolBar.add(nodesBtn);
-        toolBar.addSeparator();
         toolBar.add(edgesBtn);
+        toolBar.addSeparator();
+
+        JButton availableColumnsButton = new JButton();
+        availableColumnsButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/config.png", false));
+        availableColumnsButton.setToolTipText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.availableColumnsButton.toolTipText"));
+        availableColumnsButton.setFocusable(false);
+        availableColumnsButton.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                availableColumnsButtonActionPerformed(evt);
+            }
+        });
+        toolBar.add(availableColumnsButton);
 
         lookup = ExplorerUtils.createLookup(explorerMgr, getActionMap());
 
@@ -150,6 +176,17 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
         if (type != GraphElementType.Edge) {
             type = GraphElementType.Edge;
             rootContext[type.ordinal()].reload();
+        }
+    }
+
+    private void availableColumnsButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        if (type == GraphElementType.Node) {
+            Table columns = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel().getNodeTable();
+            nodeAvailableColumnsModel.syncronizeTableColumns(columns);
+            DialogDescriptor dd = new DialogDescriptor(new AvailableColumnsPanel(nodeAvailableColumnsModel), NbBundle.getMessage(AvailableColumnsPanel.class, "AvailableColumnsPanel.title"));
+            dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION});
+            DialogDisplayer.getDefault().notify(dd);
+            ((GraphElementsDataTable)table.getModel()).resetColumns(nodeAvailableColumnsModel.getAvailableColumns());
         }
     }
 
@@ -300,8 +337,8 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
             Table columns = type == GraphElementType.Node ? graphModel.getNodeTable() : graphModel.getEdgeTable();
             GraphView view = graphModel.getVisibleView();
             final Graph graph = graphModel.getGraph(view);
-            final GraphElementsDataTable dataModel = type == GraphElementType.Node ? new GraphElementsDataTable(graph.getNodeCount(), getNodeColumns(columns)):
-                                                                                              new GraphElementsDataTable(graph.getEdgeCount(), getEdgeColumns(columns)) ;
+            final GraphElementsDataTable dataModel = type == GraphElementType.Node ? new GraphElementsDataTable(graph.getNodeCount(), getNodeColumns(columns))
+                    : new GraphElementsDataTable(graph.getEdgeCount(), getEdgeColumns(columns));
             table.setModel(dataModel);
 
             SwingWorker worker = new SwingWorker<Void, Element>() {
@@ -337,36 +374,31 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
                 @Override
                 protected void done() {
                     try {
-                        get();                        
+                        get();
                         dirty = false;
                     } catch (InterruptedException ex) {
                         Exceptions.printStackTrace(ex);
                     } catch (ExecutionException ex) {
                         Exceptions.printStackTrace(ex);
-                    }finally{
+                    } finally {
                         setBusyLabel(false);
                     }
                 }
             };
             worker.execute();
         }
-        
-        private GraphElementDataColumn[] getEdgeColumns(Table table){
-            List<GraphElementDataColumn> colums = new LinkedList<>();
-            for(Column column: table){
-                colums.add(new GraphElementAttributeColumn(column));
-            }
-            return colums.toArray(new GraphElementDataColumn[0]);
-        } 
-        
-        private GraphElementDataColumn[] getNodeColumns(Table table){
-            List<GraphElementDataColumn> colums = new LinkedList<>();
-            for(Column column: table){
-                colums.add(new GraphElementAttributeColumn(column));
-            }
-            return colums.toArray(new GraphElementDataColumn[0]);
-        }         
+
+        private GraphElementDataColumn[] getEdgeColumns(Table table) {
+            edgeColumns[0] = sourceColumn;
+            edgeColumns[1] = new GraphElementAttributeColumn(table.getColumn("label"));
+            edgeColumns[2] = targetColumn;
+            return edgeColumns;
+        }
+
+        private GraphElementDataColumn[] getNodeColumns(Table table) {
+            nodeAvailableColumnsModel.syncronizeTableColumns(table);
+            return nodeAvailableColumnsModel.getAvailableColumns();
+        }
 
     }
 }
-

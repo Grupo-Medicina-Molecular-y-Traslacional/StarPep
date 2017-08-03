@@ -58,7 +58,7 @@ public class GraphElementNode extends AbstractNode {
                     NbBundle.getMessage(GraphElementNode.class, "PropertySet.node.target.desc"), String.class, ((Edge) element).getTarget().getAttribute("name"));
             set.put(targetProperty);
         } else {
-            // Label property
+            // Name property
             PropertySupport.ReadOnly nameProperty = createPropertyField("name", NbBundle.getMessage(GraphElementNode.class, "PropertySet.node.name"),
                     NbBundle.getMessage(GraphElementNode.class, "PropertySet.node.name.desc"), String.class, element.getAttribute("name"));
             set.put(nameProperty);

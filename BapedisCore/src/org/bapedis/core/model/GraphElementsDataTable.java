@@ -42,7 +42,10 @@
 package org.bapedis.core.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.table.AbstractTableModel;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.Element;
@@ -54,7 +57,7 @@ import org.gephi.graph.api.Element;
 public class GraphElementsDataTable extends AbstractTableModel {
 
     private final ArrayList<Element> elements;
-    private final GraphElementDataColumn[] columns;
+    private GraphElementDataColumn[] columns;
 
     public GraphElementsDataTable(int initialCapacity, GraphElementDataColumn[] columns) {
         this.elements = new ArrayList<>(initialCapacity);
@@ -135,20 +138,17 @@ public class GraphElementsDataTable extends AbstractTableModel {
         return elements;
     }
 
-//    public void configure(T[] elements, GraphElementDataColumn<T>[] columns) {
-//        Set<GraphElementDataColumn> oldColumns = new HashSet<GraphElementDataColumn>(Arrays.asList(this.columns));
-//        Set<GraphElementDataColumn> newColumns = new HashSet<GraphElementDataColumn>(Arrays.asList(columns));
-//
-//        boolean columnsChanged = !oldColumns.equals(newColumns);
-//        this.columns = columns;
-//        this.elements = elements;
-//
-//        if (columnsChanged) {
-//            fireTableStructureChanged();//Only firing this event if columns change is useful because JXTable will not reset columns width if there is no change
-//        } else {
-//            fireTableDataChanged();
-//        }
-//    }
+    public void resetColumns(GraphElementDataColumn[] columns) {
+        Set<GraphElementDataColumn> oldColumns = new HashSet<GraphElementDataColumn>(Arrays.asList(this.columns));
+        Set<GraphElementDataColumn> newColumns = new HashSet<GraphElementDataColumn>(Arrays.asList(columns));
+
+        boolean columnsChanged = !oldColumns.equals(newColumns);
+        this.columns = columns;
+
+        if (columnsChanged) {
+            fireTableStructureChanged();//Only firing this event if columns change is useful because JXTable will not reset columns width if there is no change
+        }
+    }
     /**
      * Column at index or null if it's a fake column.
      *

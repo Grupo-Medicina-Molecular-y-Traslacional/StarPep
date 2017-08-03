@@ -193,6 +193,10 @@
                 <runtime-relative-path>ext/flamingo-5.0-gephi.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/flamingo-5.0-gephi.jar</binary-origin>
             </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/miglayout-3.7.4.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/miglayout-3.7.4.jar</binary-origin>
+            </class-path-extension>
         </data>
     </configuration>
 </project>

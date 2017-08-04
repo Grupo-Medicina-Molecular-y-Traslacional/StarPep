@@ -37,7 +37,6 @@ import org.gephi.graph.api.Node;
 import org.gephi.graph.api.Table;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.search.SearchFactory;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
 import org.openide.DialogDescriptor;
@@ -56,7 +55,7 @@ import org.openide.util.NbBundle;
  * @author loge
  */
 @NavigatorPanel.Registration(mimeType = "graph/table", displayName = "#GraphElementNavigator.name")
-public class GraphElementNavigator extends JComponent implements ExplorerManager.Provider,
+public class GraphElementNavigator extends JComponent implements
         WorkspaceEventListener, PropertyChangeListener, LookupListener, NavigatorPanelWithToolbar {
 
     protected final ExplorerManager explorerMgr;
@@ -223,10 +222,6 @@ public class GraphElementNavigator extends JComponent implements ExplorerManager
     private javax.swing.JScrollPane scrollPane;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public ExplorerManager getExplorerManager() {
-        return explorerMgr;
-    }
 
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {

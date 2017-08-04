@@ -29,7 +29,7 @@ public class MetadataNode extends AbstractNode implements Transferable, Property
     protected final Metadata metadata;
 
     public MetadataNode(Metadata metadata) {
-        super(metadata.hasChild() ? Children.create(new MetadataChildFactory(metadata), false) : Children.LEAF, Lookups.singleton(metadata));
+        super(metadata.hasChilds()? Children.create(new MetadataChildFactory(metadata), false) : Children.LEAF, Lookups.singleton(metadata));
         metadata.addPropertyChangeListener(this);
         this.metadata = metadata;
         setDisplayName(metadata.getName());

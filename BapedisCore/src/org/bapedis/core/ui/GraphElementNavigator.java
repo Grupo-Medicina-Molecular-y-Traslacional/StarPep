@@ -23,6 +23,7 @@ import org.bapedis.core.model.GraphElementAttributeColumn;
 import org.bapedis.core.model.GraphElementDataColumn;
 import org.bapedis.core.model.GraphEdgeAttributeColumn;
 import org.bapedis.core.model.GraphElementAvailableColumnsModel;
+import org.bapedis.core.model.GraphElementNavigatorModel;
 import org.bapedis.core.model.GraphElementType;
 import org.bapedis.core.model.GraphElementsDataTable;
 import org.bapedis.core.model.Workspace;
@@ -67,24 +68,20 @@ public class GraphElementNavigator extends JComponent implements
 
     protected final JToggleButton nodesBtn, edgesBtn;
     protected final JButton availableColumnsButton;
-    protected GraphElementType type;
     protected final ElementItem[] rootContext;
     protected final JXBusyLabel busyLabel;
     protected final JXTable table;
     private boolean activated;
-
+    protected GraphElementNavigatorModel navigatorModel;
     private final GraphElementDataColumn sourceColumn = new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Source);
     private final GraphElementDataColumn targetColumn = new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Targe);
     private final GraphElementDataColumn[] edgeColumns = new GraphElementDataColumn[3];
-
-    private final GraphElementAvailableColumnsModel nodeAvailableColumnsModel = new GraphElementAvailableColumnsModel();
 
     /**
      * Creates new form GraphElementNavigator
      */
     public GraphElementNavigator() {
         initComponents();
-
 
         table = new JXTable();
 //        table.setHighlighters(HighlighterFactory.createAlternateStriping());
@@ -103,9 +100,7 @@ public class GraphElementNavigator extends JComponent implements
         ButtonGroup elementGroup = new ButtonGroup();
         elementGroup.add(nodesBtn);
         elementGroup.add(edgesBtn);
-
-        type = GraphElementType.Node;
-        nodesBtn.setSelected(true);
+        
         nodesBtn.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -130,8 +125,7 @@ public class GraphElementNavigator extends JComponent implements
         findButton.setToolTipText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.findButton.toolTipText"));
         findButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/search.png", false));
         findButton.setFocusable(false);
-        toolBar.add(findButton);        
-        
+        toolBar.add(findButton);
 
         availableColumnsButton = new JButton();
         availableColumnsButton.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.availableColumnsButton.text"));
@@ -146,7 +140,7 @@ public class GraphElementNavigator extends JComponent implements
         });
         toolBar.add(availableColumnsButton);
         //----------
-        
+
         lookup = ExplorerUtils.createLookup(explorerMgr, getActionMap());
 
         rootContext = new ElementItem[]{new ElementItem(GraphElementType.Node), new ElementItem(GraphElementType.Edge)};
@@ -175,30 +169,31 @@ public class GraphElementNavigator extends JComponent implements
     }
 
     private void nodesButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        if (type != GraphElementType.Node) {
-            type = GraphElementType.Node;
-            rootContext[type.ordinal()].reload();
+        if (navigatorModel.getVisualElement() != GraphElementType.Node) {
+            navigatorModel.setVisualElement(GraphElementType.Node);
+            rootContext[GraphElementType.Node.ordinal()].reload();
             availableColumnsButton.setEnabled(true);
         }
 
     }
 
     private void edgesButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        if (type != GraphElementType.Edge) {
-            type = GraphElementType.Edge;
-            rootContext[type.ordinal()].reload();
-            availableColumnsButton.setEnabled(false);            
+        if (navigatorModel.getVisualElement() != GraphElementType.Edge) {
+            navigatorModel.setVisualElement(GraphElementType.Edge);
+            rootContext[GraphElementType.Edge.ordinal()].reload();
+            availableColumnsButton.setEnabled(false);
         }
     }
 
     private void availableColumnsButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        if (type == GraphElementType.Node) {
+        if (navigatorModel.getVisualElement() == GraphElementType.Node) {
             Table columns = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel().getNodeTable();
+            GraphElementAvailableColumnsModel nodeAvailableColumnsModel = navigatorModel.getNodeAvailableColumnsModel();
             nodeAvailableColumnsModel.syncronizeTableColumns(columns);
             DialogDescriptor dd = new DialogDescriptor(new AvailableColumnsPanel(nodeAvailableColumnsModel), NbBundle.getMessage(AvailableColumnsPanel.class, "AvailableColumnsPanel.title"));
             dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION});
             DialogDisplayer.getDefault().notify(dd);
-            ((GraphElementsDataTable)table.getModel()).resetColumns(nodeAvailableColumnsModel.getAvailableColumns());
+            ((GraphElementsDataTable) table.getModel()).resetColumns(nodeAvailableColumnsModel.getAvailableColumns());
         }
     }
 
@@ -222,7 +217,6 @@ public class GraphElementNavigator extends JComponent implements
     private javax.swing.JScrollPane scrollPane;
     // End of variables declaration//GEN-END:variables
 
-
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
         removeLookupListener();
@@ -230,21 +224,34 @@ public class GraphElementNavigator extends JComponent implements
             AttributesModel oldAttrModel = pc.getAttributesModel(oldWs);
             if (oldAttrModel != null) {
                 oldAttrModel.removeQuickFilterChangeListener(this);
-
             }
         }
         peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class
         );
         peptideLkpResult.addLookupListener(this);
 
-        AttributesModel peptidesModel = pc.getAttributesModel(newWs);
-        if (currentModel != null) {
-            currentModel.removeQuickFilterChangeListener(this);
+        AttributesModel peptidesModel = pc.getAttributesModel(newWs);       
+        if (peptidesModel != null) {
+            peptidesModel.addQuickFilterChangeListener(this);
         }
-        this.currentModel = peptidesModel;
-        if (currentModel != null) {
-            currentModel.addQuickFilterChangeListener(this);
-        }
+         this.currentModel = peptidesModel;
+         
+         navigatorModel = newWs.getLookup().lookup(GraphElementNavigatorModel.class);
+         if (navigatorModel == null){
+             navigatorModel = new GraphElementNavigatorModel();
+             newWs.add(navigatorModel);
+         }
+         
+         switch(navigatorModel.getVisualElement()){
+             case Node:
+                 nodesBtn.setSelected(true);
+                 availableColumnsButton.setEnabled(true);
+                 break;
+             case Edge:
+                 edgesBtn.setSelected(true);
+                 availableColumnsButton.setEnabled(false);
+                 break;
+         }         
         setDirtyData();
     }
 
@@ -252,7 +259,7 @@ public class GraphElementNavigator extends JComponent implements
         rootContext[0].setDirty(true);
         rootContext[1].setDirty(true);
         if (activated) {
-            rootContext[type.ordinal()].reload();
+            rootContext[navigatorModel.getVisualElement().ordinal()].reload();
         }
     }
 
@@ -267,6 +274,9 @@ public class GraphElementNavigator extends JComponent implements
     @Override
     public void resultChanged(LookupEvent le) {
         if (le.getSource().equals(peptideLkpResult)) {
+            if (currentModel != null) {
+                currentModel.removeQuickFilterChangeListener(this);
+            }
             setDirtyData();
         }
     }
@@ -304,8 +314,8 @@ public class GraphElementNavigator extends JComponent implements
     @Override
     public void panelActivated(Lookup lkp) {
         activated = true;
-        if (rootContext[type.ordinal()].isDirty()) {
-            rootContext[type.ordinal()].reload();
+        if (rootContext[navigatorModel.getVisualElement().ordinal()].isDirty()) {
+            rootContext[navigatorModel.getVisualElement().ordinal()].reload();
         }
     }
 
@@ -326,7 +336,7 @@ public class GraphElementNavigator extends JComponent implements
 
         public ElementItem(GraphElementType type) {
             this.type = type;
-            dirty = false;
+            dirty = true;
         }
 
         public boolean isDirty() {
@@ -378,7 +388,7 @@ public class GraphElementNavigator extends JComponent implements
                 @Override
                 protected void done() {
                     try {
-                        get();                        
+                        get();
                     } catch (InterruptedException ex) {
                         Exceptions.printStackTrace(ex);
                     } catch (ExecutionException ex) {
@@ -400,6 +410,7 @@ public class GraphElementNavigator extends JComponent implements
         }
 
         private GraphElementDataColumn[] getNodeColumns(Table table) {
+            GraphElementAvailableColumnsModel nodeAvailableColumnsModel = navigatorModel.getNodeAvailableColumnsModel();
             nodeAvailableColumnsModel.syncronizeTableColumns(table);
             return nodeAvailableColumnsModel.getAvailableColumns();
         }

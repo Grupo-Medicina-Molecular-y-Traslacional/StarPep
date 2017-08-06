@@ -19,8 +19,10 @@ import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.task.AlgorithmExecutor;
 import org.gephi.graph.api.Configuration;
 import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.TimeRepresentation;
+import org.gephi.graph.api.Origin;
+import org.gephi.graph.api.Table;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ServiceProvider;
@@ -39,6 +41,11 @@ public class ProjectManager implements Lookup.Provider {
     protected Workspace currentWS;
     protected List<WorkspaceEventListener> wsListeners;
     protected final AlgorithmExecutor executor;
+    private final String PRO_NAME = "name";
+    private final String PRO_NAME_TITLE=NbBundle.getMessage(ProjectManager.class, "NodeTable.column.name.title");
+    private final String PRO_XREF = "xref";
+    private final String PRO_XREF_TITLE=NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.xref.title");
+    
 
     public ProjectManager() {
         executor = new AlgorithmExecutor();
@@ -151,10 +158,23 @@ public class ProjectManager implements Lookup.Provider {
         if (model == null) {
             Configuration config = new Configuration();
             model = GraphModel.Factory.newInstance();
+            createColumns(model);
             workspace.add(model);
         }
         return model;
     }
+    
+    protected void createColumns(GraphModel graphModel) {
+        Table nodeTable = graphModel.getNodeTable();
+        if (!nodeTable.hasColumn(PRO_NAME)) {
+            nodeTable.addColumn(PRO_NAME, PRO_NAME_TITLE, String.class, Origin.DATA, "", false);
+        }                
+
+        Table edgeTable = graphModel.getEdgeTable();
+        if (!edgeTable.hasColumn(PRO_XREF)) {
+            edgeTable.addColumn(PRO_XREF, PRO_XREF_TITLE, String[].class, Origin.DATA, new String[]{}, false);
+        }
+    }    
 
     public QueryModel getQueryModel() {
         return getQueryModel(getCurrentWorkspace());

@@ -32,6 +32,7 @@ import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.ui.GraphElementNavigatorLookupHint;
+import org.bapedis.core.ui.MetadataNavigatorLookupHint;
 import org.gephi.graph.api.Node;
 import org.gephi.ui.components.JColorButton;
 import org.gephi.visualization.VizController;
@@ -98,7 +99,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         GraphDrawable drawable = VizController.getInstance().getDrawable();
         graphPanel.add(drawable.getGraphComponent(), BorderLayout.CENTER);
         content = new InstanceContent();
-        lookup = new ProxyLookup(new AbstractLookup(content), Lookups.singleton(new GraphElementNavigatorLookupHint()));
+        lookup = new ProxyLookup(new AbstractLookup(content), Lookups.singleton(new GraphElementNavigatorLookupHint()), Lookups.singleton(new MetadataNavigatorLookupHint()));
     }
 
     private void initComponents() {

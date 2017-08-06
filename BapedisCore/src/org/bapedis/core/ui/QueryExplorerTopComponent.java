@@ -75,7 +75,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         centerPanel.add(view, BorderLayout.CENTER);
 
         associateLookup(new ProxyLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()),
-                Lookups.singleton(new MetadataNavigatorLookupHint())));
+                Lookups.singleton(new MetadataNavigatorLookupHint()), Lookups.singleton(new GraphElementNavigatorLookupHint())));
 
         applyCheckBox.setSelected(NbPreferences.forModule(QueryModel.class).getBoolean(AUTO_APPLY, true));
     }

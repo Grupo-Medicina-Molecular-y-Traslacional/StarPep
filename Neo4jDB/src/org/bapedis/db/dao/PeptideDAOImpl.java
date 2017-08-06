@@ -23,9 +23,7 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphFactory;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
-import org.gephi.graph.api.Origin;
 import org.gephi.graph.api.Subgraph;
-import org.gephi.graph.api.Table;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -39,7 +37,6 @@ import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Uniqueness;
 import org.openide.util.Lookup;
-import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -56,9 +53,7 @@ public class PeptideDAOImpl implements PeptideDAO {
     private final String PRO_SEQ = "seq";
     private final String PRO_LENGHT = "length";
     private final String PRO_NAME = "name";
-    private final String PRO_NAME_TITLE=NbBundle.getMessage(PeptideDAOImpl.class, "NodeTable.column.name.title");
     private final String PRO_XREF = "xref";
-    private final String PRO_XREF_TITLE=NbBundle.getMessage(PeptideDAOImpl.class, "EdgeTable.column.xref.title");
 
     private final float GRAPH_NODE_SIZE = 10f;
     private final float GRAPH_EDGE_WEIGHT = 1f;
@@ -95,9 +90,7 @@ public class PeptideDAOImpl implements PeptideDAO {
 
             // Write lock
             graphModel.getGraph().writeLock();
-            checkColumns(graphModel);
-            GraphView gView = graphModel.createView();
-            Subgraph subGraph = graphModel.getGraph(gView);
+            GraphView gView = null;
 
             Peptide peptide;
             org.gephi.graph.api.Node graphNode, graphNeighborNode;
@@ -105,6 +98,8 @@ public class PeptideDAOImpl implements PeptideDAO {
             PeptideAttribute attr;
             String id, seq;
             try {
+                gView = graphModel.createView();
+                Subgraph subGraph = graphModel.getGraph(gView);
                 while (peptideNodes.hasNext()) {
                     Node neoNode = peptideNodes.next();
                     id = neoNode.getProperty(PRO_ID).toString();
@@ -145,7 +140,9 @@ public class PeptideDAOImpl implements PeptideDAO {
                     attrModel.addPeptide(peptide);
                 }
             } finally {
-                graphModel.setVisibleView(gView);
+                if (gView != null) {
+                    graphModel.setVisibleView(gView);
+                }
                 graphModel.getGraph().writeUnlock();
                 peptideNodes.close();
                 tx.success();
@@ -202,21 +199,9 @@ public class PeptideDAOImpl implements PeptideDAO {
         return edges;
     }
 
-    protected void checkColumns(GraphModel graphModel) {
-        Table nodeTable = graphModel.getNodeTable();
-        if (!nodeTable.hasColumn(PRO_NAME)) {
-            nodeTable.addColumn(PRO_NAME, PRO_NAME_TITLE, String.class, Origin.DATA, "", false);
-        }                
-
-        Table edgeTable = graphModel.getEdgeTable();
-        if (!edgeTable.hasColumn(PRO_XREF)) {
-            edgeTable.addColumn(PRO_XREF, PRO_XREF_TITLE, String[].class, Origin.DATA, new String[]{}, false);
-        }
-    }
-
     protected org.gephi.graph.api.Node getGraphNodeFromNeoNode(Node neoNode, GraphModel graphModel) {
         Graph mainGraph = graphModel.getGraph();
-        String id =  String.valueOf(neoNode.getId());
+        String id = String.valueOf(neoNode.getId());
         org.gephi.graph.api.Node graphNode = mainGraph.getNode(id);
         if (graphNode == null) {
             GraphFactory factory = graphModel.factory();

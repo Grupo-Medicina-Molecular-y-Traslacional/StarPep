@@ -49,7 +49,6 @@ import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
 import org.jdesktop.swingx.JXBusyLabel;
-import org.openide.awt.Mnemonics;
 import org.openide.explorer.view.NodePopupFactory;
 import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;

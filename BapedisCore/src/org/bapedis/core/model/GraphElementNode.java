@@ -1,10 +1,8 @@
 package org.bapedis.core.model;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Element;
-import org.gephi.graph.api.Node;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;

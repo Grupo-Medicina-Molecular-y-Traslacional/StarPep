@@ -6,7 +6,9 @@
 package org.bapedis.core.ui;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.ItemEvent;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
@@ -17,16 +19,24 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AnnotationType;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.MetadataNavigatorModel;
+import org.bapedis.core.model.MetadataNode;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.data.MetadataDAO;
@@ -36,14 +46,15 @@ import org.gephi.graph.api.GraphView;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTree;
 import org.openide.explorer.ExplorerManager;
-import org.openide.nodes.Node;
 import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
 import org.openide.util.NbBundle;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
+import org.openide.awt.MouseUtils;
 import org.openide.explorer.ExplorerUtils;
+import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 
@@ -78,6 +89,15 @@ public class MetadataNavigator extends JComponent implements
         explorerMgr = new ExplorerManager();
 
         tree = new JXTree();
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.addMouseListener(new MetadataPopupAdapter(tree));
+        tree.addTreeSelectionListener(new TreeSelectionListener() {
+            @Override
+            public void valueChanged(TreeSelectionEvent e) {
+                treeValueChanged(e);
+            }
+        });
+
         scrollPane.setViewportView(tree);
 
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
@@ -159,6 +179,16 @@ public class MetadataNavigator extends JComponent implements
 
     private void setBusyLabel(boolean busy) {
         scrollPane.setViewportView(busy ? busyLabel : tree);
+    }
+
+    private void treeValueChanged(TreeSelectionEvent e) {        
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+        if (node != null && node.getUserObject() != null) {
+            Metadata metadata = (Metadata)node.getUserObject();            
+            explorerMgr.setRootContext(new MetadataNode(metadata));
+        } else{
+            explorerMgr.setRootContext(Node.EMPTY);
+        }
     }
 
     /**
@@ -371,9 +401,9 @@ public class MetadataNavigator extends JComponent implements
                         get();
                         if (rootNode.getChildCount() > 0) {
                             treeModel.reload();
-                        } else{
+                        } else {
                             tree.setModel(null);
-                        }                        
+                        }
                     } catch (InterruptedException ex) {
                         Exceptions.printStackTrace(ex);
                     } catch (ExecutionException ex) {
@@ -397,4 +427,44 @@ public class MetadataNavigator extends JComponent implements
         }
 
     }
+}
+
+class MetadataPopupAdapter extends MouseUtils.PopupMouseAdapter{
+    protected final JXTree tree;
+
+    public MetadataPopupAdapter(JXTree tree) {
+        this.tree = tree;
+    }
+        
+    @Override
+    protected void showPopup(MouseEvent evt) {
+        TreePath path = tree.getPathForLocation(evt.getX(), evt.getY());
+
+//        if (path != null) {
+//            if (!tree.getSelectionModel().isRowSelected(selRow)) {
+//                tree.getSelectionModel().clearSelection();
+//                tree.getSelectionModel().i(selRow, selRow);
+//            }
+//            final Point p = e.getPoint();
+//            new Thread(new Runnable() {
+//
+//                @Override
+//                public void run() {
+//                    final JPopupMenu pop = createPopup(p);
+//                    SwingUtilities.invokeLater(new Runnable() {
+//
+//                        @Override
+//                        public void run() {
+//                            showPopup(p.x, p.y, pop);
+//                        }
+//                    });
+//                }
+//            }).start();
+//        } else {
+//            tree.getSelectionModel().clearSelection();
+//        }
+//        e.consume();
+
+    }
+
 }

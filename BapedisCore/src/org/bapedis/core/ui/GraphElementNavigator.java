@@ -84,9 +84,9 @@ public class GraphElementNavigator extends JComponent implements
         
         table = new JXTable();
 //        table.setHighlighters(HighlighterFactory.createAlternateStriping());
-//        table.setColumnControlVisible(false);
-//        table.setSortable(true);
-//        table.setAutoCreateRowSorter(true);
+        table.setColumnControlVisible(false);
+        table.setSortable(true);
+        table.setAutoCreateRowSorter(true);
 
         explorerMgr = new ExplorerManager();
         

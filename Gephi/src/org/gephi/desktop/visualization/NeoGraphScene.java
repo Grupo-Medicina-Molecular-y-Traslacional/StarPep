@@ -5,6 +5,7 @@
  */
 package org.gephi.desktop.visualization;
 
+import org.bapedis.core.model.GraphNodeWrapper;
 import com.connectina.swing.fontchooser.JFontChooser;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -586,13 +587,13 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
     @Override
     public void handleEvent(VizEvent event) {        
-        Collection<? extends NodePropertiesWrapper> oldNodes = lookup.lookupAll(NodePropertiesWrapper.class);
-        for(NodePropertiesWrapper node: oldNodes){
+        Collection<? extends GraphNodeWrapper> oldNodes = lookup.lookupAll(GraphNodeWrapper.class);
+        for(GraphNodeWrapper node: oldNodes){
             content.remove(node);
         }
         Node[] selectedNodes = (Node[]) event.getData();
         for (Node node : selectedNodes) {
-            content.add(new NodePropertiesWrapper(node));
+            content.add(new GraphNodeWrapper(node));
         }
     }
 

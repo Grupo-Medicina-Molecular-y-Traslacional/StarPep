@@ -5,7 +5,7 @@
  */
 package org.gephi.visualization.apiimpl.contextmenuitems;
 
-import org.gephi.desktop.visualization.NodePropertiesWrapper;
+import org.bapedis.core.model.GraphNodeWrapper;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.Icon;
@@ -53,7 +53,7 @@ public class ShowGraphProperties implements GraphContextMenuItem {
     public void execute() {
         final List<org.openide.nodes.Node> activeNodes = new LinkedList<>();
         for(Node n: nodes){
-            activeNodes.add(new NodePropertiesWrapper(n));
+            activeNodes.add(new GraphNodeWrapper(n));
         }
         SwingUtilities.invokeLater(new Runnable() {
             @Override

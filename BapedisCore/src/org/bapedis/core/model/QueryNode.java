@@ -14,6 +14,7 @@ import org.bapedis.core.ui.actions.RemoveFromQueryModel;
 import org.bapedis.core.ui.actions.RemoveOthersFromQueryModel;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
+import org.openide.nodes.Sheet;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.datatransfer.PasteType;
@@ -21,7 +22,7 @@ import org.openide.util.lookup.Lookups;
 
 /**
  *
- * @author Home
+ * @author loge
  */
 public class QueryNode extends AbstractNode {
 
@@ -53,30 +54,7 @@ public class QueryNode extends AbstractNode {
         actions[2].setEnabled(queryModel.countElements() > 0);
         return actions;
     }
-
-    @Override
-    public PasteType getDropType(Transferable t, int action, int index) {
-        if (t.isDataFlavorSupported(MetadataNode.DATA_FLAVOR)) {
-            try {
-                final Metadata transferData = (Metadata) t.getTransferData(MetadataNode.DATA_FLAVOR);
-                if (transferData != null) {
-                    return new PasteType() {
-                        @Override
-                        public Transferable paste() throws IOException {
-                            queryModel.add((Metadata) transferData);
-                            return null;
-                        }
-                    };
-                }
-            } catch (UnsupportedFlavorException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-        }
-        return null;
-    }
-
+    
     @Override
     public String getHtmlDisplayName() {
         if (metadata != null) {
@@ -84,6 +62,30 @@ public class QueryNode extends AbstractNode {
                     + "<i> " + metadata.getName() + "</i>";
         }
         return NbBundle.getMessage(QueryNode.class, "QueryNode.rootContext.name");
-    }
+    }    
+
+//    @Override
+//    public PasteType getDropType(Transferable t, int action, int index) {
+//        if (t.isDataFlavorSupported(MetadataNode.DATA_FLAVOR)) {
+//            try {
+//                final Metadata transferData = (Metadata) t.getTransferData(MetadataNode.DATA_FLAVOR);
+//                if (transferData != null) {
+//                    return new PasteType() {
+//                        @Override
+//                        public Transferable paste() throws IOException {
+//                            queryModel.add((Metadata) transferData);
+//                            return null;
+//                        }
+//                    };
+//                }
+//            } catch (UnsupportedFlavorException ex) {
+//                Exceptions.printStackTrace(ex);
+//            } catch (IOException ex) {
+//                Exceptions.printStackTrace(ex);
+//            }
+//        }
+//        return null;
+//    }
+        
 
 }

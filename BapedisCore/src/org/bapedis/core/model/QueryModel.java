@@ -40,7 +40,6 @@ public class QueryModel {
     public void add(Metadata metadata) {
         if (!contains(metadata)) {
             metadatas.add(metadata);
-            metadata.setSelected(true);
             propertyChangeSupport.firePropertyChange(ADDED_METADATA, null, metadata);
         }
     }
@@ -56,14 +55,10 @@ public class QueryModel {
 
     public void remove(Metadata metadata) {
         metadatas.remove(metadata);
-        metadata.setSelected(false);
         propertyChangeSupport.firePropertyChange(REMOVED_METADATA, metadata, null);
     }
     
-    public void removeAll(){
-        for (Metadata m : metadatas) {
-            m.setSelected(false);
-        }        
+    public void removeAll(){       
         metadatas.clear();
         propertyChangeSupport.firePropertyChange(REMOVED_METADATA, null, null);
     }

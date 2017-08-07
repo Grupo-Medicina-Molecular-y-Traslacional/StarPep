@@ -19,16 +19,12 @@ import org.gephi.graph.api.Node;
  * @author loge
  */
 public class Metadata{
-    public static final String SELECTED = "Selected";
-    protected boolean selected;
     protected final String underlyingNodeID;
-    protected Node node;
+    protected Node graphNode;
     protected final Metadata parent;
     protected final String name;
     protected final AnnotationType annotationType;
     protected final List<Metadata> childs;
-    private transient final PropertyChangeSupport changeSupport
-            = new PropertyChangeSupport(this);
 
     public Metadata(Metadata parent, String underlyingNodeID, String name, AnnotationType annotationType, boolean isLeaf) {
         this.parent = parent;
@@ -36,7 +32,6 @@ public class Metadata{
         this.name = name;
         this.annotationType = annotationType;
         childs = isLeaf ? null: new LinkedList<Metadata>();
-        selected = false;
     }
 
     public Metadata(String underlyingNodeID, String name, AnnotationType annotationType) {
@@ -51,19 +46,6 @@ public class Metadata{
         return annotationType;
     }
 
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        boolean oldState = this.selected;
-        this.selected = selected;
-        for (Metadata child : childs) {
-            child.setSelected(selected);
-        }
-        changeSupport.firePropertyChange(SELECTED, oldState, selected);
-    }
-
     public void addChild(Metadata child) {        
         childs.add(child);
     }
@@ -76,27 +58,12 @@ public class Metadata{
         return underlyingNodeID;
     }
 
-    public Node getNode() {
-        return node;
+    public Node getGraphNode() {
+        return graphNode;
     }
 
-    public void setNode(Node node) {
-        this.node = node;
-    }
-
-    public void addPropertyChangeListener(
-            final PropertyChangeListener listener) {
-        changeSupport.addPropertyChangeListener(listener);
-    }
-
-    /**
-     * Remove PropertyChangeListener.
-     *
-     * @param listener
-     */
-    public void removePropertyChangeListener(
-            final PropertyChangeListener listener) {
-        changeSupport.removePropertyChangeListener(listener);
+    public void setGraphNode(Node graphNode) {
+        this.graphNode = graphNode;
     }
 
     @Override

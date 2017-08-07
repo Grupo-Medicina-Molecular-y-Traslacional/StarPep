@@ -6,14 +6,15 @@
 package org.bapedis.core.ui;
 
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -22,9 +23,7 @@ import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -37,9 +36,12 @@ import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.MetadataNavigatorModel;
 import org.bapedis.core.model.MetadataNode;
+import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.data.MetadataDAO;
+import org.bapedis.core.ui.actions.AddToQueryModel;
+import org.bapedis.core.ui.actions.RemoveFromQueryModel;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
@@ -57,6 +59,8 @@ import org.openide.explorer.ExplorerUtils;
 import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
+import org.openide.util.lookup.AbstractLookup;
+import org.openide.util.lookup.InstanceContent;
 
 /**
  *
@@ -66,7 +70,7 @@ import org.openide.util.ImageUtilities;
 public class MetadataNavigator extends JComponent implements
         WorkspaceEventListener, PropertyChangeListener, LookupListener, NavigatorPanelWithToolbar {
 
-    protected final ExplorerManager explorerMgr;
+    protected final InstanceContent content;
     private final DefaultComboBoxModel comboBoxModel;
     protected final ProjectManager pc;
     protected final Lookup lookup;
@@ -86,11 +90,12 @@ public class MetadataNavigator extends JComponent implements
      */
     public MetadataNavigator() {
         initComponents();
-        explorerMgr = new ExplorerManager();
+        content = new InstanceContent();
+        lookup = new AbstractLookup(content);
 
         tree = new JXTree();
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        tree.addMouseListener(new MetadataPopupAdapter(tree));
+        tree.addMouseListener(new MetadataPopupAdapter(tree, lookup));
         tree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent e) {
@@ -129,7 +134,6 @@ public class MetadataNavigator extends JComponent implements
         }
 
         comboBox = new JComboBox(comboBoxModel);
-        comboBox.setSelectedIndex(-1);
         comboBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 comboBoxItemStateChanged(evt);
@@ -143,7 +147,6 @@ public class MetadataNavigator extends JComponent implements
         toolBar.add(findButton);
 
         pc = Lookup.getDefault().lookup(ProjectManager.class);
-        lookup = ExplorerUtils.createLookup(explorerMgr, getActionMap());
     }
 
     private void comboBoxItemStateChanged(java.awt.event.ItemEvent evt) {
@@ -181,13 +184,15 @@ public class MetadataNavigator extends JComponent implements
         scrollPane.setViewportView(busy ? busyLabel : tree);
     }
 
-    private void treeValueChanged(TreeSelectionEvent e) {        
+    private void treeValueChanged(TreeSelectionEvent e) {
+        Collection<? extends MetadataNode> oldNodes = lookup.lookupAll(MetadataNode.class);
+        for (MetadataNode node : oldNodes) {
+            content.remove(node);
+        }
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         if (node != null && node.getUserObject() != null) {
-            Metadata metadata = (Metadata)node.getUserObject();            
-            explorerMgr.setRootContext(new MetadataNode(metadata));
-        } else{
-            explorerMgr.setRootContext(Node.EMPTY);
+            Metadata metadata = (Metadata) node.getUserObject();
+            content.add(new MetadataNode(metadata));
         }
     }
 
@@ -248,6 +253,7 @@ public class MetadataNavigator extends JComponent implements
             AnnotationItem item = (AnnotationItem) comboBoxModel.getElementAt(i + 1);
             item.setShowAll(navigatorModel.isShowAll(i));
         }
+        comboBox.setSelectedIndex(-1);
         if (navigatorModel.getSelectedIndex() == -1) {
             comboBox.setSelectedItem(NO_SELECTION);
         } else {
@@ -261,7 +267,9 @@ public class MetadataNavigator extends JComponent implements
                 && evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
             if (comboBox.getSelectedItem() instanceof AnnotationItem) {
                 AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
-                item.reload();
+                if (!item.isShowAll()) {
+                    item.reload();
+                }
             }
         }
     }
@@ -278,7 +286,9 @@ public class MetadataNavigator extends JComponent implements
                 currentModel.addQuickFilterChangeListener(this);
                 if (comboBox.getSelectedItem() instanceof AnnotationItem) {
                     AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
-                    item.reload();
+                    if (!item.isShowAll()) {
+                        item.reload();
+                    }
                 }
             }
         }
@@ -374,7 +384,7 @@ public class MetadataNavigator extends JComponent implements
                             for (Metadata m : metadatas) {
                                 node = graph.getNode(m.getUnderlyingNodeID());
                                 if (node != null) {
-                                    m.setNode(node);
+                                    m.setGraphNode(node);
                                     rootNode.add(createNode(m));
                                 }
                             }
@@ -429,42 +439,38 @@ public class MetadataNavigator extends JComponent implements
     }
 }
 
-class MetadataPopupAdapter extends MouseUtils.PopupMouseAdapter{
-    protected final JXTree tree;
+class MetadataPopupAdapter extends MouseUtils.PopupMouseAdapter {
 
-    public MetadataPopupAdapter(JXTree tree) {
+    protected final JXTree tree;
+    protected final Lookup lookup;
+
+    public MetadataPopupAdapter(JXTree tree, Lookup lookup) {
         this.tree = tree;
+        this.lookup = lookup;
     }
-        
+
     @Override
     protected void showPopup(MouseEvent evt) {
-        TreePath path = tree.getPathForLocation(evt.getX(), evt.getY());
-
-//        if (path != null) {
-//            if (!tree.getSelectionModel().isRowSelected(selRow)) {
-//                tree.getSelectionModel().clearSelection();
-//                tree.getSelectionModel().i(selRow, selRow);
-//            }
-//            final Point p = e.getPoint();
-//            new Thread(new Runnable() {
-//
-//                @Override
-//                public void run() {
-//                    final JPopupMenu pop = createPopup(p);
-//                    SwingUtilities.invokeLater(new Runnable() {
-//
-//                        @Override
-//                        public void run() {
-//                            showPopup(p.x, p.y, pop);
-//                        }
-//                    });
-//                }
-//            }).start();
-//        } else {
-//            tree.getSelectionModel().clearSelection();
-//        }
-//        e.consume();
-
+        TreePath treePath = tree.getPathForLocation(evt.getX(), evt.getY());
+        if (treePath != null) {
+            DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) treePath.getLastPathComponent();
+            DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+            if (selectedNode != null && !selectedNode.equals(treeNode)) {
+                tree.getSelectionModel().clearSelection();
+                tree.getSelectionModel().setSelectionPath(treePath);
+            }
+            if (treeNode.getUserObject() != null) {
+                QueryModel queryModel = Lookup.getDefault().lookup(ProjectManager.class).getQueryModel();
+                Metadata metadata = (Metadata) treeNode.getUserObject();
+                boolean isAdded = queryModel.contains(metadata);
+                Action[] actions = new Action[]{new AddToQueryModel(metadata), new RemoveFromQueryModel(metadata)};
+                JPopupMenu contextMenu = new JPopupMenu();
+                contextMenu.add(actions[0]);
+                contextMenu.add(actions[1]);
+                actions[0].setEnabled(!isAdded);
+                actions[1].setEnabled(isAdded);
+                contextMenu.show(tree, evt.getX(), evt.getY());
+            }
+        }
     }
-
 }

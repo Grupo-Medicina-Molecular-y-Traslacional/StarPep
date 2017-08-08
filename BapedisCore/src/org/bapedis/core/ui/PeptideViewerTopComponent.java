@@ -103,7 +103,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         dataPanel.add(view, BorderLayout.CENTER);
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         associateLookup(new ProxyLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()),
-                Lookups.singleton(new MetadataNavigatorLookupHint())));
+                Lookups.singleton(new MetadataNavigatorLookupHint()), Lookups.singleton(new GraphElementNavigatorLookupHint())));
 
         //Outline configuration
         final Outline outline = view.getOutline();

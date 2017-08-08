@@ -10,7 +10,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyVetoException;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -41,13 +40,14 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.data.MetadataDAO;
 import org.bapedis.core.ui.actions.AddToQueryModel;
+import org.bapedis.core.ui.actions.CenterNodeOnGraph;
 import org.bapedis.core.ui.actions.RemoveFromQueryModel;
+import org.bapedis.core.ui.actions.SelectNodeOnGraph;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTree;
-import org.openide.explorer.ExplorerManager;
 import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
@@ -55,8 +55,6 @@ import org.openide.util.NbBundle;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
 import org.openide.awt.MouseUtils;
-import org.openide.explorer.ExplorerUtils;
-import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.lookup.AbstractLookup;
@@ -95,7 +93,7 @@ public class MetadataNavigator extends JComponent implements
 
         tree = new JXTree();
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        tree.addMouseListener(new MetadataPopupAdapter(tree, lookup));
+        tree.addMouseListener(new MetadataPopupAdapter(tree));
         tree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent e) {
@@ -141,6 +139,7 @@ public class MetadataNavigator extends JComponent implements
         });
 
         toolBar = new JToolBar();
+        toolBar.setFloatable(false);
         toolBar.add(comboBox);
         toolBar.add(showAllCheckBox);
         toolBar.addSeparator();
@@ -442,11 +441,9 @@ public class MetadataNavigator extends JComponent implements
 class MetadataPopupAdapter extends MouseUtils.PopupMouseAdapter {
 
     protected final JXTree tree;
-    protected final Lookup lookup;
 
-    public MetadataPopupAdapter(JXTree tree, Lookup lookup) {
+    public MetadataPopupAdapter(JXTree tree) {
         this.tree = tree;
-        this.lookup = lookup;
     }
 
     @Override
@@ -469,8 +466,17 @@ class MetadataPopupAdapter extends MouseUtils.PopupMouseAdapter {
                 contextMenu.add(actions[1]);
                 actions[0].setEnabled(!isAdded);
                 actions[1].setEnabled(isAdded);
+
+                if (metadata.getGraphNode() != null) {
+                    contextMenu.addSeparator();
+                    contextMenu.add(new SelectNodeOnGraph(metadata.getGraphNode()));
+                    contextMenu.add(new CenterNodeOnGraph(metadata.getGraphNode()));
+
+                }
+
                 contextMenu.show(tree, evt.getX(), evt.getY());
             }
         }
+        evt.consume();
     }
 }

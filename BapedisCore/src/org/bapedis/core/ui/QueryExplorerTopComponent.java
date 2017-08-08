@@ -13,9 +13,11 @@ import javax.swing.SwingWorker;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.spi.data.PeptideDAO;
+import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -210,7 +212,12 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
                 protected AttributesModel doInBackground() throws Exception {
                     PeptideDAO dao = Lookup.getDefault().lookup(PeptideDAO.class);
                     oldView = graphModel.getVisibleView();
-                    return dao.getPeptides(queryModel, graphModel);
+                    AttributesModel model = dao.getPeptides(queryModel, graphModel);
+                    Graph graph = graphModel.getGraphVisible();
+                    for(Metadata metadata: queryModel.getMetadatas()){
+                        metadata.setGraphNode(graph.getNode(metadata.getUnderlyingNodeID()));
+                    }
+                    return model;
                 }
 
                 @Override

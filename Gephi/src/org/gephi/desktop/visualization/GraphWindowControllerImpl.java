@@ -5,7 +5,9 @@
  */
 package org.gephi.desktop.visualization;
 
+import javax.swing.SwingUtilities;
 import org.bapedis.core.spi.ui.GraphWindowController;
+import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
 import org.gephi.visualization.VizController;
 import org.gephi.visualization.api.selection.SelectionManager;
@@ -46,24 +48,26 @@ public class GraphWindowControllerImpl implements GraphWindowController {
     @Override
     public void openGraphWindow() {
         if (graphWindow != null) {
-            if (!graphWindow.isOpened()) {
-                graphWindow.open();
-            }
-            graphWindow.requestActive();
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    if (!graphWindow.isOpened()) {
+                        graphWindow.open();
+                    }
+                    graphWindow.requestActive();
+                }
+            });
         }
     }
 
     @Override
     public void selectNode(Node node) {
-        openGraphWindow();
         SelectionManager sm = VizController.getInstance().getSelectionManager();
         sm.selectNode(node);
-//        sm.setDirectMouseSelection();
     }
 
     @Override
     public void centerOnNode(Node node) {
-        openGraphWindow();
         SelectionManager sm = VizController.getInstance().getSelectionManager();
         sm.centerOnNode(node);
     }
@@ -73,6 +77,12 @@ public class GraphWindowControllerImpl implements GraphWindowController {
         if (graphWindow != null) {
             graphWindow.close();
         }
+    }
+
+    @Override
+    public void selectEdge(Edge edge) {
+        SelectionManager sm = VizController.getInstance().getSelectionManager();
+        sm.selectEdge(edge);        
     }
 
 }

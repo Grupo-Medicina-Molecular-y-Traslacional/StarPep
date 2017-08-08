@@ -23,7 +23,7 @@ public class SelectNodeOnGraph extends AbstractAction {
 
     public SelectNodeOnGraph(Node node) {
         this.node = node;
-        putValue(NAME, NbBundle.getMessage(RemoveFromQueryModel.class, "SelectNodeOnGraph.name"));        
+        putValue(NAME, NbBundle.getMessage(SelectNodeOnGraph.class, "SelectOnGraph.name"));        
     }    
     
     @Override
@@ -31,7 +31,7 @@ public class SelectNodeOnGraph extends AbstractAction {
         GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
         if (graphWC != null){
             graphWC.openGraphWindow();
-            graphWC.centerOnNode(node);
+            graphWC.selectNode(node);
         }
     }
     

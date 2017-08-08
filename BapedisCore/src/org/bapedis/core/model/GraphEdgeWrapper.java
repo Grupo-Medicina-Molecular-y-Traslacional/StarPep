@@ -5,9 +5,7 @@
  */
 package org.bapedis.core.model;
 
-import java.awt.Color;
 import org.gephi.graph.api.Edge;
-import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;

@@ -28,9 +28,6 @@ public class GraphElementNode extends AbstractNode {
     }
 
     public Color getElementColor() {
-        if (element.alpha() == 0) {
-            return null;//Not specific color for edge
-        }
         return new Color(element.r(), element.g(), element.b(), element.alpha());
     }
 

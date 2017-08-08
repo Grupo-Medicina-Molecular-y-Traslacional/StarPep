@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.spi.ui;
 
+import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
 import org.openide.windows.TopComponent;
 
@@ -17,6 +18,8 @@ public interface GraphWindowController {
     TopComponent getGraphWindow();
     
     void openGraphWindow();
+    
+    void selectEdge(Edge edge);
 
     void selectNode(Node node);
     

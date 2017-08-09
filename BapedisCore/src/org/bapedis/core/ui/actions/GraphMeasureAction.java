@@ -12,7 +12,6 @@ import org.bapedis.core.model.AlgorithmModel;
 import org.bapedis.core.services.ProjectManager;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
-import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
@@ -21,22 +20,20 @@ import org.openide.windows.WindowManager;
 
 @ActionID(
         category = "Tools",
-        id = "org.gephi.desktop.layout.LayoutAction"
+        id = "org.bapedis.core.ui.actions.GraphMeasureAction"
 )
 @ActionRegistration(
-        displayName = "#CTL_LayoutAction"
+        displayName = "#CTL_GraphMeasureAction"
 )
-@ActionReferences({
-    @ActionReference(path = "Menu/Tools", position = 100)
-})
-@Messages("CTL_LayoutAction=Graph Layout")
-public final class LayoutAction implements ActionListener {
+@ActionReference(path = "Menu/Tools", position = 100)
+@Messages("CTL_GraphMeasureAction=Graph Measure")
+public final class GraphMeasureAction implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
         ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
         AlgorithmModel algoModel = pm.getAlgorithmModel();
-        algoModel.setCategory(AlgorithmCategory.GraphLayout);
+        algoModel.setCategory(AlgorithmCategory.GraphMeasure);
 
         TopComponent tc = WindowManager.getDefault().findTopComponent("AlgoExplorerTopComponent");
         tc.open();

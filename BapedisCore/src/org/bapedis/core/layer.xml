@@ -10,6 +10,10 @@
             </file>
             <file name="org-bapedis-core-ui-actions-ResetDefaultWorkspace.instance_hidden"/>
         </folder>
+        <folder name="Tools">
+            <file name="org-bapedis-core-ui-actions-GraphLayoutAction.instance"/>
+            <file name="org-bapedis-core-ui-actions-LayoutTool.instance_hidden"/>
+        </folder>
     </folder>
     <folder name="Menu">
         <file name="Edit_hidden"/>

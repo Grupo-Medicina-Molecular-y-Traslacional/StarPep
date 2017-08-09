@@ -13,7 +13,8 @@ import org.openide.util.NbBundle;
  */
 public enum AlgorithmCategory {
     
-    GraphLayout("graphLayout");
+    GraphLayout("graphLayout"),
+    GraphMeasure("graphMeasure");
     
     private final String displayName;
 

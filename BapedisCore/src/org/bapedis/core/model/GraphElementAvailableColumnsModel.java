@@ -62,6 +62,7 @@ public class GraphElementAvailableColumnsModel {
     private final String[] IgnoredColumnIDs = new String[]{"timeset"};
 
     public GraphElementAvailableColumnsModel() {
+        allKnownColumns.add(new GraphNodeDegreeDataColumn());
     }
 
     public boolean isColumnAvailable(GraphElementDataColumn column) {
@@ -151,7 +152,7 @@ public class GraphElementAvailableColumnsModel {
 
         if (table.getColumn(DefaultColumnID) != null) {
             addAvailableColumn(new GraphElementAttributeColumn(table.getColumn(DefaultColumnID)));
-        }
+        }                
 
         //Keep existing available columns as available.
         //Note: We need to remove all columns and add them all again because there could be a new column with the same title but different index 

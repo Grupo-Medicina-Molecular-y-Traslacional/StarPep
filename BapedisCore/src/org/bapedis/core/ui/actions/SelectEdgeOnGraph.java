@@ -8,7 +8,6 @@ package org.bapedis.core.ui.actions;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import static javax.swing.Action.NAME;
-import javax.swing.JMenuItem;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Edge;
 import org.openide.util.Lookup;

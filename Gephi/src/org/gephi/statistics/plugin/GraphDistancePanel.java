@@ -33,38 +33,64 @@ public class GraphDistancePanel extends javax.swing.JPanel implements AlgorithmS
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        normalizeButton = new javax.swing.JCheckBox();
+        closenessCheckBox = new javax.swing.JCheckBox();
+        normalizeCheckBox = new javax.swing.JCheckBox();
+        betweennessCheckBox = new javax.swing.JCheckBox();
+        eccentricityCheckBox = new javax.swing.JCheckBox();
 
         setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(normalizeButton, org.openide.util.NbBundle.getMessage(GraphDistancePanel.class, "GraphDistancePanel.normalizeButton.text_1")); // NOI18N
-        normalizeButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                normalizeButtonActionPerformed(evt);
-            }
-        });
+        closenessCheckBox.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(closenessCheckBox, org.openide.util.NbBundle.getMessage(GraphDistancePanel.class, "GraphDistancePanel.closenessCheckBox.text")); // NOI18N
+        closenessCheckBox.setToolTipText(org.openide.util.NbBundle.getMessage(GraphDistancePanel.class, "GraphDistancePanel.closenessCheckBox.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(closenessCheckBox, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(normalizeCheckBox, org.openide.util.NbBundle.getMessage(GraphDistancePanel.class, "GraphDistancePanel.normalizeCheckBox.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        add(normalizeButton, gridBagConstraints);
-    }// </editor-fold>//GEN-END:initComponents
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(normalizeCheckBox, gridBagConstraints);
 
-    private void normalizeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_normalizeButtonActionPerformed
-        if (algo != null)
-            algo.setNormalized(normalizeButton.isSelected());
-    }//GEN-LAST:event_normalizeButtonActionPerformed
+        betweennessCheckBox.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(betweennessCheckBox, org.openide.util.NbBundle.getMessage(GraphDistancePanel.class, "GraphDistancePanel.betweennessCheckBox.text")); // NOI18N
+        betweennessCheckBox.setToolTipText(org.openide.util.NbBundle.getMessage(GraphDistancePanel.class, "GraphDistancePanel.betweennessCheckBox.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(betweennessCheckBox, gridBagConstraints);
+
+        eccentricityCheckBox.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(eccentricityCheckBox, org.openide.util.NbBundle.getMessage(GraphDistancePanel.class, "GraphDistancePanel.eccentricityCheckBox.text")); // NOI18N
+        eccentricityCheckBox.setToolTipText(org.openide.util.NbBundle.getMessage(GraphDistancePanel.class, "GraphDistancePanel.eccentricityCheckBox.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(eccentricityCheckBox, gridBagConstraints);
+    }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox normalizeButton;
+    private javax.swing.JCheckBox betweennessCheckBox;
+    private javax.swing.JCheckBox closenessCheckBox;
+    private javax.swing.JCheckBox eccentricityCheckBox;
+    private javax.swing.JCheckBox normalizeCheckBox;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public JPanel getEditPanel(Algorithm algo) {       
         this.algo = (GraphDistance)algo;
-        normalizeButton.setSelected(this.algo.isNormalized());
+        normalizeCheckBox.setSelected(this.algo.isNormalized());
         return this;
     }
 }

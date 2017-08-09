@@ -8,6 +8,7 @@ package org.bapedis.core.ui.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -18,7 +19,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.model.AlgorithmModel;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -45,7 +48,7 @@ import org.openide.windows.WindowManager;
     @ActionReference(path = "Menu/Tools", position = 100)
 })
 @Messages("CTL_GraphLayoutAction=Graph Layout")
-public final class GraphLayoutAction extends AbstractAction implements ActionListener, Presenter.Popup {
+public final class GraphLayoutAction extends AbstractAction implements Presenter.Menu {
 
     public GraphLayoutAction() {
         putValue(NAME, Bundle.CTL_GraphLayoutAction());
@@ -53,17 +56,11 @@ public final class GraphLayoutAction extends AbstractAction implements ActionLis
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
-        AlgorithmModel algoModel = pm.getAlgorithmModel();
-        algoModel.setCategory(AlgorithmCategory.GraphLayout);
 
-        TopComponent tc = WindowManager.getDefault().findTopComponent("AlgoExplorerTopComponent");
-        tc.open();
-        tc.requestActive();
     }
 
     @Override
-    public JMenuItem getPopupPresenter() {
+    public JMenuItem getMenuPresenter() {
         List<? extends AlgorithmFactory> factories = new ArrayList<>(Lookup.getDefault().lookupAll(AlgorithmFactory.class));
         for (Iterator<? extends AlgorithmFactory> it = factories.iterator(); it.hasNext();) {
             AlgorithmFactory f = it.next();
@@ -79,9 +76,37 @@ public final class GraphLayoutAction extends AbstractAction implements ActionLis
         });
         JMenu main = new JMenu(AlgorithmCategory.GraphLayout.getDisplayName());
         JMenuItem item;
-        for (AlgorithmFactory factory : factories) {
+        for (final AlgorithmFactory factory : factories) {
             item = new JMenuItem(factory.getName());
-            main.add(item);            
+            item.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+                    AlgorithmModel algoModel = pc.getAlgorithmModel();
+                    algoModel.setCategory(AlgorithmCategory.GraphLayout);
+
+                    Workspace currentWs = pc.getCurrentWorkspace();
+                    Collection<? extends Algorithm> savedAlgo = currentWs.getLookup().lookupAll(Algorithm.class);
+                    Algorithm algorithm = null;
+                    for (Algorithm algo : savedAlgo) {
+                        if (algo.getFactory() == factory) {
+                            algorithm = algo;
+                            break;
+                        }
+                    }
+                    if (algorithm == null) {
+                        algorithm = factory.createAlgorithm();
+                        currentWs.add(algorithm);
+                    }
+                    algoModel.setSelectedAlgorithm(algorithm);
+
+                    TopComponent tc = WindowManager.getDefault().findTopComponent("AlgoExplorerTopComponent");
+                    tc.open();
+                    tc.requestActive();
+
+                }
+            });
+            main.add(item);
         }
         return main;
     }

@@ -98,12 +98,12 @@ import org.w3c.dom.NodeList;
     "HINT_AlgoExplorerTopComponent=This is a AlgoExplorer window"
 })
 public final class AlgoExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener {
-
+    
     protected final ProjectManager pc;
     private RichTooltip richTooltip;
     private final AlgoPresetPersistence algoPresetPersistence;
     private final AlgorithmListener algoListener;
-
+    
     public AlgoExplorerTopComponent() {
         initComponents();
         setName(Bundle.CTL_AlgoExplorerTopComponent());
@@ -315,7 +315,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             } else {
                 menu.add("<html><i>" + NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.nopreset") + "</i></html>");
             }
-
+            
             JMenuItem saveItem = new JMenuItem(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.savePreset"));
             saveItem.addActionListener(new ActionListener() {
                 @Override
@@ -371,24 +371,24 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         Workspace currentWs = pc.getCurrentWorkspace();
         workspaceChanged(null, currentWs);
     }
-
+    
     @Override
     public void componentClosed() {
         pc.removeWorkspaceEventListener(this);
     }
-
+    
     void writeProperties(java.util.Properties p) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty("version", "1.0");
         // TODO store your settings
     }
-
+    
     void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
     }
-
+    
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
         if (oldWs != null) {
@@ -401,13 +401,13 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         refreshProperties(algoModel);
         refreshRunning(algoModel.isRunning());
     }
-
+    
     private void refreshAlgChooser(AlgorithmModel algoModel) {
         String NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text", algoModel.getCategory().getDisplayName());
         DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
         comboBoxModel.addElement(NO_SELECTION);
         comboBoxModel.setSelectedItem(NO_SELECTION);
-
+        
         List<? extends AlgorithmFactory> factories = new ArrayList<>(Lookup.getDefault().lookupAll(AlgorithmFactory.class));
         for (Iterator<? extends AlgorithmFactory> it = factories.iterator(); it.hasNext();) {
             AlgorithmFactory f = it.next();
@@ -424,14 +424,14 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         for (AlgorithmFactory factory : factories) {
             AlgorithmFactoryItem item = new AlgorithmFactoryItem(factory);
             comboBoxModel.addElement(item);
-            if (algoModel.getSelectedAlgorithm() != null && algoModel.getSelectedAlgorithm().getFactory() == factory) {
+            if (algoModel.getSelectedAlgorithm() != null && algoModel.getSelectedAlgorithm().getFactory().equals(factory)) {
                 comboBoxModel.setSelectedItem(item);
             }
         }
         algoComboBox.setModel(comboBoxModel);
         setEnableState(!comboBoxModel.getSelectedItem().equals(NO_SELECTION));
     }
-
+    
     private void refreshProperties(AlgorithmModel algoModel) {
         if (algoModel == null || algoModel.getSelectedAlgorithm() == null) {
             ((PropertySheet) propSheetPanel).setNodes(new Node[0]);
@@ -441,7 +441,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         } else {
             Algorithm selectedAlgorithm = algoModel.getSelectedAlgorithm();
             AlgorithmNode algoNode = new AlgorithmNode(selectedAlgorithm);
-
+            
             if (selectedAlgorithm.getFactory().getSetupUI() != null) {
                 JPanel editPanel = selectedAlgorithm.getFactory().getSetupUI().getEditPanel(selectedAlgorithm);
                 propSheetPanel.setVisible(false);
@@ -456,7 +456,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             }
         }
     }
-
+    
     private void setEnableState(boolean enabled) {
         infoLabel.setEnabled(enabled);
         runButton.setEnabled(enabled);
@@ -465,7 +465,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         resetButton.setEnabled(enabled);
         presetsButton.setEnabled(enabled);
     }
-
+    
     private void refreshRunning(boolean running) {
         propSheetPanel.setEnabled(!running);
         algoProvidedPanel.setEnabled(!running);
@@ -482,7 +482,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             runButton.setToolTipText(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.runButton.tooltip"));
         }
     }
-
+    
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof AlgorithmModel) {
@@ -498,7 +498,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             }
         }
     }
-
+    
     private RichTooltip buildTooltip(AlgorithmFactory factory) {
         String description = factory.getDescription();
         RichTooltip tooltip = new RichTooltip(factory.getName(), description);
@@ -510,27 +510,27 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         }
         return tooltip;
     }
-
+    
     private static class AlgorithmFactoryItem {
-
+        
         private final AlgorithmFactory factory;
-
+        
         public AlgorithmFactoryItem(AlgorithmFactory factory) {
             this.factory = factory;
         }
-
+        
         public AlgorithmFactory getFactory() {
             return factory;
         }
-
+        
         @Override
         public String toString() {
             return factory.getName();
         }
     }
-
+    
     private static class AlgoDescriptionImage {
-
+        
         private static final int STAR_WIDTH = 16;
         private static final int STAR_HEIGHT = 16;
         private static final int STAR_MAX = 5;
@@ -545,7 +545,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         private final String speedStr;
         private int textMaxSize;
         private final AlgorithmFactory factory;
-
+        
         public AlgoDescriptionImage(AlgorithmFactory factory) {
             this.factory = factory;
             greenIcon = ImageUtilities.loadImage("org/bapedis/core/resources/yellow.png");
@@ -553,7 +553,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             qualityStr = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.tooltip.quality");
             speedStr = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.tooltip.speed");
         }
-
+        
         public void paint(Graphics g) {
             g.setColor(Color.BLACK);
             g.drawString(qualityStr, 0, STAR_HEIGHT + Y_BEGIN - 2);
@@ -561,7 +561,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             g.drawString(speedStr, 0, STAR_HEIGHT * 2 + LINE_GAP + Y_BEGIN - 2);
             paintStarPanel(g, textMaxSize + TEXT_GAP, STAR_HEIGHT + LINE_GAP + Y_BEGIN, STAR_MAX, factory.getSpeedRank());
         }
-
+        
         public Image getImage() {
             //Image size
             BufferedImage im = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
@@ -576,7 +576,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             paint(g);
             return img;
         }
-
+        
         public void paintStarPanel(Graphics g, int x, int y, int max, int value) {
             for (int i = 0; i < max; i++) {
                 if (i < value) {
@@ -587,11 +587,11 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             }
         }
     }
-
+    
     private static class AlgorithmListenerImpl implements AlgorithmListener {
-
+        
         private final ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
-
+        
         @Override
         public void algorithmFinished(Algorithm algo) {
             Workspace[] workspaces = pm.getWorkspaces();
@@ -603,21 +603,21 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 }
             }
         }
-
+        
     }
 }
 
 class AlgoPresetPersistence {
-
+    
     private Map<String, List<Preset>> presets = new HashMap<>();
-
+    
     public AlgoPresetPersistence() {
         loadPresets();
     }
-
+    
     public void savePreset(String name, Algorithm algorithm) {
         Preset preset = addPreset(new Preset(name, algorithm));
-
+        
         FileOutputStream fos = null;
         try {
             //Create file if dont exist
@@ -656,7 +656,7 @@ class AlgoPresetPersistence {
             }
         }
     }
-
+    
     public void loadPreset(Preset preset, Algorithm algorithm) {
         for (AlgorithmProperty p : algorithm.getProperties()) {
             for (int i = 0; i < preset.propertyNames.size(); i++) {
@@ -671,11 +671,11 @@ class AlgoPresetPersistence {
             }
         }
     }
-
+    
     public List<Preset> getPresets(Algorithm algorithm) {
         return presets.get(algorithm.getClass().getName());
     }
-
+    
     private void loadPresets() {
         FileObject folder = FileUtil.getConfigFile("algorithmpresets");
         if (folder != null) {
@@ -695,7 +695,7 @@ class AlgoPresetPersistence {
             }
         }
     }
-
+    
     private Preset addPreset(Preset preset) {
         List<Preset> algoPresets = presets.get(preset.algorithmClassName);
         if (algoPresets == null) {
@@ -710,14 +710,14 @@ class AlgoPresetPersistence {
         algoPresets.add(preset);
         return preset;
     }
-
+    
     public static class Preset {
-
+        
         private List<String> propertyNames = new ArrayList<>();
         private List<Object> propertyValues = new ArrayList<>();
         private String algorithmClassName;
         private String name;
-
+        
         private Preset(String name, Algorithm algorithm) {
             this.name = name;
             this.algorithmClassName = algorithm.getClass().getName();
@@ -732,11 +732,11 @@ class AlgoPresetPersistence {
                 }
             }
         }
-
+        
         private Preset(Document document) {
             readXML(document);
         }
-
+        
         public void readXML(Document document) {
             NodeList propertiesList = document.getDocumentElement().getElementsByTagName("properties");
             if (propertiesList.getLength() > 0) {
@@ -766,7 +766,7 @@ class AlgoPresetPersistence {
                 }
             }
         }
-
+        
         private Object parse(String classStr, String str) {
             try {
                 Class c = Class.forName(classStr);
@@ -788,7 +788,7 @@ class AlgoPresetPersistence {
             }
             return null;
         }
-
+        
         public void writeXML(Document document) {
             Element rootE = document.createElement("algorithmproperties");
 
@@ -807,12 +807,12 @@ class AlgoPresetPersistence {
             rootE.appendChild(propertiesE);
             document.appendChild(rootE);
         }
-
+        
         @Override
         public String toString() {
             return name;
         }
-
+        
         @Override
         public boolean equals(Object obj) {
             if (obj == null) {
@@ -827,7 +827,7 @@ class AlgoPresetPersistence {
             }
             return true;
         }
-
+        
         @Override
         public int hashCode() {
             int hash = 3;
@@ -835,5 +835,5 @@ class AlgoPresetPersistence {
             return hash;
         }
     }
-
+    
 }

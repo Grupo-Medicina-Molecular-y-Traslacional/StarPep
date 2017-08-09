@@ -139,8 +139,8 @@ public class GraphElementsDataTable extends AbstractTableModel {
     }
 
     public void resetColumns(GraphElementDataColumn[] columns) {
-        Set<GraphElementDataColumn> oldColumns = new HashSet<GraphElementDataColumn>(Arrays.asList(this.columns));
-        Set<GraphElementDataColumn> newColumns = new HashSet<GraphElementDataColumn>(Arrays.asList(columns));
+        Set<GraphElementDataColumn> oldColumns = new HashSet<>(Arrays.asList(this.columns));
+        Set<GraphElementDataColumn> newColumns = new HashSet<>(Arrays.asList(columns));
 
         boolean columnsChanged = !oldColumns.equals(newColumns);
         this.columns = columns;

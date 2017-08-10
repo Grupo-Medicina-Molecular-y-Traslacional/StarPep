@@ -41,6 +41,14 @@
             <file name="org-netbeans-core-multiview-SplitAction.instance_hidden"/>
             <file name="org-netbeans-core-windows-actions-ToolbarsListAction.shadow_hidden"/>
         </folder>
+        <folder name="Window">
+            <folder name="Tools">
+                <file name="org-netbeans-core-windows-actions-GlobalPropertiesAction.shadow_hidden"/>
+            </folder>
+            <file name="org-netbeans-core-windows-actions-GlobalPropertiesAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/org-netbeans-core-windows-actions-GlobalPropertiesAction.instance"/>
+            </file>
+        </folder>
     </folder>
     <folder name="Toolbars">    
         <file name="MyToolbarConfig.xml" url="MyToolbarConfig.xml"/> 

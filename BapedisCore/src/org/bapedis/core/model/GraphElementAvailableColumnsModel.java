@@ -153,6 +153,7 @@ public class GraphElementAvailableColumnsModel {
         if (table.getColumn(DefaultColumnID) != null) {
             addAvailableColumn(new GraphElementAttributeColumn(table.getColumn(DefaultColumnID)));
         }                
+        Column[] tableColumns = table.toArray();
 
         //Keep existing available columns as available.
         //Note: We need to remove all columns and add them all again because there could be a new column with the same title but different index 
@@ -160,7 +161,7 @@ public class GraphElementAvailableColumnsModel {
         //availableColumnsCopy.contains(column)
         for (GraphElementDataColumn column : availableColumnsCopy) {
             if (column instanceof GraphElementAttributeColumn) {
-                for (Column c : table.toArray()) {
+                for (Column c : tableColumns) {
                     if (!c.getId().equals(DefaultColumnID) && !isIgnored(c.getId()) && column.getColumn().equals(c)) {
                         addAvailableColumn(new GraphElementAttributeColumn(c));
                         break;
@@ -173,7 +174,7 @@ public class GraphElementAvailableColumnsModel {
         //Detect new columns and make them not available by default
         //!allKnownColumns.contains(column)
         boolean isNew;
-        for (Column c : table.toArray()) {
+        for (Column c : tableColumns) {
             if (!isIgnored(c.getId())) {
                 isNew = true;
                 for (GraphElementDataColumn column : allKnownColumns) {

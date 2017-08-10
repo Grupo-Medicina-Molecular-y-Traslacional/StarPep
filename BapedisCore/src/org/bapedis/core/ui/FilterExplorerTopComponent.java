@@ -65,7 +65,7 @@ import org.openide.util.Utilities;
         //iconBase="SET/PATH/TO/ICON/HERE", 
         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
-@TopComponent.Registration(mode = "explorer", openAtStartup = false)
+@TopComponent.Registration(mode = "explorer", openAtStartup = false, position = 433)
 @ActionID(category = "Window", id = "org.bapedis.core.ui.FilterExplorerTopComponent")
 @ActionReference(path = "Menu/Window" , position = 433 )
 @TopComponent.OpenActionRegistration(

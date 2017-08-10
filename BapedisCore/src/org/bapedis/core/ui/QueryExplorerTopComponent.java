@@ -46,7 +46,7 @@ import org.openide.util.lookup.ProxyLookup;
         //iconBase="SET/PATH/TO/ICON/HERE", 
         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
-@TopComponent.Registration(mode = "explorer", openAtStartup = true)
+@TopComponent.Registration(mode = "explorer", openAtStartup = true, position = 333)
 @ActionID(category = "Window", id = "org.bapedis.db.ui.QueryExplorerTopComponent")
 @ActionReference(path = "Menu/Window" , position = 333 )
 @TopComponent.OpenActionRegistration(

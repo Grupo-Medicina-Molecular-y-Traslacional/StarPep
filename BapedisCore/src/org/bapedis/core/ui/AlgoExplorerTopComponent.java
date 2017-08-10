@@ -84,7 +84,7 @@ import org.w3c.dom.NodeList;
         //iconBase="SET/PATH/TO/ICON/HERE", 
         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
-@TopComponent.Registration(mode = "explorer", openAtStartup = false)
+@TopComponent.Registration(mode = "explorer", openAtStartup = false, position = 533)
 @ActionID(category = "Window", id = "org.bapedis.core.ui.AlgoExplorerTopComponent")
 @ActionReference(path = "Menu/Window" , position = 533)
 @TopComponent.OpenActionRegistration(

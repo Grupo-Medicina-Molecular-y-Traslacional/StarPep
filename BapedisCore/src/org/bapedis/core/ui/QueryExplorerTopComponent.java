@@ -74,7 +74,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
 
         explorerMgr = new ExplorerManager();
         BeanTreeView view = new BeanTreeView();
-        centerPanel.add(view, BorderLayout.CENTER);
+        scrollPane.setViewportView(view);
 
         associateLookup(new ProxyLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()),
                 Lookups.singleton(new MetadataNavigatorLookupHint()), Lookups.singleton(new GraphElementNavigatorLookupHint())));
@@ -93,7 +93,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
 
         applyCheckBox = new javax.swing.JCheckBox();
         runButton = new javax.swing.JButton();
-        centerPanel = new javax.swing.JPanel();
+        scrollPane = new javax.swing.JScrollPane();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -125,7 +125,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
         add(runButton, gridBagConstraints);
 
-        centerPanel.setLayout(new java.awt.BorderLayout());
+        scrollPane.setBorder(null);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -133,7 +133,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(centerPanel, gridBagConstraints);
+        add(scrollPane, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
@@ -146,8 +146,8 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox applyCheckBox;
-    private javax.swing.JPanel centerPanel;
     private javax.swing.JButton runButton;
+    private javax.swing.JScrollPane scrollPane;
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {

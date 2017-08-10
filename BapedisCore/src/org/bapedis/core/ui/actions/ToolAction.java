@@ -85,6 +85,7 @@ public class ToolAction extends AbstractAction implements Presenter.Menu{
 
                     TopComponent tc = WindowManager.getDefault().findTopComponent("AlgoExplorerTopComponent");
                     tc.open();
+                    tc.setDisplayName(category.getDisplayName());
                     tc.requestActive();
 
                 }

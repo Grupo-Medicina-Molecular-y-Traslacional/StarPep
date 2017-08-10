@@ -24,7 +24,6 @@ public class AlgorithmModel {
     protected final AtomicBoolean running;
 
     public AlgorithmModel() {
-        category = AlgorithmCategory.GraphLayout;
         propertyChangeSupport = new PropertyChangeSupport(this);
         running = new AtomicBoolean(false);
     }

@@ -67,15 +67,15 @@ import org.openide.util.Utilities;
 )
 @TopComponent.Registration(mode = "explorer", openAtStartup = false)
 @ActionID(category = "Window", id = "org.bapedis.core.ui.FilterExplorerTopComponent")
-@ActionReference(path = "Menu/Window" /*, position = 333 */)
+@ActionReference(path = "Menu/Window" , position = 433 )
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_FilterExplorerAction",
         preferredID = "FilterExplorerTopComponent"
 )
 @Messages({
-    "CTL_FilterExplorerAction=FilterExplorer",
-    "CTL_FilterExplorerTopComponent=Filter Explorer",
-    "HINT_FilterExplorerTopComponent=This is a FilterExplorer window"
+    "CTL_FilterExplorerAction=Filter",
+    "CTL_FilterExplorerTopComponent=Filter",
+    "HINT_FilterExplorerTopComponent=This is a Filter window"
 })
 public final class FilterExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener, ExplorerManager.Provider {
 

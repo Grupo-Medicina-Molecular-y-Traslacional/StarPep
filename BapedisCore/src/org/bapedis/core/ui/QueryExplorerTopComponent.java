@@ -48,7 +48,7 @@ import org.openide.util.lookup.ProxyLookup;
 )
 @TopComponent.Registration(mode = "explorer", openAtStartup = true)
 @ActionID(category = "Window", id = "org.bapedis.db.ui.QueryExplorerTopComponent")
-@ActionReference(path = "Menu/Window" /*, position = 333 */)
+@ActionReference(path = "Menu/Window" , position = 333 )
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_QueryExplorerAction",
         preferredID = "QueryExplorerTopComponent"
@@ -56,7 +56,7 @@ import org.openide.util.lookup.ProxyLookup;
 @Messages({
     "CTL_QueryExplorerAction= Query",
     "CTL_QueryExplorerTopComponent=Query",
-    "HINT_QueryExplorerTopComponent=Query window"
+    "HINT_QueryExplorerTopComponent=This is the Query window"
 })
 public final class QueryExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener, ExplorerManager.Provider {
 

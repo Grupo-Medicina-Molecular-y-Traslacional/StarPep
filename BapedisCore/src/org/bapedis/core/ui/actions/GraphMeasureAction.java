@@ -18,7 +18,7 @@ import org.openide.util.NbBundle.Messages;
 @ActionRegistration(
         displayName = "#CTL_GraphMeasureAction"
 )
-@ActionReference(path = "Menu/Tools", position = 100)
+@ActionReference(path = "Menu/Tools", position = 200)
 @Messages("CTL_GraphMeasureAction=Graph Measure")
 public final class GraphMeasureAction extends ToolAction {
 

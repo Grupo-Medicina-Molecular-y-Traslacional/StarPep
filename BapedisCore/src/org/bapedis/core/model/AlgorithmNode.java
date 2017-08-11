@@ -33,14 +33,16 @@ public class AlgorithmNode extends AbstractNode {
         if (propertySets == null) {
             try {
                 Map<String, Sheet.Set> sheetMap = new HashMap<>();
-                for (AlgorithmProperty algoProperty : algorithm.getProperties()) {
-                    Sheet.Set set = sheetMap.get(algoProperty.getCategory());
-                    if (set == null) {
-                        set = Sheet.createPropertiesSet();
-                        set.setDisplayName(algoProperty.getCategory());
-                        sheetMap.put(algoProperty.getCategory(), set);
+                if (algorithm.getProperties() != null) {
+                    for (AlgorithmProperty algoProperty : algorithm.getProperties()) {
+                        Sheet.Set set = sheetMap.get(algoProperty.getCategory());
+                        if (set == null) {
+                            set = Sheet.createPropertiesSet();
+                            set.setDisplayName(algoProperty.getCategory());
+                            sheetMap.put(algoProperty.getCategory(), set);
+                        }
+                        set.put(algoProperty.getProperty());
                     }
-                    set.put(algoProperty.getProperty());
                 }
                 propertySets = sheetMap.values().toArray(new PropertySet[0]);
             } catch (Exception ex) {
@@ -54,5 +56,5 @@ public class AlgorithmNode extends AbstractNode {
     public Algorithm getAlgorithm() {
         return algorithm;
     }
-        
+
 }

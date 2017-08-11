@@ -1,0 +1,78 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.bapedis.core.spi.algo.impl.modamp;
+
+import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.Peptide;
+import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.task.ProgressTicket;
+import org.openide.util.Lookup;
+
+/**
+ *
+ * @author Home
+ */
+public abstract class AbstractModamp implements Algorithm{
+
+    protected final ProjectManager pc;
+    protected Peptide[] peptides;
+    boolean stopRun;
+    protected final AlgorithmFactory factory;
+    protected ProgressTicket progressTicket;
+    
+    public AbstractModamp(AlgorithmFactory factory){
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
+        this.factory = factory;
+    }
+    
+    @Override
+    public void initAlgo() {
+        AttributesModel attrModel = pc.getAttributesModel();
+        peptides = attrModel.getPeptides();
+        stopRun = false;
+    }
+
+    @Override
+    public void endAlgo() {
+        peptides = null;
+    }
+
+    @Override
+    public boolean cancel() {
+        stopRun = true;
+        return true;
+    }
+
+    @Override
+    public AlgorithmProperty[] getProperties() {
+        return null;
+    }
+
+    @Override
+    public AlgorithmFactory getFactory() {
+        return factory;
+    }
+
+    @Override
+    public void setProgressTicket(ProgressTicket progressTicket) {
+        this.progressTicket = progressTicket;
+    }
+
+    @Override
+    public void run() {
+        progressTicket.switchToDeterminate(peptides.length);
+        for(int i=0; i<peptides.length && !stopRun; i++){
+            compute(peptides[i]);
+            progressTicket.progress();
+        }
+    }
+    
+    public abstract void compute(Peptide peptide);
+    
+}

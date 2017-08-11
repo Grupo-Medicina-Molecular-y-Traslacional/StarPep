@@ -34,6 +34,9 @@
             </folder> 
         </folder>
         <file name="GoTo_hidden"/>
+        <folder name="Tools">
+            <file name="Separator1.instance_hidden"/>
+        </folder>
         <folder name="View">
             <file name="ShowEditorOnlyAction.shadow_hidden"/>
             <file name="org-netbeans-core-actions-LogAction.shadow_hidden"/>

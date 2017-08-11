@@ -156,8 +156,7 @@ public class GraphDistance implements Algorithm {
         metrics.put(HARMONIC_CLOSENESS, nodeHarmonicCloseness);
         metrics.put(BETWEENNESS, nodeBetweenness);
 
-//        Progress.start(progress, graph.getNodeCount());
-        int count = 0;
+        progress.switchToDeterminate(graph.getNodeCount());
 
         int totalPaths = 0;
         for (Node s : graph.getNodes()) {
@@ -229,11 +228,10 @@ public class GraphDistance implements Algorithm {
                     nodeBetweenness[w_index] += delta[w_index];
                 }
             }
-            count++;
             if (isCanceled) {
                 return metrics;
             }
-//            Progress.progress(progress, count);
+            progress.progress();
         }
 
         avgDist /= totalPaths;//mN * (mN - 1.0f);

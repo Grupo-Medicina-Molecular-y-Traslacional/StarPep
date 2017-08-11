@@ -14,7 +14,8 @@ import org.openide.util.NbBundle;
 public enum AlgorithmCategory {
     
     GraphLayout("graphLayout"),
-    GraphMeasure("graphMeasure");
+    GraphMeasure("graphMeasure"),
+    MolecularDescriptor("md");
     
     private final String displayName;
 

@@ -78,10 +78,7 @@ public class GraphElementAvailableColumnsModel {
      */
     public synchronized boolean addAvailableColumn(GraphElementDataColumn column) {
         if (canAddAvailableColumn()) {
-            if (!availableColumns.contains(column)) {
-                availableColumns.add(column);
-            }
-            return true;
+            return availableColumns.add(column);
         } else {
             return false;
         }

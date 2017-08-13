@@ -54,7 +54,7 @@ import org.bapedis.core.model.GraphElementDataColumn;
  * @see AvailableColumnsModel
  * @author Eduardo
  */
-public class AvailableColumnsPanel extends javax.swing.JPanel {
+public class GraphElementAvailableColumnsPanel extends javax.swing.JPanel {
 
     private final GraphElementAvailableColumnsModel availableColumnsModel;
     private final GraphElementDataColumn[] columns;
@@ -63,7 +63,7 @@ public class AvailableColumnsPanel extends javax.swing.JPanel {
 
     /** Creates new form AvailableColumnsPanel
      * @param availableColumnsModel */
-    public AvailableColumnsPanel(GraphElementAvailableColumnsModel availableColumnsModel) {
+    public GraphElementAvailableColumnsPanel(GraphElementAvailableColumnsModel availableColumnsModel) {
         initComponents();
         this.availableColumnsModel = availableColumnsModel;
         columns =  availableColumnsModel.getAllKnownColumns();
@@ -138,7 +138,7 @@ public class AvailableColumnsPanel extends javax.swing.JPanel {
         setLayout(new java.awt.GridBagLayout());
 
         infoLabel.setForeground(new java.awt.Color(255, 0, 0));
-        infoLabel.setText(org.openide.util.NbBundle.getMessage(AvailableColumnsPanel.class, "AvailableColumnsPanel.infoLabel.text")); // NOI18N
+        infoLabel.setText(org.openide.util.NbBundle.getMessage(GraphElementAvailableColumnsPanel.class, "GraphElementAvailableColumnsPanel.infoLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -159,7 +159,7 @@ public class AvailableColumnsPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(scroll, gridBagConstraints);
 
-        descriptionLabel.setText(org.openide.util.NbBundle.getMessage(AvailableColumnsPanel.class, "AvailableColumnsPanel.descriptionLabel.text")); // NOI18N
+        descriptionLabel.setText(org.openide.util.NbBundle.getMessage(GraphElementAvailableColumnsPanel.class, "GraphElementAvailableColumnsPanel.descriptionLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;

@@ -41,7 +41,7 @@ import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.ui.actions.CenterNodeOnGraph;
 import org.bapedis.core.ui.actions.SelectEdgeOnGraph;
 import org.bapedis.core.ui.actions.SelectNodeOnGraph;
-import org.bapedis.core.ui.components.AvailableColumnsPanel;
+import org.bapedis.core.ui.components.GraphElementAvailableColumnsPanel;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Element;
 import org.gephi.graph.api.Graph;
@@ -149,7 +149,7 @@ public class GraphElementNavigator extends JComponent implements
 
         availableColumnsButton = new JButton();
         availableColumnsButton.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.availableColumnsButton.text"));
-        availableColumnsButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/config.png", false));
+        availableColumnsButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/column.png", false));
         availableColumnsButton.setToolTipText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.availableColumnsButton.toolTipText"));
         availableColumnsButton.setFocusable(false);
         availableColumnsButton.addActionListener(new java.awt.event.ActionListener() {
@@ -200,7 +200,7 @@ public class GraphElementNavigator extends JComponent implements
             Table columns = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel().getNodeTable();
             GraphElementAvailableColumnsModel nodeAvailableColumnsModel = navigatorModel.getNodeAvailableColumnsModel();
             nodeAvailableColumnsModel.syncronizeTableColumns(columns);
-            DialogDescriptor dd = new DialogDescriptor(new AvailableColumnsPanel(nodeAvailableColumnsModel), NbBundle.getMessage(AvailableColumnsPanel.class, "AvailableColumnsPanel.title"));
+            DialogDescriptor dd = new DialogDescriptor(new GraphElementAvailableColumnsPanel(nodeAvailableColumnsModel), NbBundle.getMessage(GraphElementAvailableColumnsPanel.class, "GraphElementAvailableColumnsPanel.title"));
             dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION});
             DialogDisplayer.getDefault().notify(dd);
             ((GraphElementsDataTable) table.getModel()).resetColumns(nodeAvailableColumnsModel.getAvailableColumns());

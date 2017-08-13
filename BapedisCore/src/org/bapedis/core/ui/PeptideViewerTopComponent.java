@@ -12,6 +12,9 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
@@ -27,6 +30,8 @@ import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.impl.AttributeFilter;
 import org.bapedis.core.spi.filters.impl.FilterHelper;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
+import org.bapedis.core.ui.components.GraphElementAvailableColumnsPanel;
+import org.bapedis.core.ui.components.PeptideAvailableColumnsPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.netbeans.swing.etable.ETableColumn;
 import org.netbeans.swing.etable.ETableColumnModel;
@@ -49,6 +54,7 @@ import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
 import org.jdesktop.swingx.JXBusyLabel;
+import org.openide.DialogDescriptor;
 import org.openide.explorer.view.NodePopupFactory;
 import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
@@ -94,8 +100,8 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         setToolTipText(Bundle.HINT_PeptideViewerTopComponent());
         explorerMgr = new ExplorerManager();
         view = new OutlineView(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.nodelColumnLabel"));
-        view.setPropertyColumns("seq", NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.nodelColumnLabel.seq"),
-                "length", NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.nodelColumnLabel.length"));
+//        view.setPropertyColumns(PeptideDAO.SEQ.getId(), PeptideDAO.SEQ.getDisplayName());
+//        "length", NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.nodelColumnLabel.length"
         view.setQuickSearchAllowed(false);
         NodePopupFactory npf = new NodePopupFactory();
         npf.setShowQuickFilter(false);
@@ -110,27 +116,59 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         outline.setPopupUsedFromTheCorner(true);
         outline.setRootVisible(false);
         outline.setColumnHidingAllowed(false);
-        ETableColumnModel columnModel = (ETableColumnModel) outline.getColumnModel();
-        //Node column
-        ETableColumn column = (ETableColumn) columnModel.getColumn(0);
-        column.setMaxWidth(120);
-        column.setPreferredWidth(120);
-        //Sequence column
-        column = (ETableColumn) columnModel.getColumn(1);
-        column.setMinWidth(240);
-        //Length column
-        column = (ETableColumn) columnModel.getColumn(2);
-        column.setMaxWidth(240);
-        column.setPreferredWidth(240);
+//        ETableColumnModel columnModel = (ETableColumnModel) outline.getColumnModel();
+//        //Hide node column
+//        ETableColumn column = (ETableColumn) columnModel.getColumn(0);
+//        columnModel.setColumnHidden(column, true);
 
+//        column.setMaxWidth(120);
+//        column.setPreferredWidth(120);
+//        column.setMinWidth(60);
+        //Sequence column
+//        column = (ETableColumn) columnModel.getColumn(1);
+//        column.setMinWidth(240);
+        //Length column
+//        column = (ETableColumn) columnModel.getColumn(2);
+//        column.setMaxWidth(240);
+//        column.setPreferredWidth(240);
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        busyLabel.setText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.busyLabel.text")); 
+        busyLabel.setText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.busyLabel.text"));
         centerPanel.add(busyLabel, "busyCard");
 
         errorLabel = new JLabel(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.errorLabel.text"), new ImageIcon(ImageUtilities.loadImage("org/bapedis/core/resources/sad.png", true)), JLabel.CENTER);
         errorLabel.setHorizontalAlignment(SwingConstants.CENTER);
         centerPanel.add(errorLabel, "errorCard");
+
+    }
+
+    private void populateVisibleColumns(AttributesModel attrModel) {
+        if (attrModel != null) {
+            PeptideAttribute[] attrs = attrModel.getAttributes();
+            Set<PeptideAttribute> availableColumnsModel = attrModel.getAvailableColumnsModel();
+            List<String> columns = new LinkedList<>();
+            for (PeptideAttribute attr : attrs) {
+                if (availableColumnsModel.contains(attr)) {
+                    columns.add(attr.getId());
+                    columns.add(attr.getDisplayName());
+                }
+            }
+            view.setPropertyColumns(columns.toArray(new String[0]));
+            //Hide node column
+            ETableColumnModel columnModel = (ETableColumnModel) view.getOutline().getColumnModel();
+            ETableColumn column = (ETableColumn) columnModel.getColumn(0);
+            columnModel.setColumnHidden(column, true);
+            columnsButton.setEnabled(true);
+//            ETableColumnModel columnModel = (ETableColumnModel) view.getOutline().getColumnModel();
+//            ETableColumn column;
+//            for (PeptideAttribute attr : attrs) {
+//                column = (ETableColumn) view.getOutline().getColumn(attr.getId());
+//                columnModel.setColumnHidden(column, !attr.isVisible());
+//            }
+        } else {
+            view.setPropertyColumns(new String[]{});
+            columnsButton.setEnabled(false);
+        }
 
     }
 
@@ -142,8 +180,11 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         jValueTextField.setVisible(attrModel != null);
         jAddButton.setVisible(attrModel != null);
         if (attrModel != null) {
+            Set<PeptideAttribute> availableColumnsModel = attrModel.getAvailableColumnsModel();
             for (PeptideAttribute attr : attrModel.getAttributes()) {
-                jFieldComboBox.addItem(attr);
+                if (availableColumnsModel.contains(attr)) {
+                    jFieldComboBox.addItem(attr);
+                }
             }
             if (jFieldComboBox.getItemCount() > 0) {
                 jFieldComboBox.setSelectedIndex(0);
@@ -161,7 +202,8 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         java.awt.GridBagConstraints gridBagConstraints;
 
         topPanel = new javax.swing.JPanel();
-        leftPanel = new javax.swing.JPanel();
+        leftToolBar = new javax.swing.JToolBar();
+        columnsButton = new javax.swing.JButton();
         rightPanel = new javax.swing.JPanel();
         jLabelFilter = new javax.swing.JLabel();
         jFieldComboBox = new javax.swing.JComboBox();
@@ -177,13 +219,28 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
         topPanel.setLayout(new java.awt.GridBagLayout());
 
-        leftPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        leftToolBar.setFloatable(false);
+        leftToolBar.setRollover(true);
+
+        columnsButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/column.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(columnsButton, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.columnsButton.text")); // NOI18N
+        columnsButton.setToolTipText(org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.columnsButton.toolTipText")); // NOI18N
+        columnsButton.setFocusable(false);
+        columnsButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        columnsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                columnsButtonActionPerformed(evt);
+            }
+        });
+        leftToolBar.add(columnsButton);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        topPanel.add(leftPanel, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        topPanel.add(leftToolBar, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabelFilter, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jLabelFilter.text")); // NOI18N
         rightPanel.add(jLabelFilter);
@@ -298,15 +355,23 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         }
     }//GEN-LAST:event_jFieldComboBoxActionPerformed
 
+    private void columnsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_columnsButtonActionPerformed
+        DialogDescriptor dd = new DialogDescriptor(new PeptideAvailableColumnsPanel(currentModel), NbBundle.getMessage(GraphElementAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.title"));
+        dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION});
+        DialogDisplayer.getDefault().notify(dd);
+        populateVisibleColumns(currentModel);        
+    }//GEN-LAST:event_columnsButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
+    private javax.swing.JButton columnsButton;
     private javax.swing.JPanel dataPanel;
     private javax.swing.JButton jAddButton;
     private javax.swing.JComboBox jFieldComboBox;
     private javax.swing.JLabel jLabelFilter;
     private javax.swing.JComboBox jOperatorComboBox;
     private javax.swing.JTextField jValueTextField;
-    private javax.swing.JPanel leftPanel;
+    private javax.swing.JToolBar leftToolBar;
     private javax.swing.JPanel rightPanel;
     private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
@@ -400,11 +465,12 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }
 
     private void setData(AttributesModel attrModel) {
-        populateFilterFields(attrModel);
         if (currentModel != null) {
             currentModel.removeQuickFilterChangeListener(this);
         }
-        this.currentModel = attrModel;
+        this.currentModel = attrModel;        
+        populateVisibleColumns(attrModel);
+        populateFilterFields(attrModel);
         explorerMgr.setRootContext(currentModel == null ? Node.EMPTY : currentModel.getRootNode());
         setQuickFilter();
         if (currentModel != null) {

@@ -10,8 +10,11 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import org.bapedis.core.spi.data.PeptideDAO;
 import org.netbeans.swing.etable.QuickFilter;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Index;
@@ -25,6 +28,7 @@ import org.openide.nodes.Node;
 public class AttributesModel {
 
     protected final HashMap<String, PeptideAttribute> attrsMap;
+    protected final Set<PeptideAttribute> availableColumnsModel;
     protected List<PeptideNode> nodeList;
     private final PeptideNodeContainer container;
     protected QuickFilter quickFilter;
@@ -38,20 +42,37 @@ public class AttributesModel {
         container = new PeptideNodeContainer();
         rootNode = new AbstractNode(container);
         propertyChangeSupport = new PropertyChangeSupport(this);
+        
+        availableColumnsModel = new LinkedHashSet<>();
+        availableColumnsModel.add(PeptideDAO.ID);
+        availableColumnsModel.add(PeptideDAO.SEQ);
+        availableColumnsModel.add(PeptideDAO.LENGHT);        
     }
 
     public PeptideAttribute[] getAttributes() {
         return attrsMap.values().toArray(new PeptideAttribute[0]);
     }
 
+    public Set<PeptideAttribute> getAvailableColumnsModel() {
+        return availableColumnsModel;
+    }        
+    
+    public boolean addAvailableColumn(PeptideAttribute attr){
+        return availableColumnsModel.add(attr);
+    }
+    
+    public boolean removeAvailableColumn(PeptideAttribute attr){
+        return availableColumnsModel.remove(attr);
+    }
+
     public synchronized Peptide[] getPeptides() {
         List<Peptide> peptides = new LinkedList<>();
         boolean accepted;
         for (PeptideNode pNode : nodeList) {
-            accepted = quickFilter == null? true: quickFilter.accept(pNode);
-            if (accepted){
+            accepted = quickFilter == null ? true : quickFilter.accept(pNode);
+            if (accepted) {
                 peptides.add(pNode.getPeptide());
-            }            
+            }
         }
         return peptides.toArray(new Peptide[0]);
     }
@@ -86,7 +107,7 @@ public class AttributesModel {
 
     public List<PeptideNode> getNodeList() {
         return nodeList;
-    }      
+    }
 
     public void addPeptide(Peptide peptide) {
         nodeList.add(new PeptideNode(peptide));

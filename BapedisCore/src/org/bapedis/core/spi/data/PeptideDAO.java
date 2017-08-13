@@ -9,15 +9,16 @@ import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.QueryModel;
 import org.gephi.graph.api.GraphModel;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author loge
  */
 public interface PeptideDAO {
-    PeptideAttribute ID = new PeptideAttribute("id", "ID", String.class);
-    PeptideAttribute SEQ = new PeptideAttribute("seq", "Sequence", String.class);
-    PeptideAttribute LENGHT = new PeptideAttribute("length", "Length", Integer.class);
+    PeptideAttribute ID = new PeptideAttribute("id", NbBundle.getMessage(PeptideDAO.class, "PeptideAttribute.id"), String.class);
+    PeptideAttribute SEQ = new PeptideAttribute("seq", NbBundle.getMessage(PeptideDAO.class, "PeptideAttribute.seq"), String.class);
+    PeptideAttribute LENGHT = new PeptideAttribute("length", NbBundle.getMessage(PeptideDAO.class, "PeptideAttribute.length"), Integer.class);
     
     AttributesModel getPeptides(QueryModel queryModel, GraphModel graphModel);
 }

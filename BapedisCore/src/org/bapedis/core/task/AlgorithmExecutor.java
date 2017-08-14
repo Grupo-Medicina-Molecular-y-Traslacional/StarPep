@@ -107,6 +107,9 @@ public final class AlgorithmExecutor {
                 Logger.getLogger("").log(Level.SEVERE, "", e);
             }
             runnable.progress.finish();
+            if (runnable.listener != null) {
+                runnable.listener.algorithmFinished(runnable.algorithm);
+            }            
             return;
         }
         runnable.future = executor.submit(runnable);

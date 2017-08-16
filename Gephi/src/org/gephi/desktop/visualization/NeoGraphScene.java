@@ -200,13 +200,10 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (mouseButton.isSelected()) {
-                    VizController.getInstance().getSelectionManager().setDirectMouseSelection();
-                    VizController.getInstance().getSelectionManager().setDraggingMouseSelection();
-//                    VizController.getInstance().getEngine().setRectangleSelection(false);
-//                    VizController.getInstance().getVizConfig().setSelectionEnable(true);
-//                    VizController.getInstance().getVizConfig().setDraggingEnable(true);
-//                    VizController.getInstance().getVizConfig().setCustomSelection(false);
-                     VizController.getInstance().getSelectionManager().resetSelection();
+                    SelectionManager selectionManager = VizController.getInstance().getSelectionManager();
+                    selectionManager.setDirectMouseSelection();
+                    selectionManager.setDraggingMouseSelection();
+                    selectionManager.resetSelection();
                 }
             }
         });

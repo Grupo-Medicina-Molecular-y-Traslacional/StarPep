@@ -18,6 +18,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import javax.swing.Action;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -41,6 +42,7 @@ import org.gephi.visualization.VizModel;
 import org.gephi.visualization.apiimpl.GraphDrawable;
 import org.gephi.visualization.apiimpl.GraphIO;
 import org.gephi.ui.components.JPopupButton;
+import org.gephi.visualization.api.selection.SelectionManager;
 import org.gephi.visualization.apiimpl.VizEvent;
 import org.gephi.visualization.apiimpl.VizEventListener;
 import org.gephi.visualization.text.SizeMode;
@@ -70,7 +72,9 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     protected final InstanceContent content;
     protected final Lookup lookup;
     private MultiViewElementCallback callback;
-    private final JToolBar toolbar = new JToolBar();
+    private final JToolBar bottomToolbar = new JToolBar();
+    private final JToolBar topToolbar = new JToolBar();
+    private final ExtendedBar extendedBar = new ExtendedBar();
     private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(20, 20));
     private final JPanel graphPanel = new JPanel();
     // Global
@@ -99,6 +103,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         GraphDrawable drawable = VizController.getInstance().getDrawable();
         graphPanel.add(drawable.getGraphComponent(), BorderLayout.CENTER);
+        graphPanel.add(new BottomPanel(), BorderLayout.PAGE_END);
         content = new InstanceContent();
         lookup = new ProxyLookup(new AbstractLookup(content), Lookups.singleton(new GraphElementNavigatorLookupHint()), Lookups.singleton(new MetadataNavigatorLookupHint()));
     }
@@ -114,10 +119,13 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         add(graphPanel, "graphCard");
 
         // Toolbar setup
-        toolbar.setFloatable(false);
+        initTopToolbar(); // Global settings
+        initBottomToolbar(); // Node and edge settings
+    }
 
-        // Global settings
-        toolbar.addSeparator();
+    private void initTopToolbar() {
+        topToolbar.setFloatable(false);
+        topToolbar.addSeparator();
 
         // Background
         backgroundButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.backgroundButton.toolTipText"));
@@ -135,11 +143,132 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 }
             }
         });
-        toolbar.add(backgroundButton);
+        topToolbar.add(backgroundButton);
 
-        //Node settings
-        toolbar.addSeparator();
+        //Zoom
+        topToolbar.addSeparator();
 
+        // Reset Zoom 
+        JButton resetZoomButton = new JButton();
+        resetZoomButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/centerOnGraph.png", false));
+        resetZoomButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.resetZoomButton.toolTipText"));
+        resetZoomButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GraphIO io = VizController.getInstance().getGraphIO();
+                io.centerOnGraph();
+            }
+        });
+        topToolbar.add(resetZoomButton);
+
+        // Plus Zoom
+        JButton plusButton = new JButton();
+        plusButton.setText("+");
+        plusButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.plusButton.toolTipText"));
+        plusButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int cameraDistance = (int) VizController.getInstance().getVizModel().getCameraDistance();
+                GraphIO io = VizController.getInstance().getGraphIO();
+                io.setCameraDistance(cameraDistance - 1000);
+            }
+        });
+        topToolbar.add(plusButton);
+
+        // Minus Zoom
+        JButton minusButton = new JButton();
+        minusButton.setText("-");
+        minusButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.minusButton.toolTipText"));
+        minusButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int cameraDistance = (int) VizController.getInstance().getVizModel().getCameraDistance();
+                GraphIO io = VizController.getInstance().getGraphIO();
+                io.setCameraDistance(cameraDistance + 1000);
+            }
+        });
+        topToolbar.add(minusButton);
+
+        // Selection
+        final ButtonGroup buttonGroup = new ButtonGroup();
+        //Mouse
+        final JToggleButton mouseButton = new JToggleButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/mouse.png", false));
+        mouseButton.setFocusable(false);
+        mouseButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.selection.rectangle.tooltip"));
+        mouseButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (mouseButton.isSelected()) {
+                    VizController.getInstance().getSelectionManager().setDirectMouseSelection();
+                    VizController.getInstance().getSelectionManager().setDraggingMouseSelection();
+//                    VizController.getInstance().getEngine().setRectangleSelection(false);
+//                    VizController.getInstance().getVizConfig().setSelectionEnable(true);
+//                    VizController.getInstance().getVizConfig().setDraggingEnable(true);
+//                    VizController.getInstance().getVizConfig().setCustomSelection(false);
+                     VizController.getInstance().getSelectionManager().resetSelection();
+                }
+            }
+        });
+        buttonGroup.add(mouseButton);
+        topToolbar.add(mouseButton);
+
+        //Rectangle
+        final JToggleButton rectangleButton = new JToggleButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/rectangle.png", false));
+        rectangleButton.setFocusable(false);
+        rectangleButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.selection.rectangle.tooltip"));
+        rectangleButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (rectangleButton.isSelected()) {
+                    VizController.getInstance().getSelectionManager().setRectangleSelection();
+                }
+            }
+        });
+        buttonGroup.add(rectangleButton);
+        topToolbar.add(rectangleButton);
+
+        //Drag
+        final JToggleButton dragButton = new JToggleButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/hand.png", false));
+        dragButton.setFocusable(false);
+        dragButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.selection.drag.tooltip"));
+        dragButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (dragButton.isSelected()) {
+                    VizController.getInstance().getSelectionManager().setDraggingMouseSelection();
+                }
+            }
+        });
+        buttonGroup.add(dragButton);
+        topToolbar.add(dragButton);
+
+        //Init events
+        VizController.getInstance().getSelectionManager().addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                SelectionManager selectionManager = VizController.getInstance().getSelectionManager();
+                if (selectionManager.isBlocked()) {
+                    buttonGroup.clearSelection();
+                } else if (!selectionManager.isSelectionEnabled()) {
+                    buttonGroup.clearSelection();
+                } else if (selectionManager.isDirectMouseSelection()) {
+                    if (!buttonGroup.isSelected(mouseButton.getModel())) {
+                        buttonGroup.setSelected(mouseButton.getModel(), true);
+                    }
+                }
+            }
+        });
+    }
+
+    private void initBottomToolbar() {
+        bottomToolbar.setFloatable(false);
+        bottomToolbar.addSeparator();
+
+        //Node settings        
         //Show node labels
         showNodeLabelsButton.setFocusable(false);
         showNodeLabelsButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.showNodeLabelsButton.toolTipText"));
@@ -155,7 +284,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             }
         });
         setNodeLabelButton(showNodeLabelsButton.isSelected());
-        toolbar.add(showNodeLabelsButton);
+        bottomToolbar.add(showNodeLabelsButton);
 
         // Label size mode
         labelSizeModeButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/labelSizeMode.png", false));
@@ -170,7 +299,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 }
             }
         });
-        toolbar.add(labelSizeModeButton);
+        bottomToolbar.add(labelSizeModeButton);
 
         // Node Font
         nodeFontButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/font.png", false));
@@ -186,7 +315,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 }
             }
         });
-        toolbar.add(nodeFontButton);
+        bottomToolbar.add(nodeFontButton);
         //Node color
 //        nodeColorButton.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
 //
@@ -213,10 +342,10 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 }
             }
         });
-        toolbar.add(nodeSizeSlider);
+        bottomToolbar.add(nodeSizeSlider);
 
         //Edge settings
-        toolbar.addSeparator();
+        bottomToolbar.addSeparator();
 
         //Show edges
         showEdgeButton.setFocusable(false);
@@ -233,7 +362,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             }
         });
         setEdgeButton(showEdgeButton.isSelected());
-        toolbar.add(showEdgeButton);
+        bottomToolbar.add(showEdgeButton);
 
 //        Edge color mode
         edgeHasNodeColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeHasNodeColorButton.ToolTipText"));
@@ -247,7 +376,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 }
             }
         });
-        toolbar.add(edgeHasNodeColorButton);
+        bottomToolbar.add(edgeHasNodeColorButton);
 
         //Edge color
 //        edgeColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeColorButton.ToolTipText"));
@@ -266,7 +395,6 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 //            }
 //        });
 //        toolbar.add(edgeColorButton);
-
         //EdgeScale slider
         edgeScaleSlider.setMinimum(0);
         edgeScaleSlider.setMaximum(100);
@@ -282,7 +410,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 }
             }
         });
-        toolbar.add(edgeScaleSlider);
+        bottomToolbar.add(edgeScaleSlider);
 
         //Show edge labels
         showEdgeLabelsButton.setFocusable(false);
@@ -299,7 +427,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             }
         });
         setEdgeLabelButton(showEdgeLabelsButton.isSelected());
-        toolbar.add(showEdgeLabelsButton);
+        bottomToolbar.add(showEdgeLabelsButton);
 
         //Edge Font
         edgeFontButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/font.png", false));
@@ -315,7 +443,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 }
             }
         });
-        toolbar.add(edgeFontButton);
+        bottomToolbar.add(edgeFontButton);
         // Edge size slider       
         edgeSizeSlider.setPreferredSize(new Dimension(100, 23));
         edgeSizeSlider.setMaximumSize(nodeSizeSlider.getPreferredSize());
@@ -328,59 +456,12 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 }
             }
         });
-        toolbar.add(edgeSizeSlider);
-
-        //Zoom
-        toolbar.addSeparator();
-        // Reset Zoom 
-        JButton resetZoomButton = new JButton();
-        resetZoomButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/centerOnGraph.png", false));
-        resetZoomButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.resetZoomButton.toolTipText"));
-        resetZoomButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GraphIO io = VizController.getInstance().getGraphIO();
-                io.centerOnGraph();
-            }
-        });
-        toolbar.add(resetZoomButton);
-
-        // Plus Zoom
-        JButton plusButton = new JButton();
-        plusButton.setText("+");
-        plusButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.plusButton.toolTipText"));
-        plusButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int cameraDistance = (int) VizController.getInstance().getVizModel().getCameraDistance();
-                GraphIO io = VizController.getInstance().getGraphIO();
-                io.setCameraDistance(cameraDistance - 1000);
-            }
-        });
-        toolbar.add(plusButton);
-
-        // Minus Zoom
-        JButton minusButton = new JButton();
-        minusButton.setText("-");
-        minusButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.minusButton.toolTipText"));
-        minusButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int cameraDistance = (int) VizController.getInstance().getVizModel().getCameraDistance();
-                GraphIO io = VizController.getInstance().getGraphIO();
-                io.setCameraDistance(cameraDistance + 1000);
-            }
-        });
-        toolbar.add(minusButton);
+        bottomToolbar.add(edgeSizeSlider);
 
         //Advaced button
-        toolbar.addSeparator();
+        bottomToolbar.addSeparator();
 
-        final ExtendedBar extendedBar = new ExtendedBar();
-//        extendedPanel.setLayout(new BorderLayout());
-//        extendedPanel.add(new JLabel("Hello"), BorderLayout.CENTER);
-        graphPanel.add(extendedBar, BorderLayout.PAGE_START);
-
+//        graphPanel.add(extendedBar, BorderLayout.PAGE_START);
         final JToggleButton extendButton = new JToggleButton();
         extendButton.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.extendButton.text"));
         if (extendButton.isSelected()) {
@@ -406,8 +487,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             }
         });
         extendedBar.setVisible(extendButton.isSelected());
-        toolbar.add(extendButton);
-
+        bottomToolbar.add(extendButton);
     }
 
     public void setBusy(boolean busy) {
@@ -450,7 +530,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
         //Edge color mode
         edgeHasNodeColorButton.setSelected(!vizModel.isEdgeHasUniColor());
-        
+
         //Edge color
 //        float[] edgeColorArray = vizModel.getEdgeUniColor();
 //        edgeColorButton.setColor(new Color(edgeColorArray[0], edgeColorArray[1], edgeColorArray[2], edgeColorArray[3]));
@@ -497,7 +577,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
     @Override
     public JComponent getToolbarRepresentation() {
-        return toolbar;
+        return topToolbar;
     }
 
     @Override
@@ -586,9 +666,9 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     }
 
     @Override
-    public void handleEvent(VizEvent event) {        
+    public void handleEvent(VizEvent event) {
         Collection<? extends GraphNodeWrapper> oldNodes = lookup.lookupAll(GraphNodeWrapper.class);
-        for(GraphNodeWrapper node: oldNodes){
+        for (GraphNodeWrapper node : oldNodes) {
             content.remove(node);
         }
         Node[] selectedNodes = (Node[]) event.getData();
@@ -600,6 +680,16 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     @Override
     public VizEvent.Type getType() {
         return VizEvent.Type.NODE_LEFT_CLICK;
+    }
+
+    private class BottomPanel extends JPanel {
+
+        public BottomPanel() {
+            setLayout(new BorderLayout());
+            add(extendedBar, BorderLayout.CENTER);
+            add(bottomToolbar, BorderLayout.SOUTH);
+        }
+
     }
 
 }

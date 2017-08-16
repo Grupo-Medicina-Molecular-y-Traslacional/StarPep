@@ -101,7 +101,7 @@ public class DataBridge implements VizArchitecture {
     }
 
     public synchronized NodeModel[] getNodeModelsForNodes(Node[] n) {
-        if (n == null) {
+        if (n == null || nodes == null) {
             return null;
         }
 

@@ -379,7 +379,7 @@ public class CompatibilityEngine extends AbstractEngine {
             }
         }
 
-        if (customSelection || currentSelectionArea.blockSelection()) {
+        if (customSelection || currentSelectionArea == null || currentSelectionArea.blockSelection()) {
             return;
         }
 

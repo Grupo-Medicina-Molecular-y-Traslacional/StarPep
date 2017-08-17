@@ -75,9 +75,9 @@ import org.openide.util.lookup.ServiceProvider;
 public class AppearanceUIController {
 
     //Classes
-    protected static final String NODE_ELEMENT = "nodes";
-    protected static final String EDGE_ELEMENT = "edges";
-    protected static final String[] ELEMENT_CLASSES = {NODE_ELEMENT, EDGE_ELEMENT};
+    public static final String NODE_ELEMENT = "nodes";
+    public static final String EDGE_ELEMENT = "edges";
+    public static final String[] ELEMENT_CLASSES = {NODE_ELEMENT, EDGE_ELEMENT};
     //Transformers
     protected final Map<String, Map<TransformerCategory, Set<TransformerUI>>> transformers;
     //Architecture

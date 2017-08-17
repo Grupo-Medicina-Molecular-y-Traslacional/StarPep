@@ -199,7 +199,6 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-
                 transformerToolbar.refreshTransformers();
                 controlToolbar.refreshControls();
             }
@@ -210,7 +209,6 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-
                 controlToolbar.refreshControls();
             }
         });
@@ -268,7 +266,7 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
             }
             final JButton btn = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("/org/gephi/desktop/appearance/resources/chain.png", false), popup);
             btn.setToolTipText(NbBundle.getMessage(AppearanceToolbar.class, "AppearanceToolbar.chain.toolTipText"));
-            btn.setFocusPainted(false);
+            btn.setFocusable(false);
             btn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -320,7 +318,7 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
 //                        DecoratedIcon decoratedIcon = getDecoratedIcon(icon, t);
 //                        JToggleButton btn = new JToggleButton(decoratedIcon);
                         JButton btn = new JButton(icon);
-
+                        btn.setFocusable(false);
                         btn.setToolTipText(c.getDisplayName());
                         btn.addActionListener(new ActionListener() {
                             @Override

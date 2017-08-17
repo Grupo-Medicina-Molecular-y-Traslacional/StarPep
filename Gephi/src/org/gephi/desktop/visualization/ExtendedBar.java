@@ -28,12 +28,13 @@ import org.openide.util.NbBundle;
  * @author Home
  */
 public class ExtendedBar extends javax.swing.JPanel implements ActionListener, AppearanceUIModelListener {
-
-    private transient final AppearanceToolbar toolbar;
-    private transient final AppearanceUIController controller;
-    private transient final ExtendedPanel extendedPanel;
-    private transient final DialogDescriptor dd;
-    private transient AppearanceUIModel model;
+    
+    private final AppearanceToolbar toolbar;
+    private final AppearanceUIController controller;
+    private final ExtendedPanel extendedPanel;
+    private final DialogDescriptor dd;
+    private final DesktopToolController toolController;
+    private AppearanceUIModel model;
 
     /**
      * Creates new form ExtendedBar
@@ -49,9 +50,13 @@ public class ExtendedBar extends javax.swing.JPanel implements ActionListener, A
         controller.addPropertyChangeListener(this);
         AppearanceToolbar.CategoryToolbar ctb = toolbar.getCategoryToolbar();
         ctb.addActionListener(this);
-        add(ctb, BorderLayout.CENTER);
+        leftPanel.add(ctb, BorderLayout.CENTER);
         extendedPanel = new ExtendedPanel(controller, toolbar);
         dd = new DialogDescriptor(extendedPanel, "");
+        
+        toolController = new DesktopToolController();
+        centerPanel.add(toolController.getToolbar(), BorderLayout.CENTER);
+        rightPanel.add(toolController.getPropertiesBar(), BorderLayout.CENTER);
     }
 
     /**
@@ -62,11 +67,37 @@ public class ExtendedBar extends javax.swing.JPanel implements ActionListener, A
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        setLayout(new java.awt.BorderLayout());
+        leftPanel = new javax.swing.JPanel();
+        centerPanel = new javax.swing.JPanel();
+        rightPanel = new javax.swing.JPanel();
+
+        setLayout(new java.awt.GridBagLayout());
+
+        leftPanel.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        add(leftPanel, gridBagConstraints);
+
+        centerPanel.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        add(centerPanel, gridBagConstraints);
+
+        rightPanel.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        add(rightPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    
     @Override
     public void actionPerformed(ActionEvent e) {
         TransformerCategory c = model.getSelectedCategory();
@@ -76,17 +107,27 @@ public class ExtendedBar extends javax.swing.JPanel implements ActionListener, A
             controller.getAppearanceController().transform(model.getSelectedFunction());
         }
     }
-
+    
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_CATEGORY)
                 || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_TRANSFORMER_UI)
-                || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_FUNCTION)){
+                || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_FUNCTION)) {
             dd.setValid(model.getSelectedFunction() != null);
+        } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_ELEMENT_CLASS)) {
+            if (model.getSelectedElementClass().equals(AppearanceUIController.NODE_ELEMENT)) {
+                centerPanel.setVisible(true);
+            } else {
+                toolController.unselect();
+                centerPanel.setVisible(false);
+            }            
         }
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel centerPanel;
+    private javax.swing.JPanel leftPanel;
+    private javax.swing.JPanel rightPanel;
     // End of variables declaration//GEN-END:variables
 }

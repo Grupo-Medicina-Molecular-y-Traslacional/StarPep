@@ -13,3 +13,4 @@ PreviewExport
 DesktopPreview
 DesktopExport
 DesktopAppearance
+DesktopTool

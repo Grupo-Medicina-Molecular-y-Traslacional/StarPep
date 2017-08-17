@@ -143,7 +143,7 @@ public class HeatMap implements Tool {
                     }
                     Color c = colors[0];
                     n.setColor(c);
-                    heatMapPanel.setStatus(NbBundle.getMessage(HeatMap.class, "HeatMap.status.maxdistance") + new DecimalFormat("#.##").format(algorithm.getMaxDistance()));
+                    heatMapPanel.setStatus(NbBundle.getMessage(HeatMap.class, "HeatMap.status.maxdistance", new DecimalFormat("#.##").format(algorithm.getMaxDistance())));
                 } catch (Exception e) {
                     Logger.getLogger("").log(Level.SEVERE, "", e);
                 }

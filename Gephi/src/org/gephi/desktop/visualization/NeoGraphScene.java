@@ -22,6 +22,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -49,6 +50,7 @@ import org.gephi.visualization.text.SizeMode;
 import org.gephi.visualization.text.TextManager;
 import org.gephi.visualization.text.TextModelImpl;
 import org.jdesktop.swingx.JXBusyLabel;
+import org.jdesktop.swingx.JXHyperlink;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
@@ -79,6 +81,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     private final JPanel graphPanel = new JPanel();
     // Global
     final JColorButton backgroundButton = new JColorButton(Color.BLACK);
+    final JXHyperlink configureLink = new JXHyperlink();
     //Node
     final JToggleButton showNodeLabelsButton = new JToggleButton();
     final JButton nodeFontButton = new JButton();
@@ -189,12 +192,11 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         });
         topToolbar.add(minusButton);
 
-        // Selection
-        final ButtonGroup buttonGroup = new ButtonGroup();
-        //Mouse
+        // Mouse Selection
+        topToolbar.addSeparator();
         final JToggleButton mouseButton = new JToggleButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/mouse.png", false));
         mouseButton.setFocusable(false);
-        mouseButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.selection.rectangle.tooltip"));
+        mouseButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.selection.mouse.tooltip"));
         mouseButton.addActionListener(new ActionListener() {
 
             @Override
@@ -204,43 +206,28 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                     selectionManager.setDirectMouseSelection();
                     selectionManager.setDraggingMouseSelection();
                     selectionManager.resetSelection();
+                    configureLink.setEnabled(true);
                 }
             }
         });
-        buttonGroup.add(mouseButton);
         topToolbar.add(mouseButton);
 
-        //Rectangle
-        final JToggleButton rectangleButton = new JToggleButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/rectangle.png", false));
-        rectangleButton.setFocusable(false);
-        rectangleButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.selection.rectangle.tooltip"));
-        rectangleButton.addActionListener(new ActionListener() {
+        //Configure
+        configureLink.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.selection.configureLink.text")); // NOI18N
+        configureLink.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.selection.configureLink.tooltip"));
+        configureLink.setClickedColor(new java.awt.Color(0, 51, 255));
+        configureLink.setDefaultCapable(false);
+        configureLink.setFocusable(false);
+        configureLink.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N   
+        configureLink.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (rectangleButton.isSelected()) {
-                    VizController.getInstance().getSelectionManager().setRectangleSelection();
-                }
+                JPopupMenu menu = createPopup();
+                menu.show(configureLink, 0, configureLink.getHeight());
             }
         });
-        buttonGroup.add(rectangleButton);
-        topToolbar.add(rectangleButton);
-
-        //Drag
-        final JToggleButton dragButton = new JToggleButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/hand.png", false));
-        dragButton.setFocusable(false);
-        dragButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.selection.drag.tooltip"));
-        dragButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (dragButton.isSelected()) {
-                    VizController.getInstance().getSelectionManager().setDraggingMouseSelection();
-                }
-            }
-        });
-        buttonGroup.add(dragButton);
-        topToolbar.add(dragButton);
+        topToolbar.add(configureLink);
 
         //Init events
         VizController.getInstance().getSelectionManager().addChangeListener(new ChangeListener() {
@@ -248,17 +235,39 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             @Override
             public void stateChanged(ChangeEvent e) {
                 SelectionManager selectionManager = VizController.getInstance().getSelectionManager();
-                if (selectionManager.isBlocked()) {
-                    buttonGroup.clearSelection();
-                } else if (!selectionManager.isSelectionEnabled()) {
-                    buttonGroup.clearSelection();
+                if (selectionManager.isBlocked() || !selectionManager.isSelectionEnabled()) {
+                    mouseButton.setSelected(false);
+                    configureLink.setEnabled(false);
                 } else if (selectionManager.isDirectMouseSelection()) {
-                    if (!buttonGroup.isSelected(mouseButton.getModel())) {
-                        buttonGroup.setSelected(mouseButton.getModel(), true);
+                    if (!mouseButton.isSelected()) {
+                        mouseButton.setSelected(true);
+                        configureLink.setEnabled(true);
                     }
                 }
             }
         });
+        
+        topToolbar.addSeparator();
+    }
+
+    private JPopupMenu createPopup() {
+//        SelectionManager manager = VizController.getInstance().getSelectionManager();
+//        final MouseSelectionPopupPanel popupPanel = new MouseSelectionPopupPanel();
+//        popupPanel.setDiameter(manager.getMouseSelectionDiameter());
+//        popupPanel.setProportionnalToZoom(manager.isMouseSelectionZoomProportionnal());
+//        popupPanel.setChangeListener(new ChangeListener() {
+//
+//            @Override
+//            public void stateChanged(ChangeEvent e) {
+//                SelectionManager manager = VizController.getInstance().getSelectionManager();
+//                manager.setMouseSelectionDiameter(popupPanel.getDiameter());
+//                manager.setMouseSelectionZoomProportionnal(popupPanel.isProportionnalToZoom());
+//            }
+//        });
+
+        JPopupMenu menu = new JPopupMenu();
+//        menu.add(popupPanel);
+        return menu;
     }
 
     private void initBottomToolbar() {

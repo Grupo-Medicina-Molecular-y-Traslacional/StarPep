@@ -14,3 +14,5 @@ DesktopPreview
 DesktopExport
 DesktopAppearance
 DesktopTool
+StatisticsPlugin
+StatisticsPluginUI

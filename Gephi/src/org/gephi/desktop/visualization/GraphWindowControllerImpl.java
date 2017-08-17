@@ -13,6 +13,7 @@ import org.gephi.visualization.VizController;
 import org.gephi.visualization.api.selection.SelectionManager;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewFactory;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.TopComponent;
@@ -36,6 +37,7 @@ public class GraphWindowControllerImpl implements GraphWindowController {
                 multiviews[1] = new NeoGraphPreViewDescription();
                 graphWindow = MultiViewFactory.createCloneableMultiView(multiviews, multiviews[0]);
                 graphWindow.setDisplayName(NbBundle.getMessage(GraphWindowControllerImpl.class, "CTL_GraphTC"));
+//                graphWindow.setIcon(ImageUtilities.loadImage("org/gephi/desktop/visualization/resources/gephilogo.png", false));
             }
         });
     }

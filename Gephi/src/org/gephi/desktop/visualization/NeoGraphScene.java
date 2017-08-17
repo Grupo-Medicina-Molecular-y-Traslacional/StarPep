@@ -14,6 +14,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
@@ -194,6 +196,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
         // Mouse Selection
         topToolbar.addSeparator();
+        final ButtonGroup buttonGroup = new ButtonGroup();
         final JToggleButton mouseButton = new JToggleButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/mouse.png", false));
         mouseButton.setFocusable(false);
         mouseButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.selection.mouse.tooltip"));
@@ -210,6 +213,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 }
             }
         });
+        buttonGroup.add(mouseButton);
+        buttonGroup.setSelected(mouseButton.getModel(), true);
         topToolbar.add(mouseButton);
 
         //Configure
@@ -236,37 +241,37 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             public void stateChanged(ChangeEvent e) {
                 SelectionManager selectionManager = VizController.getInstance().getSelectionManager();
                 if (selectionManager.isBlocked() || !selectionManager.isSelectionEnabled()) {
-                    mouseButton.setSelected(false);
+                    buttonGroup.clearSelection();
                     configureLink.setEnabled(false);
                 } else if (selectionManager.isDirectMouseSelection()) {
-                    if (!mouseButton.isSelected()) {
-                        mouseButton.setSelected(true);
+                    if (!buttonGroup.isSelected(mouseButton.getModel())) {
+                        buttonGroup.setSelected(mouseButton.getModel(), true);
                         configureLink.setEnabled(true);
-                    }
+                    }                    
                 }
             }
         });
-        
+
         topToolbar.addSeparator();
     }
 
     private JPopupMenu createPopup() {
-//        SelectionManager manager = VizController.getInstance().getSelectionManager();
-//        final MouseSelectionPopupPanel popupPanel = new MouseSelectionPopupPanel();
-//        popupPanel.setDiameter(manager.getMouseSelectionDiameter());
-//        popupPanel.setProportionnalToZoom(manager.isMouseSelectionZoomProportionnal());
-//        popupPanel.setChangeListener(new ChangeListener() {
-//
-//            @Override
-//            public void stateChanged(ChangeEvent e) {
-//                SelectionManager manager = VizController.getInstance().getSelectionManager();
-//                manager.setMouseSelectionDiameter(popupPanel.getDiameter());
-//                manager.setMouseSelectionZoomProportionnal(popupPanel.isProportionnalToZoom());
-//            }
-//        });
+        SelectionManager manager = VizController.getInstance().getSelectionManager();
+        final MouseSelectionPopupPanel popupPanel = new MouseSelectionPopupPanel();
+        popupPanel.setDiameter(manager.getMouseSelectionDiameter());
+        popupPanel.setProportionnalToZoom(manager.isMouseSelectionZoomProportionnal());
+        popupPanel.setChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                SelectionManager manager = VizController.getInstance().getSelectionManager();
+                manager.setMouseSelectionDiameter(popupPanel.getDiameter());
+                manager.setMouseSelectionZoomProportionnal(popupPanel.isProportionnalToZoom());
+            }
+        });
 
         JPopupMenu menu = new JPopupMenu();
-//        menu.add(popupPanel);
+        menu.add(popupPanel);
         return menu;
     }
 
@@ -698,4 +703,124 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
     }
 
+}
+
+class MouseSelectionPopupPanel extends javax.swing.JPanel {
+
+    private javax.swing.JSlider diameterSlider;
+    private javax.swing.JLabel labelDiameter;
+    private javax.swing.JLabel labelValue;
+    private javax.swing.JCheckBox proportionnalZoomCheckbox;
+    private ChangeListener changeListener;
+
+    /**
+     * Creates new form MouseSelectionPopupPanel
+     */
+    public MouseSelectionPopupPanel() {
+        initComponents();
+
+        diameterSlider.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                JSlider source = (JSlider) e.getSource();
+                if (!source.getValueIsAdjusting()) {
+                    fireChangeEvent(source);
+                }
+            }
+        });
+
+        proportionnalZoomCheckbox.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                fireChangeEvent(proportionnalZoomCheckbox);
+            }
+        });
+    }
+
+    public boolean isProportionnalToZoom() {
+        return proportionnalZoomCheckbox.isSelected();
+    }
+
+    public void setProportionnalToZoom(boolean proportionnalToZoom) {
+        proportionnalZoomCheckbox.setSelected(proportionnalToZoom);
+    }
+
+    public int getDiameter() {
+        return diameterSlider.getValue();
+    }
+
+    public void setDiameter(int diameter) {
+        diameterSlider.setValue(diameter);
+    }
+
+    public void setChangeListener(ChangeListener changeListener) {
+        this.changeListener = changeListener;
+    }
+
+    private void fireChangeEvent(Object source) {
+        if (changeListener != null) {
+            ChangeEvent changeEvent = new ChangeEvent(source);
+            changeListener.stateChanged(changeEvent);
+        }
+    }
+
+    private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
+
+        labelDiameter = new javax.swing.JLabel();
+        diameterSlider = new javax.swing.JSlider();
+        labelValue = new javax.swing.JLabel();
+        proportionnalZoomCheckbox = new javax.swing.JCheckBox();
+
+        setLayout(new java.awt.GridBagLayout());
+
+        labelDiameter.setText(NbBundle.getMessage(MouseSelectionPopupPanel.class, "NeoGraphScene.labelDiameter.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(6, 5, 8, 0);
+        add(labelDiameter, gridBagConstraints);
+
+        diameterSlider.setMaximum(1000);
+        diameterSlider.setMinimum(1);
+        diameterSlider.setFocusable(false);
+        diameterSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                labelValue.setText(String.valueOf(diameterSlider.getValue()));
+            }
+        });
+        diameterSlider.setValue(1);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        add(diameterSlider, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(6, 0, 8, 5);
+        add(labelValue, gridBagConstraints);
+
+        proportionnalZoomCheckbox.setText(NbBundle.getMessage(MouseSelectionPopupPanel.class, "NeoGraphScene.proportionnalZoomCheckbox.text")); // NOI18N
+        proportionnalZoomCheckbox.setFocusable(false);
+        proportionnalZoomCheckbox.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(10, 5, 5, 0);
+        add(proportionnalZoomCheckbox, gridBagConstraints);
+
+    }
 }

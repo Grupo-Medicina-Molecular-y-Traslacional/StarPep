@@ -42,6 +42,7 @@
 package org.gephi.layout.plugin.forceAtlas;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -97,7 +98,7 @@ public class ForceAtlasLayout extends AbstractLayout {
     }
 
     private void createProperties() {
-        properties = new ArrayList<>();
+        properties = new LinkedList<>();
         final String FORCE_ATLAS = "Force Atlas";
 
         try {

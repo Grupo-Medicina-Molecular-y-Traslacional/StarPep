@@ -45,6 +45,7 @@ import gnu.trove.iterator.TIntFloatIterator;
 import gnu.trove.map.hash.TIntFloatHashMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CyclicBarrier;
@@ -93,7 +94,7 @@ public class OpenOrdLayout extends AbstractLayout{
     }
 
     private void createProperties(){
-        properties = new ArrayList<>();
+        properties = new LinkedList<>();
         final String OPENORD = "OpenOrd";
         final String STAGE = "Stages";
 

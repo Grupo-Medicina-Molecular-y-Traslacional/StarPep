@@ -18,29 +18,28 @@ import org.openide.util.Lookup;
  *
  * @author Home
  */
-public abstract class AbstractModamp implements Algorithm{
+public abstract class AbstractModamp implements Algorithm {
 
     protected final ProjectManager pc;
-    protected Peptide[] peptides;
+    protected AttributesModel attrModel;
     boolean stopRun;
     protected final AlgorithmFactory factory;
     protected ProgressTicket progressTicket;
-    
-    public AbstractModamp(AlgorithmFactory factory){
+
+    public AbstractModamp(AlgorithmFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         this.factory = factory;
     }
-    
+
     @Override
     public void initAlgo() {
-        AttributesModel attrModel = pc.getAttributesModel();
-        peptides = attrModel.getPeptides();
+        attrModel = pc.getAttributesModel();
         stopRun = false;
     }
 
     @Override
     public void endAlgo() {
-        peptides = null;
+        attrModel = null;
     }
 
     @Override
@@ -66,13 +65,16 @@ public abstract class AbstractModamp implements Algorithm{
 
     @Override
     public void run() {
-        progressTicket.switchToDeterminate(peptides.length);
-        for(int i=0; i<peptides.length && !stopRun; i++){
-            compute(peptides[i]);
-            progressTicket.progress();
+        if (attrModel != null) {
+            Peptide[] peptides = attrModel.getPeptides();
+            progressTicket.switchToDeterminate(peptides.length);
+            for (int i = 0; i < peptides.length && !stopRun; i++) {
+                compute(peptides[i]);
+                progressTicket.progress();
+            }
         }
     }
-    
+
     public abstract void compute(Peptide peptide);
-    
+
 }

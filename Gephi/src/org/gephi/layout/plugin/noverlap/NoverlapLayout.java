@@ -43,6 +43,7 @@ package org.gephi.layout.plugin.noverlap;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.bapedis.core.model.AlgorithmProperty;
@@ -73,7 +74,7 @@ public class NoverlapLayout extends AbstractLayout {
     }
 
     private void createProperties() {
-        properties = new ArrayList<>();
+        properties = new LinkedList<>();
         final String NOVERLAP_CATEGORY = "Noverlap";
         try {
             properties.add(AlgorithmProperty.createProperty(

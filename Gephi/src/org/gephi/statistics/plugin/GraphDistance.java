@@ -393,6 +393,7 @@ public class GraphDistance implements Algorithm {
 
     @Override
     public void initAlgo() {
+        isCanceled = false;
         graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();
         initializeAttributeColunms(graphModel);
     }
@@ -413,8 +414,7 @@ public class GraphDistance implements Algorithm {
     }
 
     @Override
-    public void run() {
-        isCanceled = false;
+    public void run() {        
         Graph graph = graphModel.getGraphVisible();
         
         graph.readLock();

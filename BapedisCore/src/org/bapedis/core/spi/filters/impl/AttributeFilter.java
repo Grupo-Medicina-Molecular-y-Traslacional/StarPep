@@ -10,7 +10,6 @@ import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 /**
@@ -108,11 +107,11 @@ public class AttributeFilter implements Filter {
         } else {
             accepted = operator.applyTo(objValue, value, matchCase);
         }
-        try {
-            Thread.sleep(1);
-        } catch (InterruptedException ex) {
-            Exceptions.printStackTrace(ex);
-        }
+//        try {
+//            Thread.sleep(1);
+//        } catch (InterruptedException ex) {
+//            Exceptions.printStackTrace(ex);
+//        }
         return negative ? !accepted : accepted;
     }
 

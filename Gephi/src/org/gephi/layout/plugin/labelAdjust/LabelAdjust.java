@@ -42,6 +42,7 @@
 package org.gephi.layout.plugin.labelAdjust;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -81,7 +82,7 @@ public class LabelAdjust extends AbstractLayout {
     }
 
     private void createProperties() {
-        properties = new ArrayList<>();
+        properties = new LinkedList<>();
         final String LABELADJUST_CATEGORY = "LabelAdjust";
         try {
             properties.add(AlgorithmProperty.createProperty(

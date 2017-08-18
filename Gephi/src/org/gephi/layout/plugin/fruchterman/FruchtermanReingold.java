@@ -41,7 +41,7 @@
  */
 package org.gephi.layout.plugin.fruchterman;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -80,7 +80,7 @@ public class FruchtermanReingold extends AbstractLayout {
     }
     
     private void createProperties(){
-        properties = new ArrayList<>();
+        properties = new LinkedList<>();
         final String FRUCHTERMAN_REINGOLD = "Fruchterman Reingold";
 
         try {

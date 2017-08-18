@@ -42,6 +42,7 @@
 package org.gephi.layout.plugin.random;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import org.bapedis.core.model.AlgorithmProperty;
@@ -67,7 +68,7 @@ public class RandomLayout extends AbstractLayout {
     }
 
     private void createProperties() {
-        properties = new ArrayList<>();
+        properties = new LinkedList<>();
         try {
             properties.add(AlgorithmProperty.createProperty(
                     this, Double.class,

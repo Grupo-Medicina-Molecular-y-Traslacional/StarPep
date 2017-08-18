@@ -13,6 +13,7 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.bapedis.core.model.AnnotationType;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.PeptideAttribute;
@@ -26,9 +27,9 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class AttributeFilterSetupUI extends javax.swing.JPanel implements FilterSetupUI {
+public class MetadataFilterSetupUI extends javax.swing.JPanel implements FilterSetupUI {
     
-    protected AttributeFilter filter;
+    protected MetadataFilter filter;
     protected boolean validState;
     protected final ProjectManager pc;
     protected final PropertyChangeSupport changeSupport;
@@ -36,7 +37,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
     /**
      * Creates new form AttributeFilterSetupUI
      */
-    public AttributeFilterSetupUI() {
+    public MetadataFilterSetupUI() {
         initComponents();
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         changeSupport = new PropertyChangeSupport(this);
@@ -78,6 +79,12 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
             public void ancestorMoved(AncestorEvent event) {               
             }
         });
+        for(AnnotationType aType: AnnotationType.values()){
+            annotationComboBox.addItem(aType);
+        }
+        for(FilterOperator operator: StringFilterOperator.values()){
+            opComboBox.addItem(operator);
+        }
     }
 
     /**
@@ -90,8 +97,8 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        attrLabel = new javax.swing.JLabel();
-        attrComboBox = new javax.swing.JComboBox();
+        metadataLabel = new javax.swing.JLabel();
+        annotationComboBox = new javax.swing.JComboBox();
         opLabel = new javax.swing.JLabel();
         opComboBox = new javax.swing.JComboBox();
         valueLabel = new javax.swing.JLabel();
@@ -104,27 +111,22 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         setPreferredSize(new java.awt.Dimension(340, 170));
         setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(attrLabel, org.openide.util.NbBundle.getMessage(AttributeFilterSetupUI.class, "AttributeFilterSetupUI.attrLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(metadataLabel, org.openide.util.NbBundle.getMessage(MetadataFilterSetupUI.class, "MetadataFilterSetupUI.metadataLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 3);
-        add(attrLabel, gridBagConstraints);
+        add(metadataLabel, gridBagConstraints);
 
-        attrComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                attrComboBoxActionPerformed(evt);
-            }
-        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(3, 0, 3, 0);
-        add(attrComboBox, gridBagConstraints);
+        add(annotationComboBox, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(opLabel, org.openide.util.NbBundle.getMessage(AttributeFilterSetupUI.class, "AttributeFilterSetupUI.opLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(opLabel, org.openide.util.NbBundle.getMessage(MetadataFilterSetupUI.class, "MetadataFilterSetupUI.opLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -139,7 +141,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 3, 0);
         add(opComboBox, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(valueLabel, org.openide.util.NbBundle.getMessage(AttributeFilterSetupUI.class, "AttributeFilterSetupUI.valueLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(valueLabel, org.openide.util.NbBundle.getMessage(MetadataFilterSetupUI.class, "MetadataFilterSetupUI.valueLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -147,7 +149,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
         add(valueLabel, gridBagConstraints);
 
-        valueTextField.setText(org.openide.util.NbBundle.getMessage(AttributeFilterSetupUI.class, "AttributeFilterSetupUI.valueTextField.text")); // NOI18N
+        valueTextField.setText(org.openide.util.NbBundle.getMessage(MetadataFilterSetupUI.class, "MetadataFilterSetupUI.valueTextField.text")); // NOI18N
         valueTextField.setPreferredSize(new java.awt.Dimension(150, 27));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -158,7 +160,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         add(valueTextField, gridBagConstraints);
 
         errorLabel.setForeground(new java.awt.Color(255, 0, 0));
-        org.openide.awt.Mnemonics.setLocalizedText(errorLabel, org.openide.util.NbBundle.getMessage(AttributeFilterSetupUI.class, "AttributeFilterSetupUI.errorLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(errorLabel, org.openide.util.NbBundle.getMessage(MetadataFilterSetupUI.class, "MetadataFilterSetupUI.errorLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
@@ -167,7 +169,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 3, 0);
         add(errorLabel, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(matchCaseCheckBox, org.openide.util.NbBundle.getMessage(AttributeFilterSetupUI.class, "AttributeFilterSetupUI.matchCaseCheckBox.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(matchCaseCheckBox, org.openide.util.NbBundle.getMessage(MetadataFilterSetupUI.class, "MetadataFilterSetupUI.matchCaseCheckBox.text")); // NOI18N
         matchCaseCheckBox.setMargin(new java.awt.Insets(2, 0, 2, 2));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -175,7 +177,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         add(matchCaseCheckBox, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(notCheckBox, org.openide.util.NbBundle.getMessage(AttributeFilterSetupUI.class, "AttributeFilterSetupUI.notCheckBox.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(notCheckBox, org.openide.util.NbBundle.getMessage(MetadataFilterSetupUI.class, "MetadataFilterSetupUI.notCheckBox.text")); // NOI18N
         notCheckBox.setMargin(new java.awt.Insets(2, 0, 2, 2));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -184,23 +186,12 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         add(notCheckBox, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void attrComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_attrComboBoxActionPerformed
-        opComboBox.removeAllItems();
-        if (attrComboBox.getSelectedItem() instanceof PeptideAttribute) {
-            PeptideAttribute attr = (PeptideAttribute) attrComboBox.getSelectedItem();
-            FilterOperator[] operators = FilterHelper.getOperators(attr.getType());
-            for (FilterOperator operator : operators) {
-                opComboBox.addItem(operator);
-            }
-        }
-    }//GEN-LAST:event_attrComboBoxActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox attrComboBox;
-    private javax.swing.JLabel attrLabel;
+    private javax.swing.JComboBox annotationComboBox;
     private javax.swing.JLabel errorLabel;
     private javax.swing.JCheckBox matchCaseCheckBox;
+    private javax.swing.JLabel metadataLabel;
     private javax.swing.JCheckBox notCheckBox;
     private javax.swing.JComboBox opComboBox;
     private javax.swing.JLabel opLabel;
@@ -210,12 +201,11 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
 
     @Override
     public JPanel getEditPanel(Filter filter) {
-        this.filter = (AttributeFilter) filter;
+        this.filter = (MetadataFilter) filter;
         notCheckBox.setSelected(this.filter.isNegative());
-        initAttrComboBox();
-        PeptideAttribute attr = this.filter.getAttribute();
-        if (attr != null && !attr.equals(attrComboBox.getSelectedItem())) {
-            attrComboBox.setSelectedItem(attr);
+        AnnotationType annotationType = this.filter.getAnnotationType();
+        if (annotationType != null && !annotationType.equals(annotationComboBox.getSelectedItem())) {
+            annotationComboBox.setSelectedItem(annotationType);
         }
         FilterOperator operator = this.filter.getOperator();
         if (operator != null && !operator.equals(opComboBox.getSelectedItem())) {
@@ -229,23 +219,12 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         }
         matchCaseCheckBox.setSelected(this.filter.isMatchCase());
         return this;
-    }
-    
-    protected void initAttrComboBox() {
-        attrComboBox.removeAllItems();
-        AttributesModel attrModel = pc.getAttributesModel();
-        if (attrModel != null) {
-            for (PeptideAttribute attr : attrModel.getAttributes()) {
-                attrComboBox.addItem(attr);
-            }
-            attrComboBox.setSelectedIndex(0);
-        }
-    }
+    }   
     
     @Override
     public void finishSettings() {
         filter.setNegative(notCheckBox.isSelected());
-        filter.setAttribute((PeptideAttribute) attrComboBox.getSelectedItem());
+        filter.setAnnotationType((AnnotationType) annotationComboBox.getSelectedItem());
         filter.setOperator((FilterOperator) opComboBox.getSelectedItem());
         filter.setValue(valueTextField.getText().trim());
         filter.setMatchCase(matchCaseCheckBox.isSelected());
@@ -260,17 +239,17 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         boolean oldValue = validState;
         validState = true;
         errorLabel.setText("");
-        if (attrComboBox.getSelectedIndex() == -1) {
+        if (annotationComboBox.getSelectedIndex() == -1) {
             validState = false;
-            errorLabel.setText(NbBundle.getMessage(AttributeFilterSetupUI.class, "AttributeFilterSetupUI.errorLabel.invalidAttribute"));
+            errorLabel.setText(NbBundle.getMessage(MetadataFilterSetupUI.class, "AttributeFilterSetupUI.errorLabel.invalidAttribute"));
         }
         if (validState && opComboBox.getSelectedIndex() == -1) {
             validState = false;
-            errorLabel.setText(NbBundle.getMessage(AttributeFilterSetupUI.class, "AttributeFilterSetupUI.errorLabel.invalidOperator"));
+            errorLabel.setText(NbBundle.getMessage(MetadataFilterSetupUI.class, "AttributeFilterSetupUI.errorLabel.invalidOperator"));
         }
         if (validState && !((FilterOperator) opComboBox.getSelectedItem()).isValid(valueTextField.getText())) {
             validState = false;
-            errorLabel.setText(NbBundle.getMessage(AttributeFilterSetupUI.class, "AttributeFilterSetupUI.errorLabel.invalidValue"));
+            errorLabel.setText(NbBundle.getMessage(MetadataFilterSetupUI.class, "AttributeFilterSetupUI.errorLabel.invalidValue"));
         }
         changeSupport.firePropertyChange(VALID_STATE, oldValue, validState);
     }

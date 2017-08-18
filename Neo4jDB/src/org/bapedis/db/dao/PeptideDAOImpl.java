@@ -13,7 +13,6 @@ import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.spi.data.PeptideDAO;
-import org.bapedis.core.model.AnnotationType;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.db.Neo4jDB;
@@ -71,10 +70,6 @@ public class PeptideDAOImpl implements PeptideDAO {
         attrModel.addAttribute(SEQ);
         attrModel.addAttribute(LENGHT);
 
-        for (AnnotationType aType : AnnotationType.values()) {
-            attrModel.addAttribute(new PeptideAttribute(aType.name(), aType.getDisplayName(), String.class));
-        }
-
         try (Transaction tx = graphDb.beginTx()) {
             // Get peptides
             ResourceIterator<Node> peptideNodes;
@@ -131,11 +126,6 @@ public class PeptideDAOImpl implements PeptideDAO {
                             }
                             peptide.setAttributeValue(attr, value);
                         }
-                    }
-
-                    for (AnnotationType aType : AnnotationType.values()) {
-                        attr = attrModel.getAttribute(aType.name());
-                        peptide.setAttributeValue(attr, peptide.getAnnotationValues(aType));
                     }
                     attrModel.addPeptide(peptide);
                 }

@@ -93,6 +93,8 @@ public class PeptideAvailableColumnsPanel extends javax.swing.JPanel {
         removeButton = new javax.swing.JButton();
         removeAllButton = new javax.swing.JButton();
 
+        setMinimumSize(new java.awt.Dimension(336, 280));
+        setPreferredSize(new java.awt.Dimension(336, 280));
         setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.jLabel1.text")); // NOI18N

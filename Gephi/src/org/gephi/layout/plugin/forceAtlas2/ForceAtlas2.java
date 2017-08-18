@@ -42,6 +42,7 @@
 package org.gephi.layout.plugin.forceAtlas2;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -327,7 +328,7 @@ public class ForceAtlas2 extends AbstractLayout {
     }
 
     private void createProperties() {
-        properties = new ArrayList<>();
+        properties = new LinkedList<>();
         final String FORCEATLAS2_TUNING = NbBundle.getMessage(getClass(), "ForceAtlas2.tuning");
         final String FORCEATLAS2_BEHAVIOR = NbBundle.getMessage(getClass(), "ForceAtlas2.behavior");
         final String FORCEATLAS2_PERFORMANCE = NbBundle.getMessage(getClass(), "ForceAtlas2.performance");

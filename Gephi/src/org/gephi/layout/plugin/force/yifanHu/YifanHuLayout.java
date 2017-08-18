@@ -41,7 +41,7 @@
  */
 package org.gephi.layout.plugin.force.yifanHu;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -102,7 +102,7 @@ public class YifanHuLayout extends AbstractLayout {
     }
 
     private void createProperties() {
-        properties = new ArrayList<>();
+        properties = new LinkedList<>();
         final String YIFANHU_CATEGORY = "Yifan Hu's properties";
         final String BARNESHUT_CATEGORY = "Barnes-Hut's properties";
 

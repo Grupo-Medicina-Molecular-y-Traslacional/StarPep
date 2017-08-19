@@ -12,7 +12,7 @@ import java.util.Set;
 import org.bapedis.core.spi.algo.impl.modamp.scales.ReduceAlphabet;
 import org.bapedis.core.spi.algo.impl.modamp.scales.ReducedAlphabets;
 import org.bapedis.core.spi.algo.impl.modamp.scales.otherScales;
-import org.bapedis.core.spi.algo.impl.modamp.scales.PkaValues;
+import org.bapedis.core.spi.algo.impl.modamp.scales.PkaValues1;
 import org.bapedis.core.spi.algo.impl.modamp.scales.HydrophobicityScale;
 
 /**
@@ -149,7 +149,7 @@ public class MD {
      * @return netCharge
      */
     public static double netCharge(String seq) {
-        return netCharge(seq, 7.0, PkaValues.Lehninger());
+        return netCharge(seq, 7.0, PkaValues1.Lehninger());
     }
 
     /**
@@ -205,7 +205,7 @@ public class MD {
      * @return
      */
     public static double isoelectricPoint(String seq) {
-        return isoelectricPoint(seq, PkaValues.IPC_protein());
+        return isoelectricPoint(seq, PkaValues1.IPC_protein());
     }
 
     /**

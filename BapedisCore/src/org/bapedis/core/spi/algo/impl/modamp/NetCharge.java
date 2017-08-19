@@ -5,11 +5,8 @@
  */
 package org.bapedis.core.spi.algo.impl.modamp;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.algo.AlgorithmFactory;

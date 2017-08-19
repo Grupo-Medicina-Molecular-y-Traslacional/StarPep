@@ -6,9 +6,12 @@
 package org.bapedis.core.model;
 
 import java.awt.Image;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import javax.swing.Action;
+import org.bapedis.core.spi.data.PeptideDAO;
 import org.bapedis.core.ui.actions.SelectNodeOnGraph;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
@@ -28,10 +31,11 @@ import org.openide.util.lookup.Lookups;
  *
  * @author loge
  */
-public class PeptideNode extends AbstractNode {
+public class PeptideNode extends AbstractNode implements PropertyChangeListener {
 
     protected Peptide peptide;
     private final Action[] actions;
+    protected Sheet.Set descriptors;
 
     public PeptideNode(Peptide peptide) {
         this(peptide, Children.LEAF, Lookups.singleton(peptide));
@@ -40,6 +44,7 @@ public class PeptideNode extends AbstractNode {
     public PeptideNode(Peptide peptide, Children children, Lookup lookup) {
         super(children, lookup);
         this.peptide = peptide;
+        peptide.addDescriptorChangeListener(this);
         actions = new Action[]{new SelectNodeOnGraph(peptide.getGraphNode()), SystemAction.get(PropertiesAction.class)};
     }
 
@@ -83,10 +88,6 @@ public class PeptideNode extends AbstractNode {
         property = createPropertyField("seq", NbBundle.getMessage(PeptideNode.class, "PropertySet.seq"),
                 NbBundle.getMessage(PeptideNode.class, "PropertySet.seq.desc"), String.class, peptide.getSequence());
         set.put(property);
-        // Length property
-        property = createPropertyField("length", NbBundle.getMessage(PeptideNode.class, "PropertySet.length"),
-                NbBundle.getMessage(PeptideNode.class, "PropertySet.length.desc"), Integer.class, peptide.getLength());
-        set.put(property);
         sheet.put(set);
 
         // Annotations
@@ -116,7 +117,7 @@ public class PeptideNode extends AbstractNode {
             }
             sheet.put(set);
         }
-        
+
         // Databases
 //        set = Sheet.createPropertiesSet();
 //        set.setName("databases");
@@ -132,16 +133,18 @@ public class PeptideNode extends AbstractNode {
 //        }
 //        sheet.put(set);
         // Descriptors
-//        set = Sheet.createPropertiesSet();
-//        set.setName("attributes");
-//        set.setDisplayName(NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.attributes"));
-//        for (PeptideAttribute attr : peptide.getAttributes()) {
-//            property = createPropertyField(attr.getId(), attr.getId(), attr.getId(), attr.getType(), peptide.getAttributeValue(attr));
-//            set.put(property);
-//        }
-//        set.put(property);
-//        set.setValue("tabName", NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.attributes.tabName"));
-//        sheet.put(set);
+        descriptors = Sheet.createPropertiesSet();
+        descriptors.setName("descriptors");
+        descriptors.setValue("tabName", NbBundle.getMessage(PeptideNode.class, "PropertySet.attributes.tabName"));
+        descriptors.setDisplayName(NbBundle.getMessage(PeptideNode.class, "PropertySet.descriptors"));
+        for (PeptideAttribute attr : peptide.getAttributes()) {
+            if (!(attr.equals(PeptideDAO.ID) || attr.equals(PeptideDAO.SEQ))) {
+                property = createPropertyField(attr.getId(), attr.getDisplayName(), attr.getDisplayName(), attr.getType(), peptide.getAttributeValue(attr));
+                descriptors.put(property);
+            }
+        }
+        sheet.put(descriptors);
+
         return sheet;
     }
 
@@ -172,5 +175,13 @@ public class PeptideNode extends AbstractNode {
         return property;
     }
 
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(Peptide.DESCRIPTOR_CHANGE) && descriptors != null) {
+            PeptideAttribute attr = (PeptideAttribute) evt.getNewValue();
+            PropertySupport.ReadOnly property = createPropertyField(attr.getId(), attr.getDisplayName(), attr.getDisplayName(), attr.getType(), peptide.getAttributeValue(attr));
+            descriptors.put(property);
+        }
+    }
 
 }

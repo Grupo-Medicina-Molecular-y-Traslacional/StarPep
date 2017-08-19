@@ -33,6 +33,8 @@ public class AttributesModel {
     private final PeptideNodeContainer container;
     protected QuickFilter quickFilter;
     public static final String CHANGED_FILTER = "quickFilter";
+    public static final String AVAILABLE_ATTR_ADDED = "attribute_add";
+    public static final String AVAILABLE_ATTR_REMOVED = "attribute_remove";
     protected transient final PropertyChangeSupport propertyChangeSupport;
     protected Node rootNode;
 
@@ -42,11 +44,11 @@ public class AttributesModel {
         container = new PeptideNodeContainer();
         rootNode = new AbstractNode(container);
         propertyChangeSupport = new PropertyChangeSupport(this);
-        
+
         availableColumnsModel = new LinkedHashSet<>();
         availableColumnsModel.add(PeptideDAO.ID);
         availableColumnsModel.add(PeptideDAO.SEQ);
-        availableColumnsModel.add(PeptideDAO.LENGHT);        
+        availableColumnsModel.add(PeptideDAO.LENGHT);
     }
 
     public PeptideAttribute[] getAttributes() {
@@ -55,14 +57,22 @@ public class AttributesModel {
 
     public Set<PeptideAttribute> getAvailableColumnsModel() {
         return availableColumnsModel;
-    }        
-    
-    public boolean addAvailableColumn(PeptideAttribute attr){
-        return availableColumnsModel.add(attr);
     }
-    
-    public boolean removeAvailableColumn(PeptideAttribute attr){
-        return availableColumnsModel.remove(attr);
+
+    public boolean addAvailableColumn(PeptideAttribute attr) {
+        if (availableColumnsModel.add(attr)) {
+            propertyChangeSupport.firePropertyChange(AVAILABLE_ATTR_ADDED, null, attr);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeAvailableColumn(PeptideAttribute attr) {
+        if (availableColumnsModel.remove(attr)) {
+            propertyChangeSupport.firePropertyChange(AVAILABLE_ATTR_REMOVED, attr, null);
+            return true;
+        }
+        return false;
     }
 
     public synchronized Peptide[] getPeptides() {
@@ -75,6 +85,10 @@ public class AttributesModel {
             }
         }
         return peptides.toArray(new Peptide[0]);
+    }
+
+    public void refresh() {
+        container.refreshNodes();
     }
 
     public PeptideAttribute getAttribute(String id) {
@@ -131,6 +145,16 @@ public class AttributesModel {
         propertyChangeSupport.removePropertyChangeListener(CHANGED_FILTER, listener);
     }
 
+    public void addAvailableColumnChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(AVAILABLE_ATTR_ADDED, listener);
+        propertyChangeSupport.addPropertyChangeListener(AVAILABLE_ATTR_REMOVED, listener);
+    }
+
+    public void removeAvailableColumnChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(AVAILABLE_ATTR_ADDED, listener);
+        propertyChangeSupport.removePropertyChangeListener(AVAILABLE_ATTR_REMOVED, listener);
+    }
+
     private class PeptideNodeContainer extends Index.ArrayChildren {
 
         @Override
@@ -140,6 +164,10 @@ public class AttributesModel {
                 nodes.add(node);
             }
             return nodes;
+        }
+
+        public void refreshNodes() {
+            refresh();
         }
 
     }

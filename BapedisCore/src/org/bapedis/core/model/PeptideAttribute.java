@@ -52,8 +52,8 @@ public class PeptideAttribute {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof PeptideAttribute){
-           PeptideAttribute column = (PeptideAttribute)obj;
-           return id.equals(column.id);
+           PeptideAttribute attr = (PeptideAttribute)obj;
+           return id.equals(attr.id);
         }
         return false;
     }

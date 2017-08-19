@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.ui;
 
-import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
@@ -106,7 +105,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         NodePopupFactory npf = new NodePopupFactory();
         npf.setShowQuickFilter(false);
         view.setNodePopupFactory(npf);
-        dataPanel.add(view, BorderLayout.CENTER);
+        scrollPane.setViewportView(view);
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         associateLookup(new ProxyLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()),
                 Lookups.singleton(new MetadataNavigatorLookupHint()), Lookups.singleton(new GraphElementNavigatorLookupHint())));
@@ -211,7 +210,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         jValueTextField = new javax.swing.JTextField();
         jAddButton = new javax.swing.JButton();
         centerPanel = new javax.swing.JPanel();
-        dataPanel = new javax.swing.JPanel();
+        scrollPane = new javax.swing.JScrollPane();
 
         setMinimumSize(new java.awt.Dimension(331, 250));
         setPreferredSize(new java.awt.Dimension(514, 152));
@@ -290,9 +289,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         add(topPanel, gridBagConstraints);
 
         centerPanel.setLayout(new java.awt.CardLayout());
-
-        dataPanel.setLayout(new java.awt.BorderLayout());
-        centerPanel.add(dataPanel, "dataCard");
+        centerPanel.add(scrollPane, "dataCard");
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -359,13 +356,12 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         DialogDescriptor dd = new DialogDescriptor(new PeptideAvailableColumnsPanel(currentModel), NbBundle.getMessage(GraphElementAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.title"));
         dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION});
         DialogDisplayer.getDefault().notify(dd);
-        populateVisibleColumns(currentModel);        
+        populateVisibleColumns(currentModel);
     }//GEN-LAST:event_columnsButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
     private javax.swing.JButton columnsButton;
-    private javax.swing.JPanel dataPanel;
     private javax.swing.JButton jAddButton;
     private javax.swing.JComboBox jFieldComboBox;
     private javax.swing.JLabel jLabelFilter;
@@ -373,6 +369,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     private javax.swing.JTextField jValueTextField;
     private javax.swing.JToolBar leftToolBar;
     private javax.swing.JPanel rightPanel;
+    private javax.swing.JScrollPane scrollPane;
     private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
     @Override
@@ -467,14 +464,16 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     private void setData(AttributesModel attrModel) {
         if (currentModel != null) {
             currentModel.removeQuickFilterChangeListener(this);
+            currentModel.removeAvailableColumnChangeListener(this);
         }
-        this.currentModel = attrModel;        
+        this.currentModel = attrModel;
         populateVisibleColumns(attrModel);
         populateFilterFields(attrModel);
         explorerMgr.setRootContext(currentModel == null ? Node.EMPTY : currentModel.getRootNode());
         setQuickFilter();
         if (currentModel != null) {
             currentModel.addQuickFilterChangeListener(this);
+            currentModel.addAvailableColumnChangeListener(this);
         }
     }
 
@@ -494,9 +493,16 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource().equals(currentModel)
-                && evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
-            setQuickFilter();
+        if (evt.getSource().equals(currentModel)) {
+            if (evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
+                setQuickFilter();
+            } else if (evt.getPropertyName().equals(AttributesModel.AVAILABLE_ATTR_ADDED)){
+                PeptideAttribute attr = (PeptideAttribute)evt.getNewValue();
+                jFieldComboBox.addItem(attr);
+            }else if (evt.getPropertyName().equals(AttributesModel.AVAILABLE_ATTR_REMOVED)){
+                PeptideAttribute attr = (PeptideAttribute)evt.getOldValue();
+                jFieldComboBox.removeItem(attr);
+            }
         } else if (evt.getSource() instanceof QueryModel) {
             if (evt.getPropertyName().equals(QueryModel.RUNNING)) {
                 setBusyLabel(((QueryModel) evt.getSource()).isRunning());

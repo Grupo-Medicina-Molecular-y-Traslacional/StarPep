@@ -5,6 +5,8 @@
  */
 package org.bapedis.core.model;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -23,11 +25,15 @@ public class Peptide {
     protected final Node graphNode;
     protected final Graph graph;
     protected HashMap<PeptideAttribute, Object> attrsValue;
+    public final static String DESCRIPTOR_CHANGE = "descriptor_change";
+    protected transient final PropertyChangeSupport propertyChangeSupport;
+    
 
     public Peptide(Node graphNode, Graph graph) {
         this.graphNode = graphNode;
         this.graph = graph;
         attrsValue = new LinkedHashMap<>();
+        propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
     public String getId() {
@@ -44,6 +50,7 @@ public class Peptide {
 
     public void setAttributeValue(PeptideAttribute attr, Object value) {
         attrsValue.put(attr, value);
+        propertyChangeSupport.firePropertyChange(DESCRIPTOR_CHANGE, null, attr);
     }
 
     public Object getAttributeValue(PeptideAttribute attr) {
@@ -86,5 +93,13 @@ public class Peptide {
     public String toString() {
         return getSequence();
     }
+    
+    public void addDescriptorChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(DESCRIPTOR_CHANGE, listener);
+    }
+
+    public void removeDescriptorChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(DESCRIPTOR_CHANGE, listener);
+    }    
 
 }

@@ -97,7 +97,7 @@ public class VizModel {
         limits = VizController.getInstance().getLimits();
         
         GraphModel gm = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel(workspace);
-        textModel.setTextColumns(new Column[]{gm.getNodeTable().getColumn("label")}, new Column[]{gm.getEdgeTable().getColumn("label")});
+        textModel.setTextColumns(new Column[]{gm.getNodeTable().getColumn("name")}, new Column[]{gm.getEdgeTable().getColumn("label")});
     }
     
     public VizModel(boolean defaultModel) {

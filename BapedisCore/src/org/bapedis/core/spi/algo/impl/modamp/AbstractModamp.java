@@ -25,6 +25,7 @@ public abstract class AbstractModamp implements Algorithm {
     boolean stopRun;
     protected final AlgorithmFactory factory;
     protected ProgressTicket progressTicket;
+    protected final String PRO_CATEGORY = "Properties";
 
     public AbstractModamp(AlgorithmFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);

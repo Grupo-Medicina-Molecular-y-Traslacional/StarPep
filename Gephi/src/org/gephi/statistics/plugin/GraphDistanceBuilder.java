@@ -72,7 +72,7 @@ public class GraphDistanceBuilder implements AlgorithmFactory {
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        return new GraphDistancePanel();
+        return null;
     }
 
     @Override

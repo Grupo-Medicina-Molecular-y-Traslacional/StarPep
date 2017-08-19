@@ -6,32 +6,33 @@
 package org.bapedis.core.spi.algo.impl.modamp;
 
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
 
 /**
  *
  * @author loge
  */
-public class BomanIndex extends AbstractModamp {
-
-    protected final String BM = "Boman";
-
-    public BomanIndex(BomanIndexFactory factory) {
+public class AliphaticIndex  extends AbstractModamp{
+    protected String AI= "aI";
+    
+    public AliphaticIndex(AlgorithmFactory factory) {
         super(factory);
     }
 
     @Override
     public void initAlgo() {
         super.initAlgo();
-        if (attrModel != null && !attrModel.hasAttribute(BM)) {
-            attrModel.addAttribute(BM, BM, Double.class);
+        if (attrModel != null && !attrModel.hasAttribute(AI)){
+            attrModel.addAttribute(AI, AI, Double.class);
         }
     }
+    
+    
 
     @Override
     public void compute(Peptide peptide) {
-        double val = MD.boman(peptide.getSequence());
-        peptide.setAttributeValue(attrModel.getAttribute(BM), val);
-
+        double val = MD.aliphaticIndex(peptide.getSequence());
+        peptide.setAttributeValue(attrModel.getAttribute(AI), val);
     }
-
+    
 }

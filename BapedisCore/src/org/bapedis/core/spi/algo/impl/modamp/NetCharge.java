@@ -35,12 +35,11 @@ public class NetCharge extends AbstractModamp {
         populateProperties();
     }
 
-    private void populateProperties() {
-        final String NetCharge_CATEGORY = "NetCharge's properties";
+    private void populateProperties() {        
         try {
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, Z5, NetCharge_CATEGORY, "Net charge at pH=5", "isPh5", "setPh5"));
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, Z7, NetCharge_CATEGORY, "Net charge at pH=7", "isPh7", "setPh7"));
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, Z9, NetCharge_CATEGORY, "Net charge at pH=9", "isPh9", "setPh9"));
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, Z5, PRO_CATEGORY, "Net charge at pH=5", "isPh5", "setPh5"));
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, Z7, PRO_CATEGORY, "Net charge at pH=7", "isPh7", "setPh7"));
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, Z9, PRO_CATEGORY, "Net charge at pH=9", "isPh9", "setPh9"));
         } catch (NoSuchMethodException ex) {
             Exceptions.printStackTrace(ex);
         }

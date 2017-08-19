@@ -456,6 +456,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 }
             }
         }
+        richTooltip = null;
     }
 
     private void setEnableState(boolean enabled) {
@@ -599,7 +600,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             AlgorithmModel algoModel;
             for (Workspace workspace : workspaces) {
                 algoModel = pm.getAlgorithmModel(workspace);
-                if (algoModel.getSelectedAlgorithm().equals(algo)) {
+                if (algoModel.getSelectedAlgorithm() != null && algoModel.getSelectedAlgorithm().equals(algo)) {
                     algoModel.setRunning(false);
                 }
             }

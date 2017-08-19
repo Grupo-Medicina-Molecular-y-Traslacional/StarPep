@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.spi.algo.impl.modamp.scales.PkaValues;
 import org.openide.util.Exceptions;
 
 /**
@@ -20,10 +19,10 @@ public class HydrophobicMoment extends AbstractModamp {
 
     private final List<AlgorithmProperty> properties;
     private boolean angle100, angle160, angle180;
-    private final String uH100 = "uH(angle=100)";
-    private final String uH160 = "uH(angle=160)";
-    private final String uH180 = "uH(angle=180)";
-    private final String AVGH="avgH";
+    private final String uH100 = "\u03BCH(angle=100)";
+    private final String uH160 = "\u03BCH(angle=160)";
+    private final String uH180 = "\u03BCH(angle=180)";
+    private final String AVGH="maxAvgH";
     
     private int window;
 
@@ -38,12 +37,11 @@ public class HydrophobicMoment extends AbstractModamp {
     }
 
     private void populateProperties() {
-        final String CATEGORY = "Hydrophobic Moment's properties";
         try {
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, uH100, CATEGORY, "Angle", "isAngle100", "setAngle100"));
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, uH160, CATEGORY, "Angle", "isAngle160", "setAngle160"));
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, uH180, CATEGORY, "Angle", "isAngle180", "setAngle180"));
-            properties.add(AlgorithmProperty.createProperty(this, Integer.class, "Window", CATEGORY, "Size of windows", "getWindow", "setWindow"));
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, uH100, PRO_CATEGORY, "Angle", "isAngle100", "setAngle100"));
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, uH160, PRO_CATEGORY, "Angle", "isAngle160", "setAngle160"));
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, uH180, PRO_CATEGORY, "Angle", "isAngle180", "setAngle180"));
+            properties.add(AlgorithmProperty.createProperty(this, Integer.class, "Window", PRO_CATEGORY, "Size of windows", "getWindow", "setWindow"));
         } catch (NoSuchMethodException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -118,5 +116,11 @@ public class HydrophobicMoment extends AbstractModamp {
             peptide.setAttributeValue(attrModel.getAttribute(uH180), val);
         }
     }
+    
+    @Override
+    public AlgorithmProperty[] getProperties() {
+        return properties.toArray(new AlgorithmProperty[0]);
+    }
+    
 
 }

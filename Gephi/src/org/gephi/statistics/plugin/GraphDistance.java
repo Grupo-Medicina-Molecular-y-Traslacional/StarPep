@@ -43,6 +43,7 @@ package org.gephi.statistics.plugin;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Stack;
@@ -52,7 +53,9 @@ import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.gephi.graph.api.*;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 /**
  * Ref: Ulrik Brandes, A Faster Algorithm for Betweenness Centrality, in Journal
@@ -67,6 +70,7 @@ public class GraphDistance implements Algorithm {
     public static final String CLOSENESS = "closnesscentrality";
     public static final String HARMONIC_CLOSENESS = "harmonicclosnesscentrality";
     public static final String ECCENTRICITY = "eccentricity";
+    private final List<AlgorithmProperty> properties;
 
     protected GraphModel graphModel;
     protected final GraphDistanceBuilder factory;
@@ -108,7 +112,7 @@ public class GraphDistance implements Algorithm {
      *
      */
     private boolean isCanceled;
-    private boolean isNormalized;
+    private boolean normalizedComp, closenessComp, betweennessComp, eccentricityComp;
 
     /**
      * Gets the average shortest path length in the network
@@ -139,6 +143,24 @@ public class GraphDistance implements Algorithm {
     public GraphDistance(GraphDistanceBuilder factory) {
         this.factory = factory;
         isDirected = false;
+        properties = new LinkedList<>();
+        populateProperties();
+        normalizedComp = true;
+        betweennessComp = true;
+        closenessComp = true;
+        eccentricityComp = true;
+    }
+
+    private void populateProperties() {
+        final String CATEGORY = "Properties";
+        try {
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(GraphDistance.class, "GraphDistance.normalize.name"), CATEGORY, NbBundle.getMessage(GraphDistance.class, "GraphDistance.normalize.desc"), "isNormalizedComp", "setNormalizedComp"));
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(GraphDistance.class, "GraphDistance.betweenness.name"), CATEGORY, NbBundle.getMessage(GraphDistance.class, "GraphDistance.betweenness.desc"), "isBetweennessComp", "setBetweennessComp"));
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(GraphDistance.class, "GraphDistance.closeness.name"), CATEGORY, NbBundle.getMessage(GraphDistance.class, "GraphDistance.closeness.desc"), "isClosenessComp", "setClosenessComp"));
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(GraphDistance.class, "GraphDistance.eccentricity.name"), CATEGORY, NbBundle.getMessage(GraphDistance.class, "GraphDistance.eccentricity.desc"), "isEccentricityComp", "setEccentricityComp"));
+        } catch (NoSuchMethodException ex) {
+            Exceptions.printStackTrace(ex);
+        }
     }
 
     protected Map<String, double[]> calculateDistanceMetrics(Graph graph, HashMap<Node, Integer> indicies, boolean directed, boolean normalized) {
@@ -263,16 +285,16 @@ public class GraphDistance implements Algorithm {
 
     private void initializeAttributeColunms(GraphModel graphModel) {
         Table nodeTable = graphModel.getNodeTable();
-        if (!nodeTable.hasColumn(ECCENTRICITY)) {
+        if (eccentricityComp && !nodeTable.hasColumn(ECCENTRICITY)) {
             nodeTable.addColumn(ECCENTRICITY, "Eccentricity", Double.class, new Double(0));
         }
-        if (!nodeTable.hasColumn(CLOSENESS)) {
+        if (closenessComp && !nodeTable.hasColumn(CLOSENESS)) {
             nodeTable.addColumn(CLOSENESS, "Closeness Centrality", Double.class, new Double(0));
         }
-        if (!nodeTable.hasColumn(HARMONIC_CLOSENESS)) {
+        if (closenessComp && !nodeTable.hasColumn(HARMONIC_CLOSENESS)) {
             nodeTable.addColumn(HARMONIC_CLOSENESS, "Harmonic Closeness Centrality", Double.class, new Double(0));
         }
-        if (!nodeTable.hasColumn(BETWEENNESS)) {
+        if (betweennessComp && !nodeTable.hasColumn(BETWEENNESS)) {
             nodeTable.addColumn(BETWEENNESS, "Betweenness Centrality", Double.class, new Double(0));
         }
     }
@@ -319,7 +341,8 @@ public class GraphDistance implements Algorithm {
             double[] nodeEccentricity, double[] nodeBetweenness, double[] nodeCloseness, double[] nodeHarmonicCloseness) {
         for (Node s : graph.getNodes()) {
             int s_index = indicies.get(s);
-
+            
+            
             s.setAttribute(ECCENTRICITY, nodeEccentricity[s_index]);
             s.setAttribute(CLOSENESS, nodeCloseness[s_index]);
             s.setAttribute(HARMONIC_CLOSENESS, nodeHarmonicCloseness[s_index]);
@@ -327,12 +350,36 @@ public class GraphDistance implements Algorithm {
         }
     }
 
-    public void setNormalized(boolean isNormalized) {
-        this.isNormalized = isNormalized;
+    public boolean isNormalizedComp() {
+        return normalizedComp;
     }
 
-    public boolean isNormalized() {
-        return isNormalized;
+    public void setNormalizedComp(Boolean normalizedComp) {
+        this.normalizedComp = normalizedComp;
+    }
+
+    public boolean isClosenessComp() {
+        return closenessComp;
+    }
+
+    public void setClosenessComp(Boolean closenessComp) {
+        this.closenessComp = closenessComp;
+    }
+
+    public boolean isBetweennessComp() {
+        return betweennessComp;
+    }
+
+    public void setBetweennessComp(Boolean betweennessComp) {
+        this.betweennessComp = betweennessComp;
+    }
+
+    public boolean isEccentricityComp() {
+        return eccentricityComp;
+    }
+
+    public void setEccentricityComp(Boolean eccentricityComp) {
+        this.eccentricityComp = eccentricityComp;
     }
 
     public boolean isDirected() {
@@ -405,7 +452,7 @@ public class GraphDistance implements Algorithm {
 
     @Override
     public AlgorithmProperty[] getProperties() {
-        return null;
+        return properties.toArray(new AlgorithmProperty[0]);
     }
 
     @Override
@@ -414,9 +461,9 @@ public class GraphDistance implements Algorithm {
     }
 
     @Override
-    public void run() {        
+    public void run() {
         Graph graph = graphModel.getGraphVisible();
-        
+
         graph.readLock();
         try {
             N = graph.getNodeCount();
@@ -425,7 +472,7 @@ public class GraphDistance implements Algorithm {
 
             HashMap<Node, Integer> indicies = createIndiciesMap(graph);
 
-            Map<String, double[]> metrics = calculateDistanceMetrics(graph, indicies, isDirected, isNormalized);
+            Map<String, double[]> metrics = calculateDistanceMetrics(graph, indicies, isDirected, normalizedComp);
 
             eccentricity = metrics.get(ECCENTRICITY);
             closeness = metrics.get(CLOSENESS);

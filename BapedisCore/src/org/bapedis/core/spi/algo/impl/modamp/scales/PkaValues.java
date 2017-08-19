@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author beltran
  */
-public class PkaValues1 {
+public class PkaValues {
     
     
     public static Map<String, Double> EMBOSS() {

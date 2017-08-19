@@ -13,7 +13,7 @@ import java.util.Map;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.bapedis.core.spi.algo.impl.modamp.scales.PkaValues1;
+import org.bapedis.core.spi.algo.impl.modamp.scales.PkaValues;
 import org.openide.util.Exceptions;
 
 /**
@@ -93,15 +93,15 @@ public class NetCharge extends AbstractModamp {
     public void compute(Peptide peptide) {
         double val;
         if (ph5) {
-            val = MD.netCharge(peptide.getSequence(), 5, PkaValues1.IPC_peptide());
+            val = MD.netCharge(peptide.getSequence(), 5, PkaValues.IPC_peptide());
             peptide.setAttributeValue(attrModel.getAttribute(Z5), val);
         }
         if (ph7) {
-            val = MD.netCharge(peptide.getSequence(), 7, PkaValues1.IPC_peptide());
+            val = MD.netCharge(peptide.getSequence(), 7, PkaValues.IPC_peptide());
             peptide.setAttributeValue(attrModel.getAttribute(Z7), val);
         }
         if (ph9) {
-            val = MD.netCharge(peptide.getSequence(), 9, PkaValues1.IPC_peptide());
+            val = MD.netCharge(peptide.getSequence(), 9, PkaValues.IPC_peptide());
             peptide.setAttributeValue(attrModel.getAttribute(Z9), val);
         }
     }

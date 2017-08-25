@@ -12,6 +12,7 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.spi.algo.impl.modamp.scales.PkaValues;
 import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -37,9 +38,9 @@ public class NetCharge extends AbstractModamp {
 
     private void populateProperties() {        
         try {
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, Z5, PRO_CATEGORY, "Net charge at pH=5", "isPh5", "setPh5"));
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, Z7, PRO_CATEGORY, "Net charge at pH=7", "isPh7", "setPh7"));
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, Z9, PRO_CATEGORY, "Net charge at pH=9", "isPh9", "setPh9"));
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(NetCharge.class, "NetCharge.z5.name"), PRO_CATEGORY, NbBundle.getMessage(NetCharge.class, "NetCharge.z5.desc"), "isPh5", "setPh5"));
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(NetCharge.class, "NetCharge.z7.name"), PRO_CATEGORY, NbBundle.getMessage(NetCharge.class, "NetCharge.z7.desc"), "isPh7", "setPh7"));
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(NetCharge.class, "NetCharge.z9.name"), PRO_CATEGORY, NbBundle.getMessage(NetCharge.class, "NetCharge.z9.desc"), "isPh9", "setPh9"));
         } catch (NoSuchMethodException ex) {
             Exceptions.printStackTrace(ex);
         }

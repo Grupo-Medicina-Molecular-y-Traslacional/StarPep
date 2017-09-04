@@ -26,7 +26,7 @@ public class HydrophobicMoment extends AbstractModamp {
     private final boolean[] scale;
     private final Map<String, Double>[] scaleVal;
     private final String[][] attrNames;
-    private final String AVGH = "maxAvgH";
+    private final String[] AVGH;
 
     private int window;
 
@@ -37,12 +37,14 @@ public class HydrophobicMoment extends AbstractModamp {
         angle = new boolean[]{true, true, true};
         angleVal = new int[]{100, 160, 180};
 
-        scale = new boolean[]{true, true, true};
+        scale = new boolean[]{false, false, true};
         scaleVal = new Map[]{HydrophobicityScale.kyte_doolittle_hydrov_hash(), HydrophobicityScale.tossi_hydrov_hash(), HydrophobicityScale.eisenberg_hydrov_hash()};
 
         attrNames = new String[][]{{"\u03BCH(angle=100,scale=KYTJ820101)", "\u03BCH(angle=160,scale=KYTJ820101)", "\u03BCH(angle=180,scale=KYTJ820101)"},
         {"\u03BCH(angle=100,scale=Tossi12)", "\u03BCH(angle=160,scale=Tossi12)", "\u03BCH(angle=180,scale=Tossi12)"},
         {"\u03BCH(angle=100,scale=EISD840101)", "\u03BCH(angle=160,scale=EISD840101)", "\u03BCH(angle=180,scale=EISD840101)"}};
+
+        AVGH = new String[]{"maxAvgH(KYTJ820101)", "maxAvgH(Tossi12)", "maxAvgH(EISD840101)"};
         window = 10;
         populateProperties();
     }
@@ -56,8 +58,8 @@ public class HydrophobicMoment extends AbstractModamp {
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(HydrophobicMoment.class, "HydrophobicMoment.scale.KYTJ820101.name"), PRO_CATEGORY, NbBundle.getMessage(HydrophobicMoment.class, "HydrophobicMoment.scale.KYTJ820101.desc"), "isKYTJ820101", "setKYTJ820101"));
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(HydrophobicMoment.class, "HydrophobicMoment.scale.Tossi12.name"), PRO_CATEGORY, NbBundle.getMessage(HydrophobicMoment.class, "HydrophobicMoment.scale.Tossi12.desc"), "isTossi12", "setTossi12"));
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(HydrophobicMoment.class, "HydrophobicMoment.scale.EISD840101.name"), PRO_CATEGORY, NbBundle.getMessage(HydrophobicMoment.class, "HydrophobicMoment.scale.EISD840101.desc"), "isEISD840101", "setEISD840101"));
-                       
-            properties.add(AlgorithmProperty.createProperty(this, Integer.class, "Window", PRO_CATEGORY, "Size of windows", "getWindow", "setWindow"));
+
+            properties.add(AlgorithmProperty.createProperty(this, Integer.class, NbBundle.getMessage(HydrophobicMoment.class, "HydrophobicMoment.window.name"), PRO_CATEGORY, NbBundle.getMessage(HydrophobicMoment.class, "HydrophobicMoment.window.desc"), "getWindow", "setWindow"));
         } catch (NoSuchMethodException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -123,15 +125,15 @@ public class HydrophobicMoment extends AbstractModamp {
     public void initAlgo() {
         super.initAlgo();
         if (attrModel != null) {
-            if (!attrModel.hasAttribute(AVGH)) {
-                attrModel.addAttribute(AVGH, AVGH, Double.class);
-            }
             for (int i = 0; i < scale.length; i++) {
                 if (scale[i]) {
                     for (int j = 0; j < angle.length; j++) {
                         if (angle[j] && !attrModel.hasAttribute(attrNames[i][j])) {
                             attrModel.addAttribute(attrNames[i][j], attrNames[i][j], Double.class);
                         }
+                    }
+                    if (!attrModel.hasAttribute(AVGH[i])) {
+                        attrModel.addAttribute(AVGH[i], AVGH[i], Double.class);
                     }
                 }
             }
@@ -141,16 +143,16 @@ public class HydrophobicMoment extends AbstractModamp {
     @Override
     public void compute(Peptide peptide) {
         double val;
-        val = MD.maxMeanHydrophobicity(peptide.getSequence(), window);
-        peptide.setAttributeValue(attrModel.getAttribute(AVGH), val);
         for (int i = 0; i < scale.length; i++) {
             if (scale[i]) {
                 for (int j = 0; j < angle.length; j++) {
                     if (angle[j]) {
-                        val = MD.hMoment(peptide.getSequence(), angleVal[j], window, scaleVal[j]);
+                        val = MD.hMoment(peptide.getSequence(), angleVal[j], window, scaleVal[i]);
                         peptide.setAttributeValue(attrModel.getAttribute(attrNames[i][j]), val);
                     }
                 }
+                val = MD.maxMeanHydrophobicity(peptide.getSequence(), window, scaleVal[i]);
+                peptide.setAttributeValue(attrModel.getAttribute(AVGH[i]), val);
             }
         }
     }

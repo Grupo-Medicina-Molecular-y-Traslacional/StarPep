@@ -37,7 +37,7 @@ public class InestabilityIndex extends AbstractModamp {
         double val = MD.inestabilityIndex(peptide.getSequence());
         peptide.setAttributeValue(attrModel.getAttribute(II), val);
         
-        int isPS = MD.isProteinStable(peptide.getSequence());
+        int isPS = MD.isProteinStable(val);
         peptide.setAttributeValue(attrModel.getAttribute(PS), isPS);
     }
 

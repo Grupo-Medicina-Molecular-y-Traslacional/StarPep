@@ -21,17 +21,14 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class RAComposition extends AbstractModamp {
+public class RATransition extends AbstractModamp {
 
-    protected boolean hyR, b50, cs, hydT, vw, pol, polz, chrg, ss, sa;
+    protected boolean hydT, vw, pol, polz, chrg, ss, sa;
     private final List<AlgorithmProperty> properties;
     private final List<ReduceAlphabet> alphabets;
 
-    public RAComposition(AlgorithmFactory factory) {
+    public RATransition(AlgorithmFactory factory) {
         super(factory);
-        hyR = true;
-        b50 = true;
-        cs = true;
         hydT = true;
         vw = true;
         pol = true;
@@ -46,9 +43,6 @@ public class RAComposition extends AbstractModamp {
 
     private void populateProperties() {
         try {
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(RAComposition.class, "RAComposition.hyR.name"), PRO_CATEGORY, NbBundle.getMessage(HydrophobicMoment.class, "RAComposition.hyR.desc"), "isHyR", "setHyR"));
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(RAComposition.class, "RAComposition.b50.name"), PRO_CATEGORY, NbBundle.getMessage(HydrophobicMoment.class, "RAComposition.b50.desc"), "isB50", "setB50"));
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(RAComposition.class, "RAComposition.cs.name"), PRO_CATEGORY, NbBundle.getMessage(HydrophobicMoment.class, "RAComposition.cs.desc"), "isCs", "setCs"));
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(RAComposition.class, "RAComposition.hydT.name"), PRO_CATEGORY, NbBundle.getMessage(HydrophobicMoment.class, "RAComposition.hydT.desc"), "isHydT", "setHydT"));
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(RAComposition.class, "RAComposition.vw.name"), PRO_CATEGORY, NbBundle.getMessage(HydrophobicMoment.class, "RAComposition.vw.desc"), "isVw", "setVw"));
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(RAComposition.class, "RAComposition.pol.name"), PRO_CATEGORY, NbBundle.getMessage(HydrophobicMoment.class, "RAComposition.pol.desc"), "isPol", "setPol"));
@@ -59,30 +53,6 @@ public class RAComposition extends AbstractModamp {
         } catch (NoSuchMethodException ex) {
             Exceptions.printStackTrace(ex);
         }
-    }
-
-    public boolean isHyR() {
-        return hyR;
-    }
-
-    public void setHyR(Boolean hyR) {
-        this.hyR = hyR;
-    }
-
-    public boolean isB50() {
-        return b50;
-    }
-
-    public void setB50(Boolean b50) {
-        this.b50 = b50;
-    }
-
-    public boolean isCs() {
-        return cs;
-    }
-
-    public void setCs(Boolean cs) {
-        this.cs = cs;
     }
 
     public boolean isHydT() {
@@ -142,18 +112,14 @@ public class RAComposition extends AbstractModamp {
     }
 
     @Override
+    public AlgorithmProperty[] getProperties() {
+        return properties.toArray(new AlgorithmProperty[0]);
+    }
+
+    @Override
     public void initAlgo() {
         super.initAlgo();
         if (attrModel != null) {
-            if (hyR) {
-                alphabets.add(ReducedAlphabets.ra_hydrop_Rose());
-            }
-            if (b50) {
-                alphabets.add(ReducedAlphabets.ra_Blosum50_Murphy());
-            }
-            if (cs) {
-                alphabets.add(ReducedAlphabets.ra_cSimilarity_chakrabarty());
-            }
             if (hydT) {
                 alphabets.add(ReducedAlphabets.ra_Hydrophobicity_Tomii());
             }
@@ -175,14 +141,17 @@ public class RAComposition extends AbstractModamp {
             if (sa) {
                 alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
             }
-            
-            String key;
+            String key1, key2, newKey;
             for (ReduceAlphabet ra : alphabets) {
-                Iterator<String> it = ra.getCount().keySet().iterator();
-                while (it.hasNext()) {
-                    key = String.format("%s[%s]", ra.getName(), it.next());
-                    if (!attrModel.hasAttribute(key)) {
-                        attrModel.addAttribute(key, key, Double.class);
+                Object[] keys = ra.getCount().keySet().toArray();
+                for (int i = 0; i < keys.length - 1; i++) {
+                    key1 = keys[i].toString();
+                    for (int j = i + 1; j < keys.length; j++) {
+                        key2 = keys[j].toString();
+                        newKey = String.format("%s[%s]", ra.getName(), key1 + "->" + key2);
+                        if (!attrModel.hasAttribute(newKey)) {
+                            attrModel.addAttribute(newKey, newKey, Double.class);
+                        }
                     }
                 }
             }
@@ -191,14 +160,9 @@ public class RAComposition extends AbstractModamp {
     }
 
     @Override
-    public AlgorithmProperty[] getProperties() {
-        return properties.toArray(new AlgorithmProperty[0]);
-    }
-
-    @Override
     public void compute(Peptide peptide) {
         for (ReduceAlphabet ra : alphabets) {
-            Map<String, Double> aminoAcidComposition = MD.compositionReducedAlphabet(peptide.getSequence(), ra);
+            Map<String, Double> aminoAcidComposition = MD.transitionReducedAlphabet(peptide.getSequence(), ra);
             Iterator<String> it = aminoAcidComposition.keySet().iterator();
             double val;
             String attrName, key;

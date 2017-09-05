@@ -21,7 +21,7 @@ public class ReducedAlphabets {
         for (int i = 0; i < ALPHABET.length(); i++) {
             counter.put(ALPHABET.substring(i, i + 1), 0.0);
         }
-        return new ReduceAlphabet(counter);
+        return new ReduceAlphabet("std", counter);
     }
 
     /**
@@ -59,7 +59,7 @@ public class ReducedAlphabets {
         AAH.put("Y", "NQSTY");
         AAH.put("I", "CFLMVWI");
         AAH.put("V", "CFLMVWI");
-        return new ReduceAlphabet(count, AAH);
+        return new ReduceAlphabet("hyR",count, AAH);
     }
 
     /**
@@ -100,7 +100,7 @@ public class ReducedAlphabets {
         AAH.put("Y", "FWY");
         AAH.put("I", "CLVIM");
         AAH.put("V", "CLVIM");
-        return new ReduceAlphabet(reduce_alphabet, AAH);
+        return new ReduceAlphabet("b50",reduce_alphabet, AAH);
     }
 
     /**
@@ -140,7 +140,7 @@ public class ReducedAlphabets {
         AAH.put("Y", "HFYW");
         AAH.put("I", "VIT");
         AAH.put("V", "VIT");
-        return new ReduceAlphabet(reduce_alphabet, AAH);
+        return new ReduceAlphabet("cs",reduce_alphabet, AAH);
     }
 
     /**
@@ -177,7 +177,7 @@ public class ReducedAlphabets {
         AAH.put("Y", "GASTPHY");
         AAH.put("I", "CLVIMFW");
         AAH.put("V", "CLVIMFW");
-        return new ReduceAlphabet(reduce_alphabet, AAH);
+        return new ReduceAlphabet("hydT",reduce_alphabet, AAH);
     }
 
     /**
@@ -215,7 +215,7 @@ public class ReducedAlphabets {
         AAH.put("Y", "MHKFRYW");
         AAH.put("I", "NVEQIL");
         AAH.put("V", "NVEQIL");
-        return new ReduceAlphabet(reduce_alphabet, AAH);
+        return new ReduceAlphabet("vw",reduce_alphabet, AAH);
     }
 
     /**
@@ -251,7 +251,7 @@ public class ReducedAlphabets {
         AAH.put("Y", "LIFWCMVY");
         AAH.put("I", "LIFWCMVY");
         AAH.put("V", "LIFWCMVY");
-        return new ReduceAlphabet(reduce_alphabet, AAH);
+        return new ReduceAlphabet("pol",reduce_alphabet, AAH);
     }
 
     /**
@@ -287,7 +287,7 @@ public class ReducedAlphabets {
         AAH.put("Y", "KMHFRYW");
         AAH.put("I", "CPNVEQIL");
         AAH.put("V", "CPNVEQIL");
-        return new ReduceAlphabet(reduce_alphabet, AAH);
+        return new ReduceAlphabet("polz",reduce_alphabet, AAH);
     }
 
     /**
@@ -323,7 +323,7 @@ public class ReducedAlphabets {
         AAH.put("Y", "ANCQGHILMFPSTWYV");
         AAH.put("I", "ANCQGHILMFPSTWYV");
         AAH.put("V", "ANCQGHILMFPSTWYV");
-        return new ReduceAlphabet(reduce_alphabet, AAH);
+        return new ReduceAlphabet("chrg",reduce_alphabet, AAH);
     }
 
     /**
@@ -359,7 +359,7 @@ public class ReducedAlphabets {
         AAH.put("Y", "VIYCWFT");
         AAH.put("I", "VIYCWFT");
         AAH.put("V", "VIYCWFT");
-        return new ReduceAlphabet(reduce_alphabet, AAH);
+        return new ReduceAlphabet("ss",reduce_alphabet, AAH);
     }
 
     /**
@@ -395,7 +395,7 @@ public class ReducedAlphabets {
         AAH.put("Y", "MPSTHY");
         AAH.put("I", "ALFCGIVW");
         AAH.put("V", "ALFCGIVW");
-        return new ReduceAlphabet(reduce_alphabet, AAH);
+        return new ReduceAlphabet("sa",reduce_alphabet, AAH);
     }
 
     

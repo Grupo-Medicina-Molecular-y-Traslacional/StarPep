@@ -13,15 +13,17 @@ import java.util.Map;
  * @author beltran
  */
 public class ReduceAlphabet {
-    Map<String, Double> count;
-    Map<String, String> rAlphabet;
+    private final String name;
+    private Map<String, Double> count;
+    private Map<String, String> rAlphabet;
 
     
-    public ReduceAlphabet(Map<String,Double>count){
-        this(count, null);
+    public ReduceAlphabet(String name,Map<String,Double>count){
+        this(name, count, null);
     }
     
-    public ReduceAlphabet(Map<String, Double> count, Map<String, String> rAlphabet) {
+    public ReduceAlphabet(String name, Map<String, Double> count, Map<String, String> rAlphabet) {
+        this.name = name;
         this.count = count;
         this.rAlphabet = rAlphabet;
     }
@@ -42,6 +44,9 @@ public class ReduceAlphabet {
             count.replace(key, 0.0);
         }
     }
-    
+
+    public String getName() {
+        return name;
+    }        
     
 }

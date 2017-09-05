@@ -18,6 +18,8 @@ import org.bapedis.core.spi.algo.impl.modamp.scales.ReducedAlphabets;
  */
 public class AAComposition extends AbstractModamp {
 
+    private ReduceAlphabet ra;
+    
     public AAComposition(AlgorithmFactory factory) {
         super(factory);
     }
@@ -26,12 +28,13 @@ public class AAComposition extends AbstractModamp {
     public void initAlgo() {
         super.initAlgo();
         if (attrModel != null) {
-            ReduceAlphabet ra = ReducedAlphabets.stdAminoAcids();
+            ra = ReducedAlphabets.stdAminoAcids();
             Iterator<String> it = ra.getCount().keySet().iterator();
+            String attrName;
             while (it.hasNext()) {
-                String key = it.next();
-                if (!attrModel.hasAttribute(key)) {
-                    attrModel.addAttribute(key, key, Double.class);
+                attrName = String.format("%s[%s]", ra.getName(), it.next());
+                if (!attrModel.hasAttribute(attrName)) {
+                    attrModel.addAttribute(attrName, attrName, Double.class);
                 }
             }
         }
@@ -39,14 +42,22 @@ public class AAComposition extends AbstractModamp {
 
     @Override
     public void compute(Peptide peptide) {
-        Map<String, Double> aminoAcidComposition = MD.compositionReducedAlphabet(peptide.getSequence(), ReducedAlphabets.stdAminoAcids());
+        Map<String, Double> aminoAcidComposition = MD.compositionReducedAlphabet(peptide.getSequence(), ra);
         Iterator<String> it = aminoAcidComposition.keySet().iterator();
         double val;
+        String attrName, key;
         while (it.hasNext()) {
-            String key = it.next();
+            key = it.next();
+            attrName = String.format("%s[%s]", ra.getName(), key);
             val = aminoAcidComposition.get(key);
-            peptide.setAttributeValue(attrModel.getAttribute(key), val);
+            peptide.setAttributeValue(attrModel.getAttribute(attrName), val);
         }
     }
+
+    @Override
+    public void endAlgo() {
+        super.endAlgo(); 
+        ra = null;
+    }        
 
 }

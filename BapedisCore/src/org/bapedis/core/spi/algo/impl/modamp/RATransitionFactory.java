@@ -17,7 +17,7 @@ import org.openide.util.lookup.ServiceProvider;
  * @author loge
  */
 @ServiceProvider(service = AlgorithmFactory.class)
-public class RACompositionFactory implements AlgorithmFactory {
+public class RATransitionFactory implements AlgorithmFactory {
 
     @Override
     public AlgorithmCategory getCategory() {
@@ -26,12 +26,12 @@ public class RACompositionFactory implements AlgorithmFactory {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(RACompositionFactory.class, "RAComposition.name");
+        return NbBundle.getMessage(RATransitionFactory.class, "RATransition.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(RACompositionFactory.class, "RAComposition.desc");
+       return NbBundle.getMessage(RATransitionFactory.class, "RATransition.desc");
     }
 
     @Override
@@ -41,7 +41,7 @@ public class RACompositionFactory implements AlgorithmFactory {
 
     @Override
     public Algorithm createAlgorithm() {
-        return new RAComposition(this);
+        return new RATransition(this);
     }
 
     @Override

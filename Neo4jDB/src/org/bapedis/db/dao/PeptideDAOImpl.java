@@ -81,14 +81,14 @@ public class PeptideDAOImpl implements PeptideDAO {
         }
         metadataTraversal = td.uniqueness(Uniqueness.NODE_GLOBAL)
                 .breadthFirst()
-                .evaluator(Evaluators.excludeStartPosition())
-                .evaluator(new Evaluator() {
-                    @Override
-                    public Evaluation evaluate(Path path) {
-                        boolean isMetadata = !path.endNode().hasLabel(MyLabel.Peptide);
-                        return isMetadata ? Evaluation.INCLUDE_AND_CONTINUE : Evaluation.EXCLUDE_AND_CONTINUE;
-                    }
-                });
+                .evaluator(Evaluators.excludeStartPosition());
+//                .evaluator(new Evaluator() {
+//                    @Override
+//                    public Evaluation evaluate(Path path) {
+//                        boolean isMetadata = !path.endNode().hasLabel(MyLabel.Peptide);
+//                        return isMetadata ? Evaluation.INCLUDE_AND_CONTINUE : Evaluation.EXCLUDE_AND_CONTINUE;
+//                    }
+//                });
     }
 
     @Override

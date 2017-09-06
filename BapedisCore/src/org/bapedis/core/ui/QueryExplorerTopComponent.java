@@ -8,6 +8,7 @@ package org.bapedis.core.ui;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.concurrent.ExecutionException;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingWorker;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
@@ -81,8 +82,9 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
 
         applyCheckBox.setSelected(NbPreferences.forModule(QueryModel.class).getBoolean(AUTO_APPLY, true));
 
+        DefaultComboBoxModel comboModel = (DefaultComboBoxModel)restrictiveComboBox.getModel();
         for (RestrictionLevel restriction : RestrictionLevel.values()) {
-            restrictiveComboBox.addItem(restriction);
+            comboModel.addElement(restriction);
         }
     }
 
@@ -99,6 +101,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         runButton = new javax.swing.JButton();
         scrollPane = new javax.swing.JScrollPane();
         restrictiveComboBox = new javax.swing.JComboBox();
+        emptyLabel = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -111,6 +114,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 2, 0);
         add(applyCheckBox, gridBagConstraints);
@@ -124,7 +128,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
@@ -134,13 +138,15 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(scrollPane, gridBagConstraints);
 
+        restrictiveComboBox.setMinimumSize(new java.awt.Dimension(150, 27));
+        restrictiveComboBox.setPreferredSize(new java.awt.Dimension(150, 27));
         restrictiveComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 restrictiveComboBoxActionPerformed(evt);
@@ -151,9 +157,18 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 5;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(restrictiveComboBox, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(emptyLabel, org.openide.util.NbBundle.getMessage(QueryExplorerTopComponent.class, "QueryExplorerTopComponent.emptyLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        add(emptyLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
@@ -174,6 +189,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox applyCheckBox;
+    private javax.swing.JLabel emptyLabel;
     private javax.swing.JComboBox restrictiveComboBox;
     private javax.swing.JButton runButton;
     private javax.swing.JScrollPane scrollPane;
@@ -223,6 +239,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
             switch (evt.getPropertyName()) {
                 case QueryModel.ADDED_METADATA:
                 case QueryModel.REMOVED_METADATA:
+                case QueryModel.CHANGED_RESTRICTION:
                     if (applyCheckBox.isSelected()) {
                         runQuery();
                     }

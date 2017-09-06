@@ -20,6 +20,7 @@ public class QueryModel {
 
     public static final String ADDED_METADATA = "ADDED_METADATA";
     public static final String REMOVED_METADATA = "REMOVED_METADATA";
+    public static final String CHANGED_RESTRICTION = "RESTRICTION";
     protected transient final PropertyChangeSupport propertyChangeSupport;
     protected final Node rootContext;
     private final List<Metadata> metadatas;
@@ -40,7 +41,9 @@ public class QueryModel {
     }
 
     public void setRestriction(RestrictionLevel restriction) {
+        RestrictionLevel old = this.restriction;
         this.restriction = restriction;
+        propertyChangeSupport.firePropertyChange(CHANGED_RESTRICTION, old, restriction);
     }        
 
     public Metadata[] getMetadatas() {

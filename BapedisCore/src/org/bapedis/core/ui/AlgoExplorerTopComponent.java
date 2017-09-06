@@ -43,6 +43,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.bapedis.core.events.WorkspaceEventListener;
+import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.model.AlgorithmModel;
 import org.bapedis.core.model.AlgorithmNode;
 import org.bapedis.core.model.AlgorithmProperty;
@@ -86,7 +87,7 @@ import org.w3c.dom.NodeList;
 )
 @TopComponent.Registration(mode = "explorer", openAtStartup = false, position = 533)
 @ActionID(category = "Window", id = "org.bapedis.core.ui.AlgoExplorerTopComponent")
-@ActionReference(path = "Menu/Window" , position = 533)
+//@ActionReference(path = "Menu/Window" , position = 533)
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_AlgoExplorerAction",
         preferredID = "AlgoExplorerTopComponent"
@@ -142,8 +143,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(algoComboBox, gridBagConstraints);
 
@@ -160,7 +160,9 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(infoLabel, gridBagConstraints);
 
@@ -386,21 +388,25 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
+        AlgorithmCategory oldAlgoCategory = null;
         if (oldWs != null) {
-            AlgorithmModel oldModel = pc.getAlgorithmModel();
+            AlgorithmModel oldModel = pc.getAlgorithmModel(oldWs);
             oldModel.removePropertyChangeListener(this);
+            oldAlgoCategory = oldModel.getCategory();
         }
         AlgorithmModel algoModel = pc.getAlgorithmModel(newWs);
-        algoModel.addPropertyChangeListener(this);
+        if (algoModel.getCategory() == null){
+            algoModel.setCategory(oldAlgoCategory != null? oldAlgoCategory: AlgorithmCategory.GraphLayout);
+        }
         refreshAlgChooser(algoModel);
         refreshProperties(algoModel);
         refreshRunning(algoModel.isRunning());
+        algoModel.addPropertyChangeListener(this);
     }
 
     private void refreshAlgChooser(AlgorithmModel algoModel) {
         DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
-        String NO_SELECTION = algoModel.getCategory() != null ? NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text", algoModel.getCategory().getDisplayName())
-                : NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text.default");
+        String NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text", algoModel.getCategory().getDisplayName());
         comboBoxModel.addElement(NO_SELECTION);
         comboBoxModel.setSelectedItem(NO_SELECTION);
 

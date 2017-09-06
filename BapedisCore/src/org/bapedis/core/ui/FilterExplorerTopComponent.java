@@ -13,6 +13,7 @@ import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.List;
 import javax.swing.Action;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JPopupMenu;
 import org.bapedis.core.services.ProjectManager;
@@ -81,8 +82,9 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));
         pc = Lookup.getDefault().lookup(ProjectManager.class);
 
+        DefaultComboBoxModel comboModel = (DefaultComboBoxModel)restrictiveComboBox.getModel();
         for (RestrictionLevel restriction : RestrictionLevel.values()) {
-            restrictiveComboBox.addItem(restriction);
+            comboModel.addElement(restriction);
         }
 
         filterToolBar1.add(createAddFilterButton());
@@ -150,12 +152,14 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 2, 0);
         add(applyCheckBox, gridBagConstraints);
 
+        restrictiveComboBox.setMinimumSize(new java.awt.Dimension(150, 27));
+        restrictiveComboBox.setPreferredSize(new java.awt.Dimension(150, 27));
         restrictiveComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 restrictiveComboBoxActionPerformed(evt);
@@ -166,7 +170,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 5;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(restrictiveComboBox, gridBagConstraints);
 
@@ -179,12 +183,16 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
         add(filterToolBar1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void restrictiveComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restrictiveComboBoxActionPerformed
         FilterModel filterModel = pc.getFilterModel();
-        filterModel.setRestriction((RestrictionLevel) restrictiveComboBox.getSelectedItem());
+        RestrictionLevel restriction = (RestrictionLevel) restrictiveComboBox.getSelectedItem();
+        if (filterModel.getRestriction() != restriction) {
+            filterModel.setRestriction(restriction);
+        }        
     }//GEN-LAST:event_restrictiveComboBoxActionPerformed
 
     private void applyCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyCheckBoxActionPerformed

@@ -9,7 +9,7 @@ import org.neo4j.graphdb.Label;
 
 /**
  *
- * @author cicese
+ * @author loge
  */
 public enum MyLabel implements Label {
     Peptide,

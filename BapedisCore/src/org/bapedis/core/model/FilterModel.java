@@ -34,27 +34,6 @@ public class FilterModel {
     protected RestrictionLevel restriction;
     protected Node rootContext;
 
-    public enum RestrictionLevel {
-
-        MATCH_ALL {
-
-            @Override
-            public String toString() {
-                return NbBundle.getMessage(FilterModel.class, "FilterModel.restrictiveMode.matchAll");
-            }
-
-        },
-        MATCH_ANY {
-
-            @Override
-            public String toString() {
-                return NbBundle.getMessage(FilterModel.class, "FilterModel.restrictiveMode.matchAny");
-            }
-
-        };
-
-    }
-
     public FilterModel() {
         restriction = RestrictionLevel.MATCH_ALL;
         filters = new LinkedList<>();

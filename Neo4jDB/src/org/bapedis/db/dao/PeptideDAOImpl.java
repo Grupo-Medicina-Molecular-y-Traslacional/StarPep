@@ -14,6 +14,7 @@ import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.spi.data.PeptideDAO;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.RestrictionLevel;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.db.Neo4jDB;
 import org.bapedis.db.model.MyLabel;
@@ -57,10 +58,37 @@ public class PeptideDAOImpl implements PeptideDAO {
     private final float GRAPH_NODE_SIZE = 10f;
     private final float GRAPH_EDGE_WEIGHT = 1f;
     private final Color color = new Color(0.6f, 0.6f, 0.6f);
+    private final TraversalDescription peptideTraversal, metadataTraversal;
 
     public PeptideDAOImpl() {
         graphDb = Neo4jDB.getDbService();
         pm = Lookup.getDefault().lookup(ProjectManager.class);
+
+        TraversalDescription td;
+        // Peptide traversal from metadata
+        td = graphDb.traversalDescription();
+        for (MyRelationship edge : MyRelationship.values()) {
+            td = td.relationships(edge, Direction.INCOMING);
+        }
+        peptideTraversal = td.uniqueness(Uniqueness.NODE_GLOBAL)
+                .breadthFirst()
+                .evaluator(Evaluators.excludeStartPosition());
+
+        // Metadata traversal from peptide node
+        td = graphDb.traversalDescription().breadthFirst();
+        for (MyRelationship edge : MyRelationship.values()) {
+            td = td.relationships(edge, Direction.OUTGOING);
+        }
+        metadataTraversal = td.uniqueness(Uniqueness.NODE_GLOBAL)
+                .breadthFirst()
+                .evaluator(Evaluators.excludeStartPosition())
+                .evaluator(new Evaluator() {
+                    @Override
+                    public Evaluation evaluate(Path path) {
+                        boolean isMetadata = !path.endNode().hasLabel(MyLabel.Peptide);
+                        return isMetadata ? Evaluation.INCLUDE_AND_CONTINUE : Evaluation.EXCLUDE_AND_CONTINUE;
+                    }
+                });
     }
 
     @Override
@@ -74,11 +102,11 @@ public class PeptideDAOImpl implements PeptideDAO {
             // Get peptides
             ResourceIterator<Node> peptideNodes;
             if (queryModel.countElements() > 0) {
-                List<Node> startNodes = new LinkedList<>();
+                List<Node> metadataNodes = new LinkedList<>();
                 for (Metadata metadata : queryModel.getMetadatas()) {
-                    startNodes.add(graphDb.getNodeById(Long.valueOf(metadata.getUnderlyingNodeID())));
+                    metadataNodes.add(graphDb.getNodeById(Long.valueOf(metadata.getUnderlyingNodeID())));
                 }
-                peptideNodes = getPeptides(startNodes);
+                peptideNodes = getPeptides(metadataNodes, queryModel.getRestriction());
             } else {
                 peptideNodes = getPeptides();
             }
@@ -133,6 +161,7 @@ public class PeptideDAOImpl implements PeptideDAO {
                 if (gView != null) {
                     graphModel.setVisibleView(gView);
                 }
+                //Write unlock
                 graphModel.getGraph().writeUnlock();
                 peptideNodes.close();
                 tx.success();
@@ -145,38 +174,54 @@ public class PeptideDAOImpl implements PeptideDAO {
         return graphDb.findNodes(MyLabel.Peptide);
     }
 
-    protected ResourceIterator<Node> getPeptides(List<Node> startNodes) {
-        TraversalDescription td = graphDb.traversalDescription().breadthFirst();
-        for (MyRelationship edge : MyRelationship.values()) {
-            td = td.relationships(edge, Direction.INCOMING);
+    protected ResourceIterator<Node> getPeptides(final List<Node> metadataNodes, RestrictionLevel restriction) {
+        Evaluator restrictiveEvaluator = null;
+
+        if (restriction == RestrictionLevel.MATCH_ANY) {
+            restrictiveEvaluator = new Evaluator() {
+                @Override
+                public Evaluation evaluate(Path path) {
+                    boolean accepted = path.endNode().hasLabel(MyLabel.Peptide);
+                    return accepted ? Evaluation.INCLUDE_AND_PRUNE : Evaluation.EXCLUDE_AND_CONTINUE;
+                }
+            };
+        } else if (restriction == RestrictionLevel.MATCH_ALL) {
+            final Node[] endNodes = metadataNodes.toArray(new Node[0]);
+            restrictiveEvaluator = new Evaluator() {
+                @Override
+                public Evaluation evaluate(Path path) {
+                    if (path.endNode().hasLabel(MyLabel.Peptide)) {
+                        LinkedList<Node> metadataList = new LinkedList<>();
+                        try (ResourceIterator<Node> nodes = getMetadata(path.endNode(), endNodes)) {
+                            while (nodes.hasNext()) {
+                                metadataList.add(nodes.next());
+                            }
+                        }
+                        boolean accepted = metadataList.containsAll(metadataNodes);
+                        return accepted ? Evaluation.INCLUDE_AND_PRUNE : Evaluation.EXCLUDE_AND_PRUNE;
+                    }
+                    return Evaluation.EXCLUDE_AND_CONTINUE;
+                }
+            };
         }
 
-        ResourceIterator<Node> nodes = td.evaluator(new Evaluator() {
-
-            @Override
-            public Evaluation evaluate(Path path) {
-                boolean accepted = path.endNode().hasLabel(MyLabel.Peptide);
-                return accepted ? Evaluation.INCLUDE_AND_PRUNE : Evaluation.EXCLUDE_AND_CONTINUE;
-            }
-        })
-                .uniqueness(Uniqueness.NODE_GLOBAL)
-                .traverse(startNodes)
+        ResourceIterator<Node> nodes = peptideTraversal.evaluator(restrictiveEvaluator)
+                .traverse(metadataNodes)
                 .nodes()
                 .iterator();
+
         return nodes;
     }
 
-//    private Iterable<Node> getNeighbors(Node startNode) {
-//        Iterable<Node> nodes = graphDb.traversalDescription()
-//                .breadthFirst()
-//                .evaluator(Evaluators.atDepth(1))
-//                .evaluator(Evaluators.excludeStartPosition())
-//                .uniqueness(Uniqueness.NODE_GLOBAL)
-//                .traverse(startNode)
-//                .nodes();
-//
-//        return nodes;
-//    }
+    private ResourceIterator<Node> getMetadata(Node peptideNode, Node[] metadataNodes) {
+        ResourceIterator<Node> nodes = metadataTraversal.evaluator(Evaluators.pruneWhereEndNodeIs(metadataNodes))
+                .traverse(peptideNode)
+                .nodes()
+                .iterator();
+
+        return nodes;
+    }
+
     protected Iterable<Relationship> getRelationships(Node startNode) {
         Iterable<Relationship> edges = graphDb.traversalDescription()
                 .breadthFirst()

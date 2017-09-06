@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.ui;
 
-import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.concurrent.ExecutionException;
@@ -16,6 +15,7 @@ import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.model.QueryModel;
+import org.bapedis.core.model.RestrictionLevel;
 import org.bapedis.core.spi.data.PeptideDAO;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
@@ -48,7 +48,7 @@ import org.openide.util.lookup.ProxyLookup;
 )
 @TopComponent.Registration(mode = "explorer", openAtStartup = true, position = 333)
 @ActionID(category = "Window", id = "org.bapedis.db.ui.QueryExplorerTopComponent")
-@ActionReference(path = "Menu/Window" , position = 333 )
+@ActionReference(path = "Menu/Window", position = 333)
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_QueryExplorerAction",
         preferredID = "QueryExplorerTopComponent"
@@ -80,6 +80,10 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
                 Lookups.singleton(new MetadataNavigatorLookupHint()), Lookups.singleton(new GraphElementNavigatorLookupHint())));
 
         applyCheckBox.setSelected(NbPreferences.forModule(QueryModel.class).getBoolean(AUTO_APPLY, true));
+
+        for (RestrictionLevel restriction : RestrictionLevel.values()) {
+            restrictiveComboBox.addItem(restriction);
+        }
     }
 
     /**
@@ -94,6 +98,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         applyCheckBox = new javax.swing.JCheckBox();
         runButton = new javax.swing.JButton();
         scrollPane = new javax.swing.JScrollPane();
+        restrictiveComboBox = new javax.swing.JComboBox();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -119,7 +124,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
@@ -129,11 +134,26 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(scrollPane, gridBagConstraints);
+
+        restrictiveComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                restrictiveComboBoxActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipady = 5;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
+        add(restrictiveComboBox, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
@@ -144,8 +164,17 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         NbPreferences.forModule(QueryModel.class).putBoolean(AUTO_APPLY, applyCheckBox.isSelected());
     }//GEN-LAST:event_applyCheckBoxActionPerformed
 
+    private void restrictiveComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restrictiveComboBoxActionPerformed
+        QueryModel queryModel = pc.getQueryModel();
+        RestrictionLevel restriction = (RestrictionLevel) restrictiveComboBox.getSelectedItem();
+        if (queryModel.getRestriction() != restriction) {
+            queryModel.setRestriction(restriction);
+        }
+    }//GEN-LAST:event_restrictiveComboBoxActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox applyCheckBox;
+    private javax.swing.JComboBox restrictiveComboBox;
     private javax.swing.JButton runButton;
     private javax.swing.JScrollPane scrollPane;
     // End of variables declaration//GEN-END:variables
@@ -183,18 +212,23 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         }
         QueryModel newModel = pc.getQueryModel(newWs);
         newModel.addPropertyChangeListener(this);
+        restrictiveComboBox.setSelectedItem(newModel.getRestriction());
         explorerMgr.setRootContext(newModel.getRootContext());
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof QueryModel) {
+            QueryModel queryModel = (QueryModel)evt.getSource();
             switch (evt.getPropertyName()) {
                 case QueryModel.ADDED_METADATA:
                 case QueryModel.REMOVED_METADATA:
                     if (applyCheckBox.isSelected()) {
                         runQuery();
                     }
+                    break;
+                case QueryModel.RUNNING:
+                    refreshRunningState(queryModel.isRunning());
             }
         }
     }
@@ -214,7 +248,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
                     oldView = graphModel.getVisibleView();
                     AttributesModel model = dao.getPeptides(queryModel, graphModel);
                     Graph graph = graphModel.getGraphVisible();
-                    for(Metadata metadata: queryModel.getMetadatas()){
+                    for (Metadata metadata : queryModel.getMetadatas()) {
                         metadata.setGraphNode(graph.getNode(metadata.getUnderlyingNodeID()));
                     }
                     return model;
@@ -246,6 +280,9 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         }
     }
 
+    private void refreshRunningState(boolean running){
+        restrictiveComboBox.setEnabled(!running);
+    }
     @Override
     public ExplorerManager getExplorerManager() {
         return explorerMgr;

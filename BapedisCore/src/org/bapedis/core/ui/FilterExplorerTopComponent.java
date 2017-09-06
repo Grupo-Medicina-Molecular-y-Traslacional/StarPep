@@ -11,41 +11,29 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeSet;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingWorker;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.model.FilterModel;
-import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideNode;
-import org.bapedis.core.spi.filters.Filter;
+import org.bapedis.core.model.RestrictionLevel;
 import org.bapedis.core.task.FilterWorker;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.core.ui.actions.AddFilter;
-import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
-import org.gephi.graph.api.Subgraph;
 import org.netbeans.api.settings.ConvertAsProperties;
-import org.netbeans.swing.etable.QuickFilter;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.DropDownButtonFactory;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
 import org.openide.explorer.view.ListView;
-import org.openide.util.Cancellable;
-import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -93,7 +81,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));
         pc = Lookup.getDefault().lookup(ProjectManager.class);
 
-        for (FilterModel.RestrictionLevel restriction : FilterModel.RestrictionLevel.values()) {
+        for (RestrictionLevel restriction : RestrictionLevel.values()) {
             restrictiveComboBox.addItem(restriction);
         }
 
@@ -196,7 +184,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 
     private void restrictiveComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restrictiveComboBoxActionPerformed
         FilterModel filterModel = pc.getFilterModel();
-        filterModel.setRestriction((FilterModel.RestrictionLevel) restrictiveComboBox.getSelectedItem());
+        filterModel.setRestriction((RestrictionLevel) restrictiveComboBox.getSelectedItem());
     }//GEN-LAST:event_restrictiveComboBoxActionPerformed
 
     private void applyCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyCheckBoxActionPerformed

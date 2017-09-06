@@ -25,13 +25,23 @@ public class QueryModel {
     private final List<Metadata> metadatas;
     public static final String RUNNING = "RUNNING";
     protected final AtomicBoolean running;
+    protected RestrictionLevel restriction;
 
     public QueryModel() {
         propertyChangeSupport = new PropertyChangeSupport(this);
         rootContext = new QueryNode(this);
         metadatas = new LinkedList<>();
         running = new AtomicBoolean(false);
+        restriction = RestrictionLevel.MATCH_ALL;
     }
+
+    public RestrictionLevel getRestriction() {
+        return restriction;
+    }
+
+    public void setRestriction(RestrictionLevel restriction) {
+        this.restriction = restriction;
+    }        
 
     public Metadata[] getMetadatas() {
         return metadatas.toArray(new Metadata[0]);

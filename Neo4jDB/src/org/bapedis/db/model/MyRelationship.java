@@ -9,7 +9,7 @@ import org.neo4j.graphdb.RelationshipType;
 
 /**
  *
- * @author cicese
+ * @author loge
  */
 public enum MyRelationship implements RelationshipType {
     is_a, 

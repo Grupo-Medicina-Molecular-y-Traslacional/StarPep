@@ -182,7 +182,7 @@ public class DipeptideComposition extends AbstractModamp {
                 String attrName;
                 for (String key1 : keySet) {
                     for (String key2 : keySet) {
-                        attrName = String.format("[%s][%s]", key1, key2);
+                        attrName = String.format("%s([%s][%s])", ra.getName(),key1, key2);
                         if (!attrModel.hasAttribute(attrName)) {
                             attrModel.addAttribute(attrName, attrName, Double.class);
                         }
@@ -195,6 +195,7 @@ public class DipeptideComposition extends AbstractModamp {
 
     @Override
     public void compute(Peptide peptide) {
+        String attrName;
         for (ReduceAlphabet ra : alphabets) {
             Map<String, Double> aminoAcidComposition = MD.dipeptideComposition(peptide.getSequence(), ra);
             Iterator<String> it = aminoAcidComposition.keySet().iterator();
@@ -202,8 +203,9 @@ public class DipeptideComposition extends AbstractModamp {
             double val;
             while (it.hasNext()) {
                 key = it.next();
+                attrName = String.format("%s(%s)", ra.getName(),key);
                 val = aminoAcidComposition.get(key);
-                peptide.setAttributeValue(attrModel.getAttribute(key), val);
+                peptide.setAttributeValue(attrModel.getAttribute(attrName), val);
             }
         }
     }
@@ -213,5 +215,10 @@ public class DipeptideComposition extends AbstractModamp {
         super.endAlgo();
         alphabets.clear();
     }
+    
+    @Override
+    public AlgorithmProperty[] getProperties() {
+        return properties.toArray(new AlgorithmProperty[0]);
+    }     
 
 }

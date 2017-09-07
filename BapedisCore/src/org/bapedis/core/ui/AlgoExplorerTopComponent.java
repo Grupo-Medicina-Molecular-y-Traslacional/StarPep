@@ -58,7 +58,6 @@ import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
 import org.openide.awt.StatusDisplayer;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
@@ -144,6 +143,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(algoComboBox, gridBagConstraints);
 
@@ -158,12 +158,10 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
         add(infoLabel, gridBagConstraints);
 
         runButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/run.gif"))); // NOI18N
@@ -174,10 +172,10 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(runButton, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -395,18 +393,25 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             oldAlgoCategory = oldModel.getCategory();
         }
         AlgorithmModel algoModel = pc.getAlgorithmModel(newWs);
-        if (algoModel.getCategory() == null){
-            algoModel.setCategory(oldAlgoCategory != null? oldAlgoCategory: AlgorithmCategory.GraphLayout);
+        if (algoModel.getCategory() == null) {
+            if (oldAlgoCategory != null) {
+                algoModel.setCategory(oldAlgoCategory);
+            } else {
+                close();
+            }
         }
-        refreshAlgChooser(algoModel);
-        refreshProperties(algoModel);
-        refreshRunning(algoModel.isRunning());
-        algoModel.addPropertyChangeListener(this);
+        if (algoModel.getCategory() != null) {            
+            refreshAlgChooser(algoModel);
+            refreshProperties(algoModel);
+            refreshRunning(algoModel.isRunning());
+            algoModel.addPropertyChangeListener(this);
+        }
     }
 
     private void refreshAlgChooser(AlgorithmModel algoModel) {
+        setDisplayName(algoModel.getCategory().getDisplayName());
         DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
-        String NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text", algoModel.getCategory().getDisplayName());
+        String NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text");
         comboBoxModel.addElement(NO_SELECTION);
         comboBoxModel.setSelectedItem(NO_SELECTION);
 

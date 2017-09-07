@@ -26,6 +26,7 @@ import org.bapedis.core.model.RestrictionLevel;
 import org.bapedis.core.task.FilterWorker;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.core.ui.actions.AddFilter;
+import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -42,6 +43,7 @@ import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
 import org.openide.util.Utilities;
+import static org.bapedis.core.ui.Bundle.*;
 
 /**
  * Top component which displays something.
@@ -55,9 +57,9 @@ import org.openide.util.Utilities;
         //iconBase="SET/PATH/TO/ICON/HERE", 
         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
-@TopComponent.Registration(mode = "explorer", openAtStartup = false, position = 433)
+@TopComponent.Registration(mode = "explorer", openAtStartup = true, position = 433)
 @ActionID(category = "Window", id = "org.bapedis.core.ui.FilterExplorerTopComponent")
-@ActionReference(path = "Menu/Window" , position = 433 )
+@ActionReference(path = "Menu/Window", position = 433)
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_FilterExplorerAction",
         preferredID = "FilterExplorerTopComponent"
@@ -72,6 +74,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     protected final ExplorerManager explorerMgr;
     protected final ProjectManager pc;
     private static final String AUTO_APPLY = "AUTO_APPLY";
+    private final RichTooltip richTooltip;
 
     public FilterExplorerTopComponent() {
         initComponents();
@@ -82,7 +85,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         associateLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()));
         pc = Lookup.getDefault().lookup(ProjectManager.class);
 
-        DefaultComboBoxModel comboModel = (DefaultComboBoxModel)restrictiveComboBox.getModel();
+        DefaultComboBoxModel comboModel = (DefaultComboBoxModel) restrictiveComboBox.getModel();
         for (RestrictionLevel restriction : RestrictionLevel.values()) {
             comboModel.addElement(restriction);
         }
@@ -95,6 +98,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         viewerScrollPane.setViewportView(new ListView());
 
         applyCheckBox.setSelected(NbPreferences.forModule(FilterModel.class).getBoolean(AUTO_APPLY, true));
+        richTooltip = new RichTooltip(Bundle.CTL_FilterExplorerTopComponent(), Bundle.HINT_FilterExplorerTopComponent());
     }
 
     /**
@@ -112,6 +116,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         restrictiveComboBox = new javax.swing.JComboBox();
         filterToolBar1 = new javax.swing.JToolBar();
         jSeparator1 = new javax.swing.JToolBar.Separator();
+        infoLabel = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -120,7 +125,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -140,7 +145,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(runButton, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(applyCheckBox, org.openide.util.NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.applyCheckBox.text")); // NOI18N
@@ -185,6 +190,23 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         add(filterToolBar1, gridBagConstraints);
+
+        infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(infoLabel, org.openide.util.NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.infoLabel.text")); // NOI18N
+        infoLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                infoLabelMouseExited(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                infoLabelMouseEntered(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
+        add(infoLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void restrictiveComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restrictiveComboBoxActionPerformed
@@ -192,7 +214,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         RestrictionLevel restriction = (RestrictionLevel) restrictiveComboBox.getSelectedItem();
         if (filterModel.getRestriction() != restriction) {
             filterModel.setRestriction(restriction);
-        }        
+        }
     }//GEN-LAST:event_restrictiveComboBoxActionPerformed
 
     private void applyCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyCheckBoxActionPerformed
@@ -208,9 +230,18 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         }
     }//GEN-LAST:event_runButtonActionPerformed
 
+    private void infoLabelMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_infoLabelMouseExited
+        richTooltip.hideTooltip();
+    }//GEN-LAST:event_infoLabelMouseExited
+
+    private void infoLabelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_infoLabelMouseEntered
+        richTooltip.showTooltip(infoLabel, evt.getLocationOnScreen());
+    }//GEN-LAST:event_infoLabelMouseEntered
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox applyCheckBox;
     private javax.swing.JToolBar filterToolBar1;
+    private javax.swing.JLabel infoLabel;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JComboBox restrictiveComboBox;
     private javax.swing.JButton runButton;

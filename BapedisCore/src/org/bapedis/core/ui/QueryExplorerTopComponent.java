@@ -18,6 +18,7 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.RestrictionLevel;
 import org.bapedis.core.spi.data.PeptideDAO;
+import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
@@ -64,6 +65,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
     protected final ProjectManager pc;
     protected final ExplorerManager explorerMgr;
     private static final String AUTO_APPLY = "AUTO_APPLY";
+    private final RichTooltip richTooltip;
 
     public QueryExplorerTopComponent() {
         initComponents();
@@ -86,6 +88,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         for (RestrictionLevel restriction : RestrictionLevel.values()) {
             comboModel.addElement(restriction);
         }
+        richTooltip = new RichTooltip(Bundle.CTL_QueryExplorerTopComponent(), Bundle.HINT_QueryExplorerTopComponent());
     }
 
     /**
@@ -101,7 +104,8 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         runButton = new javax.swing.JButton();
         scrollPane = new javax.swing.JScrollPane();
         restrictiveComboBox = new javax.swing.JComboBox();
-        emptyLabel = new javax.swing.JLabel();
+        infoLabel = new javax.swing.JLabel();
+        queryToolBar = new javax.swing.JToolBar();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -131,14 +135,14 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(runButton, gridBagConstraints);
 
         scrollPane.setBorder(null);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -161,14 +165,31 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(restrictiveComboBox, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(emptyLabel, org.openide.util.NbBundle.getMessage(QueryExplorerTopComponent.class, "QueryExplorerTopComponent.emptyLabel.text")); // NOI18N
+        infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(infoLabel, org.openide.util.NbBundle.getMessage(QueryExplorerTopComponent.class, "QueryExplorerTopComponent.infoLabel.text")); // NOI18N
+        infoLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                infoLabelMouseExited(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                infoLabelMouseEntered(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
+        add(infoLabel, gridBagConstraints);
+
+        queryToolBar.setRollover(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
-        add(emptyLabel, gridBagConstraints);
+        add(queryToolBar, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
@@ -187,9 +208,18 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         }
     }//GEN-LAST:event_restrictiveComboBoxActionPerformed
 
+    private void infoLabelMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_infoLabelMouseExited
+        richTooltip.hideTooltip();
+    }//GEN-LAST:event_infoLabelMouseExited
+
+    private void infoLabelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_infoLabelMouseEntered
+        richTooltip.showTooltip(infoLabel, evt.getLocationOnScreen());
+    }//GEN-LAST:event_infoLabelMouseEntered
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox applyCheckBox;
-    private javax.swing.JLabel emptyLabel;
+    private javax.swing.JLabel infoLabel;
+    private javax.swing.JToolBar queryToolBar;
     private javax.swing.JComboBox restrictiveComboBox;
     private javax.swing.JButton runButton;
     private javax.swing.JScrollPane scrollPane;

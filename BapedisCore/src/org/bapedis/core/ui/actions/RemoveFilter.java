@@ -8,8 +8,6 @@ package org.bapedis.core.ui.actions;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 import org.bapedis.core.services.ProjectManager;
-import org.bapedis.core.model.Workspace;
-import org.bapedis.core.ui.actions.GlobalContextSensitiveAction;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.model.FilterModel;
 import org.openide.awt.ActionID;
@@ -26,7 +24,7 @@ import org.openide.util.NbBundle;
  */
 @ActionID(
         category = "Edit",
-        id = "org.bapedis.db.ui.actions.RemoveFilter"
+        id = "org.bapedis.core.ui.actions.RemoveFilter"
 )
 @ActionRegistration(
         displayName = "#CTL_RemoveFilter",

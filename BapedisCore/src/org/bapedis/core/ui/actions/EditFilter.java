@@ -34,7 +34,7 @@ import org.openide.windows.WindowManager;
  */
 @ActionID(
         category = "Edit",
-        id = "org.bapedis.db.ui.actions.EditFilter"
+        id = "org.bapedis.core.ui.actions.EditFilter"
 )
 @ActionRegistration(
         displayName = "#CTL_EditFilter",

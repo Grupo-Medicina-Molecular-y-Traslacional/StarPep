@@ -98,7 +98,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         viewerScrollPane.setViewportView(new ListView());
 
         applyCheckBox.setSelected(NbPreferences.forModule(FilterModel.class).getBoolean(AUTO_APPLY, true));
-        richTooltip = new RichTooltip(Bundle.CTL_FilterExplorerTopComponent(), Bundle.HINT_FilterExplorerTopComponent());
+        richTooltip = new RichTooltip(Bundle.CTL_FilterExplorerTopComponent(), NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.info.text"));
     }
 
     /**

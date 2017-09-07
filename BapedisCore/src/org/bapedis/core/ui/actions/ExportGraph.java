@@ -14,7 +14,7 @@ import org.openide.util.NbBundle.Messages;
 
 @ActionID(
         category = "File",
-        id = "org.bapedis.db.ui.actions.ExportGraph"
+        id = "org.bapedis.core.ui.actions.ExportGraph"
 )
 @ActionRegistration(
         displayName = "#CTL_ExportGraph"

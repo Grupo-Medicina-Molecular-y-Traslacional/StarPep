@@ -14,6 +14,7 @@ import org.openide.awt.Toolbar;
 import org.openide.awt.ToolbarPool;
 import org.openide.modules.ModuleInstall;
 import org.openide.util.Lookup;
+import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
 public class Installer extends ModuleInstall implements WorkspaceEventListener, PropertyChangeListener {
@@ -33,7 +34,15 @@ public class Installer extends ModuleInstall implements WorkspaceEventListener, 
                 Toolbar tb = ToolbarPool.getDefault().findToolbar("Memory");
                 if (tb != null) {
                     tb.setVisible(false);
-                }  
+                }
+
+                // Property windows
+                TopComponent tc = WindowManager.getDefault().findTopComponent("properties"); // NOI18N
+                tc.open();
+                
+                // Navigator windows
+                tc = WindowManager.getDefault().findTopComponent("navigatorTC"); //NOI18N
+                tc.open();
             }
         });
     }

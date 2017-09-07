@@ -21,7 +21,7 @@ import org.openide.util.NbBundle;
  */
 @ActionID(
         category = "View",
-        id = "org.bapedis.db.ui.actions.ShowGraph"
+        id = "org.bapedis.core.ui.actions.ShowGraph"
 )
 @ActionRegistration(
         displayName = "#CTL_ShowGraph",

@@ -30,17 +30,19 @@ import org.openide.explorer.ExplorerUtils;
 import org.openide.explorer.view.BeanTreeView;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
 import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
+import org.openide.windows.WindowManager;
 
 /**
  * Top component which displays something.
  */
 @ConvertAsProperties(
-        dtd = "-//org.bapedis.db.ui//QueryExplorer//EN",
+        dtd = "-//org.bapedis.core.ui//QueryExplorer//EN",
         autostore = false
 )
 @TopComponent.Description(
@@ -49,7 +51,7 @@ import org.openide.util.lookup.ProxyLookup;
         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
 @TopComponent.Registration(mode = "explorer", openAtStartup = true, position = 333)
-@ActionID(category = "Window", id = "org.bapedis.db.ui.QueryExplorerTopComponent")
+@ActionID(category = "Window", id = "org.bapedis.core.ui.QueryExplorerTopComponent")
 @ActionReference(path = "Menu/Window", position = 333)
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_QueryExplorerAction",
@@ -84,11 +86,19 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
 
         applyCheckBox.setSelected(NbPreferences.forModule(QueryModel.class).getBoolean(AUTO_APPLY, true));
 
-        DefaultComboBoxModel comboModel = (DefaultComboBoxModel)restrictiveComboBox.getModel();
+        DefaultComboBoxModel comboModel = (DefaultComboBoxModel) restrictiveComboBox.getModel();
         for (RestrictionLevel restriction : RestrictionLevel.values()) {
             comboModel.addElement(restriction);
         }
-        richTooltip = new RichTooltip(Bundle.CTL_QueryExplorerTopComponent(), Bundle.HINT_QueryExplorerTopComponent());
+        
+        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
+            @Override
+            public void run() {
+                requestActive();
+            }
+        });
+        
+        richTooltip = new RichTooltip(Bundle.CTL_QueryExplorerTopComponent(), NbBundle.getMessage(QueryExplorerTopComponent.class, "QueryExplorerTopComponent.info.text"));
     }
 
     /**
@@ -106,6 +116,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         restrictiveComboBox = new javax.swing.JComboBox();
         infoLabel = new javax.swing.JLabel();
         queryToolBar = new javax.swing.JToolBar();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -183,6 +194,8 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         add(infoLabel, gridBagConstraints);
 
         queryToolBar.setRollover(true);
+        queryToolBar.add(jSeparator1);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -219,6 +232,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox applyCheckBox;
     private javax.swing.JLabel infoLabel;
+    private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar queryToolBar;
     private javax.swing.JComboBox restrictiveComboBox;
     private javax.swing.JButton runButton;
@@ -265,7 +279,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof QueryModel) {
-            QueryModel queryModel = (QueryModel)evt.getSource();
+            QueryModel queryModel = (QueryModel) evt.getSource();
             switch (evt.getPropertyName()) {
                 case QueryModel.ADDED_METADATA:
                 case QueryModel.REMOVED_METADATA:
@@ -327,9 +341,10 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         }
     }
 
-    private void refreshRunningState(boolean running){
+    private void refreshRunningState(boolean running) {
         restrictiveComboBox.setEnabled(!running);
     }
+
     @Override
     public ExplorerManager getExplorerManager() {
         return explorerMgr;

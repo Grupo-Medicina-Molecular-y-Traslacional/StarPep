@@ -25,7 +25,7 @@ import org.openide.util.Utilities;
  */
 //@ActionID(
 //        category = "View",
-//        id = "org.bapedis.db.ui.actions.ShowPeptideNodes"
+//        id = "org.bapedis.core.ui.actions.ShowPeptideNodes"
 //)
 //@ActionRegistration(
 //        displayName = "#CTL_ShowPeptideNodes"

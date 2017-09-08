@@ -8,15 +8,18 @@ package org.bapedis.core.ui.actions;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 import org.bapedis.core.services.ProjectManager;
-import org.bapedis.core.spi.filters.Filter;
-import org.bapedis.core.model.FilterModel;
+import org.bapedis.core.model.Metadata;
+import org.bapedis.core.model.QueryModel;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
+import org.openide.util.LookupEvent;
 import org.openide.util.NbBundle;
+import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -24,23 +27,23 @@ import org.openide.util.NbBundle;
  */
 @ActionID(
         category = "Edit",
-        id = "org.bapedis.core.ui.actions.RemoveFilter"
+        id = "org.bapedis.core.ui.actions.RemoveQuery"
 )
 @ActionRegistration(
-        displayName = "#CTL_RemoveFilter",
+        displayName = "#CTL_RemoveQuery",
         lazy = false
 )
 @ActionReferences({
-    @ActionReference(path = "Actions/EditFilter", position = 200)
+    @ActionReference(path = "Actions/EditQuery", position = 100)
 })
-@NbBundle.Messages("CTL_RemoveFilter=Remove filter")
-public class RemoveFilter extends GlobalContextSensitiveAction<Filter> {
+@NbBundle.Messages("CTL_RemoveQuery=Remove metadata from query")
+public class RemoveQuery extends GlobalContextSensitiveAction<Metadata> {
     protected final ProjectManager pc;
 
-    public RemoveFilter() {
-        super(Filter.class);
+    public RemoveQuery() {
+        super(Metadata.class);
         pc = Lookup.getDefault().lookup(ProjectManager.class);
-        String name = NbBundle.getMessage(RemoveFilter.class, "CTL_RemoveFilter");
+        String name = NbBundle.getMessage(RemoveQuery.class, "CTL_RemoveQuery");
         putValue(NAME, name);
         putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/core/resources/remove.png", false));
         putValue(SHORT_DESCRIPTION, name);
@@ -48,11 +51,12 @@ public class RemoveFilter extends GlobalContextSensitiveAction<Filter> {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Collection<? extends Filter> context = lkpResult.allInstances();
+        Collection<? extends Metadata> context = lkpResult.allInstances();
         if (!context.isEmpty()){
-            FilterModel filterModel = pc.getFilterModel();
-            filterModel.remove(context.toArray(new Filter[0]));
+            QueryModel queryModel = pc.getQueryModel();
+            queryModel.remove(context.toArray(new Metadata[0]));
         }
-    }
+    }  
+    
 
 }

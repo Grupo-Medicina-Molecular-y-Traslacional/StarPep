@@ -315,6 +315,7 @@ public class MetadataNavigator extends JComponent implements
         pc.addWorkspaceEventListener(this);
         Workspace currentWorkspace = pc.getCurrentWorkspace();
         workspaceChanged(null, currentWorkspace);
+        pc.getQueryModel().setMetadataActivated(true);
     }
 
     @Override
@@ -324,6 +325,7 @@ public class MetadataNavigator extends JComponent implements
         if (currentModel != null) {
             currentModel.removeQuickFilterChangeListener(this);
         }
+        pc.getQueryModel().setMetadataActivated(false);
     }
 
     @Override

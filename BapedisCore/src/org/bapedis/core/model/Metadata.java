@@ -69,7 +69,7 @@ public class Metadata{
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Metadata) {
-            return name.equals(((Metadata) obj).name);
+            return underlyingNodeID.equals(((Metadata) obj).underlyingNodeID);
         }
         return false;
     }
@@ -77,7 +77,7 @@ public class Metadata{
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 89 * hash + Objects.hashCode(this.name);
+        hash = 89 * hash + Objects.hashCode(this.underlyingNodeID);
         return hash;
     }
 

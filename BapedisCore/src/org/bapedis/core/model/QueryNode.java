@@ -5,19 +5,13 @@
  */
 package org.bapedis.core.model;
 
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 import javax.swing.Action;
 import org.bapedis.core.ui.actions.RemoveAllFromQueryModel;
 import org.bapedis.core.ui.actions.RemoveFromQueryModel;
 import org.bapedis.core.ui.actions.RemoveOthersFromQueryModel;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
-import org.openide.nodes.Sheet;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
-import org.openide.util.datatransfer.PasteType;
 import org.openide.util.lookup.Lookups;
 
 /**

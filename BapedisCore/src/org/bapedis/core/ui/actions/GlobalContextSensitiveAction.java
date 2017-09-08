@@ -21,13 +21,17 @@ public abstract class GlobalContextSensitiveAction<T> extends AbstractAction imp
     protected Lookup.Result<T> lkpResult;
     protected Class<T> contextClass;
 
-    public GlobalContextSensitiveAction(Class<T> contextClass) {
+    public GlobalContextSensitiveAction(Class<T> contextClass, Lookup lookup) {
         this.contextClass = contextClass;
-        lkpResult = Utilities.actionsGlobalContext().lookupResult(contextClass);
+        lkpResult = lookup.lookupResult(contextClass);
         lkpResult.addLookupListener(this);        
-        T context = Utilities.actionsGlobalContext().lookup(contextClass);        
+        T context = lookup.lookup(contextClass);        
         setEnabled(context != null);
     }
+    
+    public GlobalContextSensitiveAction(Class<T> contextClass) {
+        this(contextClass, Utilities.actionsGlobalContext());
+    }    
 
     @Override
     public void resultChanged(LookupEvent le) {

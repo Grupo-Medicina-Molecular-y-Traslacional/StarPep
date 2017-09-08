@@ -1,5 +1,14 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
+ * To change this license header, choose License Headers in Project Prop                @Override
+                public <T> T lookup(Class<T> type) {
+                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                }
+
+                @Override
+                public <T> Lookup.Result<T> lookup(Lookup.Template<T> tmplt) {
+                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                }
+            }rties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -7,7 +16,11 @@ package org.bapedis.core.ui;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingWorker;
 import org.bapedis.core.services.ProjectManager;
@@ -23,6 +36,8 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.netbeans.spi.navigator.NavigatorHandler;
+import org.netbeans.spi.navigator.NavigatorPanel;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.explorer.ExplorerManager;
@@ -34,6 +49,7 @@ import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
+import org.openide.util.Utilities;
 import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
 import org.openide.windows.WindowManager;
@@ -90,14 +106,23 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         for (RestrictionLevel restriction : RestrictionLevel.values()) {
             comboModel.addElement(restriction);
         }
-        
+
+        List<? extends Action> actions = Utilities.actionsForPath("Actions/EditQuery");
+        for (Action action : actions) {
+            queryToolBar.add(action);
+        }
+
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             @Override
             public void run() {
                 requestActive();
+
+                TopComponent navigatorTC = WindowManager.getDefault().findTopComponent("navigatorTC");
+                navigatorToggleButton.setSelected(navigatorTC.isOpened());
+//                navigatorTC.add
             }
         });
-        
+
         richTooltip = new RichTooltip(Bundle.CTL_QueryExplorerTopComponent(), NbBundle.getMessage(QueryExplorerTopComponent.class, "QueryExplorerTopComponent.info.text"));
     }
 
@@ -117,6 +142,8 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         infoLabel = new javax.swing.JLabel();
         queryToolBar = new javax.swing.JToolBar();
         jSeparator1 = new javax.swing.JToolBar.Separator();
+        navigatorToggleButton = new javax.swing.JToggleButton();
+        jSeparator2 = new javax.swing.JToolBar.Separator();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -193,8 +220,23 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
         add(infoLabel, gridBagConstraints);
 
+        queryToolBar.setFloatable(false);
         queryToolBar.setRollover(true);
         queryToolBar.add(jSeparator1);
+
+        navigatorToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/navigator.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(navigatorToggleButton, org.openide.util.NbBundle.getMessage(QueryExplorerTopComponent.class, "QueryExplorerTopComponent.navigatorToggleButton.text")); // NOI18N
+        navigatorToggleButton.setFocusable(false);
+        navigatorToggleButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        navigatorToggleButton.setPreferredSize(new java.awt.Dimension(28, 23));
+        navigatorToggleButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        navigatorToggleButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                navigatorToggleButtonActionPerformed(evt);
+            }
+        });
+        queryToolBar.add(navigatorToggleButton);
+        queryToolBar.add(jSeparator2);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -229,10 +271,30 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         richTooltip.showTooltip(infoLabel, evt.getLocationOnScreen());
     }//GEN-LAST:event_infoLabelMouseEntered
 
+    private void navigatorToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_navigatorToggleButtonActionPerformed
+        TopComponent navigatorTC = WindowManager.getDefault().findTopComponent("navigatorTC");
+        if (navigatorToggleButton.isSelected()) {
+            if (!navigatorTC.isOpened()) {
+                navigatorTC.open();
+            }
+            Lookup.Template<NavigatorPanel> NAV_PANEL_TEMPLATE = new Lookup.Template(NavigatorPanel.class);
+            Lookup.Result<NavigatorPanel> result = Lookups.forPath("Navigator/Panels/peptide/metadata").lookup(NAV_PANEL_TEMPLATE);
+            Collection<? extends NavigatorPanel> panels = result.allInstances();
+            Iterator<? extends NavigatorPanel> it = panels.iterator();
+            if (it.hasNext()) {
+                NavigatorHandler.activatePanel(it.next());
+            }
+        } else {
+            navigatorTC.close();
+        }
+    }//GEN-LAST:event_navigatorToggleButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox applyCheckBox;
     private javax.swing.JLabel infoLabel;
     private javax.swing.JToolBar.Separator jSeparator1;
+    private javax.swing.JToolBar.Separator jSeparator2;
+    private javax.swing.JToggleButton navigatorToggleButton;
     private javax.swing.JToolBar queryToolBar;
     private javax.swing.JComboBox restrictiveComboBox;
     private javax.swing.JButton runButton;
@@ -243,8 +305,6 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         pc.addWorkspaceEventListener(this);
         Workspace currentWs = pc.getCurrentWorkspace();
         workspaceChanged(null, currentWs);
-//        Collection<? extends MetadataNavigator> panels = Lookups.forPath("Navigator/Panels/peptide/metadata").lookupAll(MetadataNavigator.class);
-//        NavigatorHandler.activatePanel(panels.iterator().next());
     }
 
     @Override
@@ -290,6 +350,9 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
                     break;
                 case QueryModel.RUNNING:
                     refreshRunningState(queryModel.isRunning());
+                    break;
+                case QueryModel.METADATA_ACTIVATED:
+                    navigatorToggleButton.setSelected(queryModel.isMetadataActivated());
             }
         }
     }

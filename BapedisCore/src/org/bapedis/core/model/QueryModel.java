@@ -20,6 +20,7 @@ public class QueryModel {
 
     public static final String ADDED_METADATA = "ADDED_METADATA";
     public static final String REMOVED_METADATA = "REMOVED_METADATA";
+    public static final String METADATA_ACTIVATED = "METADATA_ACTIVATED"; 
     public static final String CHANGED_RESTRICTION = "RESTRICTION";
     protected transient final PropertyChangeSupport propertyChangeSupport;
     protected final Node rootContext;
@@ -27,6 +28,7 @@ public class QueryModel {
     public static final String RUNNING = "RUNNING";
     protected final AtomicBoolean running;
     protected RestrictionLevel restriction;
+    protected boolean metadataActivated;
 
     public QueryModel() {
         propertyChangeSupport = new PropertyChangeSupport(this);
@@ -34,6 +36,7 @@ public class QueryModel {
         metadatas = new LinkedList<>();
         running = new AtomicBoolean(false);
         restriction = RestrictionLevel.MATCH_ALL;
+        metadataActivated = false;
     }
 
     public RestrictionLevel getRestriction() {
@@ -44,7 +47,17 @@ public class QueryModel {
         RestrictionLevel old = this.restriction;
         this.restriction = restriction;
         propertyChangeSupport.firePropertyChange(CHANGED_RESTRICTION, old, restriction);
-    }        
+    }
+
+    public boolean isMetadataActivated() {
+        return metadataActivated;
+    }
+
+    public void setMetadataActivated(boolean metadataActivated) {
+        boolean old = this.metadataActivated;
+        this.metadataActivated = metadataActivated;
+        propertyChangeSupport.firePropertyChange(METADATA_ACTIVATED, old, metadataActivated);
+    }
 
     public Metadata[] getMetadatas() {
         return metadatas.toArray(new Metadata[0]);
@@ -52,8 +65,9 @@ public class QueryModel {
 
     public void add(Metadata metadata) {
         if (!contains(metadata)) {
-            metadatas.add(metadata);
-            propertyChangeSupport.firePropertyChange(ADDED_METADATA, null, metadata);
+            if (metadatas.add(metadata)) {
+                propertyChangeSupport.firePropertyChange(ADDED_METADATA, null, metadata);
+            }
         }
     }
 
@@ -67,13 +81,30 @@ public class QueryModel {
     }
 
     public void remove(Metadata metadata) {
-        metadatas.remove(metadata);
-        propertyChangeSupport.firePropertyChange(REMOVED_METADATA, metadata, null);
+        boolean removed = metadatas.remove(metadata);
+        if (removed) {
+            propertyChangeSupport.firePropertyChange(REMOVED_METADATA, metadata, null);
+        }
     }
-    
-    public void removeAll(){       
+
+    public void remove(Metadata[] metadatas) {
+        boolean removed = false;
+        for (Metadata metadata : metadatas) {
+            if (this.metadatas.remove(metadata)) {
+                removed = true;
+            }
+        }
+        if (removed) {
+            propertyChangeSupport.firePropertyChange(REMOVED_METADATA, metadatas, null);
+        }
+    }
+
+    public void removeAll() {
+        boolean removed = metadatas.size() > 0;
         metadatas.clear();
-        propertyChangeSupport.firePropertyChange(REMOVED_METADATA, null, null);
+        if (removed) {
+            propertyChangeSupport.firePropertyChange(REMOVED_METADATA, null, null);
+        }
     }
 
     public Node getRootContext() {
@@ -87,11 +118,11 @@ public class QueryModel {
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
-    
-    public int countElements(){
+
+    public int countElements() {
         return metadatas.size();
     }
-    
+
     public boolean isRunning() {
         return running.get();
     }
@@ -100,6 +131,6 @@ public class QueryModel {
         boolean oldValue = this.running.get();
         this.running.set(running);
         propertyChangeSupport.firePropertyChange(RUNNING, oldValue, running);
-    }    
+    }
 
 }

@@ -45,14 +45,35 @@ public class FilterModel {
         return rootContext;
     }
 
-    public void addFilter(Filter filter) {
-        filters.add(filter);
-        propertyChangeSupport.firePropertyChange(ADDED_FILTER, null, filter);
+    public void add(Filter filter) {
+        if (filters.add(filter)) {
+            propertyChangeSupport.firePropertyChange(ADDED_FILTER, null, filter);
+        }
     }
 
-    public void removeFilter(Filter filter) {
-        filters.remove(filter);
-        propertyChangeSupport.firePropertyChange(REMOVED_FILTER, filter, null);
+    public void remove(Filter filter) {
+        boolean removed = filters.remove(filter);
+        if (removed) {
+            propertyChangeSupport.firePropertyChange(REMOVED_FILTER, filter, null);
+        }
+    }
+
+    public void remove(Filter[] filters) {
+        boolean removed = false;
+        for (Filter filter : filters) {
+            removed = this.filters.remove(filter);
+        }
+        if (removed) {
+            propertyChangeSupport.firePropertyChange(REMOVED_FILTER, filters, null);
+        }
+    }
+
+    public void removeAll() {
+        boolean removed = filters.size() > 0;
+        this.filters.clear();
+        if (removed) {
+            propertyChangeSupport.firePropertyChange(REMOVED_FILTER, null, null);
+        }
     }
 
     public boolean isEmpty() {

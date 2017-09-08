@@ -27,7 +27,7 @@ public class MetadataNode extends AbstractNode {
     protected final Metadata metadata;
 
     public MetadataNode(Metadata metadata) {
-        super(metadata.hasChilds() ? Children.create(new MetadataChildFactory(metadata), false) : Children.LEAF, Lookups.singleton(metadata));
+        super(metadata.hasChilds() ? Children.create(new MetadataChildFactory(metadata), false) : Children.LEAF);
         this.metadata = metadata;
         setDisplayName(metadata.getName());
     }

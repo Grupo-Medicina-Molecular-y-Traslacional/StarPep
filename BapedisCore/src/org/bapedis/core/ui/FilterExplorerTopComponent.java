@@ -43,7 +43,6 @@ import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
 import org.openide.util.Utilities;
-import static org.bapedis.core.ui.Bundle.*;
 
 /**
  * Top component which displays something.
@@ -90,10 +89,10 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
             comboModel.addElement(restriction);
         }
 
-        filterToolBar1.add(createAddFilterButton());
+        filterToolBar.add(createAddFilterButton());
         List<? extends Action> actions = Utilities.actionsForPath("Actions/EditFilter");
         for (Action action : actions) {
-            filterToolBar1.add(action);
+            filterToolBar.add(action);
         }
         viewerScrollPane.setViewportView(new ListView());
 
@@ -114,7 +113,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         runButton = new javax.swing.JButton();
         applyCheckBox = new javax.swing.JCheckBox();
         restrictiveComboBox = new javax.swing.JComboBox();
-        filterToolBar1 = new javax.swing.JToolBar();
+        filterToolBar = new javax.swing.JToolBar();
         jSeparator1 = new javax.swing.JToolBar.Separator();
         infoLabel = new javax.swing.JLabel();
 
@@ -179,9 +178,9 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(restrictiveComboBox, gridBagConstraints);
 
-        filterToolBar1.setFloatable(false);
-        filterToolBar1.setRollover(true);
-        filterToolBar1.add(jSeparator1);
+        filterToolBar.setFloatable(false);
+        filterToolBar.setRollover(true);
+        filterToolBar.add(jSeparator1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -189,7 +188,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
-        add(filterToolBar1, gridBagConstraints);
+        add(filterToolBar, gridBagConstraints);
 
         infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(infoLabel, org.openide.util.NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.infoLabel.text")); // NOI18N
@@ -240,7 +239,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox applyCheckBox;
-    private javax.swing.JToolBar filterToolBar1;
+    private javax.swing.JToolBar filterToolBar;
     private javax.swing.JLabel infoLabel;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JComboBox restrictiveComboBox;
@@ -310,7 +309,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 
     private void refreshRunningState(boolean running) {
         restrictiveComboBox.setEnabled(!running);
-        for (Component c : filterToolBar1.getComponents()) {
+        for (Component c : filterToolBar.getComponents()) {
             c.setEnabled(!running);
         }
         applyCheckBox.setEnabled(!running);

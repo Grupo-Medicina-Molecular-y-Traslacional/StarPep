@@ -315,7 +315,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
                 Filter filter = new AttributeFilter(attr, operator, jValueTextField.getText());
                 FilterModel filterModel = pc.getFilterModel();
-                filterModel.addFilter(filter);
+                filterModel.add(filter);
                 jValueTextField.setText("");
             } else {
                 String errorMsg = NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jValueTextField.badinput", attr.getDisplayName());

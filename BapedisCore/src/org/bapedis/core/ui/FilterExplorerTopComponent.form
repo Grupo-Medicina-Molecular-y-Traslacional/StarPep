@@ -91,7 +91,7 @@
         </Constraint>
       </Constraints>
     </Component>
-    <Container class="javax.swing.JToolBar" name="filterToolBar1">
+    <Container class="javax.swing.JToolBar" name="filterToolBar">
       <Properties>
         <Property name="floatable" type="boolean" value="false"/>
         <Property name="rollover" type="boolean" value="true"/>

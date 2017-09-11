@@ -7,28 +7,44 @@ package org.bapedis.core.ui;
 
 import java.awt.CardLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
+import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.QueryModel;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.spi.filters.Filter;
+import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.spi.filters.impl.AttributeFilter;
 import org.bapedis.core.spi.filters.impl.FilterHelper;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
+import org.bapedis.core.ui.actions.AddFilter;
+import org.bapedis.core.ui.actions.MolecularDescriptorAction;
+import org.bapedis.core.ui.actions.ToolAction;
 import org.bapedis.core.ui.components.GraphElementAvailableColumnsPanel;
 import org.bapedis.core.ui.components.PeptideAvailableColumnsPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -54,6 +70,7 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.openide.DialogDescriptor;
+import org.openide.awt.DropDownButtonFactory;
 import org.openide.explorer.view.NodePopupFactory;
 import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
@@ -138,8 +155,27 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         errorLabel = new JLabel(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.errorLabel.text"), new ImageIcon(ImageUtilities.loadImage("org/bapedis/core/resources/sad.png", true)), JLabel.CENTER);
         errorLabel.setHorizontalAlignment(SwingConstants.CENTER);
         centerPanel.add(errorLabel, "errorCard");
-
+        
+        leftToolBar.add(createAddMDButton(), 0);
     }
+    
+    private JButton createAddMDButton() {        
+        MolecularDescriptorAction mdAction = new MolecularDescriptorAction();
+        JMenu menu = (JMenu)mdAction.getMenuPresenter();
+        final JPopupMenu popup = menu.getPopupMenu();
+        
+        final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/bapedis/core/resources/add_md.gif", false), popup);
+        dropDownButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.addMD.tooltiptext"));
+        dropDownButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (dropDownButton.isEnabled()) {
+                    popup.show(dropDownButton, 0, dropDownButton.getHeight());
+                }
+            }
+        });
+        return dropDownButton;
+    }    
 
     private void populateVisibleColumns(AttributesModel attrModel) {
         if (attrModel != null) {
@@ -202,7 +238,9 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
         topPanel = new javax.swing.JPanel();
         leftToolBar = new javax.swing.JToolBar();
+        delMDButton = new javax.swing.JButton();
         columnsButton = new javax.swing.JButton();
+        exportButton = new javax.swing.JButton();
         rightPanel = new javax.swing.JPanel();
         jLabelFilter = new javax.swing.JLabel();
         jFieldComboBox = new javax.swing.JComboBox();
@@ -221,7 +259,14 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         leftToolBar.setFloatable(false);
         leftToolBar.setRollover(true);
 
-        columnsButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/column.png"))); // NOI18N
+        delMDButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/delete_md.gif"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(delMDButton, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.delMDButton.text")); // NOI18N
+        delMDButton.setFocusable(false);
+        delMDButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        delMDButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        leftToolBar.add(delMDButton);
+
+        columnsButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/select_md.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(columnsButton, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.columnsButton.text")); // NOI18N
         columnsButton.setToolTipText(org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.columnsButton.toolTipText")); // NOI18N
         columnsButton.setFocusable(false);
@@ -232,6 +277,13 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             }
         });
         leftToolBar.add(columnsButton);
+
+        exportButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/export_table.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(exportButton, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.exportButton.text")); // NOI18N
+        exportButton.setFocusable(false);
+        exportButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        exportButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        leftToolBar.add(exportButton);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -362,6 +414,8 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
     private javax.swing.JButton columnsButton;
+    private javax.swing.JButton delMDButton;
+    private javax.swing.JButton exportButton;
     private javax.swing.JButton jAddButton;
     private javax.swing.JComboBox jFieldComboBox;
     private javax.swing.JLabel jLabelFilter;

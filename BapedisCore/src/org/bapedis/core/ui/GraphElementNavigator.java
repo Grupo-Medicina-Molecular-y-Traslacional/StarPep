@@ -140,13 +140,6 @@ public class GraphElementNavigator extends JComponent implements
         toolBar.add(edgesBtn);
         toolBar.addSeparator();
 
-        JButton findButton = new JButton(table.getActionMap().get("find"));
-        findButton.setText("");
-        findButton.setToolTipText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.findButton.toolTipText"));
-        findButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/search.png", false));
-        findButton.setFocusable(false);
-        toolBar.add(findButton);
-
         availableColumnsButton = new JButton();
         availableColumnsButton.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.availableColumnsButton.text"));
         availableColumnsButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/column.png", false));
@@ -159,6 +152,14 @@ public class GraphElementNavigator extends JComponent implements
             }
         });
         toolBar.add(availableColumnsButton);
+
+        toolBar.addSeparator();
+        JButton findButton = new JButton(table.getActionMap().get("find"));
+        findButton.setText("");
+        findButton.setToolTipText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.findButton.toolTipText"));
+        findButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/search.png", false));
+        findButton.setFocusable(false);
+        toolBar.add(findButton);
         //----------
 
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
@@ -457,7 +458,7 @@ class GraphElementPopupAdapter extends MouseUtils.PopupMouseAdapter {
                 Edge edge = (Edge) element;
                 // Add select
                 JMenu selectMenu = new JMenu(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.selectOnGraph.name"));
-                
+
                 JMenuItem selectEdge = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.name"));
                 selectEdge.addActionListener(new SelectEdgeOnGraph(edge));
                 selectMenu.add(selectEdge);
@@ -472,7 +473,7 @@ class GraphElementPopupAdapter extends MouseUtils.PopupMouseAdapter {
                 contextMenu.add(selectMenu);
                 // Add center
                 JMenu centerMenu = new JMenu(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.centerOnGraph.name"));
-                
+
                 JMenuItem centerSource = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.source"));
                 centerSource.addActionListener(new CenterNodeOnGraph(edge.getSource()));
                 centerMenu.add(centerSource);
@@ -480,9 +481,9 @@ class GraphElementPopupAdapter extends MouseUtils.PopupMouseAdapter {
                 JMenuItem centerTarget = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.target"));
                 centerTarget.addActionListener(new CenterNodeOnGraph(edge.getTarget()));
                 centerMenu.add(centerTarget);
-                
+
                 contextMenu.add(centerMenu);
-                
+
             }
             contextMenu.show(table, me.getX(), me.getY());
         } else {

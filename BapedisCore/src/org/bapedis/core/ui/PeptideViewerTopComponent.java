@@ -432,13 +432,21 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             }
             QueryModel oldQueryModel = pc.getQueryModel(oldWs);
             oldQueryModel.removePropertyChangeListener(this);
+            
+            FilterModel oldFilterModel = pc.getFilterModel(oldWs);
+            oldFilterModel.removePropertyChangeListener(this);
+            
         }
         peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
         peptideLkpResult.addLookupListener(this);
 
         QueryModel queryModel = pc.getQueryModel(newWs);
         queryModel.addPropertyChangeListener(this);
-        setBusyLabel(queryModel.isRunning());
+        
+        FilterModel filterModel = pc.getFilterModel(newWs);
+        filterModel.addPropertyChangeListener(this);
+        
+        setBusyLabel(queryModel.isRunning() || filterModel.isRunning());
 
         AttributesModel peptidesModel = pc.getAttributesModel(newWs);
         setData(peptidesModel);
@@ -506,6 +514,10 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         } else if (evt.getSource() instanceof QueryModel) {
             if (evt.getPropertyName().equals(QueryModel.RUNNING)) {
                 setBusyLabel(((QueryModel) evt.getSource()).isRunning());
+            }
+        } else if (evt.getSource() instanceof FilterModel) {
+            if (evt.getPropertyName().equals(FilterModel.RUNNING)) {
+                setBusyLabel(((FilterModel) evt.getSource()).isRunning());
             }
         }
     }

@@ -31,6 +31,7 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.RestrictionLevel;
 import org.bapedis.core.spi.data.PeptideDAO;
+import org.bapedis.core.task.QueryExecutor;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
@@ -358,50 +359,8 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
     }
 
     private void runQuery() {
-        final Workspace workspace = pc.getCurrentWorkspace();
-        final QueryModel queryModel = pc.getQueryModel(workspace);
-        final GraphModel graphModel = pc.getGraphModel(workspace);
-
-        if (!queryModel.isRunning()) {
-            SwingWorker<AttributesModel, Void> worker = new SwingWorker<AttributesModel, Void>() {
-                private GraphView oldView;
-
-                @Override
-                protected AttributesModel doInBackground() throws Exception {
-                    PeptideDAO dao = Lookup.getDefault().lookup(PeptideDAO.class);
-                    oldView = graphModel.getVisibleView();
-                    AttributesModel model = dao.getPeptides(queryModel, graphModel);
-                    Graph graph = graphModel.getGraphVisible();
-                    for (Metadata metadata : queryModel.getMetadatas()) {
-                        metadata.setGraphNode(graph.getNode(metadata.getUnderlyingNodeID()));
-                    }
-                    return model;
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        AttributesModel newModel = get();
-                        AttributesModel oldModel = pc.getAttributesModel(workspace);
-                        if (oldModel != null) {
-                            workspace.remove(oldModel);
-                        }
-                        if (!oldView.isMainView()) {
-                            graphModel.destroyView(oldView);
-                        }
-                        workspace.add(newModel);
-                    } catch (InterruptedException ex) {
-                        Exceptions.printStackTrace(ex);
-                    } catch (ExecutionException ex) {
-                        Exceptions.printStackTrace(ex);
-                    } finally {
-                        queryModel.setRunning(false);
-                    }
-                }
-            };
-            queryModel.setRunning(true);
-            worker.execute();
-        }
+        QueryExecutor worker = new QueryExecutor(pc.getCurrentWorkspace());
+        worker.execute();
     }
 
     private void refreshRunningState(boolean running) {

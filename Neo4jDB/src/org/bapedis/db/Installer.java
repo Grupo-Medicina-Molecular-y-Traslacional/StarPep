@@ -5,6 +5,7 @@
  */
 package org.bapedis.db;
 
+import org.bapedis.core.task.QueryExecutor;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.openide.modules.ModuleInstall;
 
@@ -16,19 +17,14 @@ public class Installer extends ModuleInstall {
             Neo4jDB.extractDatabase();
             Neo4jDB.loadDatabase();
             //Load all peptides into the default workspace
-//            ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
-//            Workspace currentWorkspace = pm.getCurrentWorkspace();
-//
-//            MetadataManager bcManager = Lookup.getDefault().lookup(MetadataManager.class);
-//            NeoPeptideManager npManager = Lookup.getDefault().lookup(NeoPeptideManager.class);
-//            bcManager.setSelectedCategoriesTo(currentWorkspace, new Metadata[]{bcManager.getBioCategory()});
-//            npManager.loadNeoPeptides(currentWorkspace);
+            QueryExecutor worker = new QueryExecutor();
+            worker.execute();
         } catch (Exception ex) {
             System.out.println(ex);
             ex.printStackTrace();
         }
     }
-        
+
     @Override
     public void uninstalled() {
         GraphDatabaseService graphDb = Neo4jDB.getDbService();

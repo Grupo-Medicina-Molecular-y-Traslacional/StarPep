@@ -110,7 +110,6 @@ public class AttributeFilter implements Filter {
 //        try {
 //            Thread.sleep(1);
 //        } catch (InterruptedException ex) {
-//            Exceptions.printStackTrace(ex);
 //        }
         return negative ? !accepted : accepted;
     }

@@ -30,7 +30,7 @@
             <file name="org-openide-actions-SaveAsAction.shadow_hidden"/>
             <folder name="ExportData">
                 <attr name="displayName" bundlevalue="org.bapedis.core.ui.Bundle#Menu/ExportData"/> 
-                <attr name="position" intvalue="1500"/>
+                <attr name="position" intvalue="1600"/>
             </folder> 
         </folder>
         <file name="GoTo_hidden"/>

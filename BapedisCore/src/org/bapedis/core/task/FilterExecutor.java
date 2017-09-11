@@ -16,6 +16,7 @@ import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideNode;
 import org.bapedis.core.model.Workspace;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.filters.Filter;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.GraphModel;
@@ -24,30 +25,35 @@ import org.gephi.graph.api.Subgraph;
 import org.netbeans.swing.etable.QuickFilter;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author loge
  */
-public class FilterWorker extends SwingWorker<Void, Void> {
+public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
 
-    private final Workspace workspace;
-    private final FilterModel filterModel;
-    private final AttributesModel attrModel;
-    private final GraphModel graphModel;
-    private TreeSet<String> set;
-    private GraphView newView;
-    private final ProgressTicket ticket;
-    private final AtomicBoolean stopRun;
+    protected static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+    protected final Workspace workspace;
+    protected final FilterModel filterModel;
+    protected final AttributesModel attrModel;
+    protected final GraphModel graphModel;
+    protected GraphView newView;
+    protected final ProgressTicket ticket;
+    protected final AtomicBoolean stopRun;
 
-    public FilterWorker(Workspace workspace, AttributesModel attrModel, GraphModel graphModel, FilterModel filterModel) {
+    public FilterExecutor() {
+        this(pc.getCurrentWorkspace());
+    }
+
+    public FilterExecutor(Workspace workspace) {
         this.workspace = workspace;
-        this.attrModel = attrModel;
-        this.graphModel = graphModel;
-        this.filterModel = filterModel;
+        this.attrModel = pc.getAttributesModel(workspace);
+        this.graphModel = pc.getGraphModel(workspace);
+        this.filterModel = pc.getFilterModel(workspace);
         stopRun = new AtomicBoolean(false);
-        ticket = new ProgressTicket(NbBundle.getMessage(FilterWorker.class, "FilterWorker.name"), new Cancellable() {
+        ticket = new ProgressTicket(NbBundle.getMessage(FilterExecutor.class, "FilterWorker.name"), new Cancellable() {
             @Override
             public boolean cancel() {
                 stopRun.set(true);
@@ -57,12 +63,13 @@ public class FilterWorker extends SwingWorker<Void, Void> {
     }
 
     @Override
-    protected Void doInBackground() throws Exception {
-        ticket.progress(NbBundle.getMessage(FilterWorker.class, "FilterWorker.running"));
+    protected TreeSet<String> doInBackground() throws Exception {
+        publish("start");
+        ticket.start(attrModel.getNodeList().size());
+        ticket.progress(NbBundle.getMessage(FilterExecutor.class, "FilterWorker.running"));
 
-        List<PeptideNode> nodeList = attrModel.getNodeList();
+        TreeSet<String> set = filterModel.isEmpty() ? null : new TreeSet<String>();
 
-        set = new TreeSet<>();
         newView = graphModel.createView();
         Subgraph subGraph = graphModel.getGraph(newView);
 
@@ -70,13 +77,15 @@ public class FilterWorker extends SwingWorker<Void, Void> {
         org.gephi.graph.api.Node graphNode;
         List<org.gephi.graph.api.Node> graphNeighbors;
         List<Edge> graphEdges;
-        for (PeptideNode node : nodeList) {
+        for (PeptideNode node : attrModel.getNodeList()) {
             if (stopRun.get()) {
                 break;
             }
             peptide = node.getPeptide();
             if (isAccepted(peptide)) {
-                set.add(peptide.getId());
+                if (!filterModel.isEmpty()) {
+                    set.add(peptide.getId());
+                }
 
                 // Add graph node
                 graphNode = peptide.getGraphNode();
@@ -103,14 +112,20 @@ public class FilterWorker extends SwingWorker<Void, Void> {
             }
             ticket.progress();
         }
-        return null;
+        return set;
+    }
+
+    @Override
+    protected void process(List<String> chunks) {
+        workspace.add(this);
+        filterModel.setRunning(true);
     }
 
     @Override
     protected void done() {
         try {
-            get();
-            attrModel.setQuickFilter(new QuickFilterImpl(set));
+            TreeSet<String> set = get();
+            attrModel.setQuickFilter(filterModel.isEmpty()? null:new QuickFilterImpl(set));
             GraphView oldView = graphModel.getVisibleView();
             if (!oldView.isMainView()) {
                 graphModel.destroyView(oldView);
@@ -155,10 +170,6 @@ public class FilterWorker extends SwingWorker<Void, Void> {
 
     public void setStopRun(boolean stopRun) {
         this.stopRun.set(stopRun);
-    }
-
-    public int getTotalProgress() {
-        return attrModel.getNodeList().size();
     }
 
 }

@@ -33,6 +33,7 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.bapedis.core.events.WorkspaceEventListener;
+import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
@@ -656,11 +657,18 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         if (oldWs != null) {
             QueryModel oldQueryModel = pc.getQueryModel(oldWs);
             oldQueryModel.removePropertyChangeListener(this);
+            
+            FilterModel oldFilterModel = pc.getFilterModel(oldWs);
+            oldFilterModel.removePropertyChangeListener(this);            
         }
 
         QueryModel queryModel = pc.getQueryModel(newWs);
         queryModel.addPropertyChangeListener(this);
-        setBusy(queryModel.isRunning());
+        
+        FilterModel filterModel = pc.getFilterModel(newWs);
+        filterModel.addPropertyChangeListener(this);
+        
+        setBusy(queryModel.isRunning() || filterModel.isRunning());
     }
 
     @Override
@@ -669,7 +677,11 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             if (evt.getPropertyName().equals(QueryModel.RUNNING)) {
                 setBusy(((QueryModel) evt.getSource()).isRunning());
             }
-        } else if (evt.getSource() instanceof VizModel) {
+        } else if (evt.getSource() instanceof FilterModel) {
+            if (evt.getPropertyName().equals(FilterModel.RUNNING)) {
+                setBusy(((FilterModel) evt.getSource()).isRunning());
+            }
+        }else if (evt.getSource() instanceof VizModel) {
             if (evt.getPropertyName().equals("init")) {
                 initToolBarComponents();
             }

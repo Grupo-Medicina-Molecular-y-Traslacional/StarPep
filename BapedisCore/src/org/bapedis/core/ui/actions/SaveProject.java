@@ -12,22 +12,27 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 
+/**
+ *
+ * @author loge
+ */
 @ActionID(
         category = "File",
-        id = "org.bapedis.core.ui.actions.OpenProject"
+        id = "org.bapedis.core.ui.actions.SaveProject"
 )
 @ActionRegistration(
-        iconBase = "org/bapedis/core/resources/openProject.png",
-        displayName = "#CTL_OpenProject"
+        iconBase = "org/bapedis/core/resources/saveProject.png",
+        displayName = "#CTL_SaveProject"
 )
 @ActionReferences({
-    @ActionReference(path = "Menu/File", position = 1300, separatorBefore = 1250),
-    @ActionReference(path = "Toolbars/File", position = 100)
+    @ActionReference(path = "Menu/File", position = 1400),
+    @ActionReference(path = "Toolbars/File", position = 200)
 })
-public final class OpenProject implements ActionListener {
+public class SaveProject implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // TODO implement action body
+       
     }
+    
 }

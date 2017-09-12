@@ -40,7 +40,7 @@ public class FastaExporterUI extends javax.swing.JPanel implements ExporterUI {
     /**
      * Creates new form ExportFastaUI
      */
-    public FastaExporterUI(PeptideAttribute[] attributes) {
+    public FastaExporterUI() {
         initComponents();
         chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);

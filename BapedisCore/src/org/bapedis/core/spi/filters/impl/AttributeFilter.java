@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.spi.filters.impl;
 
+import java.util.Iterator;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.services.ProjectManager;
@@ -32,7 +33,8 @@ public class AttributeFilter implements Filter {
 
     public AttributeFilter(PeptideAttribute attr, FilterOperator operator, String value) {
         AttributeFilterFactory foundFactory = null;
-        for (FilterFactory f : Lookup.getDefault().lookup(ProjectManager.class).getFilterFactories()) {
+        for (Iterator<? extends FilterFactory> it = Lookup.getDefault().lookup(ProjectManager.class).getFilterFactoryIterator(); it.hasNext(); ) {
+            FilterFactory f = it.next();
             if (f instanceof AttributeFilterFactory) {
                 foundFactory = (AttributeFilterFactory) f;
                 break;

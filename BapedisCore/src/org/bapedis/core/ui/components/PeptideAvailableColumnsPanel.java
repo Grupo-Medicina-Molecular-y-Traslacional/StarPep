@@ -5,8 +5,12 @@
  */
 package org.bapedis.core.ui.components;
 
+import java.util.Iterator;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.PeptideAttribute;
 
@@ -35,15 +39,40 @@ public class PeptideAvailableColumnsPanel extends javax.swing.JPanel {
         rightList = new JList<>(selectedModel);
         rightScrollPane.setViewportView(rightList);
 
-        for (PeptideAttribute attr : attrModel.getAttributes()) {
-            if (!attrModel.getAvailableColumnsModel().contains(attr)) {
+        for (Iterator<PeptideAttribute> it = attrModel.getAttributeIterator(); it.hasNext();) {
+            PeptideAttribute attr = it.next();
+            if (attr.isMolecularDescriptor() && !attrModel.getAvailableColumnsModel().contains(attr)) {
                 unselectedModel.addElement(attr);
             }
         }
 
         for (PeptideAttribute attr : attrModel.getAvailableColumnsModel()) {
-            selectedModel.addElement(attr);
+            if (attr.isMolecularDescriptor()) {
+                selectedModel.addElement(attr);
+            }
         }
+
+        addAllButton.setEnabled(!unselectedModel.isEmpty());
+        addButton.setEnabled(false);
+        removeAllButton.setEnabled(!selectedModel.isEmpty());
+        removeButton.setEnabled(false);
+
+        leftList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+                addButton.setEnabled(!lsm.isSelectionEmpty());
+            }
+        });
+
+        rightList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+                removeButton.setEnabled(!lsm.isSelectionEmpty());
+            }
+        });
+
     }
 
     private void moveFromTo(int[] indices, DefaultListModel<PeptideAttribute> srcModel, DefaultListModel<PeptideAttribute> desModel) {
@@ -63,14 +92,18 @@ public class PeptideAvailableColumnsPanel extends javax.swing.JPanel {
             attrModel.addAvailableColumn(unselectedModel.get(indices[i]));
         }
         moveFromTo(indices, unselectedModel, selectedModel);
+        addAllButton.setEnabled(!unselectedModel.isEmpty());
+        removeAllButton.setEnabled(!selectedModel.isEmpty());
     }
-    
-    private void remove(){
+
+    private void remove() {
         int[] indices = rightList.getSelectedIndices();
         for (int i = 0; i < indices.length; i++) {
             attrModel.removeAvailableColumn(selectedModel.get(indices[i]));
         }
-        moveFromTo(indices, selectedModel, unselectedModel);    
+        moveFromTo(indices, selectedModel, unselectedModel);
+        addAllButton.setEnabled(!unselectedModel.isEmpty());
+        removeAllButton.setEnabled(!selectedModel.isEmpty());
     }
 
     /**
@@ -94,8 +127,8 @@ public class PeptideAvailableColumnsPanel extends javax.swing.JPanel {
         removeButton = new javax.swing.JButton();
         removeAllButton = new javax.swing.JButton();
 
-        setMinimumSize(new java.awt.Dimension(486, 380));
-        setPreferredSize(new java.awt.Dimension(486, 380));
+        setMinimumSize(new java.awt.Dimension(590, 380));
+        setPreferredSize(new java.awt.Dimension(590, 380));
         setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.jLabel1.text")); // NOI18N
@@ -112,8 +145,8 @@ public class PeptideAvailableColumnsPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         add(jLabel2, gridBagConstraints);
 
-        leftScrollPane.setMinimumSize(new java.awt.Dimension(225, 23));
-        leftScrollPane.setPreferredSize(new java.awt.Dimension(225, 23));
+        leftScrollPane.setMinimumSize(new java.awt.Dimension(275, 23));
+        leftScrollPane.setPreferredSize(new java.awt.Dimension(275, 23));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -123,8 +156,8 @@ public class PeptideAvailableColumnsPanel extends javax.swing.JPanel {
         gridBagConstraints.weighty = 1.0;
         add(leftScrollPane, gridBagConstraints);
 
-        rightScrollPane.setMinimumSize(new java.awt.Dimension(225, 23));
-        rightScrollPane.setPreferredSize(new java.awt.Dimension(225, 23));
+        rightScrollPane.setMinimumSize(new java.awt.Dimension(275, 23));
+        rightScrollPane.setPreferredSize(new java.awt.Dimension(275, 23));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
@@ -137,10 +170,11 @@ public class PeptideAvailableColumnsPanel extends javax.swing.JPanel {
         controlToolBar.setFloatable(false);
         controlToolBar.setOrientation(javax.swing.SwingConstants.VERTICAL);
         controlToolBar.setRollover(true);
-        controlToolBar.setMinimumSize(new java.awt.Dimension(36, 102));
-        controlToolBar.setPreferredSize(new java.awt.Dimension(36, 102));
+        controlToolBar.setMinimumSize(new java.awt.Dimension(40, 102));
+        controlToolBar.setPreferredSize(new java.awt.Dimension(40, 102));
 
         org.openide.awt.Mnemonics.setLocalizedText(addButton, org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.addButton.text")); // NOI18N
+        addButton.setToolTipText(org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.addButton.toolTipText")); // NOI18N
         addButton.setFocusable(false);
         addButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         addButton.setMaximumSize(new java.awt.Dimension(50, 21));
@@ -155,6 +189,7 @@ public class PeptideAvailableColumnsPanel extends javax.swing.JPanel {
         controlToolBar.add(addButton);
 
         org.openide.awt.Mnemonics.setLocalizedText(addAllButton, org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.addAllButton.text")); // NOI18N
+        addAllButton.setToolTipText(org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.addAllButton.toolTipText")); // NOI18N
         addAllButton.setFocusable(false);
         addAllButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         addAllButton.setMaximumSize(new java.awt.Dimension(50, 21));
@@ -169,6 +204,7 @@ public class PeptideAvailableColumnsPanel extends javax.swing.JPanel {
         controlToolBar.add(jSeparator1);
 
         org.openide.awt.Mnemonics.setLocalizedText(removeButton, org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.removeButton.text")); // NOI18N
+        removeButton.setToolTipText(org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.removeButton.toolTipText")); // NOI18N
         removeButton.setFocusable(false);
         removeButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         removeButton.setMaximumSize(new java.awt.Dimension(50, 21));
@@ -183,6 +219,7 @@ public class PeptideAvailableColumnsPanel extends javax.swing.JPanel {
         controlToolBar.add(removeButton);
 
         org.openide.awt.Mnemonics.setLocalizedText(removeAllButton, org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.removeAllButton.text")); // NOI18N
+        removeAllButton.setToolTipText(org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.removeAllButton.toolTipText")); // NOI18N
         removeAllButton.setFocusable(false);
         removeAllButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         removeAllButton.setMaximumSize(new java.awt.Dimension(50, 21));

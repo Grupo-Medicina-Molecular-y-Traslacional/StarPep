@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -73,7 +74,7 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
         menu = new JMenu(NbBundle.getMessage(SelectWorkspace.class, "CTL_SelectWorkspace"));
 //        menuGroup = new ButtonGroup();
         menuMap = new HashMap<>();
-        populateMenuItems(pc.getWorkspaces());
+        populateMenuItems();
         pc.getCurrentWorkspace().addPropertyChangeListener(this);
     }
 
@@ -142,9 +143,10 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
         item.setSelected(true);
     }
 
-    private void populateMenuItems(Workspace[] workspaces) {
+    private void populateMenuItems() {
         JCheckBoxMenuItem item;
-        for (Workspace ws : workspaces) {
+        for (Iterator<? extends Workspace> it = pc.getWorkspaceIterator(); it.hasNext();) {
+            Workspace ws = it.next();
             item = createJMenuItem(ws);
             popup.add(item);
             popupGroup.add(item);
@@ -165,7 +167,7 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
 //        menuGroup = new ButtonGroup();
         popupMap.clear();
         menuMap.clear();
-        populateMenuItems(workspaces.toArray(new Workspace[0]));
+        populateMenuItems();
     }
 
     @Override

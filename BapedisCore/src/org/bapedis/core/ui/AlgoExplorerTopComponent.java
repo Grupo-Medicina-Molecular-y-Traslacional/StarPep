@@ -607,9 +607,9 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
         @Override
         public void algorithmFinished(Algorithm algo) {
-            Workspace[] workspaces = pm.getWorkspaces();
             AlgorithmModel algoModel;
-            for (Workspace workspace : workspaces) {
+            for (Iterator<? extends Workspace> it = pm.getWorkspaceIterator(); it.hasNext();) {
+                Workspace workspace = it.next();
                 algoModel = pm.getAlgorithmModel(workspace);
                 if (algoModel.getSelectedAlgorithm() != null && algoModel.getSelectedAlgorithm().equals(algo)) {
                     algoModel.setRunning(false);

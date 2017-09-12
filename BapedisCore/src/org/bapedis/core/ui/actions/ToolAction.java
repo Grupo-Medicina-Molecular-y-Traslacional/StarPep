@@ -31,67 +31,60 @@ import org.openide.windows.WindowManager;
  *
  * @author Home
  */
-public class ToolAction extends AbstractAction implements Presenter.Menu{
+public class ToolAction extends AbstractAction implements Presenter.Menu {
+
     protected final AlgorithmCategory category;
+    protected final ProjectManager pc;
 
     public ToolAction(AlgorithmCategory category) {
         this.category = category;
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
     }
-        
+
     @Override
-    public void actionPerformed(ActionEvent e) {       
+    public void actionPerformed(ActionEvent e) {
     }
 
     @Override
     public JMenuItem getMenuPresenter() {
-        List<? extends AlgorithmFactory> factories = new ArrayList<>(Lookup.getDefault().lookupAll(AlgorithmFactory.class));
-        for (Iterator<? extends AlgorithmFactory> it = factories.iterator(); it.hasNext();) {
-            AlgorithmFactory f = it.next();
-            if (f.getCategory() != category) {
-                it.remove();
-            }
-        }
-        Collections.sort(factories, new Comparator() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                return ((AlgorithmFactory) o1).getName().compareTo(((AlgorithmFactory) o2).getName());
-            }
-        });
         JMenu main = new JMenu(category.getDisplayName());
         JMenuItem item;
-        for (final AlgorithmFactory factory : factories) {
-            item = new JMenuItem(factory.getName());
-            item.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-                    AlgorithmModel algoModel = pc.getAlgorithmModel();
-                    algoModel.setCategory(category);
+        for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
+            final AlgorithmFactory factory = it.next();
+            if (factory.getCategory() == category) {
+                item = new JMenuItem(factory.getName());
+                item.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+                        AlgorithmModel algoModel = pc.getAlgorithmModel();
+                        algoModel.setCategory(category);
 
-                    Workspace currentWs = pc.getCurrentWorkspace();
-                    Collection<? extends Algorithm> savedAlgo = currentWs.getLookup().lookupAll(Algorithm.class);
-                    Algorithm algorithm = null;
-                    for (Algorithm algo : savedAlgo) {
-                        if (algo.getFactory() == factory) {
-                            algorithm = algo;
-                            break;
+                        Workspace currentWs = pc.getCurrentWorkspace();
+                        Collection<? extends Algorithm> savedAlgo = currentWs.getLookup().lookupAll(Algorithm.class);
+                        Algorithm algorithm = null;
+                        for (Algorithm algo : savedAlgo) {
+                            if (algo.getFactory() == factory) {
+                                algorithm = algo;
+                                break;
+                            }
                         }
-                    }
-                    if (algorithm == null) {
-                        algorithm = factory.createAlgorithm();
-                        currentWs.add(algorithm);
-                    }
-                    algoModel.setSelectedAlgorithm(algorithm);
+                        if (algorithm == null) {
+                            algorithm = factory.createAlgorithm();
+                            currentWs.add(algorithm);
+                        }
+                        algoModel.setSelectedAlgorithm(algorithm);
 
-                    TopComponent tc = WindowManager.getDefault().findTopComponent("AlgoExplorerTopComponent");
-                    tc.open();
-                    tc.requestActive();
+                        TopComponent tc = WindowManager.getDefault().findTopComponent("AlgoExplorerTopComponent");
+                        tc.open();
+                        tc.requestActive();
 
-                }
-            });
-            main.add(item);
+                    }
+                });
+                main.add(item);
+            }
         }
         return main;
     }
-    
+
 }

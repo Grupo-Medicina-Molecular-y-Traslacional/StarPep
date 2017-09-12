@@ -7,6 +7,7 @@ package org.bapedis.core.model;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -80,8 +81,8 @@ public class FilterModel {
         return filters.isEmpty();
     }
 
-    public Filter[] getFilters() {
-        return filters.toArray(new Filter[0]);
+    public Iterator<Filter> getFilterIterator() {
+        return filters.iterator();
     }
 
     public RestrictionLevel getRestriction() {

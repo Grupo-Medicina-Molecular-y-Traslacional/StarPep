@@ -6,6 +6,7 @@
 package org.bapedis.db.dao;
 
 import java.awt.Color;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AttributesModel;
@@ -103,7 +104,8 @@ public class PeptideDAOImpl implements PeptideDAO {
             ResourceIterator<Node> peptideNodes;
             if (queryModel.countElements() > 0) {
                 List<Node> metadataNodes = new LinkedList<>();
-                for (Metadata metadata : queryModel.getMetadatas()) {
+                for (Iterator<Metadata> it = queryModel.getMetadataIterator(); it.hasNext();) {
+                    Metadata metadata = it.next();
                     metadataNodes.add(graphDb.getNodeById(Long.valueOf(metadata.getUnderlyingNodeID())));
                 }
                 peptideNodes = getPeptides(metadataNodes, queryModel.getRestriction());

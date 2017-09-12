@@ -7,6 +7,7 @@ package org.bapedis.core.spi.filters.impl;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Iterator;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.AncestorEvent;
@@ -16,7 +17,6 @@ import javax.swing.event.DocumentListener;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.model.PeptideAttribute;
-import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterSetupUI;
 import org.openide.util.Lookup;
@@ -235,7 +235,8 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         attrComboBox.removeAllItems();
         AttributesModel attrModel = pc.getAttributesModel();
         if (attrModel != null) {
-            for (PeptideAttribute attr : attrModel.getAttributes()) {
+            for (Iterator<PeptideAttribute> it = attrModel.getAttributeIterator(); it.hasNext();) {
+                PeptideAttribute attr = it.next();
                 attrComboBox.addItem(attr);
             }
             attrComboBox.setSelectedIndex(0);

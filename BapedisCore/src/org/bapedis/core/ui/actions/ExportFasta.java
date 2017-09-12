@@ -12,7 +12,6 @@ import org.bapedis.core.io.impl.FastaExporterUI;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.ui.components.SetupDialog;
-import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionID;
@@ -46,7 +45,7 @@ public final class ExportFasta extends WorkspaceContextSensitiveAction<Attribute
         ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
         AttributesModel attrModel = pm.getAttributesModel();
         Peptide[] peptides = attrModel.getPeptides();
-        FastaExporterUI ui = new FastaExporterUI(attrModel.getAttributes());
+        FastaExporterUI ui = new FastaExporterUI();
         if (dialog.setup(ui.getPanel(), ui, NbBundle.getMessage(ExportFasta.class, "ExportFasta.dialogTitle"))) {
             try {
                 FastaExporter exporter = new FastaExporter(peptides, ui.getSelectedAttributes());

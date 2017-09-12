@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.task;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
@@ -146,14 +147,16 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
         if (!filterModel.isEmpty()) {
             switch (filterModel.getRestriction()) {
                 case MATCH_ALL:
-                    for (Filter filter : filterModel.getFilters()) {
+                    for (Iterator<Filter> it = filterModel.getFilterIterator(); it.hasNext();) {
+                        Filter filter = it.next();
                         if (!filter.accept(peptide)) {
                             return false;
                         }
                     }
                     return true;
                 case MATCH_ANY:
-                    for (Filter filter : filterModel.getFilters()) {
+                    for (Iterator<Filter> it = filterModel.getFilterIterator(); it.hasNext();) {
+                        Filter filter = it.next();
                         if (filter.accept(peptide)) {
                             return true;
                         }

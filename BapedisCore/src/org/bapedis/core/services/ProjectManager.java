@@ -7,6 +7,7 @@ package org.bapedis.core.services;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.events.WorkspaceEventListener;
@@ -15,6 +16,7 @@ import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.task.AlgorithmExecutor;
 import org.gephi.graph.api.Configuration;
@@ -42,10 +44,9 @@ public class ProjectManager implements Lookup.Provider {
     protected List<WorkspaceEventListener> wsListeners;
     protected final AlgorithmExecutor executor;
     private final String PRO_NAME = "name";
-    private final String PRO_NAME_TITLE=NbBundle.getMessage(ProjectManager.class, "NodeTable.column.name.title");
+    private final String PRO_NAME_TITLE = NbBundle.getMessage(ProjectManager.class, "NodeTable.column.name.title");
     private final String PRO_XREF = "xref";
-    private final String PRO_XREF_TITLE=NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.xref.title");
-    
+    private final String PRO_XREF_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.xref.title");
 
     public ProjectManager() {
         executor = new AlgorithmExecutor();
@@ -89,8 +90,8 @@ public class ProjectManager implements Lookup.Provider {
 
     public Workspace getPrevWorkspace() {
         Workspace prev = null;
-        Workspace[] workspaces = getWorkspaces();
-        for (Workspace w : workspaces) {
+        for (Iterator<? extends Workspace> it = getWorkspaceIterator(); it.hasNext();) {
+            Workspace w = it.next();
             if (w == currentWS) {
                 return prev;
             }
@@ -101,8 +102,8 @@ public class ProjectManager implements Lookup.Provider {
 
     public Workspace getNextWorkspace() {
         Workspace prev = null;
-        Workspace[] workspaces = getWorkspaces();
-        for (Workspace w : workspaces) {
+        for (Iterator<? extends Workspace> it = getWorkspaceIterator(); it.hasNext();) {
+            Workspace w = it.next();
             if (prev == currentWS) {
                 return w;
             }
@@ -111,9 +112,9 @@ public class ProjectManager implements Lookup.Provider {
         return null;
     }
 
-    public synchronized Workspace[] getWorkspaces() {
+    public synchronized Iterator<? extends Workspace> getWorkspaceIterator() {
         Collection<? extends Workspace> workspaces = lookup.lookupAll(Workspace.class);
-        return workspaces.toArray(new Workspace[0]);
+        return workspaces.iterator();
     }
 
     public AlgorithmExecutor getExecutor() {
@@ -135,10 +136,15 @@ public class ProjectManager implements Lookup.Provider {
         setCurrentWorkspace(defaultWorkspace);
     }
 
-    public FilterFactory[] getFilterFactories() {
+    public Iterator<? extends FilterFactory> getFilterFactoryIterator() {
         Collection<? extends FilterFactory> factories = Lookup.getDefault().lookupAll(FilterFactory.class);
-        return factories.toArray(new FilterFactory[0]);
+        return factories.iterator();
     }
+    
+    public Iterator<? extends AlgorithmFactory> getAlgorithmFactoryIterator() {
+        Collection<? extends AlgorithmFactory> factories = Lookup.getDefault().lookupAll(AlgorithmFactory.class);
+        return factories.iterator();
+    }    
 
     // Data Models
     public AttributesModel getAttributesModel() {
@@ -163,18 +169,18 @@ public class ProjectManager implements Lookup.Provider {
         }
         return model;
     }
-    
+
     protected void createColumns(GraphModel graphModel) {
         Table nodeTable = graphModel.getNodeTable();
         if (!nodeTable.hasColumn(PRO_NAME)) {
             nodeTable.addColumn(PRO_NAME, PRO_NAME_TITLE, String.class, Origin.DATA, "", false);
-        }                
+        }
 
         Table edgeTable = graphModel.getEdgeTable();
         if (!edgeTable.hasColumn(PRO_XREF)) {
             edgeTable.addColumn(PRO_XREF, PRO_XREF_TITLE, String[].class, Origin.DATA, new String[]{}, false);
         }
-    }    
+    }
 
     public QueryModel getQueryModel() {
         return getQueryModel(getCurrentWorkspace());

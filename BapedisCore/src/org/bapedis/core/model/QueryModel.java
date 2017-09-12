@@ -7,6 +7,7 @@ package org.bapedis.core.model;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -59,8 +60,12 @@ public class QueryModel {
         propertyChangeSupport.firePropertyChange(METADATA_ACTIVATED, old, metadataActivated);
     }
 
-    public Metadata[] getMetadatas() {
-        return metadatas.toArray(new Metadata[0]);
+    public Iterator<Metadata> getMetadataIterator() {
+        return metadatas.iterator();
+    }
+    
+    public List<Metadata> getMetadataList(){
+        return metadatas;
     }
 
     public void add(Metadata metadata) {

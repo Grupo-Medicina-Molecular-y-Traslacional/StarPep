@@ -9,6 +9,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -51,8 +52,8 @@ public class AttributesModel {
         availableColumnsModel.add(PeptideDAO.LENGHT);
     }
 
-    public PeptideAttribute[] getAttributes() {
-        return attrsMap.values().toArray(new PeptideAttribute[0]);
+    public Iterator<PeptideAttribute> getAttributeIterator() {
+        return attrsMap.values().iterator();
     }
 
     public Set<PeptideAttribute> getAvailableColumnsModel() {
@@ -73,6 +74,14 @@ public class AttributesModel {
             return true;
         }
         return false;
+    }
+    
+    public void deleteAttribute(PeptideAttribute attr){
+        for (PeptideNode pNode : nodeList){
+            pNode.getPeptide().deleteAttribute(attr);
+        }
+        removeAvailableColumn(attr);
+        attrsMap.remove(attr.id);
     }
 
     public synchronized Peptide[] getPeptides() {

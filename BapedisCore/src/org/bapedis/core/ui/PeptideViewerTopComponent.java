@@ -47,6 +47,7 @@ import org.bapedis.core.ui.actions.MolecularDescriptorAction;
 import org.bapedis.core.ui.actions.ToolAction;
 import org.bapedis.core.ui.components.GraphElementAvailableColumnsPanel;
 import org.bapedis.core.ui.components.PeptideAvailableColumnsPanel;
+import org.bapedis.core.ui.components.PeptideDeleteColumnsPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.netbeans.swing.etable.ETableColumn;
 import org.netbeans.swing.etable.ETableColumnModel;
@@ -155,15 +156,15 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         errorLabel = new JLabel(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.errorLabel.text"), new ImageIcon(ImageUtilities.loadImage("org/bapedis/core/resources/sad.png", true)), JLabel.CENTER);
         errorLabel.setHorizontalAlignment(SwingConstants.CENTER);
         centerPanel.add(errorLabel, "errorCard");
-        
+
         leftToolBar.add(createAddMDButton(), 0);
     }
-    
-    private JButton createAddMDButton() {        
+
+    private JButton createAddMDButton() {
         MolecularDescriptorAction mdAction = new MolecularDescriptorAction();
-        JMenu menu = (JMenu)mdAction.getMenuPresenter();
+        JMenu menu = (JMenu) mdAction.getMenuPresenter();
         final JPopupMenu popup = menu.getPopupMenu();
-        
+
         final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/bapedis/core/resources/add_md.gif", false), popup);
         dropDownButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.addMD.tooltiptext"));
         dropDownButton.addActionListener(new ActionListener() {
@@ -175,18 +176,15 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             }
         });
         return dropDownButton;
-    }    
+    }
 
     private void populateVisibleColumns(AttributesModel attrModel) {
         if (attrModel != null) {
-            PeptideAttribute[] attrs = attrModel.getAttributes();
             Set<PeptideAttribute> availableColumnsModel = attrModel.getAvailableColumnsModel();
             List<String> columns = new LinkedList<>();
-            for (PeptideAttribute attr : attrs) {
-                if (availableColumnsModel.contains(attr)) {
-                    columns.add(attr.getId());
-                    columns.add(attr.getDisplayName());
-                }
+            for (PeptideAttribute attr : availableColumnsModel) {
+                columns.add(attr.getId());
+                columns.add(attr.getDisplayName());
             }
             view.setPropertyColumns(columns.toArray(new String[0]));
             //Hide node column
@@ -216,10 +214,8 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         jAddButton.setVisible(attrModel != null);
         if (attrModel != null) {
             Set<PeptideAttribute> availableColumnsModel = attrModel.getAvailableColumnsModel();
-            for (PeptideAttribute attr : attrModel.getAttributes()) {
-                if (availableColumnsModel.contains(attr)) {
-                    jFieldComboBox.addItem(attr);
-                }
+            for (PeptideAttribute attr : availableColumnsModel) {
+                jFieldComboBox.addItem(attr);
             }
             if (jFieldComboBox.getItemCount() > 0) {
                 jFieldComboBox.setSelectedIndex(0);
@@ -261,9 +257,15 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
         delMDButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/delete_md.gif"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(delMDButton, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.delMDButton.text")); // NOI18N
+        delMDButton.setToolTipText(org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.delMDButton.toolTipText")); // NOI18N
         delMDButton.setFocusable(false);
         delMDButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         delMDButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        delMDButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                delMDButtonActionPerformed(evt);
+            }
+        });
         leftToolBar.add(delMDButton);
 
         columnsButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/select_md.png"))); // NOI18N
@@ -405,11 +407,18 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }//GEN-LAST:event_jFieldComboBoxActionPerformed
 
     private void columnsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_columnsButtonActionPerformed
-        DialogDescriptor dd = new DialogDescriptor(new PeptideAvailableColumnsPanel(currentModel), NbBundle.getMessage(GraphElementAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.title"));
+        DialogDescriptor dd = new DialogDescriptor(new PeptideAvailableColumnsPanel(currentModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.AvailableColumnsPanel.title"));
         dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION});
         DialogDisplayer.getDefault().notify(dd);
         populateVisibleColumns(currentModel);
     }//GEN-LAST:event_columnsButtonActionPerformed
+
+    private void delMDButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delMDButtonActionPerformed
+        DialogDescriptor dd = new DialogDescriptor(new PeptideDeleteColumnsPanel(currentModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.DeleteColumnsPanel.title"));
+        dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION});
+        DialogDisplayer.getDefault().notify(dd);
+        populateVisibleColumns(currentModel);
+    }//GEN-LAST:event_delMDButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
@@ -486,20 +495,20 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             }
             QueryModel oldQueryModel = pc.getQueryModel(oldWs);
             oldQueryModel.removePropertyChangeListener(this);
-            
+
             FilterModel oldFilterModel = pc.getFilterModel(oldWs);
             oldFilterModel.removePropertyChangeListener(this);
-            
+
         }
         peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
         peptideLkpResult.addLookupListener(this);
 
         QueryModel queryModel = pc.getQueryModel(newWs);
         queryModel.addPropertyChangeListener(this);
-        
+
         FilterModel filterModel = pc.getFilterModel(newWs);
         filterModel.addPropertyChangeListener(this);
-        
+
         setBusyLabel(queryModel.isRunning() || filterModel.isRunning());
 
         AttributesModel peptidesModel = pc.getAttributesModel(newWs);
@@ -558,11 +567,11 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         if (evt.getSource().equals(currentModel)) {
             if (evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
                 setQuickFilter();
-            } else if (evt.getPropertyName().equals(AttributesModel.AVAILABLE_ATTR_ADDED)){
-                PeptideAttribute attr = (PeptideAttribute)evt.getNewValue();
+            } else if (evt.getPropertyName().equals(AttributesModel.AVAILABLE_ATTR_ADDED)) {
+                PeptideAttribute attr = (PeptideAttribute) evt.getNewValue();
                 jFieldComboBox.addItem(attr);
-            }else if (evt.getPropertyName().equals(AttributesModel.AVAILABLE_ATTR_REMOVED)){
-                PeptideAttribute attr = (PeptideAttribute)evt.getOldValue();
+            } else if (evt.getPropertyName().equals(AttributesModel.AVAILABLE_ATTR_REMOVED)) {
+                PeptideAttribute attr = (PeptideAttribute) evt.getOldValue();
                 jFieldComboBox.removeItem(attr);
             }
         } else if (evt.getSource() instanceof QueryModel) {

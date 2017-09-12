@@ -26,7 +26,7 @@ public class QueryModelChildFactory extends ChildFactory<Metadata> implements Pr
     
     @Override
     protected boolean createKeys(List<Metadata> list) {
-        list.addAll(Arrays.asList(queryModel.getMetadatas()));
+        list.addAll(queryModel.getMetadataList());
         return true;
     }
 

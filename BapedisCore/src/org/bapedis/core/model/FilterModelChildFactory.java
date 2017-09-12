@@ -7,6 +7,7 @@ package org.bapedis.core.model;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Iterator;
 import java.util.List;
 import org.bapedis.core.spi.filters.Filter;
 import org.openide.nodes.ChildFactory;
@@ -26,8 +27,8 @@ public class FilterModelChildFactory extends ChildFactory<Filter> implements Pro
     
     @Override
     protected boolean createKeys(List<Filter> list) {
-        Filter[] filters = filterModel.getFilters();
-        for(Filter f: filters){
+        for(Iterator<Filter> it = filterModel.getFilterIterator(); it.hasNext();){
+            Filter f = it.next();
             list.add(f);
         }
         return true;

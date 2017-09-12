@@ -15,18 +15,18 @@ public class PeptideAttribute {
     protected String id;
     protected String displayName;
     protected Class<?> type;
-    protected boolean visible;
+    protected final boolean md;
     
     public PeptideAttribute(String id, String displayName, Class<?> type) {
         this(id, displayName, type, true);
         
     }
 
-    public PeptideAttribute(String id, String displayName, Class<?> type, boolean visible) {
+    public PeptideAttribute(String id, String displayName, Class<?> type, boolean md) {
         this.id = id;
         this.displayName = displayName;
         this.type = type;
-        this.visible = visible;
+        this.md = md;
     }     
     
     public String getId() {
@@ -41,13 +41,10 @@ public class PeptideAttribute {
         return type;
     }
     
-    public boolean isVisible() {
-        return visible;
+    public boolean isMolecularDescriptor() {
+        return md;
     }
-
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }    
+ 
 
     @Override
     public boolean equals(Object obj) {

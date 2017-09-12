@@ -6,6 +6,7 @@
 package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.Iterator;
 import javax.swing.AbstractAction;
 import static javax.swing.Action.NAME;
 import org.bapedis.core.model.Metadata;
@@ -29,7 +30,8 @@ public class RemoveOthersFromQueryModel extends AbstractAction{
     @Override
     public void actionPerformed(ActionEvent e) {
         QueryModel queryModel = Lookup.getDefault().lookup(ProjectManager.class).getQueryModel();
-        for(Metadata m: queryModel.getMetadatas()){
+        for(Iterator<Metadata> it = queryModel.getMetadataIterator(); it.hasNext();){
+            Metadata m = it.next();
             if (!m.equals(metadata)){
                 queryModel.remove(m);
             }

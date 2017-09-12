@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
@@ -271,8 +272,8 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     
     private JButton createAddFilterButton() {
         final JPopupMenu popup = new JPopupMenu();
-        FilterFactory[] factories = pc.getFilterFactories();
-        for (final FilterFactory factory : factories) {
+        for (Iterator<? extends FilterFactory> it = pc.getFilterFactoryIterator(); it.hasNext();) {
+            FilterFactory factory = it.next();
             popup.add(new AddFilter(factory));
         }
         

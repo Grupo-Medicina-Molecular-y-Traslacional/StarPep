@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.task;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
@@ -49,7 +50,8 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
         oldView = graphModel.getVisibleView();
         AttributesModel model = dao.getPeptides(queryModel, graphModel);
         Graph graph = graphModel.getGraphVisible();
-        for (Metadata metadata : queryModel.getMetadatas()) {
+        for (Iterator<Metadata> it = queryModel.getMetadataIterator(); it.hasNext();) {
+            Metadata metadata = it.next();
             metadata.setGraphNode(graph.getNode(metadata.getUnderlyingNodeID()));
         }
         return model;

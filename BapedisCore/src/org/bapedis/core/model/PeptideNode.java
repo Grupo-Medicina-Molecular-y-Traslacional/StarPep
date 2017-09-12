@@ -11,7 +11,6 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import javax.swing.Action;
-import org.bapedis.core.spi.data.PeptideDAO;
 import org.bapedis.core.ui.actions.SelectNodeOnGraph;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
@@ -138,7 +137,7 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
         descriptors.setValue("tabName", NbBundle.getMessage(PeptideNode.class, "PropertySet.attributes.tabName"));
         descriptors.setDisplayName(NbBundle.getMessage(PeptideNode.class, "PropertySet.descriptors"));
         for (PeptideAttribute attr : peptide.getAttributes()) {
-            if (!(attr.equals(PeptideDAO.ID) || attr.equals(PeptideDAO.SEQ))) {
+            if (attr.isMolecularDescriptor()) {
                 property = createPropertyField(attr.getId(), attr.getDisplayName(), attr.getDisplayName(), attr.getType(), peptide.getAttributeValue(attr));
                 descriptors.put(property);
             }
@@ -178,9 +177,14 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(Peptide.DESCRIPTOR_CHANGE) && descriptors != null) {
-            PeptideAttribute attr = (PeptideAttribute) evt.getNewValue();
-            PropertySupport.ReadOnly property = createPropertyField(attr.getId(), attr.getDisplayName(), attr.getDisplayName(), attr.getType(), peptide.getAttributeValue(attr));
-            descriptors.put(property);
+            if (evt.getNewValue() != null) {
+                PeptideAttribute attr = (PeptideAttribute) evt.getNewValue();
+                PropertySupport.ReadOnly property = createPropertyField(attr.getId(), attr.getDisplayName(), attr.getDisplayName(), attr.getType(), peptide.getAttributeValue(attr));
+                descriptors.put(property);
+            } else if (evt.getOldValue() != null) {
+                PeptideAttribute attr = (PeptideAttribute) evt.getOldValue();
+                descriptors.remove(attr.getId());
+            }
         }
     }
 

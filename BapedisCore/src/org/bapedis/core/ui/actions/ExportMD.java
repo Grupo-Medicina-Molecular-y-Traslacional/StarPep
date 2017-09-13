@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import org.bapedis.core.io.impl.FastaExporter;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.io.impl.FileExporterUI;
+import org.bapedis.core.io.impl.MDExporter;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.ui.components.SetupDialog;
 import org.openide.DialogDisplayer;
@@ -24,21 +25,21 @@ import org.openide.util.NbBundle.Messages;
 
 @ActionID(
         category = "File",
-        id = "org.bapedis.core.ui.actions.ExportFasta"
+        id = "org.bapedis.core.ui.actions.ExportMD"
 )
 @ActionRegistration(
-        displayName = "#CTL_ExportFasta"
+        displayName = "#CTL_ExportMD"
 )
 @ActionReferences({
-    @ActionReference(path = "Actions/ExportPeptides", position = 100),
-    @ActionReference(path = "Menu/File/ExportData", position = 100)
+    @ActionReference(path = "Actions/ExportPeptides", position = 200),
+    @ActionReference(path = "Menu/File/ExportData", position = 200)
 })
-@Messages("CTL_ExportFasta=Peptide sequences (FASTA format)")
-public final class ExportFasta extends WorkspaceContextSensitiveAction<AttributesModel> {
+@Messages("CTL_ExportMD=Molecular descriptors (CSV format)")
+public final class ExportMD extends WorkspaceContextSensitiveAction<AttributesModel> {
 
     protected final SetupDialog dialog;
 
-    public ExportFasta() {
+    public ExportMD() {
         super(AttributesModel.class);
         dialog = new SetupDialog();
     }
@@ -47,10 +48,10 @@ public final class ExportFasta extends WorkspaceContextSensitiveAction<Attribute
     public void actionPerformed(ActionEvent e) {
         ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
         AttributesModel attrModel = pm.getAttributesModel();
-        FileExporterUI ui = new FileExporterUI(".fasta");
-        if (dialog.setup(ui, ui, NbBundle.getMessage(ExportFasta.class, "ExportFasta.dialogTitle"))) {
+        FileExporterUI ui = new FileExporterUI(".csv");
+        if (dialog.setup(ui, ui, NbBundle.getMessage(ExportMD.class, "ExportMD.dialogTitle"))) {
             try {
-                FastaExporter exporter = new FastaExporter(attrModel);
+                MDExporter exporter = new MDExporter(attrModel);
                 exporter.exportTo(ui.getSelectedFile());
             } catch (Exception ex) {
                 DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Error: " + ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE));

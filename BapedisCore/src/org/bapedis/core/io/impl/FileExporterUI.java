@@ -55,8 +55,8 @@ public class FileExporterUI extends javax.swing.JPanel implements ValidationSupp
         browseButton = new javax.swing.JButton();
         fileTextField = new javax.swing.JTextField();
 
-        setMinimumSize(new java.awt.Dimension(489, 23));
-        setPreferredSize(new java.awt.Dimension(489, 23));
+        setMinimumSize(new java.awt.Dimension(489, 50));
+        setPreferredSize(new java.awt.Dimension(489, 50));
         setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(fileLabel, org.openide.util.NbBundle.getMessage(FileExporterUI.class, "FileExporterUI.fileLabel.text")); // NOI18N

@@ -6,14 +6,11 @@
 package org.bapedis.core.io.impl;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.io.Exporter;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideAttribute;
-import org.bapedis.core.spi.data.PeptideDAO;
 import org.biojava.nbio.core.sequence.ProteinSequence;
 import org.biojava.nbio.core.sequence.io.FastaWriterHelper;
 

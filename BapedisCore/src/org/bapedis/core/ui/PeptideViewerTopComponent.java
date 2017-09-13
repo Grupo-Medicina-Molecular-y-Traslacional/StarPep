@@ -12,40 +12,30 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
-import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.QueryModel;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.spi.filters.Filter;
-import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.spi.filters.impl.AttributeFilter;
 import org.bapedis.core.spi.filters.impl.FilterHelper;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
-import org.bapedis.core.ui.actions.AddFilter;
 import org.bapedis.core.ui.actions.MolecularDescriptorAction;
-import org.bapedis.core.ui.actions.ToolAction;
-import org.bapedis.core.ui.components.GraphElementAvailableColumnsPanel;
 import org.bapedis.core.ui.components.PeptideAvailableColumnsPanel;
 import org.bapedis.core.ui.components.PeptideDeleteColumnsPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -73,6 +63,7 @@ import org.jdesktop.swingx.JXBusyLabel;
 import org.openide.DialogDescriptor;
 import org.openide.awt.DropDownButtonFactory;
 import org.openide.explorer.view.NodePopupFactory;
+import org.openide.util.Utilities;
 import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
 
@@ -158,6 +149,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         centerPanel.add(errorLabel, "errorCard");
 
         leftToolBar.add(createAddMDButton(), 0);
+        leftToolBar.add(createExportButton());
     }
 
     private JButton createAddMDButton() {
@@ -177,6 +169,27 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         });
         return dropDownButton;
     }
+    
+    private JButton createExportButton() {
+        final JPopupMenu popup = new JPopupMenu();
+        
+        List<? extends Action> actions = Utilities.actionsForPath("Actions/ExportPeptides");
+        for (Action action : actions) {
+            popup.add(action);
+        }        
+
+        final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/bapedis/core/resources/export.png", false), popup);
+        dropDownButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.export.tooltiptext"));
+        dropDownButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (dropDownButton.isEnabled()) {
+                    popup.show(dropDownButton, 0, dropDownButton.getHeight());
+                }
+            }
+        });
+        return dropDownButton;
+    }    
 
     private void populateVisibleColumns(AttributesModel attrModel) {
         if (attrModel != null) {
@@ -236,7 +249,6 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         leftToolBar = new javax.swing.JToolBar();
         delMDButton = new javax.swing.JButton();
         columnsButton = new javax.swing.JButton();
-        exportButton = new javax.swing.JButton();
         rightPanel = new javax.swing.JPanel();
         jLabelFilter = new javax.swing.JLabel();
         jFieldComboBox = new javax.swing.JComboBox();
@@ -279,13 +291,6 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             }
         });
         leftToolBar.add(columnsButton);
-
-        exportButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/export_table.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(exportButton, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.exportButton.text")); // NOI18N
-        exportButton.setFocusable(false);
-        exportButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        exportButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        leftToolBar.add(exportButton);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -424,7 +429,6 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     private javax.swing.JPanel centerPanel;
     private javax.swing.JButton columnsButton;
     private javax.swing.JButton delMDButton;
-    private javax.swing.JButton exportButton;
     private javax.swing.JButton jAddButton;
     private javax.swing.JComboBox jFieldComboBox;
     private javax.swing.JLabel jLabelFilter;

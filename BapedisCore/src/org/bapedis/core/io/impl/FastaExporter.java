@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.io.Exporter;
+import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.data.PeptideDAO;
@@ -22,32 +23,19 @@ import org.biojava.nbio.core.sequence.io.FastaWriterHelper;
  */
 public class FastaExporter implements Exporter {
 
-    protected List<PeptideAttribute> attributes;
-    protected Peptide[] peptides;
+    protected final AttributesModel attrModel;
 
-    public FastaExporter(Peptide[] peptides, List<PeptideAttribute> attributes) {
-        this.peptides = peptides;
-        this.attributes = attributes;
+    public FastaExporter(AttributesModel attrModel) {
+        this.attrModel = attrModel;
     }
 
     @Override
     public void exportTo(File file) throws Exception {
         List<ProteinSequence> sequences = new LinkedList<>();
         ProteinSequence seq;
-        StringBuilder header;
-        Object objValue;
-        String strValue;
-        for (Peptide pept : peptides) {
+        for (Peptide pept : attrModel.getPeptides()) {
             seq = new ProteinSequence(pept.getSequence());
-            header = new StringBuilder(pept.getId());
-            for (PeptideAttribute attr : attributes) {
-                if (!(attr.equals(PeptideDAO.ID) || attr.equals(PeptideDAO.SEQ))) {
-                    objValue = pept.getAttributeValue(attr);
-                    strValue = objValue.getClass().isArray() ? Arrays.toString((Object[]) objValue) : objValue.toString();
-                    header.append(String.format("|%s=%s", attr.getDisplayName(),strValue));
-                }
-            }
-            seq.setOriginalHeader(header.toString());
+            seq.setOriginalHeader(pept.getId());
             sequences.add(seq);
         }
         FastaWriterHelper.writeProteinSequence(file, sequences);

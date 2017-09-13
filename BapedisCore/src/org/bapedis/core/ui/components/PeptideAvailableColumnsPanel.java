@@ -173,6 +173,7 @@ public class PeptideAvailableColumnsPanel extends javax.swing.JPanel {
         controlToolBar.setMinimumSize(new java.awt.Dimension(40, 102));
         controlToolBar.setPreferredSize(new java.awt.Dimension(40, 102));
 
+        addButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(addButton, org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.addButton.text")); // NOI18N
         addButton.setToolTipText(org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.addButton.toolTipText")); // NOI18N
         addButton.setFocusable(false);
@@ -188,6 +189,7 @@ public class PeptideAvailableColumnsPanel extends javax.swing.JPanel {
         });
         controlToolBar.add(addButton);
 
+        addAllButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(addAllButton, org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.addAllButton.text")); // NOI18N
         addAllButton.setToolTipText(org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.addAllButton.toolTipText")); // NOI18N
         addAllButton.setFocusable(false);
@@ -203,6 +205,7 @@ public class PeptideAvailableColumnsPanel extends javax.swing.JPanel {
         controlToolBar.add(addAllButton);
         controlToolBar.add(jSeparator1);
 
+        removeButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(removeButton, org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.removeButton.text")); // NOI18N
         removeButton.setToolTipText(org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.removeButton.toolTipText")); // NOI18N
         removeButton.setFocusable(false);
@@ -218,6 +221,7 @@ public class PeptideAvailableColumnsPanel extends javax.swing.JPanel {
         });
         controlToolBar.add(removeButton);
 
+        removeAllButton.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(removeAllButton, org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.removeAllButton.text")); // NOI18N
         removeAllButton.setToolTipText(org.openide.util.NbBundle.getMessage(PeptideAvailableColumnsPanel.class, "PeptideAvailableColumnsPanel.removeAllButton.toolTipText")); // NOI18N
         removeAllButton.setFocusable(false);

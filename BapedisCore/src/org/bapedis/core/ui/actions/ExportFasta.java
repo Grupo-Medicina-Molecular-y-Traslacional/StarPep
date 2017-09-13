@@ -8,7 +8,7 @@ package org.bapedis.core.ui.actions;
 import java.awt.event.ActionEvent;
 import org.bapedis.core.io.impl.FastaExporter;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.io.impl.FastaExporterUI;
+import org.bapedis.core.io.impl.FileExporterUI;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.ui.components.SetupDialog;
@@ -29,7 +29,7 @@ import org.openide.util.NbBundle.Messages;
 @ActionRegistration(
         displayName = "#CTL_ExportFasta"
 )
-@ActionReference(path = "Menu/File/ExportData", position = 3333)
+@ActionReference(path = "Actions/ExportPeptides", position = 100)
 @Messages("CTL_ExportFasta=Fasta")
 public final class ExportFasta extends WorkspaceContextSensitiveAction<AttributesModel> {
 
@@ -44,11 +44,10 @@ public final class ExportFasta extends WorkspaceContextSensitiveAction<Attribute
     public void actionPerformed(ActionEvent e) {
         ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
         AttributesModel attrModel = pm.getAttributesModel();
-        Peptide[] peptides = attrModel.getPeptides();
-        FastaExporterUI ui = new FastaExporterUI();
-        if (dialog.setup(ui.getPanel(), ui, NbBundle.getMessage(ExportFasta.class, "ExportFasta.dialogTitle"))) {
+        FileExporterUI ui = new FileExporterUI(".fasta");
+        if (dialog.setup(ui, ui, NbBundle.getMessage(ExportFasta.class, "ExportFasta.dialogTitle"))) {
             try {
-                FastaExporter exporter = new FastaExporter(peptides, ui.getSelectedAttributes());
+                FastaExporter exporter = new FastaExporter(attrModel);                
                 exporter.exportTo(ui.getSelectedFile());
             } catch (Exception ex) {
                 DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Error: " + ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE));

@@ -30,6 +30,7 @@ public class AttributesModel {
 
     protected final HashMap<String, PeptideAttribute> attrsMap;
     protected final Set<PeptideAttribute> availableColumnsModel;
+    private static final int MAX_AVAILABLE_COLUMNS = 6;
     protected List<PeptideNode> nodeList;
     private final PeptideNodeContainer container;
     protected QuickFilter quickFilter;
@@ -59,9 +60,13 @@ public class AttributesModel {
     public Set<PeptideAttribute> getAvailableColumnsModel() {
         return availableColumnsModel;
     }
+    
+    public boolean canAddAvailableColumn() {
+        return availableColumnsModel.size() < MAX_AVAILABLE_COLUMNS;
+    }    
 
     public boolean addAvailableColumn(PeptideAttribute attr) {
-        if (availableColumnsModel.add(attr)) {
+        if (canAddAvailableColumn() && availableColumnsModel.add(attr)) {
             propertyChangeSupport.firePropertyChange(AVAILABLE_ATTR_ADDED, null, attr);
             return true;
         }
@@ -75,9 +80,9 @@ public class AttributesModel {
         }
         return false;
     }
-    
-    public void deleteAttribute(PeptideAttribute attr){
-        for (PeptideNode pNode : nodeList){
+
+    public void deleteAttribute(PeptideAttribute attr) {
+        for (PeptideNode pNode : nodeList) {
             pNode.getPeptide().deleteAttribute(attr);
         }
         removeAvailableColumn(attr);

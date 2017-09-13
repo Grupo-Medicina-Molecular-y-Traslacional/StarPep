@@ -6,9 +6,10 @@
 package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
-import org.bapedis.core.io.impl.FastaExporter;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.io.impl.FileExporterUI;
+import org.bapedis.core.io.impl.MDExporter;
+import org.bapedis.core.io.impl.MetadataExporter;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.ui.components.SetupDialog;
 import org.openide.DialogDisplayer;
@@ -24,21 +25,21 @@ import org.openide.util.NbBundle.Messages;
 
 @ActionID(
         category = "File",
-        id = "org.bapedis.core.ui.actions.ExportFasta"
+        id = "org.bapedis.core.ui.actions.ExportMetadata"
 )
 @ActionRegistration(
-        displayName = "#CTL_ExportFasta"
+        displayName = "#CTL_ExportMetadata"
 )
 @ActionReferences({
-    @ActionReference(path = "Actions/ExportPeptides", position = 100),
-    @ActionReference(path = "Menu/File/ExportData", position = 100)
+    @ActionReference(path = "Actions/ExportPeptides", position = 300),
+    @ActionReference(path = "Menu/File/ExportData", position = 300)
 })
-@Messages("CTL_ExportFasta=Peptide sequences (FASTA format)")
-public final class ExportFasta extends WorkspaceContextSensitiveAction<AttributesModel> {
+@Messages("CTL_ExportMetadata=Metadata relationship (CSV format)")
+public final class ExportMetadata extends WorkspaceContextSensitiveAction<AttributesModel> {
 
     protected final SetupDialog dialog;
 
-    public ExportFasta() {
+    public ExportMetadata() {
         super(AttributesModel.class);
         dialog = new SetupDialog();
     }
@@ -47,10 +48,10 @@ public final class ExportFasta extends WorkspaceContextSensitiveAction<Attribute
     public void actionPerformed(ActionEvent e) {
         ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
         AttributesModel attrModel = pm.getAttributesModel();
-        FileExporterUI ui = new FileExporterUI("peptides",".fasta");
-        if (dialog.setup(ui, ui, NbBundle.getMessage(ExportFasta.class, "ExportFasta.dialogTitle"))) {
+        FileExporterUI ui = new FileExporterUI("metadata", ".csv");
+        if (dialog.setup(ui, ui, NbBundle.getMessage(ExportMetadata.class, "ExportMetadata.dialogTitle"))) {
             try {
-                FastaExporter exporter = new FastaExporter(attrModel);
+                MetadataExporter exporter = new MetadataExporter(attrModel);
                 exporter.exportTo(ui.getSelectedFile());
             } catch (Exception ex) {
                 DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Error: " + ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE));

@@ -6,7 +6,6 @@
 package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
-import org.bapedis.core.io.impl.FastaExporter;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.io.impl.FileExporterUI;
 import org.bapedis.core.io.impl.MDExporter;
@@ -48,7 +47,7 @@ public final class ExportMD extends WorkspaceContextSensitiveAction<AttributesMo
     public void actionPerformed(ActionEvent e) {
         ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
         AttributesModel attrModel = pm.getAttributesModel();
-        FileExporterUI ui = new FileExporterUI(".csv");
+        FileExporterUI ui = new FileExporterUI("mds",".csv");
         if (dialog.setup(ui, ui, NbBundle.getMessage(ExportMD.class, "ExportMD.dialogTitle"))) {
             try {
                 MDExporter exporter = new MDExporter(attrModel);

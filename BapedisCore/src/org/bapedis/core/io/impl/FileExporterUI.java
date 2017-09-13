@@ -23,18 +23,19 @@ public class FileExporterUI extends javax.swing.JPanel implements ValidationSupp
 
     protected JFileChooser chooser;
     protected static File parentDirectory;
-    protected final String ext;
+    protected final String fileName;
     protected File selectedFile;
     protected boolean validState;
     protected final PropertyChangeSupport changeSupport;
 
     /**
      * Creates new form ExportFastaUI
+     * @param name
      * @param ext
      */
-    public FileExporterUI(String ext) {
+    public FileExporterUI(String name, String ext) {
         initComponents();
-        this.ext = ext;
+        this.fileName = "_" + name + ext;        
         chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         validState = false;
@@ -95,7 +96,7 @@ public class FileExporterUI extends javax.swing.JPanel implements ValidationSupp
         }
         ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
         Workspace workspace = pm.getCurrentWorkspace();
-        chooser.setSelectedFile(new File(parentDirectory, workspace.getName() + ext));
+        chooser.setSelectedFile(new File(parentDirectory, workspace.getName() + fileName));
         int returnVal = chooser.showSaveDialog(FileExporterUI.this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             fileTextField.setText(chooser.getSelectedFile().getAbsolutePath());

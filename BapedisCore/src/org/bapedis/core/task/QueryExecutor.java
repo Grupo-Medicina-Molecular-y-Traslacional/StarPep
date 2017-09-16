@@ -31,7 +31,6 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
     protected final Workspace workspace;
     protected final QueryModel queryModel;
     protected final GraphModel graphModel;
-    protected GraphView oldView;
 
     public QueryExecutor(){
         this(pc.getCurrentWorkspace());
@@ -47,9 +46,8 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
     protected AttributesModel doInBackground() throws Exception {
         publish("start");
         PeptideDAO dao = Lookup.getDefault().lookup(PeptideDAO.class);
-        oldView = graphModel.getVisibleView();
         AttributesModel model = dao.getPeptides(queryModel, graphModel);
-        Graph graph = graphModel.getGraphVisible();
+        Graph graph = graphModel.getGraph(model.getGraphDBView());
         for (Iterator<Metadata> it = queryModel.getMetadataIterator(); it.hasNext();) {
             Metadata metadata = it.next();
             metadata.setGraphNode(graph.getNode(metadata.getUnderlyingNodeID()));
@@ -69,10 +67,18 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
             AttributesModel oldModel = pc.getAttributesModel(workspace);
             if (oldModel != null) {
                 workspace.remove(oldModel);
+                graphModel.destroyView(oldModel.getCsnView());
+                graphModel.destroyView(oldModel.getGraphDBView());
+                newModel.setMainGView(oldModel.getMainGView());
             }
-            if (!oldView.isMainView()) {
-                graphModel.destroyView(oldView);
-            }
+            switch (newModel.getMainGView()){
+                case AttributesModel.CSN_VIEW:
+                    graphModel.setVisibleView(newModel.getCsnView());
+                    break;
+                case AttributesModel.GRAPH_DB_VIEW:
+                    graphModel.setVisibleView(newModel.getGraphDBView());
+                    break;
+            }            
             workspace.add(newModel);
         } catch (InterruptedException ex) {
             Exceptions.printStackTrace(ex);

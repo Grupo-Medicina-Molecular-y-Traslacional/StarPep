@@ -115,7 +115,8 @@ public class PeptideDAOImpl implements PeptideDAO {
 
             // Write lock
             graphModel.getGraph().writeLock();
-            GraphView gView = null;
+            GraphView graphDBView = null;
+            GraphView csnView = null;
 
             Peptide peptide;
             org.gephi.graph.api.Node graphNode, graphNeighborNode;
@@ -123,24 +124,29 @@ public class PeptideDAOImpl implements PeptideDAO {
             PeptideAttribute attr;
             String id, seq;
             try {
-                gView = graphModel.createView();
-                Subgraph subGraph = graphModel.getGraph(gView);
+                graphDBView = graphModel.createView();
+                Subgraph subGraphDB = graphModel.getGraph(graphDBView);
+
+                csnView = graphModel.createView();
+                Subgraph subGraphCSN = graphModel.getGraph(csnView);
+
                 while (peptideNodes.hasNext()) {
                     Node neoNode = peptideNodes.next();
                     id = neoNode.getProperty(PRO_ID).toString();
                     seq = neoNode.getProperty(PRO_SEQ).toString();
                     // Fill graph
                     graphNode = getGraphNodeFromNeoNode(neoNode, graphModel);
-                    subGraph.addNode(graphNode);
+                    subGraphDB.addNode(graphNode);
+                    subGraphCSN.addNode(graphNode);
                     for (Relationship relation : neoNode.getRelationships(Direction.OUTGOING)) {
                         graphNeighborNode = getGraphNodeFromNeoNode(relation.getEndNode(), graphModel);
                         graphEdge = getGraphEdgeFromNeoRelationship(graphNode, graphNeighborNode, relation, graphModel);
-                        subGraph.addNode(graphNeighborNode);
-                        subGraph.addEdge(graphEdge);
+                        subGraphDB.addNode(graphNeighborNode);
+                        subGraphDB.addEdge(graphEdge);
                     }
 
                     //Fill Attribute Model
-                    peptide = new Peptide(graphNode, subGraph);
+                    peptide = new Peptide(graphNode, graphModel.getGraph());
                     peptide.setAttributeValue(ID, id);
                     peptide.setAttributeValue(SEQ, seq);
                     peptide.setAttributeValue(LENGHT, seq.length());
@@ -160,11 +166,10 @@ public class PeptideDAOImpl implements PeptideDAO {
                     attrModel.addPeptide(peptide);
                 }
             } finally {
-                if (gView != null) {
-                    graphModel.setVisibleView(gView);
-                }
                 //Write unlock
                 graphModel.getGraph().writeUnlock();
+                attrModel.setCsnView(csnView);
+                attrModel.setGraphDBView(graphDBView);
                 peptideNodes.close();
                 tx.success();
             }

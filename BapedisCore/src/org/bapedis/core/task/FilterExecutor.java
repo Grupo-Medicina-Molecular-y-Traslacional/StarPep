@@ -40,7 +40,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
     protected final FilterModel filterModel;
     protected final AttributesModel attrModel;
     protected final GraphModel graphModel;
-    protected GraphView newView;
+    protected GraphView graphDBView, csnView;
     protected final ProgressTicket ticket;
     protected final AtomicBoolean stopRun;
 
@@ -66,13 +66,16 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
     @Override
     protected TreeSet<String> doInBackground() throws Exception {
         publish("start");
-        ticket.start(attrModel.getNodeList().size());
+        ticket.start(attrModel.getNodeList().size() + 1);
         ticket.progress(NbBundle.getMessage(FilterExecutor.class, "FilterWorker.running"));
 
         TreeSet<String> set = filterModel.isEmpty() ? null : new TreeSet<String>();
 
-        newView = graphModel.createView();
-        Subgraph subGraph = graphModel.getGraph(newView);
+        graphDBView = graphModel.createView();
+        Subgraph subGraphDB = graphModel.getGraph(graphDBView);
+
+        csnView = graphModel.createView();
+        Subgraph subGraphCSN = graphModel.getGraph(csnView);
 
         Peptide peptide;
         org.gephi.graph.api.Node graphNode;
@@ -90,7 +93,9 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
 
                 // Add graph node
                 graphNode = peptide.getGraphNode();
-                subGraph.addNode(graphNode);
+                subGraphDB.addNode(graphNode);
+
+                subGraphCSN.addNode(graphNode);
 
                 // Add neighbors and edges
                 peptide.getGraph().readLock();
@@ -108,11 +113,21 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
                     peptide.getGraph().readUnlock();
                 }
 
-                subGraph.addAllNodes(graphNeighbors);
-                subGraph.addAllEdges(graphEdges);
+                subGraphDB.addAllNodes(graphNeighbors);
+                subGraphDB.addAllEdges(graphEdges);
             }
             ticket.progress();
         }
+        if (attrModel.getCsnView() != null) {
+            for (org.gephi.graph.api.Node csnNode : subGraphCSN.getNodes()) {
+                for (Edge edge : graphModel.getGraph(attrModel.getCsnView()).getEdges(csnNode)) {
+                    if (set.contains((String) edge.getTarget().getId())) {
+                        subGraphCSN.addEdge(edge);
+                    }
+                }
+            }
+        }
+        ticket.progress();
         return set;
     }
 
@@ -126,12 +141,21 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
     protected void done() {
         try {
             TreeSet<String> set = get();
-            attrModel.setQuickFilter(filterModel.isEmpty()? null:new QuickFilterImpl(set));
-            GraphView oldView = graphModel.getVisibleView();
-            if (!oldView.isMainView()) {
-                graphModel.destroyView(oldView);
+            attrModel.setQuickFilter(filterModel.isEmpty() ? null : new QuickFilterImpl(set));
+            // destroy old view
+            graphModel.destroyView(attrModel.getCsnView());
+            graphModel.destroyView(attrModel.getGraphDBView());
+            // set new view
+            attrModel.setCsnView(csnView);
+            attrModel.setGraphDBView(graphDBView);
+            switch (attrModel.getMainGView()) {
+                case AttributesModel.CSN_VIEW:
+                    graphModel.setVisibleView(attrModel.getCsnView());
+                    break;
+                case AttributesModel.GRAPH_DB_VIEW:
+                    graphModel.setVisibleView(attrModel.getGraphDBView());
+                    break;
             }
-            graphModel.setVisibleView(newView);
         } catch (InterruptedException ex) {
             Exceptions.printStackTrace(ex);
         } catch (ExecutionException ex) {

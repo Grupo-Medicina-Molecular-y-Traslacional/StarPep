@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.bapedis.core.spi.data.PeptideDAO;
+import org.gephi.graph.api.GraphView;
 import org.netbeans.swing.etable.QuickFilter;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Index;
@@ -37,8 +38,13 @@ public class AttributesModel {
     public static final String CHANGED_FILTER = "quickFilter";
     public static final String AVAILABLE_ATTR_ADDED = "attribute_add";
     public static final String AVAILABLE_ATTR_REMOVED = "attribute_remove";
+    public static final String CHANGED_GVIEW = "graphview";
     protected transient final PropertyChangeSupport propertyChangeSupport;
     protected Node rootNode;
+    public static final int GRAPH_DB_VIEW = 1;
+    public static final int CSN_VIEW = 2;
+    protected int mainGView;
+    protected GraphView graphDBView, csnView;
 
     public AttributesModel() {
         attrsMap = new LinkedHashMap<>();
@@ -51,6 +57,37 @@ public class AttributesModel {
         availableColumnsModel.add(PeptideDAO.ID);
         availableColumnsModel.add(PeptideDAO.SEQ);
         availableColumnsModel.add(PeptideDAO.LENGHT);
+        
+        mainGView = GRAPH_DB_VIEW;
+    }
+
+    public int getMainGView() {
+        return mainGView;
+    }
+
+    public void setMainGView(int mainGView) {
+        int oldvalue = this.mainGView;
+        if (mainGView != GRAPH_DB_VIEW && mainGView != CSN_VIEW) {
+            throw new IllegalArgumentException("Unknown value for main graph view");
+        }
+        this.mainGView = mainGView;
+        propertyChangeSupport.firePropertyChange(CHANGED_GVIEW, oldvalue, mainGView);
+    }
+
+    public GraphView getGraphDBView() {
+        return graphDBView;
+    }
+
+    public void setGraphDBView(GraphView graphDBView) {
+        this.graphDBView = graphDBView;
+    }
+
+    public GraphView getCsnView() {
+        return csnView;
+    }
+
+    public void setCsnView(GraphView csnView) {
+        this.csnView = csnView;
     }
 
     public Iterator<PeptideAttribute> getAttributeIterator() {
@@ -60,10 +97,10 @@ public class AttributesModel {
     public Set<PeptideAttribute> getAvailableColumnsModel() {
         return availableColumnsModel;
     }
-    
+
     public boolean canAddAvailableColumn() {
         return availableColumnsModel.size() < MAX_AVAILABLE_COLUMNS;
-    }    
+    }
 
     public boolean addAvailableColumn(PeptideAttribute attr) {
         if (canAddAvailableColumn() && availableColumnsModel.add(attr)) {
@@ -168,6 +205,14 @@ public class AttributesModel {
         propertyChangeSupport.removePropertyChangeListener(AVAILABLE_ATTR_ADDED, listener);
         propertyChangeSupport.removePropertyChangeListener(AVAILABLE_ATTR_REMOVED, listener);
     }
+    
+    public void addGraphViewChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(CHANGED_GVIEW, listener);
+    }
+
+    public void removeGraphViewChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(CHANGED_GVIEW, listener);
+    }    
 
     private class PeptideNodeContainer extends Index.ArrayChildren {
 

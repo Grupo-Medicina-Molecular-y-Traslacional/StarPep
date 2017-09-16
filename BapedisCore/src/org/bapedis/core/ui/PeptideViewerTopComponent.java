@@ -169,14 +169,14 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         });
         return dropDownButton;
     }
-    
+
     private JButton createExportButton() {
         final JPopupMenu popup = new JPopupMenu();
-        
+
         List<? extends Action> actions = Utilities.actionsForPath("Actions/ExportPeptides");
         for (Action action : actions) {
             popup.add(action);
-        }        
+        }
 
         final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/bapedis/core/resources/export.png", false), popup);
         dropDownButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.export.tooltiptext"));
@@ -189,7 +189,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             }
         });
         return dropDownButton;
-    }    
+    }
 
     private void populateVisibleColumns(AttributesModel attrModel) {
         if (attrModel != null) {
@@ -524,6 +524,10 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         if (le.getSource().equals(peptideLkpResult)) {
             Collection<? extends AttributesModel> attrModels = peptideLkpResult.allInstances();
             if (!attrModels.isEmpty()) {
+                if (currentModel != null) {
+                    currentModel.removeQuickFilterChangeListener(this);
+                    currentModel.removeAvailableColumnChangeListener(this);
+                }
                 final AttributesModel attrModel = attrModels.iterator().next();
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
@@ -537,10 +541,6 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }
 
     private void setData(AttributesModel attrModel) {
-        if (currentModel != null) {
-            currentModel.removeQuickFilterChangeListener(this);
-            currentModel.removeAvailableColumnChangeListener(this);
-        }
         this.currentModel = attrModel;
         populateVisibleColumns(attrModel);
         populateFilterFields(attrModel);

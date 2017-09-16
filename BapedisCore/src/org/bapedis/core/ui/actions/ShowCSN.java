@@ -7,6 +7,8 @@ package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
+import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -21,29 +23,34 @@ import org.openide.util.NbBundle;
  */
 @ActionID(
         category = "View",
-        id = "org.bapedis.core.ui.actions.ShowGraph"
+        id = "org.bapedis.core.ui.actions.ShowCSN"
 )
 @ActionRegistration(
-        displayName = "#CTL_ShowGraph",
+        displayName = "#CTL_ShowCSN",
         lazy = false
 )
 @ActionReferences({
-    @ActionReference(path = "Menu/View", position = 310)
+    @ActionReference(path = "Menu/View", position = 330)
 })
-public class ShowGraph extends AbstractAction {
-
+public class ShowCSN extends AbstractAction {
+    protected final ProjectManager pc;
     private final GraphWindowController graphWC;
 
-    public ShowGraph() {
-        String name = NbBundle.getMessage(ShowGraph.class, "CTL_ShowGraph");
+    public ShowCSN() {
+        String name = NbBundle.getMessage(ShowCSN.class, "CTL_ShowCSN");
         putValue(NAME, name);
-        graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
+        graphWC = Lookup.getDefault().lookup(GraphWindowController.class);        
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (graphWC != null) {
-            graphWC.openGraphWindow();
+            AttributesModel attrModel = pc.getAttributesModel();
+            if (attrModel != null){
+                attrModel.setMainGView(AttributesModel.CSN_VIEW);
+                graphWC.openGraphWindow();
+            }
         }
     }
 

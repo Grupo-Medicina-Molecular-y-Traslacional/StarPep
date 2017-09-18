@@ -7,11 +7,14 @@ package org.bapedis.core.ui.actions;
 
 import org.bapedis.core.model.AlgorithmCategory;
 
-
-public final class GraphMeasureAction extends ToolAction {
-
-    public GraphMeasureAction() {
-        super(AlgorithmCategory.GraphMeasure);
+/**
+ *
+ * @author loge
+ */
+public class NetworkSimilarityAction extends ToolAction {
+    
+    public NetworkSimilarityAction() {
+        super(AlgorithmCategory.NetworkSimilarity);
     }
-   
+    
 }

@@ -29,7 +29,7 @@ import org.openide.windows.WindowManager;
 
 /**
  *
- * @author Home
+ * @author loge
  */
 public class ToolAction extends AbstractAction implements Presenter.Menu {
 

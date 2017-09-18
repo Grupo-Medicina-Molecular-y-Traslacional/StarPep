@@ -7,6 +7,10 @@
             <suite-component/>
             <module-dependencies/>
             <public-packages>
+                <package>org.biojava.nbio.alignment</package>
+                <package>org.biojava.nbio.alignment.io</package>
+                <package>org.biojava.nbio.alignment.routines</package>
+                <package>org.biojava.nbio.alignment.template</package>
                 <package>org.biojava.nbio.core.alignment</package>
                 <package>org.biojava.nbio.core.alignment.matrices</package>
                 <package>org.biojava.nbio.core.alignment.template</package>
@@ -29,6 +33,10 @@
                 <package>org.biojava.nbio.core.sequence.views</package>
                 <package>org.biojava.nbio.core.util</package>
             </public-packages>
+            <class-path-extension>
+                <runtime-relative-path>ext/biojava-alignment-4.2.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/biojava-alignment-4.2.0.jar</binary-origin>
+            </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/slf4j-simple-1.7.25.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/slf4j-simple-1.7.25.jar</binary-origin>

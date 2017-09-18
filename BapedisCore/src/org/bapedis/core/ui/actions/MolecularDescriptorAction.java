@@ -22,7 +22,7 @@ import org.openide.util.NbBundle;
 @ActionRegistration(
         displayName = "#CTL_MolecularDescriptorAction"
 )
-@ActionReference(path = "Menu/Tools", position = 300)
+@ActionReference(path = "Menu/Tools", position = 200)
 @NbBundle.Messages("CTL_MolecularDescriptorAction=Molecular Descriptor")
 public class MolecularDescriptorAction extends ToolAction{
     

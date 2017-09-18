@@ -7,11 +7,11 @@ package org.bapedis.core.model;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.bapedis.core.spi.data.PeptideDAO;
 import org.gephi.graph.api.Edge;
@@ -24,7 +24,6 @@ import org.gephi.graph.api.NodeIterable;
  * @author loge
  */
 public class Peptide {
-
     protected final Node graphNode;
     protected final Graph graph;
     protected HashMap<PeptideAttribute, Object> attrsValue;
@@ -110,5 +109,29 @@ public class Peptide {
     public void removeDescriptorChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(DESCRIPTOR_CHANGE, listener);
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 37 * hash + Objects.hashCode(getId());
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Peptide other = (Peptide) obj;
+        return Objects.equals(this.getId(), other.getId());
+    }
+    
+    
 
 }

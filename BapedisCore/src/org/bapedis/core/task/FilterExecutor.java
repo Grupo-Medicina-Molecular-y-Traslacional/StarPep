@@ -20,6 +20,7 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.filters.Filter;
 import org.gephi.graph.api.Edge;
+import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
 import org.gephi.graph.api.Subgraph;
@@ -119,10 +120,14 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
             ticket.progress();
         }
         if (attrModel.getCsnView() != null) {
+            // Add edges between nodes
+            Graph oldGraph = graphModel.getGraph(attrModel.getCsnView());
             for (org.gephi.graph.api.Node csnNode : subGraphCSN.getNodes()) {
-                for (Edge edge : graphModel.getGraph(attrModel.getCsnView()).getEdges(csnNode)) {
-                    if (set.contains((String) edge.getTarget().getId())) {
-                        subGraphCSN.addEdge(edge);
+                if (oldGraph.hasNode(csnNode.getId())) {
+                    for (Edge edge : oldGraph.getEdges(csnNode)) {
+                        if (set.contains((String) edge.getTarget().getId())) {
+                            subGraphCSN.addEdge(edge);
+                        }
                     }
                 }
             }

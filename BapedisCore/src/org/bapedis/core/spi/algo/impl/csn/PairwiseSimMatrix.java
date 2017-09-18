@@ -16,14 +16,14 @@ import org.bapedis.core.model.Peptide;
  *
  * @author Longendri Aguilera Mendoza
  */
-public class PairwiseIdentityMatrix implements Serializable {
+public class PairwiseSimMatrix implements Serializable {
 
     protected ArrayList<Peptide> peptide;
     protected HashMap<Peptide, Integer> map;
     protected double[] data;
     protected int size;
 
-    public PairwiseIdentityMatrix(ArrayList<Peptide> peptide) {
+    public PairwiseSimMatrix(ArrayList<Peptide> peptide) {
         this.peptide = peptide;
         map = new HashMap<>();
         for (int i = 0; i < peptide.size(); i++) {

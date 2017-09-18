@@ -68,7 +68,7 @@ public final class ProgressTicket {
     /**
      * Finish the task.
      */
-    public void finish() {
+    public synchronized void finish() {
         if (handle != null && started && !finished) {
             try {
                 handle.finish();
@@ -82,7 +82,7 @@ public final class ProgressTicket {
      * Finish the task and display a statusbar message
      * @param finishMessage 
      */
-    public void finish(String finishMessage) {
+    public synchronized void finish(String finishMessage) {
         if (handle != null && started && !finished) {
             try {
                 handle.finish();
@@ -96,7 +96,7 @@ public final class ProgressTicket {
     /**
      * Notify the user about a new completed unit. Equivalent to incrementing workunits by one.
      */
-    public void progress() {
+    public synchronized void progress() {
         progress(currentUnit + 1);
     }
 
@@ -104,7 +104,7 @@ public final class ProgressTicket {
      * Notify the user about completed workunits.
      * @param workunit a cumulative number of workunits completed so far
      */
-    public void progress(int workunit) {
+    public synchronized void progress(int workunit) {
         this.currentUnit = workunit;
         if (handle != null) {
             int ratioProgress = (int) (100.0 * workunit / progressTotal);
@@ -119,7 +119,7 @@ public final class ProgressTicket {
      * Notify the user about progress by showing message with details.
      * @param message about the status of the task
      */
-    public void progress(String message) {
+    public synchronized void progress(String message) {
         if (handle != null) {
             handle.progress(message);
         }
@@ -130,7 +130,7 @@ public final class ProgressTicket {
      * @param message details about the status of the task
      * @param workunit a cumulative number of workunits completed so far
      */
-    public void progress(String message, int workunit) {
+    public synchronized void progress(String message, int workunit) {
         currentUnit = workunit;
         if (handle != null) {
             int ratioProgress = (int) (100.0 * workunit / progressTotal);
@@ -145,7 +145,7 @@ public final class ProgressTicket {
      * Change the display name of the progress task. Use with care, please make sure the changed name is not completely different, or otherwise it might appear to the user as a different task.
      * @param newDisplayName the new display name
      */
-    public void setDisplayName(String newDisplayName) {
+    public synchronized void setDisplayName(String newDisplayName) {
         if (handle != null) {
             handle.setDisplayName(newDisplayName);
             this.displayName = newDisplayName;
@@ -156,14 +156,14 @@ public final class ProgressTicket {
      * Returns the current display name.
      * @return the current task's display name
      */
-    public String getDisplayName() {
+    public synchronized String getDisplayName() {
         return displayName;
     }
 
     /**
      * Start the progress indication for indeterminate task.
      */
-    public void start() {
+    public synchronized void start() {
         if (handle != null) {
             started = true;
             handle.start();
@@ -174,7 +174,7 @@ public final class ProgressTicket {
      * Start the progress indication for a task with known number of steps.
      * @param workunits total number of workunits that will be processed
      */
-    public void start(int workunits) {
+    public synchronized void start(int workunits) {
         if (handle != null) {
             started = true;
             this.progressTotal = workunits;
@@ -186,7 +186,7 @@ public final class ProgressTicket {
      * Currently indeterminate task can be switched to show percentage completed.
      * @param workunits workunits total number of workunits that will be processed
      */
-    public void switchToDeterminate(int workunits) {
+    public synchronized void switchToDeterminate(int workunits) {
         if (handle != null) {
             if (started) {
                 this.progressTotal = workunits;
@@ -200,7 +200,7 @@ public final class ProgressTicket {
     /**
      * Currently determinate task can be switched to indeterminate mode.
      */
-    public void switchToIndeterminate() {
+    public synchronized void switchToIndeterminate() {
         if (handle != null) {
             handle.switchToIndeterminate();
         }

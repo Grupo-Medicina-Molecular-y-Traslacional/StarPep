@@ -20,6 +20,7 @@ import org.bapedis.core.services.ProjectManager;
 import org.bapedis.db.Neo4jDB;
 import org.bapedis.db.model.MyLabel;
 import org.bapedis.db.model.MyRelationship;
+import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphFactory;
 import org.gephi.graph.api.GraphModel;
@@ -272,10 +273,10 @@ public class PeptideDAOImpl implements PeptideDAO {
         return graphNode;
     }
 
-    protected org.gephi.graph.api.Edge getGraphEdgeFromNeoRelationship(org.gephi.graph.api.Node startNode, org.gephi.graph.api.Node endNode, Relationship relation, GraphModel graphModel) {
+    protected Edge getGraphEdgeFromNeoRelationship(org.gephi.graph.api.Node startNode, org.gephi.graph.api.Node endNode, Relationship relation, GraphModel graphModel) {
         Graph mainGraph = graphModel.getGraph();
         String id = String.valueOf(relation.getId());
-        org.gephi.graph.api.Edge graphEdge = mainGraph.getEdge(id);
+        Edge graphEdge = mainGraph.getEdge(id);
         if (graphEdge == null) {
             GraphFactory factory = graphModel.factory();
             String relName = relation.getType().name();

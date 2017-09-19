@@ -5,16 +5,25 @@
  */
 package org.bapedis.core.spi.algo.impl.csn;
 
+import java.util.logging.Level;
+import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
+import static org.bapedis.core.spi.algo.impl.csn.PairwiseSimMatrixBuilder.log;
 import org.biojava.nbio.alignment.Alignments;
+import org.biojava.nbio.alignment.SimpleGapPenalty;
 import org.biojava.nbio.core.alignment.matrices.SubstitutionMatrixHelper;
+import org.biojava.nbio.core.alignment.template.SequencePair;
 import org.biojava.nbio.core.alignment.template.SubstitutionMatrix;
+import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
+import org.biojava.nbio.core.sequence.ProteinSequence;
+import org.biojava.nbio.core.sequence.compound.AminoAcidCompound;
+import org.openide.util.Exceptions;
 
 /**
  *
  * @author loge
  */
-public class PairwiseSequenceAlignment extends NetworkSimilarityBuilder {
+public class PairwiseSequenceAlignment extends NetworkSimilarityBuilder implements SimilarityProvider{
 
     public static final String[] Alignment_Type = new String[]{"Needleman-Wunsch", "Smith-Waterman"};
     public static final String[] Substitution_Matrix = new String[]{
@@ -28,11 +37,15 @@ public class PairwiseSequenceAlignment extends NetworkSimilarityBuilder {
     public static final String[][] Similarity_Score = new String[][]{{"Identities / (Length of shorter sequence)", "Identities / Columns"},
     {"Positives / (Length of shorter sequence)", "Positives / Columns"}};
     protected int alignmentTypeIndex, substitutionMatrixIndex, similarityTypeIndex, similarityScoreIndex;
+    protected SubstitutionMatrix<AminoAcidCompound> substitutionMatrix;
+    protected Alignments.PairwiseSequenceAlignerType alignerType;
 
     public PairwiseSequenceAlignment(AlgorithmFactory factory) {
-        super(factory);        
+        super(factory);
         alignmentTypeIndex = 0;
+        alignerType = getAlignerType();
         substitutionMatrixIndex = 7; // Blosum 62 by Henikoff & Henikoff
+        substitutionMatrix = getSubstitutionMatrix();
         similarityTypeIndex = 0;
         similarityScoreIndex = 0;
     }
@@ -41,11 +54,12 @@ public class PairwiseSequenceAlignment extends NetworkSimilarityBuilder {
         return alignmentTypeIndex;
     }
 
-    public void setAlignmentTypeIndex(int alignmentType) {
-        if (alignmentType < 0 || alignmentType >= Alignment_Type.length) {
+    public void setAlignmentTypeIndex(int alignmentTypeIndex) {
+        if (alignmentTypeIndex < 0 || alignmentTypeIndex >= Alignment_Type.length) {
             throw new IllegalArgumentException("Unknown value for alignment type");
         }
-        this.alignmentTypeIndex = alignmentType;
+        this.alignmentTypeIndex = alignmentTypeIndex;
+        alignerType = getAlignerType();
     }
 
     public int getSubstitutionMatrixIndex() {
@@ -77,14 +91,15 @@ public class PairwiseSequenceAlignment extends NetworkSimilarityBuilder {
         this.similarityScoreIndex = similarityScore;
     }
 
-    public void setSubstitutionMatrixIndex(int substitutionMatrix) {
-        if (substitutionMatrix < 0 || substitutionMatrix >= Substitution_Matrix.length) {
+    public void setSubstitutionMatrixIndex(int substitutionMatrixIndex) {
+        if (substitutionMatrixIndex < 0 || substitutionMatrixIndex >= Substitution_Matrix.length) {
             throw new IllegalArgumentException("Unknown value for substitution matrix");
         }
-        this.substitutionMatrixIndex = substitutionMatrix;
+        this.substitutionMatrixIndex = substitutionMatrixIndex;
+        substitutionMatrix = getSubstitutionMatrix();
     }
 
-    private SubstitutionMatrix getSubstitutionMatrix() {
+    private SubstitutionMatrix<AminoAcidCompound> getSubstitutionMatrix() {
         switch (Substitution_Matrix[substitutionMatrixIndex]) {
             case "Blosum 30 by Henikoff & Henikoff":
                 return SubstitutionMatrixHelper.getBlosum30();
@@ -131,5 +146,55 @@ public class PairwiseSequenceAlignment extends NetworkSimilarityBuilder {
             return Alignments.PairwiseSequenceAlignerType.LOCAL;
         }
         return null;
+    }
+    
+    private int getNumeratorValue(SequencePair<ProteinSequence, AminoAcidCompound> pair){
+        switch (Similarity_Type[similarityTypeIndex]){
+            case "Percent sequence identity":
+                return pair.getNumIdenticals();
+            case "Percent positive substitutions":
+                return pair.getNumSimilars();
+        }
+        return 0;
+    }
+    
+    private int getDenominatorValue(SequencePair<ProteinSequence, AminoAcidCompound> pair, Peptide peptide1, Peptide peptide2){
+        switch(Similarity_Score[similarityTypeIndex][similarityScoreIndex]){
+            case "Identities / (Length of shorter sequence)":
+            case "Positives / (Length of shorter sequence)":
+                return Math.min(peptide1.getSequence().length(), peptide2.getSequence().length());
+            case "Identities / Columns":
+            case "Positives / Columns":
+                return pair.getLength();
+        }       
+        return 0;
+    }
+    
+
+    @Override
+    public double computeSimilarity(Peptide peptide1, Peptide peptide2) {
+        SimpleGapPenalty gapPenalty = new SimpleGapPenalty();
+        SequencePair<ProteinSequence, AminoAcidCompound> pair;
+        double score;
+        if (peptide1.getSequence().equals(peptide2.getSequence())) {
+            score = 1;
+            log.warning("There have been found identical sequences in the unique sequence list.");
+        } else {
+            try {
+                pair = Alignments.getPairwiseAlignment(peptide1.getBiojavaSeq(), peptide2.getBiojavaSeq(),
+                        alignerType, gapPenalty, substitutionMatrix);
+                score = ((double)getNumeratorValue(pair)) / getDenominatorValue(pair, peptide1, peptide2);
+            } catch (CompoundNotFoundException ex) {
+                log.log(Level.SEVERE, "Compound Not Found Exception: {0}", ex.getMessage());
+                Exceptions.printStackTrace(ex);
+                score = -1;
+            }
+        }
+        return score;
+    }
+
+    @Override
+    protected SimilarityProvider getSimilarityProvider() {
+        return this;
     }
 }

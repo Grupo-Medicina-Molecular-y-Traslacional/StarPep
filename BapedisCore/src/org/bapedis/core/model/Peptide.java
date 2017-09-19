@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.bapedis.core.spi.data.PeptideDAO;
+import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
+import org.biojava.nbio.core.sequence.ProteinSequence;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
@@ -24,11 +26,13 @@ import org.gephi.graph.api.NodeIterable;
  * @author loge
  */
 public class Peptide {
+
     protected final Node graphNode;
     protected final Graph graph;
     protected HashMap<PeptideAttribute, Object> attrsValue;
     public final static String DESCRIPTOR_CHANGE = "descriptor_change";
     protected transient final PropertyChangeSupport propertyChangeSupport;
+    protected ProteinSequence biojavaSeq;
 
     public Peptide(Node graphNode, Graph graph) {
         this.graphNode = graphNode;
@@ -43,6 +47,13 @@ public class Peptide {
 
     public String getSequence() {
         return (String) attrsValue.get(PeptideDAO.SEQ);
+    }
+
+    public ProteinSequence getBiojavaSeq() throws CompoundNotFoundException {
+        if (biojavaSeq == null) {
+            biojavaSeq = new ProteinSequence(getSequence());
+        }
+        return biojavaSeq;
     }
 
     public int getLength() {
@@ -131,7 +142,5 @@ public class Peptide {
         final Peptide other = (Peptide) obj;
         return Objects.equals(this.getId(), other.getId());
     }
-    
-    
 
 }

@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.spi.algo.impl.csn;
 
-import java.util.ArrayList;
 import java.util.concurrent.ForkJoinPool;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;

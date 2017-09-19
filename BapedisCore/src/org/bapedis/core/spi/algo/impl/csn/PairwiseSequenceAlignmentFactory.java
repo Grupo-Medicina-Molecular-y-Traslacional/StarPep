@@ -10,11 +10,13 @@ import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author loge
  */
+@ServiceProvider(service = AlgorithmFactory.class)
 public class PairwiseSequenceAlignmentFactory implements AlgorithmFactory {
 
     private final PairwiseSequenceAlignmentPanel panel = new PairwiseSequenceAlignmentPanel();

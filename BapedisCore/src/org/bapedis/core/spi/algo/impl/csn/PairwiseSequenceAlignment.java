@@ -5,81 +5,87 @@
  */
 package org.bapedis.core.spi.algo.impl.csn;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ForkJoinPool;
-import org.bapedis.core.model.AlgorithmProperty;
-import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.Peptide;
-import org.bapedis.core.services.ProjectManager;
-import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.bapedis.core.task.ProgressTicket;
 import org.biojava.nbio.alignment.Alignments;
 import org.biojava.nbio.core.alignment.matrices.SubstitutionMatrixHelper;
 import org.biojava.nbio.core.alignment.template.SubstitutionMatrix;
-import org.biojava.nbio.core.sequence.ProteinSequence;
-import org.openide.util.Lookup;
 
 /**
  *
  * @author loge
  */
-public class PairwiseSequenceAlignment implements Algorithm {
+public class PairwiseSequenceAlignment extends NetworkSimilarityBuilder {
 
-    public static final ForkJoinPool fjPool = new ForkJoinPool();
-    protected final String NeedlemanWunsch = "Needleman-Wunsch";
-    protected final String SmithWaterman = "Smith-Waterman";
-    protected final String[] Substitution_Matrix = new String[]{
+    public static final String[] Alignment_Type = new String[]{"Needleman-Wunsch", "Smith-Waterman"};
+    public static final String[] Substitution_Matrix = new String[]{
         "Blosum 30 by Henikoff & Henikoff", "Blosum 35 by Henikoff & Henikoff", "Blosum 40 by Henikoff & Henikoff",
         "Blosum 45 by Henikoff & Henikoff", "Blosum 50 by Henikoff & Henikoff", "Blosum 55 by Henikoff & Henikoff",
         "Blosum 60 by Henikoff & Henikoff", "Blosum 62 by Henikoff & Henikoff", "Blosum 65 by Henikoff & Henikoff",
         "Blosum 70 by Henikoff & Henikoff", "Blosum 75 by Henikoff & Henikoff", "Blosum 80 by Henikoff & Henikoff",
         "Blosum 85 by Henikoff & Henikoff", "Blosum 90 by Henikoff & Henikoff", "Blosum 100 by Henikoff & Henikoff",
         "PAM 250 by Gonnet, Cohen & Benner", "PAM 250 by Dayhoff"};
-    protected String alignmentType, substitutionMatrix, sequenceIdentity;
-    protected final AlgorithmFactory factory;
-    protected final ProjectManager pc;
-    protected AttributesModel attrModel;
-    protected ProgressTicket progressTicket;
-    protected List<ProteinSequence> dataSet;
+    public static final String[] Similarity_Type = new String[]{"Percent sequence identity", "Percent positive substitutions"};
+    public static final String[][] Similarity_Score = new String[][]{{"Identities / (Length of shorter sequence)", "Identities / Columns"},
+    {"Positives / (Length of shorter sequence)", "Positives / Columns"}};
+    protected int alignmentTypeIndex, substitutionMatrixIndex, similarityTypeIndex, similarityScoreIndex;
 
     public PairwiseSequenceAlignment(AlgorithmFactory factory) {
-        this.factory = factory;
-        pc = Lookup.getDefault().lookup(ProjectManager.class);
+        super(factory);        
+        alignmentTypeIndex = 0;
+        substitutionMatrixIndex = 7; // Blosum 62 by Henikoff & Henikoff
+        similarityTypeIndex = 0;
+        similarityScoreIndex = 0;
     }
 
-    public String getAlignmentType() {
-        return alignmentType;
+    public int getAlignmentTypeIndex() {
+        return alignmentTypeIndex;
     }
 
-    public void setAlignmentType(String alignmentType) {
-        if (!alignmentType.equals(NeedlemanWunsch) && !alignmentType.equals(SmithWaterman)) {
+    public void setAlignmentTypeIndex(int alignmentType) {
+        if (alignmentType < 0 || alignmentType >= Alignment_Type.length) {
             throw new IllegalArgumentException("Unknown value for alignment type");
         }
-        this.alignmentType = alignmentType;
+        this.alignmentTypeIndex = alignmentType;
     }
 
-    public String getSubstitutionMatrix() {
-        return substitutionMatrix;
+    public int getSubstitutionMatrixIndex() {
+        return substitutionMatrixIndex;
     }
 
-    public void setSubstitutionMatrix(String substitutionMatrix) {
-        boolean acepted = false;
-        for (String sm : Substitution_Matrix) {
-            if (substitutionMatrix.equals(sm)) {
-                acepted = true;
-                break;
-            }
+    public int getSimilarityTypeIndex() {
+        return similarityTypeIndex;
+    }
+
+    public void setSimilarityTypeIndex(int similarityType) {
+        if (similarityType < 0 || similarityType >= Similarity_Type.length) {
+            throw new IllegalArgumentException("Unknown value for similarity type");
         }
-        if (!acepted) {
+        this.similarityTypeIndex = similarityType;
+    }
+
+    public int getSimilarityScoreIndex() {
+        return similarityScoreIndex;
+    }
+
+    public void setSimilarityScoreIndex(int similarityScore) {
+        if (similarityTypeIndex < 0 || similarityTypeIndex >= Similarity_Score.length) {
+            throw new IllegalArgumentException("Unknown value for similarity type");
+        }
+        if (similarityScore < 0 || similarityScore >= Similarity_Score[similarityTypeIndex].length) {
+            throw new IllegalArgumentException("Unknown value for similarity score");
+        }
+        this.similarityScoreIndex = similarityScore;
+    }
+
+    public void setSubstitutionMatrixIndex(int substitutionMatrix) {
+        if (substitutionMatrix < 0 || substitutionMatrix >= Substitution_Matrix.length) {
             throw new IllegalArgumentException("Unknown value for substitution matrix");
         }
-        this.substitutionMatrix = substitutionMatrix;
+        this.substitutionMatrixIndex = substitutionMatrix;
     }
 
-    private SubstitutionMatrix getSubMatrix() {
-        switch (substitutionMatrix) {
+    private SubstitutionMatrix getSubstitutionMatrix() {
+        switch (Substitution_Matrix[substitutionMatrixIndex]) {
             case "Blosum 30 by Henikoff & Henikoff":
                 return SubstitutionMatrixHelper.getBlosum30();
             case "Blosum 35 by Henikoff & Henikoff":
@@ -119,59 +125,11 @@ public class PairwiseSequenceAlignment implements Algorithm {
     }
 
     private Alignments.PairwiseSequenceAlignerType getAlignerType() {
-        if (alignmentType.equals("Needleman-Wunsch")) {
+        if (Alignment_Type[alignmentTypeIndex].equals("Needleman-Wunsch")) {
             return Alignments.PairwiseSequenceAlignerType.GLOBAL;
-        } else if (alignmentType.equals("Smith-Waterman")) {
+        } else if (Alignment_Type[alignmentTypeIndex].equals("Smith-Waterman")) {
             return Alignments.PairwiseSequenceAlignerType.LOCAL;
         }
         return null;
     }
-
-    @Override
-    public void initAlgo() {
-        attrModel = pc.getAttributesModel();
-        PairwiseSimMatrixBuilder.setStopRun(false);
-    }
-
-    @Override
-    public void endAlgo() {
-        attrModel = null;
-    }
-
-    @Override
-    public boolean cancel() {
-        PairwiseSimMatrixBuilder.setStopRun(true);
-        return true;
-    }
-
-    @Override
-    public AlgorithmProperty[] getProperties() {
-        return null;
-    }
-
-    @Override
-    public AlgorithmFactory getFactory() {
-        return factory;
-    }
-
-    @Override
-    public void setProgressTicket(ProgressTicket progressTicket) {
-        this.progressTicket = progressTicket;
-    }
-
-    @Override
-    public void run() {
-        Peptide[] peptides = attrModel.getPeptides();
-        int size = peptides.length + ((dataSet != null) ? dataSet.size() : 0);
-        ArrayList<Peptide> peptideList = new ArrayList<>(size);
-        for (Peptide pept : peptides) {
-            peptideList.add(pept);
-        }
-        // Workunits for pairwise sim matrix builder
-        size = peptideList.size() * (peptideList.size() - 1) / 2;
-        progressTicket.switchToDeterminate(size);
-        PairwiseSimMatrix idMatrix = new PairwiseSimMatrix(peptideList);
-
-    }
-
 }

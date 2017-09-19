@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.PeptideAttribute;
 
 /**
  *
@@ -18,28 +19,23 @@ import org.bapedis.core.model.Peptide;
  */
 public class PairwiseSimMatrix implements Serializable {
 
-    protected ArrayList<Peptide> peptide;
-    protected HashMap<Peptide, Integer> map;
+    protected Peptide[] peptide;
     protected double[] data;
     protected int size;
+    public static final PeptideAttribute MAPPING_INDEX = new PeptideAttribute("mapIndex", "Internal mapping index", Integer.class);
 
-    public PairwiseSimMatrix(ArrayList<Peptide> peptide) {
-        this.peptide = peptide;
-        map = new HashMap<>();
-        for (int i = 0; i < peptide.size(); i++) {
-            map.put(peptide.get(i), i);
+    public PairwiseSimMatrix(Peptide[] peptide) {
+        this.peptide = peptide;        
+        for (int i = 0; i < peptide.length; i++) {
+            peptide[i].setAttributeValue(MAPPING_INDEX, i);
         }
-        size = peptide.size();
+        size = peptide.length;
         data = new double[size * (size - 1) / 2];
-    }
-    
-    public boolean contains(Peptide peptide){
-        return map.containsKey(peptide);
-    }
+    }    
 
     public void set(Peptide peptide1, Peptide peptide2, double value) {
-        int x = map.get(peptide1);
-        int y = map.get(peptide2);
+        int x = (int)peptide1.getAttributeValue(MAPPING_INDEX);
+        int y = (int)peptide2.getAttributeValue(MAPPING_INDEX);;
         assert x != y || (x == y && value == 1);
         if (x != y) {
             data[ pos(x, y)] = value;
@@ -47,8 +43,8 @@ public class PairwiseSimMatrix implements Serializable {
     }
 
     public double get(Peptide peptide1, Peptide peptide2) {
-        int x = map.get(peptide1);
-        int y = map.get(peptide2);
+        int x = (int)peptide1.getAttributeValue(MAPPING_INDEX);
+        int y = (int)peptide2.getAttributeValue(MAPPING_INDEX);
         if (x == y) {
             return 1;
         }
@@ -83,13 +79,12 @@ public class PairwiseSimMatrix implements Serializable {
     private void readObject(ObjectInputStream o)
             throws IOException, ClassNotFoundException {
         size = o.readInt();
-        peptide = new ArrayList<>(size);
+        peptide = new Peptide[size];
         for (int i = 0; i < size; i++) {
-            peptide.set(i, ((Peptide) o.readObject()));
+            peptide[i] = ((Peptide) o.readObject());
         }
-        map = new HashMap<>();
-        for (int i = 0; i < peptide.size(); i++) {
-            map.put(peptide.get(i), i);
+        for (int i = 0; i < peptide.length; i++) {
+            peptide[i].setAttributeValue(MAPPING_INDEX, i);
         }
         data = new double[size * (size - 1) / 2];
         for (int i = 0; i < data.length; i++) {

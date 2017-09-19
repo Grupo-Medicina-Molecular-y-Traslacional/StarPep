@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -447,6 +448,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
             if (selectedAlgorithm.getFactory().getSetupUI() != null) {
                 JPanel editPanel = selectedAlgorithm.getFactory().getSetupUI().getEditPanel(selectedAlgorithm);
+                editPanel.setBorder(BorderFactory.createTitledBorder(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.editPanel.border.title"))); // NOI18N
                 propSheetPanel.setVisible(false);
                 algoProvidedPanel.removeAll();
                 algoProvidedPanel.add(editPanel);

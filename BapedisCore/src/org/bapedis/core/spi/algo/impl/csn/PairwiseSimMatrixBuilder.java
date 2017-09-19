@@ -4,7 +4,6 @@
  */
 package org.bapedis.core.spi.algo.impl.csn;
 
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicBoolean;

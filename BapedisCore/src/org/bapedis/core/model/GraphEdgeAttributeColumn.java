@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.model;
 
+import org.bapedis.core.services.ProjectManager;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Element;
@@ -35,7 +36,7 @@ public class GraphEdgeAttributeColumn implements GraphElementDataColumn{
 
     @Override
     public Object getValueFor(Element element) {
-        return (direction == Direction.Source)?((Edge)element).getSource().getAttribute("name"): ((Edge)element).getTarget().getAttribute("name");
+        return (direction == Direction.Source)?((Edge)element).getSource().getAttribute(ProjectManager.NODE_TABLE_PRO_NAME): ((Edge)element).getTarget().getAttribute(ProjectManager.NODE_TABLE_PRO_NAME);
     }
 
     @Override

@@ -43,6 +43,7 @@ package org.bapedis.core.model;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import org.bapedis.core.services.ProjectManager;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.Table;
 
@@ -58,8 +59,8 @@ public class GraphElementAvailableColumnsModel {
     private static final int MAX_AVAILABLE_COLUMNS = 3;
     private final Set<GraphElementDataColumn> availableColumns = new LinkedHashSet<>();
     private final Set<GraphElementDataColumn> allKnownColumns = new LinkedHashSet<>();
-    private final String DefaultColumnID = "name";
-    private final String[] IgnoredColumnIDs = new String[]{"timeset"};
+    public static final String DefaultColumnID = ProjectManager.NODE_TABLE_PRO_NAME;
+    public static final String[] IgnoredColumnIDs = new String[]{"timeset"};
 
     public GraphElementAvailableColumnsModel() {
         allKnownColumns.add(new GraphNodeDegreeDataColumn());

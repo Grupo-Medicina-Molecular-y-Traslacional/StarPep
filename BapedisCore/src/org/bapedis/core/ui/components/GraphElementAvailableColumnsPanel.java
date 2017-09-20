@@ -79,7 +79,7 @@ public class GraphElementAvailableColumnsPanel extends javax.swing.JPanel {
             columnsCheckBoxes[i] = new JCheckBox(columns[i].getColumnName(), availableColumnsModel.isColumnAvailable(columns[i]));
             columnsCheckBoxes[i].addActionListener(new ColumnCheckBoxListener(i));
             contentPanel.add(columnsCheckBoxes[i], "wrap");
-            if (columns[i] instanceof GraphElementAttributeColumn && columns[i].getColumn().getId().equals("name")){
+            if (columns[i] instanceof GraphElementAttributeColumn && columns[i].getColumn().getId().equals(GraphElementAvailableColumnsModel.DefaultColumnID)){
                 columnsCheckBoxes[i].setEnabled(false);
             }
         }

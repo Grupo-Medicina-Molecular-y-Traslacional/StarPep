@@ -248,7 +248,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                     if (!buttonGroup.isSelected(mouseButton.getModel())) {
                         buttonGroup.setSelected(mouseButton.getModel(), true);
                         configureLink.setEnabled(true);
-                    }                    
+                    }
                 }
             }
         });
@@ -657,17 +657,17 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         if (oldWs != null) {
             QueryModel oldQueryModel = pc.getQueryModel(oldWs);
             oldQueryModel.removePropertyChangeListener(this);
-            
+
             FilterModel oldFilterModel = pc.getFilterModel(oldWs);
-            oldFilterModel.removePropertyChangeListener(this);            
+            oldFilterModel.removePropertyChangeListener(this);
         }
 
         QueryModel queryModel = pc.getQueryModel(newWs);
         queryModel.addPropertyChangeListener(this);
-        
+
         FilterModel filterModel = pc.getFilterModel(newWs);
         filterModel.addPropertyChangeListener(this);
-        
+
         setBusy(queryModel.isRunning() || filterModel.isRunning());
     }
 
@@ -681,7 +681,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             if (evt.getPropertyName().equals(FilterModel.RUNNING)) {
                 setBusy(((FilterModel) evt.getSource()).isRunning());
             }
-        }else if (evt.getSource() instanceof VizModel) {
+        } else if (evt.getSource() instanceof VizModel) {
             if (evt.getPropertyName().equals("init")) {
                 initToolBarComponents();
             }
@@ -803,7 +803,9 @@ class MouseSelectionPopupPanel extends javax.swing.JPanel {
         diameterSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                labelValue.setText(String.valueOf(diameterSlider.getValue()));
+                if (!diameterSlider.getValueIsAdjusting()) {
+                    labelValue.setText(String.valueOf(diameterSlider.getValue()));
+                }
             }
         });
         diameterSlider.setValue(1);

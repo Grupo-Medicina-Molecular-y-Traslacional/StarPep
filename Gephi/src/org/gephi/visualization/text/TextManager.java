@@ -48,6 +48,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.bapedis.core.services.ProjectManager;
 import org.gephi.graph.api.AttributeUtils;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.Edge;
@@ -247,8 +248,8 @@ public class TextManager implements VizArchitecture {
     private String buildText(Graph graph, Element element, Column[] selectedColumns) {
         String txt;
         if (selectedColumns == null || selectedColumns.length == 0) {
-            if (element.getTable().hasColumn("name")) {
-                txt = (String) element.getAttribute("name");
+            if (element.getTable().hasColumn(ProjectManager.NODE_TABLE_PRO_NAME)) {
+                txt = (String) element.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME);
             } else {
                 txt = element.getLabel();
             }

@@ -43,10 +43,12 @@ public class ProjectManager implements Lookup.Provider {
     protected Workspace currentWS;
     protected List<WorkspaceEventListener> wsListeners;
     protected final AlgorithmExecutor executor;
-    private final String PRO_NAME = "name";
-    private final String PRO_NAME_TITLE = NbBundle.getMessage(ProjectManager.class, "NodeTable.column.name.title");
-    private final String PRO_XREF = "xref";
-    private final String PRO_XREF_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.xref.title");
+    public static final String NODE_TABLE_PRO_NAME = "name";
+    public static final String NODE_TABLE_PRO_NAME_TITLE = NbBundle.getMessage(ProjectManager.class, "NodeTable.column.name.title");
+    public static final String EDGE_TABLE_PRO_XREF = "xref";
+    public static final String EDGE_TABLE_PRO_XREF_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.xref.title");
+    public static final String EDGE_TABLE_PRO_SIMILARITY="similarity";
+    public static final String EDGE_TABLE_PRO_SIMILARITY_TITLE=NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.similarity.title");;
 
     public ProjectManager() {
         executor = new AlgorithmExecutor();
@@ -172,14 +174,17 @@ public class ProjectManager implements Lookup.Provider {
 
     protected void createColumns(GraphModel graphModel) {
         Table nodeTable = graphModel.getNodeTable();
-        if (!nodeTable.hasColumn(PRO_NAME)) {
-            nodeTable.addColumn(PRO_NAME, PRO_NAME_TITLE, String.class, Origin.DATA, "", false);
+        if (!nodeTable.hasColumn(NODE_TABLE_PRO_NAME)) {
+            nodeTable.addColumn(NODE_TABLE_PRO_NAME, NODE_TABLE_PRO_NAME_TITLE, String.class, Origin.DATA, "", false);
         }
 
         Table edgeTable = graphModel.getEdgeTable();
-        if (!edgeTable.hasColumn(PRO_XREF)) {
-            edgeTable.addColumn(PRO_XREF, PRO_XREF_TITLE, String[].class, Origin.DATA, new String[]{}, false);
+        if (!edgeTable.hasColumn(EDGE_TABLE_PRO_XREF)) {
+            edgeTable.addColumn(EDGE_TABLE_PRO_XREF, EDGE_TABLE_PRO_XREF_TITLE, String[].class, Origin.DATA, new String[]{}, false);
         }
+        if (!edgeTable.hasColumn(EDGE_TABLE_PRO_SIMILARITY)) {
+            edgeTable.addColumn(EDGE_TABLE_PRO_SIMILARITY, EDGE_TABLE_PRO_SIMILARITY_TITLE, Double.class, Origin.DATA, new Double(0), false);
+        }        
     }
 
     public QueryModel getQueryModel() {

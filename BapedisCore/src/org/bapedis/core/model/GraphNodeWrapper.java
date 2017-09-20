@@ -5,9 +5,8 @@
  */
 package org.bapedis.core.model;
 
-import java.awt.Color;
+import org.bapedis.core.services.ProjectManager;
 import org.gephi.graph.api.Node;
-import org.gephi.graph.api.TextProperties;
 import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;
 import org.openide.util.NbBundle;
@@ -25,7 +24,7 @@ public class GraphNodeWrapper extends GraphElementNode {
 
     @Override
     public String getDisplayName() {
-        return (String) element.getAttribute("name");
+        return (String) element.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME);
     }        
 
     
@@ -45,7 +44,7 @@ public class GraphNodeWrapper extends GraphElementNode {
         // Name property
         name = NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.name");
         descName = NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.name.desc");
-        final String nameValue = (String)node.getAttribute("name");
+        final String nameValue = (String)node.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME);
         property = createReadOnlyPropertyField("name", name, descName, String.class, nameValue);
         set.put(property);
         

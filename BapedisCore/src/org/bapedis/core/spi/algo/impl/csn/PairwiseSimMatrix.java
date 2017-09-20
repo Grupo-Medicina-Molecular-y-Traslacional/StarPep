@@ -49,7 +49,7 @@ public class PairwiseSimMatrix implements Serializable {
         return data[ pos(x, y)];
     }
 
-    public double[] getData() {
+    public double[] getValues() {
         return data;
     }
 

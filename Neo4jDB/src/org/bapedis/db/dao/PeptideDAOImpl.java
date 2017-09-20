@@ -250,9 +250,9 @@ public class PeptideDAOImpl implements PeptideDAO {
             GraphFactory factory = graphModel.factory();
             graphNode = factory.newNode(id);
             if (neoNode.hasProperty(PRO_NAME)) {
-                graphNode.setAttribute(PRO_NAME, neoNode.getProperty(PRO_NAME));
+                graphNode.setAttribute(ProjectManager.NODE_TABLE_PRO_NAME, neoNode.getProperty(PRO_NAME));
             } else {
-                graphNode.setAttribute(PRO_NAME, id);
+                graphNode.setAttribute(ProjectManager.NODE_TABLE_PRO_NAME, id);
             }
             String label = neoNode.getLabels().iterator().next().name();
             graphNode.setLabel(label);

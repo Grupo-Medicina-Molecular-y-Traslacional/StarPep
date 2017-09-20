@@ -5,6 +5,8 @@
  */
 package org.bapedis.core.spi.algo.impl.csn;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.concurrent.ForkJoinPool;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
@@ -23,9 +25,9 @@ import org.openide.util.Lookup;
  *
  * @author loge
  */
-public abstract class NetworkSimilarityBuilder implements Algorithm {
+public abstract class NetworkSimilarityAlgo implements Algorithm {
 
-    public static final String GRAPH_EDGE_TYPE="similarity";
+    public static final String GRAPH_EDGE_LABEL = "pairwise_similarity";
     private final float GRAPH_EDGE_WEIGHT = 1f;
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
     protected final ProjectManager pc;
@@ -33,10 +35,13 @@ public abstract class NetworkSimilarityBuilder implements Algorithm {
     protected AttributesModel attrModel;
     protected GraphModel graphModel;
     protected ProgressTicket progressTicket;
+    protected final PropertyChangeSupport propertyChangeSupport;
+    public static final String CHANGED_SIMILARITY = "similarity";
 
-    public NetworkSimilarityBuilder(AlgorithmFactory factory) {
+    public NetworkSimilarityAlgo(AlgorithmFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         this.factory = factory;
+        propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
     @Override
@@ -85,21 +90,47 @@ public abstract class NetworkSimilarityBuilder implements Algorithm {
         task.join();
         double score;
         Peptide peptide1, peptide2;
-        Graph mainGraph = graphModel.getGraph();
         GraphFactory factory = graphModel.factory();
         Edge graphEdge;
-        int relType = graphModel.addEdgeType(GRAPH_EDGE_TYPE);
-        for (int i = 0; i < peptides.length - 1; i++) {
-            peptide1 = peptides[i];
-            for (int j = i + 1; j < peptides.length; j++) {
-                peptide2 = peptides[j];
-                score = idMatrix.get(peptide1, peptide2);
-                System.out.println(score);                        
-//                graphEdge = factory.newEdge(id, peptide1.getGraphNode(), peptide2.getGraphNode(), relType, GRAPH_EDGE_WEIGHT, false);
+        String id;
+        Graph mainGraph = graphModel.getGraph();
+        Graph csnGraph = graphModel.getGraph(attrModel.getCsnView());
+        mainGraph.writeLock();
+        try {
+            int relType = graphModel.addEdgeType(GRAPH_EDGE_LABEL);
+            for (int i = 0; i < peptides.length - 1; i++) {
+                peptide1 = peptides[i];
+                for (int j = i + 1; j < peptides.length; j++) {
+                    peptide2 = peptides[j];
+                    score = idMatrix.get(peptide1, peptide2);
+                    id = String.format("%s-%s", peptide1.getGraphNode().getId(), peptide2.getGraphNode().getId());
+                    graphEdge = mainGraph.getEdge(id);
+                    if (graphEdge == null) {
+                        graphEdge = factory.newEdge(id, peptide1.getGraphNode(), peptide2.getGraphNode(), relType, GRAPH_EDGE_WEIGHT, false);
+                        graphEdge.setLabel(GRAPH_EDGE_LABEL);
+                        mainGraph.addEdge(graphEdge);
+                    }
+                    graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, score);
+                    
+                    if (!csnGraph.hasEdge(id) && score >= 0.7) {
+                        csnGraph.addEdge(graphEdge);
+                    }
+                }
             }
+            propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY, null, idMatrix.getValues());
+        } finally {
+            mainGraph.writeUnlock();
         }
     }
 
     protected abstract SimilarityProvider getSimilarityProvider();
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
 
 }

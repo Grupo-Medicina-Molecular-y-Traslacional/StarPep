@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -177,6 +178,8 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(runButton, gridBagConstraints);
+
+        algoProvidedPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -451,7 +454,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 editPanel.setBorder(BorderFactory.createTitledBorder(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.editPanel.border.title"))); // NOI18N
                 propSheetPanel.setVisible(false);
                 algoProvidedPanel.removeAll();
-                algoProvidedPanel.add(editPanel);
+                algoProvidedPanel.add(editPanel, BorderLayout.PAGE_START);
                 algoProvidedPanel.setVisible(true);
             } else {
                 algoProvidedPanel.removeAll();

@@ -12,7 +12,7 @@ import org.bapedis.core.io.Exporter;
 import org.bapedis.core.model.AnnotationType;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.spi.data.PeptideDAO;
+import org.bapedis.core.services.ProjectManager;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.NodeIterable;
@@ -51,12 +51,12 @@ public class MetadataExporter implements Exporter {
                     neighbors = pept.getNeighbors(aType);
                     for (Node neighbor : neighbors) {
                         edge = pept.getEdge(neighbor, aType);
-                        xref = Arrays.toString((String[]) edge.getAttribute("xref"));
+                        xref = Arrays.toString((String[]) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_XREF));
                         pw.format("\"%s\"", pept.getId());
                         pw.write(separator);
                         pw.format("\"%s\"", edge.getLabel());
                         pw.write(separator);
-                        pw.format("\"%s\"", neighbor.getAttribute("name"));
+                        pw.format("\"%s\"", neighbor.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
                         pw.write(separator);
                         pw.format("\"%s\"", xref);
                         pw.println();

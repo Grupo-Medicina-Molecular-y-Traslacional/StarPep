@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.data.PeptideDAO;
 import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
 import org.biojava.nbio.core.sequence.ProteinSequence;
@@ -103,7 +104,7 @@ public class Peptide {
         NodeIterable neighbors = getNeighbors(aType);
         List<String> values = new LinkedList<>();
         for (Node node : neighbors) {
-            values.add((String) node.getAttribute("name"));
+            values.add((String) node.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
         }
         return values.toArray(new String[0]);
     }

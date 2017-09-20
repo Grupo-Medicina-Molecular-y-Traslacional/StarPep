@@ -23,7 +23,7 @@ import org.openide.util.Exceptions;
  *
  * @author loge
  */
-public class PairwiseSequenceAlignment extends NetworkSimilarityBuilder implements SimilarityProvider{
+public class PairwiseSequenceAlignment extends NetworkSimilarityAlgo implements SimilarityProvider{
 
     public static final String[] Alignment_Type = new String[]{"Needleman-Wunsch", "Smith-Waterman"};
     public static final String[] Substitution_Matrix = new String[]{

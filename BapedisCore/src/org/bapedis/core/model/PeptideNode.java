@@ -11,6 +11,7 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import javax.swing.Action;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.ui.actions.SelectNodeOnGraph;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
@@ -110,7 +111,7 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
                     desc = name;
                 }
                 property = createPropertyField(name + count, aType.getDisplayName(),
-                        desc, String.class, neighbor.getAttribute("name"));
+                        desc, String.class, neighbor.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
                 set.put(property);
                 count++;
             }

@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.model;
 
+import org.bapedis.core.services.ProjectManager;
 import org.gephi.graph.api.Edge;
 import org.openide.nodes.Sheet;
 import org.openide.util.Exceptions;
@@ -45,12 +46,12 @@ public class GraphEdgeWrapper extends GraphElementNode {
 
         //Source propery
         property = createReadOnlyPropertyField("source", NbBundle.getMessage(GraphElementNode.class, "PropertySet.edge.source"),
-                NbBundle.getMessage(GraphElementNode.class, "PropertySet.edge.source.desc"), String.class, edge.getSource().getAttribute("name"));
+                NbBundle.getMessage(GraphElementNode.class, "PropertySet.edge.source.desc"), String.class, edge.getSource().getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
         set.put(property);
 
         //Target propery
         property = createReadOnlyPropertyField("target", NbBundle.getMessage(GraphElementNode.class, "PropertySet.edge.target"),
-                NbBundle.getMessage(GraphElementNode.class, "PropertySet.edge.target.desc"), String.class, edge.getTarget().getAttribute("name"));
+                NbBundle.getMessage(GraphElementNode.class, "PropertySet.edge.target.desc"), String.class, edge.getTarget().getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
         set.put(property);
 
         // Graph set

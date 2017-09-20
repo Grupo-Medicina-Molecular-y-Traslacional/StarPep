@@ -37,6 +37,7 @@ public abstract class NetworkSimilarityAlgo implements Algorithm {
     protected ProgressTicket progressTicket;
     protected final PropertyChangeSupport propertyChangeSupport;
     public static final String CHANGED_SIMILARITY = "similarity";
+    private boolean stopRun;
 
     public NetworkSimilarityAlgo(AlgorithmFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
@@ -48,7 +49,8 @@ public abstract class NetworkSimilarityAlgo implements Algorithm {
     public void initAlgo() {
         attrModel = pc.getAttributesModel();
         graphModel = pc.getGraphModel();
-        PairwiseSimMatrixBuilder.setStopRun(false);
+        stopRun = false;
+        PairwiseSimMatrixBuilder.setStopRun(stopRun);
     }
 
     @Override
@@ -59,7 +61,8 @@ public abstract class NetworkSimilarityAlgo implements Algorithm {
 
     @Override
     public boolean cancel() {
-        PairwiseSimMatrixBuilder.setStopRun(true);
+        stopRun = true;
+        PairwiseSimMatrixBuilder.setStopRun(stopRun);
         return true;
     }
 
@@ -90,7 +93,7 @@ public abstract class NetworkSimilarityAlgo implements Algorithm {
         task.join();
         double score;
         Peptide peptide1, peptide2;
-        GraphFactory factory = graphModel.factory();
+        GraphFactory graphFactory = graphModel.factory();
         Edge graphEdge;
         String id;
         Graph mainGraph = graphModel.getGraph();
@@ -98,15 +101,15 @@ public abstract class NetworkSimilarityAlgo implements Algorithm {
         mainGraph.writeLock();
         try {
             int relType = graphModel.addEdgeType(GRAPH_EDGE_LABEL);
-            for (int i = 0; i < peptides.length - 1; i++) {
+            for (int i = 0; i < peptides.length - 1 && !stopRun; i++) {
                 peptide1 = peptides[i];
-                for (int j = i + 1; j < peptides.length; j++) {
+                for (int j = i + 1; j < peptides.length && !stopRun; j++) {
                     peptide2 = peptides[j];
                     score = idMatrix.get(peptide1, peptide2);
                     id = String.format("%s-%s", peptide1.getGraphNode().getId(), peptide2.getGraphNode().getId());
                     graphEdge = mainGraph.getEdge(id);
-                    if (graphEdge == null) {
-                        graphEdge = factory.newEdge(id, peptide1.getGraphNode(), peptide2.getGraphNode(), relType, GRAPH_EDGE_WEIGHT, false);
+                    if (graphEdge == null) {                        
+                        graphEdge = graphFactory.newEdge(id, peptide1.getGraphNode(), peptide2.getGraphNode(), relType, GRAPH_EDGE_WEIGHT, false);
                         graphEdge.setLabel(GRAPH_EDGE_LABEL);
                         mainGraph.addEdge(graphEdge);
                     }
@@ -116,11 +119,11 @@ public abstract class NetworkSimilarityAlgo implements Algorithm {
                         csnGraph.addEdge(graphEdge);
                     }
                 }
-            }
-            propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY, null, idMatrix.getValues());
+            }            
         } finally {
             mainGraph.writeUnlock();
         }
+        propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY, null, idMatrix.getValues());
     }
 
     protected abstract SimilarityProvider getSimilarityProvider();

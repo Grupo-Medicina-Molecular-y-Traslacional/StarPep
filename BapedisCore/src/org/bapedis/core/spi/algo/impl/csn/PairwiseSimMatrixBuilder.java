@@ -49,7 +49,6 @@ public class PairwiseSimMatrixBuilder extends RecursiveAction {
         return idMatrix;
     }
 
-
     @Override
     protected void compute() {
         if (xlow >= yhigh || stopRun.get()) {
@@ -85,8 +84,10 @@ public class PairwiseSimMatrixBuilder extends RecursiveAction {
             peptide1 = peptides[y];
             for (int x = xlow; x < Math.min(xhigh, y); x++) {
                 peptide2 = peptides[x];
-                score = similarityProvider.computeSimilarity(peptide1, peptide2);
-                idMatrix.set(peptide1, peptide2, score);
+                if (!stopRun.get()) {
+                    score = similarityProvider.computeSimilarity(peptide1, peptide2);
+                    idMatrix.set(peptide1, peptide2, score);
+                }
                 progressTicket.progress();
             }
         }

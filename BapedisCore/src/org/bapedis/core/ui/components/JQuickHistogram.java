@@ -68,11 +68,11 @@ public class JQuickHistogram {
     private Double maxRange;
 
     public JQuickHistogram() {
-        clear();
+        reset(0);
     }
 
-    public void clear() {
-        data = new ArrayList<>();
+    public void reset(int capacity) {
+        data = new ArrayList<>(capacity);
         minValue = Double.MAX_VALUE;
         maxValue = Double.NEGATIVE_INFINITY;
     }

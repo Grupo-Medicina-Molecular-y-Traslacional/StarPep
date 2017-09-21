@@ -42,16 +42,27 @@
 package org.bapedis.core.spi.algo.impl.csn;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import javax.swing.JLabel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.ui.PeptideViewerTopComponent;
 import org.bapedis.core.ui.components.JQuickHistogram;
+import org.bapedis.core.ui.components.JQuickHistogramPanel;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.gephi.graph.api.Edge;
+import org.jdesktop.swingx.JXBusyLabel;
+import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -63,6 +74,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
     private static final int DEFAULT_VALUE = 70;
     private final JQuickHistogram histogram;
     private final SpinnerNumberModel thresholdSpinnerModel;
+    protected final JXBusyLabel busyLabel;
 
     public ThresholdRangePanel() {
         initComponents();
@@ -70,9 +82,19 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
         jThresholdSpinner.setModel(thresholdSpinnerModel);
         jThresholdSlider.setMaximum(MAXIMUM_VALUE);
         jThresholdSlider.setValue(DEFAULT_VALUE);
+
+        busyLabel = new JXBusyLabel(new Dimension(20, 20));
+        busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        histogramPanel.add(busyLabel, "busyCard");
+
         histogram = new JQuickHistogram();
-        histogramPanel.add(histogram.getPanel(), BorderLayout.CENTER);
-        histogram.setConstraintHeight(30);
+        histogram.setConstraintHeight(30);        
+    }
+
+    private void setBusyLabel(boolean busy) {
+        CardLayout cl = (CardLayout) histogramPanel.getLayout();
+        busyLabel.setBusy(busy);
+        cl.show(histogramPanel, busy ? "busyCard" : "histoCard");
     }
 
     static {
@@ -80,32 +102,54 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
     }
 
     public void setup(final List<Edge> similarityEdges) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                setupHistogram(similarityEdges);
-            }
-        }).start();
+        if (similarityEdges == null) {
+            setBusyLabel(true);
+        } else {
+            SwingWorker sw = new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    histogram.reset(similarityEdges.size());
+                    histogram.setConstraintHeight(30);
+                    for (Edge edge : similarityEdges) {
+                        histogram.addData((double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
+                    }
+                    histogram.sortData();
+                    double rangeLowerBound = 0.0;
+                    double rangeUpperBound = 1.0;
+                    histogram.setLowerBound(rangeLowerBound);
+                    histogram.setUpperBound(rangeUpperBound);
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        get();
+                    } catch (InterruptedException ex) {
+                        Exceptions.printStackTrace(ex);
+                    } catch (ExecutionException ex) {
+                        Exceptions.printStackTrace(ex);
+                    } finally {
+                        histogramPanel.add(new JQuickHistogramPanel(histogram), "histoCard");
+//                        histogramPanel.add(new JLabel("text"), "histoCard");
+                        setBusyLabel(false);                        
+//                        revalidate();
+//                        repaint();
+                    }
+                }
+
+            };
+            sw.execute();
+        }
     }
 
     private void setupHistogram(List<Edge> similarityEdges) {
-        histogram.reset(similarityEdges.size());
-        histogram.setConstraintHeight(30);
-        for (Edge edge : similarityEdges) {
-            histogram.addData((double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
-        }
-        histogram.sortData();
-        double rangeLowerBound = 0.0;
-        double rangeUpperBound = 1.0;
-        histogram.setLowerBound(rangeLowerBound);
-        histogram.setUpperBound(rangeUpperBound);
 
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
             public void run() {
-                histogram.getPanel().revalidate();
-                histogram.getPanel().repaint();
+                setBusyLabel(false);
             }
         });
     }
@@ -154,7 +198,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
         add(jLabel1, gridBagConstraints);
 
         histogramPanel.setOpaque(false);
-        histogramPanel.setLayout(new java.awt.BorderLayout());
+        histogramPanel.setLayout(new java.awt.CardLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;

@@ -47,7 +47,7 @@ public abstract class NetworkSimilarityAlgo implements Algorithm {
         SimilarityGraphEdgeBuilder.mainGraph = graphModel.getGraph();
         SimilarityGraphEdgeBuilder.csnGraph = graphModel.getGraph(attrModel.getCsnView());
         SimilarityGraphEdgeBuilder.similarityProvider = getSimilarityProvider();
-        SimilarityGraphEdgeBuilder.edgeList = new LinkedList<>();
+        SimilarityGraphEdgeBuilder.edgeList = new LinkedList<>();        
     }
 
     @Override
@@ -85,6 +85,7 @@ public abstract class NetworkSimilarityAlgo implements Algorithm {
 
     @Override
     public void run() {
+        propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY, null, null);
         Peptide[] peptides = SimilarityGraphEdgeBuilder.peptides;
         // Workunits for pairwise sim matrix builder
         int workunits = peptides.length * (peptides.length - 1) / 2;

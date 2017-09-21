@@ -104,8 +104,8 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
 
             @Override
             public void run() {
-                histogramPanel.revalidate();
-                histogramPanel.repaint();
+                histogram.getPanel().revalidate();
+                histogram.getPanel().repaint();
             }
         });
     }

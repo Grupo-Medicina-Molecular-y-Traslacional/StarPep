@@ -42,14 +42,18 @@
 package org.bapedis.core.spi.algo.impl.csn;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import javax.swing.JSpinner;
+import java.util.List;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.ui.components.JQuickHistogram;
+import org.bapedis.core.ui.components.JQuickHistogramPanel;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
+import org.gephi.graph.api.Edge;
 
 /**
  *
@@ -59,10 +63,8 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
 
     private static final int MAXIMUM_VALUE = 100;
     private static final int DEFAULT_VALUE = 70;
-    private final JQuickHistogram histogram;
     private final SpinnerNumberModel thresholdSpinnerModel;
-    //Info
-    private Object[] values;
+    private RichTooltip richTooltip;
 
     public ThresholdRangePanel() {
         initComponents();
@@ -70,47 +72,50 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
         jThresholdSpinner.setModel(thresholdSpinnerModel);
         jThresholdSlider.setMaximum(MAXIMUM_VALUE);
         jThresholdSlider.setValue(DEFAULT_VALUE);
-        histogram = new JQuickHistogram();
-        histogramPanel.add(histogram.getPanel(), BorderLayout.CENTER);
-        histogram.setConstraintHeight(30);
     }
     
     static {
         UIManager.put("Slider.paintValue", false);
     }
 
-    public void setup(final double[] values) {
+    public void setup(final List<Edge> similarityEdges) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                setupHistogram(values);
+                setupHistogram(similarityEdges);
             }
         }).start();
     }
 
-    private void setupHistogram(double[] values) {
-        histogram.clear();
-        for (Object value : values) {
-            histogram.addData(value);
+    private void setupHistogram(List<Edge> similarityEdges) {                
+        final JQuickHistogram histogram = new JQuickHistogram(similarityEdges.size());        
+        histogram.setConstraintHeight(30);        
+        for (Edge edge : similarityEdges) {
+            histogram.addData((double)edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
         }
         histogram.sortData();
         double rangeLowerBound = 0.0;
         double rangeUpperBound = 1.0;
         histogram.setLowerBound(rangeLowerBound);
         histogram.setUpperBound(rangeUpperBound);
+        
+        richTooltip = buildTooltip(histogram);
 
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
             public void run() {
+                histogramPanel.removeAll();
+                histogramPanel.add(new JQuickHistogramPanel(histogram), BorderLayout.CENTER);
                 histogramPanel.revalidate();
                 histogramPanel.repaint();
             }
         });
     }
 
-    private RichTooltip buildTooltip() {
-        if (histogram.countValues() == 0) {
+
+    private RichTooltip buildTooltip(JQuickHistogram histogram) {
+        if (histogram == null || histogram.countValues() == 0) {
             return null;
         }
         NumberFormat formatter = DecimalFormat.getNumberInstance();

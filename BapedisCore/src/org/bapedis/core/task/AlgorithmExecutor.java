@@ -104,7 +104,7 @@ public final class AlgorithmExecutor {
             if (errorHandler != null) {
                 errorHandler.fatalError(e);
             } else {
-                Logger.getLogger("").log(Level.SEVERE, "", e);
+                Logger.getLogger(AlgoExecutor.class.getName()).log(Level.SEVERE, "", e);
             }
             runnable.progress.finish();
             if (runnable.listener != null) {
@@ -210,7 +210,7 @@ public final class AlgorithmExecutor {
                 if (errorHandler != null) {
                     errorHandler.fatalError(e);
                 } else {
-                    Logger.getLogger("").log(Level.SEVERE, "", e);
+                    Logger.getLogger(AlgoExecutor.class.getName()).log(Level.SEVERE, "", e);
                 }
             } finally {
                 finished(this);

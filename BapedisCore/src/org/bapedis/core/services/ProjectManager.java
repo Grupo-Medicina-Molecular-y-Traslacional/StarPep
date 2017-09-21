@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.services;
 
+import java.awt.Color;
 import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
@@ -43,6 +44,11 @@ public class ProjectManager implements Lookup.Provider {
     protected Workspace currentWS;
     protected List<WorkspaceEventListener> wsListeners;
     protected final AlgorithmExecutor executor;
+    
+    public static final float GRAPH_NODE_SIZE = 10f;
+    public static final Color GRAPH_NODE_COLOR = new Color(0.6f, 0.6f, 0.6f);
+    public static final float GRAPH_EDGE_WEIGHT = 1f;    
+    public static final String GRAPH_EDGE_SIMALIRITY = "pairwise_similarity";
     public static final String NODE_TABLE_PRO_NAME = "name";
     public static final String NODE_TABLE_PRO_NAME_TITLE = NbBundle.getMessage(ProjectManager.class, "NodeTable.column.name.title");
     public static final String EDGE_TABLE_PRO_XREF = "xref";

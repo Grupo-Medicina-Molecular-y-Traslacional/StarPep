@@ -56,10 +56,7 @@ public class PeptideDAOImpl implements PeptideDAO {
     private final String PRO_LENGHT = "length";
     private final String PRO_NAME = "name";
     private final String PRO_XREF = "xref";
-
-    private final float GRAPH_NODE_SIZE = 10f;
-    private final float GRAPH_EDGE_WEIGHT = 1f;
-    private final Color color = new Color(0.6f, 0.6f, 0.6f);
+    
     private final TraversalDescription peptideTraversal, metadataTraversal;
 
     public PeptideDAOImpl() {
@@ -256,16 +253,16 @@ public class PeptideDAOImpl implements PeptideDAO {
             }
             String label = neoNode.getLabels().iterator().next().name();
             graphNode.setLabel(label);
-            graphNode.setSize(GRAPH_NODE_SIZE);
+            graphNode.setSize(ProjectManager.GRAPH_NODE_SIZE);
 
             //Set random position
             graphNode.setX((float) ((0.01 + Math.random()) * 1000) - 500);
             graphNode.setY((float) ((0.01 + Math.random()) * 1000) - 500);
 
             //Set color
-            graphNode.setR(color.getRed() / 255f);
-            graphNode.setG(color.getGreen() / 255f);
-            graphNode.setB(color.getBlue() / 255f);
+            graphNode.setR(ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f);
+            graphNode.setG(ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f);
+            graphNode.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
             graphNode.setAlpha(1f);
 
             mainGraph.addNode(graphNode);
@@ -282,14 +279,14 @@ public class PeptideDAOImpl implements PeptideDAO {
             String relName = relation.getType().name();
             int relType = graphModel.addEdgeType(relName);
 
-            graphEdge = factory.newEdge(id, startNode, endNode, relType, GRAPH_EDGE_WEIGHT, false);
+            graphEdge = factory.newEdge(id, startNode, endNode, relType, ProjectManager.GRAPH_EDGE_WEIGHT, false);
             graphEdge.setLabel(relName);
             graphEdge.setAttribute(PRO_XREF, relation.getProperty(PRO_XREF));
 
             //Set color
-            graphEdge.setR(color.getRed() / 255f);
-            graphEdge.setG(color.getGreen() / 255f);
-            graphEdge.setB(color.getBlue() / 255f);
+            graphEdge.setR(ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f);
+            graphEdge.setG(ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f);
+            graphEdge.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
             graphEdge.setAlpha(0f);
 
             mainGraph.addEdge(graphEdge);

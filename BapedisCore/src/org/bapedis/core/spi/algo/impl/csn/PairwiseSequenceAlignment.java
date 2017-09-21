@@ -8,7 +8,7 @@ package org.bapedis.core.spi.algo.impl.csn;
 import java.util.logging.Level;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
-import static org.bapedis.core.spi.algo.impl.csn.PairwiseSimMatrixBuilder.log;
+import static org.bapedis.core.spi.algo.impl.csn.SimilarityGraphEdgeBuilder.log;
 import org.biojava.nbio.alignment.Alignments;
 import org.biojava.nbio.alignment.SimpleGapPenalty;
 import org.biojava.nbio.core.alignment.matrices.SubstitutionMatrixHelper;

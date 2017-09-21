@@ -8,10 +8,12 @@ package org.bapedis.core.spi.algo.impl.csn;
 import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+import org.gephi.graph.api.Edge;
 
 /**
  *
@@ -233,7 +235,7 @@ public class PairwiseSequenceAlignmentPanel extends javax.swing.JPanel implement
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource().equals(seqAlignmentAlgo) &&
             evt.getPropertyName().equals(NetworkSimilarityAlgo.CHANGED_SIMILARITY)){            
-            thresholdPanel.setup((double[])evt.getNewValue());
+            thresholdPanel.setup((List<Edge>)evt.getNewValue());
         }
     }
 }

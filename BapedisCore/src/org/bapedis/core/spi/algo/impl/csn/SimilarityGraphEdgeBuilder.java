@@ -85,8 +85,8 @@ class SimilarityGraphEdgeBuilder extends RecursiveAction {
                 if (!stopRun.get()) {
                     score = similarityProvider.computeSimilarity(peptide1, peptide2);
                     createGraphEdge(peptide1, peptide2, score);
+                    progressTicket.progress();
                 }
-                progressTicket.progress();
             }
         }
     }
@@ -110,9 +110,9 @@ class SimilarityGraphEdgeBuilder extends RecursiveAction {
                 graphEdge.setAlpha(0f);
 
                 mainGraph.addEdge(graphEdge);
-                edgeList.add(graphEdge);
             }
             graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, score);
+            edgeList.add(graphEdge);
         } finally {
             mainGraph.writeUnlock();
         }

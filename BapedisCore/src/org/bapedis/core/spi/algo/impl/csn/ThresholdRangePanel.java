@@ -41,28 +41,24 @@
  */
 package org.bapedis.core.spi.algo.impl.csn;
 
-import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import javax.swing.JLabel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import org.bapedis.core.services.ProjectManager;
-import org.bapedis.core.ui.PeptideViewerTopComponent;
 import org.bapedis.core.ui.components.JQuickHistogram;
 import org.bapedis.core.ui.components.JQuickHistogramPanel;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.gephi.graph.api.Edge;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.openide.util.Exceptions;
-import org.openide.util.NbBundle;
 
 /**
  *
@@ -88,7 +84,10 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
         histogramPanel.add(busyLabel, "busyCard");
 
         histogram = new JQuickHistogram();
-        histogram.setConstraintHeight(30);        
+        histogram.setConstraintHeight(30);
+        histogramPanel.add(new JQuickHistogramPanel(histogram), "histoCard");
+
+        setBusyLabel(false);
     }
 
     private void setBusyLabel(boolean busy) {
@@ -111,7 +110,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
                     histogram.reset(similarityEdges.size());
                     histogram.setConstraintHeight(30);
                     for (Edge edge : similarityEdges) {
-                        histogram.addData((double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
+                        histogram.addData(edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
                     }
                     histogram.sortData();
                     double rangeLowerBound = 0.0;
@@ -130,28 +129,12 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
                     } catch (ExecutionException ex) {
                         Exceptions.printStackTrace(ex);
                     } finally {
-                        histogramPanel.add(new JQuickHistogramPanel(histogram), "histoCard");
-//                        histogramPanel.add(new JLabel("text"), "histoCard");
-                        setBusyLabel(false);                        
-//                        revalidate();
-//                        repaint();
+                        setBusyLabel(false);
                     }
                 }
-
             };
             sw.execute();
         }
-    }
-
-    private void setupHistogram(List<Edge> similarityEdges) {
-
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                setBusyLabel(false);
-            }
-        });
     }
 
     private RichTooltip buildTooltip(JQuickHistogram histogram) {

@@ -41,7 +41,6 @@ Portions Copyrighted 2011 Gephi Consortium.
  */
 package org.bapedis.core.ui.components;
 
-import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

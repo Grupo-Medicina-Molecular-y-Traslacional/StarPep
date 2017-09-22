@@ -74,19 +74,23 @@ public class JQuickHistogram {
         data.clear();
         minValue = Double.MAX_VALUE;
         maxValue = Double.NEGATIVE_INFINITY;
+        minRange = 0.;
+        maxRange = 1.;        
     }
 
     public void addData(Double data) {
+        if (data < 0 || data > 1) {
+            throw new IllegalArgumentException("Invalid data value for histogram. It should be in [0,1]");
+        }
         Double key = Math.floor(data * 100) / 100.0; // 2 decimals
         int previousCount = 0;
         if (this.data.containsKey(key)) {
             previousCount = this.data.get(key);
         }
-        this.data.put(key, previousCount + 1);
-        minValue = Math.min(minValue, key);
-        maxValue = Math.max(maxValue, key);
-        minRange = minValue;
-        maxRange = maxValue;
+        int newCount = previousCount + 1;
+        this.data.put(key, newCount);
+        minValue = Math.min(minValue, newCount);
+        maxValue = Math.max(maxValue, newCount);
     }
 
     public void setLowerBound(Double lowerBound) {

@@ -71,10 +71,11 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
     private final JQuickHistogram histogram;
     private final SpinnerNumberModel thresholdSpinnerModel;
     protected final JXBusyLabel busyLabel;
+    protected final double STEP_SIZE = 0.01;
 
     public ThresholdRangePanel() {
         initComponents();
-        thresholdSpinnerModel = new SpinnerNumberModel((double) DEFAULT_VALUE / MAXIMUM_VALUE, 0, 1, 0.01);
+        thresholdSpinnerModel = new SpinnerNumberModel((double) DEFAULT_VALUE / MAXIMUM_VALUE, 0, 1, STEP_SIZE);
         jThresholdSpinner.setModel(thresholdSpinnerModel);
         jThresholdSlider.setMaximum(MAXIMUM_VALUE);
         jThresholdSlider.setValue(DEFAULT_VALUE);
@@ -85,7 +86,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
 
         histogram = new JQuickHistogram();
         histogram.setConstraintHeight(30);
-        histogramPanel.add(new JQuickHistogramPanel(histogram), "histoCard");
+        histogramPanel.add(new JQuickHistogramPanel(histogram, STEP_SIZE), "histoCard");
 
         setBusyLabel(false);
     }
@@ -108,12 +109,10 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
                 @Override
                 protected Void doInBackground() throws Exception {
                     histogram.clear();
-                    histogram.setConstraintHeight(30);
                     for (Edge edge : similarityEdges) {
                         histogram.addData((Double)edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
                     }
-                    histogram.sortData();
-                    double rangeLowerBound = 0.0;
+                    double rangeLowerBound = 0.7;
                     double rangeUpperBound = 1.0;
                     histogram.setLowerBound(rangeLowerBound);
                     histogram.setUpperBound(rangeUpperBound);

@@ -107,10 +107,10 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
             SwingWorker sw = new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
-                    histogram.reset(similarityEdges.size());
+                    histogram.clear();
                     histogram.setConstraintHeight(30);
                     for (Edge edge : similarityEdges) {
-                        histogram.addData(edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
+                        histogram.addData((Double)edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
                     }
                     histogram.sortData();
                     double rangeLowerBound = 0.0;

@@ -43,11 +43,16 @@ package org.bapedis.core.ui.components;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *
- * @author Mathieu Bastian
+ * @author Mathieu Bastian Modified by Longendri Aguilera Mendoza to use a
+ * TreeMap instead of ArrayList
  */
 public class JQuickHistogram {
 
@@ -55,44 +60,33 @@ public class JQuickHistogram {
     protected int constraintWidth = 0;
     protected final boolean inclusive = true;
     //Data
-    protected List<Double> data;
+    protected final TreeMap<Double, Integer> data;
     protected Double minValue;
     protected Double maxValue;
     protected Double minRange;
     protected Double maxRange;
 
     public JQuickHistogram() {
-        reset(0);
+        data = new TreeMap<>();
     }
 
-    public void reset(int capacity) {
-        data = new ArrayList<>(capacity);
+    public void clear() {
+        data.clear();
         minValue = Double.MAX_VALUE;
         maxValue = Double.NEGATIVE_INFINITY;
     }
 
-    public void addData(Object data) {
-        if (data instanceof Double) {
-            addData((Double) data);
-        } else if (data instanceof Integer) {
-            addData(((Integer) data).doubleValue());
-        } else if (data instanceof Float) {
-            addData(((Float) data).doubleValue());
-        } else if (data instanceof Long) {
-            addData(((Long) data).doubleValue());
-        }
-    }
-
     public void addData(Double data) {
-        this.data.add(data);
-        minValue = Math.min(minValue, data);
-        maxValue = Math.max(maxValue, data);
+        Double key = Math.floor(data * 100) / 100.0; // 2 decimals
+        int previousCount = 0;
+        if (this.data.containsKey(key)) {
+            previousCount = this.data.get(key);
+        }
+        this.data.put(key, previousCount + 1);
+        minValue = Math.min(minValue, key);
+        maxValue = Math.max(maxValue, key);
         minRange = minValue;
         maxRange = maxValue;
-    }
-
-    public void sortData() {
-        Collections.sort(data);
     }
 
     public void setLowerBound(Double lowerBound) {
@@ -113,56 +107,74 @@ public class JQuickHistogram {
     }
 
     public int countValues() {
-        return data.size();
+        int count = 0;
+        for (Integer c : data.values()) {
+            count += c;
+        }
+        return count;
     }
 
     public int countInRange() {
-        int res = 0;
-        for (int i = 0; i < data.size(); i++) {
-            Double d = data.get(i);
+        int count = 0;
+        double d;
+        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
+            d = entry.getKey();
             if ((inclusive && d >= minRange && d <= maxRange) || (!inclusive && d > minRange && d < maxRange)) {
-                res++;
+                count += entry.getValue();
             }
         }
-        return res;
+        return count;
     }
 
     public double getAverage() {
-        double res = 0;
-        for (int i = 0; i < data.size(); i++) {
-            double d = data.get(i);
-            res += d;
+        double sum = 0;
+        int count = 0;
+        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
+            sum += entry.getKey() * entry.getValue();
+            count += entry.getValue();
         }
-        return res /= data.size();
+        return sum / count;
     }
 
     public double getAverageInRange() {
-        double res = 0;
-        int c = 0;
-        for (int i = 0; i < data.size(); i++) {
-            double d = data.get(i);
+        double sum = 0;
+        int count = 0;
+        double d;
+        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
+            d = entry.getKey();
             if ((inclusive && d >= minRange && d <= maxRange) || (!inclusive && d > minRange && d < maxRange)) {
-                res += d;
-                c++;
+                sum += entry.getKey() * entry.getValue();
+                count += entry.getValue();
             }
         }
-        return res /= c;
+        return sum / count;
     }
 
     public double getMedian() {
-        return data.get((data.size() + 1) / 2);
+        int median = (countValues() + 1) / 2;
+        double d;
+        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
+            d = entry.getKey();
+            median -= entry.getValue();
+            if (median <= 0) {
+                return d;
+            }
+        }
+        return -1.;
     }
 
     public double getMedianInRange() {
         int median = (countInRange() + 1) / 2;
-        for (int i = 0; i < data.size(); i++) {
-            double d = data.get(i);
+        double d;
+        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
+            d = entry.getKey();
             if ((inclusive && d >= minRange && d <= maxRange) || (!inclusive && d > minRange && d < maxRange)) {
-                if (median-- == 0) {
+                median -= entry.getValue();
+                if (median <= 0) {
                     return d;
                 }
             }
         }
         return -1.;
-    }    
+    }
 }

@@ -41,12 +41,9 @@ Portions Copyrighted 2011 Gephi Consortium.
  */
 package org.bapedis.core.ui.components;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 import java.util.TreeMap;
 
 /**
@@ -60,7 +57,8 @@ public class JQuickHistogram {
     protected int constraintWidth = 0;
     protected final boolean inclusive = true;
     //Data
-    protected final TreeMap<Double, Integer> data;
+    protected final TreeMap<String, Integer> data;
+    protected DecimalFormat df;
     protected Double minValue;
     protected Double maxValue;
     protected Double minRange;
@@ -68,6 +66,9 @@ public class JQuickHistogram {
 
     public JQuickHistogram() {
         data = new TreeMap<>();
+        DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
+        symbols.setDecimalSeparator('.');
+        df = new DecimalFormat("0.00", symbols);
     }
 
     public void clear() {
@@ -75,14 +76,14 @@ public class JQuickHistogram {
         minValue = Double.MAX_VALUE;
         maxValue = Double.NEGATIVE_INFINITY;
         minRange = 0.;
-        maxRange = 1.;        
+        maxRange = 1.;
     }
 
     public void addData(Double data) {
         if (data < 0 || data > 1) {
             throw new IllegalArgumentException("Invalid data value for histogram. It should be in [0,1]");
         }
-        Double key = Math.floor(data * 100) / 100.0; // 2 decimals
+        String key = df.format(Math.floor(data * 100) / 100); // 2 decimals
         int previousCount = 0;
         if (this.data.containsKey(key)) {
             previousCount = this.data.get(key);
@@ -118,67 +119,67 @@ public class JQuickHistogram {
         return count;
     }
 
-    public int countInRange() {
-        int count = 0;
-        double d;
-        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
-            d = entry.getKey();
-            if ((inclusive && d >= minRange && d <= maxRange) || (!inclusive && d > minRange && d < maxRange)) {
-                count += entry.getValue();
-            }
-        }
-        return count;
-    }
-
-    public double getAverage() {
-        double sum = 0;
-        int count = 0;
-        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
-            sum += entry.getKey() * entry.getValue();
-            count += entry.getValue();
-        }
-        return sum / count;
-    }
-
-    public double getAverageInRange() {
-        double sum = 0;
-        int count = 0;
-        double d;
-        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
-            d = entry.getKey();
-            if ((inclusive && d >= minRange && d <= maxRange) || (!inclusive && d > minRange && d < maxRange)) {
-                sum += entry.getKey() * entry.getValue();
-                count += entry.getValue();
-            }
-        }
-        return sum / count;
-    }
-
-    public double getMedian() {
-        int median = (countValues() + 1) / 2;
-        double d;
-        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
-            d = entry.getKey();
-            median -= entry.getValue();
-            if (median <= 0) {
-                return d;
-            }
-        }
-        return -1.;
-    }
-
-    public double getMedianInRange() {
-        int median = (countInRange() + 1) / 2;
-        double d;
-        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
-            d = entry.getKey();
-            if ((inclusive && d >= minRange && d <= maxRange) || (!inclusive && d > minRange && d < maxRange)) {
-                median -= entry.getValue();
-                if (median <= 0) {
-                    return d;
-                }
-            }
-        }
-        return -1.;
-    }
+//    public int countInRange() {
+//        int count = 0;
+//        double d;
+//        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
+//            d = entry.getKey();
+//            if ((inclusive && d >= minRange && d <= maxRange) || (!inclusive && d > minRange && d < maxRange)) {
+//                count += entry.getValue();
+//            }
+//        }
+//        return count;
+//    }
+//
+//    public double getAverage() {
+//        double sum = 0;
+//        int count = 0;
+//        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
+//            sum += entry.getKey() * entry.getValue();
+//            count += entry.getValue();
+//        }
+//        return sum / count;
+//    }
+//
+//    public double getAverageInRange() {
+//        double sum = 0;
+//        int count = 0;
+//        double d;
+//        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
+//            d = entry.getKey();
+//            if ((inclusive && d >= minRange && d <= maxRange) || (!inclusive && d > minRange && d < maxRange)) {
+//                sum += entry.getKey() * entry.getValue();
+//                count += entry.getValue();
+//            }
+//        }
+//        return sum / count;
+//    }
+//
+//    public double getMedian() {
+//        int median = (countValues() + 1) / 2;
+//        double d;
+//        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
+//            d = entry.getKey();
+//            median -= entry.getValue();
+//            if (median <= 0) {
+//                return d;
+//            }
+//        }
+//        return -1.;
+//    }
+//
+//    public double getMedianInRange() {
+//        int median = (countInRange() + 1) / 2;
+//        double d;
+//        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
+//            d = entry.getKey();
+//            if ((inclusive && d >= minRange && d <= maxRange) || (!inclusive && d > minRange && d < maxRange)) {
+//                median -= entry.getValue();
+//                if (median <= 0) {
+//                    return d;
+//                }
+//            }
+//        }
+//        return -1.;
+//    }
 }

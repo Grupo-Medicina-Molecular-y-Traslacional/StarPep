@@ -22,15 +22,14 @@ public class JQuickHistogramPanel extends JPanel {
     private final JQuickHistogram histogram;
     private int currentHeight = 0;
     private int currentWidth = 0;
-    private final Double[] keys;
+    private final String[] keys;
 
     public JQuickHistogramPanel(JQuickHistogram histogram, double stepSize) {
         this.histogram = histogram;
-        int dataSize = (int) (1 / stepSize)+1;
-        this.keys = new Double[dataSize];
-        this.keys[0] = new Double(0);
-        for (int i= 1; i<keys.length; i++) {
-            this.keys[i] = Math.floor((this.keys[i-1] + stepSize)*100)/100;
+        int bins = (int) (1 / stepSize);
+        this.keys = new String[bins + 1];
+        for (int i = 0; i <= bins; i++) {
+            this.keys[i] = histogram.df.format(Math.floor(i * stepSize * 100) / 100);
         }
         setOpaque(false);
     }
@@ -47,17 +46,17 @@ public class JQuickHistogramPanel extends JPanel {
     }
 
     private void drawHisto(Graphics2D g2d) {
-
         if (histogram.minRange == null || histogram.maxRange == null) {
             return;
         }
-
 //        if (dataSize < currentWidth) {
         int rectWidth = (int) (currentWidth / keys.length);
         int leftover = (int) (currentWidth - rectWidth * keys.length);
         int xPosition = 0;
-        for (Double d: keys) {
-            int value = (histogram.data.containsKey(d))? histogram.data.get(d): 0;
+        double d;
+        for (String key : keys) {
+            d = Double.valueOf(key);
+            int value = (histogram.data.containsKey(key)) ? histogram.data.get(key) : 0;
             int rectangleWidth = rectWidth + (leftover > 0 ? 1 : 0);
             leftover--;
             int rectangleHeight = (int) ((value - histogram.minValue) / (histogram.maxValue - histogram.minValue) * currentHeight);

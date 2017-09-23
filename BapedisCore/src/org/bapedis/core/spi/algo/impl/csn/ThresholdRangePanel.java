@@ -110,7 +110,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
                 protected Void doInBackground() throws Exception {
                     histogram.clear();
                     for (Edge edge : similarityEdges) {
-                        histogram.addData((Double)edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
+                        histogram.addData((Double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
                     }
                     double rangeLowerBound = 0.7;
                     double rangeUpperBound = 1.0;
@@ -137,19 +137,20 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
     }
 
     private RichTooltip buildTooltip(JQuickHistogram histogram) {
-        if (histogram.countValues() == 0) {
-            return null;
-        }
-        NumberFormat formatter = DecimalFormat.getNumberInstance();
-        formatter.setMaximumFractionDigits(3);
-        String average = formatter.format(histogram.getAverage());
-        String averageInRange = formatter.format(histogram.getAverageInRange());
-        RichTooltip richTooltip = new RichTooltip();
-        richTooltip.setTitle("Statistics (In-Range)");
-        richTooltip.addDescriptionSection("<html><b># of Values:</b> " + histogram.countValues() + " (" + histogram.countInRange() + ")");
-        richTooltip.addDescriptionSection("<html><b>Average:</b> " + average + " (" + averageInRange + ")");
-        richTooltip.addDescriptionSection("<html><b>Median:</b> " + histogram.getMedian() + " (" + histogram.getMedianInRange() + ")");
-        return richTooltip;
+//        if (histogram.countValues() == 0) {
+//            return null;
+//        }
+//        NumberFormat formatter = DecimalFormat.getNumberInstance();
+//        formatter.setMaximumFractionDigits(3);
+//        String average = formatter.format(histogram.getAverage());
+//        String averageInRange = formatter.format(histogram.getAverageInRange());
+//        RichTooltip richTooltip = new RichTooltip();
+//        richTooltip.setTitle("Statistics (In-Range)");
+//        richTooltip.addDescriptionSection("<html><b># of Values:</b> " + histogram.countValues() + " (" + histogram.countInRange() + ")");
+//        richTooltip.addDescriptionSection("<html><b>Average:</b> " + average + " (" + averageInRange + ")");
+//        richTooltip.addDescriptionSection("<html><b>Median:</b> " + histogram.getMedian() + " (" + histogram.getMedianInRange() + ")");
+//        return richTooltip;
+        return null;
     }
 
     /**

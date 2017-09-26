@@ -161,7 +161,7 @@ public class JQuickHistogram {
 
         JFreeChart chart = ChartFactory.createBarChart(
                 "", // chart title
-                "Range", // domain axis label
+                "", // domain axis label
                 "Frequency", // range axis label
                 dataset, // data
                 PlotOrientation.HORIZONTAL.VERTICAL, // orientation

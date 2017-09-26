@@ -41,23 +41,23 @@
  */
 package org.bapedis.core.spi.algo.impl.csn;
 
+import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.ui.components.JQuickHistogram;
-import org.bapedis.core.ui.components.JQuickHistogramPanel;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.gephi.graph.api.Edge;
 import org.jdesktop.swingx.JXBusyLabel;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.plot.CategoryMarker;
+import org.jfree.chart.plot.CategoryPlot;
 import org.openide.util.Exceptions;
 
 /**
@@ -69,6 +69,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
     private static final int MAXIMUM_VALUE = 100;
     private static final int DEFAULT_VALUE = 70;
     private final JQuickHistogram histogram;
+    private ChartPanel chartPanel;
     private final SpinnerNumberModel thresholdSpinnerModel;
     protected final JXBusyLabel busyLabel;
     protected final double STEP_SIZE = 0.01;
@@ -77,33 +78,39 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
         initComponents();
         thresholdSpinnerModel = new SpinnerNumberModel((double) DEFAULT_VALUE / MAXIMUM_VALUE, 0, 1, STEP_SIZE);
         jThresholdSpinner.setModel(thresholdSpinnerModel);
-        jThresholdSlider.setMaximum(MAXIMUM_VALUE);
-        jThresholdSlider.setValue(DEFAULT_VALUE);
 
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        histogramPanel.add(busyLabel, "busyCard");
 
         histogram = new JQuickHistogram();
-        histogram.setConstraintHeight(30);
-        histogramPanel.add(new JQuickHistogramPanel(histogram, STEP_SIZE), "histoCard");
+        histogram.setConstraintHeight(histogramPanel.getHeight());
 
-        setBusyLabel(false);
-    }
-
-    private void setBusyLabel(boolean busy) {
-        CardLayout cl = (CardLayout) histogramPanel.getLayout();
-        busyLabel.setBusy(busy);
-        cl.show(histogramPanel, busy ? "busyCard" : "histoCard");
     }
 
     static {
         UIManager.put("Slider.paintValue", false);
     }
 
+    private void setBusy(boolean busy) {
+        busyLabel.setBusy(busy);
+        if (busy) {
+            if (chartPanel != null) {
+                histogramPanel.remove(chartPanel);
+            }
+            histogramPanel.add(busyLabel, BorderLayout.CENTER);
+        } else {
+            histogramPanel.remove(busyLabel);
+            if (chartPanel != null) {
+                histogramPanel.add(chartPanel, BorderLayout.CENTER);
+            }                        
+        }
+        histogramPanel.revalidate();
+        histogramPanel.repaint();
+    }
+
     public void setup(final List<Edge> similarityEdges) {
         if (similarityEdges == null) {
-            setBusyLabel(true);
+            setBusy(true);
         } else {
             SwingWorker sw = new SwingWorker<Void, Void>() {
                 @Override
@@ -112,10 +119,6 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
                     for (Edge edge : similarityEdges) {
                         histogram.addData((Double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
                     }
-                    double rangeLowerBound = 0.7;
-                    double rangeUpperBound = 1.0;
-                    histogram.setLowerBound(rangeLowerBound);
-                    histogram.setUpperBound(rangeUpperBound);
                     return null;
                 }
 
@@ -123,12 +126,16 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
                 protected void done() {
                     try {
                         get();
+                        if (chartPanel != null) {
+                            histogramPanel.remove(chartPanel);
+                        }
+                        chartPanel = histogram.createChart();
                     } catch (InterruptedException ex) {
                         Exceptions.printStackTrace(ex);
                     } catch (ExecutionException ex) {
                         Exceptions.printStackTrace(ex);
                     } finally {
-                        setBusyLabel(false);
+                        setBusy(false);
                     }
                 }
             };
@@ -153,6 +160,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
         return null;
     }
 
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -165,7 +173,6 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
 
         jLabel1 = new javax.swing.JLabel();
         histogramPanel = new javax.swing.JPanel();
-        jThresholdSlider = new javax.swing.JSlider();
         jApplyButton = new javax.swing.JButton();
         jThresholdSpinner = new javax.swing.JSpinner();
 
@@ -180,30 +187,26 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         add(jLabel1, gridBagConstraints);
 
+        histogramPanel.setMinimumSize(new java.awt.Dimension(0, 180));
         histogramPanel.setOpaque(false);
-        histogramPanel.setLayout(new java.awt.CardLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        add(histogramPanel, gridBagConstraints);
-
-        jThresholdSlider.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jThresholdSliderStateChanged(evt);
-            }
-        });
+        histogramPanel.setPreferredSize(new java.awt.Dimension(0, 180));
+        histogramPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        add(jThresholdSlider, gridBagConstraints);
+        gridBagConstraints.weighty = 1.0;
+        add(histogramPanel, gridBagConstraints);
 
         jApplyButton.setText(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.jApplyButton.text")); // NOI18N
         jApplyButton.setPreferredSize(new java.awt.Dimension(60, 29));
+        jApplyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jApplyButtonActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -213,11 +216,6 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
 
         jThresholdSpinner.setMinimumSize(new java.awt.Dimension(60, 28));
         jThresholdSpinner.setPreferredSize(new java.awt.Dimension(60, 28));
-        jThresholdSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jThresholdSpinnerStateChanged(evt);
-            }
-        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -226,28 +224,14 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
         add(jThresholdSpinner, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jThresholdSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jThresholdSliderStateChanged
-        if (!jThresholdSlider.getValueIsAdjusting()) {
-            double normalizedVAlue = jThresholdSlider.getValue() / (double) MAXIMUM_VALUE;
-            if (!thresholdSpinnerModel.getValue().equals(normalizedVAlue)) {
-                thresholdSpinnerModel.setValue(normalizedVAlue);
-            }
-        }
-    }//GEN-LAST:event_jThresholdSliderStateChanged
+    private void jApplyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jApplyButtonActionPerformed
 
-    private void jThresholdSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jThresholdSpinnerStateChanged
-        double value = (Double) thresholdSpinnerModel.getValue();
-        int percent = (int) (value * 100);
-        if (jThresholdSlider.getValue() != percent) {
-            jThresholdSlider.setValue(percent);
-        }
-    }//GEN-LAST:event_jThresholdSpinnerStateChanged
+    }//GEN-LAST:event_jApplyButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel histogramPanel;
     private javax.swing.JButton jApplyButton;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JSlider jThresholdSlider;
     private javax.swing.JSpinner jThresholdSpinner;
     // End of variables declaration//GEN-END:variables
 }

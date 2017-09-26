@@ -41,10 +41,17 @@ Portions Copyrighted 2011 Gephi Consortium.
  */
 package org.bapedis.core.ui.components;
 
+import java.awt.Dimension;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.Locale;
 import java.util.TreeMap;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
 
 /**
  *
@@ -68,7 +75,7 @@ public class JQuickHistogram {
         data = new TreeMap<>();
         DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
         symbols.setDecimalSeparator('.');
-        df = new DecimalFormat("0.00", symbols);
+        df = new DecimalFormat("0.0", symbols);
     }
 
     public void clear() {
@@ -83,7 +90,7 @@ public class JQuickHistogram {
         if (data < 0 || data > 1) {
             throw new IllegalArgumentException("Invalid data value for histogram. It should be in [0,1]");
         }
-        String key = df.format(Math.floor(data * 100) / 100); // 2 decimals
+        String key = df.format(Math.floor(data * 10) / 10);
         int previousCount = 0;
         if (this.data.containsKey(key)) {
             previousCount = this.data.get(key);
@@ -119,67 +126,60 @@ public class JQuickHistogram {
         return count;
     }
 
-//    public int countInRange() {
-//        int count = 0;
-//        double d;
-//        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
-//            d = entry.getKey();
-//            if ((inclusive && d >= minRange && d <= maxRange) || (!inclusive && d > minRange && d < maxRange)) {
-//                count += entry.getValue();
-//            }
-//        }
-//        return count;
-//    }
-//
-//    public double getAverage() {
-//        double sum = 0;
-//        int count = 0;
-//        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
-//            sum += entry.getKey() * entry.getValue();
-//            count += entry.getValue();
-//        }
-//        return sum / count;
-//    }
-//
-//    public double getAverageInRange() {
-//        double sum = 0;
-//        int count = 0;
-//        double d;
-//        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
-//            d = entry.getKey();
-//            if ((inclusive && d >= minRange && d <= maxRange) || (!inclusive && d > minRange && d < maxRange)) {
-//                sum += entry.getKey() * entry.getValue();
-//                count += entry.getValue();
-//            }
-//        }
-//        return sum / count;
-//    }
-//
-//    public double getMedian() {
-//        int median = (countValues() + 1) / 2;
-//        double d;
-//        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
-//            d = entry.getKey();
-//            median -= entry.getValue();
-//            if (median <= 0) {
-//                return d;
-//            }
-//        }
-//        return -1.;
-//    }
-//
-//    public double getMedianInRange() {
-//        int median = (countInRange() + 1) / 2;
-//        double d;
-//        for (Map.Entry<Double, Integer> entry : data.entrySet()) {
-//            d = entry.getKey();
-//            if ((inclusive && d >= minRange && d <= maxRange) || (!inclusive && d > minRange && d < maxRange)) {
-//                median -= entry.getValue();
-//                if (median <= 0) {
-//                    return d;
-//                }
-//            }
-//        }
-//        return -1.;
-//    }
+    private String getChartColumnKey(String key) {
+        switch (key) {
+            case "0.0":
+                return "[0.0-0.1)";
+            case "0.1":
+                return "[0.1-0.2)";
+            case "0.2":
+                return "[0.2-0.3)";
+            case "0.3":
+                return "[0.3-0.4)";
+            case "0.4":
+                return "[0.4-0.5)";
+            case "0.5":
+                return "[0.5-0.6)";
+            case "0.6":
+                return "[0.6-0.7)";
+            case "0.7":
+                return "[0.7-0.8)";
+            case "0.8":
+                return "[0.8-0.9)";
+            case "0.9":
+                return "[0.9-1.0)";
+        }
+        return key;
+    }
+
+    public ChartPanel createChart() {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        String serie = "serie";
+        for (String key : data.keySet()) {
+            dataset.addValue(data.get(key), serie, getChartColumnKey(key));
+        }
+
+        JFreeChart chart = ChartFactory.createBarChart(
+                "", // chart title
+                "Range", // domain axis label
+                "Frequency", // range axis label
+                dataset, // data
+                PlotOrientation.HORIZONTAL.VERTICAL, // orientation
+                false, // include legend
+                false, // tooltips?
+                false // URLs?
+        );
+
+        ChartPanel chartPanel = new ChartPanel(chart);
+
+        int currentHeight = (constraintHeight > 0 ? constraintHeight : chartPanel.getHeight());
+        int currentWidth = (constraintWidth > 0 ? constraintWidth : chartPanel.getWidth());
+        chartPanel.setPreferredSize(new Dimension(currentWidth, currentHeight));
+        chartPanel.setMinimumSize(new Dimension(currentWidth, currentHeight));
+
+        CategoryAxis axis = chart.getCategoryPlot().getDomainAxis();
+        axis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
+        return chartPanel;
+    }
+
 }

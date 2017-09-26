@@ -28,7 +28,7 @@ class SimilarityGraphEdgeBuilder extends RecursiveAction {
     protected static Graph mainGraph, csnGraph;
     protected static Peptide[] peptides;
     protected static ProgressTicket progressTicket;
-    protected static SimilarityProvider similarityProvider;
+    protected static SimilarityMeasure similarityMeasure;
     protected static List<Edge> edgeList;
 
     protected int xlow, xhigh, ylow, yhigh;
@@ -49,7 +49,7 @@ class SimilarityGraphEdgeBuilder extends RecursiveAction {
 
     static void setStopRun(boolean stop) {
         stopRun.set(stop);
-    }
+    }        
 
     @Override
     protected void compute() {
@@ -83,7 +83,7 @@ class SimilarityGraphEdgeBuilder extends RecursiveAction {
             for (int x = xlow; x < Math.min(xhigh, y); x++) {
                 peptide2 = peptides[x];
                 if (!stopRun.get()) {
-                    score = similarityProvider.computeSimilarity(peptide1, peptide2);
+                    score = similarityMeasure.computeSimilarity(peptide1, peptide2);
                     createGraphEdge(peptide1, peptide2, score);
                     progressTicket.progress();
                 }
@@ -120,12 +120,12 @@ class SimilarityGraphEdgeBuilder extends RecursiveAction {
         // Add edge to csn graph
         csnGraph.writeLock();
         try {
-            if (!csnGraph.hasEdge(id) && score >= 0.7) {
+            if (!csnGraph.hasEdge(id) && score >= similarityMeasure.getThreshold()) {
                 csnGraph.addEdge(graphEdge);
             }
         } finally {
             csnGraph.writeUnlock();
         }
-    }
+    }    
 
 }

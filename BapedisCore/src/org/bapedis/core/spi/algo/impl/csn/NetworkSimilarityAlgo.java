@@ -46,7 +46,7 @@ public abstract class NetworkSimilarityAlgo implements Algorithm {
         SimilarityGraphEdgeBuilder.setStopRun(false);
         SimilarityGraphEdgeBuilder.mainGraph = graphModel.getGraph();
         SimilarityGraphEdgeBuilder.csnGraph = graphModel.getGraph(attrModel.getCsnView());
-        SimilarityGraphEdgeBuilder.similarityProvider = getSimilarityProvider();
+        SimilarityGraphEdgeBuilder.similarityMeasure = getSimilarityProvider();
         SimilarityGraphEdgeBuilder.edgeList = new LinkedList<>();        
     }
 
@@ -57,7 +57,7 @@ public abstract class NetworkSimilarityAlgo implements Algorithm {
         SimilarityGraphEdgeBuilder.graphModel = null;
         SimilarityGraphEdgeBuilder.mainGraph = null;
         SimilarityGraphEdgeBuilder.csnGraph = null;
-        SimilarityGraphEdgeBuilder.similarityProvider = null;
+        SimilarityGraphEdgeBuilder.similarityMeasure = null;
         SimilarityGraphEdgeBuilder.progressTicket = null;
         SimilarityGraphEdgeBuilder.edgeList = null;
     }
@@ -96,7 +96,7 @@ public abstract class NetworkSimilarityAlgo implements Algorithm {
         propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY, null, SimilarityGraphEdgeBuilder.edgeList);
     }
 
-    protected abstract SimilarityProvider getSimilarityProvider();
+    protected abstract SimilarityMeasure getSimilarityProvider();
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);

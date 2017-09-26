@@ -11,6 +11,8 @@ import org.bapedis.core.model.Peptide;
  *
  * @author loge
  */
-public interface SimilarityProvider {
+public interface SimilarityMeasure {
+    double getThreshold();
+    void setThreshold(double value);
     double computeSimilarity(Peptide peptide1, Peptide peptide2);
 }

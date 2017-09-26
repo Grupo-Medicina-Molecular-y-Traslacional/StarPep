@@ -23,7 +23,7 @@ import org.openide.util.Exceptions;
  *
  * @author loge
  */
-public class PairwiseSequenceAlignment extends NetworkSimilarityAlgo implements SimilarityProvider{
+public class PairwiseSequenceAlignment extends NetworkSimilarityAlgo implements SimilarityMeasure{
 
     public static final String[] Alignment_Type = new String[]{"Needleman-Wunsch", "Smith-Waterman"};
     public static final String[] Substitution_Matrix = new String[]{
@@ -39,6 +39,7 @@ public class PairwiseSequenceAlignment extends NetworkSimilarityAlgo implements 
     protected int alignmentTypeIndex, substitutionMatrixIndex, similarityTypeIndex, similarityScoreIndex;
     protected SubstitutionMatrix<AminoAcidCompound> substitutionMatrix;
     protected Alignments.PairwiseSequenceAlignerType alignerType;
+    protected double threshold;
 
     public PairwiseSequenceAlignment(AlgorithmFactory factory) {
         super(factory);
@@ -48,6 +49,7 @@ public class PairwiseSequenceAlignment extends NetworkSimilarityAlgo implements 
         substitutionMatrix = getSubstitutionMatrix();
         similarityTypeIndex = 0;
         similarityScoreIndex = 0;
+        threshold = 0.7;
     }
 
     public int getAlignmentTypeIndex() {
@@ -194,7 +196,17 @@ public class PairwiseSequenceAlignment extends NetworkSimilarityAlgo implements 
     }
 
     @Override
-    protected SimilarityProvider getSimilarityProvider() {
+    protected SimilarityMeasure getSimilarityProvider() {
         return this;
+    }
+
+    @Override
+    public double getThreshold() {
+        return threshold;
+    }
+
+    @Override
+    public void setThreshold(double value) {
+        this.threshold = value;
     }
 }

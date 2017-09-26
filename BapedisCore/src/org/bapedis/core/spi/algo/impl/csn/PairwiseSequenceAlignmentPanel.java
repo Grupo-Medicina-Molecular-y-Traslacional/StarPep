@@ -214,6 +214,8 @@ public class PairwiseSequenceAlignmentPanel extends javax.swing.JPanel implement
         jSMComboBox.setSelectedIndex(seqAlignmentAlgo.getSubstitutionMatrixIndex());
         jPercentComboBox.setSelectedIndex(seqAlignmentAlgo.getSimilarityTypeIndex());
         seqAlignmentAlgo.addPropertyChangeListener(this);
+        
+        thresholdPanel.setup(seqAlignmentAlgo);
         return this;
     }
 

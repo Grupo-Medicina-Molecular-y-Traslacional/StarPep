@@ -152,7 +152,7 @@ public class JQuickHistogram {
         return key;
     }
 
-    public ChartPanel createChart() {
+    public ChartPanel createChartPanel() {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         String serie = "serie";
         for (String key : data.keySet()) {

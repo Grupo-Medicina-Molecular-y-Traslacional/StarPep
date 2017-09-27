@@ -11,7 +11,7 @@ import org.bapedis.modamp.scales.PkaValues;
 
 /**
  *
- * @author Home
+ * @author beltran
  */
 public class IsoelectricPoint extends AbstractModamp {
 

@@ -15,7 +15,7 @@ import org.openide.util.NbBundle;
 
 /**
  *
- * @author cicese
+ * @author loge
  */
 public class CenterNodeOnGraph extends AbstractAction {
     private final Node node;

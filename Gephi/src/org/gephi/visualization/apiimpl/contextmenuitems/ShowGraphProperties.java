@@ -17,10 +17,7 @@ import org.openide.nodes.NodeOperation;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
-/**
- *
- * @author Home
- */
+
 @ServiceProvider(service = GraphContextMenuItem.class)
 public class ShowGraphProperties implements GraphContextMenuItem {
 

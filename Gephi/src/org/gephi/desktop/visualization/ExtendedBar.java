@@ -23,10 +23,7 @@ import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
-/**
- *
- * @author Home
- */
+
 public class ExtendedBar extends javax.swing.JPanel implements ActionListener, AppearanceUIModelListener {
     
     private final AppearanceToolbar toolbar;

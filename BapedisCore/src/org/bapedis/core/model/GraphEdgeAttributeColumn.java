@@ -13,7 +13,7 @@ import org.openide.util.NbBundle;
 
 /**
  *
- * @author Home
+ * @author loge
  */
 public class GraphEdgeAttributeColumn implements GraphElementDataColumn{
     public static enum Direction{Source, Targe};

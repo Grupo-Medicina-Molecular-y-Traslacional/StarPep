@@ -67,10 +67,7 @@ import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
 import org.openide.windows.WindowManager;
 
-/**
- *
- * @author loge
- */
+
 public class NeoGraphScene extends JPanel implements MultiViewElement, WorkspaceEventListener, PropertyChangeListener, VizEventListener {
 
     protected final ProjectManager pc;

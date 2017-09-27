@@ -16,7 +16,7 @@ import org.openide.util.NbBundle;
 
 /**
  *
- * @author Home
+ * @author loge
  */
 public class RemoveFromQueryModel extends AbstractAction {
     private final Metadata metadata;

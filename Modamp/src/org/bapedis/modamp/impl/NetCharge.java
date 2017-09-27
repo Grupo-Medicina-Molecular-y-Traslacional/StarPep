@@ -5,7 +5,6 @@
  */
 package org.bapedis.modamp.impl;
 
-import org.bapedis.modamp.impl.AbstractModamp;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
@@ -19,7 +18,7 @@ import org.openide.util.NbBundle;
 
 /**
  *
- * @author Home
+ * @author beltran
  */
 public class NetCharge extends AbstractModamp {
 

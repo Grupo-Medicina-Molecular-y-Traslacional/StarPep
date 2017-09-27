@@ -7,7 +7,7 @@ package org.bapedis.core.model;
 
 /**
  *
- * @author cicese
+ * @author loge
  */
 public enum GraphElementType {
     Node, Edge;

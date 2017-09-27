@@ -19,7 +19,7 @@ import org.openide.util.NbBundle;
 
 /**
  *
- * @author Home
+ * @author loge
  */
 public class PeptideAvailableColumnsPanel extends javax.swing.JPanel {
 

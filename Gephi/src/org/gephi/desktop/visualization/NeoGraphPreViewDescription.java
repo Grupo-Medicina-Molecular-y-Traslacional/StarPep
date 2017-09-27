@@ -13,10 +13,7 @@ import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 
-/**
- *
- * @author loge
- */
+
 public class NeoGraphPreViewDescription implements MultiViewDescription, Serializable  { 
 
     public NeoGraphPreViewDescription() {

@@ -16,7 +16,7 @@ import org.openide.util.NbBundle;
 
 /**
  *
- * @author Home
+ * @author loge
  */
 public class RemoveAllFromQueryModel extends AbstractAction{
 

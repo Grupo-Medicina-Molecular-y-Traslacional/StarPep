@@ -12,7 +12,7 @@ import org.bapedis.modamp.MD;
 
 /**
  *
- * @author loge
+ * @author beltran
  */
 public class MolecularWeight extends AbstractModamp{
 

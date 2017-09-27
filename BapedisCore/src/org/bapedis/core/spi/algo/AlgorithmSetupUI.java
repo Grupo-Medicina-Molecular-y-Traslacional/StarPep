@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 
 /**
  *
- * @author cicese
+ * @author loge
  */
 public interface AlgorithmSetupUI {   
 

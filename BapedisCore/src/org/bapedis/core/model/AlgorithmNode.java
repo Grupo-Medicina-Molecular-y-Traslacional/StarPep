@@ -15,7 +15,7 @@ import org.openide.util.Exceptions;
 
 /**
  *
- * @author cicese
+ * @author loge
  */
 public class AlgorithmNode extends AbstractNode {
 

@@ -29,10 +29,7 @@ import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
-/**
- *
- * @author loge
- */
+
 @ServiceProvider(service = GraphWindowController.class)
 public class GraphWindowControllerImpl implements GraphWindowController, WorkspaceEventListener, LookupListener, PropertyChangeListener {
 

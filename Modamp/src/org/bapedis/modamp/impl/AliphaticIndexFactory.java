@@ -14,7 +14,7 @@ import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
- * @author loge
+ * @author beltran
  */
 @ServiceProvider(service = AlgorithmFactory.class)
 public class AliphaticIndexFactory implements AlgorithmFactory {

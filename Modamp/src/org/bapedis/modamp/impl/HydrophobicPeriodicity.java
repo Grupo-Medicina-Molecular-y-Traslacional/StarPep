@@ -16,7 +16,7 @@ import org.openide.util.NbBundle;
 
 /**
  *
- * @author loge
+ * @author beltran
  */
 public class HydrophobicPeriodicity extends AbstractModamp {
     private final String PRO_NAME;

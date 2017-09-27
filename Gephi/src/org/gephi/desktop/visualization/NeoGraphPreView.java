@@ -44,10 +44,7 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.Lookups;
 
-/**
- *
- * @author loge
- */
+
 public class NeoGraphPreView extends JPanel implements MultiViewElement {
 
     private final PreviewController previewController = Lookup.getDefault().lookup(PreviewController.class);

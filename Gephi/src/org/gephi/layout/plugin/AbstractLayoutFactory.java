@@ -9,10 +9,7 @@ import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
 
-/**
- *
- * @author cicese
- */
+
 public abstract class AbstractLayoutFactory implements AlgorithmFactory {
 
     @Override

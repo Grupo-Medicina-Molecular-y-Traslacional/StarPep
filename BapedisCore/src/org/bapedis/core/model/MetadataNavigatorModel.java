@@ -7,7 +7,7 @@ package org.bapedis.core.model;
 
 /**
  *
- * @author Home
+ * @author loge
  */
 public class MetadataNavigatorModel {
 

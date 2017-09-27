@@ -11,7 +11,7 @@ import org.bapedis.modamp.MD;
 
 /**
  *
- * @author loge
+ * @author beltran
  */
 public class InestabilityIndex extends AbstractModamp {
 

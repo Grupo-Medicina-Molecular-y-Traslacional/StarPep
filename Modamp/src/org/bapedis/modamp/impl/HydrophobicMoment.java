@@ -17,7 +17,7 @@ import org.openide.util.NbBundle;
 
 /**
  *
- * @author loge
+ * @author beltran
  */
 public class HydrophobicMoment extends AbstractModamp {
 

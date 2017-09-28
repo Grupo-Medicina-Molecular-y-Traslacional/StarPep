@@ -5,25 +5,31 @@
  */
 package org.bapedis.core.ui.actions;
 
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import org.bapedis.core.model.AlgorithmCategory;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 
+/**
+ *
+ * @author loge
+ */
 @ActionID(
         category = "Tools",
-        id = "org.bapedis.core.ui.actions.GraphMeasureAction"
+        id = "org.bapedis.core.ui.actions.SimilarityNetworkAction"
 )
 @ActionRegistration(
-        displayName = "#CTL_GraphMeasureAction"
+        displayName = "#CTL_SimilarityNetworkAction"
 )
-@ActionReference(path = "Menu/Tools", position = 400)
-@NbBundle.Messages("CTL_GraphMeasureAction=Graph Measure")
-public final class GraphMeasureAction extends ToolAction {
-
-    public GraphMeasureAction() {
-        super(AlgorithmCategory.GraphMeasure);
+@ActionReference(path = "Menu/Tools", position = 300)
+@NbBundle.Messages({"CTL_SimilarityNetworkAction=Similarity Network"})
+public class SimilarityNetworkAction extends ToolAction {
+    
+    public SimilarityNetworkAction() {
+        super(AlgorithmCategory.SimilarityNetwork);
     }
-   
+
 }

@@ -16,7 +16,7 @@ public enum AlgorithmCategory {
     GraphLayout("graphLayout"),
     GraphMeasure("graphMeasure"),
     MolecularDescriptor("md"),
-    NetworkSimilarity("csn");
+    SimilarityNetwork("csn");
     
     private final String displayName;
 

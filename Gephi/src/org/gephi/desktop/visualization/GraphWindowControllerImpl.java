@@ -146,7 +146,7 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
                 break;
             case AttributesModel.CSN_VIEW:
                 graphModel.setVisibleView(currentModel.getCsnView());
-                setDisplayName("csn");
+                setDisplayName("chemSpace");
                 break;
         }
     }

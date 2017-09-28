@@ -63,6 +63,7 @@ public class JQuickHistogram {
     protected int constraintHeight = 0;
     protected int constraintWidth = 0;
     protected final boolean inclusive = true;
+    protected double sum;
     //Data
     protected final TreeMap<String, Integer> data;
     protected DecimalFormat df;
@@ -76,14 +77,20 @@ public class JQuickHistogram {
         DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
         symbols.setDecimalSeparator('.');
         df = new DecimalFormat("0.0", symbols);
+        initValues();
     }
 
-    public void clear() {
-        data.clear();
+    private void initValues() {
         minValue = Double.MAX_VALUE;
         maxValue = Double.NEGATIVE_INFINITY;
         minRange = 0.;
         maxRange = 1.;
+        sum = 0;
+    }
+
+    public void clear() {
+        data.clear();
+        initValues();
     }
 
     public void addData(Double data) {
@@ -99,6 +106,11 @@ public class JQuickHistogram {
         this.data.put(key, newCount);
         minValue = Math.min(minValue, newCount);
         maxValue = Math.max(maxValue, newCount);
+        sum += data;
+    }
+    
+    public double getAverage(){
+        return sum / countValues();
     }
 
     public void setLowerBound(Double lowerBound) {

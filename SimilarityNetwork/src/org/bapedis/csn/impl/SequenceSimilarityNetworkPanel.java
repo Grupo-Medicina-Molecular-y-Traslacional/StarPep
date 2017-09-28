@@ -13,24 +13,28 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.gephi.graph.api.Edge;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author loge
  */
-public class PairwiseSequenceAlignmentPanel extends javax.swing.JPanel implements AlgorithmSetupUI, PropertyChangeListener {
+public class SequenceSimilarityNetworkPanel extends javax.swing.JPanel implements AlgorithmSetupUI, PropertyChangeListener {
 
     /**
      * Creates new form PairwiseSequenceAlignmentPanel
      */
-    protected PairwiseSequenceAlignment seqAlignmentAlgo;
+    protected SequenceSimilarityNetwork seqAlignmentAlgo;
     protected final ThresholdRangePanel thresholdPanel;
+    private final RichTooltip richTooltip;
 
-    public PairwiseSequenceAlignmentPanel() {
+    public SequenceSimilarityNetworkPanel() {
         initComponents();
         thresholdPanel = new ThresholdRangePanel();
         southPanel.add(thresholdPanel, BorderLayout.CENTER);
+        richTooltip = new RichTooltip(NbBundle.getMessage(SequenceSimilarityNetworkPanel.class, "PairwiseSequenceAlignmentPanel.info.title"), NbBundle.getMessage(SequenceSimilarityNetworkPanel.class, "PairwiseSequenceAlignmentPanel.info.text"));
     }
 
     /**
@@ -49,7 +53,7 @@ public class PairwiseSequenceAlignmentPanel extends javax.swing.JPanel implement
         jLabel2 = new javax.swing.JLabel();
         jSMComboBox = new javax.swing.JComboBox();
         jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        infoLabel = new javax.swing.JLabel();
         jPercentComboBox = new javax.swing.JComboBox<>();
         jScoreComboBox = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
@@ -57,10 +61,10 @@ public class PairwiseSequenceAlignmentPanel extends javax.swing.JPanel implement
 
         setLayout(new java.awt.GridBagLayout());
 
-        alignmentPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(PairwiseSequenceAlignmentPanel.class, "PairwiseSequenceAlignmentPanel.alignmentPanel.border.title"))); // NOI18N
+        alignmentPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(SequenceSimilarityNetworkPanel.class, "SequenceSimilarityNetworkPanel.alignmentPanel.border.title"))); // NOI18N
         alignmentPanel.setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(PairwiseSequenceAlignmentPanel.class, "PairwiseSequenceAlignmentPanel.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(SequenceSimilarityNetworkPanel.class, "SequenceSimilarityNetworkPanel.jLabel1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -83,7 +87,7 @@ public class PairwiseSequenceAlignmentPanel extends javax.swing.JPanel implement
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         alignmentPanel.add(jATComboBox, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(PairwiseSequenceAlignmentPanel.class, "PairwiseSequenceAlignmentPanel.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(SequenceSimilarityNetworkPanel.class, "SequenceSimilarityNetworkPanel.jLabel2.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -106,7 +110,7 @@ public class PairwiseSequenceAlignmentPanel extends javax.swing.JPanel implement
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         alignmentPanel.add(jSMComboBox, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(PairwiseSequenceAlignmentPanel.class, "PairwiseSequenceAlignmentPanel.jLabel3.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(SequenceSimilarityNetworkPanel.class, "SequenceSimilarityNetworkPanel.jLabel3.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -114,15 +118,21 @@ public class PairwiseSequenceAlignmentPanel extends javax.swing.JPanel implement
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         alignmentPanel.add(jLabel3, gridBagConstraints);
 
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/csn/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(PairwiseSequenceAlignmentPanel.class, "PairwiseSequenceAlignmentPanel.jLabel4.text")); // NOI18N
-        jLabel4.setToolTipText(org.openide.util.NbBundle.getMessage(PairwiseSequenceAlignmentPanel.class, "PairwiseSequenceAlignmentPanel.jLabel4.toolTipText")); // NOI18N
+        infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/csn/resources/info.png"))); // NOI18N
+        infoLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                infoLabelMouseExited(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                infoLabelMouseEntered(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        alignmentPanel.add(jLabel4, gridBagConstraints);
+        alignmentPanel.add(infoLabel, gridBagConstraints);
 
         jPercentComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Percent sequence identity", "Percent positive substitutions" }));
         jPercentComboBox.setSelectedIndex(-1);
@@ -151,7 +161,7 @@ public class PairwiseSequenceAlignmentPanel extends javax.swing.JPanel implement
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         alignmentPanel.add(jScoreComboBox, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(PairwiseSequenceAlignmentPanel.class, "PairwiseSequenceAlignmentPanel.jLabel5.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(SequenceSimilarityNetworkPanel.class, "SequenceSimilarityNetworkPanel.jLabel5.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -183,10 +193,10 @@ public class PairwiseSequenceAlignmentPanel extends javax.swing.JPanel implement
     private void jPercentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPercentComboBoxActionPerformed
         seqAlignmentAlgo.setSimilarityTypeIndex(jPercentComboBox.getSelectedIndex());
         DefaultComboBoxModel model = new DefaultComboBoxModel();
-        for (String item : PairwiseSequenceAlignment.Similarity_Score[seqAlignmentAlgo.getSimilarityTypeIndex()]) {
+        for (String item : SequenceSimilarityNetwork.Similarity_Score[seqAlignmentAlgo.getSimilarityTypeIndex()]) {
             model.addElement(item);
         }
-        model.setSelectedItem(PairwiseSequenceAlignment.Similarity_Score[seqAlignmentAlgo.getSimilarityTypeIndex()][seqAlignmentAlgo.getSimilarityScoreIndex()]);
+        model.setSelectedItem(SequenceSimilarityNetwork.Similarity_Score[seqAlignmentAlgo.getSimilarityTypeIndex()][seqAlignmentAlgo.getSimilarityScoreIndex()]);
         jScoreComboBox.setModel(model);        
     }//GEN-LAST:event_jPercentComboBoxActionPerformed
 
@@ -204,12 +214,20 @@ public class PairwiseSequenceAlignmentPanel extends javax.swing.JPanel implement
         }
     }//GEN-LAST:event_jScoreComboBoxActionPerformed
 
+    private void infoLabelMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_infoLabelMouseExited
+        richTooltip.hideTooltip();
+    }//GEN-LAST:event_infoLabelMouseExited
+
+    private void infoLabelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_infoLabelMouseEntered
+       richTooltip.showTooltip(infoLabel, evt.getLocationOnScreen());
+    }//GEN-LAST:event_infoLabelMouseEntered
+
     @Override
     public JPanel getEditPanel(Algorithm algo) {
         if (seqAlignmentAlgo != null){
             seqAlignmentAlgo.removePropertyChangeListener(this);
         }
-        seqAlignmentAlgo = (PairwiseSequenceAlignment) algo;
+        seqAlignmentAlgo = (SequenceSimilarityNetwork) algo;
         jATComboBox.setSelectedIndex(seqAlignmentAlgo.getAlignmentTypeIndex());
         jSMComboBox.setSelectedIndex(seqAlignmentAlgo.getSubstitutionMatrixIndex());
         jPercentComboBox.setSelectedIndex(seqAlignmentAlgo.getSimilarityTypeIndex());
@@ -222,11 +240,11 @@ public class PairwiseSequenceAlignmentPanel extends javax.swing.JPanel implement
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel alignmentPanel;
+    private javax.swing.JLabel infoLabel;
     private javax.swing.JComboBox jATComboBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JComboBox<String> jPercentComboBox;
     private javax.swing.JComboBox jSMComboBox;
@@ -238,7 +256,7 @@ public class PairwiseSequenceAlignmentPanel extends javax.swing.JPanel implement
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource().equals(seqAlignmentAlgo) &&
             evt.getPropertyName().equals(SimilarityNetworkAlgo.CHANGED_SIMILARITY)){            
-            thresholdPanel.setup((List<Edge>)evt.getNewValue());
+            thresholdPanel.setupHistogram((List<Edge>)evt.getNewValue());
         }
     }
 }

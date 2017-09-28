@@ -23,21 +23,21 @@ import org.openide.util.NbBundle;
  */
 @ActionID(
         category = "View",
-        id = "org.bapedis.core.ui.actions.ShowCSN"
+        id = "org.bapedis.core.ui.actions.ShowChemicalSpace"
 )
 @ActionRegistration(
-        displayName = "#CTL_ShowCSN",
+        displayName = "#CTL_ShowChemicalSpace",
         lazy = false
 )
 @ActionReferences({
     @ActionReference(path = "Menu/View", position = 330)
 })
-public class ShowCSN extends AbstractAction {
+public class ShowChemicalSpace extends AbstractAction {
     protected final ProjectManager pc;
     private final GraphWindowController graphWC;
 
-    public ShowCSN() {
-        String name = NbBundle.getMessage(ShowCSN.class, "CTL_ShowCSN");
+    public ShowChemicalSpace() {
+        String name = NbBundle.getMessage(ShowChemicalSpace.class, "CTL_ShowChemicalSpace");
         putValue(NAME, name);
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         graphWC = Lookup.getDefault().lookup(GraphWindowController.class);        
@@ -53,14 +53,4 @@ public class ShowCSN extends AbstractAction {
             }
         }
     }
-
-//    @Override
-//    public JMenuItem getPopupPresenter() {
-//        JMenu main = new JMenu(NbBundle.getMessage(ShowPeptideNodes.class, "CTL_ShowGraph"));
-//        List<? extends Action> actionsForPath = Utilities.actionsForPath("Actions/ShowDataFromLibrary/InWorkspace");
-//        for (Action action : actionsForPath) {
-//            main.add(action);
-//        }
-//        return main;
-//    }
 }

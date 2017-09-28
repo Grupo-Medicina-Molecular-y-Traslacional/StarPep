@@ -5,10 +5,8 @@
  */
 package org.bapedis.csn.impl;
 
-import java.util.logging.Level;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
-import static org.bapedis.csn.impl.SimilarityGraphEdgeBuilder.log;
 import org.biojava.nbio.alignment.Alignments;
 import org.biojava.nbio.alignment.SimpleGapPenalty;
 import org.biojava.nbio.core.alignment.matrices.SubstitutionMatrixHelper;
@@ -23,7 +21,7 @@ import org.openide.util.Exceptions;
  *
  * @author loge
  */
-public class PairwiseSequenceAlignment extends SimilarityNetworkAlgo implements SimilarityMeasure{
+public class SequenceSimilarityNetwork extends SimilarityNetworkAlgo implements SimilarityMeasure{
 
     public static final String[] Alignment_Type = new String[]{"Needleman-Wunsch", "Smith-Waterman"};
     public static final String[] Substitution_Matrix = new String[]{
@@ -41,7 +39,7 @@ public class PairwiseSequenceAlignment extends SimilarityNetworkAlgo implements 
     protected Alignments.PairwiseSequenceAlignerType alignerType;
     protected double threshold;
 
-    public PairwiseSequenceAlignment(AlgorithmFactory factory) {
+    public SequenceSimilarityNetwork(AlgorithmFactory factory) {
         super(factory);
         alignmentTypeIndex = 0;
         alignerType = getAlignerType();
@@ -180,14 +178,13 @@ public class PairwiseSequenceAlignment extends SimilarityNetworkAlgo implements 
         double score;
         if (peptide1.getSequence().equals(peptide2.getSequence())) {
             score = 1;
-            log.warning("There have been found identical sequences in the unique sequence list.");
         } else {
             try {
                 pair = Alignments.getPairwiseAlignment(peptide1.getBiojavaSeq(), peptide2.getBiojavaSeq(),
                         alignerType, gapPenalty, substitutionMatrix);
                 score = ((double)getNumeratorValue(pair)) / getDenominatorValue(pair, peptide1, peptide2);
             } catch (CompoundNotFoundException ex) {
-                log.log(Level.SEVERE, "Compound Not Found Exception: {0}", ex.getMessage());
+//                log.log(Level.SEVERE, "Compound Not Found Exception: {0}", ex.getMessage());
                 Exceptions.printStackTrace(ex);
                 score = -1;
             }

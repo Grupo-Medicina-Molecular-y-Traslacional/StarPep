@@ -17,23 +17,23 @@ import org.openide.util.lookup.ServiceProvider;
  * @author loge
  */
 @ServiceProvider(service = AlgorithmFactory.class)
-public class PairwiseSequenceAlignmentFactory implements AlgorithmFactory {
+public class SequenceSimilarityNetworkFactory implements AlgorithmFactory {
 
-    private final PairwiseSequenceAlignmentPanel panel = new PairwiseSequenceAlignmentPanel();
+    private final SequenceSimilarityNetworkPanel panel = new SequenceSimilarityNetworkPanel();
     
     @Override
     public AlgorithmCategory getCategory() {
-        return AlgorithmCategory.NetworkSimilarity;
+        return AlgorithmCategory.SimilarityNetwork;
     }
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(PairwiseSequenceAlignment.class, "PairwiseSequenceAlignment.name");
+        return NbBundle.getMessage(SequenceSimilarityNetwork.class, "SequenceSimilarityNetwork.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(PairwiseSequenceAlignment.class, "PairwiseSequenceAlignment.desc");
+        return NbBundle.getMessage(SequenceSimilarityNetwork.class, "SequenceSimilarityNetwork.desc");
     }
 
     @Override
@@ -43,7 +43,7 @@ public class PairwiseSequenceAlignmentFactory implements AlgorithmFactory {
 
     @Override
     public Algorithm createAlgorithm() {
-        return new PairwiseSequenceAlignment(this);
+        return new SequenceSimilarityNetwork(this);
     }
 
     @Override

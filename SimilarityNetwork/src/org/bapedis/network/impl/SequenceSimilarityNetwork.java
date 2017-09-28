@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.csn.impl;
+package org.bapedis.network.impl;
 
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -21,7 +21,7 @@ import org.openide.util.Exceptions;
  *
  * @author loge
  */
-public class SequenceSimilarityNetwork extends SimilarityNetworkAlgo implements SimilarityMeasure{
+public class SequenceSimilarityNetwork extends SimilarityNetworkAlgo{
 
     public static final String[] Alignment_Type = new String[]{"Needleman-Wunsch", "Smith-Waterman"};
     public static final String[] Substitution_Matrix = new String[]{
@@ -36,8 +36,7 @@ public class SequenceSimilarityNetwork extends SimilarityNetworkAlgo implements 
     {"Positives / (Length of shorter sequence)", "Positives / Columns"}};
     protected int alignmentTypeIndex, substitutionMatrixIndex, similarityTypeIndex, similarityScoreIndex;
     protected SubstitutionMatrix<AminoAcidCompound> substitutionMatrix;
-    protected Alignments.PairwiseSequenceAlignerType alignerType;
-    protected double threshold;
+    protected Alignments.PairwiseSequenceAlignerType alignerType;    
 
     public SequenceSimilarityNetwork(AlgorithmFactory factory) {
         super(factory);
@@ -190,20 +189,5 @@ public class SequenceSimilarityNetwork extends SimilarityNetworkAlgo implements 
             }
         }
         return score;
-    }
-
-    @Override
-    protected SimilarityMeasure getSimilarityProvider() {
-        return this;
-    }
-
-    @Override
-    public double getThreshold() {
-        return threshold;
-    }
-
-    @Override
-    public void setThreshold(double value) {
-        this.threshold = value;
     }
 }

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.csn.impl;
+package org.bapedis.network.impl;
 
 import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
@@ -118,7 +118,7 @@ public class SequenceSimilarityNetworkPanel extends javax.swing.JPanel implement
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         alignmentPanel.add(jLabel3, gridBagConstraints);
 
-        infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/csn/resources/info.png"))); // NOI18N
+        infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/network/resources/info.png"))); // NOI18N
         infoLabel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 infoLabelMouseExited(evt);

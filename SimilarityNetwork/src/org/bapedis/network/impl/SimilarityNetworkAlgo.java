@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.csn.impl;
+package org.bapedis.network.impl;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -23,18 +23,29 @@ import org.openide.util.Lookup;
  *
  * @author loge
  */
-public abstract class SimilarityNetworkAlgo implements Algorithm {
+public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeasure {
 
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected final AlgorithmFactory factory;
     protected final PropertyChangeSupport propertyChangeSupport;
     public static final String CHANGED_SIMILARITY = "similarity";
+    protected double threshold;
 
     public SimilarityNetworkAlgo(AlgorithmFactory factory) {
         this.factory = factory;
         propertyChangeSupport = new PropertyChangeSupport(this);
+    } 
+    
+    @Override
+    public double getThreshold() {
+        return threshold;
     }
+
+    @Override
+    public void setThreshold(double value) {
+        this.threshold = value;
+    }      
 
     @Override
     public void initAlgo() {
@@ -46,7 +57,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm {
         SimilarityGraphEdgeBuilder.setStopRun(false);
         SimilarityGraphEdgeBuilder.mainGraph = graphModel.getGraph();
         SimilarityGraphEdgeBuilder.csnGraph = graphModel.getGraph(attrModel.getCsnView());
-        SimilarityGraphEdgeBuilder.similarityMeasure = getSimilarityProvider();
+        SimilarityGraphEdgeBuilder.similarityMeasure = this;
         SimilarityGraphEdgeBuilder.edgeList = new LinkedList<>();        
     }
 
@@ -94,9 +105,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm {
         fjPool.invoke(task);
         task.join();
         propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY, null, SimilarityGraphEdgeBuilder.edgeList);
-    }
-
-    protected abstract SimilarityMeasure getSimilarityProvider();
+    }      
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);

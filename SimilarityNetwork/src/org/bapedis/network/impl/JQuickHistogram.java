@@ -39,7 +39,7 @@ Contributor(s):
 
 Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.bapedis.csn.impl;
+package org.bapedis.network.impl;
 
 import java.awt.Dimension;
 import java.text.DecimalFormat;

@@ -39,7 +39,7 @@
 
  Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.bapedis.csn.impl;
+package org.bapedis.network.impl;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -205,7 +205,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
         gridBagConstraints.weighty = 1.0;
         add(histogramPanel, gridBagConstraints);
 
-        jApplyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/csn/resources/refresh.png"))); // NOI18N
+        jApplyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/network/resources/refresh.png"))); // NOI18N
         jApplyButton.setText(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.jApplyButton.text")); // NOI18N
         jApplyButton.setToolTipText(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.jApplyButton.toolTipText")); // NOI18N
         jApplyButton.setMinimumSize(new java.awt.Dimension(80, 29));
@@ -236,7 +236,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jThresholdSpinner, gridBagConstraints);
 
-        infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/csn/resources/info.png"))); // NOI18N
+        infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/network/resources/info.png"))); // NOI18N
         infoLabel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 infoLabelMouseExited(evt);

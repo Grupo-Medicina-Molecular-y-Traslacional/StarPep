@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.csn.impl;
+package org.bapedis.network.impl;
 
 import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.algo.Algorithm;
@@ -48,12 +48,12 @@ public class SequenceSimilarityNetworkFactory implements AlgorithmFactory {
 
     @Override
     public int getQualityRank() {
-        return -1;
+        return 5;
     }
 
     @Override
     public int getSpeedRank() {
-        return -1;
+        return 3;
     }
     
 }

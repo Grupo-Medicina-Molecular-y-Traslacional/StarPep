@@ -455,6 +455,8 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 propSheetPanel.setVisible(false);
                 algoProvidedPanel.removeAll();
                 algoProvidedPanel.add(editPanel, BorderLayout.PAGE_START);
+                algoProvidedPanel.revalidate();
+                algoProvidedPanel.repaint();
                 algoProvidedPanel.setVisible(true);
             } else {
                 algoProvidedPanel.removeAll();
@@ -471,7 +473,9 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 }
             }
         }
-        richTooltip = null;
+        richTooltip = null;        
+        revalidate();
+        repaint();
     }
 
     private void setEnableState(boolean enabled) {

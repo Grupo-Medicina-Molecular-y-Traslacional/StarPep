@@ -17,6 +17,8 @@ public interface SimilarityMeasure {
     String CHANGED_THRESHOLD_VALUE = "threshold_value";
     String CHANGED_SIMILARITY_VALUES = "similarity_values";
 
+    JQuickHistogram getHistogram();
+    
     double getThreshold();
 
     void setThreshold(double value);

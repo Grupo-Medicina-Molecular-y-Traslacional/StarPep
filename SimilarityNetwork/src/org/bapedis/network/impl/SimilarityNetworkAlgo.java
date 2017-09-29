@@ -16,6 +16,7 @@ import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
+import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.GraphModel;
 import org.openide.util.Lookup;
 
@@ -26,16 +27,18 @@ import org.openide.util.Lookup;
 public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeasure {
 
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
+    protected final JQuickHistogram histogram;
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected final AlgorithmFactory factory;
-    protected final PropertyChangeSupport propertyChangeSupport;    
+    protected final PropertyChangeSupport propertyChangeSupport;
     protected double threshold;
 
     public SimilarityNetworkAlgo(AlgorithmFactory factory) {
         this.factory = factory;
         propertyChangeSupport = new PropertyChangeSupport(this);
-    } 
-    
+        histogram = new JQuickHistogram();
+    }
+
     @Override
     public double getThreshold() {
         return threshold;
@@ -46,10 +49,16 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
         double oldValue = this.threshold;
         this.threshold = value;
         propertyChangeSupport.firePropertyChange(CHANGED_THRESHOLD_VALUE, oldValue, threshold);
-    }      
+    }
+
+    @Override
+    public JQuickHistogram getHistogram() {
+        return histogram;
+    }
 
     @Override
     public void initAlgo() {
+        histogram.clear();
         AttributesModel attrModel = pc.getAttributesModel();
         GraphModel graphModel = pc.getGraphModel();
         SimilarityGraphEdgeBuilder.attrModel = attrModel;
@@ -59,7 +68,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
         SimilarityGraphEdgeBuilder.mainGraph = graphModel.getGraph();
         SimilarityGraphEdgeBuilder.csnGraph = graphModel.getGraph(attrModel.getCsnView());
         SimilarityGraphEdgeBuilder.similarityMeasure = this;
-        SimilarityGraphEdgeBuilder.edgeList = new LinkedList<>();        
+        SimilarityGraphEdgeBuilder.edgeList = new LinkedList<>();
     }
 
     @Override
@@ -92,7 +101,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
 
     @Override
     public void setProgressTicket(ProgressTicket progressTicket) {
-        SimilarityGraphEdgeBuilder.progressTicket=progressTicket;
+        SimilarityGraphEdgeBuilder.progressTicket = progressTicket;
     }
 
     @Override
@@ -104,9 +113,12 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
         SimilarityGraphEdgeBuilder.progressTicket.switchToDeterminate(workunits);
         SimilarityGraphEdgeBuilder task = new SimilarityGraphEdgeBuilder();
         fjPool.invoke(task);
-        task.join();
-        propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY_VALUES, null, SimilarityGraphEdgeBuilder.edgeList);
-    }      
+        task.join();        
+        for (Edge edge : SimilarityGraphEdgeBuilder.edgeList) {
+            histogram.addData((Double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
+        }
+        propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY_VALUES, null, histogram);
+    }
 
     @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {

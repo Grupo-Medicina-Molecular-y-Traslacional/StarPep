@@ -6,22 +6,18 @@
 package org.bapedis.network.impl;
 
 import java.awt.BorderLayout;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
-import org.gephi.graph.api.Edge;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author loge
  */
-public class SequenceSimilarityNetworkPanel extends javax.swing.JPanel implements AlgorithmSetupUI, PropertyChangeListener {
+public class SequenceSimilarityNetworkPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
 
     /**
      * Creates new form PairwiseSequenceAlignmentPanel
@@ -224,15 +220,10 @@ public class SequenceSimilarityNetworkPanel extends javax.swing.JPanel implement
 
     @Override
     public JPanel getEditPanel(Algorithm algo) {
-        if (seqAlignmentAlgo != null){
-            seqAlignmentAlgo.removePropertyChangeListener(this);
-        }
         seqAlignmentAlgo = (SequenceSimilarityNetwork) algo;
         jATComboBox.setSelectedIndex(seqAlignmentAlgo.getAlignmentTypeIndex());
         jSMComboBox.setSelectedIndex(seqAlignmentAlgo.getSubstitutionMatrixIndex());
-        jPercentComboBox.setSelectedIndex(seqAlignmentAlgo.getSimilarityTypeIndex());
-        seqAlignmentAlgo.addPropertyChangeListener(this);
-        
+        jPercentComboBox.setSelectedIndex(seqAlignmentAlgo.getSimilarityTypeIndex());                
         thresholdPanel.setup(seqAlignmentAlgo);
         return this;
     }
@@ -252,11 +243,5 @@ public class SequenceSimilarityNetworkPanel extends javax.swing.JPanel implement
     private javax.swing.JPanel southPanel;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource().equals(seqAlignmentAlgo) &&
-            evt.getPropertyName().equals(SimilarityNetworkAlgo.CHANGED_SIMILARITY)){            
-            thresholdPanel.setupHistogram((List<Edge>)evt.getNewValue());
-        }
-    }
+
 }

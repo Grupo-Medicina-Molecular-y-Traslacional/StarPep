@@ -28,8 +28,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected final AlgorithmFactory factory;
-    protected final PropertyChangeSupport propertyChangeSupport;
-    public static final String CHANGED_SIMILARITY = "similarity";
+    protected final PropertyChangeSupport propertyChangeSupport;    
     protected double threshold;
 
     public SimilarityNetworkAlgo(AlgorithmFactory factory) {
@@ -44,7 +43,9 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
 
     @Override
     public void setThreshold(double value) {
+        double oldValue = this.threshold;
         this.threshold = value;
+        propertyChangeSupport.firePropertyChange(CHANGED_THRESHOLD_VALUE, oldValue, threshold);
     }      
 
     @Override
@@ -96,7 +97,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
 
     @Override
     public void run() {
-        propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY, null, null);
+        propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY_VALUES, null, null);
         Peptide[] peptides = SimilarityGraphEdgeBuilder.peptides;
         // Workunits for pairwise sim matrix builder
         int workunits = peptides.length * (peptides.length - 1) / 2;
@@ -104,13 +105,15 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
         SimilarityGraphEdgeBuilder task = new SimilarityGraphEdgeBuilder();
         fjPool.invoke(task);
         task.join();
-        propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY, null, SimilarityGraphEdgeBuilder.edgeList);
+        propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY_VALUES, null, SimilarityGraphEdgeBuilder.edgeList);
     }      
 
+    @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
+    @Override
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }

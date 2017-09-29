@@ -5,11 +5,15 @@
  */
 package org.bapedis.network.impl;
 
+import javax.swing.JPanel;
+import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+
 /**
  *
  * @author loge
  */
-public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel {
+public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
 
     /**
      * Creates new form ChemicalSpaceNetworkPanel
@@ -38,6 +42,11 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel {
             .addGap(0, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    @Override
+    public JPanel getEditPanel(Algorithm algo) {
+        return this;
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

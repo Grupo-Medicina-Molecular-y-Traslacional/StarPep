@@ -20,7 +20,7 @@ import org.bapedis.modamp.scales.HydrophobicityScale;
  * @author beltran
  */
 public class MD {
-
+    
     private static final String ALPHABET = "ACDEFGHIKLMNPQRSTVWY";
     private static final double GRP[][] = {
         {1.0, 44.94, -7.49, 1.0, 1.0, 1.0, -7.49, 1.0, 1.0, 1.0, 1.0, 1.0, 20.26, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0},
@@ -60,11 +60,11 @@ public class MD {
     public static double mw(String seq) {
         Map<String, Double> aa_hash = otherScales.molecularWeight();
         double molW = 0.0;
-
+        
         for (int i = 0; i < seq.length(); i++) {
             molW += aa_hash.getOrDefault(seq.subSequence(i, i + 1), 0.0);
         }
-
+        
         double H = 1.00797;
         double OH = 17.00738;
         return H + molW + OH;
@@ -113,10 +113,10 @@ public class MD {
                 Ni.replace(aa, Ni.get(aa) + 1);
             }
         }
-
+        
         double pos = 0;
         Iterator<String> it = Ni.keySet().iterator();
-
+        
         while (it.hasNext()) {
             String ni = it.next();
             Double count = Ni.get(ni);
@@ -135,7 +135,7 @@ public class MD {
                 neg += (count * (-1 / (1 + Math.pow(10, pKai - pH))));
             }
         }
-
+        
         return pos + neg;
     }
 
@@ -172,7 +172,7 @@ public class MD {
         double pHnext = 14.0;
         double E = 0.0001;
         double temp = 0.0;
-
+        
         while (true) {
             z = netCharge(seq, pH, pKscale); //pkA_EMBOSS()
             if (pH >= 14) {
@@ -188,13 +188,13 @@ public class MD {
                 pH += (pHnext - pH) / 2;
                 pHprev = temp;
             }
-
+            
             if ((pH - pHprev < E) && (pHnext - pH < E)) //terminal condition, finding isoelectric point with given precision
             {
                 break;
             }
         }
-
+        
         return pH;
     }
 
@@ -253,11 +253,11 @@ public class MD {
     public static double boman(String seq) {
         Map<String, Double> BI = otherScales.bomanIndex();
         double bi = 0.0;
-
+        
         for (int i = 0; i < seq.length(); i++) {
             bi += BI.getOrDefault(seq.subSequence(i, i + 1), 0.0);
         }
-
+        
         return -1 * (bi / seq.length());
     }
 
@@ -299,7 +299,7 @@ public class MD {
      * @return
      */
     public static double hMoment(String seq, int angle, int window, Map<String, Double> hydrophobicityScale) {
-
+        
         double angRad = Math.toRadians(angle);
         double sumHmSin = 0.0;
         double sumHmCos = 0.0;
@@ -309,17 +309,17 @@ public class MD {
         if (window > seq.length()) {
             return -1;
         }
-
+        
         for (int i = 0; i < (seq.length() - window + 1); i++) {
             String subseq = seq.substring(i, window + i);
-
+            
             for (int j = 0; j < subseq.length(); j++) {
                 double hv = hydrophobicityScale.getOrDefault(subseq.subSequence(j, j + 1), 0.0);
                 sumHmSin += hv * Math.sin(Math.toRadians(angle * (j + i + 1)));
                 sumHmCos += hv * Math.cos(Math.toRadians(angle * (j + i + 1)));
                 //System.out.println("C="+sumHmCos + "\n" + "S="+sumHmSin);
             }
-
+            
             hM = Math.sqrt(Math.pow(sumHmSin, 2) + Math.pow(sumHmCos, 2)) / window;
             //System.out.println(subseq + "\t" + hM );
 
@@ -330,7 +330,7 @@ public class MD {
             sumHmSin = 0;
             sumHmCos = 0;
         }
-
+        
         return hMMax;
     }
 
@@ -389,7 +389,7 @@ public class MD {
         if (window > seq.length()) {
             return -1;
         }
-
+        
         for (int i = 0; i < (seq.length() - window + 1); i++) {
             String subseq = seq.substring(i, window + i);
             h = gravy(subseq, hydrophobicityScale);
@@ -418,7 +418,7 @@ public class MD {
     public static double maxMeanHydrophobicity(String seq, int window) {
         return maxMeanHydrophobicity(seq, window, HydrophobicityScale.normalized_eisenberg_hydrov_hash());
     }
-
+    
     public static Map<String, Double> aaComposition(String seq) {
         return compositionReducedAlphabet(seq, ReducedAlphabets.stdAminoAcids());
     }
@@ -447,7 +447,7 @@ public class MD {
         val = aminoAcidComposition.containsKey("V") ? (double) aminoAcidComposition.get("V") : 0.0;
         ile = aminoAcidComposition.containsKey("I") ? (double) aminoAcidComposition.get("I") : 0.0;
         leu = aminoAcidComposition.containsKey("L") ? (double) aminoAcidComposition.get("L") : 0.0;
-
+        
         return ala + 2.9 * val + 3.9 * (ile + leu);
     }
 
@@ -475,9 +475,11 @@ public class MD {
         for (int i = 0; i < seq.length() - 1; i++) {
             int x_i = ALPHABET.indexOf(seq.charAt(i));
             int x_i1 = ALPHABET.indexOf(seq.charAt(i + 1));
-            iIndex += GRP[x_i][x_i1];
+            if (x_i != -1 && x_i1 != -1) {
+                iIndex += GRP[x_i][x_i1];
+            }
         }
-
+        
         return (10.0 / seq.length()) * iIndex;
     }
 
@@ -491,7 +493,7 @@ public class MD {
     public static int isProteinStable(String seq) {
         return inestabilityIndex(seq) < 40 ? 1 : 0;
     }
-
+    
     public static int isProteinStable(double inestabilityIndex) {
         return inestabilityIndex < 40 ? 1 : 0;
     }
@@ -516,7 +518,7 @@ public class MD {
         if (seq.length() < windows) {
             return 0;
         }
-
+        
         Map<String, Double> hydro_NOZY = HydrophobicityScale.hydro_NOZY();
         double Am = 0.0;
         double Amk = 0.0;
@@ -533,7 +535,7 @@ public class MD {
             //then the average amplitude of the periodicity for the entire sequences of length L
             //is defiened as
         }
-
+        
         return (1.0 / seq.length() - windows + 1) * Am;
     }
 
@@ -568,13 +570,12 @@ public class MD {
     public static Map<String, Double> compositionReducedAlphabet(String seq, ReduceAlphabet ra) {
         ra.init();
         Map<String, Double> count = ra.getCount();
-
+        
         for (int i = 0; i < seq.length(); i++) {
             String rClass = ra.getrAlphabet() == null ? seq.substring(i, i + 1) : ra.getrAlphabet().get(seq.substring(i, i + 1));
-            if (count.get(rClass) == null){
-                System.out.println("rClass:"  +rClass);
+            if (count.get(rClass) != null) {
+                count.replace(rClass, count.get(rClass) + 1);
             }
-            count.replace(rClass, count.get(rClass) + 1);
         }
 
         /**
@@ -586,7 +587,7 @@ public class MD {
             Double percent = (count.get(key) / seq.length()) * 100;
             count.replace(key, percent);
         }
-
+        
         return count;
     }
 
@@ -636,12 +637,14 @@ public class MD {
         for (int i = 0; i < seq.length() - 1; i++) {
             String key1 = rAlphabet.getOrDefault(seq.subSequence(i, i + 1), "");
             String key2 = rAlphabet.getOrDefault(seq.subSequence(i + 1, i + 2), "");
-            if (!key1.equalsIgnoreCase(key2)) {
+            if (key1 != null && key2 != null && !key1.equalsIgnoreCase(key2)) {
                 String newKey = key1 + "->" + key2;
                 if (!trans.containsKey(newKey)) {
                     newKey = key2 + "->" + key1;
                 }
-                trans.replace(newKey, trans.get(newKey) + 1);
+                if (trans.containsKey(newKey)) {
+                    trans.replace(newKey, trans.get(newKey) + 1);
+                }
             }
         }
 
@@ -654,7 +657,7 @@ public class MD {
             Double percent = (trans.get(key) / (seq.length() - 1)) * 100;
             trans.replace(key, percent);
         }
-
+        
         return trans;
     }
 
@@ -679,7 +682,7 @@ public class MD {
     public static Map<String, Double> distributionReducedAlphabet(String seq, ReduceAlphabet ra, int percent) {
         //composition
         Map<String, Double> composition = compositionReducedAlphabet(seq, ra);
-
+        
         Map<String, String> rAlphabet = ra.getrAlphabet();
         Iterator<String> it = composition.keySet().iterator();
         while (it.hasNext()) {
@@ -704,10 +707,10 @@ public class MD {
                 }
             }
         }
-
+        
         return composition;
     }
-
+    
     public static Map<String, Double> dipeptideComposition(String seq, ReduceAlphabet ra) {
         Map<String, Double> trans = new HashMap<>(); //Trasition from one grou to another based on reduced alphabets
         Set<String> keySet = ra.getCount().keySet();
@@ -729,13 +732,11 @@ public class MD {
         Map<String, String> rAlphabet = ra.getrAlphabet();
         String key1, key2;
         for (int i = 0; i < seq.length() - 1; i++) {
-            try {
-                key1 = rAlphabet.get(seq.subSequence(i, i + 1));
-                key2 = rAlphabet.get(seq.subSequence(i + 1, i + 2));
+            key1 = rAlphabet.get(seq.subSequence(i, i + 1));
+            key2 = rAlphabet.get(seq.subSequence(i + 1, i + 2));
+            if (key1 != null && key2 != null) {
                 String newKey = "[" + key1 + "][" + key2 + "]";
                 trans.replace(newKey, trans.get(newKey) + 1);
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
 
@@ -748,10 +749,10 @@ public class MD {
             Double percent = (trans.get(key) / (seq.length() - 1)) * 100;
             trans.replace(key, percent);
         }
-
+        
         return trans;
     }
-
+    
     public static Map<String, Double> tripeptideComposition(String seq, ReduceAlphabet ra) {
         Map<String, Double> trans = new HashMap<>(); //Trasition from one grou to another based on reduced alphabets
         Set<String> keySet = ra.getCount().keySet();
@@ -779,7 +780,9 @@ public class MD {
             String key2 = rAlphabet.get(seq.subSequence(i + 1, i + 2));
             String key3 = rAlphabet.get(seq.subSequence(i + 2, i + 3));
             String newKey = "[" + key1 + "][" + key2 + "][" + key3 + "]";
-            trans.replace(newKey, trans.get(newKey) + 1);
+            if (trans.containsKey(newKey)) {
+                trans.replace(newKey, trans.get(newKey) + 1);
+            }
         }
 
         /**
@@ -791,8 +794,8 @@ public class MD {
             Double percent = (trans.get(key) / (seq.length() - 2)) * 100;
             trans.replace(key, percent);
         }
-
+        
         return trans;
     }
-
+    
 }

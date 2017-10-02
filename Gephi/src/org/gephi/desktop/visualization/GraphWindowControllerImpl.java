@@ -60,13 +60,11 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
 
     @Override
     public void openGraphWindow() {
-        if (graphWindow != null) {
+        if (graphWindow != null && !graphWindow.isOpened()) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    if (!graphWindow.isOpened()) {
-                        graphWindow.open();
-                    }
+                    graphWindow.open();
                     graphWindow.requestActive();
                 }
             });
@@ -100,12 +98,7 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
 
     private void setDisplayName(final String name) {
         if (graphWindow != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    graphWindow.setDisplayName(NbBundle.getMessage(GraphWindowControllerImpl.class, "CTL_GraphTC_" + name));
-                }
-            });
+            graphWindow.setDisplayName(NbBundle.getMessage(GraphWindowControllerImpl.class, "CTL_GraphTC_" + name));
         }
     }
 

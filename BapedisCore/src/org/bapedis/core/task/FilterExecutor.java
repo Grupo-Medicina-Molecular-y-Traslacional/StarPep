@@ -80,8 +80,8 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
 
         Peptide peptide;
         org.gephi.graph.api.Node graphNode;
-        List<org.gephi.graph.api.Node> graphNeighbors;
-        List<Edge> graphEdges;
+        List<org.gephi.graph.api.Node> graphNodes = new LinkedList<>();
+        List<Edge> graphEdges = new LinkedList<>();
         for (PeptideNode node : attrModel.getNodeList()) {
             if (stopRun.get()) {
                 break;
@@ -92,7 +92,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
                     set.add(peptide.getId());
                 }
 
-                // Add graph node
+                // Add graph node to graph db and csn
                 graphNode = peptide.getGraphNode();
                 subGraphDB.addNode(graphNode);
 
@@ -101,12 +101,10 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
                 // Add neighbors and edges
                 peptide.getGraph().readLock();
                 try {
-                    graphNeighbors = new LinkedList<>();
                     for (org.gephi.graph.api.Node neighbor : peptide.getGraph().getNeighbors(graphNode)) {
-                        graphNeighbors.add(neighbor);
+                        graphNodes.add(neighbor);
                     }
 
-                    graphEdges = new LinkedList<>();
                     for (Edge edge : peptide.getGraph().getEdges(graphNode)) {
                         graphEdges.add(edge);
                     }
@@ -114,23 +112,28 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
                     peptide.getGraph().readUnlock();
                 }
 
-                subGraphDB.addAllNodes(graphNeighbors);
+                subGraphDB.addAllNodes(graphNodes);
                 subGraphDB.addAllEdges(graphEdges);
             }
             ticket.progress();
         }
         if (attrModel.getCsnView() != null) {
             // Add edges between nodes
+            graphEdges.clear();
             Graph oldGraph = graphModel.getGraph(attrModel.getCsnView());
-            for (org.gephi.graph.api.Node csnNode : subGraphCSN.getNodes()) {
-                if (oldGraph.hasNode(csnNode.getId())) {
-                    for (Edge edge : oldGraph.getEdges(csnNode)) {
-                        if (set.contains((String) edge.getTarget().getId())) {
-                            subGraphCSN.addEdge(edge);
+            int relType = graphModel.getEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+            if (relType != -1) {
+                for (org.gephi.graph.api.Node csnNode : subGraphCSN.getNodes()) {
+                    if (oldGraph.hasNode(csnNode.getId())) {
+                        for (Edge edge : oldGraph.getEdges(csnNode, relType)) {
+                            if (subGraphCSN.hasNode(edge.getSource().getId()) && subGraphCSN.hasNode(edge.getTarget().getId())) {
+                                graphEdges.add(edge);
+                            }
                         }
                     }
                 }
             }
+            subGraphCSN.addAllEdges(graphEdges);
         }
         ticket.progress();
         return set;

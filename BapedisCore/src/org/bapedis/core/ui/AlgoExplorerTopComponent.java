@@ -425,12 +425,12 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 it.remove();
             }
         }
-        Collections.sort(factories, new Comparator() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                return ((AlgorithmFactory) o1).getName().compareTo(((AlgorithmFactory) o2).getName());
-            }
-        });
+//        Collections.sort(factories, new Comparator() {
+//            @Override
+//            public int compare(Object o1, Object o2) {
+//                return ((AlgorithmFactory) o1).getName().compareTo(((AlgorithmFactory) o2).getName());
+//            }
+//        });
         for (AlgorithmFactory factory : factories) {
             AlgorithmFactoryItem item = new AlgorithmFactoryItem(factory);
             comboBoxModel.addElement(item);

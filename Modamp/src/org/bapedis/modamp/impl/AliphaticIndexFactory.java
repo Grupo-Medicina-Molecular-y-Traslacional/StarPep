@@ -16,7 +16,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author beltran
  */
-@ServiceProvider(service = AlgorithmFactory.class)
+@ServiceProvider(service = AlgorithmFactory.class, position = 800)
 public class AliphaticIndexFactory implements AlgorithmFactory {
 
     @Override

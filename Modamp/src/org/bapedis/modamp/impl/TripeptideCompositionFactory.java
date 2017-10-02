@@ -16,7 +16,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author beltran
  */
-@ServiceProvider(service = AlgorithmFactory.class)
+@ServiceProvider(service = AlgorithmFactory.class, position = 1500)
 public class TripeptideCompositionFactory implements AlgorithmFactory {
 
     @Override
@@ -26,12 +26,12 @@ public class TripeptideCompositionFactory implements AlgorithmFactory {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(RATransitionFactory.class, "TripeptideComposition.name");
+        return NbBundle.getMessage(TripeptideCompositionFactory.class, "TripeptideComposition.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(RATransitionFactory.class, "TripeptideComposition.desc");
+        return NbBundle.getMessage(TripeptideCompositionFactory.class, "TripeptideComposition.desc");
     }
 
     @Override

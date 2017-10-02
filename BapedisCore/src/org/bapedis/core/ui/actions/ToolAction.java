@@ -52,7 +52,6 @@ public class ToolAction extends AbstractAction implements Presenter.Menu {
                 item.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
                         AlgorithmModel algoModel = pc.getAlgorithmModel();
                         algoModel.setCategory(category);
 

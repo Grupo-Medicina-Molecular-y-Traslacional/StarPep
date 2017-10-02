@@ -16,7 +16,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author beltran
  */
-@ServiceProvider(service = AlgorithmFactory.class)
+@ServiceProvider(service = AlgorithmFactory.class, position = 900)
 public class InestabilityIndexFactory implements AlgorithmFactory{
 
     @Override
@@ -26,12 +26,12 @@ public class InestabilityIndexFactory implements AlgorithmFactory{
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(HydrophobicMomentFactory.class, "InestabilityIndex.name");
+        return NbBundle.getMessage(InestabilityIndexFactory.class, "InestabilityIndex.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(HydrophobicMomentFactory.class, "InestabilityIndex.desc");
+        return NbBundle.getMessage(InestabilityIndexFactory.class, "InestabilityIndex.desc");
     }
 
     @Override

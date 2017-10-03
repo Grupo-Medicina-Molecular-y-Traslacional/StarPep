@@ -151,7 +151,7 @@ public class RATransition extends AbstractModamp {
                     key1 = keys[i].toString();
                     for (int j = i + 1; j < keys.length; j++) {
                         key2 = keys[j].toString();
-                        newKey = String.format("%s[%s]", ra.getName(), key1 + "->" + key2);
+                        newKey = String.format("T_%s[%s]", ra.getName(), key1 + "->" + key2);
                         if (!attrModel.hasAttribute(newKey)) {
                             attrModel.addAttribute(newKey, newKey, Double.class);
                         }
@@ -171,7 +171,7 @@ public class RATransition extends AbstractModamp {
             String attrName, key;
             while (it.hasNext()) {
                 key = it.next();
-                attrName = String.format("%s[%s]", ra.getName(), key);
+                attrName = String.format("T_%s[%s]", ra.getName(), key);
                 val = aminoAcidComposition.get(key);
                 peptide.setAttributeValue(attrModel.getAttribute(attrName), val);
             }

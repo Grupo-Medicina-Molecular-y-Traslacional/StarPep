@@ -5,8 +5,6 @@
  */
 package org.bapedis.modamp.impl;
 
-import org.bapedis.modamp.impl.HydrophobicMoment;
-import org.bapedis.modamp.impl.AbstractModamp;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -149,7 +147,7 @@ public class RADistribution extends AbstractModamp {
                 for (int percent = 0; percent <= 100; percent += 25) {
                     Iterator<String> it = ra.getCount().keySet().iterator();
                     while (it.hasNext()) {
-                        key = String.format("%s_%d[%s]", ra.getName(), percent, it.next());
+                        key = String.format("D_%s_%d[%s]", ra.getName(), percent, it.next());
                         if (!attrModel.hasAttribute(key)) {
                             attrModel.addAttribute(key, key, Double.class);
                         }
@@ -170,7 +168,7 @@ public class RADistribution extends AbstractModamp {
                 String attrName, key;
                 while (it.hasNext()) {
                     key = it.next();
-                    attrName = String.format("%s_%d[%s]", ra.getName(), percent,key);
+                    attrName = String.format("D_%s_%d[%s]", ra.getName(), percent,key);
                     val = aminoAcidComposition.get(key);
                     peptide.setAttributeValue(attrModel.getAttribute(attrName), val);
                 }

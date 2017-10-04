@@ -46,7 +46,7 @@ public class ToolAction extends AbstractAction implements Presenter.Menu {
         JMenu main = new JMenu(category.getDisplayName());
         JMenuItem item;
         for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
-            final AlgorithmFactory factory = it.next();
+            final AlgorithmFactory factory = it.next();             
             if (factory.getCategory() == category) {
                 item = new JMenuItem(factory.getName());
                 item.addActionListener(new ActionListener() {

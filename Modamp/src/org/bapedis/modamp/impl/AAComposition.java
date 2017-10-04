@@ -15,7 +15,7 @@ import org.bapedis.modamp.scales.ReducedAlphabets;
 
 /**
  *
- * @author beltran
+ * @author beltran, loge
  */
 public class AAComposition extends AbstractModamp {
 

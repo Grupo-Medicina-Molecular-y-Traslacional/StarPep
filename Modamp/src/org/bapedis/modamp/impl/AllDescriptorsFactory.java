@@ -14,7 +14,7 @@ import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
- * @author loge
+ * @author beltran, loge
  */
 @ServiceProvider(service = AlgorithmFactory.class, position = 0)
 public class AllDescriptorsFactory implements AlgorithmFactory {

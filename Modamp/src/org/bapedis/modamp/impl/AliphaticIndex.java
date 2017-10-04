@@ -11,7 +11,7 @@ import org.bapedis.modamp.MD;
 
 /**
  *
- * @author beltran
+ * @author beltran, loge
  */
 public class AliphaticIndex  extends AbstractModamp{
     protected String AI= "aI";

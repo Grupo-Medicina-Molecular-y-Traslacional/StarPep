@@ -21,7 +21,7 @@ import org.openide.util.NbBundle;
 
 /**
  *
- * @author beltran
+ * @author beltran, loge
  */
 public class DipeptideComposition extends AbstractModamp {
 

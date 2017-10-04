@@ -14,7 +14,7 @@ import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
- * @author beltran
+ * @author beltran, loge
  */
 @ServiceProvider(service = AlgorithmFactory.class, position = 300)
 public class MolecularWeightFactory implements AlgorithmFactory{

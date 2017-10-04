@@ -10,7 +10,7 @@ import org.bapedis.modamp.MD;
 
 /**
  *
- * @author beltran
+ * @author beltran, loge
  */
 public class BomanIndex extends AbstractModamp {
 

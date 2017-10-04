@@ -16,7 +16,7 @@ import org.openide.util.Lookup;
 
 /**
  *
- * @author beltran
+ * @author beltran, loge
  */
 public abstract class AbstractModamp implements Algorithm {
 

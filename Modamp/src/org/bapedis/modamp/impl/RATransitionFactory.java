@@ -14,7 +14,7 @@ import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
- * @author beltran
+ * @author beltran, loge
  */
 @ServiceProvider(service = AlgorithmFactory.class, position = 1400)
 public class RATransitionFactory implements AlgorithmFactory {

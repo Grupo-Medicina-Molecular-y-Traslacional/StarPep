@@ -18,6 +18,7 @@ import org.bapedis.modamp.scales.HydrophobicityScale;
 /**
  *
  * @author beltran
+ * Modified by Loge
  */
 public class MD {
     

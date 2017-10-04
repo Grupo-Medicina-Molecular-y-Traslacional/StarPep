@@ -5,17 +5,22 @@
  */
 package org.bapedis.modamp.impl;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.Workspace;
+import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
  *
- * @author loge
+ * @author beltran, loge
  */
 public class AllDescriptors extends AbstractModamp {
 
@@ -24,6 +29,7 @@ public class AllDescriptors extends AbstractModamp {
             dComposition, hMoment, hPeriodicity, iIndex,
             iPoint, mWeight, netCharge, raComposition,
             raDistribution, raTransition, triComposition;
+    private final HashMap<String, AbstractModamp> map;
 
     public AllDescriptors(AlgorithmFactory factory) {
         super(factory);
@@ -44,6 +50,7 @@ public class AllDescriptors extends AbstractModamp {
         triComposition = true;
         properties = new LinkedList<>();
         populateProperties();
+        map = new HashMap<>();
     }
 
     private void populateProperties() {
@@ -52,9 +59,9 @@ public class AllDescriptors extends AbstractModamp {
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IsoelectricPointFactory.class, "IsoelectricPoint.name"), PRO_CATEGORY, NbBundle.getMessage(IsoelectricPointFactory.class, "IsoelectricPoint.desc"), "isiPoint", "setiPoint"));
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(MolecularWeightFactory.class, "MolecularWeight.name"), PRO_CATEGORY, NbBundle.getMessage(MolecularWeightFactory.class, "MolecularWeight.desc"), "ismWeight", "setmWeight"));
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(BomanIndexFactory.class, "BomanIndex.name"), PRO_CATEGORY, NbBundle.getMessage(BomanIndexFactory.class, "BomanIndex.desc"), "isbIndex", "setbIndex"));
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(HydrophobicMomentFactory.class, "HydrophobicMoment.name"), PRO_CATEGORY, NbBundle.getMessage(HydrophobicMomentFactory.class, "HydrophobicMoment.desc"), "ishMoment", "sethMoment"));            
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(AverageHydrophilicityFactory.class, "AverageHydrophilicity.name"), PRO_CATEGORY, NbBundle.getMessage(AverageHydrophilicityFactory.class, "AverageHydrophilicity.desc"), "isAvgHydrophilicity", "setAvgHydrophilicity"));            
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(HydrophobicPeriodicityFactory.class, "HydrophobicPeriodicity.name"), PRO_CATEGORY, NbBundle.getMessage(HydrophobicPeriodicityFactory.class, "HydrophobicPeriodicity.desc"), "ishPeriodicity", "sethPeriodicity"));            
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(HydrophobicMomentFactory.class, "HydrophobicMoment.name"), PRO_CATEGORY, NbBundle.getMessage(HydrophobicMomentFactory.class, "HydrophobicMoment.desc"), "ishMoment", "sethMoment"));
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(AverageHydrophilicityFactory.class, "AverageHydrophilicity.name"), PRO_CATEGORY, NbBundle.getMessage(AverageHydrophilicityFactory.class, "AverageHydrophilicity.desc"), "isAvgHydrophilicity", "setAvgHydrophilicity"));
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(HydrophobicPeriodicityFactory.class, "HydrophobicPeriodicity.name"), PRO_CATEGORY, NbBundle.getMessage(HydrophobicPeriodicityFactory.class, "HydrophobicPeriodicity.desc"), "ishPeriodicity", "sethPeriodicity"));
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(AliphaticIndexFactory.class, "AliphaticIndex.name"), PRO_CATEGORY, NbBundle.getMessage(AliphaticIndexFactory.class, "AliphaticIndex.desc"), "isaIndex", "setaIndex"));
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(InestabilityIndexFactory.class, "InestabilityIndex.name"), PRO_CATEGORY, NbBundle.getMessage(InestabilityIndexFactory.class, "InestabilityIndex.desc"), "isiIndex", "setiIndex"));
 
@@ -190,13 +197,117 @@ public class AllDescriptors extends AbstractModamp {
     }
 
     @Override
-    public void compute(Peptide peptide) {
-        
+    public void initAlgo() {
+        super.initAlgo();
+        map.clear();
+        // fill hashmap
+        Workspace currentWs = pc.getCurrentWorkspace();
+        for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
+            final AlgorithmFactory f = it.next();
+            if (this.factory != f) {
+                Algorithm algorithm = f.createAlgorithm();
+                if (algorithm instanceof AbstractModamp) {
+                    AbstractModamp algoModamp = (AbstractModamp) algorithm;
+                    // check for an existing algorithm 
+                    Collection<? extends Algorithm> savedAlgo = currentWs.getLookup().lookupAll(Algorithm.class);
+                    for (Algorithm algo : savedAlgo) {
+                        if (algo instanceof AbstractModamp && algo.getFactory() == f) {
+                            algoModamp = (AbstractModamp) algo;
+                            break;
+                        }
+                    }
+                    map.put(f.getName(), algoModamp);
+                }
+            }
+        }
+
+        // Remove unselected algorithms
+        if (!aaComposition) {
+            map.remove(NbBundle.getMessage(AACompositionFactory.class, "AAComposition.name"));
+        }
+
+        if (!aIndex) {
+            map.remove(NbBundle.getMessage(AliphaticIndexFactory.class, "AliphaticIndex.name"));
+        }
+
+        if (!avgHydrophilicity) {
+            map.remove(NbBundle.getMessage(AverageHydrophilicityFactory.class, "AverageHydrophilicity.name"));
+        }
+
+        if (!bIndex) {
+            map.remove(NbBundle.getMessage(BomanIndexFactory.class, "BomanIndex.name"));
+        }
+
+        if (!dComposition) {
+            map.remove(NbBundle.getMessage(DipeptideCompositionFactory.class, "DipeptideComposition.name"));
+        }
+
+        if (!hMoment) {
+            map.remove(NbBundle.getMessage(HydrophobicMomentFactory.class, "HydrophobicMoment.name"));
+        }
+
+        if (!hPeriodicity) {
+            map.remove(NbBundle.getMessage(HydrophobicPeriodicityFactory.class, "HydrophobicPeriodicity.name"));
+        }
+
+        if (!iIndex) {
+            map.remove(NbBundle.getMessage(InestabilityIndexFactory.class, "InestabilityIndex.name"));
+        }
+
+        if (!iPoint) {
+            map.remove(NbBundle.getMessage(IsoelectricPointFactory.class, "IsoelectricPoint.name"));
+        }
+
+        if (!mWeight) {
+            map.remove(NbBundle.getMessage(MolecularWeightFactory.class, "MolecularWeight.name"));
+        }
+
+        if (!netCharge) {
+            map.remove(NbBundle.getMessage(NetChargeFactory.class, "NetCharge.name"));
+        }
+
+        if (!raComposition) {
+            map.remove(NbBundle.getMessage(RACompositionFactory.class, "RAComposition.name"));
+        }
+
+        if (!raDistribution) {
+            map.remove(NbBundle.getMessage(RADistributionFactory.class, "RADistribution.name"));
+        }
+
+        if (!raTransition) {
+            map.remove(NbBundle.getMessage(RATransitionFactory.class, "RATransition.name"));
+        }
+
+        if (!triComposition) {
+            map.remove(NbBundle.getMessage(TripeptideCompositionFactory.class, "TripeptideComposition.name"));
+        }
+
+        // Init all algoritms
+        for (AbstractModamp algo : map.values()) {
+            algo.initAlgo();
+        }
+
     }
-    
+
+    @Override
+    public void compute(Peptide peptide) {
+        for (AbstractModamp algo : map.values()) {
+            algo.compute(peptide);
+        }
+    }
+
+    @Override
+    public void endAlgo() {
+        super.endAlgo();
+        // Init all algoritms
+        for (AbstractModamp algo : map.values()) {
+            algo.endAlgo();
+        }
+    }
+
     @Override
     public AlgorithmProperty[] getProperties() {
         return properties.toArray(new AlgorithmProperty[0]);
-    }    
+    }
 
 }

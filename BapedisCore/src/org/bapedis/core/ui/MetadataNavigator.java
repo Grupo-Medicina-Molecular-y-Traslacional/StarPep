@@ -376,21 +376,24 @@ public class MetadataNavigator extends JComponent implements
                             rootNode.add(createNode(m));
                         }
                     } else {
-                        GraphModel graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();
-                        GraphView view = graphModel.getVisibleView();
-                        Graph graph = graphModel.getGraph(view);
-                        org.gephi.graph.api.Node node;
-                        graph.readLock();
-                        try {
-                            for (Metadata m : metadatas) {
-                                node = graph.getNode(m.getUnderlyingNodeID());
-                                if (node != null) {
-                                    m.setGraphNode(node);
-                                    rootNode.add(createNode(m));
+                        AttributesModel attrModel = pc.getAttributesModel();
+                        if (attrModel != null) {
+                            GraphModel graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();
+                            GraphView view = attrModel.getGraphDBView();
+                            Graph graph = graphModel.getGraph(view);
+                            org.gephi.graph.api.Node node;
+                            graph.readLock();
+                            try {
+                                for (Metadata m : metadatas) {
+                                    node = graph.getNode(m.getUnderlyingNodeID());
+                                    if (node != null) {
+                                        m.setGraphNode(node);
+                                        rootNode.add(createNode(m));
+                                    }
                                 }
+                            } finally {
+                                graph.readUnlock();
                             }
-                        } finally {
-                            graph.readUnlock();
                         }
                     }
                     return null;

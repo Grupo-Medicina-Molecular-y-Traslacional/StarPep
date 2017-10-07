@@ -52,14 +52,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.services.ProjectManager;
-import org.gephi.graph.api.Column;
-import org.gephi.graph.api.GraphModel;
 import org.gephi.ui.utils.ColorUtils;
 import org.gephi.visualization.apiimpl.GraphDrawable;
 import org.gephi.visualization.apiimpl.VizConfig;
 import org.gephi.visualization.text.TextModelImpl;
-import org.openide.util.Lookup;
 
 /**
  *
@@ -94,10 +90,7 @@ public class VizModel {
     
     public VizModel(Workspace workspace) {
         defaultValues();
-        limits = VizController.getInstance().getLimits();
-        
-        GraphModel gm = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel(workspace);
-        textModel.setTextColumns(new Column[]{gm.getNodeTable().getColumn(ProjectManager.NODE_TABLE_PRO_NAME)}, new Column[]{gm.getEdgeTable().getColumn("label")});
+        limits = VizController.getInstance().getLimits();        
     }
     
     public VizModel(boolean defaultModel) {

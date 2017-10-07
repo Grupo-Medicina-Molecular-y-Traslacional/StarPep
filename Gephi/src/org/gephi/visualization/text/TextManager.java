@@ -54,6 +54,7 @@ import org.gephi.graph.api.Column;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Element;
 import org.gephi.graph.api.Graph;
+import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.TextProperties;
 import org.gephi.visualization.VizArchitecture;
@@ -62,6 +63,7 @@ import org.gephi.visualization.apiimpl.GraphDrawable;
 import org.gephi.visualization.apiimpl.VizConfig;
 import org.gephi.visualization.model.edge.EdgeModel;
 import org.gephi.visualization.model.node.NodeModel;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -157,7 +159,8 @@ public class TextManager implements VizArchitecture {
 
                     //Initialize columns if needed
                     if (model.getNodeTextColumns() == null || model.getNodeTextColumns().length == 0) {
-                        model.setTextColumns(new Column[0], new Column[0]);
+                        GraphModel gm = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();
+                        model.setTextColumns(new Column[]{gm.getNodeTable().getColumn(ProjectManager.NODE_TABLE_PRO_NAME)}, new Column[]{gm.getEdgeTable().getColumn(ProjectManager.EDGE_TABLE_PRO_SIMILARITY)});
                     }
                 }
             }
@@ -248,11 +251,7 @@ public class TextManager implements VizArchitecture {
     private String buildText(Graph graph, Element element, Column[] selectedColumns) {
         String txt;
         if (selectedColumns == null || selectedColumns.length == 0) {
-            if (element.getTable().hasColumn(ProjectManager.NODE_TABLE_PRO_NAME)) {
-                txt = (String) element.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME);
-            } else {
-                txt = element.getLabel();
-            }
+            txt = element.getLabel();
         } else if (selectedColumns.length == 1) {
             return buildText(graph, element, selectedColumns[0]);
         } else {
@@ -272,7 +271,7 @@ public class TextManager implements VizArchitecture {
     private String buildText(Graph graph, Element element, Column column) {
         Object val = element.getAttribute(column, graph.getView());
         if (val == null) {
-            return "";
+            return element.getLabel();
         }
         if (column.isArray()) {
             return AttributeUtils.printArray(val);

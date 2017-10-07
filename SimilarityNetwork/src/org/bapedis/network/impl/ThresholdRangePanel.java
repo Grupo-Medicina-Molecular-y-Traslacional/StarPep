@@ -161,6 +161,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
             protected Object doInBackground() throws Exception {
                 AttributesModel attrModel = pc.getAttributesModel();
                 if (attrModel != null) {
+                    attrModel.setSimilarityThreshold(newValue);
                     Graph csnGraph = pc.getGraphModel().getGraph(attrModel.getCsnView());
                     double score;
                     if (newValue < oldValue) { // to add edges

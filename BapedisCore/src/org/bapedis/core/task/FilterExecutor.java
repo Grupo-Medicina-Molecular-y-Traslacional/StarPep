@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.SwingWorker;
+import org.bapedis.core.model.AnnotationType;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.Peptide;
@@ -23,6 +24,7 @@ import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
+import org.gephi.graph.api.Node;
 import org.gephi.graph.api.Subgraph;
 import org.netbeans.swing.etable.QuickFilter;
 import org.openide.util.Cancellable;
@@ -72,68 +74,94 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
 
         TreeSet<String> set = filterModel.isEmpty() ? null : new TreeSet<String>();
 
-        graphDBView = graphModel.createView();
+        graphDBView = graphModel.copyView(attrModel.getGraphDBView());
         Subgraph subGraphDB = graphModel.getGraph(graphDBView);
 
-        csnView = graphModel.createView();
+        csnView = graphModel.copyView(attrModel.getCsnView());
         Subgraph subGraphCSN = graphModel.getGraph(csnView);
 
+        List<org.gephi.graph.api.Node> toAddNodes = new LinkedList<>();
+        List<org.gephi.graph.api.Node> toRemoveNodes = new LinkedList<>();
+
         Peptide peptide;
-        org.gephi.graph.api.Node graphNode;
-        List<org.gephi.graph.api.Node> graphNodes = new LinkedList<>();
-        List<Edge> graphEdges = new LinkedList<>();
+        Node graphNode;
         for (PeptideNode node : attrModel.getNodeList()) {
             if (stopRun.get()) {
                 break;
             }
+
             peptide = node.getPeptide();
+            graphNode = peptide.getGraphNode();
+
             if (isAccepted(peptide)) {
                 if (!filterModel.isEmpty()) {
                     set.add(peptide.getId());
                 }
 
-                // Add graph node to graph db and csn
-                graphNode = peptide.getGraphNode();
-                subGraphDB.addNode(graphNode);
-
-                subGraphCSN.addNode(graphNode);
-
-                // Add neighbors and edges
-                peptide.getGraph().readLock();
-                try {
-                    for (org.gephi.graph.api.Node neighbor : peptide.getGraph().getNeighbors(graphNode)) {
-                        graphNodes.add(neighbor);
-                    }
-
-                    for (Edge edge : peptide.getGraph().getEdges(graphNode)) {
-                        graphEdges.add(edge);
-                    }
-                } finally {
-                    peptide.getGraph().readUnlock();
+                if (!subGraphCSN.hasNode(graphNode.getId())) {
+                    toAddNodes.add(graphNode);
                 }
-
-                subGraphDB.addAllNodes(graphNodes);
-                subGraphDB.addAllEdges(graphEdges);
+            } else if (subGraphCSN.hasNode(graphNode.getId())) {
+                toRemoveNodes.add(graphNode);
             }
             ticket.progress();
         }
-        if (attrModel.getCsnView() != null) {
-            // Add edges between nodes
+
+        // Add graph node to graph db and csn
+        int relType;
+        List<Node> metadataNodes = new LinkedList<>();
+        List<Edge> graphEdges = new LinkedList<>();
+        double score;
+        for (Node node : toAddNodes) {
+            // add nodes to csn
+            subGraphCSN.addNode(node);
             graphEdges.clear();
-            Graph oldGraph = graphModel.getGraph(attrModel.getCsnView());
-            int relType = graphModel.getEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+            relType = graphModel.getEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
             if (relType != -1) {
-                for (org.gephi.graph.api.Node csnNode : subGraphCSN.getNodes()) {
-                    if (oldGraph.hasNode(csnNode.getId())) {
-                        for (Edge edge : oldGraph.getEdges(csnNode, relType)) {
-                            if (subGraphCSN.hasNode(edge.getSource().getId()) && subGraphCSN.hasNode(edge.getTarget().getId())) {
-                                graphEdges.add(edge);
-                            }
+                for (Edge edge : graphModel.getGraph().getEdges(node, relType)) {
+                    if (subGraphCSN.hasNode(edge.getSource().getId()) && subGraphCSN.hasNode(edge.getTarget().getId())) {
+                        score = (double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
+                        if (score >= attrModel.getSimilarityThreshold()) {
+                            graphEdges.add(edge);
                         }
                     }
                 }
             }
             subGraphCSN.addAllEdges(graphEdges);
+
+            // add nodes to database
+            subGraphDB.addNode(node);
+            metadataNodes.clear();
+            graphEdges.clear();
+            for (AnnotationType aType : AnnotationType.values()) {
+                relType = graphModel.getEdgeType(aType.getRelationType());
+                if (relType != -1) {
+                    for (Node neighbor : graphModel.getGraph().getNeighbors(node, relType)) {
+                        metadataNodes.add(neighbor);
+                        graphEdges.add(graphModel.getGraph().getEdge(node, neighbor, relType));
+                    }
+                }
+            }
+            subGraphDB.addAllNodes(metadataNodes);
+            subGraphDB.addAllEdges(graphEdges);
+        }
+
+        // To remove node from graph db and csn
+        for (Node node : toRemoveNodes) {
+            subGraphCSN.removeNode(node);
+            subGraphDB.removeNode(node);
+            metadataNodes.clear();
+            for (AnnotationType aType : AnnotationType.values()) {
+                relType = graphModel.getEdgeType(aType.getRelationType());
+                if (relType != -1) {
+                    for (Node neighbor : graphModel.getGraph().getNeighbors(node, relType)) {
+                        if (graphModel.getGraph().getDegree(neighbor) == 1) {
+                            metadataNodes.add(neighbor);
+                        }
+                    }
+                }
+            }
+            subGraphDB.removeAllNodes(metadataNodes);
         }
         ticket.progress();
         return set;

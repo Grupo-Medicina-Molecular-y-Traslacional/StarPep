@@ -45,6 +45,7 @@ public class AttributesModel {
     public static final int CSN_VIEW = 2;
     protected int mainGView;
     protected GraphView graphDBView, csnView;
+    protected double similarityThreshold;
 
     public AttributesModel() {
         attrsMap = new LinkedHashMap<>();
@@ -74,6 +75,14 @@ public class AttributesModel {
         propertyChangeSupport.firePropertyChange(CHANGED_GVIEW, oldvalue, mainGView);
     }
 
+    public double getSimilarityThreshold() {
+        return similarityThreshold;
+    }
+
+    public void setSimilarityThreshold(double similarityThreshold) {
+        this.similarityThreshold = similarityThreshold;
+    }
+    
     public GraphView getGraphDBView() {
         return graphDBView;
     }

@@ -68,7 +68,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
         SimilarityGraphEdgeBuilder.mainGraph = graphModel.getGraph();
         SimilarityGraphEdgeBuilder.csnGraph = graphModel.getGraph(attrModel.getCsnView());
         SimilarityGraphEdgeBuilder.similarityMeasure = this;
-        SimilarityGraphEdgeBuilder.edgeList = new LinkedList<>();
+        SimilarityGraphEdgeBuilder.edgeList = new LinkedList<>();        
     }
 
     @Override
@@ -114,9 +114,10 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
         SimilarityGraphEdgeBuilder task = new SimilarityGraphEdgeBuilder();
         fjPool.invoke(task);
         task.join();        
+        SimilarityGraphEdgeBuilder.attrModel.setSimilarityThreshold(threshold);
         for (Edge edge : SimilarityGraphEdgeBuilder.edgeList) {
             histogram.addData((Double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
-        }
+        }        
         propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY_VALUES, null, histogram);
     }
 

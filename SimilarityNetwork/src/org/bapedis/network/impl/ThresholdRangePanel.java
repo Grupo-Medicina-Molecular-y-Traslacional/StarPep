@@ -156,10 +156,10 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
     }
 
     private void resetSimilarityThreshold(final double oldValue, final double newValue) {
+        final AttributesModel attrModel = pc.getAttributesModel();
         SwingWorker sw = new SwingWorker() {
             @Override
-            protected Object doInBackground() throws Exception {
-                AttributesModel attrModel = pc.getAttributesModel();
+            protected Object doInBackground() throws Exception {                
                 if (attrModel != null) {
                     attrModel.setSimilarityThreshold(newValue);
                     Graph csnGraph = pc.getGraphModel().getGraph(attrModel.getCsnView());
@@ -215,7 +215,8 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
                 try {
                     get();
                     currentValueLabel.setText(formatter.format(newValue));
-                    jApplyButton.setVisible(false);
+                    jApplyButton.setVisible(false); 
+                    attrModel.fireUpdatedCSNView();
                 } catch (InterruptedException ex) {
                     Exceptions.printStackTrace(ex);
                 } catch (ExecutionException ex) {

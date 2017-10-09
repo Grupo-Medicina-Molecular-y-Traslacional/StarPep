@@ -124,6 +124,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         algoComboBox = new javax.swing.JComboBox<>();
         infoLabel = new javax.swing.JLabel();
         runButton = new javax.swing.JButton();
+        scrollPane = new javax.swing.JScrollPane();
         algoProvidedPanel = new javax.swing.JPanel();
         propSheetPanel = new PropertySheet();
         algoToolBar = new javax.swing.JToolBar();
@@ -178,6 +179,8 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         add(runButton, gridBagConstraints);
 
         algoProvidedPanel.setLayout(new java.awt.BorderLayout());
+        scrollPane.setViewportView(algoProvidedPanel);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -186,7 +189,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(algoProvidedPanel, gridBagConstraints);
+        add(scrollPane, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -360,6 +363,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     private javax.swing.JPanel propSheetPanel;
     private javax.swing.JButton resetButton;
     private javax.swing.JButton runButton;
+    private javax.swing.JScrollPane scrollPane;
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {
@@ -440,6 +444,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     private void refreshProperties(AlgorithmModel algoModel) {
         if (algoModel == null || algoModel.getSelectedAlgorithm() == null) {
             ((PropertySheet) propSheetPanel).setNodes(new Node[0]);
+            scrollPane.setVisible(false);
             algoProvidedPanel.removeAll();
             algoProvidedPanel.setVisible(false);
             propSheetPanel.setVisible(true);
@@ -456,9 +461,11 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 algoProvidedPanel.revalidate();
                 algoProvidedPanel.repaint();
                 algoProvidedPanel.setVisible(true);
+                scrollPane.setVisible(true);
             } else {
                 algoProvidedPanel.removeAll();
                 algoProvidedPanel.setVisible(false);
+                scrollPane.setVisible(false);
                 ((PropertySheet) propSheetPanel).setNodes(new Node[]{algoNode});
                 propSheetPanel.setVisible(true);
             }

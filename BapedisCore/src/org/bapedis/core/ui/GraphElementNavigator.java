@@ -256,6 +256,7 @@ public class GraphElementNavigator extends JComponent implements
             AttributesModel oldAttrModel = pc.getAttributesModel(oldWs);
             if (oldAttrModel != null) {
                 oldAttrModel.removeQuickFilterChangeListener(this);
+                oldAttrModel.removeGraphViewChangeListener(this);
             }
         }
         peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class
@@ -265,6 +266,7 @@ public class GraphElementNavigator extends JComponent implements
         AttributesModel peptidesModel = pc.getAttributesModel(newWs);
         if (peptidesModel != null) {
             peptidesModel.addQuickFilterChangeListener(this);
+            peptidesModel.addGraphViewChangeListener(this);
         }
         this.currentModel = peptidesModel;
 
@@ -343,7 +345,11 @@ public class GraphElementNavigator extends JComponent implements
 
     private GraphElementDataColumn[] getEdgeColumns(Table table) {
         edgeColumns[0] = sourceColumn;
-        edgeColumns[1] = new GraphElementAttributeColumn(table.getColumn("label"));
+        if (currentModel.getMainGView() == AttributesModel.GRAPH_DB_VIEW) {
+            edgeColumns[1] = new GraphElementAttributeColumn(table.getColumn("label"));
+        } else if (currentModel.getMainGView() == AttributesModel.CSN_VIEW) {
+            edgeColumns[1] = new GraphElementAttributeColumn(table.getColumn(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
+        }
         edgeColumns[2] = targetColumn;
         return edgeColumns;
     }
@@ -356,9 +362,13 @@ public class GraphElementNavigator extends JComponent implements
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource().equals(currentModel)
-                && evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
-            reload();
+        if (evt.getSource().equals(currentModel)) {
+            if (evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
+                reload();
+            } else if (evt.getPropertyName().equals(AttributesModel.CHANGED_GVIEW) &&
+                    navigatorModel.getVisualElement() == GraphElementType.Edge) {
+                reload();
+            }
         }
     }
 
@@ -367,11 +377,13 @@ public class GraphElementNavigator extends JComponent implements
         if (le.getSource().equals(peptideLkpResult)) {
             if (currentModel != null) {
                 currentModel.removeQuickFilterChangeListener(this);
+                currentModel.removeGraphViewChangeListener(this);
             }
             Collection<? extends AttributesModel> attrModels = peptideLkpResult.allInstances();
             if (!attrModels.isEmpty()) {
                 currentModel = attrModels.iterator().next();
                 currentModel.addQuickFilterChangeListener(this);
+                currentModel.addGraphViewChangeListener(this);
                 reload();
             }
         }
@@ -420,6 +432,7 @@ public class GraphElementNavigator extends JComponent implements
         pc.removeWorkspaceEventListener(this);
         if (currentModel != null) {
             currentModel.removeQuickFilterChangeListener(this);
+            currentModel.removeGraphViewChangeListener(this);
         }
     }
 

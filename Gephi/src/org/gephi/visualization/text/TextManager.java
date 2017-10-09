@@ -46,6 +46,8 @@ import java.awt.Font;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.bapedis.core.services.ProjectManager;
@@ -89,6 +91,7 @@ public class TextManager implements VizArchitecture {
     private boolean mipmap;
     private boolean fractionalMetrics;
     private boolean antialised;
+    private static final DecimalFormat df;
 
     static {
         sizeModes = new SizeMode[3];
@@ -101,6 +104,11 @@ public class TextManager implements VizArchitecture {
         colorModes[0] = new UniqueColorMode();
         colorModes[1] = new ObjectColorMode();
         colorModes[2] = new TextColorMode();
+
+        // Decimal format
+        DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
+        symbols.setDecimalSeparator('.');
+        df = new DecimalFormat("#.##", symbols);
     }
 
     public TextManager() {
@@ -276,6 +284,9 @@ public class TextManager implements VizArchitecture {
         if (column.isArray()) {
             return AttributeUtils.printArray(val);
         } else {
+            if (val instanceof Number){
+                return df.format(val);
+            }
             return val.toString();
         }
     }

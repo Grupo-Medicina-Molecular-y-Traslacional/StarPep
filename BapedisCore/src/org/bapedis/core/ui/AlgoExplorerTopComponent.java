@@ -125,7 +125,6 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         infoLabel = new javax.swing.JLabel();
         runButton = new javax.swing.JButton();
         scrollPane = new javax.swing.JScrollPane();
-        algoProvidedPanel = new javax.swing.JPanel();
         propSheetPanel = new PropertySheet();
         algoToolBar = new javax.swing.JToolBar();
         presetsButton = new javax.swing.JButton();
@@ -177,10 +176,6 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(runButton, gridBagConstraints);
-
-        algoProvidedPanel.setLayout(new java.awt.BorderLayout());
-        scrollPane.setViewportView(algoProvidedPanel);
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -356,7 +351,6 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> algoComboBox;
-    private javax.swing.JPanel algoProvidedPanel;
     private javax.swing.JToolBar algoToolBar;
     private javax.swing.JLabel infoLabel;
     private javax.swing.JButton presetsButton;
@@ -405,7 +399,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 close();
             }
         }
-        if (algoModel.getCategory() != null) {            
+        if (algoModel.getCategory() != null) {
             refreshAlgChooser(algoModel);
             refreshProperties(algoModel);
             refreshRunning(algoModel.isRunning());
@@ -444,9 +438,8 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     private void refreshProperties(AlgorithmModel algoModel) {
         if (algoModel == null || algoModel.getSelectedAlgorithm() == null) {
             ((PropertySheet) propSheetPanel).setNodes(new Node[0]);
+            scrollPane.setViewportView(null);
             scrollPane.setVisible(false);
-            algoProvidedPanel.removeAll();
-            algoProvidedPanel.setVisible(false);
             propSheetPanel.setVisible(true);
         } else {
             Algorithm selectedAlgorithm = algoModel.getSelectedAlgorithm();
@@ -456,15 +449,10 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 JPanel editPanel = selectedAlgorithm.getFactory().getSetupUI().getEditPanel(selectedAlgorithm);
                 editPanel.setBorder(BorderFactory.createTitledBorder(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.editPanel.border.title"))); // NOI18N
                 propSheetPanel.setVisible(false);
-                algoProvidedPanel.removeAll();
-                algoProvidedPanel.add(editPanel, BorderLayout.PAGE_START);
-                algoProvidedPanel.revalidate();
-                algoProvidedPanel.repaint();
-                algoProvidedPanel.setVisible(true);
+                scrollPane.setViewportView(editPanel);
                 scrollPane.setVisible(true);
             } else {
-                algoProvidedPanel.removeAll();
-                algoProvidedPanel.setVisible(false);
+                scrollPane.setViewportView(null);
                 scrollPane.setVisible(false);
                 ((PropertySheet) propSheetPanel).setNodes(new Node[]{algoNode});
                 propSheetPanel.setVisible(true);
@@ -478,7 +466,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 }
             }
         }
-        richTooltip = null;        
+        richTooltip = null;
         revalidate();
         repaint();
     }
@@ -487,14 +475,14 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         infoLabel.setEnabled(enabled);
         runButton.setEnabled(enabled);
         propSheetPanel.setEnabled(enabled);
-        algoProvidedPanel.setEnabled(enabled);
+        scrollPane.setEnabled(enabled);
         resetButton.setEnabled(enabled);
         presetsButton.setEnabled(enabled);
     }
 
     private void refreshRunning(boolean running) {
         propSheetPanel.setEnabled(!running);
-        algoProvidedPanel.setEnabled(!running);
+        scrollPane.setEnabled(!running);
         resetButton.setEnabled(!running);
         presetsButton.setEnabled(!running);
         algoComboBox.setEnabled(!running);

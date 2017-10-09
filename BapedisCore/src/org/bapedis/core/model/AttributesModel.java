@@ -38,7 +38,7 @@ public class AttributesModel {
     public static final String CHANGED_FILTER = "quickFilter";
     public static final String AVAILABLE_ATTR_ADDED = "attribute_add";
     public static final String AVAILABLE_ATTR_REMOVED = "attribute_remove";
-    public static final String CHANGED_GVIEW = "graphview";
+    public static final String CHANGED_GVIEW = "changed_graphview";
     protected transient final PropertyChangeSupport propertyChangeSupport;
     protected Node rootNode;
     public static final int GRAPH_DB_VIEW = 1;
@@ -221,7 +221,13 @@ public class AttributesModel {
 
     public void removeGraphViewChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(CHANGED_GVIEW, listener);
-    }    
+    }  
+    
+    public void fireUpdatedCSNView(){
+        if (mainGView == CSN_VIEW){
+            propertyChangeSupport.firePropertyChange(CHANGED_GVIEW, null, mainGView);
+        }
+    }
 
     private class PeptideNodeContainer extends Index.ArrayChildren {
 

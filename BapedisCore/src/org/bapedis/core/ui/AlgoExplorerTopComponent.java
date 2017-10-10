@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -110,6 +109,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         algoPresetPersistence = new AlgoPresetPersistence();
         algoListener = new AlgorithmListenerImpl();
+        ((PropertySheet) propSheetPanel).setDescriptionAreaVisible(false);
     }
 
     /**
@@ -442,8 +442,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             scrollPane.setVisible(false);
             propSheetPanel.setVisible(true);
         } else {
-            Algorithm selectedAlgorithm = algoModel.getSelectedAlgorithm();
-            AlgorithmNode algoNode = new AlgorithmNode(selectedAlgorithm);
+            Algorithm selectedAlgorithm = algoModel.getSelectedAlgorithm();            
 
             if (selectedAlgorithm.getFactory().getSetupUI() != null) {
                 JPanel editPanel = selectedAlgorithm.getFactory().getSetupUI().getEditPanel(selectedAlgorithm);
@@ -454,7 +453,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             } else {
                 scrollPane.setViewportView(null);
                 scrollPane.setVisible(false);
-                ((PropertySheet) propSheetPanel).setNodes(new Node[]{algoNode});
+                ((PropertySheet) propSheetPanel).setNodes(new Node[]{new AlgorithmNode(selectedAlgorithm)});
                 propSheetPanel.setVisible(true);
             }
 

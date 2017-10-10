@@ -31,7 +31,11 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <public-packages/>
+            <public-packages>
+                <package>org.bapedis.modamp</package>
+                <package>org.bapedis.modamp.impl</package>
+                <package>org.bapedis.modamp.scales</package>
+            </public-packages>
         </data>
     </configuration>
 </project>

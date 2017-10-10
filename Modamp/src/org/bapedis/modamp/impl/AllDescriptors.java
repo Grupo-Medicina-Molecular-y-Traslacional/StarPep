@@ -33,27 +33,32 @@ public class AllDescriptors extends AbstractModamp {
 
     public AllDescriptors(AlgorithmFactory factory) {
         super(factory);
-        aaComposition = true;
-        aIndex = true;
-        avgHydrophilicity = true;
-        bIndex = true;
-        dComposition = true;
-        hMoment = true;
-        hPeriodicity = true;
-        iIndex = true;
-        iPoint = true;
-        mWeight = true;
-        netCharge = true;
-        raComposition = true;
-        raDistribution = true;
-        raTransition = true;
-        triComposition = true;
+        setAllMD(true);
         properties = new LinkedList<>();
         populateProperties();
         map = new HashMap<>();
     }
+    
+    public void setAllMD(boolean selected){
+        aaComposition = selected;
+        aIndex = selected;
+        avgHydrophilicity = selected;
+        bIndex = selected;
+        dComposition = selected;
+        hMoment = selected;
+        hPeriodicity = selected;
+        iIndex = selected;
+        iPoint = selected;
+        mWeight = selected;
+        netCharge = selected;
+        raComposition = selected;
+        raDistribution = selected;
+        raTransition = selected;
+        triComposition = selected;    
+    }
 
     private void populateProperties() {
+        properties.clear();
         try {
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(NetChargeFactory.class, "NetCharge.name"), PRO_CATEGORY, NbBundle.getMessage(NetChargeFactory.class, "NetCharge.desc"), "isNetCharge", "setNetCharge"));
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IsoelectricPointFactory.class, "IsoelectricPoint.name"), PRO_CATEGORY, NbBundle.getMessage(IsoelectricPointFactory.class, "IsoelectricPoint.desc"), "isiPoint", "setiPoint"));

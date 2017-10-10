@@ -41,7 +41,9 @@ public class AllDescriptorsFactory implements AlgorithmFactory {
 
     @Override
     public Algorithm createAlgorithm() {
-        return new AllDescriptors(this);
+        AllDescriptors algo = new AllDescriptors(this);
+        algo.setAllMD(true);
+        return algo;
     }
 
     @Override

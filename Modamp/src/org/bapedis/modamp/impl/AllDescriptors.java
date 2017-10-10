@@ -33,7 +33,6 @@ public class AllDescriptors extends AbstractModamp {
 
     public AllDescriptors(AlgorithmFactory factory) {
         super(factory);
-        setAllMD(true);
         properties = new LinkedList<>();
         populateProperties();
         map = new HashMap<>();

@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import org.bapedis.core.model.AlgorithmNode;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+import org.bapedis.modamp.impl.AllDescriptors;
 import org.jdesktop.swingx.JXHyperlink;
 import org.openide.explorer.propertysheet.PropertySheet;
 import org.openide.nodes.Node;
@@ -26,7 +27,7 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
      */
     protected ChemicalSpaceNetwork csnAlgo;
     protected final ThresholdRangePanel thresholdPanel;
-    JXHyperlink checkAll, uncheckAll;
+    JXHyperlink checkAll, uncheckAll, subset;
 
     public ChemicalSpaceNetworkPanel() {
         initComponents();
@@ -64,6 +65,23 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
             }
         });
         topPanel.add(uncheckAll);
+        
+        subset = new JXHyperlink();
+        subset.setText(NbBundle.getMessage(ChemicalSpaceNetworkPanel.class, "ChemicalSpaceNetworkPanel.subset.text"));
+        subset.setToolTipText(org.openide.util.NbBundle.getMessage(ChemicalSpaceNetworkPanel.class, "ChemicalSpaceNetworkPanel.subset.toolTipText"));       
+        subset.setClickedColor(new java.awt.Color(0, 51, 255));
+        subset.setFocusPainted(false);
+        subset.setFocusable(false);
+        subset.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        subset.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);                
+        subset.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                setSubset();
+            }
+        });
+        topPanel.add(subset);
+        
     }
 
     private void checkAll(boolean selected) {
@@ -71,6 +89,20 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
             csnAlgo.getDescriptorAlgorithm().setAllMD(selected);
             propSheetPanel.repaint();
         }
+    }
+    
+    private void setSubset(){
+        if (csnAlgo != null){
+            AllDescriptors allDescriptor =csnAlgo.getDescriptorAlgorithm();
+            allDescriptor.setAllMD(true);
+            allDescriptor.setAaComposition(false);
+            allDescriptor.setdComposition(false);
+            allDescriptor.setRaComposition(false);
+            allDescriptor.setRaDistribution(false);
+            allDescriptor.setRaTransition(false);
+            allDescriptor.setTriComposition(false);
+            propSheetPanel.repaint();
+        }        
     }
 
     /**

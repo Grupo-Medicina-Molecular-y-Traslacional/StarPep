@@ -228,6 +228,7 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
         this.csnAlgo = (ChemicalSpaceNetwork) algo;
         ((PropertySheet) propSheetPanel).setNodes(new Node[]{new AlgorithmNode(csnAlgo.getDescriptorAlgorithm())});
         setSelectedGroupIndex(csnAlgo.getButtonGroupIndex());
+        thresholdPanel.setup(csnAlgo);
         return this;
     }
 

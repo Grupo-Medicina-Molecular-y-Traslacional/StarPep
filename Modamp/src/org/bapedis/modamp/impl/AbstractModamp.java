@@ -41,6 +41,7 @@ public abstract class AbstractModamp implements Algorithm {
     @Override
     public void endAlgo() {
         attrModel = null;
+        progressTicket = null;
     }
 
     @Override

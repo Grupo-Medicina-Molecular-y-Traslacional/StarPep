@@ -16,6 +16,7 @@ public class PeptideAttribute {
     protected String displayName;
     protected Class<?> type;
     protected final boolean md;
+    protected double maxValue, minValue;
     
     public PeptideAttribute(String id, String displayName, Class<?> type) {
         this(id, displayName, type, true);
@@ -27,6 +28,8 @@ public class PeptideAttribute {
         this.displayName = displayName;
         this.type = type;
         this.md = md;
+        maxValue = Double.MAX_VALUE;
+        minValue = Double.MIN_VALUE;
     }     
     
     public String getId() {
@@ -44,8 +47,23 @@ public class PeptideAttribute {
     public boolean isMolecularDescriptor() {
         return md;
     }
- 
 
+    public double getMaxValue() {
+        return maxValue;
+    }
+
+    public void setMaxValue(double maxValue) {
+        this.maxValue = maxValue;
+    }
+
+    public double getMinValue() {
+        return minValue;
+    }
+
+    public void setMinValue(double minValue) {
+        this.minValue = minValue;
+    }
+    
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof PeptideAttribute){

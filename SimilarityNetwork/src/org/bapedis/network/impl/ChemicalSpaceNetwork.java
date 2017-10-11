@@ -11,6 +11,7 @@ import java.util.List;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.data.PeptideDAO;
 import org.bapedis.modamp.impl.AllDescriptors;
 import org.bapedis.modamp.impl.AllDescriptorsFactory;
 import org.openide.util.Lookup;
@@ -64,7 +65,7 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
                 descriptorAlgo.compute(peptides[i]);
                 progressTicket.progress();
             }
-            
+
             for (Iterator<PeptideAttribute> it = attrModel.getAttributeIterator(); it.hasNext() && !stopRun;) {
                 PeptideAttribute attr = it.next();
                 if (attr.isMolecularDescriptor()) {
@@ -72,8 +73,32 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
                 }
             }
             progressTicket.progress();
+            // normalizing
             progressTicket.progress("normalizing");
-            
+            double val, max, min;
+            for (PeptideAttribute descriptor : descriptorList) {
+                max = Double.MIN_VALUE;
+                min = Double.MAX_VALUE;
+                for (Peptide peptide : peptides) {
+                    val = convertToDouble(descriptor, peptide.getAttributeValue(descriptor));
+                    if (val < min) {
+                        min = val;
+                    }
+                    if (val > max) {
+                        max = val;
+                    }
+                }
+                descriptor.setMaxValue(max);
+                descriptor.setMinValue(min);
+                if (descriptor != PeptideDAO.LENGHT) {
+                    for (Peptide peptide : peptides) {
+                        val = convertToDouble(descriptor, peptide.getAttributeValue(descriptor));
+                        val = (val - min) / (max - min);
+                        peptide.setAttributeValue(descriptor, val);
+                    }
+                }
+            }
+
             progressTicket.progress(NbBundle.getMessage(ChemicalSpaceNetwork.class, "ChemicalSpaceNetwork.task.running"));
             if (!stopRun) {
                 super.run();

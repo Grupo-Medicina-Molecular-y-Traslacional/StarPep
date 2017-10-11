@@ -64,6 +64,7 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
                 descriptorAlgo.compute(peptides[i]);
                 progressTicket.progress();
             }
+            progressTicket.progress("normalizing");
             for (Iterator<PeptideAttribute> it = attrModel.getAttributeIterator(); it.hasNext();) {
                 PeptideAttribute attr = it.next();
                 if (attr.isMolecularDescriptor()) {
@@ -86,10 +87,29 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
 
     @Override
     public double computeSimilarity(Peptide peptide1, Peptide peptide2) {
+        return tanimotoBased(peptide1, peptide2);
+    }
+    
+    private float tanimotoBased(Peptide peptide1, Peptide peptide2) {                
+        double ab = 0.0;
+        double a2 = 0.0;
+        double b2 = 0.0;
+        double val1, val2;
+        for (PeptideAttribute descriptor : descriptorList) {
+            val1 = (double) convertToDouble(descriptor, peptide1.getAttributeValue(descriptor));
+            val2 = (double) convertToDouble(descriptor, peptide2.getAttributeValue(descriptor));
+            ab += val1 * val2;
+            a2 += val1*val1;
+            b2 += val2*val2;
+        }        
+        return (float)ab/(float)(a2+b2-ab);
+    } 
+
+    private double distanceBased(Peptide peptide1, Peptide peptide2) {
         double val1, val2, diff, squareSum = 0;
         for (PeptideAttribute descriptor : descriptorList) {
-            val1 = (double) convertToDouble(peptide1.getAttributeValue(descriptor));
-            val2 = (double) convertToDouble(peptide2.getAttributeValue(descriptor));
+            val1 = (double) convertToDouble(descriptor, peptide1.getAttributeValue(descriptor));
+            val2 = (double) convertToDouble(descriptor, peptide2.getAttributeValue(descriptor));
             diff = val2 - val1;
             squareSum += diff * diff;
         }
@@ -97,13 +117,13 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
         return 1 / (1 + distance);
     }
 
-    private double convertToDouble(Object obj) {
-        if (obj instanceof Double) {
-            return (double) obj;
-        } else if (obj instanceof Integer) {
-            return ((Integer) obj).doubleValue();
+    private double convertToDouble(PeptideAttribute descritor, Object value) {
+        if (value instanceof Double) {
+            return (double) value;
+        } else if (value instanceof Integer) {
+            return ((Integer) value).doubleValue();
         }
-        throw new IllegalArgumentException("Unknown value for molecular descriptor:" + obj);
+        throw new IllegalArgumentException("Unknown value for molecular descriptor: " + descritor.getDisplayName() + "=" + value);
     }
 
 }

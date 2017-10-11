@@ -59,20 +59,25 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
         if (attrModel != null) {
             Peptide[] peptides = attrModel.getPeptides();
             progressTicket.progress(NbBundle.getMessage(ChemicalSpaceNetwork.class, "ChemicalSpaceNetwork.md.running"));
-            progressTicket.switchToDeterminate(peptides.length);
+            progressTicket.switchToDeterminate(peptides.length + 1);
             for (int i = 0; i < peptides.length && !stopRun; i++) {
                 descriptorAlgo.compute(peptides[i]);
                 progressTicket.progress();
             }
-            progressTicket.progress("normalizing");
-            for (Iterator<PeptideAttribute> it = attrModel.getAttributeIterator(); it.hasNext();) {
+            
+            for (Iterator<PeptideAttribute> it = attrModel.getAttributeIterator(); it.hasNext() && !stopRun;) {
                 PeptideAttribute attr = it.next();
                 if (attr.isMolecularDescriptor()) {
                     descriptorList.add(attr);
                 }
             }
+            progressTicket.progress();
+            progressTicket.progress("normalizing");
+            
             progressTicket.progress(NbBundle.getMessage(ChemicalSpaceNetwork.class, "ChemicalSpaceNetwork.task.running"));
-            super.run();
+            if (!stopRun) {
+                super.run();
+            }
         }
     }
 
@@ -89,8 +94,8 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
     public double computeSimilarity(Peptide peptide1, Peptide peptide2) {
         return tanimotoBased(peptide1, peptide2);
     }
-    
-    private float tanimotoBased(Peptide peptide1, Peptide peptide2) {                
+
+    private float tanimotoBased(Peptide peptide1, Peptide peptide2) {
         double ab = 0.0;
         double a2 = 0.0;
         double b2 = 0.0;
@@ -99,11 +104,11 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
             val1 = (double) convertToDouble(descriptor, peptide1.getAttributeValue(descriptor));
             val2 = (double) convertToDouble(descriptor, peptide2.getAttributeValue(descriptor));
             ab += val1 * val2;
-            a2 += val1*val1;
-            b2 += val2*val2;
-        }        
-        return (float)ab/(float)(a2+b2-ab);
-    } 
+            a2 += val1 * val1;
+            b2 += val2 * val2;
+        }
+        return (float) ab / (float) (a2 + b2 - ab);
+    }
 
     private double distanceBased(Peptide peptide1, Peptide peptide2) {
         double val1, val2, diff, squareSum = 0;

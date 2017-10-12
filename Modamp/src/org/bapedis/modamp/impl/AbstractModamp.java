@@ -5,9 +5,13 @@
  */
 package org.bapedis.modamp.impl;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -26,14 +30,21 @@ public abstract class AbstractModamp implements Algorithm {
     protected final AlgorithmFactory factory;
     protected ProgressTicket progressTicket;
     protected final String PRO_CATEGORY = "Properties";
+    protected final List<PeptideAttribute> descriptorList;
 
     public AbstractModamp(AlgorithmFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         this.factory = factory;
+        descriptorList = new LinkedList<>();
+    }
+    
+    public List<PeptideAttribute> getDescriptorList(){
+        return descriptorList;
     }
 
     @Override
     public void initAlgo() {
+        descriptorList.clear();
         attrModel = pc.getAttributesModel();
         stopRun = false;
     }

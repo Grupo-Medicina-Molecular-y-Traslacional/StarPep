@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.scales.ChargeScale;
@@ -115,38 +116,78 @@ public class NetCharge extends AbstractModamp {
     public void initAlgo() {
         super.initAlgo();
         if (attrModel != null) {
-            if (ph5 && !attrModel.hasAttribute(Z5)) {
-                attrModel.addAttribute(Z5, Z5, Double.class);
+            PeptideAttribute descriptor;
+            if (ph5) {
+                if (!attrModel.hasAttribute(Z5)) {
+                    descriptor = attrModel.addAttribute(Z5, Z5, Double.class);
+                } else {
+                    descriptor = attrModel.getAttribute(Z5);
+                }
+                descriptorList.add(descriptor);
             }
-            if (ph7 && !attrModel.hasAttribute(Z7)) {
-                attrModel.addAttribute(Z7, Z7, Double.class);
+
+            if (ph7) {
+                if (!attrModel.hasAttribute(Z7)) {
+                    descriptor = attrModel.addAttribute(Z7, Z7, Double.class);
+                } else {
+                    descriptor = attrModel.getAttribute(Z7);
+                }
+                descriptorList.add(descriptor);
             }
-            if (ph9 && !attrModel.hasAttribute(Z9)) {
-                attrModel.addAttribute(Z9, Z9, Double.class);
+
+            if (ph9) {
+                if (!attrModel.hasAttribute(Z9)) {
+                    descriptor = attrModel.addAttribute(Z9, Z9, Double.class);
+                } else {
+                    descriptor = attrModel.getAttribute(Z9);
+                }
+                descriptorList.add(descriptor);
             }
+
             if (KLEP840101) {
                 if (!attrModel.hasAttribute(KLEP840101_NAME)) {
-                    attrModel.addAttribute(KLEP840101_NAME, KLEP840101_NAME, Double.class);
+                    descriptor = attrModel.addAttribute(KLEP840101_NAME, KLEP840101_NAME, Double.class);
+                } else {
+                    descriptor = attrModel.getAttribute(KLEP840101_NAME);
                 }
+                descriptorList.add(descriptor);
+
                 if (!attrModel.hasAttribute(KLEP840101_AVG)) {
-                    attrModel.addAttribute(KLEP840101_AVG, KLEP840101_AVG, Double.class);
+                    descriptor = attrModel.addAttribute(KLEP840101_AVG, KLEP840101_AVG, Double.class);
+                } else {
+                    descriptor = attrModel.getAttribute(KLEP840101_AVG);
                 }
+                descriptorList.add(descriptor);
             }
             if (CHAM830107) {
                 if (!attrModel.hasAttribute(CHAM830107_NAME)) {
-                    attrModel.addAttribute(CHAM830107_NAME, CHAM830107_NAME, Double.class);
+                    descriptor = attrModel.addAttribute(CHAM830107_NAME, CHAM830107_NAME, Double.class);
+                } else {
+                    descriptor = attrModel.getAttribute(CHAM830107_NAME);
                 }
+                descriptorList.add(descriptor);
+
                 if (!attrModel.hasAttribute(CHAM830107_AVG)) {
-                    attrModel.addAttribute(CHAM830107_AVG, CHAM830107_AVG, Double.class);
+                    descriptor = attrModel.addAttribute(CHAM830107_AVG, CHAM830107_AVG, Double.class);
+                } else {
+                    descriptor = attrModel.getAttribute(CHAM830107_AVG);
                 }
+                descriptorList.add(descriptor);
             }
             if (CHAM830108) {
                 if (!attrModel.hasAttribute(CHAM830108_NAME)) {
-                    attrModel.addAttribute(CHAM830108_NAME, CHAM830108_NAME, Double.class);
+                    descriptor = attrModel.addAttribute(CHAM830108_NAME, CHAM830108_NAME, Double.class);
+                } else {
+                    descriptor = attrModel.getAttribute(CHAM830108_NAME);
                 }
+                descriptorList.add(descriptor);
+
                 if (!attrModel.hasAttribute(CHAM830108_AVG)) {
-                    attrModel.addAttribute(CHAM830108_AVG, CHAM830108_AVG, Double.class);
+                    descriptor = attrModel.addAttribute(CHAM830108_AVG, CHAM830108_AVG, Double.class);
+                } else {
+                    descriptor = attrModel.getAttribute(CHAM830108_AVG);
                 }
+                descriptorList.add(descriptor);
             }
         }
     }
@@ -168,21 +209,21 @@ public class NetCharge extends AbstractModamp {
             peptide.setAttributeValue(attrModel.getAttribute(Z9), val);
         }
         double[] values;
-        if (KLEP840101){
+        if (KLEP840101) {
             values = MD.sumAndAvg(seq, ChargeScale.klein_hash());
             peptide.setAttributeValue(attrModel.getAttribute(KLEP840101_NAME), values[0]);
             peptide.setAttributeValue(attrModel.getAttribute(KLEP840101_AVG), values[1]);
         }
-        if (CHAM830107){
+        if (CHAM830107) {
             values = MD.sumAndAvg(seq, ChargeScale.charton_ctc_hash());
             peptide.setAttributeValue(attrModel.getAttribute(CHAM830107_NAME), values[0]);
             peptide.setAttributeValue(attrModel.getAttribute(CHAM830107_AVG), values[1]);
-        }  
-        if (CHAM830108){
+        }
+        if (CHAM830108) {
             values = MD.sumAndAvg(seq, ChargeScale.charton_ctdc_hash());
             peptide.setAttributeValue(attrModel.getAttribute(CHAM830108_NAME), values[0]);
             peptide.setAttributeValue(attrModel.getAttribute(CHAM830108_AVG), values[1]);
-        }         
+        }
     }
 
     @Override

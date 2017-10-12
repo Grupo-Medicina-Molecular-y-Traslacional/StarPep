@@ -5,14 +5,13 @@
  */
 package org.bapedis.modamp.impl;
 
-import org.bapedis.modamp.impl.HydrophobicMoment;
-import org.bapedis.modamp.impl.AbstractModamp;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.scales.ReduceAlphabet;
@@ -144,6 +143,8 @@ public class RATransition extends AbstractModamp {
             if (sa) {
                 alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
             }
+            
+            PeptideAttribute descriptor;
             String key1, key2, newKey;
             for (ReduceAlphabet ra : alphabets) {
                 Object[] keys = ra.getCount().keySet().toArray();
@@ -153,8 +154,11 @@ public class RATransition extends AbstractModamp {
                         key2 = keys[j].toString();
                         newKey = String.format("T_%s[%s]", ra.getName(), key1 + "->" + key2);
                         if (!attrModel.hasAttribute(newKey)) {
-                            attrModel.addAttribute(newKey, newKey, Double.class);
+                            descriptor = attrModel.addAttribute(newKey, newKey, Double.class);
+                        } else {
+                            descriptor = attrModel.getAttribute(newKey);
                         }
+                        descriptorList.add(descriptor);
                     }
                 }
             }

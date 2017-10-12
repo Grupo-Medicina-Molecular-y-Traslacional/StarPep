@@ -5,8 +5,6 @@
  */
 package org.bapedis.modamp.impl;
 
-import org.bapedis.modamp.impl.HydrophobicMoment;
-import org.bapedis.modamp.impl.AbstractModamp;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.scales.ReduceAlphabet;
@@ -180,6 +179,7 @@ public class TripeptideComposition extends AbstractModamp {
                 alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
             }
 
+            PeptideAttribute descriptor;
             for (ReduceAlphabet ra : alphabets) {
                 Set<String> keySet = ra.getCount().keySet();
                 String attrName;
@@ -188,8 +188,11 @@ public class TripeptideComposition extends AbstractModamp {
                         for (String key3 : keySet) {
                             attrName = String.format("%s([%s][%s][%s])", ra.getName(), key1, key2, key3);
                             if (!attrModel.hasAttribute(attrName)) {
-                                attrModel.addAttribute(attrName, attrName, Double.class);
+                                descriptor = attrModel.addAttribute(attrName, attrName, Double.class);
+                            } else {
+                                descriptor = attrModel.getAttribute(attrName);
                             }
+                            descriptorList.add(descriptor);
                         }
                     }
                 }
@@ -209,7 +212,7 @@ public class TripeptideComposition extends AbstractModamp {
             while (it.hasNext()) {
                 key = it.next();
                 val = aminoAcidComposition.get(key);
-                attrName = String.format("%s(%s)", ra.getName(),key);
+                attrName = String.format("%s(%s)", ra.getName(), key);
                 peptide.setAttributeValue(attrModel.getAttribute(attrName), val);
             }
         }

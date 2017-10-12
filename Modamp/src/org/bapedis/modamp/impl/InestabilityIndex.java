@@ -6,6 +6,7 @@
 package org.bapedis.modamp.impl;
 
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.modamp.MD;
 
@@ -25,11 +26,21 @@ public class InestabilityIndex extends AbstractModamp {
     @Override
     public void initAlgo() {
         super.initAlgo();
-        if (attrModel != null && !attrModel.hasAttribute(II)) {
-            attrModel.addAttribute(II, II, Double.class);
-        }
-        if (attrModel != null && !attrModel.hasAttribute(PS)) {
-            attrModel.addAttribute(PS, PS, Integer.class);
+        if (attrModel != null) {
+            PeptideAttribute descriptor;
+            if (!attrModel.hasAttribute(II)) {
+                descriptor = attrModel.addAttribute(II, II, Double.class);
+            } else {
+                descriptor = attrModel.getAttribute(II);
+            }
+            descriptorList.add(descriptor);
+            
+            if (!attrModel.hasAttribute(PS)) {
+                descriptor = attrModel.addAttribute(PS, PS, Integer.class);
+            } else {
+                descriptor = attrModel.getAttribute(PS);
+            }
+            descriptorList.add(descriptor);
         }
     }
 
@@ -37,7 +48,7 @@ public class InestabilityIndex extends AbstractModamp {
     public void compute(Peptide peptide) {
         double val = MD.inestabilityIndex(peptide.getSequence());
         peptide.setAttributeValue(attrModel.getAttribute(II), val);
-        
+
         int isPS = MD.isProteinStable(val);
         peptide.setAttributeValue(attrModel.getAttribute(PS), isPS);
     }

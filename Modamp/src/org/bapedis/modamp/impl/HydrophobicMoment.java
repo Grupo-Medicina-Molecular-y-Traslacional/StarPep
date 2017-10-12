@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.scales.HydrophobicityScale;
 import org.openide.util.Exceptions;
@@ -125,12 +126,18 @@ public class HydrophobicMoment extends AbstractModamp {
     @Override
     public void initAlgo() {
         super.initAlgo();
+        PeptideAttribute descriptor;
         if (attrModel != null) {
             for (int i = 0; i < scale.length; i++) {
                 if (scale[i]) {
                     for (int j = 0; j < angle.length; j++) {
-                        if (angle[j] && !attrModel.hasAttribute(attrNames[i][j])) {
-                            attrModel.addAttribute(attrNames[i][j], attrNames[i][j], Double.class);
+                        if (angle[j]) {
+                            if (!attrModel.hasAttribute(attrNames[i][j])) {
+                                descriptor = attrModel.addAttribute(attrNames[i][j], attrNames[i][j], Double.class);
+                            } else {
+                                descriptor = attrModel.getAttribute(attrNames[i][j]);
+                            }
+                            descriptorList.add(descriptor);
                         }
                     }
                     if (!attrModel.hasAttribute(AVGH[i])) {

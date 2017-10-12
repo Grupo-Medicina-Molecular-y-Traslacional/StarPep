@@ -2,6 +2,7 @@ package org.bapedis.modamp.impl;
 
 import org.bapedis.modamp.impl.AbstractModamp;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.modamp.MD;
 
 /*
@@ -9,33 +10,36 @@ import org.bapedis.modamp.MD;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author beltran, loge
  */
-public class MolecularWeight extends AbstractModamp{
+public class MolecularWeight extends AbstractModamp {
 
-    protected final String MW="mw";
-    
+    protected final String MW = "mw";
+
     public MolecularWeight(MolecularWeightFactory factory) {
         super(factory);
     }
 
     @Override
     public void initAlgo() {
-        super.initAlgo(); 
-        if (attrModel != null && !attrModel.hasAttribute(MW)){
-            attrModel.addAttribute(MW, MW, Double.class);
+        super.initAlgo();
+        if (attrModel != null) {
+            PeptideAttribute descriptor;
+            if (!attrModel.hasAttribute(MW)) {
+                descriptor = attrModel.addAttribute(MW, MW, Double.class);
+            } else {
+                descriptor = attrModel.getAttribute(MW);
+            }
+            descriptorList.add(descriptor);
         }
     }
-    
-    
 
     @Override
     public void compute(Peptide peptide) {
         double val = MD.mw(peptide.getSequence());
         peptide.setAttributeValue(attrModel.getAttribute(MW), val);
     }
-    
+
 }

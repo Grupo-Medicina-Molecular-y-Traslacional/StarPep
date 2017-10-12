@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.scales.ReduceAlphabet;
@@ -178,15 +179,20 @@ public class DipeptideComposition extends AbstractModamp {
                 alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
             }
 
+            Set<String> keySet;
+            PeptideAttribute descriptor;
+            String attrName;
             for (ReduceAlphabet ra : alphabets) {
-                Set<String> keySet = ra.getCount().keySet();
-                String attrName;
+                keySet = ra.getCount().keySet();
                 for (String key1 : keySet) {
                     for (String key2 : keySet) {
-                        attrName = String.format("%s([%s][%s])", ra.getName(),key1, key2);
+                        attrName = String.format("%s([%s][%s])", ra.getName(), key1, key2);
                         if (!attrModel.hasAttribute(attrName)) {
-                            attrModel.addAttribute(attrName, attrName, Double.class);
+                            descriptor = attrModel.addAttribute(attrName, attrName, Double.class);
+                        } else {
+                            descriptor = attrModel.getAttribute(attrName);
                         }
+                        descriptorList.add(descriptor);
                     }
                 }
             }
@@ -204,7 +210,7 @@ public class DipeptideComposition extends AbstractModamp {
             double val;
             while (it.hasNext()) {
                 key = it.next();
-                attrName = String.format("%s(%s)", ra.getName(),key);
+                attrName = String.format("%s(%s)", ra.getName(), key);
                 val = aminoAcidComposition.get(key);
                 peptide.setAttributeValue(attrModel.getAttribute(attrName), val);
             }
@@ -216,10 +222,10 @@ public class DipeptideComposition extends AbstractModamp {
         super.endAlgo();
         alphabets.clear();
     }
-    
+
     @Override
     public AlgorithmProperty[] getProperties() {
         return properties.toArray(new AlgorithmProperty[0]);
-    }     
+    }
 
 }

@@ -6,8 +6,12 @@
 package org.gephi;
 
 import com.jogamp.opengl.GLProfile;
+import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.visualization.VizController;
 import org.openide.modules.ModuleInstall;
+import org.openide.util.Lookup;
+import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 public class Installer extends ModuleInstall {
 
@@ -17,6 +21,18 @@ public class Installer extends ModuleInstall {
         GLProfile.initSingleton();
         VizController instance = VizController.getInstance();
         instance.initInstances();
+//        final GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
+//        if (graphWC != null) {
+//            WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
+//                @Override
+//                public void run() {
+//                    TopComponent tc = graphWC.getGraphWindow();
+//                    if (tc != null) {
+//                        tc.open();
+//                    }
+//                }
+//            });
+//        }
     }
 
     @Override
@@ -25,8 +41,5 @@ public class Installer extends ModuleInstall {
         VizController instance = VizController.getInstance();
         instance.destroy();
     }
-    
-    
-    
 
 }

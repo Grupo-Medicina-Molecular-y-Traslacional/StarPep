@@ -48,6 +48,7 @@ import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLProfile;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 
@@ -104,7 +105,7 @@ public class GraphicalConfiguration {
                 @Override
                 public void run() {
                     JOptionPane.showMessageDialog(WindowManager.getDefault().getMainWindow(), exc.getMessage(), "Configuration", JOptionPane.WARNING_MESSAGE);
-                    exc.printStackTrace();
+                    Exceptions.printStackTrace(exc);
                 }
             });
         }
@@ -129,4 +130,8 @@ public class GraphicalConfiguration {
     public boolean isVboSupported() {
         return vboSupport;
     }
+    
+    public boolean isIntelVendor() {
+        return vendor.toLowerCase().contains("intel");
+    }    
 }

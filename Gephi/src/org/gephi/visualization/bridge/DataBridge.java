@@ -45,6 +45,7 @@ import java.util.Arrays;
 import org.bapedis.core.services.ProjectManager;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.ColumnObserver;
+import org.gephi.graph.api.GraphView;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
@@ -62,6 +63,7 @@ import org.gephi.visualization.octree.Octree;
 import org.gephi.visualization.opengl.AbstractEngine;
 import org.gephi.visualization.text.TextManager;
 import org.gephi.visualization.text.TextModelImpl;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 /**
@@ -157,6 +159,7 @@ public class DataBridge implements VizArchitecture {
                 force = true;
             } finally {
                 graphModel.getGraph().writeUnlock();
+                graphModel.getGraph().readUnlockAll();
             }
         }
 
@@ -176,8 +179,8 @@ public class DataBridge implements VizArchitecture {
 
             graph.readLock();
             try {
-
-                boolean isView = !graph.getView().isMainView();
+                GraphView graphView = graph.getView();
+                boolean isView = !graphView.isMainView();
                 for (int i = 0; i < nodes.length; i++) {
                     NodeModel node = nodes[i];
                     if (node != null && (node.getNode().getStoreId() == -1 || (isView && !graph.contains(node.getNode())))) {
@@ -238,7 +241,7 @@ public class DataBridge implements VizArchitecture {
                     } else {
                         model = edges[id];
                     }
-                    float w = (float) edge.getWeight(graph.getView());
+                    float w = (float) edge.getWeight(graphView);
                     model.setWeight(w);
                     minWeight = Math.min(w, minWeight);
                     maxWeight = Math.max(w, maxWeight);
@@ -249,6 +252,9 @@ public class DataBridge implements VizArchitecture {
                     limits.setMaxWeight(maxWeight);
                     limits.setMinWeight(minWeight);
 //                }
+            } catch (Throwable e) {
+                //Don't crash the whole visualization if some strange exception occurs
+                Exceptions.printStackTrace(e);
             } finally {
                 graph.readUnlockAll();
             }
@@ -308,8 +314,8 @@ public class DataBridge implements VizArchitecture {
             }
         } finally {
             if (graphModel != null) {
-                graph.readUnlockAll();
                 graph.writeUnlock();
+                graph.readUnlockAll();
             }
         }
 

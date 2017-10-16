@@ -50,7 +50,13 @@ import org.gephi.graph.api.Node;
  * @author Mathieu Bastian
  */
 public interface VisualizationController {
-
+    
+    public void resetSelection();
+    
+    public void resetNodesSelection();
+    
+    public void resetEdgesSelection();
+    
     public void selectNodes(Node[] nodes);
 
     public void selectEdges(Edge[] edges);

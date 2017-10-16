@@ -186,27 +186,39 @@ public class VizController implements VisualizationController, WorkspaceEventLis
         instance = null;
     }
 
+    @Override
     public void resetSelection() {
         if (selectionManager != null) {
             selectionManager.resetSelection();
         }
     }
+    
+    @Override
+    public void resetNodesSelection() {
+        if (selectionManager != null) {
+            selectionManager.selectNodes(null);
+        }
+    }
+    
+    @Override
+    public void resetEdgesSelection() {
+        if (selectionManager != null) {
+            selectionManager.selectEdges(null);
+        }
+    }    
 
     public void selectNode(Node node) {
-        if (selectionManager != null) {
-            selectionManager.selectNode(node);
-        }
+        selectNodes(new Node[]{node});
     }
 
     public void selectEdge(Edge edge) {
-        if (selectionManager != null) {
-            selectionManager.selectEdge(edge);
-        }
+        selectEdges(new Edge[]{edge});
     }
 
     @Override
     public void selectNodes(Node[] nodes) {
         if (selectionManager != null) {
+            currentModel.setAutoSelectNeighbor(false);
             selectionManager.selectNodes(nodes);
         }
     }
@@ -214,6 +226,7 @@ public class VizController implements VisualizationController, WorkspaceEventLis
     @Override
     public void selectEdges(Edge[] edges) {
         if (selectionManager != null) {
+            currentModel.setAutoSelectNeighbor(false);
             selectionManager.selectEdges(edges);
         }
     }

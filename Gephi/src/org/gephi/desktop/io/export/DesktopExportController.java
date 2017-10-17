@@ -45,15 +45,12 @@ import org.bapedis.core.services.ProjectManager;
 import org.gephi.io.exporter.api.ExportController;
 import org.gephi.io.exporter.spi.Exporter;
 import org.bapedis.core.task.AlgorithmExecutor;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
-import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.bapedis.core.task.AlgorithmErrorHandler;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -72,13 +69,7 @@ public class DesktopExportController implements ExportControllerUI {
 
             @Override
             public void fatalError(Throwable t) {
-                t.printStackTrace();
-                String message = t.getCause().getMessage();
-                if (message == null || message.isEmpty()) {
-                    message = t.getMessage();
-                }
-                NotifyDescriptor.Message msg = new NotifyDescriptor.Message(message, NotifyDescriptor.WARNING_MESSAGE);
-                DialogDisplayer.getDefault().notify(msg);
+                Exceptions.printStackTrace(t);
                 //Logger.getLogger("").log(Level.WARNING, "", t.getCause());
             }
         };

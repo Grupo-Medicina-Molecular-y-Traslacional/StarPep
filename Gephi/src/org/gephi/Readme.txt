@@ -9,7 +9,6 @@ Utils
 UIUtils
 PreviewAPI
 PreviewPlugin
-----
 PreviewExport
 DesktopPreview
 DesktopExport
@@ -17,3 +16,5 @@ DesktopAppearance
 DesktopTool
 StatisticsPlugin
 StatisticsPluginUI
+AlgorithmsPlugin
+ToolsPlugin

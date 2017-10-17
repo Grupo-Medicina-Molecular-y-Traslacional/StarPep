@@ -181,7 +181,8 @@ public class GraphDistance implements Algorithm {
         progress.switchToDeterminate(graph.getNodeCount());
 
         int totalPaths = 0;
-        for (Node s : graph.getNodes()) {
+        NodeIterable nodesIterable = graph.getNodes();
+        for (Node s : nodesIterable) {
             Stack<Node> S = new Stack<>();
 
             LinkedList<Node>[] P = new LinkedList[n];
@@ -251,6 +252,7 @@ public class GraphDistance implements Algorithm {
                 }
             }
             if (isCanceled) {
+                nodesIterable.doBreak();
                 return metrics;
             }
             progress.progress();

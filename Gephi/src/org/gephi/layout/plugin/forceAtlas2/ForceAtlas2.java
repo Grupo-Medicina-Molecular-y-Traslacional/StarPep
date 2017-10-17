@@ -97,6 +97,8 @@ public class ForceAtlas2 extends AbstractLayout {
 
     @Override
     public void initLayout() {
+        ensureSafeLayoutNodePositions(graphModel);
+        
         speed = 1.;
         speedEfficiency = 1.;
 
@@ -424,7 +426,7 @@ public class ForceAtlas2 extends AbstractLayout {
                     "getThreadsCount", "setThreadsCount"));
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Exceptions.printStackTrace(e);
         }
     }
 

@@ -46,6 +46,7 @@ import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.gephi.graph.api.Edge;
+import org.gephi.graph.api.EdgeIterable;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 import org.gephi.layout.plugin.AbstractLayout;
@@ -276,8 +277,10 @@ public class YifanHuLayout extends AbstractLayout {
         }
 
         // Apply edge forces.
-        for (Edge e : graph.getEdges()) {
+        EdgeIterable itrEdges =graph.getEdges();
+        for (Edge e : itrEdges) {
             if (!canLayout()){
+                itrEdges.doBreak();
                 return;
             }              
             if (!e.getSource().equals(e.getTarget())) {

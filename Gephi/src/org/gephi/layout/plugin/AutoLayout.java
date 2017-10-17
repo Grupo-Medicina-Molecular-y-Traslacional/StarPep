@@ -47,6 +47,7 @@ import java.util.concurrent.TimeUnit;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.gephi.graph.api.GraphModel;
 import org.openide.nodes.Node.Property;
+import org.openide.util.Exceptions;
 
 /**
  * Class to build layout scenario that runs for a certain duration. Multiple
@@ -78,7 +79,6 @@ public class AutoLayout {
 
     private final float duration;
     private final List<LayoutScenario> layouts;
-    private GraphModel graphModel;
     //Flags
     private long startTime = 0;
     private long lastExecutionTime;
@@ -142,7 +142,7 @@ public class AutoLayout {
                         d.getProperty().setValue(val);
                     }
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    Exceptions.printStackTrace(ex);
                 }
             }
         }
@@ -195,10 +195,6 @@ public class AutoLayout {
             return 0;
         }
         return System.currentTimeMillis() - startTime;
-    }
-
-    public void setGraphModel(GraphModel graphModel) {
-        this.graphModel = graphModel;
     }
 
     private void verifiy() {
@@ -280,7 +276,7 @@ public class AutoLayout {
                 }
                 return property.getValue();
             } catch (Exception e) {
-                e.printStackTrace();
+                Exceptions.printStackTrace(e);
             }
             return null;
         }

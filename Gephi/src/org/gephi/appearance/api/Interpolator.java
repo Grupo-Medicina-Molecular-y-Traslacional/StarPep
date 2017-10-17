@@ -151,6 +151,11 @@ public abstract class Interpolator {
                 throw new IllegalArgumentException("control point coordinates must "
                         + "all be in range [0,1]");
             }
+            
+            if(px1 == 0 && px2 == 0) {
+                px2 += 0.01;//Fix numerical inestability with some small difference
+            }
+            
 
             // save control point data
             x1 = px1;

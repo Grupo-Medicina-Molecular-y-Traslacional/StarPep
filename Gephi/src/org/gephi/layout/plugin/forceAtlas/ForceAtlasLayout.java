@@ -41,7 +41,6 @@
  */
 package org.gephi.layout.plugin.forceAtlas;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
@@ -186,6 +185,8 @@ public class ForceAtlasLayout extends AbstractLayout {
 
     @Override
     public void initLayout() {
+        ensureSafeLayoutNodePositions(graphModel);
+        
         nodes = graph.getNodes().toArray();
         edges = graph.getEdges().toArray();
 

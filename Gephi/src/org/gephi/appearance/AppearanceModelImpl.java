@@ -482,7 +482,7 @@ public class AppearanceModelImpl implements AppearanceModel {
                 }
                 refreshAttributeFunctions(graphHasChanged);
             } finally {
-                graph.readUnlock();
+                graph.readUnlockAll();
             }
         }
 
@@ -648,6 +648,7 @@ public class AppearanceModelImpl implements AppearanceModel {
                     Object[] va = val.toValuesArray();
                     for (Object v : va) {
                         if (v != null) {
+                            iterable.doBreak();
                             return true;
                         }
                     }

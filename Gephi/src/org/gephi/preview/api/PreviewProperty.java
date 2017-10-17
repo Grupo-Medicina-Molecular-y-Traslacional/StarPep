@@ -51,24 +51,28 @@ import org.openide.util.NbBundle;
  * <p>
  * Preview properties are created by renderers to let users configure how items
  * should be rendered. Each property should have a unique name and a type. Users
- * should use the static <code>createProperty()</code> methods to create instances.
+ * should use the static <code>createProperty()</code> methods to create
+ * instances.
  * <p>
- * Static default property names are defined in this class to help renderers to 
+ * Static default property names are defined in this class to help renderers to
  * reuse external properties and have cleaner code.
  * <P>
- * Properties can be grouped by categories, which default are 
- * <code>PreviewProperty.CATEGORY_NODES</code>, <code>PreviewProperty.CATEGORY_EDGES</code>,
- * <code>PreviewProperty.CATEGORY_NODE_LABELS</code>, <code>PreviewProperty.CATEGORY_EDGE_LABELS</code>
- * and <code>PreviewProperty.CATEGORY_EDGE_ARROWS</code>.
- * 
+ * Properties can be grouped by categories, which default are
+ * <code>PreviewProperty.CATEGORY_NODES</code>,
+ * <code>PreviewProperty.CATEGORY_EDGES</code>,
+ * <code>PreviewProperty.CATEGORY_NODE_LABELS</code>,
+ * <code>PreviewProperty.CATEGORY_EDGE_LABELS</code> and
+ * <code>PreviewProperty.CATEGORY_EDGE_ARROWS</code>.
+ *
  * @author Mathieu Bastian
- * @see Renderer#getProperties() 
+ * @see Renderer#getProperties()
  */
 public class PreviewProperty {
 
     //Constants global
     /**
-     * General <code>Boolean</code> property which indicates wheter the graph is directed
+     * General <code>Boolean</code> property which indicates wheter the graph is
+     * directed
      */
     public static final String DIRECTED = "directed";
     /**
@@ -76,14 +80,15 @@ public class PreviewProperty {
      */
     public static final String BACKGROUND_COLOR = "background-color";
     /**
-     * General <code>Float</code> property which indicates the ratio of the visible graph
-     * used in preview. For instance if 0.5 only 50% of nodes items are built.
+     * General <code>Float</code> property which indicates the ratio of the
+     * visible graph used in preview. For instance if 0.5 only 50% of nodes
+     * items are built.
      */
     public static final String VISIBILITY_RATIO = "visibility-ratio";
     /**
-     * General <code>Float</code> property in percentage (0-100) describing the 
-     * margin size. For instance if the value is 4 the size of the margin is 4% of
-     * the total graph width.
+     * General <code>Float</code> property in percentage (0-100) describing the
+     * margin size. For instance if the value is 4 the size of the margin is 4%
+     * of the total graph width.
      */
     public static final String MARGIN = "margin";
     //Constants nodes
@@ -92,8 +97,8 @@ public class PreviewProperty {
      */
     public static final String NODE_BORDER_WIDTH = "node.border.width";
     /**
-     * Node <code>DependantColor</code> property which defines the border color. A
-     * dependant color value is either the node's color or a custom color.
+     * Node <code>DependantColor</code> property which defines the border color.
+     * A dependant color value is either the node's color or a custom color.
      */
     public static final String NODE_BORDER_COLOR = "node.border.color";
     /**
@@ -101,14 +106,14 @@ public class PreviewProperty {
      * 100 means opaque.
      */
     public static final String NODE_OPACITY = "node.opacity";
-    
+
     /**
      * Node <code>Boolean</code> property indicating whether or not to use the
-     * opacity value defined as part of the Node color. If true, NODE_OPACITY will
-     * be ignored.
+     * opacity value defined as part of the Node color. If true, NODE_OPACITY
+     * will be ignored.
      */
     public static final String NODE_PER_NODE_OPACITY = "node.per.node.opacity";
-    
+
     //Constants edges
     /**
      * Edge <code>Boolean</code> property defining whether to show edges.
@@ -125,8 +130,8 @@ public class PreviewProperty {
     public static final String EDGE_CURVED = "edge.curved";
     /**
      * Edge <code>EdgeColor</code> property defining the edge color. It could be
-     * the source's color, the target's color, a mixed color, the edge's original
-     * color or a custom color.
+     * the source's color, the target's color, a mixed color, the edge's
+     * original color or a custom color.
      */
     public static final String EDGE_COLOR = "edge.color";
     /**
@@ -135,13 +140,23 @@ public class PreviewProperty {
      */
     public static final String EDGE_OPACITY = "edge.opacity";
     /**
-     * Edge <code>Boolean</code> property defining whether edge's weight should be
-     * rescaled between fixed bounds.
+     * Edge <code>Boolean</code> property defining whether edge's weight should
+     * be rescaled between fixed bounds.
      */
     public static final String EDGE_RESCALE_WEIGHT = "edge.rescale-weight";
     /**
-     * Edge <code>Float</code> property defining an extra distance between the node
-     * and the edge.
+     * Edge <code>float</code> property defining the minimum weight when edge
+     * weight rescaling is enabled.
+     */
+    public static final String EDGE_RESCALE_WEIGHT_MIN = "edge.rescale-weight.min";
+    /**
+     * Edge <code>float</code> property defining the minimum weight when edge
+     * weight rescaling is enabled.
+     */
+    public static final String EDGE_RESCALE_WEIGHT_MAX = "edge.rescale-weight.max";
+    /**
+     * Edge <code>Float</code> property defining an extra distance between the
+     * node and the edge.
      */
     public static final String EDGE_RADIUS = "edge.radius";
     //Constants arrows
@@ -151,7 +166,8 @@ public class PreviewProperty {
     public static final String ARROW_SIZE = "arrow.size";
     //Constants node labels
     /**
-     * Node Label <code>Boolean</code> property defining whether to show node labels.
+     * Node Label <code>Boolean</code> property defining whether to show node
+     * labels.
      */
     public static final String SHOW_NODE_LABELS = "node.label.show";
     /**
@@ -159,18 +175,19 @@ public class PreviewProperty {
      */
     public static final String NODE_LABEL_FONT = "node.label.font";
     /**
-     * Node Label <code>Boolean</code> property defining whether to use node's size
-     * in label size calculation.
+     * Node Label <code>Boolean</code> property defining whether to use node's
+     * size in label size calculation.
      */
     public static final String NODE_LABEL_PROPORTIONAL_SIZE = "node.label.proportinalSize";
     /**
-     * Node Label <code>DependantOriginalColor</code> property defining the color label.
-     * The color could either be the node's color, the label original color if it has any
-     * or a custom color.
+     * Node Label <code>DependantOriginalColor</code> property defining the
+     * color label. The color could either be the node's color, the label
+     * original color if it has any or a custom color.
      */
     public static final String NODE_LABEL_COLOR = "node.label.color";
     /**
-     * Node Label <code>Boolean</code> property defining whether the label is shortened.
+     * Node Label <code>Boolean</code> property defining whether the label is
+     * shortened.
      */
     public static final String NODE_LABEL_SHORTEN = "node.label.shorten";
     /**
@@ -179,17 +196,17 @@ public class PreviewProperty {
      */
     public static final String NODE_LABEL_MAX_CHAR = "node.label.max-char";
     /**
-     * Node Label Outline <code>Float</code> property defining the outline size. 
+     * Node Label Outline <code>Float</code> property defining the outline size.
      */
     public static final String NODE_LABEL_OUTLINE_SIZE = "node.label.outline.size";
     /**
-     * Node Label Outline <code>Float</code> property between 0-100 which defines the opacity.
-     * 100 means opaque.
+     * Node Label Outline <code>Float</code> property between 0-100 which
+     * defines the opacity. 100 means opaque.
      */
     public static final String NODE_LABEL_OUTLINE_OPACITY = "node.label.outline.opacity";
     /**
-     * Node Label Outline <code>DependantColor</code> property defining the outline color.
-     * The color can be the node's color or a custom color.
+     * Node Label Outline <code>DependantColor</code> property defining the
+     * outline color. The color can be the node's color or a custom color.
      */
     public static final String NODE_LABEL_OUTLINE_COLOR = "node.label.outline.color";
     public static final String NODE_LABEL_SHOW_BOX = "node.label.box";
@@ -197,7 +214,8 @@ public class PreviewProperty {
     public static final String NODE_LABEL_BOX_OPACITY = "node.label.box.opacity";
     //Constants edge labels
     /**
-     * Edge Label <code>Boolean</code> property defining whether to show edge labels.
+     * Edge Label <code>Boolean</code> property defining whether to show edge
+     * labels.
      */
     public static final String SHOW_EDGE_LABELS = "edge.label.show";
     /**
@@ -205,13 +223,14 @@ public class PreviewProperty {
      */
     public static final String EDGE_LABEL_FONT = "edge.label.font";
     /**
-     * Edge Label <code>DependantOriginalColor</code> property defining the color label.
-     * The color could either be the edge's color, the label original color if it has any
-     * or a custom color.
+     * Edge Label <code>DependantOriginalColor</code> property defining the
+     * color label. The color could either be the edge's color, the label
+     * original color if it has any or a custom color.
      */
     public static final String EDGE_LABEL_COLOR = "edge.label.color";
     /**
-     * Edge Label <code>Boolean</code> property defining whether the label is shortened.
+     * Edge Label <code>Boolean</code> property defining whether the label is
+     * shortened.
      */
     public static final String EDGE_LABEL_SHORTEN = "edge.label.shorten";
     /**
@@ -220,24 +239,24 @@ public class PreviewProperty {
      */
     public static final String EDGE_LABEL_MAX_CHAR = "edge.label.max-char";
     /**
-     * Edge Label Outline <code>Float</code> property defining the outline size. 
+     * Edge Label Outline <code>Float</code> property defining the outline size.
      */
     public static final String EDGE_LABEL_OUTLINE_SIZE = "edge.label.outline.size";
     /**
-     * Edge Label Outline <code>Float</code> property between 0-100 which defines the opacity.
-     * 100 means opaque.
+     * Edge Label Outline <code>Float</code> property between 0-100 which
+     * defines the opacity. 100 means opaque.
      */
     public static final String EDGE_LABEL_OUTLINE_OPACITY = "edge.label.outline.opacity";
     /**
-     * Edge Label Outline <code>DependantColor</code> property defining the outline color.
-     * The color can be the edge's color or a custom color.
+     * Edge Label Outline <code>DependantColor</code> property defining the
+     * outline color. The color can be the edge's color or a custom color.
      */
     public static final String EDGE_LABEL_OUTLINE_COLOR = "edge.label.outline.color";
     //Constants UI helps
     /**
-     * General <code>Boolean</code> property set as <code>true</code> when the user
-     * is panning the canvas. Helps to conditionally hide elements while moving to
-     * speed things up.
+     * General <code>Boolean</code> property set as <code>true</code> when the
+     * user is panning the canvas. Helps to conditionally hide elements while
+     * moving to speed things up.
      */
     public static final String MOVING = "canvas.moving";
     //Constants categories
@@ -292,6 +311,7 @@ public class PreviewProperty {
 
     /**
      * Create a new preview property. The <code>name</code> should be unique.
+     *
      * @param source the property source, for instance the renderer
      * @param name the property's name
      * @return a new preview property
@@ -302,9 +322,11 @@ public class PreviewProperty {
 
     /**
      * Create a new preview property. The <code>name</code> should be unique. If
-     * the type is different from basic types (Integer, Float, Double, String, 
-     * Boolean or Color) make sure to implement a {@link PropertyEditor} and register it:
+     * the type is different from basic types (Integer, Float, Double, String,
+     * Boolean or Color) make sure to implement a {@link PropertyEditor} and
+     * register it:
      * <pre>PropertyEditorManager.registerEditor(MyType.class, MyTypePropertyEditor.class);</pre>
+     *
      * @param source the property source, for instance the renderer
      * @param name the property's name
      * @param type the property's value type
@@ -316,8 +338,9 @@ public class PreviewProperty {
 
     /**
      * Create a new preview property. The <code>name</code> should be unique. If
-     * the type is different from basic types (Integer, Float, Double, String, 
-     * Boolean or Color) make sure to implement a {@link PropertyEditor} and register it:
+     * the type is different from basic types (Integer, Float, Double, String,
+     * Boolean or Color) make sure to implement a {@link PropertyEditor} and
+     * register it:
      * <pre>PropertyEditorManager.registerEditor(MyType.class, MyTypePropertyEditor.class);</pre>
      * The category can be one of the default categories:
      * <ul><li>PreviewProperty.CATEGORY_NODES</li>
@@ -325,6 +348,7 @@ public class PreviewProperty {
      * <li>PreviewProperty.CATEGORY_NODE_LABELS</li>
      * <li>PreviewProperty.CATEGORY_EDGE_LABELS</li>
      * <li>PreviewProperty.CATEGORY_EDGE_ARROWS</li></ul>
+     *
      * @param source the property source, for instance the renderer
      * @param name the property's name
      * @param type the property's value type
@@ -339,8 +363,9 @@ public class PreviewProperty {
 
     /**
      * Create a new preview property. The <code>name</code> should be unique. If
-     * the type is different from basic types (Integer, Float, Double, String, 
-     * Boolean or Color) make sure to implement a {@link PropertyEditor} and register it:
+     * the type is different from basic types (Integer, Float, Double, String,
+     * Boolean or Color) make sure to implement a {@link PropertyEditor} and
+     * register it:
      * <pre>PropertyEditorManager.registerEditor(MyType.class, MyTypePropertyEditor.class);</pre>
      * The category can be one of the default categories:
      * <ul><li>PreviewProperty.CATEGORY_NODES</li>
@@ -348,16 +373,18 @@ public class PreviewProperty {
      * <li>PreviewProperty.CATEGORY_NODE_LABELS</li>
      * <li>PreviewProperty.CATEGORY_EDGE_LABELS</li>
      * <li>PreviewProperty.CATEGORY_EDGE_ARROWS</li></ul>
-     * The <code>dependantProperties</code> list is used to automatically disable
-     * the property if the dependant property is not selected. The dependant properties
-     * need to be <code>Boolean</code> type.
+     * The <code>dependantProperties</code> list is used to automatically
+     * disable the property if the dependant property is not selected. The
+     * dependant properties need to be <code>Boolean</code> type.
+     *
      * @param source the property source, for instance the renderer
      * @param name the property's name
      * @param type the property's value type
      * @param displayName the property's display name
      * @param description the property's description
      * @param category the property's category
-     * @param dependantProperties a list of boolean properties this property depend on
+     * @param dependantProperties a list of boolean properties this property
+     * depend on
      * @return a new preview property
      */
     public static PreviewProperty createProperty(Object source, String name, Class type, String displayName, String description, String category, String... dependantProperties) {
@@ -366,6 +393,7 @@ public class PreviewProperty {
 
     /**
      * Returns the property value.
+     *
      * @param <T> the return type
      * @return the property value or <code>null</code>
      */
@@ -374,7 +402,9 @@ public class PreviewProperty {
     }
 
     /**
-     * Sets this property value and return it. The value can be <code>null</code>.
+     * Sets this property value and return it. The value can be
+     * <code>null</code>.
+     *
      * @param value the value to be set
      * @return this property instance
      */
@@ -385,6 +415,7 @@ public class PreviewProperty {
 
     /**
      * Returns the (unique) name of this property.
+     *
      * @return the property's name
      */
     public String getName() {
@@ -393,6 +424,7 @@ public class PreviewProperty {
 
     /**
      * Returns the type of this property.
+     *
      * @return this property's type
      */
     public Class getType() {
@@ -400,7 +432,9 @@ public class PreviewProperty {
     }
 
     /**
-     * Returns the display name of this property or <code>null</code> if not set.
+     * Returns the display name of this property or <code>null</code> if not
+     * set.
+     *
      * @return this property's display name or <code>null</code>
      */
     public String getDisplayName() {
@@ -409,6 +443,7 @@ public class PreviewProperty {
 
     /**
      * Returns the description of this property or <code>null</code> if not set.
+     *
      * @return this property's description or <code>null</code>
      */
     public String getDescription() {
@@ -417,6 +452,7 @@ public class PreviewProperty {
 
     /**
      * Returns the source object of this property.
+     *
      * @return this property's source object
      */
     public Object getSource() {
@@ -425,6 +461,7 @@ public class PreviewProperty {
 
     /**
      * Returns the category of this property or <code>null</code> if not set.
+     *
      * @return this property's category or <code>null</code>
      */
     public String getCategory() {

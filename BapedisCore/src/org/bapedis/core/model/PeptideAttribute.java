@@ -9,18 +9,20 @@ import java.util.Objects;
 
 /**
  * Class that represents an attribute type for the peptide
+ *
  * @author loge
  */
 public class PeptideAttribute {
+
     protected String id;
     protected String displayName;
     protected Class<?> type;
     protected final boolean md;
     protected double maxValue, minValue;
-    
+
     public PeptideAttribute(String id, String displayName, Class<?> type) {
         this(id, displayName, type, true);
-        
+
     }
 
     public PeptideAttribute(String id, String displayName, Class<?> type, boolean md) {
@@ -30,20 +32,20 @@ public class PeptideAttribute {
         this.md = md;
         maxValue = Double.MAX_VALUE;
         minValue = Double.MIN_VALUE;
-    }     
-    
+    }
+
     public String getId() {
         return id;
     }
 
     public String getDisplayName() {
         return displayName;
-    }        
+    }
 
     public Class<?> getType() {
         return type;
     }
-    
+
     public boolean isMolecularDescriptor() {
         return md;
     }
@@ -63,12 +65,19 @@ public class PeptideAttribute {
     public void setMinValue(double minValue) {
         this.minValue = minValue;
     }
-    
+
+    public double normalize(double val) {
+        if (!md) {
+            throw new UnsupportedOperationException("");
+        }
+        return (val - minValue) / (maxValue - minValue);
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof PeptideAttribute){
-           PeptideAttribute attr = (PeptideAttribute)obj;
-           return id.equals(attr.id);
+        if (obj instanceof PeptideAttribute) {
+            PeptideAttribute attr = (PeptideAttribute) obj;
+            return id.equals(attr.id);
         }
         return false;
     }
@@ -84,6 +93,5 @@ public class PeptideAttribute {
     public String toString() {
         return displayName; //To change body of generated methods, choose Tools | Templates.
     }
-    
-    
+
 }

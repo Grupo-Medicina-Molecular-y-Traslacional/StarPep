@@ -5,7 +5,6 @@
  */
 package org.bapedis.modamp.impl;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
@@ -84,6 +83,24 @@ public abstract class AbstractModamp implements Algorithm {
             for (int i = 0; i < peptides.length && !stopRun; i++) {
                 compute(peptides[i]);
                 progressTicket.progress();
+            }
+            
+            // Calculating max and min values for molecular descriptors
+            double val, max, min;
+            for (PeptideAttribute descriptor : descriptorList) {
+                max = Double.MIN_VALUE;
+                min = Double.MAX_VALUE;
+                for (Peptide peptide : peptides) {
+                    val = PeptideAttribute.convertToDouble(peptide.getAttributeValue(descriptor));
+                    if (val < min) {
+                        min = val;
+                    }
+                    if (val > max) {
+                        max = val;
+                    }
+                }
+                descriptor.setMaxValue(max);
+                descriptor.setMinValue(min);
             }
         }
     }

@@ -66,11 +66,21 @@ public class PeptideAttribute {
         this.minValue = minValue;
     }
 
-    public double normalize(double val) {
+    public double normalize(Object value) {
         if (!md) {
-            throw new UnsupportedOperationException("");
+            throw new UnsupportedOperationException("The attribute " + displayName +" can't be normalized because it is not a molecular descriptor.");
         }
+        double val = convertToDouble(value);
         return (val - minValue) / (maxValue - minValue);
+    }
+    
+    public static double convertToDouble(Object value) {
+        if (value instanceof Double) {
+            return (double) value;
+        } else if (value instanceof Integer) {
+            return ((Integer) value).doubleValue();
+        }
+        throw new IllegalArgumentException("Unknown double value : " + value);
     }
 
     @Override

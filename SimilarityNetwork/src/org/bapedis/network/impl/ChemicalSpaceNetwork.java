@@ -90,13 +90,6 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
                 }
                 descriptor.setMaxValue(max);
                 descriptor.setMinValue(min);
-                if (descriptor != PeptideDAO.LENGHT) {
-                    for (Peptide peptide : peptides) {
-                        val = convertToDouble(descriptor, peptide.getAttributeValue(descriptor));
-                        val = (val - min) / (max - min);
-                        peptide.setAttributeValue(descriptor, val);
-                    }
-                }
             }
 
             progressTicket.progress(NbBundle.getMessage(ChemicalSpaceNetwork.class, "ChemicalSpaceNetwork.task.running"));
@@ -134,6 +127,7 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
         }
         return (float) ab / (float) (a2 + b2 - ab);
     }
+    
 
     private double distanceBased(Peptide peptide1, Peptide peptide2) {
         double val1, val2, diff, squareSum = 0;

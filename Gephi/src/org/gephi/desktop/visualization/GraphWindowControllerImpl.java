@@ -29,7 +29,6 @@ import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
-
 @ServiceProvider(service = GraphWindowController.class)
 public class GraphWindowControllerImpl implements GraphWindowController, WorkspaceEventListener, LookupListener, PropertyChangeListener {
 
@@ -40,6 +39,7 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
 
     public GraphWindowControllerImpl() {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
+        pc.addWorkspaceEventListener(this);
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             @Override
             public void run() {
@@ -51,7 +51,6 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
                 workspaceChanged(null, pc.getCurrentWorkspace());
             }
         });
-        pc.addWorkspaceEventListener(this);
     }
 
     @Override
@@ -125,6 +124,10 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
 
         AttributesModel peptidesModel = pc.getAttributesModel(newWs);
         if (peptidesModel != null) {
+            AttributesModel oldModel = currentModel;
+            if (oldModel != null) {
+                currentModel.setMainGView(oldModel.getMainGView());
+            }
             this.currentModel = peptidesModel;
             currentModel.addGraphViewChangeListener(this);
             setMainGraphView();
@@ -153,7 +156,11 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
                 if (currentModel != null) {
                     currentModel.removeGraphViewChangeListener(this);
                 }
+                AttributesModel oldModel = currentModel;
                 this.currentModel = attrModels.iterator().next();
+                if (oldModel != null) {
+                    currentModel.setMainGView(oldModel.getMainGView());
+                }
                 currentModel.addGraphViewChangeListener(this);
                 setMainGraphView();
             }

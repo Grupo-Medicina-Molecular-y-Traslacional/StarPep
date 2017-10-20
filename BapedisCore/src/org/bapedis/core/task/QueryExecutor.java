@@ -17,7 +17,6 @@ import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.data.PeptideDAO;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.GraphView;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
@@ -31,15 +30,17 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
     protected final Workspace workspace;
     protected final QueryModel queryModel;
     protected final GraphModel graphModel;
+    protected final AttributesModel oldModel;
 
-    public QueryExecutor(){
+    public QueryExecutor() {
         this(pc.getCurrentWorkspace());
     }
-    
+
     public QueryExecutor(Workspace workspace) {
         this.workspace = workspace;
         queryModel = pc.getQueryModel(workspace);
         graphModel = pc.getGraphModel(workspace);
+        oldModel  = pc.getAttributesModel(workspace);
     }
 
     @Override
@@ -52,6 +53,11 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
             Metadata metadata = it.next();
             metadata.setGraphNode(graph.getNode(metadata.getUnderlyingNodeID()));
         }
+        // Destroy old graph model       
+        if (oldModel != null) {
+            graphModel.destroyView(oldModel.getCsnView());
+            graphModel.destroyView(oldModel.getGraphDBView());
+        }
         return model;
     }
 
@@ -59,30 +65,16 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
     protected void process(List<String> chunks) {
         queryModel.setRunning(true);
     }
-        
+
     @Override
     protected void done() {
         try {
             AttributesModel newModel = get();
-            AttributesModel oldModel = pc.getAttributesModel(workspace);
             if (oldModel != null) {
                 workspace.remove(oldModel);
-                graphModel.destroyView(oldModel.getCsnView());
-                graphModel.destroyView(oldModel.getGraphDBView());
-                newModel.setMainGView(oldModel.getMainGView());
             }
-            switch (newModel.getMainGView()){
-                case AttributesModel.CSN_VIEW:
-                    graphModel.setVisibleView(newModel.getCsnView());
-                    break;
-                case AttributesModel.GRAPH_DB_VIEW:
-                    graphModel.setVisibleView(newModel.getGraphDBView());
-                    break;
-            }            
             workspace.add(newModel);
-        } catch (InterruptedException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (ExecutionException ex) {
+        } catch (InterruptedException | ExecutionException ex) {
             Exceptions.printStackTrace(ex);
         } finally {
             queryModel.setRunning(false);

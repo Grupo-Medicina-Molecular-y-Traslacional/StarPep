@@ -51,6 +51,7 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
                 workspaceChanged(null, pc.getCurrentWorkspace());
             }
         });
+        pc.addWorkspaceEventListener(this);
     }
 
     @Override

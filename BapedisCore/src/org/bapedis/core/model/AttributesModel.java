@@ -223,12 +223,10 @@ public class AttributesModel {
         propertyChangeSupport.removePropertyChangeListener(CHANGED_GVIEW, listener);
     }  
     
-    public void fireUpdatedCSNView(){
-        if (mainGView == CSN_VIEW){
-            propertyChangeSupport.firePropertyChange(CHANGED_GVIEW, null, mainGView);
-        }
+    public void fireChangedGraphView(){
+        propertyChangeSupport.firePropertyChange(CHANGED_GVIEW, null, mainGView);
     }
-
+    
     private class PeptideNodeContainer extends Index.ArrayChildren {
 
         @Override

@@ -128,7 +128,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
             histogram.addData((Double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
         }        
         propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY_VALUES, null, histogram);
-        attrModel.fireUpdatedCSNView();
+        attrModel.fireChangedGraphView();
     }
 
     @Override

@@ -184,14 +184,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
             // set new view
             attrModel.setCsnView(csnView);
             attrModel.setGraphDBView(graphDBView);
-            switch (attrModel.getMainGView()) {
-                case AttributesModel.CSN_VIEW:
-                    graphModel.setVisibleView(attrModel.getCsnView());
-                    break;
-                case AttributesModel.GRAPH_DB_VIEW:
-                    graphModel.setVisibleView(attrModel.getGraphDBView());
-                    break;
-            }
+            attrModel.fireChangedGraphView();
         } catch (InterruptedException ex) {
             Exceptions.printStackTrace(ex);
         } catch (ExecutionException ex) {

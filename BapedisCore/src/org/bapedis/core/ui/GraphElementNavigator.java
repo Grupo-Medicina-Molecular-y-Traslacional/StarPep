@@ -265,7 +265,6 @@ public class GraphElementNavigator extends JComponent implements
 
         AttributesModel peptidesModel = pc.getAttributesModel(newWs);
         if (peptidesModel != null) {
-            peptidesModel.addQuickFilterChangeListener(this);
             peptidesModel.addGraphViewChangeListener(this);
         }
         this.currentModel = peptidesModel;
@@ -363,10 +362,7 @@ public class GraphElementNavigator extends JComponent implements
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource().equals(currentModel)) {
-            if (evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
-                reload();
-            } else if (evt.getPropertyName().equals(AttributesModel.CHANGED_GVIEW) &&
-                    navigatorModel.getVisualElement() == GraphElementType.Edge) {
+            if (evt.getPropertyName().equals(AttributesModel.CHANGED_GVIEW)){
                 reload();
             }
         }
@@ -376,13 +372,11 @@ public class GraphElementNavigator extends JComponent implements
     public void resultChanged(LookupEvent le) {
         if (le.getSource().equals(peptideLkpResult)) {
             if (currentModel != null) {
-                currentModel.removeQuickFilterChangeListener(this);
                 currentModel.removeGraphViewChangeListener(this);
             }
             Collection<? extends AttributesModel> attrModels = peptideLkpResult.allInstances();
             if (!attrModels.isEmpty()) {
                 currentModel = attrModels.iterator().next();
-                currentModel.addQuickFilterChangeListener(this);
                 currentModel.addGraphViewChangeListener(this);
                 reload();
             }
@@ -431,7 +425,6 @@ public class GraphElementNavigator extends JComponent implements
         removeLookupListener();
         pc.removeWorkspaceEventListener(this);
         if (currentModel != null) {
-            currentModel.removeQuickFilterChangeListener(this);
             currentModel.removeGraphViewChangeListener(this);
         }
     }

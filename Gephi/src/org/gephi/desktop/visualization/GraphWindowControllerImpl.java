@@ -124,10 +124,6 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
 
         AttributesModel peptidesModel = pc.getAttributesModel(newWs);
         if (peptidesModel != null) {
-            AttributesModel oldModel = currentModel;
-            if (oldModel != null) {
-                currentModel.setMainGView(oldModel.getMainGView());
-            }
             this.currentModel = peptidesModel;
             currentModel.addGraphViewChangeListener(this);
             setMainGraphView();

@@ -32,11 +32,12 @@ import org.openide.util.NbBundle;
 @ActionReferences({
     @ActionReference(path = "Menu/View", position = 330)
 })
-public class ShowChemicalSpace extends AbstractAction {
+public class ShowChemicalSpace extends WorkspaceContextSensitiveAction<AttributesModel> {
     protected final ProjectManager pc;
     private final GraphWindowController graphWC;
 
     public ShowChemicalSpace() {
+        super(AttributesModel.class);
         String name = NbBundle.getMessage(ShowChemicalSpace.class, "CTL_ShowChemicalSpace");
         putValue(NAME, name);
         pc = Lookup.getDefault().lookup(ProjectManager.class);

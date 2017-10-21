@@ -32,12 +32,13 @@ import org.openide.util.NbBundle;
 @ActionReferences({
     @ActionReference(path = "Menu/View", position = 310)
 })
-public class ShowGraphDB extends AbstractAction {
+public class ShowGraphDB extends WorkspaceContextSensitiveAction<AttributesModel> {
 
     protected final ProjectManager pc;
     private final GraphWindowController graphWC;
 
     public ShowGraphDB() {
+        super(AttributesModel.class);
         String name = NbBundle.getMessage(ShowGraphDB.class, "CTL_ShowGraphDB");
         putValue(NAME, name);
         pc = Lookup.getDefault().lookup(ProjectManager.class);

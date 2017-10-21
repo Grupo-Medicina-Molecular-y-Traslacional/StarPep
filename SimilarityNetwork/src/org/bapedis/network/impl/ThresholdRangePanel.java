@@ -216,7 +216,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
                     get();
                     currentValueLabel.setText(formatter.format(newValue));
                     jApplyButton.setVisible(false); 
-                    attrModel.fireUpdatedCSNView();
+                    attrModel.fireChangedGraphView();
                 } catch (InterruptedException ex) {
                     Exceptions.printStackTrace(ex);
                 } catch (ExecutionException ex) {

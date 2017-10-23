@@ -550,6 +550,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             currentModel.addQuickFilterChangeListener(this);
             currentModel.addAvailableColumnChangeListener(this);
         }
+        leftToolBar.setVisible(attrModel != null);
     }
 
     private void setQuickFilter() {

@@ -343,12 +343,12 @@ public class GraphElementNavigator extends JComponent implements
     }
 
     private GraphElementDataColumn[] getEdgeColumns(Table table) {
-        edgeColumns[0] = sourceColumn;
-        if (currentModel.getMainGView() == AttributesModel.GRAPH_DB_VIEW) {
-            edgeColumns[1] = new GraphElementAttributeColumn(table.getColumn("label"));
-        } else if (currentModel.getMainGView() == AttributesModel.CSN_VIEW) {
+        edgeColumns[0] = sourceColumn;        
+        if (currentModel != null && currentModel.getMainGView() == AttributesModel.CSN_VIEW) {
             edgeColumns[1] = new GraphElementAttributeColumn(table.getColumn(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
-        }
+        } else {
+            edgeColumns[1] = new GraphElementAttributeColumn(table.getColumn("label"));
+        } 
         edgeColumns[2] = targetColumn;
         return edgeColumns;
     }

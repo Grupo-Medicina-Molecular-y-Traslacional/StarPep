@@ -67,6 +67,8 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jfree.chart.ChartPanel;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -344,10 +346,12 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         if (simMeasure != null) {
             try {
                 jThresholdSpinner.commitEdit();
-                simMeasure.setThreshold((double) thresholdSpinnerModel.getValue());
+                simMeasure.setThreshold((double) thresholdSpinnerModel.getValue());                
                 jApplyButton.setVisible(false);
             } catch (ParseException ex) {
-                Exceptions.printStackTrace(new Exception(NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.threshold.invalid"), ex));
+                NotifyDescriptor d
+                        = new NotifyDescriptor.Message(NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.threshold.invalid"), NotifyDescriptor.ERROR_MESSAGE);
+                DialogDisplayer.getDefault().notify(d);
             }
         }
     }//GEN-LAST:event_jApplyButtonActionPerformed

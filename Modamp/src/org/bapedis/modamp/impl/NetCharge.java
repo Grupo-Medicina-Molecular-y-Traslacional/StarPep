@@ -193,7 +193,7 @@ public class NetCharge extends AbstractModamp {
     }
 
     @Override
-    public void compute(Peptide peptide) {
+    protected void compute(Peptide peptide) {
         double val;
         String seq = peptide.getSequence();
         if (ph5) {

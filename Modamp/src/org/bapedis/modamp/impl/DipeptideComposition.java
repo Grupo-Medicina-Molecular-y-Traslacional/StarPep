@@ -201,7 +201,7 @@ public class DipeptideComposition extends AbstractModamp {
     }
 
     @Override
-    public void compute(Peptide peptide) {
+    protected void compute(Peptide peptide) {
         String attrName;
         for (ReduceAlphabet ra : alphabets) {
             Map<String, Double> aminoAcidComposition = MD.dipeptideComposition(peptide.getSequence(), ra);

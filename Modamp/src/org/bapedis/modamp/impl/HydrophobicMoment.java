@@ -149,7 +149,7 @@ public class HydrophobicMoment extends AbstractModamp {
     }
 
     @Override
-    public void compute(Peptide peptide) {
+    protected void compute(Peptide peptide) {
         double val;
         for (int i = 0; i < scale.length; i++) {
             if (scale[i]) {

@@ -296,7 +296,7 @@ public class AllDescriptors extends AbstractModamp {
     }
 
     @Override
-    public void compute(Peptide peptide) {
+    protected void compute(Peptide peptide) {
         for (AbstractModamp algo : map.values()) {
             algo.compute(peptide);
         }

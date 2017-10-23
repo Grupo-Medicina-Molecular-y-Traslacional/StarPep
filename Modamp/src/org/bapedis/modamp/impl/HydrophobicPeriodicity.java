@@ -50,7 +50,7 @@ public class HydrophobicPeriodicity extends AbstractModamp {
     }
 
     @Override
-    public void compute(Peptide peptide) {
+    protected void compute(Peptide peptide) {
         double val = MD.A_m(peptide.getSequence(), window);
         String name = getProName();
         peptide.setAttributeValue(attrModel.getAttribute(name), val);

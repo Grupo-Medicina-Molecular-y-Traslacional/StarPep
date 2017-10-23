@@ -165,7 +165,7 @@ public class RADistribution extends AbstractModamp {
     }
 
     @Override
-    public void compute(Peptide peptide) {
+    protected void compute(Peptide peptide) {
         for (ReduceAlphabet ra : alphabets) {
             for (int percent = 0; percent <= 100; percent += 25) {
                 Map<String, Double> aminoAcidComposition = MD.distributionReducedAlphabet(peptide.getSequence(), ra, percent);

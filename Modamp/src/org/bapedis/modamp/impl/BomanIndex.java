@@ -34,7 +34,7 @@ public class BomanIndex extends AbstractModamp {
     }
 
     @Override
-    public void compute(Peptide peptide) {
+    protected void compute(Peptide peptide) {
         double val = MD.boman(peptide.getSequence());
         peptide.setAttributeValue(attrModel.getAttribute(BM), val);
 

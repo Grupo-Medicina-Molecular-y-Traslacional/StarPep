@@ -105,6 +105,6 @@ public abstract class AbstractModamp implements Algorithm {
         }
     }
 
-    public abstract void compute(Peptide peptide);
+    protected abstract void compute(Peptide peptide);
 
 }

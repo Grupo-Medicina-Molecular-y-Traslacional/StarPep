@@ -167,7 +167,7 @@ public class RATransition extends AbstractModamp {
     }
 
     @Override
-    public void compute(Peptide peptide) {
+    protected void compute(Peptide peptide) {
         for (ReduceAlphabet ra : alphabets) {
             Map<String, Double> aminoAcidComposition = MD.transitionReducedAlphabet(peptide.getSequence(), ra);
             Iterator<String> it = aminoAcidComposition.keySet().iterator();

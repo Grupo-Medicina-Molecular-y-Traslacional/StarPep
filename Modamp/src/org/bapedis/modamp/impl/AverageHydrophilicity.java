@@ -94,7 +94,7 @@ public class AverageHydrophilicity extends AbstractModamp {
     }
 
     @Override
-    public void compute(Peptide peptide) {
+    protected void compute(Peptide peptide) {
         double val;
         if (HOPT810101) {
             val = MD.gravy(peptide.getSequence(), HydrophilicityScale.hopp_Woods_hydrov_hash());

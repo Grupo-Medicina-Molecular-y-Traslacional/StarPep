@@ -37,7 +37,7 @@ public class AliphaticIndex extends AbstractModamp {
     }
 
     @Override
-    public void compute(Peptide peptide) {
+    protected void compute(Peptide peptide) {
         double val = MD.aliphaticIndex(peptide.getSequence());
         peptide.setAttributeValue(attrModel.getAttribute(AI), val);
     }

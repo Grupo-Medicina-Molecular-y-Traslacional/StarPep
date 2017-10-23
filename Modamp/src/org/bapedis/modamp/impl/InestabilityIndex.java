@@ -45,7 +45,7 @@ public class InestabilityIndex extends AbstractModamp {
     }
 
     @Override
-    public void compute(Peptide peptide) {
+    protected void compute(Peptide peptide) {
         double val = MD.inestabilityIndex(peptide.getSequence());
         peptide.setAttributeValue(attrModel.getAttribute(II), val);
 

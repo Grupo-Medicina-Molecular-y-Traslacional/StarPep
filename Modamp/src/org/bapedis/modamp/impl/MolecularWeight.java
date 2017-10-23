@@ -37,7 +37,7 @@ public class MolecularWeight extends AbstractModamp {
     }
 
     @Override
-    public void compute(Peptide peptide) {
+    protected void compute(Peptide peptide) {
         double val = MD.mw(peptide.getSequence());
         peptide.setAttributeValue(attrModel.getAttribute(MW), val);
     }

@@ -47,7 +47,7 @@ public class AAComposition extends AbstractModamp {
     }
 
     @Override
-    public void compute(Peptide peptide) {
+    protected void compute(Peptide peptide) {
         Map<String, Double> aminoAcidComposition = MD.compositionReducedAlphabet(peptide.getSequence(), ra);
         Iterator<String> it = aminoAcidComposition.keySet().iterator();
         double val;

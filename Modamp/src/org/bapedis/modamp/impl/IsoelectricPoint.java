@@ -37,7 +37,7 @@ public class IsoelectricPoint extends AbstractModamp {
     }
 
     @Override
-    public void compute(Peptide peptide) {
+    protected void compute(Peptide peptide) {
         double val = MD.isoelectricPoint(peptide.getSequence(), PkaValues.IPC_peptide());
         peptide.setAttributeValue(attrModel.getAttribute(pI), val);
     }

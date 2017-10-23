@@ -45,8 +45,7 @@ public class SequenceSimilarityNetwork extends SimilarityNetworkAlgo{
         substitutionMatrixIndex = 7; // Blosum 62 by Henikoff & Henikoff
         substitutionMatrix = getSubstitutionMatrix();
         similarityTypeIndex = 0;
-        similarityScoreIndex = 0;
-        threshold = 0.7;
+        similarityScoreIndex = 0;       
     }
 
     public int getAlignmentTypeIndex() {

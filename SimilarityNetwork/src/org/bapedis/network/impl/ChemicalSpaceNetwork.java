@@ -5,13 +5,10 @@
  */
 package org.bapedis.network.impl;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.bapedis.core.spi.data.PeptideDAO;
 import org.bapedis.modamp.impl.AllDescriptors;
 import org.bapedis.modamp.impl.AllDescriptorsFactory;
 import org.openide.util.Lookup;
@@ -26,12 +23,14 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
     protected final AllDescriptors descriptorAlgo;
     protected List<PeptideAttribute> descriptorList;
     protected int buttonGroupIndex;
+    protected boolean normalize;
 
     public ChemicalSpaceNetwork(AlgorithmFactory factory) {
         super(factory);
         AllDescriptorsFactory descriptorFactory = Lookup.getDefault().lookup(AllDescriptorsFactory.class);
         descriptorAlgo = (AllDescriptors) descriptorFactory.createAlgorithm();
         buttonGroupIndex = 0;
+        normalize = true;
     }
 
     public AllDescriptors getDescriptorAlgorithm() {
@@ -51,28 +50,25 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
         super.initAlgo();
         if (attrModel != null) {
             descriptorAlgo.initAlgo();
-            descriptorList = new LinkedList<>();
+            descriptorList = descriptorAlgo.getDescriptorList();
         }
+    }
+
+    @Override
+    public boolean cancel() {
+        if (attrModel != null) {
+            descriptorAlgo.cancel();
+        }
+        return super.cancel();
     }
 
     @Override
     public void run() {
         if (attrModel != null) {
-            Peptide[] peptides = attrModel.getPeptides();
             progressTicket.progress(NbBundle.getMessage(ChemicalSpaceNetwork.class, "ChemicalSpaceNetwork.md.running"));
-            progressTicket.switchToDeterminate(peptides.length + 1);
-            for (int i = 0; i < peptides.length && !stopRun; i++) {
-                descriptorAlgo.compute(peptides[i]);
-                progressTicket.progress();
-            }
-
-            for (Iterator<PeptideAttribute> it = attrModel.getAttributeIterator(); it.hasNext() && !stopRun;) {
-                PeptideAttribute attr = it.next();
-                if (attr.isMolecularDescriptor()) {
-                    descriptorList.add(attr);
-                }
-            }
-            progressTicket.progress();
+            descriptorAlgo.setProgressTicket(progressTicket);
+            descriptorAlgo.run();
+            descriptorAlgo.setProgressTicket(null);
 
             progressTicket.progress(NbBundle.getMessage(ChemicalSpaceNetwork.class, "ChemicalSpaceNetwork.task.running"));
             if (!stopRun) {
@@ -98,8 +94,8 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
         double b2 = 0.0;
         double val1, val2;
         for (PeptideAttribute descriptor : descriptorList) {
-            val1 = descriptor.normalize(peptide1.getAttributeValue(descriptor)) ;
-            val2 = descriptor.normalize(peptide2.getAttributeValue(descriptor));
+            val1 = normalize ? descriptor.normalize(peptide1.getAttributeValue(descriptor)) : PeptideAttribute.convertToDouble(peptide1.getAttributeValue(descriptor));
+            val2 = normalize ? descriptor.normalize(peptide2.getAttributeValue(descriptor)) : PeptideAttribute.convertToDouble(peptide2.getAttributeValue(descriptor));
             ab += val1 * val2;
             a2 += val1 * val1;
             b2 += val2 * val2;
@@ -118,7 +114,4 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
 //        double distance = Math.sqrt(squareSum);
 //        return 1 / (1 + distance);
 //    }
-    
-    
-
 }

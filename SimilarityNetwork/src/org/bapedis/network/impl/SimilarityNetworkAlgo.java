@@ -40,6 +40,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
         this.factory = factory;
         propertyChangeSupport = new PropertyChangeSupport(this);
         histogram = new JQuickHistogram();
+        threshold = 0.7;
     }
 
     @Override
@@ -64,16 +65,18 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
         histogram.clear();
         attrModel = pc.getAttributesModel();
         stopRun = false;
-        GraphModel graphModel = pc.getGraphModel();
-        SimilarityGraphEdgeBuilder.attrModel = attrModel;
-        SimilarityGraphEdgeBuilder.peptides = attrModel.getPeptides();
-        SimilarityGraphEdgeBuilder.graphModel = graphModel;
-        SimilarityGraphEdgeBuilder.setStopRun(stopRun);
-        SimilarityGraphEdgeBuilder.progressTicket = progressTicket;
-        SimilarityGraphEdgeBuilder.mainGraph = graphModel.getGraph();
-        SimilarityGraphEdgeBuilder.csnGraph = graphModel.getGraph(attrModel.getCsnView());
-        SimilarityGraphEdgeBuilder.similarityMeasure = this;
-        SimilarityGraphEdgeBuilder.edgeList = new LinkedList<>();        
+        if (attrModel != null) {
+            GraphModel graphModel = pc.getGraphModel();
+            SimilarityGraphEdgeBuilder.attrModel = attrModel;
+            SimilarityGraphEdgeBuilder.peptides = attrModel.getPeptides();
+            SimilarityGraphEdgeBuilder.graphModel = graphModel;
+            SimilarityGraphEdgeBuilder.setStopRun(stopRun);
+            SimilarityGraphEdgeBuilder.progressTicket = progressTicket;
+            SimilarityGraphEdgeBuilder.mainGraph = graphModel.getGraph();
+            SimilarityGraphEdgeBuilder.csnGraph = graphModel.getGraph(attrModel.getCsnView());
+            SimilarityGraphEdgeBuilder.similarityMeasure = this;
+            SimilarityGraphEdgeBuilder.edgeList = new LinkedList<>();
+        }
     }
 
     @Override
@@ -115,20 +118,22 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
 
     @Override
     public void run() {
-        attrModel.setSimilarityThreshold(threshold);
-        propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY_VALUES, null, null);
-        Peptide[] peptides = SimilarityGraphEdgeBuilder.peptides;
-        // Workunits for pairwise sim matrix builder
-        int workunits = peptides.length * (peptides.length - 1) / 2;        
-        progressTicket.switchToDeterminate(workunits);
-        SimilarityGraphEdgeBuilder task = new SimilarityGraphEdgeBuilder();
-        fjPool.invoke(task);
-        task.join();                
-        for (Edge edge : SimilarityGraphEdgeBuilder.edgeList) {
-            histogram.addData((Double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
-        }        
-        propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY_VALUES, null, histogram);
-        attrModel.fireChangedGraphView();
+        if (attrModel != null) {
+            attrModel.setSimilarityThreshold(threshold);
+            propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY_VALUES, null, null);
+            Peptide[] peptides = SimilarityGraphEdgeBuilder.peptides;
+            // Workunits for pairwise sim matrix builder
+            int workunits = peptides.length * (peptides.length - 1) / 2;
+            progressTicket.switchToDeterminate(workunits);
+            SimilarityGraphEdgeBuilder task = new SimilarityGraphEdgeBuilder();
+            fjPool.invoke(task);
+            task.join();
+            for (Edge edge : SimilarityGraphEdgeBuilder.edgeList) {
+                histogram.addData((Double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
+            }
+            propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY_VALUES, null, histogram);
+            attrModel.fireChangedGraphView();
+        }
     }
 
     @Override

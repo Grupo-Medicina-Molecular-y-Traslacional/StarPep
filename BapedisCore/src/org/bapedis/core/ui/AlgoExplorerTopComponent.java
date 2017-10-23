@@ -31,6 +31,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
+import javax.swing.SwingUtilities;
 import org.openide.filesystems.FileObject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -46,6 +47,7 @@ import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.model.AlgorithmModel;
 import org.bapedis.core.model.AlgorithmNode;
 import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
@@ -65,6 +67,8 @@ import org.openide.filesystems.FileUtil;
 import org.openide.nodes.Node;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
+import org.openide.util.LookupEvent;
+import org.openide.util.LookupListener;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 import org.w3c.dom.Document;
@@ -95,21 +99,33 @@ import org.w3c.dom.NodeList;
     "CTL_AlgoExplorerTopComponent=Tool",
     "HINT_AlgoExplorerTopComponent=This is the Tool window"
 })
-public final class AlgoExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener {
+public final class AlgoExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener, LookupListener {
 
     protected final ProjectManager pc;
+    protected final AlgorithmExecutor executor;
     private RichTooltip richTooltip;
     private final AlgoPresetPersistence algoPresetPersistence;
     private final AlgorithmListener algoListener;
+    protected Lookup.Result<AttributesModel> peptideLkpResult;
+    protected final String NO_SELECTION;
 
     public AlgoExplorerTopComponent() {
         initComponents();
         setName(Bundle.CTL_AlgoExplorerTopComponent());
         setToolTipText(Bundle.HINT_AlgoExplorerTopComponent());
         pc = Lookup.getDefault().lookup(ProjectManager.class);
+        executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
         algoPresetPersistence = new AlgoPresetPersistence();
         algoListener = new AlgorithmListenerImpl();
         ((PropertySheet) propSheetPanel).setDescriptionAreaVisible(false);
+         NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text");
+    }
+
+    private void removeLookupListener() {
+        if (peptideLkpResult != null) {
+            peptideLkpResult.removeLookupListener(this);
+            peptideLkpResult = null;
+        }
     }
 
     /**
@@ -313,7 +329,6 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
         AlgorithmModel algoModel = pc.getAlgorithmModel();
         Algorithm algo = algoModel.getSelectedAlgorithm();
-        AlgorithmExecutor executor = pc.getExecutor();
         if (algo != null) {
             if (algoModel.isRunning()) {
                 executor.cancel(algo);
@@ -385,6 +400,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
+        removeLookupListener();
         AlgorithmCategory oldAlgoCategory = null;
         if (oldWs != null) {
             AlgorithmModel oldModel = pc.getAlgorithmModel(oldWs);
@@ -404,13 +420,19 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             refreshProperties(algoModel);
             refreshRunning(algoModel.isRunning());
             algoModel.addPropertyChangeListener(this);
+            
+            if (pc.getAttributesModel()== null){
+                algoComboBox.setEnabled(false);
+                setEnableState(false);                
+            }
+            peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
+            peptideLkpResult.addLookupListener(this);
         }
     }
 
     private void refreshAlgChooser(AlgorithmModel algoModel) {
         setDisplayName(algoModel.getCategory().getDisplayName());
-        DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
-        String NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text");
+        DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();        
         comboBoxModel.addElement(NO_SELECTION);
         comboBoxModel.setSelectedItem(NO_SELECTION);
 
@@ -442,7 +464,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             scrollPane.setVisible(false);
             propSheetPanel.setVisible(true);
         } else {
-            Algorithm selectedAlgorithm = algoModel.getSelectedAlgorithm();            
+            Algorithm selectedAlgorithm = algoModel.getSelectedAlgorithm();
 
             if (selectedAlgorithm.getFactory().getSetupUI() != null) {
                 JPanel editPanel = selectedAlgorithm.getFactory().getSetupUI().getEditPanel(selectedAlgorithm);
@@ -522,6 +544,15 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             tooltip.setMainImage(algoDescriptionImage.getImage());
         }
         return tooltip;
+    }
+
+    @Override
+    public void resultChanged(LookupEvent le) {
+        if (le.getSource().equals(peptideLkpResult)) {
+            Collection<? extends AttributesModel> attrModels = peptideLkpResult.allInstances();
+            algoComboBox.setEnabled(!attrModels.isEmpty());
+            setEnableState(!algoComboBox.getSelectedItem().equals(NO_SELECTION));
+        }
     }
 
     private static class AlgorithmFactoryItem {

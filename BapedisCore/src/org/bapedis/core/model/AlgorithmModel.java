@@ -15,6 +15,7 @@ import org.bapedis.core.spi.algo.Algorithm;
  * @author loge
  */
 public class AlgorithmModel {
+    protected final Workspace owner;
     protected AlgorithmCategory category;
     protected Algorithm selectedAlgorithm;
     protected transient final PropertyChangeSupport propertyChangeSupport;
@@ -23,10 +24,15 @@ public class AlgorithmModel {
     public static final String RUNNING = "RUNNING";
     protected final AtomicBoolean running;
 
-    public AlgorithmModel() {
+    public AlgorithmModel(Workspace owner) {
+        this.owner = owner;
         propertyChangeSupport = new PropertyChangeSupport(this);
         running = new AtomicBoolean(false);
     }
+
+    public Workspace getOwnerWS() {
+        return owner;
+    }        
 
     public AlgorithmCategory getCategory() {
         return category;
@@ -46,7 +52,7 @@ public class AlgorithmModel {
         Algorithm oldAlgo = this.selectedAlgorithm;
         this.selectedAlgorithm = selectedAlgorithm;
         propertyChangeSupport.firePropertyChange(CHANGED_ALGORITHM, oldAlgo, selectedAlgorithm);
-    }  
+    }      
 
     public boolean isRunning() {
         return running.get();

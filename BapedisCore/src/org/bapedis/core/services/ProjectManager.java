@@ -19,7 +19,6 @@ import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.spi.filters.FilterFactory;
-import org.bapedis.core.task.AlgorithmExecutor;
 import org.gephi.graph.api.Configuration;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Origin;
@@ -43,7 +42,6 @@ public class ProjectManager implements Lookup.Provider {
     protected InstanceContent content;
     protected Workspace currentWS;
     protected List<WorkspaceEventListener> wsListeners;
-    protected final AlgorithmExecutor executor;
     
     public static final float GRAPH_NODE_SIZE = 10f;
     public static final Color GRAPH_NODE_COLOR = new Color(0.6f, 0.6f, 0.6f);
@@ -57,7 +55,6 @@ public class ProjectManager implements Lookup.Provider {
     public static final String EDGE_TABLE_PRO_SIMILARITY_TITLE=NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.similarity.title");;
 
     public ProjectManager() {
-        executor = new AlgorithmExecutor();
     }
 
     public void newProject() {
@@ -123,10 +120,6 @@ public class ProjectManager implements Lookup.Provider {
     public synchronized Iterator<? extends Workspace> getWorkspaceIterator() {
         Collection<? extends Workspace> workspaces = lookup.lookupAll(Workspace.class);
         return workspaces.iterator();
-    }
-
-    public AlgorithmExecutor getExecutor() {
-        return executor;
     }
 
     public void clean() {
@@ -200,7 +193,7 @@ public class ProjectManager implements Lookup.Provider {
     public QueryModel getQueryModel(Workspace workspace) {
         QueryModel model = workspace.getLookup().lookup(QueryModel.class);
         if (model == null) {
-            model = new QueryModel();
+            model = new QueryModel(workspace);
             workspace.add(model);
         }
         return model;
@@ -213,7 +206,7 @@ public class ProjectManager implements Lookup.Provider {
     public FilterModel getFilterModel(Workspace workspace) {
         FilterModel model = workspace.getLookup().lookup(FilterModel.class);
         if (model == null) {
-            model = new FilterModel();
+            model = new FilterModel(workspace);
             workspace.add(model);
         }
         return model;
@@ -226,7 +219,7 @@ public class ProjectManager implements Lookup.Provider {
     public AlgorithmModel getAlgorithmModel(Workspace workspace) {
         AlgorithmModel model = workspace.getLookup().lookup(AlgorithmModel.class);
         if (model == null) {
-            model = new AlgorithmModel();
+            model = new AlgorithmModel(workspace);
             workspace.add(model);
         }
         return model;

@@ -41,6 +41,7 @@
  */
 package org.bapedis.core.task;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -50,9 +51,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.bapedis.core.model.Workspace;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.openide.util.Cancellable;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  * Portable long-task executor, that supports synchronous and asynchronous
@@ -63,8 +68,10 @@ import org.openide.util.NbBundle;
  * @author Mathieu Bastian
  * @see LongTask
  */
+@ServiceProvider(service = AlgorithmExecutor.class)
 public final class AlgorithmExecutor {
 
+    private final ProjectManager pc;
     private final ThreadPoolExecutor executor;
     private final List<AlgoExecutor> taskList;
 
@@ -73,28 +80,30 @@ public final class AlgorithmExecutor {
      *
      */
     public AlgorithmExecutor() {
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
         int numberOfCPUs = Runtime.getRuntime().availableProcessors();
         int maximumPoolSize = numberOfCPUs + 1;
-        this.executor = new ThreadPoolExecutor(0, 1, 15, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+        this.executor = new ThreadPoolExecutor(0, maximumPoolSize, 15, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
         taskList = new LinkedList<>();
     }
 
     /**
      * Execute an algorithm with cancel and progress support.
      *
+     * @param workspace the workspace containing the algorithm 
      * @param algorithm the algorithm to be executed
-     * @param taskName the name of the task, is displayed in the status bar if
-     * available
      * @param listener the listener to this executor. The listener is called
      * when the task is finished.
      * @param errorHandler error handler for exception retrieval during
      * execution
      * @throws NullPointerException if <code>algorithm</code> is null
      */
-    public synchronized void execute(final Algorithm algorithm, String taskName, AlgorithmListener listener, AlgorithmErrorHandler errorHandler) {
-        if (algorithm == null) {
-            throw new NullPointerException();
+    public synchronized void execute(Workspace workspace, final Algorithm algorithm, AlgorithmListener listener, AlgorithmErrorHandler errorHandler) {
+        Collection<? extends Algorithm> algorithms = workspace.getLookup().lookupAll(Algorithm.class);
+        if (!algorithms.contains(algorithm)){
+            throw new IllegalArgumentException("The workspace does not contains the algorithm to be executed");
         }
+        String taskName = NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.name", workspace.getName(), algorithm.getFactory().getName());
         AlgoExecutor runnable = new AlgoExecutor(algorithm, taskName, listener, errorHandler);
         runnable.progress.start();
         runnable.progress.progress(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.submitted"));
@@ -128,7 +137,7 @@ public final class AlgorithmExecutor {
      * @throws NullPointerException if <code>algorithm</code> is null
      */
     public synchronized void execute(Algorithm algorithm, AlgorithmListener listener, AlgorithmErrorHandler errorHandler) {
-        execute(algorithm, algorithm.getFactory().getName(), listener, errorHandler);
+        execute(pc.getCurrentWorkspace(),algorithm, listener, errorHandler);
     }
 
     /**

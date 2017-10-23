@@ -24,13 +24,16 @@ public class BomanIndex extends AbstractModamp {
     @Override
     public void initAlgo() {
         super.initAlgo();
-        PeptideAttribute descriptor;
-        if (attrModel != null && !attrModel.hasAttribute(BM)) {
-            descriptor = attrModel.addAttribute(BM, BM, Double.class);
-        } else {
-            descriptor = attrModel.getAttribute(BM);
+        if (attrModel != null) {
+            PeptideAttribute descriptor;
+            if (!attrModel.hasAttribute(BM)) {
+                descriptor = attrModel.addAttribute(BM, BM, Double.class);
+            } else {
+                descriptor = attrModel.getAttribute(BM);
+            }
+            descriptorList.add(descriptor);
+
         }
-        descriptorList.add(descriptor);
     }
 
     @Override

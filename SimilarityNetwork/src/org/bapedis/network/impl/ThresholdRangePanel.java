@@ -44,13 +44,17 @@ package org.bapedis.network.impl;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
@@ -92,10 +96,14 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
         symbols.setDecimalSeparator('.');
         formatter = new DecimalFormat("0.00", symbols);
-    }
 
-    static {
-        UIManager.put("Slider.paintValue", false);
+        jApplyButton.setVisible(false);
+        ((JSpinner.DefaultEditor) jThresholdSpinner.getEditor()).getTextField().addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                jApplyButton.setVisible(true);
+            }
+        });
     }
 
     public void setup(SimilarityMeasure measure) {
@@ -159,7 +167,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         final AttributesModel attrModel = pc.getAttributesModel();
         SwingWorker sw = new SwingWorker() {
             @Override
-            protected Object doInBackground() throws Exception {                
+            protected Object doInBackground() throws Exception {
                 if (attrModel != null) {
                     attrModel.setSimilarityThreshold(newValue);
                     Graph csnGraph = pc.getGraphModel().getGraph(attrModel.getCsnView());
@@ -215,7 +223,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
                 try {
                     get();
                     currentValueLabel.setText(formatter.format(newValue));
-                    jApplyButton.setVisible(false); 
+                    jApplyButton.setVisible(false);
                     attrModel.fireChangedGraphView();
                 } catch (InterruptedException ex) {
                     Exceptions.printStackTrace(ex);
@@ -334,7 +342,13 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
 
     private void jApplyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jApplyButtonActionPerformed
         if (simMeasure != null) {
-            simMeasure.setThreshold((double) thresholdSpinnerModel.getValue());
+            try {
+                jThresholdSpinner.commitEdit();
+                simMeasure.setThreshold((double) thresholdSpinnerModel.getValue());
+                jApplyButton.setVisible(false);
+            } catch (ParseException ex) {
+                Exceptions.printStackTrace(new Exception(NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.threshold.invalid"), ex));
+            }
         }
     }//GEN-LAST:event_jApplyButtonActionPerformed
 

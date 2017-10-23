@@ -18,7 +18,7 @@ import org.openide.nodes.Node;
  * @author loge
  */
 public class QueryModel {
-
+    protected final Workspace owner;
     public static final String ADDED_METADATA = "ADDED_METADATA";
     public static final String REMOVED_METADATA = "REMOVED_METADATA";
     public static final String METADATA_ACTIVATED = "METADATA_ACTIVATED"; 
@@ -31,7 +31,8 @@ public class QueryModel {
     protected RestrictionLevel restriction;
     protected boolean metadataActivated;
 
-    public QueryModel() {
+    public QueryModel(Workspace owner) {
+        this.owner = owner;
         propertyChangeSupport = new PropertyChangeSupport(this);
         rootContext = new QueryNode(this);
         metadatas = new LinkedList<>();
@@ -39,6 +40,10 @@ public class QueryModel {
         restriction = RestrictionLevel.MATCH_ALL;
         metadataActivated = false;
     }
+    
+    public Workspace getOwnerWS() {
+        return owner;
+    }    
 
     public RestrictionLevel getRestriction() {
         return restriction;

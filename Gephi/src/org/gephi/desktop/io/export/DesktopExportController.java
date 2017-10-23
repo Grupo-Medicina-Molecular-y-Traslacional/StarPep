@@ -75,7 +75,7 @@ public class DesktopExportController implements ExportControllerUI {
         };
         ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
 //        executor = new TaskExecutor("Exporter", 10);
-        executor = pm.getExecutor();
+        executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
     }
 
     @Override

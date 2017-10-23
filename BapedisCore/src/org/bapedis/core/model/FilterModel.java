@@ -22,7 +22,7 @@ import org.openide.util.lookup.Lookups;
  * @author loge
  */
 public class FilterModel {
-
+    protected final Workspace owner;
     protected final List<Filter> filters;
     protected transient final PropertyChangeSupport propertyChangeSupport;
     public static final String ADDED_FILTER = "ADD";
@@ -34,7 +34,8 @@ public class FilterModel {
     protected RestrictionLevel restriction;
     protected Node rootContext;
 
-    public FilterModel() {
+    public FilterModel(Workspace owner) {
+        this.owner = owner;
         restriction = RestrictionLevel.MATCH_ALL;
         filters = new LinkedList<>();
         propertyChangeSupport = new PropertyChangeSupport(this);
@@ -42,6 +43,10 @@ public class FilterModel {
         running = new AtomicBoolean(false);
     }
 
+    public Workspace getOwnerWS() {
+        return owner;
+    }
+    
     public Node getRootContext() {
         return rootContext;
     }

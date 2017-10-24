@@ -107,6 +107,7 @@ public class FilterModel {
     public void setRunning(boolean running) {
         boolean oldValue = this.running.get();
         this.running.set(running);
+        owner.setBusy(running);
         propertyChangeSupport.firePropertyChange(RUNNING, oldValue, running);
     }
 

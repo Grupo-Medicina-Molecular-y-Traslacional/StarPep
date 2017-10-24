@@ -378,7 +378,6 @@ public class GraphElementNavigator extends JComponent implements
             if (!attrModels.isEmpty()) {
                 currentModel = attrModels.iterator().next();
                 currentModel.addGraphViewChangeListener(this);
-                reload();
             }
         }
     }

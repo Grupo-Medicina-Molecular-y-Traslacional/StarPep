@@ -158,7 +158,6 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
                     currentModel.setMainGView(oldModel.getMainGView());
                 }
                 currentModel.addGraphViewChangeListener(this);
-                setMainGraphView();
             }
         }
     }

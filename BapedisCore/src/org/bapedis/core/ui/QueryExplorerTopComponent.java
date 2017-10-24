@@ -355,6 +355,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
 
     private void refreshRunningState(boolean running) {
         restrictiveComboBox.setEnabled(!running);
+        runButton.setEnabled(!running);
     }
 
     @Override

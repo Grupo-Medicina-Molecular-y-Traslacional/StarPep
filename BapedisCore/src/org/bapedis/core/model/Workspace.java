@@ -7,6 +7,7 @@ package org.bapedis.core.model;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -23,6 +24,7 @@ public class Workspace implements Lookup.Provider {
     public static final String PRO_NAME = "name";
     protected final int id;
     protected String name;
+    protected final AtomicBoolean busy;
     protected Lookup lookup;
     protected InstanceContent content;
     protected static final AtomicInteger counter = new AtomicInteger(1);
@@ -53,6 +55,7 @@ public class Workspace implements Lookup.Provider {
     private Workspace(int id, String name) {
         this.id = id;
         this.name = name;
+        busy = new AtomicBoolean(false);
         content = new InstanceContent();
         lookup = new AbstractLookup(content);
         changeSupport = new PropertyChangeSupport(this);
@@ -74,6 +77,14 @@ public class Workspace implements Lookup.Provider {
         changeSupport.firePropertyChange(PRO_NAME, this.name, name);
         this.name = name;
     }
+
+    public boolean isBusy() {
+        return busy.get();
+    }
+
+    public void setBusy(boolean busy) {
+        this.busy.set(busy);
+    }        
 
     /**
      * Adds an instance to this workspaces lookup.

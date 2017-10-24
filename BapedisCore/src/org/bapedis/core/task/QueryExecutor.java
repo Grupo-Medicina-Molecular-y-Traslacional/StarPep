@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.task;
 
+import java.awt.Cursor;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -19,6 +20,7 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -40,7 +42,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
         this.workspace = workspace;
         queryModel = pc.getQueryModel(workspace);
         graphModel = pc.getGraphModel(workspace);
-        oldModel  = pc.getAttributesModel(workspace);
+        oldModel = pc.getAttributesModel(workspace);
     }
 
     @Override
@@ -53,31 +55,37 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
             Metadata metadata = it.next();
             metadata.setGraphNode(graph.getNode(metadata.getUnderlyingNodeID()));
         }
-        // Destroy old graph model       
-        if (oldModel != null) {
-            graphModel.destroyView(oldModel.getCsnView());
-            graphModel.destroyView(oldModel.getGraphDBView());
-        }
+
         return model;
     }
 
     @Override
     protected void process(List<String> chunks) {
         queryModel.setRunning(true);
+        WindowManager.getDefault().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     }
 
     @Override
     protected void done() {
         try {
             AttributesModel newModel = get();
+            // Set new Model
             if (oldModel != null) {
                 workspace.remove(oldModel);
-            }
+            }            
             workspace.add(newModel);
+            newModel.fireChangedGraphView();
+
+            // Destroy old graph model       
+            if (oldModel != null) {
+                graphModel.destroyView(oldModel.getCsnView());
+                graphModel.destroyView(oldModel.getGraphDBView());
+            }
         } catch (InterruptedException | ExecutionException ex) {
             Exceptions.printStackTrace(ex);
         } finally {
             queryModel.setRunning(false);
+            WindowManager.getDefault().getMainWindow().setCursor(Cursor.getDefaultCursor());
         }
     }
 

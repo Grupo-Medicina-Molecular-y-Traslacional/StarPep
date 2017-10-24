@@ -21,7 +21,6 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.filters.Filter;
 import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
 import org.gephi.graph.api.Node;
@@ -69,7 +68,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
     @Override
     protected TreeSet<String> doInBackground() throws Exception {
         publish("start");
-        ticket.start(attrModel.getNodeList().size() + 1);
+        ticket.start(attrModel.getNodeList().size() + 2); // plus add and remove nodes
         ticket.progress(NbBundle.getMessage(FilterExecutor.class, "FilterWorker.running"));
 
         TreeSet<String> set = filterModel.isEmpty() ? null : new TreeSet<String>();
@@ -145,6 +144,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
             subGraphDB.addAllNodes(metadataNodes);
             subGraphDB.addAllEdges(graphEdges);
         }
+        ticket.progress();
 
         // To remove node from graph db and csn
         for (Node node : toRemoveNodes) {
@@ -164,6 +164,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
             subGraphDB.removeAllNodes(metadataNodes);
         }
         ticket.progress();
+
         return set;
     }
 
@@ -178,13 +179,19 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
         try {
             TreeSet<String> set = get();
             attrModel.setQuickFilter(filterModel.isEmpty() ? null : new QuickFilterImpl(set));
-            // destroy old view
-            graphModel.destroyView(attrModel.getCsnView());
-            graphModel.destroyView(attrModel.getGraphDBView());
+            
+            GraphView oldCsnView = attrModel.getCsnView();
+            GraphView oldGraphDBView = attrModel.getGraphDBView(); 
+
             // set new view
             attrModel.setCsnView(csnView);
             attrModel.setGraphDBView(graphDBView);
+
             attrModel.fireChangedGraphView();
+            
+            // destroy old view
+            graphModel.destroyView(oldCsnView);
+            graphModel.destroyView(oldGraphDBView);            
         } catch (InterruptedException ex) {
             Exceptions.printStackTrace(ex);
         } catch (ExecutionException ex) {

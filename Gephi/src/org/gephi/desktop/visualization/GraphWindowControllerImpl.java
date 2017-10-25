@@ -147,7 +147,7 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
                 }
                 AttributesModel oldModel = currentModel;
                 this.currentModel = attrModels.iterator().next();
-                if (oldModel != null) {
+                if (oldModel != null && graphWindow.isOpened()) {
                     currentModel.setMainGView(oldModel.getMainGView());
                 }
                 currentModel.addGraphViewChangeListener(this);

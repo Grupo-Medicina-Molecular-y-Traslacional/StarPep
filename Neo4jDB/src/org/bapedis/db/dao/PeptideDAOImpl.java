@@ -5,7 +5,6 @@
  */
 package org.bapedis.db.dao;
 
-import java.awt.Color;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -168,6 +167,7 @@ public class PeptideDAOImpl implements PeptideDAO {
                 graphModel.getGraph().writeUnlock();
                 attrModel.setCsnView(csnView);
                 attrModel.setGraphDBView(graphDBView);
+                attrModel.setMainGView(AttributesModel.CSN_VIEW);
                 peptideNodes.close();
                 tx.success();
             }

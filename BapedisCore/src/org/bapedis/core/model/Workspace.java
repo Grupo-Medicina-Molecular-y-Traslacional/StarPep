@@ -9,6 +9,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.AbstractLookup;
@@ -30,6 +31,7 @@ public class Workspace implements Lookup.Provider {
     protected static final AtomicInteger counter = new AtomicInteger(1);
     protected static Workspace defaultWorkspace = new Workspace(0, NbBundle.getMessage(Workspace.class, "Workspace.defaultName"));
     protected final transient PropertyChangeSupport changeSupport;
+    protected final NotifyDescriptor busyND;
 
     public static void resetDefault() {
         counter.set(1);
@@ -59,6 +61,7 @@ public class Workspace implements Lookup.Provider {
         content = new InstanceContent();
         lookup = new AbstractLookup(content);
         changeSupport = new PropertyChangeSupport(this);
+        busyND = new NotifyDescriptor.Message(NbBundle.getMessage(Workspace.class, "Workspace.busy.info"), NotifyDescriptor.WARNING_MESSAGE);
     }
 
     public static Workspace getDefault() {
@@ -84,6 +87,10 @@ public class Workspace implements Lookup.Provider {
 
     public void setBusy(boolean busy) {
         this.busy.set(busy);
+    }        
+
+    public NotifyDescriptor getBusyNotifyDescriptor() {
+        return busyND;
     }        
 
     /**

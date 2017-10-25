@@ -111,7 +111,7 @@ public abstract class AbstractLayout implements Algorithm {
         try {
             initLayout();
         } finally {
-            graph.readUnlock();
+            graph.readUnlockAll();
         }
         stopRun = false;
         converged = false;
@@ -125,7 +125,7 @@ public abstract class AbstractLayout implements Algorithm {
             try {
                 runLayout();
             } finally {
-                graph.readUnlock();
+                graph.readUnlockAll();
             }
             i++;
             if (iterations != null && iterations.longValue() == i) {
@@ -143,7 +143,7 @@ public abstract class AbstractLayout implements Algorithm {
                 n.setLayoutData(null);
             }
         } finally {
-            graph.readUnlock();
+            graph.readUnlockAll();
         }
         graph = null;
         graphModel = null;

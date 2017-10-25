@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.bapedis.core.spi.data.PeptideDAO;
+import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
 import org.netbeans.swing.etable.QuickFilter;
 import org.openide.nodes.AbstractNode;
@@ -59,7 +60,7 @@ public class AttributesModel {
         availableColumnsModel.add(PeptideDAO.SEQ);
         availableColumnsModel.add(PeptideDAO.LENGHT);
         
-        mainGView = GRAPH_DB_VIEW;
+        mainGView = 0; // Unknown
     }
 
     public int getMainGView() {
@@ -71,7 +72,20 @@ public class AttributesModel {
         if (mainGView != GRAPH_DB_VIEW && mainGView != CSN_VIEW) {
             throw new IllegalArgumentException("Unknown value for main graph view");
         }
+        
         this.mainGView = mainGView;
+        GraphModel graphModel;
+        switch (mainGView) {
+            case GRAPH_DB_VIEW:
+                graphModel = graphDBView.getGraphModel();
+                graphModel.setVisibleView(graphDBView);
+                break;
+            case AttributesModel.CSN_VIEW:
+                graphModel = csnView.getGraphModel();
+                graphModel.setVisibleView(csnView);
+                break;
+        }
+        
         propertyChangeSupport.firePropertyChange(CHANGED_GVIEW, oldvalue, mainGView);
     }
 

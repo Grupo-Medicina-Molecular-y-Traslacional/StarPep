@@ -15,6 +15,7 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Edge;
+import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.visualization.VizController;
@@ -36,6 +37,8 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
     private TopComponent graphWindow;
     protected Lookup.Result<AttributesModel> peptideLkpResult;
     protected AttributesModel currentModel;
+    protected final String GRAPHDB_NAME = "graphDB";
+    protected final String CHEMSPACE_NAME = "chemSpace";
 
     public GraphWindowControllerImpl() {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
@@ -124,23 +127,13 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
 
         AttributesModel peptidesModel = pc.getAttributesModel(newWs);
         if (peptidesModel != null) {
-            this.currentModel = peptidesModel;
+            currentModel = peptidesModel;
+            if (currentModel.getMainGView() == AttributesModel.GRAPH_DB_VIEW) {
+                setDisplayName(GRAPHDB_NAME);
+            } else if (currentModel.getMainGView() == AttributesModel.CSN_VIEW) {
+                setDisplayName(CHEMSPACE_NAME);
+            }
             currentModel.addGraphViewChangeListener(this);
-            setMainGraphView();
-        }
-    }
-
-    private void setMainGraphView() {
-        GraphModel graphModel = pc.getGraphModel();
-        switch (currentModel.getMainGView()) {
-            case AttributesModel.GRAPH_DB_VIEW:
-                graphModel.setVisibleView(currentModel.getGraphDBView());
-                setDisplayName("graphDB");
-                break;
-            case AttributesModel.CSN_VIEW:
-                graphModel.setVisibleView(currentModel.getCsnView());
-                setDisplayName("chemSpace");
-                break;
         }
     }
 
@@ -165,7 +158,11 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource().equals(currentModel) && evt.getPropertyName().equals(AttributesModel.CHANGED_GVIEW)) {
-            setMainGraphView();
+            if (currentModel.getMainGView() == AttributesModel.GRAPH_DB_VIEW) {
+                setDisplayName(GRAPHDB_NAME);
+            } else if (currentModel.getMainGView() == AttributesModel.CSN_VIEW) {
+                setDisplayName(CHEMSPACE_NAME);
+            }
         }
     }
 }

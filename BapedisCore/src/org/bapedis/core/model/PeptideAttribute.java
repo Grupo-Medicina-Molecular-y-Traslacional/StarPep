@@ -6,6 +6,7 @@
 package org.bapedis.core.model;
 
 import java.util.Objects;
+import org.bapedis.core.spi.algo.Algorithm;
 
 /**
  * Class that represents an attribute type for the peptide
@@ -19,6 +20,7 @@ public class PeptideAttribute {
     protected Class<?> type;
     protected final boolean md;
     protected double maxValue, minValue;
+    protected Algorithm  originAlgorithm;
 
     public PeptideAttribute(String id, String displayName, Class<?> type) {
         this(id, displayName, type, true);
@@ -65,6 +67,14 @@ public class PeptideAttribute {
     public void setMinValue(double minValue) {
         this.minValue = minValue;
     }
+
+    public Algorithm getOriginAlgorithm() {
+        return originAlgorithm;
+    }
+
+    public void setOriginAlgorithm(Algorithm originAlgorithm) {
+        this.originAlgorithm = originAlgorithm;
+    }        
 
     public double normalize(Object value) {
         if (!md) {

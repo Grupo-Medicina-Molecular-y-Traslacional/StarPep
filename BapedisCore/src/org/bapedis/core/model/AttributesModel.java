@@ -30,7 +30,7 @@ import org.openide.nodes.Node;
 public class AttributesModel {
 
     protected final HashMap<String, PeptideAttribute> attrsMap;
-    protected final Set<PeptideAttribute> availableColumnsModel;
+    protected final Set<PeptideAttribute> displayedColumnsModel;
     private static final int MAX_AVAILABLE_COLUMNS = 6;
     protected List<PeptideNode> nodeList;
     private final PeptideNodeContainer container;
@@ -54,10 +54,10 @@ public class AttributesModel {
         rootNode = new AbstractNode(container);
         propertyChangeSupport = new PropertyChangeSupport(this);
 
-        availableColumnsModel = new LinkedHashSet<>();
-        availableColumnsModel.add(PeptideDAO.ID);
-        availableColumnsModel.add(PeptideDAO.SEQ);
-        availableColumnsModel.add(PeptideDAO.LENGHT);
+        displayedColumnsModel = new LinkedHashSet<>();
+        displayedColumnsModel.add(PeptideDAO.ID);
+        displayedColumnsModel.add(PeptideDAO.SEQ);
+        displayedColumnsModel.add(PeptideDAO.LENGHT);
         
         mainGView = CSN_VIEW;
     }
@@ -103,16 +103,16 @@ public class AttributesModel {
         return attrsMap.values().iterator();
     }
 
-    public Set<PeptideAttribute> getAvailableColumnsModel() {
-        return availableColumnsModel;
+    public Set<PeptideAttribute> getDisplayedColumnsModel() {
+        return displayedColumnsModel;
     }
 
-    public boolean canAddAvailableColumn() {
-        return availableColumnsModel.size() < MAX_AVAILABLE_COLUMNS;
+    public boolean canAddDisplayColumn() {
+        return displayedColumnsModel.size() < MAX_AVAILABLE_COLUMNS;
     }
 
-    public boolean addAvailableColumn(PeptideAttribute attr) {
-        if (canAddAvailableColumn() && availableColumnsModel.add(attr)) {
+    public boolean addDisplayedColumn(PeptideAttribute attr) {
+        if (canAddDisplayColumn() && displayedColumnsModel.add(attr)) {
             propertyChangeSupport.firePropertyChange(AVAILABLE_ATTR_ADDED, null, attr);
             return true;
         }
@@ -120,7 +120,7 @@ public class AttributesModel {
     }
 
     public boolean removeAvailableColumn(PeptideAttribute attr) {
-        if (availableColumnsModel.remove(attr)) {
+        if (displayedColumnsModel.remove(attr)) {
             propertyChangeSupport.firePropertyChange(AVAILABLE_ATTR_REMOVED, attr, null);
             return true;
         }

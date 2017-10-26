@@ -101,6 +101,7 @@ public abstract class AbstractModamp implements Algorithm {
                 }
                 descriptor.setMaxValue(max);
                 descriptor.setMinValue(min);
+                descriptor.setOriginAlgorithm(this);
             }
         }
     }

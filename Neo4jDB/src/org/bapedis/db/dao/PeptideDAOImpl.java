@@ -167,7 +167,6 @@ public class PeptideDAOImpl implements PeptideDAO {
                 graphModel.getGraph().writeUnlock();
                 attrModel.setCsnView(csnView);
                 attrModel.setGraphDBView(graphDBView);
-                attrModel.setMainGView(AttributesModel.CSN_VIEW);
                 peptideNodes.close();
                 tx.success();
             }

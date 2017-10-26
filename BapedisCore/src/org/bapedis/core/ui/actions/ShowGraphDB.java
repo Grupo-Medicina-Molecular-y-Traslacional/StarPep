@@ -6,10 +6,11 @@
 package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
+import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.GraphView;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -50,6 +51,11 @@ public class ShowGraphDB extends WorkspaceContextSensitiveAction<AttributesModel
         if (graphWC != null) {
             AttributesModel attrModel = pc.getAttributesModel();
             if (attrModel != null) {
+                GraphModel graphModel = pc.getGraphModel();
+                GraphView graphDBView = attrModel.getGraphDBView();
+                if (graphModel.getVisibleView() != graphDBView){
+                    graphModel.setVisibleView(graphDBView);
+                }                
                 attrModel.setMainGView(AttributesModel.GRAPH_DB_VIEW);
                 graphWC.openGraphWindow();
             }

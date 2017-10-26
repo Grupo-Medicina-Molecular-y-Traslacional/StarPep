@@ -15,8 +15,6 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.visualization.VizController;
 import org.gephi.visualization.api.selection.SelectionManager;
@@ -145,11 +143,7 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
                 if (currentModel != null) {
                     currentModel.removeGraphViewChangeListener(this);
                 }
-                AttributesModel oldModel = currentModel;
                 this.currentModel = attrModels.iterator().next();
-                if (oldModel != null && graphWindow.isOpened()) {
-                    currentModel.setMainGView(oldModel.getMainGView());
-                }
                 currentModel.addGraphViewChangeListener(this);
             }
         }

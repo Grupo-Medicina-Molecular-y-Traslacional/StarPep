@@ -51,7 +51,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Helder Suzuki <heldersuzuki@gephi.org>
  */
-@ServiceProvider(service = AlgorithmFactory.class)
+//@ServiceProvider(service = AlgorithmFactory.class)
 public class ForceAtlasFactory extends AbstractLayoutFactory {
 
     @Override

@@ -26,6 +26,7 @@ import org.bapedis.core.task.FilterExecutor;
 import org.bapedis.core.ui.actions.AddFilter;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.DropDownButtonFactory;
@@ -67,35 +68,35 @@ import org.openide.util.lookup.ProxyLookup;
     "HINT_FilterExplorerTopComponent=This is the Filter window"
 })
 public final class FilterExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener, ExplorerManager.Provider {
-    
+
     protected final ExplorerManager explorerMgr;
     protected final ProjectManager pc;
     private static final String AUTO_APPLY = "AUTO_APPLY";
     private final RichTooltip richTooltip;
-    
+
     public FilterExplorerTopComponent() {
         initComponents();
         setName(Bundle.CTL_FilterExplorerTopComponent());
         setToolTipText(Bundle.HINT_FilterExplorerTopComponent());
-        
+
         explorerMgr = new ExplorerManager();
         associateLookup(new ProxyLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()),
                 Lookups.singleton(new MetadataNavigatorLookupHint()), Lookups.singleton(new GraphElementNavigatorLookupHint())));
-        
+
         pc = Lookup.getDefault().lookup(ProjectManager.class);
-        
+
         DefaultComboBoxModel comboModel = (DefaultComboBoxModel) restrictiveComboBox.getModel();
         for (RestrictionLevel restriction : RestrictionLevel.values()) {
             comboModel.addElement(restriction);
         }
-        
+
         filterToolBar.add(createAddFilterButton());
         List<? extends Action> actions = Utilities.actionsForPath("Actions/EditFilter");
         for (Action action : actions) {
             filterToolBar.add(action);
         }
         viewerScrollPane.setViewportView(new ListView());
-        
+
         applyCheckBox.setSelected(NbPreferences.forModule(FilterModel.class).getBoolean(AUTO_APPLY, true));
         richTooltip = new RichTooltip(Bundle.CTL_FilterExplorerTopComponent(), NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.info.text"));
     }
@@ -251,31 +252,31 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         Workspace currentWs = pc.getCurrentWorkspace();
         workspaceChanged(null, currentWs);
     }
-    
+
     @Override
     public void componentClosed() {
         pc.removeWorkspaceEventListener(this);
     }
-    
+
     void writeProperties(java.util.Properties p) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty("version", "1.0");
         // TODO store your settings
     }
-    
+
     void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
     }
-    
+
     private JButton createAddFilterButton() {
         final JPopupMenu popup = new JPopupMenu();
         for (Iterator<? extends FilterFactory> it = pc.getFilterFactoryIterator(); it.hasNext();) {
             FilterFactory factory = it.next();
             popup.add(new AddFilter(factory));
         }
-        
+
         final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/bapedis/core/resources/add.png", false), popup);
         dropDownButton.setToolTipText(NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.addFilter.tooltiptext"));
         dropDownButton.addActionListener(new ActionListener() {
@@ -287,8 +288,8 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
             }
         });
         return dropDownButton;
-    }        
-    
+    }
+
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
         if (oldWs != null) {
@@ -298,12 +299,12 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         FilterModel filterModel = pc.getFilterModel(newWs);
         filterModel.addPropertyChangeListener(this);
         restrictiveComboBox.setSelectedItem(filterModel.getRestriction());
-        
+
         explorerMgr.setRootContext(filterModel.getRootContext());
         refreshRunningState(filterModel.isRunning());
         runButton.setEnabled(!filterModel.isEmpty());
     }
-    
+
     private void refreshRunningState(boolean running) {
         restrictiveComboBox.setEnabled(!running);
 //        for (Component c : filterToolBar.getComponents()) {
@@ -321,12 +322,17 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
             runButton.setToolTipText(NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.runButton.tooltip"));
         }
     }
-    
+
     private void runFilter() {
-        FilterExecutor worker = new FilterExecutor(pc.getCurrentWorkspace());
-        worker.execute();
+        Workspace currentWS = pc.getCurrentWorkspace();
+        if (currentWS.isBusy()) {
+            DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
+        } else {
+            FilterExecutor worker = new FilterExecutor(currentWS);
+            worker.execute();
+        }
     }
-    
+
     private void stop() {
         Workspace workspace = pc.getCurrentWorkspace();
         Collection<? extends FilterExecutor> executor = workspace.getLookup().lookupAll(FilterExecutor.class);
@@ -335,12 +341,12 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
             worker.setStopRun(true);
         }
     }
-    
+
     @Override
     public ExplorerManager getExplorerManager() {
         return explorerMgr;
     }
-    
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof FilterModel) {

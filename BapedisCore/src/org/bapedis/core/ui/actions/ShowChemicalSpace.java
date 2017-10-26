@@ -10,6 +10,8 @@ import javax.swing.AbstractAction;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
+import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.GraphView;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -49,6 +51,11 @@ public class ShowChemicalSpace extends WorkspaceContextSensitiveAction<Attribute
         if (graphWC != null) {
             AttributesModel attrModel = pc.getAttributesModel();
             if (attrModel != null){
+                GraphModel graphModel = pc.getGraphModel();
+                GraphView csnView = attrModel.getCsnView();
+                if (graphModel.getVisibleView() != csnView){
+                    graphModel.setVisibleView(csnView);
+                }
                 attrModel.setMainGView(AttributesModel.CSN_VIEW);
                 graphWC.openGraphWindow();
             }

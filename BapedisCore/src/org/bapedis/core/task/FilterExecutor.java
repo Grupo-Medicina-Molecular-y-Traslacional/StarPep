@@ -179,19 +179,28 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
         try {
             TreeSet<String> set = get();
             attrModel.setQuickFilter(filterModel.isEmpty() ? null : new QuickFilterImpl(set));
-            
+
             GraphView oldCsnView = attrModel.getCsnView();
-            GraphView oldGraphDBView = attrModel.getGraphDBView(); 
+            GraphView oldGraphDBView = attrModel.getGraphDBView();
 
             // set new view
             attrModel.setCsnView(csnView);
             attrModel.setGraphDBView(graphDBView);
-
-            attrModel.fireChangedGraphView();
             
+            switch (attrModel.getMainGView()) {
+                case AttributesModel.GRAPH_DB_VIEW:
+                    graphModel.setVisibleView(graphDBView);
+                    break;
+                case AttributesModel.CSN_VIEW:
+                    graphModel.setVisibleView(csnView);
+                    break;
+            }
+            attrModel.fireChangedGraphView();
+
             // destroy old view
             graphModel.destroyView(oldCsnView);
-            graphModel.destroyView(oldGraphDBView);            
+            graphModel.destroyView(oldGraphDBView);
+            
         } catch (InterruptedException ex) {
             Exceptions.printStackTrace(ex);
         } catch (ExecutionException ex) {

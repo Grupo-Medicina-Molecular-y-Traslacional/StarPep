@@ -31,6 +31,7 @@ import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.netbeans.spi.navigator.NavigatorHandler;
 import org.netbeans.spi.navigator.NavigatorPanel;
+import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.explorer.ExplorerManager;
@@ -349,8 +350,13 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
     }
 
     private void runQuery() {
-        QueryExecutor worker = new QueryExecutor(pc.getCurrentWorkspace());
-        worker.execute();
+        Workspace currentWS = pc.getCurrentWorkspace();
+        if (currentWS.isBusy()) {
+            DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
+        } else {
+            QueryExecutor worker = new QueryExecutor(currentWS);
+            worker.execute();
+        }
     }
 
     private void refreshRunningState(boolean running) {

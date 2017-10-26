@@ -72,8 +72,19 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
             // Set new Model
             if (oldModel != null) {
                 workspace.remove(oldModel);
-            }            
+                newModel.setMainGView(oldModel.getMainGView());
+            }                                                                   
             workspace.add(newModel);
+            
+            // Set new view            
+            switch (newModel.getMainGView()) {
+                case AttributesModel.GRAPH_DB_VIEW:
+                    graphModel.setVisibleView(newModel.getGraphDBView());
+                    break;
+                case AttributesModel.CSN_VIEW:
+                    graphModel.setVisibleView(newModel.getCsnView());
+                    break;
+            }            
             newModel.fireChangedGraphView();
 
             // Destroy old graph model       

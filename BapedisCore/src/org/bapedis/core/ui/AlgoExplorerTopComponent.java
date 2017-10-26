@@ -89,7 +89,7 @@ import org.w3c.dom.NodeList;
 )
 @TopComponent.Registration(mode = "explorer", openAtStartup = false, position = 533)
 @ActionID(category = "Window", id = "org.bapedis.core.ui.AlgoExplorerTopComponent")
-//@ActionReference(path = "Menu/Window" , position = 533)
+@ActionReference(path = "Menu/Window", position = 533)
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_AlgoExplorerAction",
         preferredID = "AlgoExplorerTopComponent"
@@ -118,7 +118,10 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         algoPresetPersistence = new AlgoPresetPersistence();
         algoListener = new AlgorithmListenerImpl();
         ((PropertySheet) propSheetPanel).setDescriptionAreaVisible(false);
-         NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text");
+        NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text");
+        DefaultComboBoxModel comboBoxModel = (DefaultComboBoxModel) algoComboBox.getModel();
+        comboBoxModel.addElement(NO_SELECTION);
+        comboBoxModel.setSelectedItem(NO_SELECTION);
     }
 
     private void removeLookupListener() {
@@ -333,8 +336,13 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             if (algoModel.isRunning()) {
                 executor.cancel(algo);
             } else {
-                algoModel.setRunning(true);
-                executor.execute(algo, algoListener, null);
+                Workspace currentWS = pc.getCurrentWorkspace();
+                if (currentWS.isBusy()) {
+                    DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
+                } else {
+                    algoModel.setRunning(true);
+                    executor.execute(algo, algoListener, null);
+                }
             }
         }
     }//GEN-LAST:event_runButtonActionPerformed
@@ -408,31 +416,27 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             oldAlgoCategory = oldModel.getCategory();
         }
         AlgorithmModel algoModel = pc.getAlgorithmModel(newWs);
-        if (algoModel.getCategory() == null) {
-            if (oldAlgoCategory != null) {
-                algoModel.setCategory(oldAlgoCategory);
-            } else {
-                close();
-            }
+        if (algoModel.getCategory() == null && oldAlgoCategory != null) {
+            algoModel.setCategory(oldAlgoCategory);
         }
         if (algoModel.getCategory() != null) {
             refreshAlgChooser(algoModel);
             refreshProperties(algoModel);
             refreshRunning(algoModel.isRunning());
-            algoModel.addPropertyChangeListener(this);
-            
-            if (pc.getAttributesModel()== null){
-                algoComboBox.setEnabled(false);
-                setEnableState(false);                
-            }
-            peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
-            peptideLkpResult.addLookupListener(this);
         }
+        algoModel.addPropertyChangeListener(this);
+        if (pc.getAttributesModel() == null) {
+            algoComboBox.setEnabled(false);
+            setEnableState(false);
+        }
+        peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
+        peptideLkpResult.addLookupListener(this);
+
     }
 
     private void refreshAlgChooser(AlgorithmModel algoModel) {
         setDisplayName(algoModel.getCategory().getDisplayName());
-        DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();        
+        DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
         comboBoxModel.addElement(NO_SELECTION);
         comboBoxModel.setSelectedItem(NO_SELECTION);
 

@@ -58,7 +58,6 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
-import javax.swing.UIManager;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;

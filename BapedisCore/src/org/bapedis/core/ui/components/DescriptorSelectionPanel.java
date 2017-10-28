@@ -5,6 +5,8 @@
  */
 package org.bapedis.core.ui.components;
 
+import java.awt.BorderLayout;
+import java.util.HashMap;
 import java.util.Iterator;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -31,6 +33,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
     protected final AttributesModel attrModel;
     protected final JButton findButton;
     protected final String ALL_SELECTION;
+    protected final HashMap<PeptideAttribute, StatsPanel> map;
 
     /**
      * Creates new form DescriptorSelectionPanel
@@ -78,17 +81,18 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         }
 
         // Configure components...
-        infoLabel.setVisible(!attrModel.canAddDisplayColumn());        
-        
+        infoLabel.setVisible(!attrModel.canAddDisplayColumn());
+
         leftList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-                if (!lsm.isSelectionEmpty()){
+                if (!lsm.isSelectionEmpty()) {
                     rightList.clearSelection();
-                    loadButton.setEnabled(true);
+                    setStats(leftListModel.get(leftList.getSelectedIndex()));
+                    loadButton.setEnabled(leftList.getSelectedIndices().length == 1);
                 }
-                addToDisplayButton.setEnabled(!lsm.isSelectionEmpty() && attrModel.canAddDisplayColumn());                
+                addToDisplayButton.setEnabled(!lsm.isSelectionEmpty() && attrModel.canAddDisplayColumn());
             }
         });
 
@@ -96,17 +100,28 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-                if (!lsm.isSelectionEmpty()){
-                   leftList.clearSelection();
-                   loadButton.setEnabled(true);
-                }   
-                removeFromDisplayButton.setEnabled(!lsm.isSelectionEmpty());                 
+                if (!lsm.isSelectionEmpty()) {
+                    leftList.clearSelection();
+                    setStats(rightListModel.get(rightList.getSelectedIndex()));
+                    loadButton.setEnabled(rightList.getSelectedIndices().length == 1);
+                }
+                removeFromDisplayButton.setEnabled(!lsm.isSelectionEmpty());
             }
-        });         
-        
+        });
+
         addToDisplayButton.setEnabled(false);
         removeFromDisplayButton.setEnabled(false);
         loadButton.setEnabled(false);
+        map = new HashMap<>();
+    }
+
+    private void setStats(PeptideAttribute attribute) {
+        rightBottomPanel.removeAll();
+        if (map.containsKey(attribute)) {
+            rightBottomPanel.add(map.get(attribute), BorderLayout.CENTER);
+        }
+        rightBottomPanel.revalidate();
+        rightBottomPanel.repaint();
     }
 
     private void addToDisplayedColumns() {
@@ -183,7 +198,6 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.gridheight = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         add(leftScrollPane, gridBagConstraints);
@@ -216,7 +230,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
         add(rightUpperPanel, gridBagConstraints);
 
@@ -283,11 +297,14 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         add(leftToolBar, gridBagConstraints);
+
+        rightBottomPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
         add(rightBottomPanel, gridBagConstraints);
@@ -295,6 +312,11 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         rightControlPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         org.openide.awt.Mnemonics.setLocalizedText(loadButton, org.openide.util.NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.loadButton.text")); // NOI18N
+        loadButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadButtonActionPerformed(evt);
+            }
+        });
         rightControlPanel.add(loadButton);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -346,6 +368,23 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         sizeLabel.setText(NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.sizeLabel.text", leftListModel.size()));
     }//GEN-LAST:event_descriptorComboBoxActionPerformed
 
+    private void loadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadButtonActionPerformed
+        PeptideAttribute attribute = null;
+        if (!leftList.getSelectionModel().isSelectionEmpty()) {
+            attribute = leftListModel.get(leftList.getSelectedIndex());
+        } else if (!rightList.getSelectionModel().isSelectionEmpty()) {
+            attribute = rightListModel.get(rightList.getSelectedIndex());
+        }
+        rightBottomPanel.removeAll();
+        if (attribute != null) {
+            StatsPanel panel = new StatsPanel(attrModel, attribute);
+            map.put(attribute, panel);
+            rightBottomPanel.add(panel, BorderLayout.CENTER);
+        }
+        rightBottomPanel.revalidate();
+        rightBottomPanel.repaint();
+    }//GEN-LAST:event_loadButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addToDisplayButton;
@@ -353,7 +392,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> descriptorComboBox;
     private javax.swing.JLabel infoLabel;
     private javax.swing.JToolBar.Separator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JScrollPane leftScrollPane;
     private javax.swing.JToolBar leftToolBar;
     private javax.swing.JButton loadButton;

@@ -34,6 +34,7 @@ public class AttributesModel {
     private static final int MAX_AVAILABLE_COLUMNS = 6;
     protected List<PeptideNode> nodeList;
     private final PeptideNodeContainer container;
+    private Peptide[] filteredPept;
     protected QuickFilter quickFilter;
     public static final String CHANGED_FILTER = "quickFilter";
     public static final String AVAILABLE_ATTR_ADDED = "attribute_add";
@@ -58,7 +59,7 @@ public class AttributesModel {
         displayedColumnsModel.add(PeptideDAO.ID);
         displayedColumnsModel.add(PeptideDAO.SEQ);
         displayedColumnsModel.add(PeptideDAO.LENGHT);
-        
+
         mainGView = CSN_VIEW;
     }
 
@@ -70,7 +71,7 @@ public class AttributesModel {
         int oldvalue = this.mainGView;
         if (mainGView != GRAPH_DB_VIEW && mainGView != CSN_VIEW) {
             throw new IllegalArgumentException("Unknown value for main graph view");
-        }        
+        }
         this.mainGView = mainGView;
         propertyChangeSupport.firePropertyChange(CHANGED_GVIEW, oldvalue, mainGView);
     }
@@ -82,7 +83,7 @@ public class AttributesModel {
     public void setSimilarityThreshold(double similarityThreshold) {
         this.similarityThreshold = similarityThreshold;
     }
-    
+
     public GraphView getGraphDBView() {
         return graphDBView;
     }
@@ -136,6 +137,9 @@ public class AttributesModel {
     }
 
     public synchronized Peptide[] getPeptides() {
+        if (filteredPept != null) {
+            return filteredPept;
+        }
         List<Peptide> peptides = new LinkedList<>();
         boolean accepted;
         for (PeptideNode pNode : nodeList) {
@@ -144,7 +148,8 @@ public class AttributesModel {
                 peptides.add(pNode.getPeptide());
             }
         }
-        return peptides.toArray(new Peptide[0]);
+        filteredPept = peptides.toArray(new Peptide[0]);
+        return filteredPept;
     }
 
     public void refresh() {
@@ -194,6 +199,7 @@ public class AttributesModel {
     public void setQuickFilter(QuickFilter quickFilter) {
         QuickFilter oldFilter = this.quickFilter;
         this.quickFilter = quickFilter;
+        filteredPept = null;
         propertyChangeSupport.firePropertyChange(CHANGED_FILTER, oldFilter, quickFilter);
     }
 
@@ -214,19 +220,19 @@ public class AttributesModel {
         propertyChangeSupport.removePropertyChangeListener(AVAILABLE_ATTR_ADDED, listener);
         propertyChangeSupport.removePropertyChangeListener(AVAILABLE_ATTR_REMOVED, listener);
     }
-    
+
     public void addGraphViewChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(CHANGED_GVIEW, listener);
     }
 
     public void removeGraphViewChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(CHANGED_GVIEW, listener);
-    }  
-    
-    public void fireChangedGraphView(){
+    }
+
+    public void fireChangedGraphView() {
         propertyChangeSupport.firePropertyChange(CHANGED_GVIEW, null, mainGView);
     }
-    
+
     private class PeptideNodeContainer extends Index.ArrayChildren {
 
         @Override

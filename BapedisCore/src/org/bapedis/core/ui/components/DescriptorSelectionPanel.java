@@ -10,6 +10,9 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -34,7 +37,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
      *
      * @param attrModel
      */
-    public DescriptorSelectionPanel(AttributesModel attrModel) {
+    public DescriptorSelectionPanel(final AttributesModel attrModel) {
         initComponents();
         this.attrModel = attrModel;
         leftListModel = new DefaultListModel<>();
@@ -74,7 +77,36 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
             }
         }
 
-        infoLabel.setVisible(!attrModel.canAddDisplayColumn());
+        // Configure components...
+        infoLabel.setVisible(!attrModel.canAddDisplayColumn());        
+        
+        leftList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+                if (!lsm.isSelectionEmpty()){
+                    rightList.clearSelection();
+                    loadButton.setEnabled(true);
+                }
+                addToDisplayButton.setEnabled(!lsm.isSelectionEmpty() && attrModel.canAddDisplayColumn());                
+            }
+        });
+
+        rightList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+                if (!lsm.isSelectionEmpty()){
+                   leftList.clearSelection();
+                   loadButton.setEnabled(true);
+                }   
+                removeFromDisplayButton.setEnabled(!lsm.isSelectionEmpty());                 
+            }
+        });         
+        
+        addToDisplayButton.setEnabled(false);
+        removeFromDisplayButton.setEnabled(false);
+        loadButton.setEnabled(false);
     }
 
     private void addToDisplayedColumns() {
@@ -86,8 +118,6 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
             }
 
         }
-//        leftList.clearSelection();
-//        rightList.clearSelection();
         infoLabel.setVisible(!attrModel.canAddDisplayColumn());
     }
 
@@ -97,8 +127,6 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
             attrModel.removeAvailableColumn(rightListModel.get(indices[i]));
             rightListModel.removeElementAt(indices[i]);
         }
-//        leftList.clearSelection();
-//        rightList.clearSelection();        
         infoLabel.setVisible(!attrModel.canAddDisplayColumn());
     }
 
@@ -115,7 +143,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         descriptorComboBox = new javax.swing.JComboBox<>();
         leftScrollPane = new javax.swing.JScrollPane();
         infoLabel = new javax.swing.JLabel();
-        leftUpperPanel = new javax.swing.JPanel();
+        rightUpperPanel = new javax.swing.JPanel();
         rightScrollPane = new javax.swing.JScrollPane();
         upperToolBar = new javax.swing.JToolBar();
         jSeparator1 = new javax.swing.JToolBar.Separator();
@@ -123,11 +151,11 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         removeFromDisplayButton = new javax.swing.JButton();
         sizeLabel = new javax.swing.JLabel();
         leftToolBar = new javax.swing.JToolBar();
-        leftBottomPanel = new javax.swing.JPanel();
-        bottomToolBar = new javax.swing.JToolBar();
+        rightBottomPanel = new javax.swing.JPanel();
+        rightControlPanel = new javax.swing.JPanel();
+        loadButton = new javax.swing.JButton();
+        centerToolBar = new javax.swing.JToolBar();
         jSeparator2 = new javax.swing.JToolBar.Separator();
-        addToDisplayButton1 = new javax.swing.JButton();
-        removeFromDisplayButton1 = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(610, 480));
         setPreferredSize(new java.awt.Dimension(610, 480));
@@ -153,7 +181,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.gridheight = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -170,9 +198,9 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
         add(infoLabel, gridBagConstraints);
 
-        leftUpperPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.leftUpperPanel.border.title"))); // NOI18N
-        leftUpperPanel.setToolTipText(org.openide.util.NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.leftUpperPanel.toolTipText")); // NOI18N
-        leftUpperPanel.setLayout(new java.awt.GridBagLayout());
+        rightUpperPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.rightUpperPanel.border.title"))); // NOI18N
+        rightUpperPanel.setToolTipText(org.openide.util.NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.rightUpperPanel.toolTipText")); // NOI18N
+        rightUpperPanel.setLayout(new java.awt.GridBagLayout());
 
         rightScrollPane.setMinimumSize(new java.awt.Dimension(275, 90));
         rightScrollPane.setPreferredSize(new java.awt.Dimension(275, 90));
@@ -183,14 +211,14 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        leftUpperPanel.add(rightScrollPane, gridBagConstraints);
+        rightUpperPanel.add(rightScrollPane, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
-        add(leftUpperPanel, gridBagConstraints);
+        add(rightUpperPanel, gridBagConstraints);
 
         upperToolBar.setFloatable(false);
         upperToolBar.setOrientation(javax.swing.SwingConstants.VERTICAL);
@@ -243,12 +271,13 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(sizeLabel, org.openide.util.NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.sizeLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         add(sizeLabel, gridBagConstraints);
 
+        leftToolBar.setFloatable(false);
         leftToolBar.setRollover(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -256,57 +285,36 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         add(leftToolBar, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
-        add(leftBottomPanel, gridBagConstraints);
+        add(rightBottomPanel, gridBagConstraints);
 
-        bottomToolBar.setFloatable(false);
-        bottomToolBar.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        bottomToolBar.setRollover(true);
-        bottomToolBar.setPreferredSize(new java.awt.Dimension(40, 125));
-        bottomToolBar.add(jSeparator2);
+        rightControlPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        addToDisplayButton1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        addToDisplayButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/arrow.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(addToDisplayButton1, org.openide.util.NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.addToDisplayButton1.text")); // NOI18N
-        addToDisplayButton1.setToolTipText(org.openide.util.NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.addToDisplayButton1.toolTipText")); // NOI18N
-        addToDisplayButton1.setFocusable(false);
-        addToDisplayButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        addToDisplayButton1.setMaximumSize(new java.awt.Dimension(50, 21));
-        addToDisplayButton1.setMinimumSize(new java.awt.Dimension(23, 21));
-        addToDisplayButton1.setPreferredSize(new java.awt.Dimension(50, 21));
-        addToDisplayButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        addToDisplayButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addToDisplayButton1ActionPerformed(evt);
-            }
-        });
-        bottomToolBar.add(addToDisplayButton1);
+        org.openide.awt.Mnemonics.setLocalizedText(loadButton, org.openide.util.NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.loadButton.text")); // NOI18N
+        rightControlPanel.add(loadButton);
 
-        removeFromDisplayButton1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        removeFromDisplayButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/arrow-180.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(removeFromDisplayButton1, org.openide.util.NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.removeFromDisplayButton1.text")); // NOI18N
-        removeFromDisplayButton1.setToolTipText(org.openide.util.NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.removeFromDisplayButton1.toolTipText")); // NOI18N
-        removeFromDisplayButton1.setFocusable(false);
-        removeFromDisplayButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        removeFromDisplayButton1.setMaximumSize(new java.awt.Dimension(50, 21));
-        removeFromDisplayButton1.setMinimumSize(new java.awt.Dimension(23, 21));
-        removeFromDisplayButton1.setPreferredSize(new java.awt.Dimension(50, 21));
-        removeFromDisplayButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        removeFromDisplayButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                removeFromDisplayButton1ActionPerformed(evt);
-            }
-        });
-        bottomToolBar.add(removeFromDisplayButton1);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+        add(rightControlPanel, gridBagConstraints);
+
+        centerToolBar.setFloatable(false);
+        centerToolBar.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        centerToolBar.setRollover(true);
+        centerToolBar.add(jSeparator2);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        add(bottomToolBar, gridBagConstraints);
+        add(centerToolBar, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void addToDisplayButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToDisplayButtonActionPerformed
@@ -338,30 +346,22 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         sizeLabel.setText(NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.sizeLabel.text", leftListModel.size()));
     }//GEN-LAST:event_descriptorComboBoxActionPerformed
 
-    private void addToDisplayButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToDisplayButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_addToDisplayButton1ActionPerformed
-
-    private void removeFromDisplayButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeFromDisplayButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_removeFromDisplayButton1ActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addToDisplayButton;
-    private javax.swing.JButton addToDisplayButton1;
-    private javax.swing.JToolBar bottomToolBar;
+    private javax.swing.JToolBar centerToolBar;
     private javax.swing.JComboBox<String> descriptorComboBox;
     private javax.swing.JLabel infoLabel;
     private javax.swing.JToolBar.Separator jSeparator1;
-    private javax.swing.JToolBar.Separator jSeparator2;
-    private javax.swing.JPanel leftBottomPanel;
+    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JScrollPane leftScrollPane;
     private javax.swing.JToolBar leftToolBar;
-    private javax.swing.JPanel leftUpperPanel;
+    private javax.swing.JButton loadButton;
     private javax.swing.JButton removeFromDisplayButton;
-    private javax.swing.JButton removeFromDisplayButton1;
+    private javax.swing.JPanel rightBottomPanel;
+    private javax.swing.JPanel rightControlPanel;
     private javax.swing.JScrollPane rightScrollPane;
+    private javax.swing.JPanel rightUpperPanel;
     private javax.swing.JLabel sizeLabel;
     private javax.swing.JToolBar upperToolBar;
     // End of variables declaration//GEN-END:variables

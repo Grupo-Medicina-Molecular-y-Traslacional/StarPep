@@ -145,7 +145,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
     private void removeFromDisplayedColumns() {
         int[] indices = rightList.getSelectedIndices();
         for (int i = indices.length - 1; i >= 0; i--) {
-            attrModel.removeAvailableColumn(rightListModel.get(indices[i]));
+            attrModel.removeDisplayedColumn(rightListModel.get(indices[i]));
             rightListModel.removeElementAt(indices[i]);
         }
         infoLabel.setVisible(!attrModel.canAddDisplayColumn());

@@ -141,8 +141,11 @@ public class HydrophobicMoment extends AbstractModamp {
                         }
                     }
                     if (!attrModel.hasAttribute(AVGH[i])) {
-                        attrModel.addAttribute(AVGH[i], AVGH[i], Double.class);
+                        descriptor = attrModel.addAttribute(AVGH[i], AVGH[i], Double.class);
+                    } else{
+                        descriptor = attrModel.getAttribute(AVGH[i]);
                     }
+                    descriptorList.add(descriptor);
                 }
             }
         }

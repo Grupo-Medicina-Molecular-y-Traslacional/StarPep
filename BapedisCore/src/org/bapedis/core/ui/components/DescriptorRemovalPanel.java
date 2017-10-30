@@ -5,9 +5,13 @@
  */
 package org.bapedis.core.ui.components;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import javax.swing.ListSelectionModel;
@@ -20,6 +24,7 @@ import org.bapedis.core.model.PeptideAttribute;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -29,14 +34,30 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
 
     protected final AttributesModel attrModel;
     protected JXTable table;
+    HashMap<String, List<PeptideAttribute>> map;
 
-    public DescriptorRemovalPanel(AttributesModel attrModel) {
+    public DescriptorRemovalPanel(final AttributesModel attrModel) {
         initComponents();
         this.attrModel = attrModel;
 
         SwingWorker sw = new SwingWorker<MyTableModel, Void>() {
             @Override
             protected MyTableModel doInBackground() throws Exception {
+                map = new LinkedHashMap<>();
+                String key;
+                List<PeptideAttribute> list;
+                for (Iterator<PeptideAttribute> it = attrModel.getAttributeIterator(); it.hasNext();) {
+                    PeptideAttribute attr = it.next();
+                    if (attr.isMolecularDescriptor() && attr.getOriginAlgorithm() != null) {
+                        key = attr.getOriginAlgorithm().getFactory().getName();
+                        if (!map.containsKey(key)) {
+                            list = new LinkedList<>();
+                            map.put(key, list);
+                        }
+                        list = map.get(key);
+                        list.add(attr);
+                    }
+                }
                 return createTableModel();
             }
 
@@ -72,28 +93,36 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
     }
 
     private MyTableModel createTableModel() {
-        HashMap<String, Integer> map = new LinkedHashMap<>();
-        String key;
-        for (Iterator<PeptideAttribute> it = attrModel.getAttributeIterator(); it.hasNext();) {
-            PeptideAttribute attr = it.next();
-            if (attr.isMolecularDescriptor() && attr.getOriginAlgorithm() != null) {
-                key = attr.getOriginAlgorithm().getFactory().getName();
-                if (map.containsKey(key)) {
-                    map.put(key, map.get(key) + 1);
-                } else {
-                    map.put(key, 1);
-                }
-            }
-        }
-        String[] columnNames = {"Name", "No. of features"};
-        Object[][] data = new Object[map.size()][2];
+        String[] columnNames = {NbBundle.getMessage(DescriptorRemovalPanel.class, "DescriptorRemovalPanel.columnName.first"),
+            NbBundle.getMessage(DescriptorRemovalPanel.class, "DescriptorRemovalPanel.columnName.second")};
+        ArrayList<Object[]> data = new ArrayList(map.size());
+        Object[] dataRow;
         int row = 0;
-        for (Map.Entry<String, Integer> entry : map.entrySet()) {
-            data[row][0] = entry.getKey();
-            data[row][1] = entry.getValue();
-            row++;
+        for (Map.Entry<String, List<PeptideAttribute>> entry : map.entrySet()) {
+            dataRow = new Object[2];
+            dataRow[0] = entry.getKey();
+            dataRow[1] = entry.getValue().size();
+            data.add(row++, dataRow);
         }
         return map.isEmpty() ? null : new MyTableModel(columnNames, data);
+    }
+
+    private void delete() {
+        int[] selectedRows = table.getSelectedRows();
+        for (int i = 0; i < selectedRows.length; i++) {
+            selectedRows[i] = table.convertRowIndexToModel(selectedRows[i]);
+        }
+        String key;
+        List<PeptideAttribute> list;
+        for (int i = 0; i < selectedRows.length; i++) {
+            key = (String) table.getModel().getValueAt(selectedRows[i], 0);
+            list = map.get(key);
+            for (PeptideAttribute attribute : list) {
+                attrModel.deleteAttribute(attribute);
+            }
+            map.remove(key);
+        }
+        ((MyTableModel) table.getModel()).removeRows(selectedRows);
     }
 
     /**
@@ -106,13 +135,28 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        scrollPane = new javax.swing.JScrollPane();
+        rightPanel = new javax.swing.JPanel();
         deleteButton = new javax.swing.JButton();
         deleteAllButton = new javax.swing.JButton();
-        scrollPane = new javax.swing.JScrollPane();
 
         setMinimumSize(new java.awt.Dimension(440, 380));
         setPreferredSize(new java.awt.Dimension(440, 380));
         setLayout(new java.awt.GridBagLayout());
+
+        scrollPane.setMinimumSize(new java.awt.Dimension(275, 23));
+        scrollPane.setPreferredSize(new java.awt.Dimension(275, 23));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 2, 0);
+        add(scrollPane, gridBagConstraints);
+
+        rightPanel.setLayout(new javax.swing.BoxLayout(rightPanel, javax.swing.BoxLayout.Y_AXIS));
 
         org.openide.awt.Mnemonics.setLocalizedText(deleteButton, org.openide.util.NbBundle.getMessage(DescriptorRemovalPanel.class, "DescriptorRemovalPanel.deleteButton.text")); // NOI18N
         deleteButton.addActionListener(new java.awt.event.ActionListener() {
@@ -120,13 +164,7 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
                 deleteButtonActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 2);
-        add(deleteButton, gridBagConstraints);
+        rightPanel.add(deleteButton);
 
         org.openide.awt.Mnemonics.setLocalizedText(deleteAllButton, org.openide.util.NbBundle.getMessage(DescriptorRemovalPanel.class, "DescriptorRemovalPanel.deleteAllButton.text")); // NOI18N
         deleteAllButton.addActionListener(new java.awt.event.ActionListener() {
@@ -134,41 +172,32 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
                 deleteAllButtonActionPerformed(evt);
             }
         });
+        rightPanel.add(deleteAllButton);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 2);
-        add(deleteAllButton, gridBagConstraints);
-
-        scrollPane.setMinimumSize(new java.awt.Dimension(275, 23));
-        scrollPane.setPreferredSize(new java.awt.Dimension(275, 23));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 2, 0);
-        add(scrollPane, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(25, 5, 0, 5);
+        add(rightPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
-
+        delete();
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void deleteAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteAllButtonActionPerformed
-
-
+        if (table.getRowCount() > 0) {
+            table.setRowSelectionInterval(0, table.getRowCount() - 1);
+            delete();
+        }
     }//GEN-LAST:event_deleteAllButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton deleteAllButton;
     private javax.swing.JButton deleteButton;
+    private javax.swing.JPanel rightPanel;
     private javax.swing.JScrollPane scrollPane;
     // End of variables declaration//GEN-END:variables
 }
@@ -176,9 +205,9 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
 class MyTableModel extends AbstractTableModel {
 
     private final String[] columnNames;
-    private final Object[][] data;
+    private final ArrayList<Object[]> data;
 
-    public MyTableModel(String[] columnNames, Object[][] data) {
+    public MyTableModel(String[] columnNames, ArrayList<Object[]> data) {
         this.columnNames = columnNames;
         this.data = data;
     }
@@ -190,7 +219,7 @@ class MyTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        return data.length;
+        return data.size();
     }
 
     @Override
@@ -200,7 +229,7 @@ class MyTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int col) {
-        return data[row][col];
+        return data.get(row)[col];
     }
 
     @Override
@@ -216,5 +245,13 @@ class MyTableModel extends AbstractTableModel {
     @Override
     public void setValueAt(Object value, int row, int col) {
         throw new UnsupportedOperationException("The table is not editable");
+    }
+
+    public void removeRows(int[] rows) {
+        Arrays.sort(rows);
+        for (int i = rows.length - 1; i >= 0; i--) {
+            this.data.remove(rows[i]);
+            fireTableRowsDeleted(rows[i], rows[i]);
+        }
     }
 }

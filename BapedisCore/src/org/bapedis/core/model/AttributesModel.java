@@ -124,7 +124,7 @@ public class AttributesModel {
         return false;
     }
 
-    public boolean removeAvailableColumn(PeptideAttribute attr) {
+    public boolean removeDisplayedColumn(PeptideAttribute attr) {
         if (displayedColumnsModel.remove(attr)) {
             propertyChangeSupport.firePropertyChange(AVAILABLE_ATTR_REMOVED, attr, null);
             return true;
@@ -136,7 +136,7 @@ public class AttributesModel {
         for (PeptideNode pNode : nodeList) {
             pNode.getPeptide().deleteAttribute(attr);
         }
-        removeAvailableColumn(attr);
+        removeDisplayedColumn(attr);
         attrsMap.remove(attr.id);
     }
 

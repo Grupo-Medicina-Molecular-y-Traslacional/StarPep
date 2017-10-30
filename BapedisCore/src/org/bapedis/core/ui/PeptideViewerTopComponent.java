@@ -38,7 +38,6 @@ import org.bapedis.core.spi.filters.impl.FilterOperator;
 import org.bapedis.core.ui.actions.MolecularDescriptorAction;
 import org.bapedis.core.ui.components.DescriptorRemovalPanel;
 import org.bapedis.core.ui.components.DescriptorSelectionPanel;
-import org.bapedis.core.ui.components.PeptideDeleteColumnsPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.netbeans.swing.etable.ETableColumn;
 import org.netbeans.swing.etable.ETableColumnModel;

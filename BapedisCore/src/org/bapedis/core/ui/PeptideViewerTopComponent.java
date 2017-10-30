@@ -36,6 +36,7 @@ import org.bapedis.core.spi.filters.impl.AttributeFilter;
 import org.bapedis.core.spi.filters.impl.FilterHelper;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
 import org.bapedis.core.ui.actions.MolecularDescriptorAction;
+import org.bapedis.core.ui.components.DescriptorRemovalPanel;
 import org.bapedis.core.ui.components.DescriptorSelectionPanel;
 import org.bapedis.core.ui.components.PeptideDeleteColumnsPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -193,7 +194,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
     private void populateVisibleColumns(AttributesModel attrModel) {
         if (attrModel != null) {
-            Set<PeptideAttribute> availableColumnsModel = attrModel.getDisplayedColumnsModel();
+            Set<PeptideAttribute> availableColumnsModel = attrModel.getDisplayedColumns();
             List<String> columns = new LinkedList<>();
             for (PeptideAttribute attr : availableColumnsModel) {
                 columns.add(attr.getId());
@@ -226,7 +227,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         jValueTextField.setVisible(attrModel != null);
         jAddButton.setVisible(attrModel != null);
         if (attrModel != null) {
-            Set<PeptideAttribute> availableColumnsModel = attrModel.getDisplayedColumnsModel();
+            Set<PeptideAttribute> availableColumnsModel = attrModel.getDisplayedColumns();
             for (PeptideAttribute attr : availableColumnsModel) {
                 jFieldComboBox.addItem(attr);
             }
@@ -419,7 +420,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }//GEN-LAST:event_columnsButtonActionPerformed
 
     private void delMDButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delMDButtonActionPerformed
-        DialogDescriptor dd = new DialogDescriptor(new PeptideDeleteColumnsPanel(currentModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.DeleteColumnsPanel.title"));
+        DialogDescriptor dd = new DialogDescriptor(new DescriptorRemovalPanel(currentModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.DeleteColumnsPanel.title"));
         dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION});
         DialogDisplayer.getDefault().notify(dd);
         populateVisibleColumns(currentModel);

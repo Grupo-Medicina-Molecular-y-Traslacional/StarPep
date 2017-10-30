@@ -26,7 +26,7 @@ import org.openide.util.Exceptions;
 
 /**
  *
- * @author Home
+ * @author loge
  */
 public class StatsPanel extends javax.swing.JPanel {
 
@@ -122,6 +122,8 @@ public class StatsPanel extends javax.swing.JPanel {
         stdLabel = new javax.swing.JLabel();
         visualizationPanel = new javax.swing.JPanel();
 
+        setMinimumSize(new java.awt.Dimension(275, 80));
+        setPreferredSize(new java.awt.Dimension(275, 80));
         setLayout(new java.awt.GridBagLayout());
 
         summaryPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(StatsPanel.class, "StatsPanel.summaryPanel.border.title"))); // NOI18N

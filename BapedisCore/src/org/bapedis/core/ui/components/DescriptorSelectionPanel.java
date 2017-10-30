@@ -74,7 +74,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         leftToolBar.add(findButton);
 
         // Fill displayed column list
-        for (PeptideAttribute attr : attrModel.getDisplayedColumnsModel()) {
+        for (PeptideAttribute attr : attrModel.getDisplayedColumns()) {
             if (attr.isMolecularDescriptor()) {
                 rightListModel.addElement(attr);
             }
@@ -90,7 +90,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
                 if (!lsm.isSelectionEmpty()) {
                     rightList.clearSelection();
                     setStats(leftListModel.get(leftList.getSelectedIndex()));
-                    loadButton.setEnabled(leftList.getSelectedIndices().length == 1);
+                    loadButton.setEnabled(true);
                 }
                 addToDisplayButton.setEnabled(!lsm.isSelectionEmpty() && attrModel.canAddDisplayColumn());
             }
@@ -103,7 +103,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
                 if (!lsm.isSelectionEmpty()) {
                     leftList.clearSelection();
                     setStats(rightListModel.get(rightList.getSelectedIndex()));
-                    loadButton.setEnabled(rightList.getSelectedIndices().length == 1);
+                    loadButton.setEnabled(true);
                 }
                 removeFromDisplayButton.setEnabled(!lsm.isSelectionEmpty());
             }
@@ -112,13 +112,19 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         addToDisplayButton.setEnabled(false);
         removeFromDisplayButton.setEnabled(false);
         loadButton.setEnabled(false);
+        featureTextField.setEnabled(false);
         map = new HashMap<>();
     }
 
-    private void setStats(PeptideAttribute attribute) {
+    private void setStats(PeptideAttribute attribute) {                
         rightBottomPanel.removeAll();
-        if (map.containsKey(attribute)) {
+        if (map.containsKey(attribute)) {            
+            featureTextField.setText(attribute.getDisplayName());
+            featureTextField.setEnabled(true);
             rightBottomPanel.add(map.get(attribute), BorderLayout.CENTER);
+        } else{
+            featureTextField.setText("");
+            featureTextField.setEnabled(false);
         }
         rightBottomPanel.revalidate();
         rightBottomPanel.repaint();
@@ -169,6 +175,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         rightBottomPanel = new javax.swing.JPanel();
         rightControlPanel = new javax.swing.JPanel();
         loadButton = new javax.swing.JButton();
+        featureTextField = new javax.swing.JTextField();
         centerToolBar = new javax.swing.JToolBar();
         jSeparator2 = new javax.swing.JToolBar.Separator();
 
@@ -176,6 +183,8 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(610, 480));
         setLayout(new java.awt.GridBagLayout());
 
+        descriptorComboBox.setMinimumSize(new java.awt.Dimension(200, 27));
+        descriptorComboBox.setPreferredSize(new java.awt.Dimension(215, 27));
         descriptorComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 descriptorComboBoxActionPerformed(evt);
@@ -184,12 +193,11 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(descriptorComboBox, gridBagConstraints);
 
+        leftScrollPane.setMaximumSize(new java.awt.Dimension(275, 32767));
         leftScrollPane.setMinimumSize(new java.awt.Dimension(275, 23));
         leftScrollPane.setPreferredSize(new java.awt.Dimension(275, 23));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -197,7 +205,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.gridheight = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         add(leftScrollPane, gridBagConstraints);
@@ -214,6 +222,9 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
 
         rightUpperPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.rightUpperPanel.border.title"))); // NOI18N
         rightUpperPanel.setToolTipText(org.openide.util.NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.rightUpperPanel.toolTipText")); // NOI18N
+        rightUpperPanel.setMaximumSize(new java.awt.Dimension(275, 2147483647));
+        rightUpperPanel.setMinimumSize(new java.awt.Dimension(275, 113));
+        rightUpperPanel.setPreferredSize(new java.awt.Dimension(275, 113));
         rightUpperPanel.setLayout(new java.awt.GridBagLayout());
 
         rightScrollPane.setMinimumSize(new java.awt.Dimension(275, 90));
@@ -230,7 +241,9 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
         add(rightUpperPanel, gridBagConstraints);
 
@@ -296,8 +309,13 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
         add(leftToolBar, gridBagConstraints);
 
+        rightBottomPanel.setMinimumSize(new java.awt.Dimension(275, 23));
+        rightBottomPanel.setPreferredSize(new java.awt.Dimension(275, 23));
         rightBottomPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
@@ -309,7 +327,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
         add(rightBottomPanel, gridBagConstraints);
 
-        rightControlPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        rightControlPanel.setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(loadButton, org.openide.util.NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.loadButton.text")); // NOI18N
         loadButton.addActionListener(new java.awt.event.ActionListener() {
@@ -317,7 +335,22 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
                 loadButtonActionPerformed(evt);
             }
         });
-        rightControlPanel.add(loadButton);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
+        rightControlPanel.add(loadButton, gridBagConstraints);
+
+        featureTextField.setEditable(false);
+        featureTextField.setText(org.openide.util.NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.featureTextField.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
+        rightControlPanel.add(featureTextField, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
@@ -359,7 +392,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
                     leftListModel.addElement(attr);
                 } else {
                     originFactory = attr.getOriginAlgorithm() != null ? attr.getOriginAlgorithm().getFactory() : null;
-                    if (originFactory == null || originFactory.getName().equals(selectedItem)) {
+                    if (originFactory != null && originFactory.getName().equals(selectedItem)) {
                         leftListModel.addElement(attr);
                     }
                 }
@@ -369,20 +402,30 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_descriptorComboBoxActionPerformed
 
     private void loadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadButtonActionPerformed
-        PeptideAttribute attribute = null;
+        int[] indices = null;
+        DefaultListModel<PeptideAttribute> listModel = null;
         if (!leftList.getSelectionModel().isSelectionEmpty()) {
-            attribute = leftListModel.get(leftList.getSelectedIndex());
+            indices = leftList.getSelectedIndices();
+            listModel = leftListModel;
         } else if (!rightList.getSelectionModel().isSelectionEmpty()) {
-            attribute = rightListModel.get(rightList.getSelectedIndex());
+            indices = rightList.getSelectedIndices();
+            listModel = rightListModel;
         }
-        rightBottomPanel.removeAll();
-        if (attribute != null) {
-            StatsPanel panel = new StatsPanel(attrModel, attribute);
-            map.put(attribute, panel);
-            rightBottomPanel.add(panel, BorderLayout.CENTER);
+        if (indices != null && listModel != null) {
+            PeptideAttribute attribute;
+            StatsPanel panel;
+            for (int i = 0; i < indices.length; i++) {
+                attribute = listModel.get(indices[i]);
+                if (!map.containsKey(attribute)) {
+                    panel = new StatsPanel(attrModel, attribute);
+                    map.put(attribute, panel);
+                }
+            }
+            if (indices.length > 0) {
+                setStats(listModel.get(indices[0]));
+            }
         }
-        rightBottomPanel.revalidate();
-        rightBottomPanel.repaint();
+
     }//GEN-LAST:event_loadButtonActionPerformed
 
 
@@ -390,6 +433,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
     private javax.swing.JButton addToDisplayButton;
     private javax.swing.JToolBar centerToolBar;
     private javax.swing.JComboBox<String> descriptorComboBox;
+    private javax.swing.JTextField featureTextField;
     private javax.swing.JLabel infoLabel;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;

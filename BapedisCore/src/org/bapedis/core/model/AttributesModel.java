@@ -103,8 +103,12 @@ public class AttributesModel {
     public Iterator<PeptideAttribute> getAttributeIterator() {
         return attrsMap.values().iterator();
     }
+    
+    public PeptideAttribute[] getAttributeArray(){
+        return attrsMap.values().toArray(new PeptideAttribute[0]);
+    }
 
-    public Set<PeptideAttribute> getDisplayedColumnsModel() {
+    public Set<PeptideAttribute> getDisplayedColumns() {
         return displayedColumnsModel;
     }
 

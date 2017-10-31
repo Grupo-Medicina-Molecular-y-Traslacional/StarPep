@@ -127,6 +127,7 @@ public class StatsPanel extends javax.swing.JPanel {
         setLayout(new java.awt.GridBagLayout());
 
         summaryPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(StatsPanel.class, "StatsPanel.summaryPanel.border.title"))); // NOI18N
+        summaryPanel.setPreferredSize(new java.awt.Dimension(275, 51));
         summaryPanel.setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(maxLabel, org.openide.util.NbBundle.getMessage(StatsPanel.class, "StatsPanel.maxLabel.text")); // NOI18N
@@ -136,7 +137,9 @@ public class StatsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
         summaryPanel.add(maxLabel, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(minLabel, org.openide.util.NbBundle.getMessage(StatsPanel.class, "StatsPanel.minLabel.text")); // NOI18N
@@ -146,7 +149,9 @@ public class StatsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
         summaryPanel.add(minLabel, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(StatsPanel.class, "StatsPanel.jLabel1.text")); // NOI18N
@@ -184,7 +189,9 @@ public class StatsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
         summaryPanel.add(meanLabel, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(stdLabel, org.openide.util.NbBundle.getMessage(StatsPanel.class, "StatsPanel.stdLabel.text")); // NOI18N
@@ -194,12 +201,15 @@ public class StatsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
         summaryPanel.add(stdLabel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         add(summaryPanel, gridBagConstraints);
 

@@ -34,23 +34,23 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
     protected boolean stopRun;
     protected final AlgorithmFactory factory;
     protected final PropertyChangeSupport propertyChangeSupport;
-    protected double threshold;
+    protected float threshold;
 
     public SimilarityNetworkAlgo(AlgorithmFactory factory) {
         this.factory = factory;
         propertyChangeSupport = new PropertyChangeSupport(this);
         histogram = new JQuickHistogram();
-        threshold = 0.7;
+        threshold = 0.7f;
     }
 
     @Override
-    public double getThreshold() {
+    public float getThreshold() {
         return threshold;
     }
 
     @Override
-    public void setThreshold(double value) {
-        double oldValue = this.threshold;
+    public void setThreshold(float value) {
+        float oldValue = this.threshold;
         this.threshold = value;
         propertyChangeSupport.firePropertyChange(CHANGED_THRESHOLD_VALUE, oldValue, threshold);
     }
@@ -129,7 +129,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
             fjPool.invoke(task);
             task.join();
             for (Edge edge : SimilarityGraphEdgeBuilder.edgeList) {
-                histogram.addData((Double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
+                histogram.addData((float) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
             }
             propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY_VALUES, null, histogram);
             attrModel.fireChangedGraphView();

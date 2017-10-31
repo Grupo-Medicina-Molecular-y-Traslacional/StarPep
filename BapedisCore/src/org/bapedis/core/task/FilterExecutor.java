@@ -110,7 +110,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
         int relType;
         List<Node> metadataNodes = new LinkedList<>();
         List<Edge> graphEdges = new LinkedList<>();
-        double score;
+        float score;
         for (Node node : toAddNodes) {
             // add nodes to csn
             subGraphCSN.addNode(node);
@@ -119,7 +119,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
             if (relType != -1) {
                 for (Edge edge : graphModel.getGraph().getEdges(node, relType)) {
                     if (subGraphCSN.hasNode(edge.getSource().getId()) && subGraphCSN.hasNode(edge.getTarget().getId())) {
-                        score = (double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
+                        score = (float) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
                         if (score >= attrModel.getSimilarityThreshold()) {
                             graphEdges.add(edge);
                         }

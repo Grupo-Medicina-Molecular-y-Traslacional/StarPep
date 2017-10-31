@@ -19,11 +19,11 @@ public interface SimilarityMeasure {
 
     JQuickHistogram getHistogram();
     
-    double getThreshold();
+    float getThreshold();
 
-    void setThreshold(double value);
+    void setThreshold(float value);
 
-    double computeSimilarity(Peptide peptide1, Peptide peptide2);
+    float computeSimilarity(Peptide peptide1, Peptide peptide2);
     
     void addPropertyChangeListener(PropertyChangeListener listener);
     

@@ -87,7 +87,7 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
     }
 
     @Override
-    public double computeSimilarity(Peptide peptide1, Peptide peptide2) {
+    public float computeSimilarity(Peptide peptide1, Peptide peptide2) {
         // Evaluates the continuous Tanimoto coefficient
         double ab = 0.0;
         double a2 = 0.0;

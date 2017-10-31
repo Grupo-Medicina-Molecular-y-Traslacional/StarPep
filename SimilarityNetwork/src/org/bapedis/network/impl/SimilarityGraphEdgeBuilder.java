@@ -77,7 +77,7 @@ class SimilarityGraphEdgeBuilder extends RecursiveAction {
 
     private void computeDirectly() {
         Peptide peptide1, peptide2;
-        double score;
+        float score;
         for (int y = ylow; y < yhigh; y++) {
             peptide1 = peptides[y];
             for (int x = xlow; x < Math.min(xhigh, y); x++) {
@@ -91,7 +91,7 @@ class SimilarityGraphEdgeBuilder extends RecursiveAction {
         }
     }
 
-    private void createGraphEdge(Peptide peptide1, Peptide peptide2, double score) {
+    private void createGraphEdge(Peptide peptide1, Peptide peptide2, float score) {
         Edge graphEdge;
         int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
         String id = String.format("%s-%s", peptide1.getGraphNode().getId(), peptide2.getGraphNode().getId());

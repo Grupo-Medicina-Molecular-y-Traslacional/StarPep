@@ -170,17 +170,17 @@ public class SequenceSimilarityNetwork extends SimilarityNetworkAlgo{
     
 
     @Override
-    public double computeSimilarity(Peptide peptide1, Peptide peptide2) {
+    public float computeSimilarity(Peptide peptide1, Peptide peptide2) {
         SimpleGapPenalty gapPenalty = new SimpleGapPenalty();
         SequencePair<ProteinSequence, AminoAcidCompound> pair;
-        double score;
+        float score;
         if (peptide1.getSequence().equals(peptide2.getSequence())) {
             score = 1;
         } else {
             try {
                 pair = Alignments.getPairwiseAlignment(peptide1.getBiojavaSeq(), peptide2.getBiojavaSeq(),
                         alignerType, gapPenalty, substitutionMatrix);
-                score = ((double)getNumeratorValue(pair)) / getDenominatorValue(pair, peptide1, peptide2);
+                score = ((float)getNumeratorValue(pair)) / getDenominatorValue(pair, peptide1, peptide2);
             } catch (CompoundNotFoundException ex) {
 //                log.log(Level.SEVERE, "Compound Not Found Exception: {0}", ex.getMessage());
                 Exceptions.printStackTrace(ex);

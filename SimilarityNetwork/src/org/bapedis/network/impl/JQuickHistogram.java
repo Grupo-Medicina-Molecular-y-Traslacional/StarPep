@@ -63,14 +63,12 @@ public class JQuickHistogram {
     protected int constraintHeight = 0;
     protected int constraintWidth = 0;
     protected final boolean inclusive = true;
-    protected double sum;
+    protected float sum;
     //Data
     protected final TreeMap<String, Integer> data;
     protected DecimalFormat df;
-    protected Double minValue;
-    protected Double maxValue;
-    protected Double minRange;
-    protected Double maxRange;
+    protected float minValue;
+    protected float maxValue;
 
     public JQuickHistogram() {
         data = new TreeMap<>();
@@ -81,10 +79,8 @@ public class JQuickHistogram {
     }
 
     private void initValues() {
-        minValue = Double.MAX_VALUE;
-        maxValue = Double.NEGATIVE_INFINITY;
-        minRange = 0.;
-        maxRange = 1.;
+        minValue = Float.MAX_VALUE;
+        maxValue = Float.NEGATIVE_INFINITY;
         sum = 0;
     }
 
@@ -93,7 +89,7 @@ public class JQuickHistogram {
         initValues();
     }
 
-    public void addData(Double data) {
+    public void addData(float data) {
         if (data < 0 || data > 1) {
             throw new IllegalArgumentException("Invalid data value for histogram. It should be in [0,1]");
         }
@@ -104,21 +100,21 @@ public class JQuickHistogram {
         }
         int newCount = previousCount + 1;
         this.data.put(key, newCount);
-        minValue = Math.min(minValue, newCount);
-        maxValue = Math.max(maxValue, newCount);
+        minValue = Math.min(minValue, data);
+        maxValue = Math.max(maxValue, data);
         sum += data;
     }
+
+    public float getMinValue() {
+        return minValue;
+    }
+
+    public float getMaxValue() {
+        return maxValue;
+    }        
     
-    public double getAverage(){
+    public float getAverage(){
         return sum / countValues();
-    }
-
-    public void setLowerBound(Double lowerBound) {
-        this.minRange = lowerBound;
-    }
-
-    public void setUpperBound(Double upperBound) {
-        this.maxRange = upperBound;
     }
 
     public void setConstraintHeight(int constraintHeight) {

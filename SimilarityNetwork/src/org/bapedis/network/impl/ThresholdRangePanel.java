@@ -88,7 +88,11 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
 
     public ThresholdRangePanel() {
         initComponents();
-        thresholdSpinnerModel = new SpinnerNumberModel(0, 0, 1, 0.01);
+        Float value = 0f;
+        Float min = 0f;
+        Float max = 1f;
+        Float step = 0.01f;
+        thresholdSpinnerModel = new SpinnerNumberModel(value, min, max, step);
         jThresholdSpinner.setModel(thresholdSpinnerModel);
 
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
@@ -162,9 +166,11 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         richTooltip.setTitle(NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.info.title"));
         richTooltip.addDescriptionSection("Number of values: " + histogram.countValues());
         richTooltip.addDescriptionSection("Average: " + (histogram.countValues() > 0 ? formatter.format(histogram.getAverage()) : "NaN"));
+        richTooltip.addDescriptionSection("Min: " + (histogram.countValues() > 0 ? formatter.format(histogram.getMinValue()) : "NaN"));
+        richTooltip.addDescriptionSection("Max: " + (histogram.countValues() > 0 ? formatter.format(histogram.getMaxValue()) : "NaN"));
     }
 
-    private void resetSimilarityThreshold(final double oldValue, final double newValue) {
+    private void resetSimilarityThreshold(final float oldValue, final float newValue) {
         final AttributesModel attrModel = pc.getAttributesModel();
         SwingWorker sw = new SwingWorker() {
             @Override
@@ -172,7 +178,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
                 if (attrModel != null) {
                     attrModel.setSimilarityThreshold(newValue);
                     Graph csnGraph = pc.getGraphModel().getGraph(attrModel.getCsnView());
-                    double score;
+                    float score;
                     if (newValue < oldValue) { // to add edges
                         List<Edge> toAdd = new LinkedList<>();
                         Graph mainGraph = pc.getGraphModel().getGraph();
@@ -185,7 +191,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
                                     try {
                                         for (Edge edge : mainGraph.getEdges(node, relType)) {
                                             if (csnGraph.hasNode(edge.getSource().getId()) && csnGraph.hasNode(edge.getTarget().getId())) {
-                                                score = (double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
+                                                score = (float) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
                                                 if (score >= newValue) {
                                                     toAdd.add(edge);
                                                 }
@@ -205,7 +211,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
                         csnGraph.writeLock();
                         try {
                             for (Edge edge : csnGraph.getEdges()) {
-                                score = (double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
+                                score = (float) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
                                 if (score < newValue) {
                                     toRemove.add(edge);
                                 }
@@ -345,7 +351,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         if (simMeasure != null) {
             try {
                 jThresholdSpinner.commitEdit();
-                simMeasure.setThreshold((double) thresholdSpinnerModel.getValue());                
+                simMeasure.setThreshold((float) thresholdSpinnerModel.getValue());
                 jApplyButton.setVisible(false);
             } catch (ParseException ex) {
                 NotifyDescriptor d
@@ -368,7 +374,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
     }//GEN-LAST:event_infoLabelMouseExited
 
     private void jThresholdSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jThresholdSpinnerStateChanged
-        double newValue = (double) thresholdSpinnerModel.getValue();
+        float newValue = (float) thresholdSpinnerModel.getValue();
         jApplyButton.setVisible(simMeasure != null && simMeasure.getThreshold() != newValue);
     }//GEN-LAST:event_jThresholdSpinnerStateChanged
 
@@ -391,7 +397,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
             if (evt.getPropertyName().equals(SimilarityMeasure.CHANGED_SIMILARITY_VALUES)) {
                 setupHistogram((evt.getNewValue() != null ? (JQuickHistogram) evt.getNewValue() : null));
             } else if (evt.getPropertyName().equals(SimilarityMeasure.CHANGED_THRESHOLD_VALUE)) {
-                resetSimilarityThreshold((double) evt.getOldValue(), (double) evt.getNewValue());
+                resetSimilarityThreshold((float) evt.getOldValue(), (float) evt.getNewValue());
             }
         }
     }

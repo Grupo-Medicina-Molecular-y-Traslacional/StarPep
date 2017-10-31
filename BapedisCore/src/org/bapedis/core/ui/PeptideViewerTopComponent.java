@@ -412,15 +412,15 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }//GEN-LAST:event_jFieldComboBoxActionPerformed
 
     private void columnsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_columnsButtonActionPerformed
-        DialogDescriptor dd = new DialogDescriptor(new DescriptorSelectionPanel(currentModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.AvailableColumnsPanel.title"));
-        dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION});
+        DialogDescriptor dd = new DialogDescriptor(new DescriptorSelectionPanel(currentModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.DescriptorSelectionPanel.title"));
+        dd.setOptions(new Object[]{DialogDescriptor.CLOSED_OPTION});
         DialogDisplayer.getDefault().notify(dd);
         populateVisibleColumns(currentModel);
     }//GEN-LAST:event_columnsButtonActionPerformed
 
     private void delMDButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delMDButtonActionPerformed
-        DialogDescriptor dd = new DialogDescriptor(new DescriptorRemovalPanel(currentModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.DeleteColumnsPanel.title"));
-        dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION});
+        DialogDescriptor dd = new DialogDescriptor(new DescriptorRemovalPanel(currentModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.DescriptorRemovalPanel.title"));
+        dd.setOptions(new Object[]{DialogDescriptor.CLOSED_OPTION});
         DialogDisplayer.getDefault().notify(dd);
         populateVisibleColumns(currentModel);
     }//GEN-LAST:event_delMDButtonActionPerformed

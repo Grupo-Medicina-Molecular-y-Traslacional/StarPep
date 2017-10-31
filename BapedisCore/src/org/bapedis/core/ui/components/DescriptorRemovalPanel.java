@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.ui.components;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,12 +16,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.PeptideAttribute;
+import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.openide.util.Exceptions;
@@ -34,11 +37,19 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
 
     protected final AttributesModel attrModel;
     protected JXTable table;
-    HashMap<String, List<PeptideAttribute>> map;
+    protected HashMap<String, List<PeptideAttribute>> map;
+    protected final JXBusyLabel busyLabel;
 
     public DescriptorRemovalPanel(final AttributesModel attrModel) {
         initComponents();
         this.attrModel = attrModel;
+
+        busyLabel = new JXBusyLabel(new Dimension(20, 20));
+        busyLabel.setText(NbBundle.getMessage(DescriptorRemovalPanel.class, "DescriptorRemovalPanel.deleting.text"));
+        busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        busyLabel.setBusy(false);
+        busyLabel.setVisible(false);
+        rightPanel.add(busyLabel);
 
         SwingWorker sw = new SwingWorker<MyTableModel, Void>() {
             @Override
@@ -67,6 +78,7 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
                     MyTableModel tableModel = get();
                     if (tableModel != null) {
                         table = new JXTable(tableModel);
+                        table.getColumn(0).setPreferredWidth(240);
                         table.setHighlighters(HighlighterFactory.createAlternateStriping());
                         table.setColumnControlVisible(false);
                         table.setSortable(true);
@@ -108,21 +120,45 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
     }
 
     private void delete() {
-        int[] selectedRows = table.getSelectedRows();
+        final int[] selectedRows = table.getSelectedRows();
         for (int i = 0; i < selectedRows.length; i++) {
             selectedRows[i] = table.convertRowIndexToModel(selectedRows[i]);
         }
-        String key;
-        List<PeptideAttribute> list;
-        for (int i = 0; i < selectedRows.length; i++) {
-            key = (String) table.getModel().getValueAt(selectedRows[i], 0);
-            list = map.get(key);
-            for (PeptideAttribute attribute : list) {
-                attrModel.deleteAttribute(attribute);
+        SwingWorker sw = new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                String key;
+                List<PeptideAttribute> list;
+                for (int i = 0; i < selectedRows.length; i++) {
+                    key = (String) table.getModel().getValueAt(selectedRows[i], 0);
+                    list = map.get(key);
+                    for (PeptideAttribute attribute : list) {
+                        attrModel.deleteAttribute(attribute);
+                    }
+                    map.remove(key);
+                }
+                return null;
             }
-            map.remove(key);
-        }
-        ((MyTableModel) table.getModel()).removeRows(selectedRows);
+
+            @Override
+            protected void done() {
+                try {
+                    get();
+                    ((MyTableModel) table.getModel()).removeRows(selectedRows);
+                } catch (InterruptedException | ExecutionException ex) {
+                    Exceptions.printStackTrace(ex);
+                } finally {
+                    busyLabel.setBusy(false);
+                    busyLabel.setVisible(false);                    
+                    deleteAllButton.setEnabled(table.getRowCount() > 0);
+                }
+            }
+        };
+        busyLabel.setBusy(true);
+        busyLabel.setVisible(true);
+        deleteButton.setEnabled(false);
+        deleteAllButton.setEnabled(false);
+        sw.execute();
     }
 
     /**
@@ -141,7 +177,7 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
         deleteAllButton = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(440, 380));
-        setPreferredSize(new java.awt.Dimension(440, 380));
+        setPreferredSize(new java.awt.Dimension(540, 380));
         setLayout(new java.awt.GridBagLayout());
 
         scrollPane.setMinimumSize(new java.awt.Dimension(275, 23));
@@ -156,12 +192,17 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 2, 0);
         add(scrollPane, gridBagConstraints);
 
+        rightPanel.setMaximumSize(new java.awt.Dimension(110, 58));
+        rightPanel.setMinimumSize(new java.awt.Dimension(110, 58));
+        rightPanel.setPreferredSize(new java.awt.Dimension(110, 58));
         rightPanel.setLayout(new javax.swing.BoxLayout(rightPanel, javax.swing.BoxLayout.Y_AXIS));
 
+        deleteButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/delete.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(deleteButton, org.openide.util.NbBundle.getMessage(DescriptorRemovalPanel.class, "DescriptorRemovalPanel.deleteButton.text")); // NOI18N
-        deleteButton.setMaximumSize(new java.awt.Dimension(79, 29));
-        deleteButton.setMinimumSize(new java.awt.Dimension(79, 29));
-        deleteButton.setPreferredSize(new java.awt.Dimension(79, 29));
+        deleteButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        deleteButton.setMaximumSize(new java.awt.Dimension(99, 29));
+        deleteButton.setMinimumSize(new java.awt.Dimension(99, 29));
+        deleteButton.setPreferredSize(new java.awt.Dimension(99, 29));
         deleteButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 deleteButtonActionPerformed(evt);
@@ -169,7 +210,9 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
         });
         rightPanel.add(deleteButton);
 
+        deleteAllButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/delete.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(deleteAllButton, org.openide.util.NbBundle.getMessage(DescriptorRemovalPanel.class, "DescriptorRemovalPanel.deleteAllButton.text")); // NOI18N
+        deleteAllButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         deleteAllButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 deleteAllButtonActionPerformed(evt);

@@ -61,8 +61,7 @@ public class HydrophobicPeriodicity extends AbstractModamp {
     }
 
     @Override
-    public void initAlgo() {
-        super.initAlgo();        
+    public void initMD(List<PeptideAttribute> descriptorList) {
         if (attrModel != null) {
             PeptideAttribute descriptor;
             String name = getProName();
@@ -79,5 +78,11 @@ public class HydrophobicPeriodicity extends AbstractModamp {
     public AlgorithmProperty[] getProperties() {
         return properties.toArray(new AlgorithmProperty[0]);
     }
+
+    @Override
+    protected void endMD() {
+    }
+    
+    
 
 }

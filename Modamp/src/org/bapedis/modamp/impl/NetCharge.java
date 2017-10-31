@@ -113,8 +113,7 @@ public class NetCharge extends AbstractModamp {
     }
 
     @Override
-    public void initAlgo() {
-        super.initAlgo();
+    public void initMD(List<PeptideAttribute> descriptorList) {
         if (attrModel != null) {
             PeptideAttribute descriptor;
             if (ph5) {
@@ -230,5 +229,9 @@ public class NetCharge extends AbstractModamp {
     public AlgorithmProperty[] getProperties() {
         return properties.toArray(new AlgorithmProperty[0]);
     }
+
+    @Override
+    protected void endMD() {
+    }        
 
 }

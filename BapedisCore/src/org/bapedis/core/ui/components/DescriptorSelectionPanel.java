@@ -179,8 +179,8 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         centerToolBar = new javax.swing.JToolBar();
         jSeparator2 = new javax.swing.JToolBar.Separator();
 
-        setMinimumSize(new java.awt.Dimension(610, 480));
-        setPreferredSize(new java.awt.Dimension(610, 480));
+        setMinimumSize(new java.awt.Dimension(700, 480));
+        setPreferredSize(new java.awt.Dimension(690, 480));
         setLayout(new java.awt.GridBagLayout());
 
         descriptorComboBox.setMinimumSize(new java.awt.Dimension(200, 27));

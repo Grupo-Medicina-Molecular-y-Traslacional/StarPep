@@ -5,6 +5,7 @@
  */
 package org.bapedis.modamp.impl;
 
+import java.util.List;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.modamp.MD;
@@ -23,8 +24,7 @@ public class IsoelectricPoint extends AbstractModamp {
     }
 
     @Override
-    public void initAlgo() {
-        super.initAlgo();
+    public void initMD(List<PeptideAttribute> descriptorList) {
         if (attrModel != null) {
             PeptideAttribute descriptor;
             if (!attrModel.hasAttribute(pI)) {
@@ -41,5 +41,10 @@ public class IsoelectricPoint extends AbstractModamp {
         double val = MD.isoelectricPoint(peptide.getSequence(), PkaValues.IPC_peptide());
         peptide.setAttributeValue(attrModel.getAttribute(pI), val);
     }
+
+    @Override
+    protected void endMD() {
+    }    
+    
 
 }

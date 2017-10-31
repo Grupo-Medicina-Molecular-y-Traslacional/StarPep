@@ -62,8 +62,7 @@ public class AverageHydrophilicity extends AbstractModamp {
     }
 
     @Override
-    public void initAlgo() {
-        super.initAlgo();
+    public void initMD(List<PeptideAttribute> descriptorList) {
         if (attrModel != null) {
             PeptideAttribute descriptor;
             if (HOPT810101) {
@@ -114,5 +113,11 @@ public class AverageHydrophilicity extends AbstractModamp {
     public AlgorithmProperty[] getProperties() {
         return properties.toArray(new AlgorithmProperty[0]);
     }
+
+    @Override
+    protected void endMD() {
+    }
+    
+    
 
 }

@@ -5,6 +5,7 @@
  */
 package org.bapedis.modamp.impl;
 
+import java.util.List;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.modamp.MD;
@@ -22,8 +23,7 @@ public class BomanIndex extends AbstractModamp {
     }
 
     @Override
-    public void initAlgo() {
-        super.initAlgo();
+    public void initMD(List<PeptideAttribute> descriptorList) {
         if (attrModel != null) {
             PeptideAttribute descriptor;
             if (!attrModel.hasAttribute(BM)) {
@@ -42,5 +42,9 @@ public class BomanIndex extends AbstractModamp {
         peptide.setAttributeValue(attrModel.getAttribute(BM), val);
 
     }
+
+    @Override
+    protected void endMD() {
+    }        
 
 }

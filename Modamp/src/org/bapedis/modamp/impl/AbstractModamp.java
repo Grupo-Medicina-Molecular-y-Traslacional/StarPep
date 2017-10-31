@@ -29,27 +29,34 @@ public abstract class AbstractModamp implements Algorithm {
     protected final AlgorithmFactory factory;
     protected ProgressTicket progressTicket;
     protected final String PRO_CATEGORY = "Properties";
-    protected final List<PeptideAttribute> descriptorList;
+    private final List<PeptideAttribute> descriptorList;
 
     public AbstractModamp(AlgorithmFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         this.factory = factory;
         descriptorList = new LinkedList<>();
     }
-    
-    public List<PeptideAttribute> getDescriptorList(){
+
+    public List<PeptideAttribute> getDescriptorList() {
         return descriptorList;
     }
 
     @Override
-    public void initAlgo() {
+    public final void initAlgo() {
         descriptorList.clear();
         attrModel = pc.getAttributesModel();
         stopRun = false;
+        initMD(descriptorList);
+        for (PeptideAttribute descriptor : descriptorList) {
+            if (descriptor.getOriginAlgorithm() == null) {
+                descriptor.setOriginAlgorithm(this);
+            }
+        }
     }
 
     @Override
-    public void endAlgo() {
+    public final void endAlgo() {
+        endMD();
         attrModel = null;
         progressTicket = null;
     }
@@ -76,7 +83,7 @@ public abstract class AbstractModamp implements Algorithm {
     }
 
     @Override
-    public void run() {
+    public final void run() {
         if (attrModel != null) {
             Peptide[] peptides = attrModel.getPeptides();
             progressTicket.switchToDeterminate(peptides.length);
@@ -84,28 +91,34 @@ public abstract class AbstractModamp implements Algorithm {
                 compute(peptides[i]);
                 progressTicket.progress();
             }
-            
+
             // Calculating max and min values for molecular descriptors
+            // Usefull to normalize values
             double val, max, min;
             for (PeptideAttribute descriptor : descriptorList) {
                 max = Double.MIN_VALUE;
                 min = Double.MAX_VALUE;
                 for (Peptide peptide : peptides) {
-                    val = PeptideAttribute.convertToDouble(peptide.getAttributeValue(descriptor));
-                    if (val < min) {
-                        min = val;
-                    }
-                    if (val > max) {
-                        max = val;
+                    if (peptide.getAttributeValue(descriptor) != null) {
+                        val = PeptideAttribute.convertToDouble(peptide.getAttributeValue(descriptor));
+                        if (val < min) {
+                            min = val;
+                        }
+                        if (val > max) {
+                            max = val;
+                        }
                     }
                 }
                 descriptor.setMaxValue(max);
                 descriptor.setMinValue(min);
-                descriptor.setOriginAlgorithm(this);
             }
         }
     }
 
+    protected abstract void initMD(List<PeptideAttribute> descriptorList);
+
     protected abstract void compute(Peptide peptide);
+
+    protected abstract void endMD();
 
 }

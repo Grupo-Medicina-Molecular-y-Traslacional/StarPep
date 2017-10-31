@@ -159,6 +159,9 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
         rightPanel.setLayout(new javax.swing.BoxLayout(rightPanel, javax.swing.BoxLayout.Y_AXIS));
 
         org.openide.awt.Mnemonics.setLocalizedText(deleteButton, org.openide.util.NbBundle.getMessage(DescriptorRemovalPanel.class, "DescriptorRemovalPanel.deleteButton.text")); // NOI18N
+        deleteButton.setMaximumSize(new java.awt.Dimension(79, 29));
+        deleteButton.setMinimumSize(new java.awt.Dimension(79, 29));
+        deleteButton.setPreferredSize(new java.awt.Dimension(79, 29));
         deleteButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 deleteButtonActionPerformed(evt);

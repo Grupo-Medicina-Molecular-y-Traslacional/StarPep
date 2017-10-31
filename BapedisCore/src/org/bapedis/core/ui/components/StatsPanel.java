@@ -65,7 +65,7 @@ public class StatsPanel extends javax.swing.JPanel {
                 Object val;
                 for (Peptide pept : peptides) {
                     val = pept.getAttributeValue(attribute);
-                    data[pos++] = PeptideAttribute.convertToDouble(val);
+                    data[pos++] = val == null ? Double.NaN: PeptideAttribute.convertToDouble(val);
                 }
                 max = Stats.max(data);
                 min = Stats.min(data);

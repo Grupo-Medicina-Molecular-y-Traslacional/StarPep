@@ -119,8 +119,7 @@ public class RADistribution extends AbstractModamp {
     }
 
     @Override
-    public void initAlgo() {
-        super.initAlgo();
+    public void initMD(List<PeptideAttribute> descriptorList) {
         if (attrModel != null) {
             if (hydT) {
                 alphabets.add(ReducedAlphabets.ra_Hydrophobicity_Tomii());
@@ -183,8 +182,7 @@ public class RADistribution extends AbstractModamp {
     }
 
     @Override
-    public void endAlgo() {
-        super.endAlgo();
+    public void endMD() {
         alphabets.clear();
     }
 

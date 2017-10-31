@@ -8,10 +8,12 @@ package org.bapedis.modamp.impl;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -35,7 +37,7 @@ public class AllDescriptors extends AbstractModamp {
         super(factory);
         properties = new LinkedList<>();
         populateProperties();
-        map = new HashMap<>();
+        map = new LinkedHashMap<>();
     }
 
     public void setAllMD(boolean selected) {
@@ -201,8 +203,7 @@ public class AllDescriptors extends AbstractModamp {
     }
 
     @Override
-    public void initAlgo() {
-        super.initAlgo();
+    public void initMD(List<PeptideAttribute> descriptorList) {
         map.clear();
         // fill hashmap
         if (attrModel != null) {
@@ -303,11 +304,10 @@ public class AllDescriptors extends AbstractModamp {
     }
 
     @Override
-    public void endAlgo() {
-        super.endAlgo();
+    public void endMD() {
         // Init all algoritms
         for (AbstractModamp algo : map.values()) {
-            algo.endAlgo();
+            algo.endMD();
         }
     }
 

@@ -6,6 +6,7 @@
 package org.bapedis.modamp.impl;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
@@ -27,8 +28,7 @@ public class AAComposition extends AbstractModamp {
     }
 
     @Override
-    public void initAlgo() {
-        super.initAlgo();
+    public void initMD(List<PeptideAttribute> descriptorList) {
         if (attrModel != null) {
             ra = ReducedAlphabets.stdAminoAcids();
             Iterator<String> it = ra.getCount().keySet().iterator();
@@ -61,8 +61,7 @@ public class AAComposition extends AbstractModamp {
     }
 
     @Override
-    public void endAlgo() {
-        super.endAlgo(); 
+    public void endMD() {
         ra = null;
     }        
 

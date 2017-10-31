@@ -124,8 +124,7 @@ public class HydrophobicMoment extends AbstractModamp {
     }
 
     @Override
-    public void initAlgo() {
-        super.initAlgo();
+    public void initMD(List<PeptideAttribute> descriptorList) {
         PeptideAttribute descriptor;
         if (attrModel != null) {
             for (int i = 0; i < scale.length; i++) {
@@ -172,5 +171,9 @@ public class HydrophobicMoment extends AbstractModamp {
     public AlgorithmProperty[] getProperties() {
         return properties.toArray(new AlgorithmProperty[0]);
     }
+
+    @Override
+    protected void endMD() {
+    }        
 
 }

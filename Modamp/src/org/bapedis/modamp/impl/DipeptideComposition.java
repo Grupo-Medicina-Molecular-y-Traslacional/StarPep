@@ -145,8 +145,7 @@ public class DipeptideComposition extends AbstractModamp {
     }
 
     @Override
-    public void initAlgo() {
-        super.initAlgo();
+    public void initMD(List<PeptideAttribute> descriptorList) {
         if (attrModel != null) {
             if (hyR) {
                 alphabets.add(ReducedAlphabets.ra_hydrop_Rose());
@@ -218,8 +217,7 @@ public class DipeptideComposition extends AbstractModamp {
     }
 
     @Override
-    public void endAlgo() {
-        super.endAlgo();
+    public void endMD() {
         alphabets.clear();
     }
 

@@ -5,6 +5,7 @@
  */
 package org.bapedis.modamp.impl;
 
+import java.util.List;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -23,8 +24,7 @@ public class AliphaticIndex extends AbstractModamp {
     }
 
     @Override
-    public void initAlgo() {
-        super.initAlgo();
+    public void initMD(List<PeptideAttribute> descriptorList) {
         if (attrModel != null) {
             PeptideAttribute descriptor;
             if (!attrModel.hasAttribute(AI)) {
@@ -41,5 +41,10 @@ public class AliphaticIndex extends AbstractModamp {
         double val = MD.aliphaticIndex(peptide.getSequence());
         peptide.setAttributeValue(attrModel.getAttribute(AI), val);
     }
+
+    @Override
+    protected void endMD() {        
+    }    
+    
 
 }

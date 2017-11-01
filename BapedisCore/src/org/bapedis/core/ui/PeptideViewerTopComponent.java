@@ -37,7 +37,7 @@ import org.bapedis.core.spi.filters.impl.FilterHelper;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
 import org.bapedis.core.ui.actions.MolecularDescriptorAction;
 import org.bapedis.core.ui.components.DescriptorRemovalPanel;
-import org.bapedis.core.ui.components.DescriptorSelectionPanel;
+import org.bapedis.core.ui.components.MolecularFeaturesPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.netbeans.swing.etable.ETableColumn;
 import org.netbeans.swing.etable.ETableColumnModel;
@@ -412,7 +412,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }//GEN-LAST:event_jFieldComboBoxActionPerformed
 
     private void columnsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_columnsButtonActionPerformed
-        DialogDescriptor dd = new DialogDescriptor(new DescriptorSelectionPanel(currentModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.DescriptorSelectionPanel.title"));
+        DialogDescriptor dd = new DialogDescriptor(new MolecularFeaturesPanel(currentModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.MolecularFeaturesPanel.title"));
         dd.setOptions(new Object[]{DialogDescriptor.CLOSED_OPTION});
         DialogDisplayer.getDefault().notify(dd);
         populateVisibleColumns(currentModel);

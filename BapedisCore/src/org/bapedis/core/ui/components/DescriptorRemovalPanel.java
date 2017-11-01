@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.ui.components;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,14 +36,16 @@ import org.openide.util.NbBundle;
  */
 public class DescriptorRemovalPanel extends javax.swing.JPanel {
 
-    protected final AttributesModel attrModel;
-    protected JXTable table;
-    protected HashMap<String, List<PeptideAttribute>> map;
+    protected final DescriptorSelectionPanel selectionPanel;
     protected final JXBusyLabel busyLabel;
+    protected final AttributesModel attrModel;
 
-    public DescriptorRemovalPanel(final AttributesModel attrModel) {
+    public DescriptorRemovalPanel(AttributesModel attrModel) {
         initComponents();
         this.attrModel = attrModel;
+        
+        selectionPanel = new DescriptorSelectionPanel(attrModel);
+        centerPanel.add(selectionPanel, BorderLayout.CENTER);
 
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setText(NbBundle.getMessage(DescriptorRemovalPanel.class, "DescriptorRemovalPanel.deleting.text"));
@@ -51,114 +54,51 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
         busyLabel.setVisible(false);
         rightPanel.add(busyLabel);
 
-        SwingWorker sw = new SwingWorker<MyTableModel, Void>() {
-            @Override
-            protected MyTableModel doInBackground() throws Exception {
-                map = new LinkedHashMap<>();
-                String key;
-                List<PeptideAttribute> list;
-                for (Iterator<PeptideAttribute> it = attrModel.getAttributeIterator(); it.hasNext();) {
-                    PeptideAttribute attr = it.next();
-                    if (attr.isMolecularDescriptor() && attr.getOriginAlgorithm() != null) {
-                        key = attr.getOriginAlgorithm().getFactory().getName();
-                        if (!map.containsKey(key)) {
-                            list = new LinkedList<>();
-                            map.put(key, list);
-                        }
-                        list = map.get(key);
-                        list.add(attr);
-                    }
-                }
-                return createTableModel();
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    MyTableModel tableModel = get();
-                    if (tableModel != null) {
-                        table = new JXTable(tableModel);
-                        table.getColumn(0).setPreferredWidth(240);
-                        table.setHighlighters(HighlighterFactory.createAlternateStriping());
-                        table.setColumnControlVisible(false);
-                        table.setSortable(true);
-                        table.setAutoCreateRowSorter(true);
-                        scrollPane.setViewportView(table);
-                        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-                            @Override
-                            public void valueChanged(ListSelectionEvent e) {
-                                ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-                                deleteButton.setEnabled(!lsm.isSelectionEmpty());
-                            }
-                        });
-                        deleteAllButton.setEnabled(true);
-                    }
-                } catch (InterruptedException | ExecutionException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
-            }
-
-        };
-        sw.execute();
         deleteButton.setEnabled(false);
         deleteAllButton.setEnabled(false);
     }
 
-    private MyTableModel createTableModel() {
-        String[] columnNames = {NbBundle.getMessage(DescriptorRemovalPanel.class, "DescriptorRemovalPanel.columnName.first"),
-            NbBundle.getMessage(DescriptorRemovalPanel.class, "DescriptorRemovalPanel.columnName.second")};
-        ArrayList<Object[]> data = new ArrayList(map.size());
-        Object[] dataRow;
-        int row = 0;
-        for (Map.Entry<String, List<PeptideAttribute>> entry : map.entrySet()) {
-            dataRow = new Object[2];
-            dataRow[0] = entry.getKey();
-            dataRow[1] = entry.getValue().size();
-            data.add(row++, dataRow);
-        }
-        return map.isEmpty() ? null : new MyTableModel(columnNames, data);
-    }
 
     private void delete() {
-        final int[] selectedRows = table.getSelectedRows();
-        for (int i = 0; i < selectedRows.length; i++) {
-            selectedRows[i] = table.convertRowIndexToModel(selectedRows[i]);
-        }
-        SwingWorker sw = new SwingWorker() {
-            @Override
-            protected Object doInBackground() throws Exception {
-                String key;
-                List<PeptideAttribute> list;
-                for (int i = 0; i < selectedRows.length; i++) {
-                    key = (String) table.getModel().getValueAt(selectedRows[i], 0);
-                    list = map.get(key);
-                    for (PeptideAttribute attribute : list) {
-                        attrModel.deleteAttribute(attribute);
-                    }
-                    map.remove(key);
-                }
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    get();
-                    ((MyTableModel) table.getModel()).removeRows(selectedRows);
-                } catch (InterruptedException | ExecutionException ex) {
-                    Exceptions.printStackTrace(ex);
-                } finally {
-                    busyLabel.setBusy(false);
-                    busyLabel.setVisible(false);                    
-                    deleteAllButton.setEnabled(table.getRowCount() > 0);
-                }
-            }
-        };
-        busyLabel.setBusy(true);
-        busyLabel.setVisible(true);
-        deleteButton.setEnabled(false);
-        deleteAllButton.setEnabled(false);
-        sw.execute();
+//        final int[] selectedRows = table.getSelectedRows();
+//        for (int i = 0; i < selectedRows.length; i++) {
+//            selectedRows[i] = table.convertRowIndexToModel(selectedRows[i]);
+//        }
+//        SwingWorker sw = new SwingWorker() {
+//            @Override
+//            protected Object doInBackground() throws Exception {
+//                String key;
+//                List<PeptideAttribute> list;
+//                for (int i = 0; i < selectedRows.length; i++) {
+//                    key = (String) table.getModel().getValueAt(selectedRows[i], 0);
+//                    list = map.get(key);
+//                    for (PeptideAttribute attribute : list) {
+//                        attrModel.deleteAttribute(attribute);
+//                    }
+//                    map.remove(key);
+//                }
+//                return null;
+//            }
+//
+//            @Override
+//            protected void done() {
+//                try {
+//                    get();
+//                    ((MyTableModel) table.getModel()).removeRows(selectedRows);
+//                } catch (InterruptedException | ExecutionException ex) {
+//                    Exceptions.printStackTrace(ex);
+//                } finally {
+//                    busyLabel.setBusy(false);
+//                    busyLabel.setVisible(false);
+//                    deleteAllButton.setEnabled(table.getRowCount() > 0);
+//                }
+//            }
+//        };
+//        busyLabel.setBusy(true);
+//        busyLabel.setVisible(true);
+//        deleteButton.setEnabled(false);
+//        deleteAllButton.setEnabled(false);
+//        sw.execute();
     }
 
     /**
@@ -171,26 +111,14 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        scrollPane = new javax.swing.JScrollPane();
         rightPanel = new javax.swing.JPanel();
         deleteButton = new javax.swing.JButton();
         deleteAllButton = new javax.swing.JButton();
+        centerPanel = new javax.swing.JPanel();
 
         setMinimumSize(new java.awt.Dimension(440, 380));
         setPreferredSize(new java.awt.Dimension(540, 380));
         setLayout(new java.awt.GridBagLayout());
-
-        scrollPane.setMinimumSize(new java.awt.Dimension(275, 23));
-        scrollPane.setPreferredSize(new java.awt.Dimension(275, 23));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 2, 0);
-        add(scrollPane, gridBagConstraints);
 
         rightPanel.setMaximumSize(new java.awt.Dimension(110, 58));
         rightPanel.setMinimumSize(new java.awt.Dimension(110, 58));
@@ -226,6 +154,19 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(25, 5, 0, 5);
         add(rightPanel, gridBagConstraints);
+
+        centerPanel.setMinimumSize(new java.awt.Dimension(275, 10));
+        centerPanel.setPreferredSize(new java.awt.Dimension(275, 100));
+        centerPanel.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 2, 0);
+        add(centerPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
@@ -233,18 +174,18 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void deleteAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteAllButtonActionPerformed
-        if (table.getRowCount() > 0) {
-            table.setRowSelectionInterval(0, table.getRowCount() - 1);
-            delete();
-        }
+//        if (table.getRowCount() > 0) {
+//            table.setRowSelectionInterval(0, table.getRowCount() - 1);
+//            delete();
+//        }
     }//GEN-LAST:event_deleteAllButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel centerPanel;
     private javax.swing.JButton deleteAllButton;
     private javax.swing.JButton deleteButton;
     private javax.swing.JPanel rightPanel;
-    private javax.swing.JScrollPane scrollPane;
     // End of variables declaration//GEN-END:variables
 }
 

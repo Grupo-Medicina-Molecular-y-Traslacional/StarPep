@@ -9,7 +9,6 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
-import org.bapedis.modamp.impl.AllDescriptors;
 
 /**
  *

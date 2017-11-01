@@ -32,12 +32,14 @@ public class AllDescriptors extends AbstractModamp {
             iPoint, mWeight, netCharge, raComposition,
             raDistribution, raTransition, triComposition;
     private final HashMap<String, AbstractModamp> map;
+    private int buttonGroupIndex;
 
     public AllDescriptors(AlgorithmFactory factory) {
         super(factory);
         properties = new LinkedList<>();
         populateProperties();
         map = new LinkedHashMap<>();
+        buttonGroupIndex = 0;
     }
 
     public void setAllMD(boolean selected) {
@@ -81,6 +83,14 @@ public class AllDescriptors extends AbstractModamp {
             Exceptions.printStackTrace(ex);
         }
     }
+    
+    public int getButtonGroupIndex() {
+        return buttonGroupIndex;
+    }
+
+    public void setButtonGroupIndex(int buttonGroupIndex) {
+        this.buttonGroupIndex = buttonGroupIndex;
+    }    
 
     public boolean isAaComposition() {
         return aaComposition;

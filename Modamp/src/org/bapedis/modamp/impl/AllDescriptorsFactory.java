@@ -19,6 +19,8 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service = AlgorithmFactory.class, position = 0)
 public class AllDescriptorsFactory implements AlgorithmFactory {
 
+    private final AllDescriptorsPanel panel = new AllDescriptorsPanel();
+    
     @Override
     public AlgorithmCategory getCategory() {
         return AlgorithmCategory.MolecularDescriptor;
@@ -36,7 +38,7 @@ public class AllDescriptorsFactory implements AlgorithmFactory {
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        return null;
+        return panel;
     }
 
     @Override

@@ -22,27 +22,18 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
 
     protected final AllDescriptors descriptorAlgo;
     protected List<PeptideAttribute> descriptorList;
-    protected int buttonGroupIndex;
+
     protected boolean normalize;
 
     public ChemicalSpaceNetwork(AlgorithmFactory factory) {
         super(factory);
         AllDescriptorsFactory descriptorFactory = Lookup.getDefault().lookup(AllDescriptorsFactory.class);
-        descriptorAlgo = (AllDescriptors) descriptorFactory.createAlgorithm();
-        buttonGroupIndex = 0;
+        descriptorAlgo = (AllDescriptors) descriptorFactory.createAlgorithm();        
         normalize = true;
     }
 
     public AllDescriptors getDescriptorAlgorithm() {
         return descriptorAlgo;
-    }
-
-    public int getButtonGroupIndex() {
-        return buttonGroupIndex;
-    }
-
-    public void setButtonGroupIndex(int buttonGroupIndex) {
-        this.buttonGroupIndex = buttonGroupIndex;
     }
 
     @Override

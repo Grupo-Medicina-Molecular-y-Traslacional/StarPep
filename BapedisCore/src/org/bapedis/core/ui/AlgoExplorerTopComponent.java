@@ -119,9 +119,10 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         algoListener = new AlgorithmListenerImpl();
         ((PropertySheet) propSheetPanel).setDescriptionAreaVisible(false);
         NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text");
-        DefaultComboBoxModel comboBoxModel = (DefaultComboBoxModel) algoComboBox.getModel();
+        DefaultComboBoxModel comboBoxModel =  new DefaultComboBoxModel();
         comboBoxModel.addElement(NO_SELECTION);
         comboBoxModel.setSelectedItem(NO_SELECTION);
+        algoComboBox.setModel(comboBoxModel);
     }
 
     private void removeLookupListener() {

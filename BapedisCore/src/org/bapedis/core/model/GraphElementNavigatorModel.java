@@ -5,6 +5,10 @@
  */
 package org.bapedis.core.model;
 
+import org.bapedis.core.services.ProjectManager;
+import org.gephi.graph.api.Table;
+import org.openide.util.Lookup;
+
 /**
  *
  * @author loge
@@ -15,6 +19,8 @@ public class GraphElementNavigatorModel {
     
     public GraphElementNavigatorModel() {
         nodeAvailableColumnsModel = new GraphElementAvailableColumnsModel();
+        Table table = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel().getNodeTable();
+        nodeAvailableColumnsModel.addAvailableColumn(new GraphElementAttributeColumn(table.getColumn("label")));
         visualElement = GraphElementType.Node;
     }
 

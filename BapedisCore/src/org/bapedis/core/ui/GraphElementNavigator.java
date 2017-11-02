@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.ui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -51,6 +52,7 @@ import org.gephi.graph.api.Node;
 import org.gephi.graph.api.Table;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
 import org.openide.DialogDescriptor;
@@ -98,7 +100,8 @@ public class GraphElementNavigator extends JComponent implements
         lookup = new AbstractLookup(content);
 
         table = new JXTable();
-//        table.setHighlighters(HighlighterFactory.createAlternateStriping());
+        table.setGridColor(Color.LIGHT_GRAY);
+        table.setHighlighters(HighlighterFactory.createAlternateStriping());
         table.setColumnControlVisible(false);
         table.setSortable(true);
         table.setAutoCreateRowSorter(true);

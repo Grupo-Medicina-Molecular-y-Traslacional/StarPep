@@ -5,11 +5,12 @@
  */
 package org.bapedis.core.ui.components;
 
+import java.awt.Color;
 import java.awt.Component;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.Container;
+import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,19 +19,25 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javax.swing.AbstractButton;
+import javax.swing.Icon;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JTable;
-import javax.swing.UIManager;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.PeptideAttribute;
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.openide.util.NbBundle;
 
 /**
@@ -66,31 +73,25 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         MyTableModel tableModel = createTableModel();
         if (tableModel != null) {
             table = new JXTable(tableModel);
+            table.setGridColor(Color.LIGHT_GRAY);
 
             TableColumn tc = table.getColumn(0);
-            tc.setCellEditor(table.getDefaultEditor(Boolean.class));
-            tc.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-            CheckBoxHeader cbHeader = new CheckBoxHeader();
-            cbHeader.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    Object source = e.getSource();
-                    if (source instanceof AbstractButton == false) {
-                        return;
-                    }
-                    boolean checked = e.getStateChange() == ItemEvent.SELECTED;
-                    for (int row = 0; row < table.getRowCount(); row++) {
-                        table.setValueAt(checked, row, 0);
-                    }
-                }
-            });
-            tc.setHeaderRenderer(cbHeader);
+            tc.setHeaderRenderer(new CheckBoxHeader(table.getTableHeader(), 0));
+            tc.setPreferredWidth(30);
 
-            table.getColumn(1).setPreferredWidth(240);
-            table.setHighlighters(HighlighterFactory.createAlternateStriping());
+            table.getColumn(1).setPreferredWidth(210);
             table.setColumnControlVisible(false);
             table.setSortable(true);
             table.setAutoCreateRowSorter(true);
+            table.setRowSelectionAllowed(false);
+
+            TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel()) {
+                @Override
+                public boolean isSortable(int column) {
+                    return column > 0;
+                }
+            };
+            table.setRowSorter(sorter);
 
 //                        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 //                            @Override
@@ -184,7 +185,7 @@ class MyTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int col) {
-        throw new UnsupportedOperationException("The table is not editable");
+        data.get(row)[col] = value;
     }
 
     public void removeRows(int[] rows) {
@@ -196,71 +197,67 @@ class MyTableModel extends AbstractTableModel {
     }
 }
 
-class CheckBoxHeader extends JCheckBox
-        implements TableCellRenderer, MouseListener {
+class CheckBoxHeader implements TableCellRenderer {
 
-    protected int column;
-    protected boolean mousePressed = false;
+    private final JCheckBox check = new JCheckBox();
 
-    public CheckBoxHeader() {
+    public CheckBoxHeader(JTableHeader header, final int index) {
+        // index is the column to be modified
+        check.setOpaque(false);
+        check.setFont(header.getFont());
+        header.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JTable table = ((JTableHeader) e.getSource()).getTable();
+                TableColumnModel columnModel = table.getColumnModel();
+                int viewColumn = columnModel.getColumnIndexAtX(e.getX());
+                int modelColumn = table.convertColumnIndexToModel(viewColumn);
+                if (modelColumn == index) {
+                    check.setSelected(!check.isSelected());
+                    TableModel m = table.getModel();
+                    Boolean f = check.isSelected();
+                    for (int i = 0; i < m.getRowCount(); i++) {
+                        m.setValueAt(f, i, index);
+                    }
+                    ((JTableHeader) e.getSource()).repaint();
+                }
+            }
+        });
     }
 
     @Override
     public Component getTableCellRendererComponent(
-            JTable table, Object value,
-            boolean isSelected, boolean hasFocus, int row, int column) {
-        if (table != null) {
-            JTableHeader header = table.getTableHeader();
-            if (header != null) {
-                setForeground(header.getForeground());
-                setBackground(header.getBackground());
-                setFont(header.getFont());
-                header.addMouseListener(this);
-            }
+            JTable tbl, Object val, boolean isS, boolean hasF, int row, int col) {
+        TableCellRenderer r = tbl.getTableHeader().getDefaultRenderer();
+        JLabel l = (JLabel) r.getTableCellRendererComponent(tbl, val, isS, hasF, row, col);
+        l.setIcon(new CheckBoxIcon(check));
+        l.setHorizontalAlignment(SwingConstants.CENTER);
+        return l;
+    }
+
+    private static class CheckBoxIcon implements Icon {
+
+        private final JCheckBox check;
+
+        public CheckBoxIcon(JCheckBox check) {
+            this.check = check;
         }
-        setColumn(column);
-        setBorder(UIManager.getBorder("TableHeader.cellBorder"));
-        return this;
-    }
 
-    protected void setColumn(int column) {
-        this.column = column;
-    }
-
-    public int getColumn() {
-        return column;
-    }
-
-    protected void handleClickEvent(MouseEvent e) {
-        if (mousePressed) {
-            mousePressed = false;
-            JTableHeader header = (JTableHeader) (e.getSource());
-            JTable tableView = header.getTable();
-            TableColumnModel columnModel = tableView.getColumnModel();
-            int viewColumn = columnModel.getColumnIndexAtX(e.getX());
-            int column = tableView.convertColumnIndexToModel(viewColumn);
-
-            if (viewColumn == this.column && e.getClickCount() == 1 && column != -1) {
-                doClick();
-            }
+        @Override
+        public int getIconWidth() {
+            return check.getPreferredSize().width;
         }
-    }
 
-    public void mouseClicked(MouseEvent e) {
-        handleClickEvent(e);
-        ((JTableHeader) e.getSource()).repaint();
-    }
+        @Override
+        public int getIconHeight() {
+            return check.getPreferredSize().height;
+        }
 
-    public void mousePressed(MouseEvent e) {
-        mousePressed = true;
-    }
-
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    public void mouseExited(MouseEvent e) {
+        @Override
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            SwingUtilities.paintComponent(
+                    g, check, (Container) c, x, y, getIconWidth(), getIconHeight());
+        }
     }
 }

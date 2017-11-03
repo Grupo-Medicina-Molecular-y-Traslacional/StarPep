@@ -7,8 +7,12 @@ package org.bapedis.network.impl;
 
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
+import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+import org.bapedis.core.ui.components.DescriptorSelectionPanel;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -73,8 +77,8 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
     @Override
     public JPanel getEditPanel(Algorithm algo) {
         this.csnAlgo = (ChemicalSpaceNetwork) algo;
-        AlgorithmSetupUI mdPanel = this.csnAlgo.getDescriptorAlgorithm().getFactory().getSetupUI();
-        descriptorsPanel.add(mdPanel.getEditPanel(csnAlgo.getDescriptorAlgorithm()), BorderLayout.CENTER);
+        AttributesModel attrModel = Lookup.getDefault().lookup(ProjectManager.class).getAttributesModel();
+        descriptorsPanel.add(new DescriptorSelectionPanel(attrModel), BorderLayout.CENTER);
         thresholdPanel.setup(csnAlgo);
         return this;
     }

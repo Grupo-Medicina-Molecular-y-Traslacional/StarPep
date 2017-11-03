@@ -14,19 +14,24 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.bapedis.core.services.ProjectManager;
-import org.bapedis.core.spi.data.PeptideDAO;
 import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
 import org.biojava.nbio.core.sequence.ProteinSequence;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.NodeIterable;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author loge
  */
 public class Peptide {
+    
+    public static final PeptideAttribute ID = new PeptideAttribute("id", NbBundle.getMessage(Peptide.class, "Peptide.attribute.id"), String.class, false);
+    public static final PeptideAttribute SEQ = new PeptideAttribute("seq", NbBundle.getMessage(Peptide.class, "Peptide.attribute.seq"), String.class, false);
+    public static final PeptideAttribute LENGHT = new PeptideAttribute("length", NbBundle.getMessage(Peptide.class, "Peptide.attribute.length"), Integer.class, true);
+    
 
     protected final Node graphNode;
     protected final Graph graph;
@@ -43,11 +48,11 @@ public class Peptide {
     }
 
     public String getId() {
-        return (String) attrsValue.get(PeptideDAO.ID);
+        return (String) attrsValue.get(ID);
     }
 
     public String getSequence() {
-        return (String) attrsValue.get(PeptideDAO.SEQ);
+        return (String) attrsValue.get(SEQ);
     }
 
     public ProteinSequence getBiojavaSeq() throws CompoundNotFoundException {
@@ -58,7 +63,7 @@ public class Peptide {
     }
 
     public int getLength() {
-        return (int) attrsValue.get(PeptideDAO.LENGHT);
+        return (int) attrsValue.get(LENGHT);
     }
 
     public void setAttributeValue(PeptideAttribute attr, Object value) {

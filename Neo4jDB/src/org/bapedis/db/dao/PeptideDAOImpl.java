@@ -92,9 +92,6 @@ public class PeptideDAOImpl implements PeptideDAO {
     @Override
     public AttributesModel getPeptides(QueryModel queryModel, GraphModel graphModel) {
         AttributesModel attrModel = new AttributesModel();
-        attrModel.addAttribute(ID);
-        attrModel.addAttribute(SEQ);
-        attrModel.addAttribute(LENGHT);
 
         try (Transaction tx = graphDb.beginTx()) {
             // Get peptides
@@ -144,22 +141,22 @@ public class PeptideDAOImpl implements PeptideDAO {
 
                     //Fill Attribute Model
                     peptide = new Peptide(graphNode, graphModel.getGraph());
-                    peptide.setAttributeValue(ID, id);
-                    peptide.setAttributeValue(SEQ, seq);
-                    peptide.setAttributeValue(LENGHT, seq.length());
+                    peptide.setAttributeValue(Peptide.ID, id);
+                    peptide.setAttributeValue(Peptide.SEQ, seq);
+                    peptide.setAttributeValue(Peptide.LENGHT, seq.length());
 
-                    for (String propertyKey : neoNode.getPropertyKeys()) {
-                        if (!(propertyKey.equals(PRO_ID) || propertyKey.equals(PRO_SEQ)
-                                || propertyKey.equals(PRO_LENGHT))) {
-                            Object value = neoNode.getProperty(propertyKey);
-                            if (!attrModel.hasAttribute(propertyKey)) {
-                                attr = attrModel.addAttribute(propertyKey, propertyKey, value.getClass());
-                            } else {
-                                attr = attrModel.getAttribute(propertyKey);
-                            }
-                            peptide.setAttributeValue(attr, value);
-                        }
-                    }
+//                    for (String propertyKey : neoNode.getPropertyKeys()) {
+//                        if (!(propertyKey.equals(PRO_ID) || propertyKey.equals(PRO_SEQ)
+//                                || propertyKey.equals(PRO_LENGHT))) {
+//                            Object value = neoNode.getProperty(propertyKey);
+//                            if (!attrModel.hasAttribute(propertyKey)) {
+//                                attr = attrModel.addAttribute(propertyKey, propertyKey, value.getClass());
+//                            } else {
+//                                attr = attrModel.getAttribute(propertyKey);
+//                            }
+//                            peptide.setAttributeValue(attr, value);
+//                        }
+//                    }
                     attrModel.addPeptide(peptide);
                 }
             } finally {

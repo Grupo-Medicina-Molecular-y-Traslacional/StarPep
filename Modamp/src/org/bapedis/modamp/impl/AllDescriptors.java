@@ -83,14 +83,14 @@ public class AllDescriptors extends AbstractModamp {
             Exceptions.printStackTrace(ex);
         }
     }
-    
+
     public int getButtonGroupIndex() {
         return buttonGroupIndex;
     }
 
     public void setButtonGroupIndex(int buttonGroupIndex) {
         this.buttonGroupIndex = buttonGroupIndex;
-    }    
+    }
 
     public boolean isAaComposition() {
         return aaComposition;
@@ -213,97 +213,98 @@ public class AllDescriptors extends AbstractModamp {
     }
 
     @Override
-    public void initMD(List<PeptideAttribute> descriptorList) {
+    protected void initMD() {
         map.clear();
         // fill hashmap
-        if (attrModel != null) {
-            Workspace currentWs = pc.getCurrentWorkspace();
-            for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
-                final AlgorithmFactory f = it.next();
-                if (this.factory != f) {
-                    Algorithm algorithm = f.createAlgorithm();
-                    if (algorithm instanceof AbstractModamp) {
-                        AbstractModamp algoModamp = (AbstractModamp) algorithm;
-                        // check for an existing algorithm 
-                        Collection<? extends Algorithm> savedAlgo = currentWs.getLookup().lookupAll(Algorithm.class);
-                        for (Algorithm algo : savedAlgo) {
-                            if (algo instanceof AbstractModamp && algo.getFactory() == f) {
-                                algoModamp = (AbstractModamp) algo;
-                                break;
-                            }
+        Workspace currentWs = pc.getCurrentWorkspace();
+        for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
+            final AlgorithmFactory f = it.next();
+            if (this.factory != f) {
+                Algorithm algorithm = f.createAlgorithm();
+                if (algorithm instanceof AbstractModamp) {
+                    AbstractModamp algoModamp = (AbstractModamp) algorithm;
+                    // check for an existing algorithm 
+                    Collection<? extends Algorithm> savedAlgo = currentWs.getLookup().lookupAll(Algorithm.class);
+                    for (Algorithm algo : savedAlgo) {
+                        if (algo instanceof AbstractModamp && algo.getFactory() == f) {
+                            algoModamp = (AbstractModamp) algo;
+                            break;
                         }
-                        map.put(f.getName(), algoModamp);
                     }
+                    map.put(f.getName(), algoModamp);
                 }
             }
+        }
 
-            // Remove unselected algorithms
-            if (!aaComposition) {
-                map.remove(NbBundle.getMessage(AACompositionFactory.class, "AAComposition.name"));
-            }
+        // Remove unselected algorithms
+        if (!aaComposition) {
+            map.remove(NbBundle.getMessage(AACompositionFactory.class, "AAComposition.name"));
+        }
 
-            if (!aIndex) {
-                map.remove(NbBundle.getMessage(AliphaticIndexFactory.class, "AliphaticIndex.name"));
-            }
+        if (!aIndex) {
+            map.remove(NbBundle.getMessage(AliphaticIndexFactory.class, "AliphaticIndex.name"));
+        }
 
-            if (!avgHydrophilicity) {
-                map.remove(NbBundle.getMessage(AverageHydrophilicityFactory.class, "AverageHydrophilicity.name"));
-            }
+        if (!avgHydrophilicity) {
+            map.remove(NbBundle.getMessage(AverageHydrophilicityFactory.class, "AverageHydrophilicity.name"));
+        }
 
-            if (!bIndex) {
-                map.remove(NbBundle.getMessage(BomanIndexFactory.class, "BomanIndex.name"));
-            }
+        if (!bIndex) {
+            map.remove(NbBundle.getMessage(BomanIndexFactory.class, "BomanIndex.name"));
+        }
 
-            if (!dComposition) {
-                map.remove(NbBundle.getMessage(DipeptideCompositionFactory.class, "DipeptideComposition.name"));
-            }
+        if (!dComposition) {
+            map.remove(NbBundle.getMessage(DipeptideCompositionFactory.class, "DipeptideComposition.name"));
+        }
 
-            if (!hMoment) {
-                map.remove(NbBundle.getMessage(HydrophobicMomentFactory.class, "HydrophobicMoment.name"));
-            }
+        if (!hMoment) {
+            map.remove(NbBundle.getMessage(HydrophobicMomentFactory.class, "HydrophobicMoment.name"));
+        }
 
-            if (!hPeriodicity) {
-                map.remove(NbBundle.getMessage(HydrophobicPeriodicityFactory.class, "HydrophobicPeriodicity.name"));
-            }
+        if (!hPeriodicity) {
+            map.remove(NbBundle.getMessage(HydrophobicPeriodicityFactory.class, "HydrophobicPeriodicity.name"));
+        }
 
-            if (!iIndex) {
-                map.remove(NbBundle.getMessage(InestabilityIndexFactory.class, "InestabilityIndex.name"));
-            }
+        if (!iIndex) {
+            map.remove(NbBundle.getMessage(InestabilityIndexFactory.class, "InestabilityIndex.name"));
+        }
 
-            if (!iPoint) {
-                map.remove(NbBundle.getMessage(IsoelectricPointFactory.class, "IsoelectricPoint.name"));
-            }
+        if (!iPoint) {
+            map.remove(NbBundle.getMessage(IsoelectricPointFactory.class, "IsoelectricPoint.name"));
+        }
 
-            if (!mWeight) {
-                map.remove(NbBundle.getMessage(MolecularWeightFactory.class, "MolecularWeight.name"));
-            }
+        if (!mWeight) {
+            map.remove(NbBundle.getMessage(MolecularWeightFactory.class, "MolecularWeight.name"));
+        }
 
-            if (!netCharge) {
-                map.remove(NbBundle.getMessage(NetChargeFactory.class, "NetCharge.name"));
-            }
+        if (!netCharge) {
+            map.remove(NbBundle.getMessage(NetChargeFactory.class, "NetCharge.name"));
+        }
 
-            if (!raComposition) {
-                map.remove(NbBundle.getMessage(RACompositionFactory.class, "RAComposition.name"));
-            }
+        if (!raComposition) {
+            map.remove(NbBundle.getMessage(RACompositionFactory.class, "RAComposition.name"));
+        }
 
-            if (!raDistribution) {
-                map.remove(NbBundle.getMessage(RADistributionFactory.class, "RADistribution.name"));
-            }
+        if (!raDistribution) {
+            map.remove(NbBundle.getMessage(RADistributionFactory.class, "RADistribution.name"));
+        }
 
-            if (!raTransition) {
-                map.remove(NbBundle.getMessage(RATransitionFactory.class, "RATransition.name"));
-            }
+        if (!raTransition) {
+            map.remove(NbBundle.getMessage(RATransitionFactory.class, "RATransition.name"));
+        }
 
-            if (!triComposition) {
-                map.remove(NbBundle.getMessage(TripeptideCompositionFactory.class, "TripeptideComposition.name"));
-            }
+        if (!triComposition) {
+            map.remove(NbBundle.getMessage(TripeptideCompositionFactory.class, "TripeptideComposition.name"));
+        }
 
-            // Init all algoritms
-            for (AbstractModamp algo : map.values()) {
-                algo.initAlgo();
-                descriptorList.addAll(algo.getDescriptorList());
+        // Init all algoritms
+        for (AbstractModamp algo : map.values()) {
+            algo.initAlgo();
+            for(PeptideAttribute attr: algo.getMolecularDescriptors()){
+                addAttribute(attr);
             }
         }
+
     }
 
     @Override

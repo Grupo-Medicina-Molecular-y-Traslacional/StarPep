@@ -5,8 +5,9 @@
  */
 package org.bapedis.modamp.impl;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
@@ -25,33 +26,52 @@ public abstract class AbstractModamp implements Algorithm {
 
     protected final ProjectManager pc;
     protected AttributesModel attrModel;
-    boolean stopRun;
+    protected boolean stopRun;
     protected final AlgorithmFactory factory;
     protected ProgressTicket progressTicket;
     protected final String PRO_CATEGORY = "Properties";
-    private final List<PeptideAttribute> descriptorList;
+    private final HashMap<String, PeptideAttribute> map;
 
     public AbstractModamp(AlgorithmFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         this.factory = factory;
-        descriptorList = new LinkedList<>();
+        map = new LinkedHashMap<>();
+    }
+    
+    protected PeptideAttribute addAttribute(String id, String displayName, Class<?> cclass) {
+        PeptideAttribute attr = new PeptideAttribute(id, displayName, cclass);
+        addAttribute(attr);
+        return attr;
     }
 
-    public List<PeptideAttribute> getDescriptorList() {
-        return descriptorList;
+    protected void addAttribute(PeptideAttribute attr) {
+        if (hasAttribute(attr.getId())) {
+            throw new IllegalArgumentException("Duplicated attribute: " + attr.getId());
+        }
+        map.put(attr.getId(), attr);
+    }    
+    
+    public PeptideAttribute getAttribute(String id) {
+        if (!hasAttribute(id)) {
+            throw new IllegalArgumentException("Attribute doesn't exist: " + id);
+        }
+        return map.get(id);
+    }
+    
+    public boolean hasAttribute(String id) {
+        return map.containsKey(id);
+    }       
+
+    public Collection<PeptideAttribute> getMolecularDescriptors() {
+        return map.values();
     }
 
     @Override
     public final void initAlgo() {
-        descriptorList.clear();
+        map.clear();
         attrModel = pc.getAttributesModel();
         stopRun = false;
-        initMD(descriptorList);
-        for (PeptideAttribute descriptor : descriptorList) {
-            if (descriptor.getOriginAlgorithm() == null) {
-                descriptor.setOriginAlgorithm(this);
-            }
-        }
+        initMD();        
     }
 
     @Override
@@ -95,7 +115,7 @@ public abstract class AbstractModamp implements Algorithm {
             // Calculating max and min values for molecular descriptors
             // Usefull to normalize values
             double val, max, min;
-            for (PeptideAttribute descriptor : descriptorList) {
+            for (PeptideAttribute descriptor : map.values()) {
                 max = Double.MIN_VALUE;
                 min = Double.MAX_VALUE;
                 for (Peptide peptide : peptides) {
@@ -112,10 +132,11 @@ public abstract class AbstractModamp implements Algorithm {
                 descriptor.setMaxValue(max);
                 descriptor.setMinValue(min);
             }
+            
         }
     }
 
-    protected abstract void initMD(List<PeptideAttribute> descriptorList);
+    protected abstract void initMD();
 
     protected abstract void compute(Peptide peptide);
 

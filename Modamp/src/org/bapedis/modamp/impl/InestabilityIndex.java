@@ -25,38 +25,26 @@ public class InestabilityIndex extends AbstractModamp {
     }
 
     @Override
-    public void initMD(List<PeptideAttribute> descriptorList) {
-        if (attrModel != null) {
-            PeptideAttribute descriptor;
-            if (!attrModel.hasAttribute(II)) {
-                descriptor = attrModel.addAttribute(II, II, Double.class);
-            } else {
-                descriptor = attrModel.getAttribute(II);
-            }
-            descriptorList.add(descriptor);
-            
-            if (!attrModel.hasAttribute(PS)) {
-                descriptor = attrModel.addAttribute(PS, PS, Integer.class);
-            } else {
-                descriptor = attrModel.getAttribute(PS);
-            }
-            descriptorList.add(descriptor);
+    protected void initMD() {
+        if (!hasAttribute(II)) {
+            addAttribute(II, II, Double.class);
+        }
+        if (!hasAttribute(PS)) {
+            addAttribute(PS, PS, Integer.class);
         }
     }
 
     @Override
     protected void compute(Peptide peptide) {
         double val = MD.inestabilityIndex(peptide.getSequence());
-        peptide.setAttributeValue(attrModel.getAttribute(II), val);
+        peptide.setAttributeValue(getAttribute(II), val);
 
         int isPS = MD.isProteinStable(val);
-        peptide.setAttributeValue(attrModel.getAttribute(PS), isPS);
+        peptide.setAttributeValue(getAttribute(PS), isPS);
     }
 
     @Override
     protected void endMD() {
     }
-    
-    
 
 }

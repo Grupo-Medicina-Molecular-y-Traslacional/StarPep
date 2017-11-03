@@ -145,59 +145,52 @@ public class TripeptideComposition extends AbstractModamp {
     }
 
     @Override
-    public void initMD(List<PeptideAttribute> descriptorList) {
-        if (attrModel != null) {
-            if (hyR) {
-                alphabets.add(ReducedAlphabets.ra_hydrop_Rose());
-            }
-            if (b50) {
-                alphabets.add(ReducedAlphabets.ra_Blosum50_Murphy());
-            }
-            if (cs) {
-                alphabets.add(ReducedAlphabets.ra_cSimilarity_chakrabarty());
-            }
-            if (hydT) {
-                alphabets.add(ReducedAlphabets.ra_Hydrophobicity_Tomii());
-            }
-            if (vw) {
-                alphabets.add(ReducedAlphabets.ra_NormVW_Tomii());
-            }
-            if (pol) {
-                alphabets.add(ReducedAlphabets.ra_Polarity_Tomii());
-            }
-            if (polz) {
-                alphabets.add(ReducedAlphabets.ra_Polarizability_Tomii());
-            }
-            if (chrg) {
-                alphabets.add(ReducedAlphabets.ra_Charge_Tomii());
-            }
-            if (ss) {
-                alphabets.add(ReducedAlphabets.ra_secondaryStructure_Tomii());
-            }
-            if (sa) {
-                alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
-            }
+    protected void initMD() {
+        if (hyR) {
+            alphabets.add(ReducedAlphabets.ra_hydrop_Rose());
+        }
+        if (b50) {
+            alphabets.add(ReducedAlphabets.ra_Blosum50_Murphy());
+        }
+        if (cs) {
+            alphabets.add(ReducedAlphabets.ra_cSimilarity_chakrabarty());
+        }
+        if (hydT) {
+            alphabets.add(ReducedAlphabets.ra_Hydrophobicity_Tomii());
+        }
+        if (vw) {
+            alphabets.add(ReducedAlphabets.ra_NormVW_Tomii());
+        }
+        if (pol) {
+            alphabets.add(ReducedAlphabets.ra_Polarity_Tomii());
+        }
+        if (polz) {
+            alphabets.add(ReducedAlphabets.ra_Polarizability_Tomii());
+        }
+        if (chrg) {
+            alphabets.add(ReducedAlphabets.ra_Charge_Tomii());
+        }
+        if (ss) {
+            alphabets.add(ReducedAlphabets.ra_secondaryStructure_Tomii());
+        }
+        if (sa) {
+            alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
+        }
 
-            PeptideAttribute descriptor;
-            for (ReduceAlphabet ra : alphabets) {
-                Set<String> keySet = ra.getCount().keySet();
-                String attrName;
-                for (String key1 : keySet) {
-                    for (String key2 : keySet) {
-                        for (String key3 : keySet) {
-                            attrName = String.format("%s([%s][%s][%s])", ra.getName(), key1, key2, key3);
-                            if (!attrModel.hasAttribute(attrName)) {
-                                descriptor = attrModel.addAttribute(attrName, attrName, Double.class);
-                            } else {
-                                descriptor = attrModel.getAttribute(attrName);
-                            }
-                            descriptorList.add(descriptor);
+        for (ReduceAlphabet ra : alphabets) {
+            Set<String> keySet = ra.getCount().keySet();
+            String attrName;
+            for (String key1 : keySet) {
+                for (String key2 : keySet) {
+                    for (String key3 : keySet) {
+                        attrName = String.format("%s([%s][%s][%s])", ra.getName(), key1, key2, key3);
+                        if (!hasAttribute(attrName)) {
+                            addAttribute(attrName, attrName, Double.class);
                         }
                     }
                 }
             }
         }
-
     }
 
     @Override
@@ -212,7 +205,7 @@ public class TripeptideComposition extends AbstractModamp {
                 key = it.next();
                 val = aminoAcidComposition.get(key);
                 attrName = String.format("%s(%s)", ra.getName(), key);
-                peptide.setAttributeValue(attrModel.getAttribute(attrName), val);
+                peptide.setAttributeValue(getAttribute(attrName), val);
             }
         }
     }

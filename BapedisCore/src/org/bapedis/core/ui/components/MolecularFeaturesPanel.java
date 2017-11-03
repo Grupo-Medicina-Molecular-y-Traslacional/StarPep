@@ -8,11 +8,14 @@ package org.bapedis.core.ui.components;
 import java.awt.BorderLayout;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.bapedis.core.model.AttributesModel;
@@ -56,14 +59,11 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         DefaultComboBoxModel comboModel = (DefaultComboBoxModel) descriptorComboBox.getModel();
         comboModel.addElement(ALL_SELECTION);
         comboModel.setSelectedItem(ALL_SELECTION);
-        for (Iterator<PeptideAttribute> it = attrModel.getAttributeIterator(); it.hasNext();) {
-            PeptideAttribute attr = it.next();
-            if (attr.isMolecularDescriptor() && attr.getOriginAlgorithm() != null
-                    && comboModel.getIndexOf(attr.getOriginAlgorithm().getFactory().getName()) < 0) {
-                comboModel.addElement(attr.getOriginAlgorithm().getFactory().getName());
-            }
+        HashMap<String, List<PeptideAttribute>> mdMap = attrModel.getMolecularDescriptors();
+        for (Map.Entry<String, List<PeptideAttribute>> entry : mdMap.entrySet()) {
+            String key = entry.getKey();
+            comboModel.addElement(key);
         }
-
         // Add tool bar buttons
         findButton = new JButton(leftList.getActionMap().get("find"));
         findButton.setText("");
@@ -116,13 +116,13 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         map = new HashMap<>();
     }
 
-    private void setStats(PeptideAttribute attribute) {                
+    private void setStats(PeptideAttribute attribute) {
         rightBottomPanel.removeAll();
-        if (map.containsKey(attribute)) {            
+        if (map.containsKey(attribute)) {
             featureTextField.setText(attribute.getDisplayName());
             featureTextField.setEnabled(true);
             rightBottomPanel.add(map.get(attribute), BorderLayout.CENTER);
-        } else{
+        } else {
             featureTextField.setText("");
             featureTextField.setEnabled(false);
         }
@@ -382,20 +382,20 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
 
     private void descriptorComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_descriptorComboBoxActionPerformed
         leftListModel.clear();
-        PeptideAttribute attr;
-        AlgorithmFactory originFactory;
-        String selectedItem = (String) descriptorComboBox.getSelectedItem();
-        for (Iterator<PeptideAttribute> it = attrModel.getAttributeIterator(); it.hasNext();) {
-            attr = it.next();
-            if (attr.isMolecularDescriptor()) {
-                if (selectedItem.equals(ALL_SELECTION)) {
+        String selectedKey = (String) descriptorComboBox.getSelectedItem();
+        if (selectedKey.equals(ALL_SELECTION)) {
+            HashMap<String, List<PeptideAttribute>> mdMap = attrModel.getMolecularDescriptors();
+            for (Map.Entry<String, List<PeptideAttribute>> entry : mdMap.entrySet()) {
+                List<PeptideAttribute> list = entry.getValue();
+                for (PeptideAttribute attr : list) {
                     leftListModel.addElement(attr);
-                } else {
-                    originFactory = attr.getOriginAlgorithm() != null ? attr.getOriginAlgorithm().getFactory() : null;
-                    if (originFactory != null && originFactory.getName().equals(selectedItem)) {
-                        leftListModel.addElement(attr);
-                    }
                 }
+            }
+
+        } else {
+            List<PeptideAttribute> list = attrModel.getMolecularDescriptors(selectedKey);
+            for (PeptideAttribute attr : list) {
+                leftListModel.addElement(attr);
             }
         }
         sizeLabel.setText(NbBundle.getMessage(MolecularFeaturesPanel.class, "MolecularFeaturesPanel.sizeLabel.text", leftListModel.size()));

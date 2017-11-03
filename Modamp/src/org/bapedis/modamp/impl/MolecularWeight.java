@@ -24,27 +24,20 @@ public class MolecularWeight extends AbstractModamp {
     }
 
     @Override
-    public void initMD(List<PeptideAttribute> descriptorList) {
-        if (attrModel != null) {
-            PeptideAttribute descriptor;
-            if (!attrModel.hasAttribute(MW)) {
-                descriptor = attrModel.addAttribute(MW, MW, Double.class);
-            } else {
-                descriptor = attrModel.getAttribute(MW);
-            }
-            descriptorList.add(descriptor);
-        }
+    protected void initMD() {
+        if (!hasAttribute(MW)) {
+            addAttribute(MW, MW, Double.class);
+        } 
     }
 
     @Override
     protected void compute(Peptide peptide) {
         double val = MD.mw(peptide.getSequence());
-        peptide.setAttributeValue(attrModel.getAttribute(MW), val);
+        peptide.setAttributeValue(getAttribute(MW), val);
     }
 
     @Override
     protected void endMD() {
     }
 
-    
 }

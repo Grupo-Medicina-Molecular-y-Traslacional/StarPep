@@ -27,7 +27,7 @@ import org.openide.util.NbBundle;
  * @author loge
  */
 public class AttributeFilterSetupUI extends javax.swing.JPanel implements FilterSetupUI {
-    
+
     protected AttributeFilter filter;
     protected boolean validState;
     protected final ProjectManager pc;
@@ -42,24 +42,24 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         changeSupport = new PropertyChangeSupport(this);
         validState = false;
         valueTextField.getDocument().addDocumentListener(new DocumentListener() {
-            
+
             @Override
             public void insertUpdate(DocumentEvent e) {
                 updateValidState();
             }
-            
+
             @Override
             public void removeUpdate(DocumentEvent e) {
                 updateValidState();
             }
-            
+
             @Override
             public void changedUpdate(DocumentEvent e) {
-                
+
             }
         });
         valueTextField.addAncestorListener(new AncestorListener() {
-            
+
             @Override
             public void ancestorAdded(AncestorEvent event) {
                 SwingUtilities.invokeLater(new Runnable() {
@@ -69,13 +69,13 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
                     }
                 });
             }
-            
+
             @Override
-            public void ancestorRemoved(AncestorEvent event) {                
+            public void ancestorRemoved(AncestorEvent event) {
             }
-            
+
             @Override
-            public void ancestorMoved(AncestorEvent event) {               
+            public void ancestorMoved(AncestorEvent event) {
             }
         });
     }
@@ -230,19 +230,20 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         matchCaseCheckBox.setSelected(this.filter.isMatchCase());
         return this;
     }
-    
+
     protected void initAttrComboBox() {
         attrComboBox.removeAllItems();
         AttributesModel attrModel = pc.getAttributesModel();
         if (attrModel != null) {
-            for (Iterator<PeptideAttribute> it = attrModel.getAttributeIterator(); it.hasNext();) {
-                PeptideAttribute attr = it.next();
+            for (PeptideAttribute attr : attrModel.getDisplayedColumns()) {
                 attrComboBox.addItem(attr);
             }
-            attrComboBox.setSelectedIndex(0);
+            if (attrComboBox.getItemCount() > 0) {
+                attrComboBox.setSelectedIndex(0);
+            }
         }
     }
-    
+
     @Override
     public void finishSettings() {
         filter.setNegative(notCheckBox.isSelected());
@@ -251,12 +252,12 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         filter.setValue(valueTextField.getText().trim());
         filter.setMatchCase(matchCaseCheckBox.isSelected());
     }
-    
+
     @Override
     public void cancelSettings() {
         filter = null;
     }
-    
+
     private void updateValidState() {
         boolean oldValue = validState;
         validState = true;
@@ -275,17 +276,17 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
         }
         changeSupport.firePropertyChange(VALID_STATE, oldValue, validState);
     }
-    
+
     @Override
     public boolean isValidState() {
         return validState;
     }
-    
+
     @Override
     public void addValidStateListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);
     }
-    
+
     @Override
     public void removeValidStateListener(PropertyChangeListener listener) {
         changeSupport.removePropertyChangeListener(listener);

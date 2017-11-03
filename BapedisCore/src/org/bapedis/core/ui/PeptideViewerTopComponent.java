@@ -226,8 +226,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         jValueTextField.setVisible(attrModel != null);
         jAddButton.setVisible(attrModel != null);
         if (attrModel != null) {
-            Set<PeptideAttribute> availableColumnsModel = attrModel.getDisplayedColumns();
-            for (PeptideAttribute attr : availableColumnsModel) {
+            for (PeptideAttribute attr : attrModel.getDisplayedColumns()) {
                 jFieldComboBox.addItem(attr);
             }
             if (jFieldComboBox.getItemCount() > 0) {
@@ -526,7 +525,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             if (!attrModels.isEmpty()) {
                 if (currentModel != null) {
                     currentModel.removeQuickFilterChangeListener(this);
-                    currentModel.removeAvailableColumnChangeListener(this);
+                    currentModel.removeDisplayColumnChangeListener(this);
                 }
                 final AttributesModel attrModel = attrModels.iterator().next();
                 SwingUtilities.invokeLater(new Runnable() {
@@ -548,7 +547,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         setQuickFilter();
         if (currentModel != null) {
             currentModel.addQuickFilterChangeListener(this);
-            currentModel.addAvailableColumnChangeListener(this);
+            currentModel.addDisplayColumnChangeListener(this);
         }
         leftToolBar.setVisible(attrModel != null);
     }
@@ -572,10 +571,10 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         if (evt.getSource().equals(currentModel)) {
             if (evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
                 setQuickFilter();
-            } else if (evt.getPropertyName().equals(AttributesModel.AVAILABLE_ATTR_ADDED)) {
+            } else if (evt.getPropertyName().equals(AttributesModel.DISPLAY_ATTR_ADDED)) {
                 PeptideAttribute attr = (PeptideAttribute) evt.getNewValue();
                 jFieldComboBox.addItem(attr);
-            } else if (evt.getPropertyName().equals(AttributesModel.AVAILABLE_ATTR_REMOVED)) {
+            } else if (evt.getPropertyName().equals(AttributesModel.DISPLAY_ATTR_REMOVED)) {
                 PeptideAttribute attr = (PeptideAttribute) evt.getOldValue();
                 jFieldComboBox.removeItem(attr);
             }

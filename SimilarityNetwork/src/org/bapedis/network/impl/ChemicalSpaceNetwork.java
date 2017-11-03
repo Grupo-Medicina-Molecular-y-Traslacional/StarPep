@@ -5,13 +5,13 @@
  */
 package org.bapedis.network.impl;
 
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.bapedis.modamp.impl.AllDescriptors;
-import org.bapedis.modamp.impl.AllDescriptorsFactory;
-import org.openide.util.Lookup;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 
 /**
@@ -20,61 +20,28 @@ import org.openide.util.NbBundle;
  */
 public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
 
-    protected final AllDescriptors descriptorAlgo;
-    protected List<PeptideAttribute> descriptorList;
-
-    protected boolean normalize;
+    protected final Set<String> selectedKeys;
+    protected final boolean normalize;
+    protected final NotifyDescriptor emptyKeys;
 
     public ChemicalSpaceNetwork(AlgorithmFactory factory) {
         super(factory);
-        AllDescriptorsFactory descriptorFactory = Lookup.getDefault().lookup(AllDescriptorsFactory.class);
-        descriptorAlgo = (AllDescriptors) descriptorFactory.createAlgorithm();        
         normalize = true;
+        selectedKeys = new LinkedHashSet<>();
+        emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(ChemicalSpaceNetwork.class, "ChemicalSpaceNetwork.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
-    public AllDescriptors getDescriptorAlgorithm() {
-        return descriptorAlgo;
+    public Set<String> getSelectedKeys() {
+        return selectedKeys;
     }
 
     @Override
     public void initAlgo() {
         super.initAlgo();
-        if (attrModel != null) {
-            descriptorAlgo.initAlgo();
-            descriptorList = descriptorAlgo.getDescriptorList();
+        if (selectedKeys.isEmpty()) {
+            DialogDisplayer.getDefault().notify(emptyKeys);
+            cancel();
         }
-    }
-
-    @Override
-    public boolean cancel() {
-        if (attrModel != null) {
-            descriptorAlgo.cancel();
-        }
-        return super.cancel();
-    }
-
-    @Override
-    public void run() {
-        if (attrModel != null) {
-            progressTicket.progress(NbBundle.getMessage(ChemicalSpaceNetwork.class, "ChemicalSpaceNetwork.md.running"));
-            descriptorAlgo.setProgressTicket(progressTicket);
-            descriptorAlgo.run();
-            descriptorAlgo.setProgressTicket(null);
-
-            progressTicket.progress(NbBundle.getMessage(ChemicalSpaceNetwork.class, "ChemicalSpaceNetwork.task.running"));
-            if (!stopRun) {
-                super.run();
-            }
-        }
-    }
-
-    @Override
-    public void endAlgo() {
-        if (attrModel != null) {
-            descriptorAlgo.endAlgo();
-            descriptorList = null;
-        }
-        super.endAlgo();
     }
 
     @Override
@@ -84,25 +51,16 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
         double a2 = 0.0;
         double b2 = 0.0;
         double val1, val2;
-        for (PeptideAttribute descriptor : descriptorList) {
-            val1 = normalize ? descriptor.normalize(peptide1.getAttributeValue(descriptor)) : PeptideAttribute.convertToDouble(peptide1.getAttributeValue(descriptor));
-            val2 = normalize ? descriptor.normalize(peptide2.getAttributeValue(descriptor)) : PeptideAttribute.convertToDouble(peptide2.getAttributeValue(descriptor));
-            ab += val1 * val2;
-            a2 += val1 * val1;
-            b2 += val2 * val2;
+        for (String key : selectedKeys) {
+            for (PeptideAttribute descriptor : attrModel.getMolecularDescriptors(key)) {
+                val1 = normalize ? descriptor.normalize(peptide1.getAttributeValue(descriptor)) : PeptideAttribute.convertToDouble(peptide1.getAttributeValue(descriptor));
+                val2 = normalize ? descriptor.normalize(peptide2.getAttributeValue(descriptor)) : PeptideAttribute.convertToDouble(peptide2.getAttributeValue(descriptor));
+                ab += val1 * val2;
+                a2 += val1 * val1;
+                b2 += val2 * val2;
+            }
         }
         return (float) ab / (float) (a2 + b2 - ab);
     }
 
-//    private double distanceBased(Peptide peptide1, Peptide peptide2) {
-//        double val1, val2, diff, squareSum = 0;
-//        for (PeptideAttribute descriptor : descriptorList) {
-//            val1 = (double) convertToDouble(descriptor, peptide1.getAttributeValue(descriptor));
-//            val2 = (double) convertToDouble(descriptor, peptide2.getAttributeValue(descriptor));
-//            diff = val2 - val1;
-//            squareSum += diff * diff;
-//        }
-//        double distance = Math.sqrt(squareSum);
-//        return 1 / (1 + distance);
-//    }
 }

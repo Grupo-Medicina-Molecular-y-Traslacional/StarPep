@@ -24,27 +24,20 @@ public class IsoelectricPoint extends AbstractModamp {
     }
 
     @Override
-    public void initMD(List<PeptideAttribute> descriptorList) {
-        if (attrModel != null) {
-            PeptideAttribute descriptor;
-            if (!attrModel.hasAttribute(pI)) {
-                descriptor = attrModel.addAttribute(pI, pI, Double.class);
-            } else {
-                descriptor = attrModel.getAttribute(pI);
-            }
-            descriptorList.add(descriptor);
+    protected void initMD() {
+        if (!hasAttribute(pI)) {
+            addAttribute(pI, pI, Double.class);
         }
     }
 
     @Override
     protected void compute(Peptide peptide) {
         double val = MD.isoelectricPoint(peptide.getSequence(), PkaValues.IPC_peptide());
-        peptide.setAttributeValue(attrModel.getAttribute(pI), val);
+        peptide.setAttributeValue(getAttribute(pI), val);
     }
 
     @Override
     protected void endMD() {
-    }    
-    
+    }
 
 }

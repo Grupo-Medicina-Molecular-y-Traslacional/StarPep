@@ -7,12 +7,15 @@ package org.bapedis.core.io.impl;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import org.bapedis.core.io.Exporter;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
-import org.bapedis.core.spi.data.PeptideDAO;
 
 /**
  *
@@ -31,25 +34,26 @@ public class MDExporter implements Exporter {
     public void exportTo(File file) throws Exception {
         PrintWriter pw = new PrintWriter(file);
         try {
-            //Write header
-            pw.format("\"%s\"",PeptideDAO.ID.getDisplayName());
-            for (Iterator<PeptideAttribute> it = attrModel.getAttributeIterator(); it.hasNext();) {
-                PeptideAttribute attr = it.next();
-                if (attr.isMolecularDescriptor()) {
+            HashMap<String, List<PeptideAttribute>> map = attrModel.getMolecularDescriptors();
+            //Write header            
+            pw.format("\"%s\"", Peptide.ID.getDisplayName());
+            for (Map.Entry<String, List<PeptideAttribute>> entry : map.entrySet()) {
+                List<PeptideAttribute> list = entry.getValue();
+                for (PeptideAttribute attr : list) {
                     pw.write(separator);
-                    pw.format("\"%s\"",attr.getDisplayName());
+                    pw.format("\"%s\"", attr.getDisplayName());
                 }
             }
             pw.println();
             // Write data
             for (Peptide pept : attrModel.getPeptides()) {
-                pw.format("\"%s\"",pept.getId());
-                for (Iterator<PeptideAttribute> it = attrModel.getAttributeIterator(); it.hasNext();) {
-                    PeptideAttribute attr = it.next();
-                    if (attr.isMolecularDescriptor()) {
+                pw.format("\"%s\"", pept.getId());
+                for (Map.Entry<String, List<PeptideAttribute>> entry : map.entrySet()) {
+                    List<PeptideAttribute> list = entry.getValue();
+                    for (PeptideAttribute attr : list) {
                         Object val = pept.getAttributeValue(attr);
                         pw.write(separator);
-                        pw.format("\"%s\"",val != null ? val.toString() : "");
+                        pw.format("\"%s\"", val != null ? val.toString() : "");
                     }
                 }
                 pw.println();

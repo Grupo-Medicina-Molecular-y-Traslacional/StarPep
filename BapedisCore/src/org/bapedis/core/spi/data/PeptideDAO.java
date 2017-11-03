@@ -6,19 +6,14 @@
 package org.bapedis.core.spi.data;
 
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.QueryModel;
 import org.gephi.graph.api.GraphModel;
-import org.openide.util.NbBundle;
 
 /**
  *
  * @author loge
  */
 public interface PeptideDAO {
-    PeptideAttribute ID = new PeptideAttribute("id", NbBundle.getMessage(PeptideDAO.class, "PeptideAttribute.id"), String.class, false);
-    PeptideAttribute SEQ = new PeptideAttribute("seq", NbBundle.getMessage(PeptideDAO.class, "PeptideAttribute.seq"), String.class, false);
-    PeptideAttribute LENGHT = new PeptideAttribute("length", NbBundle.getMessage(PeptideDAO.class, "PeptideAttribute.length"), Integer.class, true);
     
     AttributesModel getPeptides(QueryModel queryModel, GraphModel graphModel);
 }

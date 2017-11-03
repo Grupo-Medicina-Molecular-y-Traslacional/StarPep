@@ -9,30 +9,23 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -41,7 +34,9 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.PeptideAttribute;
+import org.bapedis.core.services.ProjectManager;
 import org.jdesktop.swingx.JXTable;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
@@ -52,7 +47,10 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
 
     protected final AttributesModel attrModel;
     protected JXTable table;
-    protected HashMap<String, List<PeptideAttribute>> map;
+
+    public DescriptorSelectionPanel() {
+        this(Lookup.getDefault().lookup(ProjectManager.class).getAttributesModel());
+    }
 
     public DescriptorSelectionPanel(final AttributesModel attrModel) {
         this(attrModel, Color.BLUE);
@@ -65,22 +63,6 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
     public DescriptorSelectionPanel(final AttributesModel attrModel, final Color fgColor) {
         initComponents();
         this.attrModel = attrModel;
-
-        map = new LinkedHashMap<>();
-        String key;
-        List<PeptideAttribute> list;
-        for (Iterator<PeptideAttribute> it = attrModel.getAttributeIterator(); it.hasNext();) {
-            PeptideAttribute attr = it.next();
-            if (attr.isMolecularDescriptor() && attr.getOriginAlgorithm() != null) {
-                key = attr.getOriginAlgorithm().getFactory().getName();
-                if (!map.containsKey(key)) {
-                    list = new LinkedList<>();
-                    map.put(key, list);
-                }
-                list = map.get(key);
-                list.add(attr);
-            }
-        }
 
         final TableModel tableModel = createTableModel();
         table = new JXTable(tableModel) {
@@ -122,6 +104,8 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
     private TableModel createTableModel() {
         String[] columnNames = {"", NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.table.columnName.first"),
             NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.table.columnName.second")};
+
+        HashMap<String, List<PeptideAttribute>> map = attrModel.getMolecularDescriptors();
         ArrayList<Object[]> data = new ArrayList(map.size());
         Object[] dataRow;
         int row = 0;
@@ -135,17 +119,24 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         return new MyTableModel(columnNames, data);
     }
 
-    public HashMap<String, List<PeptideAttribute>> getSelectedDescriptor() {
-        HashMap<String, List<PeptideAttribute>> newMap = new LinkedHashMap<>();
+    public void setSelectedDescriptorKeys(Set<String> keys) {
+        TableModel model = table.getModel();
+        for (int row = 0; row < model.getRowCount(); row++) {
+            model.setValueAt(keys.contains((String)model.getValueAt(row, 1)), row, 0);
+        }
+    }
+
+    public Set<String> getSelectedDescriptorKeys() {
+        Set<String> keys = new LinkedHashSet<>();
         TableModel model = table.getModel();
         String key;
         for (int row = 0; row < model.getRowCount(); row++) {
             if ((boolean) model.getValueAt(row, 0)) {
                 key = (String) model.getValueAt(row, 1);
-                newMap.put(key, map.get(key));
+                keys.add(key);
             }
         }
-        return newMap;
+        return keys;
     }
 
     public void removeDescriptorRow(String key) {
@@ -321,7 +312,6 @@ class CheckBoxHeader2 extends JCheckBox implements TableCellRenderer {
                 int modelColumn = table.convertColumnIndexToModel(viewColumn);
                 if (modelColumn == index) {
                     doClick();
-//                    setSelected(!isSelected());
                     TableModel m = table.getModel();
                     boolean flag = isSelected();
                     for (int i = 0; i < m.getRowCount(); i++) {
@@ -333,11 +323,12 @@ class CheckBoxHeader2 extends JCheckBox implements TableCellRenderer {
         });
     }
 
+    @Override
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
         JTableHeader header = table.getTableHeader();
-        Color bg = header.getBackground();        
-        setBackground(new Color(bg.getRed(), bg.getGreen(), bg.getBlue()));        
+        Color bg = header.getBackground();
+        setBackground(new Color(bg.getRed(), bg.getGreen(), bg.getBlue()));
         return this;
     }
 }

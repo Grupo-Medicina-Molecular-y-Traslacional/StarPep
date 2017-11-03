@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.scales.HydrophilicityScale;
@@ -62,34 +61,22 @@ public class AverageHydrophilicity extends AbstractModamp {
     }
 
     @Override
-    public void initMD(List<PeptideAttribute> descriptorList) {
-        if (attrModel != null) {
-            PeptideAttribute descriptor;
-            if (HOPT810101) {
-                if (!attrModel.hasAttribute(HOPT810101_NAME)) {
-                    descriptor = attrModel.addAttribute(HOPT810101_NAME, HOPT810101_NAME, Double.class);
-                } else {
-                    descriptor = attrModel.getAttribute(HOPT810101_NAME);
-                }
-                descriptorList.add(descriptor);
-            }
-
-            if (KUHL950101) {
-                if (!attrModel.hasAttribute(KUHL950101_NAME)) {
-                    descriptor = attrModel.addAttribute(KUHL950101_NAME, KUHL950101_NAME, Double.class);
-                } else {
-                    descriptor = attrModel.getAttribute(KUHL950101_NAME);
-                }
-                descriptorList.add(descriptor);
-            }
-
-            if (!attrModel.hasAttribute(GRAVY)) {
-                descriptor = attrModel.addAttribute(GRAVY, GRAVY, Double.class);
-            } else {
-                descriptor = attrModel.getAttribute(GRAVY);
-            }
-            descriptorList.add(descriptor);
+    protected void initMD() {
+        if (HOPT810101) {
+            if (!hasAttribute(HOPT810101_NAME)) {
+                addAttribute(HOPT810101_NAME, HOPT810101_NAME, Double.class);
+            } 
         }
+
+        if (KUHL950101) {
+            if (!hasAttribute(KUHL950101_NAME)) {
+                addAttribute(KUHL950101_NAME, KUHL950101_NAME, Double.class);
+            } 
+        }
+
+        if (!hasAttribute(GRAVY)) {
+            addAttribute(GRAVY, GRAVY, Double.class);
+        } 
     }
 
     @Override
@@ -97,16 +84,16 @@ public class AverageHydrophilicity extends AbstractModamp {
         double val;
         if (HOPT810101) {
             val = MD.gravy(peptide.getSequence(), HydrophilicityScale.hopp_Woods_hydrov_hash());
-            peptide.setAttributeValue(attrModel.getAttribute(HOPT810101_NAME), val);
+            peptide.setAttributeValue(getAttribute(HOPT810101_NAME), val);
         }
 
         if (KUHL950101) {
             val = MD.gravy(peptide.getSequence(), HydrophilicityScale.kuhn_hydrov_hash());
-            peptide.setAttributeValue(attrModel.getAttribute(KUHL950101_NAME), val);
+            peptide.setAttributeValue(getAttribute(KUHL950101_NAME), val);
         }
 
         val = MD.gravy(peptide.getSequence());
-        peptide.setAttributeValue(attrModel.getAttribute(GRAVY), val);
+        peptide.setAttributeValue(getAttribute(GRAVY), val);
     }
 
     @Override
@@ -117,7 +104,5 @@ public class AverageHydrophilicity extends AbstractModamp {
     @Override
     protected void endMD() {
     }
-    
-    
 
 }

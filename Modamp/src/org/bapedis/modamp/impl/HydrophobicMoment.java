@@ -124,28 +124,19 @@ public class HydrophobicMoment extends AbstractModamp {
     }
 
     @Override
-    public void initMD(List<PeptideAttribute> descriptorList) {
-        PeptideAttribute descriptor;
-        if (attrModel != null) {
-            for (int i = 0; i < scale.length; i++) {
-                if (scale[i]) {
-                    for (int j = 0; j < angle.length; j++) {
-                        if (angle[j]) {
-                            if (!attrModel.hasAttribute(attrNames[i][j])) {
-                                descriptor = attrModel.addAttribute(attrNames[i][j], attrNames[i][j], Double.class);
-                            } else {
-                                descriptor = attrModel.getAttribute(attrNames[i][j]);
-                            }
-                            descriptorList.add(descriptor);
-                        }
+    protected void initMD() {
+        for (int i = 0; i < scale.length; i++) {
+            if (scale[i]) {
+                for (int j = 0; j < angle.length; j++) {
+                    if (angle[j]) {
+                        if (!hasAttribute(attrNames[i][j])) {
+                            addAttribute(attrNames[i][j], attrNames[i][j], Double.class);
+                        } 
                     }
-                    if (!attrModel.hasAttribute(AVGH[i])) {
-                        descriptor = attrModel.addAttribute(AVGH[i], AVGH[i], Double.class);
-                    } else{
-                        descriptor = attrModel.getAttribute(AVGH[i]);
-                    }
-                    descriptorList.add(descriptor);
                 }
+                if (!hasAttribute(AVGH[i])) {
+                    addAttribute(AVGH[i], AVGH[i], Double.class);
+                } 
             }
         }
     }
@@ -158,11 +149,11 @@ public class HydrophobicMoment extends AbstractModamp {
                 for (int j = 0; j < angle.length; j++) {
                     if (angle[j]) {
                         val = MD.hMoment(peptide.getSequence(), angleVal[j], window, scaleVal[i]);
-                        peptide.setAttributeValue(attrModel.getAttribute(attrNames[i][j]), val);
+                        peptide.setAttributeValue(getAttribute(attrNames[i][j]), val);
                     }
                 }
                 val = MD.maxMeanHydrophobicity(peptide.getSequence(), window, scaleVal[i]);
-                peptide.setAttributeValue(attrModel.getAttribute(AVGH[i]), val);
+                peptide.setAttributeValue(getAttribute(AVGH[i]), val);
             }
         }
     }
@@ -174,6 +165,6 @@ public class HydrophobicMoment extends AbstractModamp {
 
     @Override
     protected void endMD() {
-    }        
+    }
 
 }

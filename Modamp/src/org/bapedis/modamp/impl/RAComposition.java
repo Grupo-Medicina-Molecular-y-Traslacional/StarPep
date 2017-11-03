@@ -144,55 +144,48 @@ public class RAComposition extends AbstractModamp {
     }
 
     @Override
-    public void initMD(List<PeptideAttribute> descriptorList) {
-        if (attrModel != null) {
-            if (hyR) {
-                alphabets.add(ReducedAlphabets.ra_hydrop_Rose());
-            }
-            if (b50) {
-                alphabets.add(ReducedAlphabets.ra_Blosum50_Murphy());
-            }
-            if (cs) {
-                alphabets.add(ReducedAlphabets.ra_cSimilarity_chakrabarty());
-            }
-            if (hydT) {
-                alphabets.add(ReducedAlphabets.ra_Hydrophobicity_Tomii());
-            }
-            if (vw) {
-                alphabets.add(ReducedAlphabets.ra_NormVW_Tomii());
-            }
-            if (pol) {
-                alphabets.add(ReducedAlphabets.ra_Polarity_Tomii());
-            }
-            if (polz) {
-                alphabets.add(ReducedAlphabets.ra_Polarizability_Tomii());
-            }
-            if (chrg) {
-                alphabets.add(ReducedAlphabets.ra_Charge_Tomii());
-            }
-            if (ss) {
-                alphabets.add(ReducedAlphabets.ra_secondaryStructure_Tomii());
-            }
-            if (sa) {
-                alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
-            }
+    protected void initMD() {
+        if (hyR) {
+            alphabets.add(ReducedAlphabets.ra_hydrop_Rose());
+        }
+        if (b50) {
+            alphabets.add(ReducedAlphabets.ra_Blosum50_Murphy());
+        }
+        if (cs) {
+            alphabets.add(ReducedAlphabets.ra_cSimilarity_chakrabarty());
+        }
+        if (hydT) {
+            alphabets.add(ReducedAlphabets.ra_Hydrophobicity_Tomii());
+        }
+        if (vw) {
+            alphabets.add(ReducedAlphabets.ra_NormVW_Tomii());
+        }
+        if (pol) {
+            alphabets.add(ReducedAlphabets.ra_Polarity_Tomii());
+        }
+        if (polz) {
+            alphabets.add(ReducedAlphabets.ra_Polarizability_Tomii());
+        }
+        if (chrg) {
+            alphabets.add(ReducedAlphabets.ra_Charge_Tomii());
+        }
+        if (ss) {
+            alphabets.add(ReducedAlphabets.ra_secondaryStructure_Tomii());
+        }
+        if (sa) {
+            alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
+        }
 
-            PeptideAttribute descriptor;
-            String key;
-            for (ReduceAlphabet ra : alphabets) {
-                Iterator<String> it = ra.getCount().keySet().iterator();
-                while (it.hasNext()) {
-                    key = String.format("%s[%s]", ra.getName(), it.next());
-                    if (!attrModel.hasAttribute(key)) {
-                        descriptor = attrModel.addAttribute(key, key, Double.class);
-                    } else {
-                        descriptor = attrModel.getAttribute(key);
-                    }
-                    descriptorList.add(descriptor);
+        String key;
+        for (ReduceAlphabet ra : alphabets) {
+            Iterator<String> it = ra.getCount().keySet().iterator();
+            while (it.hasNext()) {
+                key = String.format("%s[%s]", ra.getName(), it.next());
+                if (!hasAttribute(key)) {
+                    addAttribute(key, key, Double.class);
                 }
             }
         }
-
     }
 
     @Override
@@ -211,7 +204,7 @@ public class RAComposition extends AbstractModamp {
                 key = it.next();
                 attrName = String.format("%s[%s]", ra.getName(), key);
                 val = aminoAcidComposition.get(key);
-                peptide.setAttributeValue(attrModel.getAttribute(attrName), val);
+                peptide.setAttributeValue(getAttribute(attrName), val);
             }
         }
     }

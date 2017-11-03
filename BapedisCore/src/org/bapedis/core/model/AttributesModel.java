@@ -9,13 +9,11 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import org.bapedis.core.spi.data.PeptideDAO;
 import org.gephi.graph.api.GraphView;
 import org.netbeans.swing.etable.QuickFilter;
 import org.openide.nodes.AbstractNode;
@@ -29,7 +27,7 @@ import org.openide.nodes.Node;
  */
 public class AttributesModel {
 
-    protected final HashMap<String, PeptideAttribute> attrsMap;
+    protected final HashMap<String, List<PeptideAttribute>> mdMap;
     protected final Set<PeptideAttribute> displayedColumnsModel;
     private static final int MAX_AVAILABLE_COLUMNS = 6;
     protected List<PeptideNode> nodeList;
@@ -37,8 +35,8 @@ public class AttributesModel {
     private Peptide[] filteredPept;
     protected QuickFilter quickFilter;
     public static final String CHANGED_FILTER = "quickFilter";
-    public static final String AVAILABLE_ATTR_ADDED = "attribute_add";
-    public static final String AVAILABLE_ATTR_REMOVED = "attribute_remove";
+    public static final String DISPLAY_ATTR_ADDED = "display_attribute_add";
+    public static final String DISPLAY_ATTR_REMOVED = "display_attribute_remove";
     public static final String CHANGED_GVIEW = "changed_graphview";
     protected transient final PropertyChangeSupport propertyChangeSupport;
     protected Node rootNode;
@@ -49,16 +47,16 @@ public class AttributesModel {
     protected double similarityThreshold;
 
     public AttributesModel() {
-        attrsMap = new LinkedHashMap<>();
+        mdMap = new LinkedHashMap<>();
         nodeList = new LinkedList<>();
         container = new PeptideNodeContainer();
         rootNode = new AbstractNode(container);
         propertyChangeSupport = new PropertyChangeSupport(this);
 
         displayedColumnsModel = new LinkedHashSet<>();
-        displayedColumnsModel.add(PeptideDAO.ID);
-        displayedColumnsModel.add(PeptideDAO.SEQ);
-        displayedColumnsModel.add(PeptideDAO.LENGHT);
+        displayedColumnsModel.add(Peptide.ID);
+        displayedColumnsModel.add(Peptide.SEQ);
+        displayedColumnsModel.add(Peptide.LENGHT);
 
         mainGView = CSN_VIEW;
     }
@@ -100,10 +98,6 @@ public class AttributesModel {
         this.csnView = csnView;
     }
 
-    public Iterator<PeptideAttribute> getAttributeIterator() {
-        return attrsMap.values().iterator();
-    }   
-
     public Set<PeptideAttribute> getDisplayedColumns() {
         return displayedColumnsModel;
     }
@@ -114,7 +108,7 @@ public class AttributesModel {
 
     public boolean addDisplayedColumn(PeptideAttribute attr) {
         if (canAddDisplayColumn() && displayedColumnsModel.add(attr)) {
-            propertyChangeSupport.firePropertyChange(AVAILABLE_ATTR_ADDED, null, attr);
+            propertyChangeSupport.firePropertyChange(DISPLAY_ATTR_ADDED, null, attr);
             return true;
         }
         return false;
@@ -122,19 +116,36 @@ public class AttributesModel {
 
     public boolean removeDisplayedColumn(PeptideAttribute attr) {
         if (displayedColumnsModel.remove(attr)) {
-            propertyChangeSupport.firePropertyChange(AVAILABLE_ATTR_REMOVED, attr, null);
+            propertyChangeSupport.firePropertyChange(DISPLAY_ATTR_REMOVED, attr, null);
             return true;
         }
         return false;
     }
-
-    public void deleteAttribute(PeptideAttribute attr) {
-        for (PeptideNode pNode : nodeList) {
-            pNode.getPeptide().deleteAttribute(attr);
-        }
-        removeDisplayedColumn(attr);
-        attrsMap.remove(attr.id);
+    
+    public HashMap<String, List<PeptideAttribute>> getMolecularDescriptors() {
+        return mdMap;
+    }       
+    
+    public List<PeptideAttribute> getMolecularDescriptors(String key){
+        return mdMap.get(key);
     }
+    
+    public void addMolecularDescriptors(String key, List<PeptideAttribute> features){
+        mdMap.put(key, features);
+    }
+    
+    public void deleteMolecularDescriptors(String key){
+        mdMap.remove(key);
+    }     
+    
+
+//    public void deleteAttribute(PeptideAttribute attr) {
+//        for (PeptideNode pNode : nodeList) {
+//            pNode.getPeptide().deleteAttribute(attr);
+//        }
+//        removeDisplayedColumn(attr);
+//        attrsMap.remove(attr.id);
+//    }
 
     public synchronized Peptide[] getPeptides() {
         if (filteredPept != null) {
@@ -156,29 +167,6 @@ public class AttributesModel {
         container.refreshNodes();
     }
 
-    public PeptideAttribute getAttribute(String id) {
-        if (!hasAttribute(id)) {
-            throw new IllegalArgumentException("Attribute doesn't exist: " + id);
-        }
-        return attrsMap.get(id);
-    }
-
-    public PeptideAttribute addAttribute(String id, String displayName, Class<?> cclass) {
-        PeptideAttribute attr = new PeptideAttribute(id, displayName, cclass);
-        addAttribute(attr);
-        return attr;
-    }
-
-    public void addAttribute(PeptideAttribute attr) {
-        if (hasAttribute(attr.getId())) {
-            throw new IllegalArgumentException("Duplicated attribute: " + attr.getId());
-        }
-        attrsMap.put(attr.id, attr);
-    }
-
-    public boolean hasAttribute(String id) {
-        return attrsMap.containsKey(id);
-    }
 
     public Node getRootNode() {
         return rootNode;
@@ -211,14 +199,14 @@ public class AttributesModel {
         propertyChangeSupport.removePropertyChangeListener(CHANGED_FILTER, listener);
     }
 
-    public void addAvailableColumnChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(AVAILABLE_ATTR_ADDED, listener);
-        propertyChangeSupport.addPropertyChangeListener(AVAILABLE_ATTR_REMOVED, listener);
+    public void addDisplayColumnChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(DISPLAY_ATTR_ADDED, listener);
+        propertyChangeSupport.addPropertyChangeListener(DISPLAY_ATTR_REMOVED, listener);
     }
 
-    public void removeAvailableColumnChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(AVAILABLE_ATTR_ADDED, listener);
-        propertyChangeSupport.removePropertyChangeListener(AVAILABLE_ATTR_REMOVED, listener);
+    public void removeDisplayColumnChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(DISPLAY_ATTR_ADDED, listener);
+        propertyChangeSupport.removePropertyChangeListener(DISPLAY_ATTR_REMOVED, listener);
     }
 
     public void addGraphViewChangeListener(PropertyChangeListener listener) {

@@ -145,8 +145,7 @@ public class DipeptideComposition extends AbstractModamp {
     }
 
     @Override
-    public void initMD(List<PeptideAttribute> descriptorList) {
-        if (attrModel != null) {
+    protected void initMD() {
             if (hyR) {
                 alphabets.add(ReducedAlphabets.ra_hydrop_Rose());
             }
@@ -179,24 +178,18 @@ public class DipeptideComposition extends AbstractModamp {
             }
 
             Set<String> keySet;
-            PeptideAttribute descriptor;
             String attrName;
             for (ReduceAlphabet ra : alphabets) {
                 keySet = ra.getCount().keySet();
                 for (String key1 : keySet) {
                     for (String key2 : keySet) {
                         attrName = String.format("%s([%s][%s])", ra.getName(), key1, key2);
-                        if (!attrModel.hasAttribute(attrName)) {
-                            descriptor = attrModel.addAttribute(attrName, attrName, Double.class);
-                        } else {
-                            descriptor = attrModel.getAttribute(attrName);
-                        }
-                        descriptorList.add(descriptor);
+                        if (!hasAttribute(attrName)) {
+                            addAttribute(attrName, attrName, Double.class);
+                        } 
                     }
                 }
             }
-        }
-
     }
 
     @Override
@@ -211,7 +204,7 @@ public class DipeptideComposition extends AbstractModamp {
                 key = it.next();
                 attrName = String.format("%s(%s)", ra.getName(), key);
                 val = aminoAcidComposition.get(key);
-                peptide.setAttributeValue(attrModel.getAttribute(attrName), val);
+                peptide.setAttributeValue(getAttribute(attrName), val);
             }
         }
     }

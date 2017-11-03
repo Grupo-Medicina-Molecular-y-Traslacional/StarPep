@@ -8,30 +8,15 @@ package org.bapedis.core.ui.components;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.PeptideAttribute;
 import org.jdesktop.swingx.JXBusyLabel;
-import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
@@ -138,20 +123,17 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
         SwingWorker sw = new SwingWorker<Set<String>, Void>() {
             @Override
             protected Set<String> doInBackground() throws Exception {
-                HashMap<String, List<PeptideAttribute>> map = selectionPanel.getSelectedDescriptor();
-                for (Map.Entry<String, List<PeptideAttribute>> entry : map.entrySet()) {
-                    for (PeptideAttribute attribute : entry.getValue()) {
-                        attrModel.deleteAttribute(attribute);
-                    }
+                Set<String> keys = selectionPanel.getSelectedDescriptorKeys();
+                for(String key: keys){
+                    attrModel.deleteMolecularDescriptors(key);
                 }
-                return map.keySet();
+                return keys;
             }
 
             @Override
             protected void done() {
                 try {
-                    Set<String> keySet = get();
-                    for (String key : keySet) {
+                    for (String key : get()) {
                         selectionPanel.removeDescriptorRow(key);
                     }
                 } catch (InterruptedException | ExecutionException ex) {

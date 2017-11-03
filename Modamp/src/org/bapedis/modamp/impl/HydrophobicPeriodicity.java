@@ -50,28 +50,22 @@ public class HydrophobicPeriodicity extends AbstractModamp {
     }
 
     @Override
+    protected void initMD() {
+        String name = getProName();
+        if (!hasAttribute(name)) {
+            addAttribute(name, name, Double.class);
+        }
+    }
+
+    @Override
     protected void compute(Peptide peptide) {
         double val = MD.A_m(peptide.getSequence(), window);
         String name = getProName();
-        peptide.setAttributeValue(attrModel.getAttribute(name), val);
+        peptide.setAttributeValue(getAttribute(name), val);
     }
 
     private String getProName() {
         return String.format(PRO_NAME, window);
-    }
-
-    @Override
-    public void initMD(List<PeptideAttribute> descriptorList) {
-        if (attrModel != null) {
-            PeptideAttribute descriptor;
-            String name = getProName();
-            if (!attrModel.hasAttribute(name)) {
-                descriptor = attrModel.addAttribute(name, name, Double.class);
-            } else {
-                descriptor = attrModel.getAttribute(name);
-            }
-            descriptorList.add(descriptor);
-        }
     }
 
     @Override
@@ -82,7 +76,5 @@ public class HydrophobicPeriodicity extends AbstractModamp {
     @Override
     protected void endMD() {
     }
-    
-    
 
 }

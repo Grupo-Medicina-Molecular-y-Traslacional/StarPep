@@ -6,13 +6,14 @@
 package org.bapedis.network.impl;
 
 import java.awt.BorderLayout;
+import java.util.Set;
 import javax.swing.JPanel;
-import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.services.ProjectManager;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableModel;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
 import org.bapedis.core.ui.components.DescriptorSelectionPanel;
-import org.openide.util.Lookup;
 
 /**
  *
@@ -77,8 +78,23 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
     @Override
     public JPanel getEditPanel(Algorithm algo) {
         this.csnAlgo = (ChemicalSpaceNetwork) algo;
-        AttributesModel attrModel = Lookup.getDefault().lookup(ProjectManager.class).getAttributesModel();
-        descriptorsPanel.add(new DescriptorSelectionPanel(attrModel), BorderLayout.CENTER);
+        DescriptorSelectionPanel selectionPanel = new DescriptorSelectionPanel();
+        final Set<String> keys = csnAlgo.getSelectedKeys();
+        selectionPanel.setSelectedDescriptorKeys(keys);
+        selectionPanel.addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {                
+                TableModel model = (TableModel) e.getSource();
+                for (int row = 0; row < model.getRowCount(); row++) {
+                    if ((boolean) model.getValueAt(row, 0)) {
+                        keys.add((String)model.getValueAt(row, 1));
+                    }else{
+                        keys.remove((String)model.getValueAt(row, 1));
+                    }
+                }
+            }
+        });        
+        descriptorsPanel.add(selectionPanel, BorderLayout.CENTER);
         thresholdPanel.setup(csnAlgo);
         return this;
     }

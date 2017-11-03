@@ -119,50 +119,43 @@ public class RATransition extends AbstractModamp {
     }
 
     @Override
-    public void initMD(List<PeptideAttribute> descriptorList) {
-        if (attrModel != null) {
-            if (hydT) {
-                alphabets.add(ReducedAlphabets.ra_Hydrophobicity_Tomii());
-            }
-            if (vw) {
-                alphabets.add(ReducedAlphabets.ra_NormVW_Tomii());
-            }
-            if (pol) {
-                alphabets.add(ReducedAlphabets.ra_Polarity_Tomii());
-            }
-            if (polz) {
-                alphabets.add(ReducedAlphabets.ra_Polarizability_Tomii());
-            }
-            if (chrg) {
-                alphabets.add(ReducedAlphabets.ra_Charge_Tomii());
-            }
-            if (ss) {
-                alphabets.add(ReducedAlphabets.ra_secondaryStructure_Tomii());
-            }
-            if (sa) {
-                alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
-            }
-            
-            PeptideAttribute descriptor;
-            String key1, key2, newKey;
-            for (ReduceAlphabet ra : alphabets) {
-                Object[] keys = ra.getCount().keySet().toArray();
-                for (int i = 0; i < keys.length - 1; i++) {
-                    key1 = keys[i].toString();
-                    for (int j = i + 1; j < keys.length; j++) {
-                        key2 = keys[j].toString();
-                        newKey = String.format("T_%s[%s]", ra.getName(), key1 + "->" + key2);
-                        if (!attrModel.hasAttribute(newKey)) {
-                            descriptor = attrModel.addAttribute(newKey, newKey, Double.class);
-                        } else {
-                            descriptor = attrModel.getAttribute(newKey);
-                        }
-                        descriptorList.add(descriptor);
+    protected void initMD() {
+        if (hydT) {
+            alphabets.add(ReducedAlphabets.ra_Hydrophobicity_Tomii());
+        }
+        if (vw) {
+            alphabets.add(ReducedAlphabets.ra_NormVW_Tomii());
+        }
+        if (pol) {
+            alphabets.add(ReducedAlphabets.ra_Polarity_Tomii());
+        }
+        if (polz) {
+            alphabets.add(ReducedAlphabets.ra_Polarizability_Tomii());
+        }
+        if (chrg) {
+            alphabets.add(ReducedAlphabets.ra_Charge_Tomii());
+        }
+        if (ss) {
+            alphabets.add(ReducedAlphabets.ra_secondaryStructure_Tomii());
+        }
+        if (sa) {
+            alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
+        }
+
+        String key1, key2, newKey;
+        for (ReduceAlphabet ra : alphabets) {
+            Object[] keys = ra.getCount().keySet().toArray();
+            for (int i = 0; i < keys.length - 1; i++) {
+                key1 = keys[i].toString();
+                for (int j = i + 1; j < keys.length; j++) {
+                    key2 = keys[j].toString();
+                    newKey = String.format("T_%s[%s]", ra.getName(), key1 + "->" + key2);
+                    if (!hasAttribute(newKey)) {
+                        addAttribute(newKey, newKey, Double.class);
                     }
                 }
             }
         }
-
     }
 
     @Override
@@ -176,7 +169,7 @@ public class RATransition extends AbstractModamp {
                 key = it.next();
                 attrName = String.format("T_%s[%s]", ra.getName(), key);
                 val = aminoAcidComposition.get(key);
-                peptide.setAttributeValue(attrModel.getAttribute(attrName), val);
+                peptide.setAttributeValue(getAttribute(attrName), val);
             }
         }
     }

@@ -28,7 +28,10 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -51,6 +54,14 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
     protected HashMap<String, List<PeptideAttribute>> map;
 
     public DescriptorSelectionPanel(final AttributesModel attrModel) {
+        this(attrModel, Color.BLUE);
+    }
+
+    public void addTableModelListener(TableModelListener listener) {
+        table.getModel().addTableModelListener(listener);
+    }
+
+    public DescriptorSelectionPanel(final AttributesModel attrModel, final Color fgColor) {
         initComponents();
         this.attrModel = attrModel;
 
@@ -70,42 +81,44 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
             }
         }
 
-        MyTableModel tableModel = createTableModel();
-        if (tableModel != null) {
-            table = new JXTable(tableModel);
-            table.setGridColor(Color.LIGHT_GRAY);
-
-            TableColumn tc = table.getColumn(0);
-            tc.setHeaderRenderer(new CheckBoxHeader(table.getTableHeader(), 0));
-            tc.setPreferredWidth(30);
-
-            table.getColumn(1).setPreferredWidth(210);
-            table.setColumnControlVisible(false);
-            table.setSortable(true);
-            table.setAutoCreateRowSorter(true);
-            table.setRowSelectionAllowed(false);
-
-            TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel()) {
-                @Override
-                public boolean isSortable(int column) {
-                    return column > 0;
+        final TableModel tableModel = createTableModel();
+        table = new JXTable(tableModel) {
+            @Override
+            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+                Component c = super.prepareRenderer(renderer, row, column); //To change body of generated methods, choose Tools | Templates.
+                if ((boolean) tableModel.getValueAt(table.convertRowIndexToModel(row), 0)) {
+                    c.setForeground(fgColor);
                 }
-            };
-            table.setRowSorter(sorter);
+                return c;
+            }
 
-//                        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-//                            @Override
-//                            public void valueChanged(ListSelectionEvent e) {
-//                                ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-//                                deleteButton.setEnabled(!lsm.isSelectionEmpty());
-//                            }
-//                        });
-//                        deleteAllButton.setEnabled(true);
-        }
+        };
+        table.setGridColor(Color.LIGHT_GRAY);
+        // Column 0
+        TableColumn tc = table.getColumn(0);
+        tc.setHeaderRenderer(new CheckBoxHeader(table.getTableHeader(), 0));
+        tc.setPreferredWidth(30);
+
+        // Column 1
+        tc = table.getColumn(1);
+        tc.setPreferredWidth(210);
+
+        table.setColumnControlVisible(false);
+        table.setSortable(true);
+        table.setAutoCreateRowSorter(true);
+        table.setRowSelectionAllowed(false);
+
+        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel()) {
+            @Override
+            public boolean isSortable(int column) {
+                return column > 0;
+            }
+        };
+        table.setRowSorter(sorter);
         scrollPane.setViewportView(table);
     }
 
-    private MyTableModel createTableModel() {
+    private TableModel createTableModel() {
         String[] columnNames = {"", NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.table.columnName.first"),
             NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.table.columnName.second")};
         ArrayList<Object[]> data = new ArrayList(map.size());
@@ -118,7 +131,29 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
             dataRow[2] = entry.getValue().size();
             data.add(row++, dataRow);
         }
-        return map.isEmpty() ? null : new MyTableModel(columnNames, data);
+        return new MyTableModel(columnNames, data);
+    }
+
+    public HashMap<String, List<PeptideAttribute>> getSelectedDescriptor() {
+        HashMap<String, List<PeptideAttribute>> newMap = new LinkedHashMap<>();
+        TableModel model = table.getModel();
+        String key;
+        for (int row = 0; row < model.getRowCount(); row++) {
+            if ((boolean) model.getValueAt(row, 0)) {
+                key = (String) model.getValueAt(row, 1);
+                newMap.put(key, map.get(key));
+            }
+        }
+        return newMap;
+    }
+
+    public void removeDescriptorRow(String key) {
+        MyTableModel model = (MyTableModel) table.getModel();
+        for (int row = 0; row < model.getRowCount(); row++) {
+            if (model.getValueAt(row, 1).equals(key)) {
+                model.removeRow(row);
+            }
+        }
     }
 
     /**
@@ -175,7 +210,15 @@ class MyTableModel extends AbstractTableModel {
 
     @Override
     public Class getColumnClass(int c) {
-        return getValueAt(0, c).getClass();
+        switch (c) {
+            case 0:
+                return Boolean.class;
+            case 1:
+                return String.class;
+            case 2:
+                return Integer.class;
+        }
+        return null;
     }
 
     @Override
@@ -186,14 +229,12 @@ class MyTableModel extends AbstractTableModel {
     @Override
     public void setValueAt(Object value, int row, int col) {
         data.get(row)[col] = value;
+        fireTableChanged(new TableModelEvent(this, row));
     }
 
-    public void removeRows(int[] rows) {
-        Arrays.sort(rows);
-        for (int i = rows.length - 1; i >= 0; i--) {
-            this.data.remove(rows[i]);
-            fireTableRowsDeleted(rows[i], rows[i]);
-        }
+    public void removeRow(int row) {
+        this.data.remove(row);
+        fireTableRowsDeleted(row, row);
     }
 }
 

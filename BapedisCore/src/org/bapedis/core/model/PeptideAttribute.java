@@ -6,7 +6,6 @@
 package org.bapedis.core.model;
 
 import java.util.Objects;
-import org.bapedis.core.spi.algo.Algorithm;
 
 /**
  * Class that represents an attribute type for the peptide
@@ -17,9 +16,10 @@ public class PeptideAttribute {
 
     protected String id;
     protected String displayName;
-    protected Class<?> type;
-    protected final boolean md;
+    protected Class<?> type;    
     protected double maxValue, minValue;
+    protected final boolean md;
+    protected String category;
 
     public PeptideAttribute(String id, String displayName, Class<?> type) {
         this(id, displayName, type, true);
@@ -65,16 +65,24 @@ public class PeptideAttribute {
 
     public void setMinValue(double minValue) {
         this.minValue = minValue;
-    }       
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
     public double normalize(Object value) {
         if (!md) {
-            throw new UnsupportedOperationException("The attribute " + displayName +" can't be normalized because it is not a molecular descriptor.");
+            throw new UnsupportedOperationException("The attribute " + displayName + " can't be normalized because it is not a molecular descriptor.");
         }
         double val = convertToDouble(value);
         return (val - minValue) / (maxValue - minValue);
     }
-    
+
     public static double convertToDouble(Object value) {
         if (value instanceof Double) {
             return (double) value;

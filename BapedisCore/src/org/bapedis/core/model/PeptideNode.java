@@ -10,6 +10,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.Action;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.ui.actions.SelectNodeOnGraph;
@@ -33,28 +36,30 @@ import org.openide.util.lookup.Lookups;
  */
 public class PeptideNode extends AbstractNode implements PropertyChangeListener {
 
+    protected final AttributesModel attrModel;
     protected Peptide peptide;
     private final Action[] actions;
-    protected Sheet.Set descriptors;
+    protected Sheet sheet;
 
-    public PeptideNode(Peptide peptide) {
-        this(peptide, Children.LEAF, Lookups.singleton(peptide));
+    public PeptideNode(AttributesModel attrModel, Peptide peptide) {
+        this(attrModel, peptide, Children.LEAF, Lookups.singleton(peptide));
     }
 
-    public PeptideNode(Peptide peptide, Children children, Lookup lookup) {
+    public PeptideNode(AttributesModel attrModel, Peptide peptide, Children children) {
+        this(attrModel, peptide, children, Lookups.singleton(peptide));
+    }
+
+    public PeptideNode(AttributesModel attrModel, Peptide peptide, Children children, Lookup lookup) {
         super(children, lookup);
+        this.attrModel = attrModel;
         this.peptide = peptide;
-        peptide.addDescriptorChangeListener(this);
         actions = new Action[]{new SelectNodeOnGraph(peptide.getGraphNode()), SystemAction.get(PropertiesAction.class)};
+        attrModel.addMolecularDescriptorChangeListener(this);
     }
 
     @Override
     public String getDisplayName() {
         return peptide.getId();
-    }
-
-    public PeptideNode(Peptide peptide, Children children) {
-        this(peptide, children, Lookups.singleton(peptide));
     }
 
     @Override
@@ -73,7 +78,7 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
 
     @Override
     protected Sheet createSheet() {
-        Sheet sheet = Sheet.createDefault();
+        sheet = Sheet.createDefault();
 
         // Primary
         Sheet.Set set = Sheet.createPropertiesSet();
@@ -133,19 +138,25 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
 //        }
 //        sheet.put(set);
         // Descriptors
-        descriptors = Sheet.createPropertiesSet();
-        descriptors.setName("descriptors");
-        descriptors.setValue("tabName", NbBundle.getMessage(PeptideNode.class, "PropertySet.attributes.tabName"));
-        descriptors.setDisplayName(NbBundle.getMessage(PeptideNode.class, "PropertySet.descriptors"));
-        for (PeptideAttribute attr : peptide.getAttributes()) {
-            if (attr.isMolecularDescriptor()) {
-                property = createPropertyField(attr.getId(), attr.getDisplayName(), attr.getDisplayName(), attr.getType(), peptide.getAttributeValue(attr));
-                descriptors.put(property);
-            }
+        HashMap<String, List<PeptideAttribute>> mdMap = attrModel.getMolecularDescriptors();
+        for (Map.Entry<String, List<PeptideAttribute>> entry : mdMap.entrySet()) {
+            setMolecularDescriptor(entry.getKey(), entry.getValue());
         }
-        sheet.put(descriptors);
 
         return sheet;
+    }
+
+    private void setMolecularDescriptor(String category, List<PeptideAttribute> features) {
+        Sheet.Set set = Sheet.createPropertiesSet();
+        set.setName(category);
+        set.setValue("tabName", NbBundle.getMessage(PeptideNode.class, "PropertySet.md.tabName"));
+        set.setDisplayName(category);
+        PropertySupport.ReadOnly property;
+        for (PeptideAttribute attr : features) {
+            property = createPropertyField(attr.getId(), attr.getDisplayName(), attr.getDisplayName(), attr.getType(), peptide.getAttributeValue(attr));
+            set.put(property);
+        }
+        sheet.put(set);
     }
 
     private PropertySupport.ReadOnly createPropertyField(String name, String displayName, String description, Class type, final Object value) {
@@ -177,14 +188,17 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(Peptide.DESCRIPTOR_CHANGE) && descriptors != null) {
-            if (evt.getNewValue() != null) {
-                PeptideAttribute attr = (PeptideAttribute) evt.getNewValue();
-                PropertySupport.ReadOnly property = createPropertyField(attr.getId(), attr.getDisplayName(), attr.getDisplayName(), attr.getType(), peptide.getAttributeValue(attr));
-                descriptors.put(property);
-            } else if (evt.getOldValue() != null) {
-                PeptideAttribute attr = (PeptideAttribute) evt.getOldValue();
-                descriptors.remove(attr.getId());
+        if (sheet != null) {
+            if (evt.getPropertyName().equals(AttributesModel.MD_ATTR_ADDED)) {
+                if (evt.getNewValue() != null) {
+                    String category = (String) evt.getNewValue();
+                    setMolecularDescriptor(category, attrModel.getMolecularDescriptors(category));
+                }
+            } else if (evt.getPropertyName().equals(AttributesModel.MD_ATTR_REMOVED)) {
+                if (evt.getOldValue() != null){
+                    String category = (String) evt.getOldValue();
+                    sheet.remove(category);
+                }
             }
         }
     }

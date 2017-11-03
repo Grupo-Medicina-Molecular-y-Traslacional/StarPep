@@ -37,7 +37,10 @@ public class AttributesModel {
     public static final String CHANGED_FILTER = "quickFilter";
     public static final String DISPLAY_ATTR_ADDED = "display_attribute_add";
     public static final String DISPLAY_ATTR_REMOVED = "display_attribute_remove";
+    public static final String MD_ATTR_ADDED = "md_attribute_add";
+    public static final String MD_ATTR_REMOVED = "md_attribute_remove";
     public static final String CHANGED_GVIEW = "changed_graphview";
+    public static final String DEFAULT_CATEGORY = "Default";
     protected transient final PropertyChangeSupport propertyChangeSupport;
     protected Node rootNode;
     public static final int GRAPH_DB_VIEW = 1;
@@ -121,23 +124,34 @@ public class AttributesModel {
         }
         return false;
     }
-    
+
     public HashMap<String, List<PeptideAttribute>> getMolecularDescriptors() {
         return mdMap;
-    }       
-    
-    public List<PeptideAttribute> getMolecularDescriptors(String key){
-        return mdMap.get(key);
+    }
+
+    public List<PeptideAttribute> getMolecularDescriptors(String category) {
+        return mdMap.get(category);
     }
     
-    public void addMolecularDescriptors(String key, List<PeptideAttribute> features){
-        mdMap.put(key, features);
+    public void addMolecularDescriptor(PeptideAttribute feature) {
+        String category = feature.getCategory() != null ? feature.getCategory() :DEFAULT_CATEGORY;
+        if (!mdMap.containsKey(category)) {
+            mdMap.put(category, new LinkedList<PeptideAttribute>());
+        }
+        List list = mdMap.get(category);
+        list.add(feature);
+        propertyChangeSupport.firePropertyChange(MD_ATTR_ADDED, null, category);
     }
-    
-    public void deleteMolecularDescriptors(String key){
-        mdMap.remove(key);
-    }     
-    
+
+    public void addMolecularDescriptor(String category, List<PeptideAttribute> features) {
+        mdMap.put(category, features);
+        propertyChangeSupport.firePropertyChange(MD_ATTR_ADDED, null, category);
+    }
+
+    public void deleteMolecularDescriptors(String category) {
+        mdMap.remove(category);
+        propertyChangeSupport.firePropertyChange(MD_ATTR_REMOVED, category, null);
+    }
 
 //    public void deleteAttribute(PeptideAttribute attr) {
 //        for (PeptideNode pNode : nodeList) {
@@ -146,7 +160,6 @@ public class AttributesModel {
 //        removeDisplayedColumn(attr);
 //        attrsMap.remove(attr.id);
 //    }
-
     public synchronized Peptide[] getPeptides() {
         if (filteredPept != null) {
             return filteredPept;
@@ -167,7 +180,6 @@ public class AttributesModel {
         container.refreshNodes();
     }
 
-
     public Node getRootNode() {
         return rootNode;
     }
@@ -177,7 +189,7 @@ public class AttributesModel {
     }
 
     public void addPeptide(Peptide peptide) {
-        nodeList.add(new PeptideNode(peptide));
+        nodeList.add(new PeptideNode(this, peptide));
     }
 
     public QuickFilter getQuickFilter() {
@@ -207,6 +219,16 @@ public class AttributesModel {
     public void removeDisplayColumnChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(DISPLAY_ATTR_ADDED, listener);
         propertyChangeSupport.removePropertyChangeListener(DISPLAY_ATTR_REMOVED, listener);
+    }
+
+    public void addMolecularDescriptorChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(MD_ATTR_ADDED, listener);
+        propertyChangeSupport.addPropertyChangeListener(MD_ATTR_REMOVED, listener);
+    }
+
+    public void removeMolecularDescriptorChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(MD_ATTR_ADDED, listener);
+        propertyChangeSupport.removePropertyChangeListener(MD_ATTR_REMOVED, listener);
     }
 
     public void addGraphViewChangeListener(PropertyChangeListener listener) {

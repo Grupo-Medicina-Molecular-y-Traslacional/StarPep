@@ -156,9 +156,10 @@ public class PeptideDAOImpl implements PeptideDAO {
 //                            }
 //                            peptide.setAttributeValue(attr, value);
 //                        }
-//                    }
+//                    }                    
                     attrModel.addPeptide(peptide);
                 }
+                attrModel.addMolecularDescriptor(Peptide.LENGHT);
             } finally {
                 //Write unlock
                 graphModel.getGraph().writeUnlock();

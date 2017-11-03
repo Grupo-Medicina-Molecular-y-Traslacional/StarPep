@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -96,7 +97,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         table.setGridColor(Color.LIGHT_GRAY);
         // Column 0
         TableColumn tc = table.getColumn(0);
-        tc.setHeaderRenderer(new CheckBoxHeader(table.getTableHeader(), 0));
+        tc.setHeaderRenderer(new CheckBoxHeader2(table.getTableHeader(), 0));
         tc.setPreferredWidth(30);
 
         // Column 1
@@ -300,5 +301,43 @@ class CheckBoxHeader implements TableCellRenderer {
             SwingUtilities.paintComponent(
                     g, check, (Container) c, x, y, getIconWidth(), getIconHeight());
         }
+    }
+}
+
+class CheckBoxHeader2 extends JCheckBox implements TableCellRenderer {
+
+    CheckBoxHeader2(JTableHeader header, final int index) {
+        setOpaque(false);
+        setFont(header.getFont());
+        setHorizontalAlignment(SwingConstants.CENTER);
+        setToolTipText("Check all");
+        header.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JTable table = ((JTableHeader) e.getSource()).getTable();
+                TableColumnModel columnModel = table.getColumnModel();
+                int viewColumn = columnModel.getColumnIndexAtX(e.getX());
+                int modelColumn = table.convertColumnIndexToModel(viewColumn);
+                if (modelColumn == index) {
+                    doClick();
+//                    setSelected(!isSelected());
+                    TableModel m = table.getModel();
+                    boolean flag = isSelected();
+                    for (int i = 0; i < m.getRowCount(); i++) {
+                        m.setValueAt(flag, i, index);
+                    }
+                    ((JTableHeader) e.getSource()).repaint();
+                }
+            }
+        });
+    }
+
+    public Component getTableCellRendererComponent(JTable table, Object value,
+            boolean isSelected, boolean hasFocus, int row, int column) {
+        JTableHeader header = table.getTableHeader();
+        Color bg = header.getBackground();        
+        setBackground(new Color(bg.getRed(), bg.getGreen(), bg.getBlue()));        
+        return this;
     }
 }

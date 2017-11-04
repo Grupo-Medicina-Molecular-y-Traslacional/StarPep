@@ -19,6 +19,8 @@ import java.util.Set;
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
@@ -30,9 +32,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.PeptideAttribute;
-import org.bapedis.core.services.ProjectManager;
 import org.jdesktop.swingx.JXTable;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
@@ -44,22 +44,29 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
     protected final AttributesModel attrModel;
     protected JXTable table;
 
-    public DescriptorSelectionPanel() {
-        this(Lookup.getDefault().lookup(ProjectManager.class).getAttributesModel());
-    }
-
     public DescriptorSelectionPanel(final AttributesModel attrModel) {
         this(attrModel, Color.BLUE);
-    }
-
-    public void addTableModelListener(TableModelListener listener) {
-        table.getModel().addTableModelListener(listener);
     }
 
     public DescriptorSelectionPanel(final AttributesModel attrModel, final Color fgColor) {
         initComponents();
         this.attrModel = attrModel;
-        this.attrModel.addMolecularDescriptorChangeListener(this);
+
+        addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent event) {
+                attrModel.addMolecularDescriptorChangeListener(DescriptorSelectionPanel.this);
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+               attrModel.removeMolecularDescriptorChangeListener(DescriptorSelectionPanel.this);
+            }
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) {
+            }
+        });
 
         final TableModel tableModel = createTableModel();
         table = new JXTable(tableModel) {
@@ -114,6 +121,10 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
         }
         return new MyTableModel(columnNames, data);
     }
+    
+    public void addTableModelListener(TableModelListener listener) {
+        table.getModel().addTableModelListener(listener);
+    }    
 
     public void setSelectedDescriptorKeys(Set<String> keys) {
         TableModel model = table.getModel();
@@ -242,7 +253,7 @@ class MyTableModel extends AbstractTableModel {
         dataRow[1] = category;
         dataRow[2] = size;
         data.add(dataRow);
-        int row = data.size()-1;
+        int row = data.size() - 1;
         fireTableRowsInserted(row, row);
     }
 

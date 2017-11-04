@@ -6,35 +6,64 @@
 package org.bapedis.network.impl;
 
 import java.awt.BorderLayout;
+import java.util.Collection;
 import java.util.Set;
 import javax.swing.JPanel;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
+import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
 import org.bapedis.core.ui.components.DescriptorSelectionPanel;
+import org.openide.util.Lookup;
+import org.openide.util.LookupEvent;
+import org.openide.util.LookupListener;
 
 /**
  *
  * @author loge
  */
-public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
+public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements AlgorithmSetupUI, LookupListener {
 
     /**
      * Creates new form ChemicalSpaceNetworkPanel
      */
     protected ChemicalSpaceNetwork csnAlgo;
     protected final ThresholdRangePanel thresholdPanel;
-    
+    protected final ProjectManager pc;
+    Lookup.Result<AttributesModel> peptideLkpResult;
 
     public ChemicalSpaceNetworkPanel() {
         initComponents();
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
         thresholdPanel = new ThresholdRangePanel();
-        southPanel.add(thresholdPanel, BorderLayout.CENTER);        
+        southPanel.add(thresholdPanel, BorderLayout.CENTER);
+
+        addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent event) {
+                peptideLkpResult = pc.getCurrentWorkspace().getLookup().lookupResult(AttributesModel.class);
+                peptideLkpResult.addLookupListener(ChemicalSpaceNetworkPanel.this);
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+                if (peptideLkpResult != null) {
+                    peptideLkpResult.removeLookupListener(ChemicalSpaceNetworkPanel.this);
+                    peptideLkpResult = null;
+                }
+            }
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) {
+            }
+        });
+
     }
-
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -78,25 +107,32 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
     @Override
     public JPanel getEditPanel(Algorithm algo) {
         this.csnAlgo = (ChemicalSpaceNetwork) algo;
-        DescriptorSelectionPanel selectionPanel = new DescriptorSelectionPanel();
+        thresholdPanel.setup(csnAlgo);
+        setMolecularDescriptors(pc.getAttributesModel());
+        return this;
+    }
+
+    private void setMolecularDescriptors(AttributesModel attrModel) {
+        descriptorsPanel.removeAll();
+        DescriptorSelectionPanel selectionPanel = new DescriptorSelectionPanel(attrModel);
         final Set<String> keys = csnAlgo.getSelectedKeys();
         selectionPanel.setSelectedDescriptorKeys(keys);
         selectionPanel.addTableModelListener(new TableModelListener() {
             @Override
-            public void tableChanged(TableModelEvent e) {                
+            public void tableChanged(TableModelEvent e) {
                 TableModel model = (TableModel) e.getSource();
                 for (int row = 0; row < model.getRowCount(); row++) {
                     if ((boolean) model.getValueAt(row, 0)) {
-                        keys.add((String)model.getValueAt(row, 1));
-                    }else{
-                        keys.remove((String)model.getValueAt(row, 1));
+                        keys.add((String) model.getValueAt(row, 1));
+                    } else {
+                        keys.remove((String) model.getValueAt(row, 1));
                     }
                 }
             }
-        });        
+        });
         descriptorsPanel.add(selectionPanel, BorderLayout.CENTER);
-        thresholdPanel.setup(csnAlgo);
-        return this;
+        descriptorsPanel.revalidate();
+        descriptorsPanel.repaint();
     }
 
 
@@ -104,4 +140,15 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
     private javax.swing.JPanel descriptorsPanel;
     private javax.swing.JPanel southPanel;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void resultChanged(LookupEvent le) {
+        if (le.getSource().equals(peptideLkpResult)){
+            Collection<? extends AttributesModel> attrModels = peptideLkpResult.allInstances();
+             if (!attrModels.isEmpty()){
+                 csnAlgo.getSelectedKeys().clear();
+                 setMolecularDescriptors(attrModels.iterator().next());
+             }
+        }
+    }
 }

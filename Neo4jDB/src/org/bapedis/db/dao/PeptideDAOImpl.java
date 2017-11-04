@@ -144,22 +144,9 @@ public class PeptideDAOImpl implements PeptideDAO {
                     peptide.setAttributeValue(Peptide.ID, id);
                     peptide.setAttributeValue(Peptide.SEQ, seq);
                     peptide.setAttributeValue(Peptide.LENGHT, seq.length());
-
-//                    for (String propertyKey : neoNode.getPropertyKeys()) {
-//                        if (!(propertyKey.equals(PRO_ID) || propertyKey.equals(PRO_SEQ)
-//                                || propertyKey.equals(PRO_LENGHT))) {
-//                            Object value = neoNode.getProperty(propertyKey);
-//                            if (!attrModel.hasAttribute(propertyKey)) {
-//                                attr = attrModel.addAttribute(propertyKey, propertyKey, value.getClass());
-//                            } else {
-//                                attr = attrModel.getAttribute(propertyKey);
-//                            }
-//                            peptide.setAttributeValue(attr, value);
-//                        }
-//                    }                    
+                    
                     attrModel.addPeptide(peptide);
                 }
-                attrModel.addMolecularDescriptor(Peptide.LENGHT);
             } finally {
                 //Write unlock
                 graphModel.getGraph().writeUnlock();

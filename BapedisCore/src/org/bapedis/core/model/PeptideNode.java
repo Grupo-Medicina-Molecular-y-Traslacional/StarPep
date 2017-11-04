@@ -147,10 +147,18 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
     }
 
     private void setMolecularDescriptor(String category, List<PeptideAttribute> features) {
-        Sheet.Set set = Sheet.createPropertiesSet();
-        set.setName(category);
-        set.setValue("tabName", NbBundle.getMessage(PeptideNode.class, "PropertySet.md.tabName"));
-        set.setDisplayName(category);
+        Sheet.Set set = sheet.get(category);
+        if (set == null) {
+            set = Sheet.createPropertiesSet();
+            set.setName(category);
+            set.setValue("tabName", NbBundle.getMessage(PeptideNode.class, "PropertySet.md.tabName"));
+            set.setDisplayName(category);
+        } else{
+            for(Property<?> p : set.getProperties()){
+               set.remove(p.getName());
+            }
+        }
+
         PropertySupport.ReadOnly property;
         for (PeptideAttribute attr : features) {
             property = createPropertyField(attr.getId(), attr.getDisplayName(), attr.getDisplayName(), attr.getType(), peptide.getAttributeValue(attr));
@@ -195,7 +203,7 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
                     setMolecularDescriptor(category, attrModel.getMolecularDescriptors(category));
                 }
             } else if (evt.getPropertyName().equals(AttributesModel.MD_ATTR_REMOVED)) {
-                if (evt.getOldValue() != null){
+                if (evt.getOldValue() != null) {
                     String category = (String) evt.getOldValue();
                     sheet.remove(category);
                 }

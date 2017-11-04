@@ -7,9 +7,7 @@ package org.bapedis.core.io.impl;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.bapedis.core.io.Exporter;
@@ -34,7 +32,7 @@ public class MDExporter implements Exporter {
     public void exportTo(File file) throws Exception {
         PrintWriter pw = new PrintWriter(file);
         try {
-            HashMap<String, List<PeptideAttribute>> map = attrModel.getMolecularDescriptors();
+            LinkedHashMap<String, List<PeptideAttribute>> map = attrModel.getMolecularDescriptors();
             //Write header            
             pw.format("\"%s\"", Peptide.ID.getDisplayName());
             for (Map.Entry<String, List<PeptideAttribute>> entry : map.entrySet()) {

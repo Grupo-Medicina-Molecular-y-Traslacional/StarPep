@@ -124,9 +124,9 @@ public abstract class AbstractModamp implements Algorithm {
             // Usefull to normalize values
             double val, max, min;
             for (PeptideAttribute descriptor : map.values()) {
-                if (stopRun){
+                if (stopRun) {
                     break;
-                }                
+                }
                 max = Double.MIN_VALUE;
                 min = Double.MAX_VALUE;
                 for (int i = 0; i < peptides.length && !stopRun; i++) {
@@ -145,11 +145,28 @@ public abstract class AbstractModamp implements Algorithm {
             }
 
             //Add molecular descriptors to attributes model
+            HashMap<String, List<PeptideAttribute>> mdMap = new LinkedHashMap<>();
+            String category;
+            List<PeptideAttribute> list;
             for (PeptideAttribute attr : map.values()) {
-                if (stopRun){
+                if (stopRun) {
                     break;
                 }
-                attrModel.addMolecularDescriptor(attr);
+                category = attr.getCategory();
+                if (!mdMap.containsKey(category)) {
+                    mdMap.put(category, new LinkedList<PeptideAttribute>());
+                }
+                list = mdMap.get(category);
+                list.add(attr);
+            }
+            if (!stopRun){
+                for (Map.Entry<String, List<PeptideAttribute>> entry : mdMap.entrySet()) {
+                    category = entry.getKey();
+//                    if (attrModel.hasMolecularDescriptors(category)){
+//                        attrModel.deleteMolecularDescriptors(category);
+//                    }
+                    attrModel.addMolecularDescriptors(category, entry.getValue());                    
+                }
             }
         }
     }

@@ -8,7 +8,6 @@ package org.bapedis.core.model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -27,7 +26,7 @@ import org.openide.nodes.Node;
  */
 public class AttributesModel {
 
-    protected final HashMap<String, List<PeptideAttribute>> mdMap;
+    protected final LinkedHashMap<String, List<PeptideAttribute>> mdMap;
     protected final Set<PeptideAttribute> displayedColumnsModel;
     private static final int MAX_AVAILABLE_COLUMNS = 6;
     protected List<PeptideNode> nodeList;
@@ -60,6 +59,10 @@ public class AttributesModel {
         displayedColumnsModel.add(Peptide.ID);
         displayedColumnsModel.add(Peptide.SEQ);
         displayedColumnsModel.add(Peptide.LENGHT);
+        
+        List<PeptideAttribute> defaultMD = new LinkedList();
+        defaultMD.add(Peptide.LENGHT);
+        mdMap.put(DEFAULT_CATEGORY, defaultMD);
 
         mainGView = CSN_VIEW;
     }
@@ -125,25 +128,19 @@ public class AttributesModel {
         return false;
     }
 
-    public HashMap<String, List<PeptideAttribute>> getMolecularDescriptors() {
+    public LinkedHashMap<String, List<PeptideAttribute>> getMolecularDescriptors() {
         return mdMap;
     }
 
     public List<PeptideAttribute> getMolecularDescriptors(String category) {
         return mdMap.get(category);
-    }
+    }    
     
-    public void addMolecularDescriptor(PeptideAttribute feature) {
-        String category = feature.getCategory() != null ? feature.getCategory() :DEFAULT_CATEGORY;
-        if (!mdMap.containsKey(category)) {
-            mdMap.put(category, new LinkedList<PeptideAttribute>());
-        }
-        List list = mdMap.get(category);
-        list.add(feature);
-        propertyChangeSupport.firePropertyChange(MD_ATTR_ADDED, null, category);
+    public boolean hasMolecularDescriptors(String category){
+        return mdMap.containsKey(category);
     }
 
-    public void addMolecularDescriptor(String category, List<PeptideAttribute> features) {
+    public void addMolecularDescriptors(String category, List<PeptideAttribute> features) {
         mdMap.put(category, features);
         propertyChangeSupport.firePropertyChange(MD_ATTR_ADDED, null, category);
     }
@@ -160,6 +157,7 @@ public class AttributesModel {
 //        removeDisplayedColumn(attr);
 //        attrsMap.remove(attr.id);
 //    }
+    
     public synchronized Peptide[] getPeptides() {
         if (filteredPept != null) {
             return filteredPept;

@@ -52,7 +52,7 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
                 TableModel model = (TableModel) e.getSource();
                 boolean flag = false;
                 for (int row = 0; row < model.getRowCount(); row++) {
-                    if ((boolean) model.getValueAt(row, 0)) {
+                    if ((boolean) model.getValueAt(row, 0) && !model.getValueAt(row, 1).equals(AttributesModel.DEFAULT_CATEGORY)) {
                         flag = true;
                         break;
                     }
@@ -124,8 +124,10 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
             @Override
             protected Set<String> doInBackground() throws Exception {
                 Set<String> keys = selectionPanel.getSelectedDescriptorKeys();
-                for(String key: keys){
-                    attrModel.deleteMolecularDescriptors(key);
+                for (String key : keys) {
+                    if (!key.equals(AttributesModel.DEFAULT_CATEGORY)) {
+                        attrModel.deleteMolecularDescriptors(key);
+                    }
                 }
                 return keys;
             }

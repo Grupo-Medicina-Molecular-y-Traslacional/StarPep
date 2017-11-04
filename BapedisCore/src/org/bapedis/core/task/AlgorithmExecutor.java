@@ -107,20 +107,6 @@ public final class AlgorithmExecutor {
         AlgoExecutor runnable = new AlgoExecutor(algorithm, taskName, listener, errorHandler);
         runnable.progress.start();
         runnable.progress.progress(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.submitted"));
-        try {
-            algorithm.initAlgo();
-        } catch (Throwable e) {
-            if (errorHandler != null) {
-                errorHandler.fatalError(e);
-            } else {
-                Logger.getLogger(AlgoExecutor.class.getName()).log(Level.SEVERE, "", e);
-            }
-            runnable.progress.finish();
-            if (runnable.listener != null) {
-                runnable.listener.algorithmFinished(runnable.algorithm);
-            }            
-            return;
-        }
         runnable.future = executor.submit(runnable);
         taskList.add(runnable);
     }
@@ -214,6 +200,7 @@ public final class AlgorithmExecutor {
             running.set(true);
             progress.progress(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.running"));
             try {
+                algorithm.initAlgo();
                 algorithm.run();
             } catch (Throwable e) {
                 if (errorHandler != null) {

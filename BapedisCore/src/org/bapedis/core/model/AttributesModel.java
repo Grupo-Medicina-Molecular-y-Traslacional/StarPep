@@ -189,7 +189,7 @@ public class AttributesModel {
     }
 
     public void addPeptide(Peptide peptide) {
-        nodeList.add(new PeptideNode(this, peptide));
+        nodeList.add(new PeptideNode(peptide));
     }
 
     public QuickFilter getQuickFilter() {

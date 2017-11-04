@@ -31,6 +31,8 @@ public class Peptide {
     public static final PeptideAttribute ID = new PeptideAttribute("id", NbBundle.getMessage(Peptide.class, "Peptide.attribute.id"), String.class, false);
     public static final PeptideAttribute SEQ = new PeptideAttribute("seq", NbBundle.getMessage(Peptide.class, "Peptide.attribute.seq"), String.class, false);
     public static final PeptideAttribute LENGHT = new PeptideAttribute("length", NbBundle.getMessage(Peptide.class, "Peptide.attribute.length"), Integer.class, true);
+    public final static String CHANGED_ATTRIBUTE = "changed_attribute";
+    protected transient final PropertyChangeSupport propertyChangeSupport;    
     
 
     protected final Node graphNode;
@@ -42,6 +44,7 @@ public class Peptide {
         this.graphNode = graphNode;
         this.graph = graph;
         attrsValue = new LinkedHashMap<>();
+        propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
     public String getId() {
@@ -65,6 +68,11 @@ public class Peptide {
 
     public void setAttributeValue(PeptideAttribute attr, Object value) {
         attrsValue.put(attr, value);
+        propertyChangeSupport.firePropertyChange(CHANGED_ATTRIBUTE, null, attr);
+    }
+    
+    public boolean hasAttribute(PeptideAttribute attr){
+        return attrsValue.containsKey(attr);
     }
 
     public Object getAttributeValue(PeptideAttribute attr) {
@@ -74,6 +82,7 @@ public class Peptide {
     public void deleteAttribute(PeptideAttribute attr) {
         if (attrsValue.containsKey(attr)) {
             attrsValue.remove(attr);
+            propertyChangeSupport.firePropertyChange(CHANGED_ATTRIBUTE, attr, null);
         }
     }
 
@@ -107,6 +116,14 @@ public class Peptide {
         }
         return values.toArray(new String[0]);
     }
+    
+    public void addMolecularFeatureChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(CHANGED_ATTRIBUTE, listener);
+    }
+
+    public void removeMolecularFeatureChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(CHANGED_ATTRIBUTE, listener);
+    }    
 
     @Override
     public String toString() {

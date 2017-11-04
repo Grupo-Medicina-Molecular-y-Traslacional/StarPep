@@ -22,13 +22,14 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
 
     protected final Set<String> selectedKeys;
     protected final boolean normalize;
-    protected final NotifyDescriptor emptyKeys;
+    protected final NotifyDescriptor emptyKeys, notFound;
 
     public ChemicalSpaceNetwork(AlgorithmFactory factory) {
         super(factory);
         normalize = true;
         selectedKeys = new LinkedHashSet<>();
         emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(ChemicalSpaceNetwork.class, "ChemicalSpaceNetwork.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
+        notFound = new NotifyDescriptor.Message(NbBundle.getMessage(ChemicalSpaceNetwork.class, "ChemicalSpaceNetwork.key.notFound"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
     public Set<String> getSelectedKeys() {
@@ -41,6 +42,28 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
         if (selectedKeys.isEmpty()) {
             DialogDisplayer.getDefault().notify(emptyKeys);
             cancel();
+        } else {
+            for (String key : selectedKeys) {
+                if (!stopRun) {
+                    if (attrModel.hasMolecularDescriptors(key)) {
+                        for (PeptideAttribute attr : attrModel.getMolecularDescriptors(key)) {
+                            if (stopRun) {
+                                break;
+                            }
+                            for (Peptide pept : attrModel.getPeptides()) {
+                                if (!pept.hasAttribute(attr)) {
+                                    DialogDisplayer.getDefault().notify(notFound);
+                                    cancel();
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        DialogDisplayer.getDefault().notify(notFound);
+                        cancel();
+                    }
+                }
+            }
         }
     }
 

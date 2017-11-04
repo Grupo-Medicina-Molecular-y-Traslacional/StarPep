@@ -26,7 +26,7 @@ import org.openide.nodes.Node;
  */
 public class AttributesModel {
 
-    protected final LinkedHashMap<String, List<PeptideAttribute>> mdMap;
+    protected final LinkedHashMap<String, PeptideAttribute[]> mdMap;
     protected final Set<PeptideAttribute> displayedColumnsModel;
     private static final int MAX_AVAILABLE_COLUMNS = 6;
     protected List<PeptideNode> nodeList;
@@ -59,10 +59,8 @@ public class AttributesModel {
         displayedColumnsModel.add(Peptide.ID);
         displayedColumnsModel.add(Peptide.SEQ);
         displayedColumnsModel.add(Peptide.LENGHT);
-        
-        List<PeptideAttribute> defaultMD = new LinkedList();
-        defaultMD.add(Peptide.LENGHT);
-        mdMap.put(DEFAULT_CATEGORY, defaultMD);
+
+        mdMap.put(DEFAULT_CATEGORY, new PeptideAttribute[]{Peptide.LENGHT});
 
         mainGView = CSN_VIEW;
     }
@@ -128,35 +126,39 @@ public class AttributesModel {
         return false;
     }
 
-    public LinkedHashMap<String, List<PeptideAttribute>> getMolecularDescriptors() {
+    public LinkedHashMap<String, PeptideAttribute[]> getMolecularDescriptors() {
         return mdMap;
     }
 
-    public List<PeptideAttribute> getMolecularDescriptors(String category) {
+    public synchronized PeptideAttribute[] getMolecularDescriptors(String category) {
         return mdMap.get(category);
-    }    
-    
-    public boolean hasMolecularDescriptors(String category){
+    }
+
+    public synchronized boolean hasMolecularDescriptors(String category) {
         return mdMap.containsKey(category);
     }
 
-    public void addMolecularDescriptors(String category, List<PeptideAttribute> features) {
+    public synchronized void addMolecularDescriptors(String category, PeptideAttribute[] features) {
         mdMap.put(category, features);
         propertyChangeSupport.firePropertyChange(MD_ATTR_ADDED, null, category);
     }
 
-    public void deleteMolecularDescriptors(String category) {
-        mdMap.remove(category);
-        propertyChangeSupport.firePropertyChange(MD_ATTR_REMOVED, category, null);
+    public synchronized void deleteMolecularDescriptors(String category) {
+        if (!category.equals(DEFAULT_CATEGORY)) {
+            PeptideAttribute[] features = mdMap.remove(category);
+            for(PeptideAttribute attr: features){
+                deleteAttribute(attr);
+            }
+            propertyChangeSupport.firePropertyChange(MD_ATTR_REMOVED, category, null);
+        }
     }
 
-//    public void deleteAttribute(PeptideAttribute attr) {
-//        for (PeptideNode pNode : nodeList) {
-//            pNode.getPeptide().deleteAttribute(attr);
-//        }
-//        removeDisplayedColumn(attr);
-//        attrsMap.remove(attr.id);
-//    }
+    private void deleteAttribute(PeptideAttribute attr) {
+        for (PeptideNode pNode : nodeList) {
+            pNode.getPeptide().deleteAttribute(attr);
+        }
+        removeDisplayedColumn(attr);
+    }
     
     public synchronized Peptide[] getPeptides() {
         if (filteredPept != null) {

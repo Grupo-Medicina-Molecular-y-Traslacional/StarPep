@@ -114,7 +114,7 @@ public abstract class AbstractModamp implements Algorithm {
     public final void run() {
         if (attrModel != null) {
             Peptide[] peptides = attrModel.getPeptides();
-            progressTicket.switchToDeterminate(peptides.length);
+            progressTicket.switchToDeterminate(peptides.length + 2);
             for (int i = 0; i < peptides.length && !stopRun; i++) {
                 compute(peptides[i]);
                 progressTicket.progress();
@@ -143,6 +143,7 @@ public abstract class AbstractModamp implements Algorithm {
                 descriptor.setMaxValue(max);
                 descriptor.setMinValue(min);
             }
+            progressTicket.progress();
 
             //Add molecular descriptors to attributes model
             HashMap<String, List<PeptideAttribute>> mdMap = new LinkedHashMap<>();
@@ -162,12 +163,10 @@ public abstract class AbstractModamp implements Algorithm {
             if (!stopRun){
                 for (Map.Entry<String, List<PeptideAttribute>> entry : mdMap.entrySet()) {
                     category = entry.getKey();
-//                    if (attrModel.hasMolecularDescriptors(category)){
-//                        attrModel.deleteMolecularDescriptors(category);
-//                    }
-                    attrModel.addMolecularDescriptors(category, entry.getValue());                    
+                    attrModel.addMolecularDescriptors(category, entry.getValue().toArray(new PeptideAttribute[0]));                    
                 }
             }
+            progressTicket.progress();
         }
     }
 

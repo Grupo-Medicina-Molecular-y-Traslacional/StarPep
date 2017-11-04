@@ -25,34 +25,36 @@ import org.openide.util.NbBundle;
  * @author loge
  */
 public class DescriptorRemovalPanel extends javax.swing.JPanel {
-
+    
     protected final DescriptorSelectionPanel selectionPanel;
     protected final JXBusyLabel busyLabel;
     protected final AttributesModel attrModel;
-
+    
     public DescriptorRemovalPanel(AttributesModel attrModel) {
         initComponents();
         this.attrModel = attrModel;
-
+        
         selectionPanel = new DescriptorSelectionPanel(attrModel, Color.RED);
+        selectionPanel.removeDescriptorRow(AttributesModel.DEFAULT_CATEGORY);
+        
         centerPanel.add(selectionPanel, BorderLayout.CENTER);
-
+        
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setText(NbBundle.getMessage(DescriptorRemovalPanel.class, "DescriptorRemovalPanel.deleting.text"));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         busyLabel.setBusy(false);
         busyLabel.setVisible(false);
         rightPanel.add(busyLabel);
-
+        
         deleteButton.setEnabled(false);
-
+        
         selectionPanel.addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
                 TableModel model = (TableModel) e.getSource();
                 boolean flag = false;
                 for (int row = 0; row < model.getRowCount(); row++) {
-                    if ((boolean) model.getValueAt(row, 0) && !model.getValueAt(row, 1).equals(AttributesModel.DEFAULT_CATEGORY)) {
+                    if ((boolean) model.getValueAt(row, 0)) {
                         flag = true;
                         break;
                     }
@@ -120,24 +122,22 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
-        SwingWorker sw = new SwingWorker<Set<String>, Void>() {
+        SwingWorker sw = new SwingWorker<Void, Void>() {
             @Override
-            protected Set<String> doInBackground() throws Exception {
+            protected Void doInBackground() throws Exception {
                 Set<String> keys = selectionPanel.getSelectedDescriptorKeys();
                 for (String key : keys) {
-                    if (!key.equals(AttributesModel.DEFAULT_CATEGORY)) {
+                    if (attrModel.hasMolecularDescriptors(key)) {
                         attrModel.deleteMolecularDescriptors(key);
                     }
                 }
-                return keys;
+                return null;
             }
-
+            
             @Override
             protected void done() {
                 try {
-                    for (String key : get()) {
-                        selectionPanel.removeDescriptorRow(key);
-                    }
+                    get();
                 } catch (InterruptedException | ExecutionException ex) {
                     Exceptions.printStackTrace(ex);
                 } finally {

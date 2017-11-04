@@ -75,7 +75,6 @@ public class Peptide {
         if (attrsValue.containsKey(attr)) {
             attrsValue.remove(attr);
         }
-
     }
 
     public Set<PeptideAttribute> getAttributes() {

@@ -11,7 +11,6 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.swing.Action;
 import org.bapedis.core.services.ProjectManager;
@@ -138,15 +137,15 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
 //        }
 //        sheet.put(set);
         // Descriptors
-        HashMap<String, List<PeptideAttribute>> mdMap = attrModel.getMolecularDescriptors();
-        for (Map.Entry<String, List<PeptideAttribute>> entry : mdMap.entrySet()) {
+        HashMap<String, PeptideAttribute[]> mdMap = attrModel.getMolecularDescriptors();
+        for (Map.Entry<String, PeptideAttribute[]> entry : mdMap.entrySet()) {
             setMolecularDescriptor(entry.getKey(), entry.getValue());
         }
 
         return sheet;
     }
 
-    private void setMolecularDescriptor(String category, List<PeptideAttribute> features) {
+    private void setMolecularDescriptor(String category, PeptideAttribute[] features) {
         Sheet.Set set = sheet.get(category);
         if (set == null) {
             set = Sheet.createPropertiesSet();

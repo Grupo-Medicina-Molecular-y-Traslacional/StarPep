@@ -7,20 +7,16 @@ package org.bapedis.core.ui.components;
 
 import java.awt.BorderLayout;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.PeptideAttribute;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.jdesktop.swingx.JXList;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -59,8 +55,8 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         DefaultComboBoxModel comboModel = (DefaultComboBoxModel) descriptorComboBox.getModel();
         comboModel.addElement(ALL_SELECTION);
         comboModel.setSelectedItem(ALL_SELECTION);
-        HashMap<String, List<PeptideAttribute>> mdMap = attrModel.getMolecularDescriptors();
-        for (Map.Entry<String, List<PeptideAttribute>> entry : mdMap.entrySet()) {
+        HashMap<String, PeptideAttribute[]> mdMap = attrModel.getMolecularDescriptors();
+        for (Map.Entry<String, PeptideAttribute[]> entry : mdMap.entrySet()) {
             String key = entry.getKey();
             comboModel.addElement(key);
         }
@@ -384,17 +380,14 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         leftListModel.clear();
         String selectedKey = (String) descriptorComboBox.getSelectedItem();
         if (selectedKey.equals(ALL_SELECTION)) {
-            HashMap<String, List<PeptideAttribute>> mdMap = attrModel.getMolecularDescriptors();
-            for (Map.Entry<String, List<PeptideAttribute>> entry : mdMap.entrySet()) {
-                List<PeptideAttribute> list = entry.getValue();
-                for (PeptideAttribute attr : list) {
+            HashMap<String, PeptideAttribute[]> mdMap = attrModel.getMolecularDescriptors();
+            for (Map.Entry<String, PeptideAttribute[]> entry : mdMap.entrySet()) {
+                for (PeptideAttribute attr : entry.getValue()) {
                     leftListModel.addElement(attr);
                 }
             }
-
         } else {
-            List<PeptideAttribute> list = attrModel.getMolecularDescriptors(selectedKey);
-            for (PeptideAttribute attr : list) {
+            for (PeptideAttribute attr : attrModel.getMolecularDescriptors(selectedKey)) {
                 leftListModel.addElement(attr);
             }
         }

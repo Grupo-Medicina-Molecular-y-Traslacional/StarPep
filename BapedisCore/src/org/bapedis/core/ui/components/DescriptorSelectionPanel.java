@@ -7,22 +7,18 @@ package org.bapedis.core.ui.components;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
-import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.swing.Icon;
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
@@ -43,7 +39,7 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class DescriptorSelectionPanel extends javax.swing.JPanel {
+public class DescriptorSelectionPanel extends javax.swing.JPanel implements PropertyChangeListener {
 
     protected final AttributesModel attrModel;
     protected JXTable table;
@@ -63,6 +59,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
     public DescriptorSelectionPanel(final AttributesModel attrModel, final Color fgColor) {
         initComponents();
         this.attrModel = attrModel;
+        this.attrModel.addMolecularDescriptorChangeListener(this);
 
         final TableModel tableModel = createTableModel();
         table = new JXTable(tableModel) {
@@ -79,7 +76,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         table.setGridColor(Color.LIGHT_GRAY);
         // Column 0
         TableColumn tc = table.getColumn(0);
-        tc.setHeaderRenderer(new CheckBoxHeader2(table.getTableHeader(), 0));
+        tc.setHeaderRenderer(new CheckBoxHeader(table.getTableHeader(), 0));
         tc.setPreferredWidth(30);
 
         // Column 1
@@ -105,16 +102,15 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
         String[] columnNames = {"", NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.table.columnName.first"),
             NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.table.columnName.second")};
 
-        HashMap<String, List<PeptideAttribute>> map = attrModel.getMolecularDescriptors();
+        HashMap<String, PeptideAttribute[]> map = attrModel.getMolecularDescriptors();
         ArrayList<Object[]> data = new ArrayList(map.size());
         Object[] dataRow;
-        int row = 0;
-        for (Map.Entry<String, List<PeptideAttribute>> entry : map.entrySet()) {
+        for (Map.Entry<String, PeptideAttribute[]> entry : map.entrySet()) {
             dataRow = new Object[3];
             dataRow[0] = false;
             dataRow[1] = entry.getKey();
-            dataRow[2] = entry.getValue().size();
-            data.add(row++, dataRow);
+            dataRow[2] = entry.getValue().length;
+            data.add(dataRow);
         }
         return new MyTableModel(columnNames, data);
     }
@@ -122,7 +118,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
     public void setSelectedDescriptorKeys(Set<String> keys) {
         TableModel model = table.getModel();
         for (int row = 0; row < model.getRowCount(); row++) {
-            model.setValueAt(keys.contains((String)model.getValueAt(row, 1)), row, 0);
+            model.setValueAt(keys.contains((String) model.getValueAt(row, 1)), row, 0);
         }
     }
 
@@ -168,6 +164,22 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane scrollPane;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(AttributesModel.MD_ATTR_ADDED)) {
+            if (evt.getNewValue() != null) {
+                String category = (String) evt.getNewValue();
+                ((MyTableModel) table.getModel()).addRow(false, category, attrModel.getMolecularDescriptors(category).length);
+            }
+        } else if (evt.getPropertyName().equals(AttributesModel.MD_ATTR_REMOVED)) {
+            if (evt.getOldValue() != null) {
+                String category = (String) evt.getOldValue();
+                removeDescriptorRow(category);
+            }
+        }
+
+    }
 }
 
 class MyTableModel extends AbstractTableModel {
@@ -224,84 +236,29 @@ class MyTableModel extends AbstractTableModel {
         fireTableChanged(new TableModelEvent(this, row));
     }
 
+    public void addRow(boolean flag, String category, int size) {
+        Object[] dataRow = new Object[3];
+        dataRow[0] = flag;
+        dataRow[1] = category;
+        dataRow[2] = size;
+        data.add(dataRow);
+        int row = data.size()-1;
+        fireTableRowsInserted(row, row);
+    }
+
     public void removeRow(int row) {
         this.data.remove(row);
         fireTableRowsDeleted(row, row);
     }
 }
 
-class CheckBoxHeader implements TableCellRenderer {
+class CheckBoxHeader extends JCheckBox implements TableCellRenderer {
 
-    private final JCheckBox check = new JCheckBox();
-
-    public CheckBoxHeader(JTableHeader header, final int index) {
-        // index is the column to be modified
-        check.setOpaque(false);
-        check.setFont(header.getFont());
-        header.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                JTable table = ((JTableHeader) e.getSource()).getTable();
-                TableColumnModel columnModel = table.getColumnModel();
-                int viewColumn = columnModel.getColumnIndexAtX(e.getX());
-                int modelColumn = table.convertColumnIndexToModel(viewColumn);
-                if (modelColumn == index) {
-                    check.setSelected(!check.isSelected());
-                    TableModel m = table.getModel();
-                    Boolean f = check.isSelected();
-                    for (int i = 0; i < m.getRowCount(); i++) {
-                        m.setValueAt(f, i, index);
-                    }
-                    ((JTableHeader) e.getSource()).repaint();
-                }
-            }
-        });
-    }
-
-    @Override
-    public Component getTableCellRendererComponent(
-            JTable tbl, Object val, boolean isS, boolean hasF, int row, int col) {
-        TableCellRenderer r = tbl.getTableHeader().getDefaultRenderer();
-        JLabel l = (JLabel) r.getTableCellRendererComponent(tbl, val, isS, hasF, row, col);
-        l.setIcon(new CheckBoxIcon(check));
-        l.setHorizontalAlignment(SwingConstants.CENTER);
-        return l;
-    }
-
-    private static class CheckBoxIcon implements Icon {
-
-        private final JCheckBox check;
-
-        public CheckBoxIcon(JCheckBox check) {
-            this.check = check;
-        }
-
-        @Override
-        public int getIconWidth() {
-            return check.getPreferredSize().width;
-        }
-
-        @Override
-        public int getIconHeight() {
-            return check.getPreferredSize().height;
-        }
-
-        @Override
-        public void paintIcon(Component c, Graphics g, int x, int y) {
-            SwingUtilities.paintComponent(
-                    g, check, (Container) c, x, y, getIconWidth(), getIconHeight());
-        }
-    }
-}
-
-class CheckBoxHeader2 extends JCheckBox implements TableCellRenderer {
-
-    CheckBoxHeader2(JTableHeader header, final int index) {
+    CheckBoxHeader(JTableHeader header, final int index) {
         setOpaque(false);
         setFont(header.getFont());
         setHorizontalAlignment(SwingConstants.CENTER);
-        setToolTipText("Check all");
+        setToolTipText(NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.checkAll.text"));
         header.addMouseListener(new MouseAdapter() {
 
             @Override

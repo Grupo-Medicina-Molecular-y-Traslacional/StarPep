@@ -5,9 +5,7 @@
  */
 package org.bapedis.modamp.impl;
 
-import java.util.List;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.modamp.MD;
 
@@ -26,12 +24,8 @@ public class InestabilityIndex extends AbstractModamp {
 
     @Override
     protected void initMD() {
-        if (!hasAttribute(II)) {
-            addAttribute(II, II, Double.class);
-        }
-        if (!hasAttribute(PS)) {
-            addAttribute(PS, PS, Integer.class);
-        }
+        addAttribute(II, II, Double.class);
+        addAttribute(PS, PS, Integer.class);
     }
 
     @Override

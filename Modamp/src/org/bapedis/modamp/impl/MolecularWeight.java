@@ -1,9 +1,7 @@
 package org.bapedis.modamp.impl;
 
-import java.util.List;
 import org.bapedis.modamp.impl.AbstractModamp;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.modamp.MD;
 
 /*
@@ -25,9 +23,7 @@ public class MolecularWeight extends AbstractModamp {
 
     @Override
     protected void initMD() {
-        if (!hasAttribute(MW)) {
-            addAttribute(MW, MW, Double.class);
-        } 
+        addAttribute(MW, MW, Double.class);
     }
 
     @Override

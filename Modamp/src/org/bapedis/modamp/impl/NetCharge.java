@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.scales.ChargeScale;
@@ -115,51 +114,30 @@ public class NetCharge extends AbstractModamp {
     @Override
     protected void initMD() {
         if (ph5) {
-            if (!hasAttribute(Z5)) {
-                addAttribute(Z5, Z5, Double.class);
-            }
+            addAttribute(Z5, Z5, Double.class);
         }
 
         if (ph7) {
-            if (!hasAttribute(Z7)) {
-                addAttribute(Z7, Z7, Double.class);
-            }
+            addAttribute(Z7, Z7, Double.class);
         }
 
         if (ph9) {
-            if (!hasAttribute(Z9)) {
-                addAttribute(Z9, Z9, Double.class);
-            }
+            addAttribute(Z9, Z9, Double.class);
         }
 
         if (KLEP840101) {
-            if (!hasAttribute(KLEP840101_NAME)) {
-                addAttribute(KLEP840101_NAME, KLEP840101_NAME, Double.class);
-            }
-
-            if (!hasAttribute(KLEP840101_AVG)) {
-                addAttribute(KLEP840101_AVG, KLEP840101_AVG, Double.class);
-            }
+            addAttribute(KLEP840101_NAME, KLEP840101_NAME, Double.class);
+            addAttribute(KLEP840101_AVG, KLEP840101_AVG, Double.class);
         }
 
         if (CHAM830107) {
-            if (!hasAttribute(CHAM830107_NAME)) {
-                addAttribute(CHAM830107_NAME, CHAM830107_NAME, Double.class);
-            }
-
-            if (!hasAttribute(CHAM830107_AVG)) {
-                addAttribute(CHAM830107_AVG, CHAM830107_AVG, Double.class);
-            }
+            addAttribute(CHAM830107_NAME, CHAM830107_NAME, Double.class);
+            addAttribute(CHAM830107_AVG, CHAM830107_AVG, Double.class);
         }
 
         if (CHAM830108) {
-            if (!hasAttribute(CHAM830108_NAME)) {
-                addAttribute(CHAM830108_NAME, CHAM830108_NAME, Double.class);
-            }
-
-            if (!hasAttribute(CHAM830108_AVG)) {
-                addAttribute(CHAM830108_AVG, CHAM830108_AVG, Double.class);
-            }
+            addAttribute(CHAM830108_NAME, CHAM830108_NAME, Double.class);
+            addAttribute(CHAM830108_AVG, CHAM830108_AVG, Double.class);
         }
     }
 

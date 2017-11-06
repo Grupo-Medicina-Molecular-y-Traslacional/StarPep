@@ -146,50 +146,36 @@ public class DipeptideComposition extends AbstractModamp {
 
     @Override
     protected void initMD() {
-            if (hyR) {
-                alphabets.add(ReducedAlphabets.ra_hydrop_Rose());
-            }
-            if (b50) {
-                alphabets.add(ReducedAlphabets.ra_Blosum50_Murphy());
-            }
-            if (cs) {
-                alphabets.add(ReducedAlphabets.ra_cSimilarity_chakrabarty());
-            }
-            if (hydT) {
-                alphabets.add(ReducedAlphabets.ra_Hydrophobicity_Tomii());
-            }
-            if (vw) {
-                alphabets.add(ReducedAlphabets.ra_NormVW_Tomii());
-            }
-            if (pol) {
-                alphabets.add(ReducedAlphabets.ra_Polarity_Tomii());
-            }
-            if (polz) {
-                alphabets.add(ReducedAlphabets.ra_Polarizability_Tomii());
-            }
-            if (chrg) {
-                alphabets.add(ReducedAlphabets.ra_Charge_Tomii());
-            }
-            if (ss) {
-                alphabets.add(ReducedAlphabets.ra_secondaryStructure_Tomii());
-            }
-            if (sa) {
-                alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
-            }
-
-            Set<String> keySet;
-            String attrName;
-            for (ReduceAlphabet ra : alphabets) {
-                keySet = ra.getCount().keySet();
-                for (String key1 : keySet) {
-                    for (String key2 : keySet) {
-                        attrName = String.format("%s([%s][%s])", ra.getName(), key1, key2);
-                        if (!hasAttribute(attrName)) {
-                            addAttribute(attrName, attrName, Double.class);
-                        } 
-                    }
-                }
-            }
+        if (hyR) {
+            alphabets.add(ReducedAlphabets.ra_hydrop_Rose());
+        }
+        if (b50) {
+            alphabets.add(ReducedAlphabets.ra_Blosum50_Murphy());
+        }
+        if (cs) {
+            alphabets.add(ReducedAlphabets.ra_cSimilarity_chakrabarty());
+        }
+        if (hydT) {
+            alphabets.add(ReducedAlphabets.ra_Hydrophobicity_Tomii());
+        }
+        if (vw) {
+            alphabets.add(ReducedAlphabets.ra_NormVW_Tomii());
+        }
+        if (pol) {
+            alphabets.add(ReducedAlphabets.ra_Polarity_Tomii());
+        }
+        if (polz) {
+            alphabets.add(ReducedAlphabets.ra_Polarizability_Tomii());
+        }
+        if (chrg) {
+            alphabets.add(ReducedAlphabets.ra_Charge_Tomii());
+        }
+        if (ss) {
+            alphabets.add(ReducedAlphabets.ra_secondaryStructure_Tomii());
+        }
+        if (sa) {
+            alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
+        }
     }
 
     @Override
@@ -200,11 +186,19 @@ public class DipeptideComposition extends AbstractModamp {
             Iterator<String> it = aminoAcidComposition.keySet().iterator();
             String key;
             double val;
+            PeptideAttribute attr;
             while (it.hasNext()) {
                 key = it.next();
-                attrName = String.format("%s(%s)", ra.getName(), key);
                 val = aminoAcidComposition.get(key);
-                peptide.setAttributeValue(getAttribute(attrName), val);
+                if (val > 0) {
+                    attrName = String.format("%s(%s)", ra.getName(), key);
+                    attr = getAttribute(attrName);
+                    if (attr == null) {
+                        attr = addAttribute(attrName, attrName, Double.class);
+                        attr.setDefaultValue(0.);
+                    }
+                    peptide.setAttributeValue(attr, val);
+                }
             }
         }
     }

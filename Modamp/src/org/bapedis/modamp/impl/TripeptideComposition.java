@@ -176,21 +176,6 @@ public class TripeptideComposition extends AbstractModamp {
         if (sa) {
             alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
         }
-
-        for (ReduceAlphabet ra : alphabets) {
-            Set<String> keySet = ra.getCount().keySet();
-            String attrName;
-            for (String key1 : keySet) {
-                for (String key2 : keySet) {
-                    for (String key3 : keySet) {
-                        attrName = String.format("%s([%s][%s][%s])", ra.getName(), key1, key2, key3);
-                        if (!hasAttribute(attrName)) {
-                            addAttribute(attrName, attrName, Double.class);
-                        }
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -201,11 +186,19 @@ public class TripeptideComposition extends AbstractModamp {
             Iterator<String> it = aminoAcidComposition.keySet().iterator();
             String key;
             double val;
+            PeptideAttribute attr;
             while (it.hasNext()) {
                 key = it.next();
                 val = aminoAcidComposition.get(key);
-                attrName = String.format("%s(%s)", ra.getName(), key);
-                peptide.setAttributeValue(getAttribute(attrName), val);
+                if (val > 0) {
+                    attrName = String.format("%s(%s)", ra.getName(), key);
+                    attr = getAttribute(attrName);
+                    if (attr == null) {
+                        attr = addAttribute(attrName, attrName, Double.class);
+                        attr.setDefaultValue(0.);
+                    }
+                    peptide.setAttributeValue(attr, val);
+                }
             }
         }
     }

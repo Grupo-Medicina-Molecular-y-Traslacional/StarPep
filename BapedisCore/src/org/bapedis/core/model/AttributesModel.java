@@ -102,8 +102,8 @@ public class AttributesModel {
         this.csnView = csnView;
     }
 
-    public Set<PeptideAttribute> getDisplayedColumns() {
-        return displayedColumnsModel;
+    public PeptideAttribute[] getDisplayedColumns() {
+        return displayedColumnsModel.toArray(new PeptideAttribute[0]);
     }
 
     public boolean canAddDisplayColumn() {
@@ -139,6 +139,22 @@ public class AttributesModel {
     }
 
     public synchronized void addMolecularDescriptors(String category, PeptideAttribute[] features) {
+        if (mdMap.containsKey(category)){
+            PeptideAttribute[] oldAttrs = mdMap.get(category);
+            boolean removed;
+            for(PeptideAttribute oldAttr: oldAttrs){
+                removed= true;
+                for(PeptideAttribute newAttr: features){
+                    if (oldAttr.equals(newAttr)){
+                        removed = false;
+                        break;
+                    }
+                }
+                if(removed){
+                    deleteAttribute(oldAttr);
+                }
+            }
+        }
         mdMap.put(category, features);
         propertyChangeSupport.firePropertyChange(MD_ATTR_ADDED, null, category);
     }

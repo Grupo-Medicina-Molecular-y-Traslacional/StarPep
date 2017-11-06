@@ -27,13 +27,12 @@ import org.openide.util.NbBundle;
  * @author loge
  */
 public class Peptide {
-    
+
     public static final PeptideAttribute ID = new PeptideAttribute("id", NbBundle.getMessage(Peptide.class, "Peptide.attribute.id"), String.class, false);
     public static final PeptideAttribute SEQ = new PeptideAttribute("seq", NbBundle.getMessage(Peptide.class, "Peptide.attribute.seq"), String.class, false);
     public static final PeptideAttribute LENGHT = new PeptideAttribute("length", NbBundle.getMessage(Peptide.class, "Peptide.attribute.length"), Integer.class, true);
     public final static String CHANGED_ATTRIBUTE = "changed_attribute";
-    protected transient final PropertyChangeSupport propertyChangeSupport;    
-    
+    protected final PropertyChangeSupport propertyChangeSupport;
 
     protected final Node graphNode;
     protected final Graph graph;
@@ -70,13 +69,17 @@ public class Peptide {
         attrsValue.put(attr, value);
         propertyChangeSupport.firePropertyChange(CHANGED_ATTRIBUTE, null, attr);
     }
-    
-    public boolean hasAttribute(PeptideAttribute attr){
-        return attrsValue.containsKey(attr);
-    }
 
     public Object getAttributeValue(PeptideAttribute attr) {
-        return attrsValue.get(attr);
+        Object val = attrsValue.get(attr);
+        if (val != null) {
+            return val;
+        }
+        val = attr.getDefaultValue();
+        if (val != null) {
+            return val;
+        }
+        return null;
     }
 
     public void deleteAttribute(PeptideAttribute attr) {
@@ -116,14 +119,14 @@ public class Peptide {
         }
         return values.toArray(new String[0]);
     }
-    
+
     public void addMolecularFeatureChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(CHANGED_ATTRIBUTE, listener);
     }
 
     public void removeMolecularFeatureChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(CHANGED_ATTRIBUTE, listener);
-    }    
+    }
 
     @Override
     public String toString() {

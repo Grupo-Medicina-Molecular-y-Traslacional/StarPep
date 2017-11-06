@@ -5,6 +5,8 @@
  */
 package org.bapedis.modamp.impl;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -34,11 +36,14 @@ public abstract class AbstractModamp implements Algorithm {
     protected ProgressTicket progressTicket;
     protected final String PRO_CATEGORY = "Properties";
     private final HashMap<String, PeptideAttribute> map;
+    public static final String MD_ADDED = "md_added";
+    protected final PropertyChangeSupport propertyChangeSupport;
 
     public AbstractModamp(AlgorithmFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         this.factory = factory;
         map = new LinkedHashMap<>();
+        propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
     protected PeptideAttribute addAttribute(String id, String displayName, Class<?> cclass) {
@@ -48,25 +53,18 @@ public abstract class AbstractModamp implements Algorithm {
     }
 
     protected void addAttribute(PeptideAttribute attr) {
-        if (hasAttribute(attr.getId())) {
+        if (map.containsKey(attr.getId())) {
             throw new IllegalArgumentException("Duplicated attribute: " + attr.getId());
         }
+        if (attr.getCategory() == null) {
+            attr.setCategory(factory.getName());
+        }
         map.put(attr.getId(), attr);
+        propertyChangeSupport.firePropertyChange(MD_ADDED, null, attr);
     }
 
     public PeptideAttribute getAttribute(String id) {
-        if (!hasAttribute(id)) {
-            throw new IllegalArgumentException("Attribute doesn't exist: " + id);
-        }
         return map.get(id);
-    }
-
-    public boolean hasAttribute(String id) {
-        return map.containsKey(id);
-    }
-
-    public Collection<PeptideAttribute> getMolecularDescriptors() {
-        return map.values();
     }
 
     @Override
@@ -75,11 +73,6 @@ public abstract class AbstractModamp implements Algorithm {
         attrModel = pc.getAttributesModel();
         stopRun = false;
         initMD();
-        for (PeptideAttribute descriptor : map.values()) {
-            if (descriptor.getCategory() == null) {
-                descriptor.setCategory(factory.getName());
-            }
-        }
     }
 
     @Override
@@ -114,9 +107,30 @@ public abstract class AbstractModamp implements Algorithm {
     public final void run() {
         if (attrModel != null) {
             Peptide[] peptides = attrModel.getPeptides();
-            progressTicket.switchToDeterminate(peptides.length + 2);
-            for (int i = 0; i < peptides.length && !stopRun; i++) {
-                compute(peptides[i]);
+            progressTicket.switchToDeterminate(peptides.length + 1);
+
+            try {
+                // Calculate molecular descriptors
+                for (int i = 0; i < peptides.length && !stopRun; i++) {
+                    compute(peptides[i]);
+                    progressTicket.progress();
+                }
+            } finally {
+                //Add molecular descriptors to attributes model
+                HashMap<String, List<PeptideAttribute>> mdMap = new LinkedHashMap<>();
+                String category;
+                List<PeptideAttribute> list;
+                for (PeptideAttribute attr : map.values()) {
+                    category = attr.getCategory();
+                    if (!mdMap.containsKey(category)) {
+                        mdMap.put(category, new LinkedList<PeptideAttribute>());
+                    }
+                    list = mdMap.get(category);
+                    list.add(attr);
+                }
+                for (Map.Entry<String, List<PeptideAttribute>> entry : mdMap.entrySet()) {
+                    attrModel.addMolecularDescriptors(entry.getKey(), entry.getValue().toArray(new PeptideAttribute[0]));
+                }
                 progressTicket.progress();
             }
 
@@ -143,32 +157,16 @@ public abstract class AbstractModamp implements Algorithm {
                 descriptor.setMaxValue(max);
                 descriptor.setMinValue(min);
             }
-            progressTicket.progress();
-
-            //Add molecular descriptors to attributes model
-            HashMap<String, List<PeptideAttribute>> mdMap = new LinkedHashMap<>();
-            String category;
-            List<PeptideAttribute> list;
-            for (PeptideAttribute attr : map.values()) {
-                if (stopRun) {
-                    break;
-                }
-                category = attr.getCategory();
-                if (!mdMap.containsKey(category)) {
-                    mdMap.put(category, new LinkedList<PeptideAttribute>());
-                }
-                list = mdMap.get(category);
-                list.add(attr);
-            }
-            if (!stopRun){
-                for (Map.Entry<String, List<PeptideAttribute>> entry : mdMap.entrySet()) {
-                    category = entry.getKey();
-                    attrModel.addMolecularDescriptors(category, entry.getValue().toArray(new PeptideAttribute[0]));                    
-                }
-            }
-            progressTicket.progress();
         }
     }
+    
+    public void addMolecularDescriptorChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(MD_ADDED, listener);
+    }
+
+    public void removeMolecularDescriptorChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(MD_ADDED, listener);
+    }      
 
     protected abstract void initMD();
 

@@ -141,19 +141,6 @@ public class RADistribution extends AbstractModamp {
         if (sa) {
             alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
         }
-
-        String key;
-        for (ReduceAlphabet ra : alphabets) {
-            for (int percent = 0; percent <= 100; percent += 25) {
-                Iterator<String> it = ra.getCount().keySet().iterator();
-                while (it.hasNext()) {
-                    key = String.format("D_%s_%d[%s]", ra.getName(), percent, it.next());
-                    if (!hasAttribute(key)) {
-                        addAttribute(key, key, Double.class);
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -164,11 +151,16 @@ public class RADistribution extends AbstractModamp {
                 Iterator<String> it = aminoAcidComposition.keySet().iterator();
                 double val;
                 String attrName, key;
+                PeptideAttribute attr;
                 while (it.hasNext()) {
                     key = it.next();
-                    attrName = String.format("D_%s_%d[%s]", ra.getName(), percent, key);
                     val = aminoAcidComposition.get(key);
-                    peptide.setAttributeValue(getAttribute(attrName), val);
+                    attrName = String.format("D_%s_%d[%s]", ra.getName(), percent, key);
+                    attr = getAttribute(attrName);
+                    if (attr == null) {
+                        attr = addAttribute(attrName, attrName, Double.class);
+                    }
+                    peptide.setAttributeValue(attr, val);
                 }
             }
         }

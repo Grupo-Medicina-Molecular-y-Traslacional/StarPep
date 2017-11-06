@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.modamp.MD;
 import org.openide.util.Exceptions;
@@ -52,9 +51,7 @@ public class HydrophobicPeriodicity extends AbstractModamp {
     @Override
     protected void initMD() {
         String name = getProName();
-        if (!hasAttribute(name)) {
-            addAttribute(name, name, Double.class);
-        }
+        addAttribute(name, name, Double.class);
     }
 
     @Override

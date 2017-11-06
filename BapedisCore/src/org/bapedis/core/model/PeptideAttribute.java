@@ -20,6 +20,7 @@ public class PeptideAttribute {
     protected double maxValue, minValue;
     protected final boolean md;
     protected String category;
+    protected Double defaultValue;
 
     public PeptideAttribute(String id, String displayName, Class<?> type) {
         this(id, displayName, type, true);
@@ -33,6 +34,8 @@ public class PeptideAttribute {
         this.md = md;
         maxValue = Double.MAX_VALUE;
         minValue = Double.MIN_VALUE;
+        category = null;
+        defaultValue = null;
     }
 
     public String getId() {
@@ -74,6 +77,14 @@ public class PeptideAttribute {
     public void setCategory(String category) {
         this.category = category;
     }
+
+    public Double getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(Double defaultValue) {
+        this.defaultValue = defaultValue;
+    }        
 
     public double normalize(Object value) {
         if (!md) {

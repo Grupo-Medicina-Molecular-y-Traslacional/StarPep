@@ -141,21 +141,6 @@ public class RATransition extends AbstractModamp {
         if (sa) {
             alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
         }
-
-        String key1, key2, newKey;
-        for (ReduceAlphabet ra : alphabets) {
-            Object[] keys = ra.getCount().keySet().toArray();
-            for (int i = 0; i < keys.length - 1; i++) {
-                key1 = keys[i].toString();
-                for (int j = i + 1; j < keys.length; j++) {
-                    key2 = keys[j].toString();
-                    newKey = String.format("T_%s[%s]", ra.getName(), key1 + "->" + key2);
-                    if (!hasAttribute(newKey)) {
-                        addAttribute(newKey, newKey, Double.class);
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -165,11 +150,19 @@ public class RATransition extends AbstractModamp {
             Iterator<String> it = aminoAcidComposition.keySet().iterator();
             double val;
             String attrName, key;
+            PeptideAttribute attr;
             while (it.hasNext()) {
                 key = it.next();
-                attrName = String.format("T_%s[%s]", ra.getName(), key);
                 val = aminoAcidComposition.get(key);
-                peptide.setAttributeValue(getAttribute(attrName), val);
+                if (val > 0) {
+                    attrName = String.format("T_%s[%s]", ra.getName(), key);
+                    attr = getAttribute(attrName);
+                    if (attr == null) {
+                        attr = addAttribute(attrName, attrName, Double.class);
+                        attr.setDefaultValue(0.);
+                    }
+                    peptide.setAttributeValue(attr, val);
+                }
             }
         }
     }

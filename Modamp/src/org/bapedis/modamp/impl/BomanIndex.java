@@ -22,9 +22,7 @@ public class BomanIndex extends AbstractModamp {
 
     @Override
     protected void initMD() {
-        if (!hasAttribute(BM)) {
-            addAttribute(BM, BM, Double.class);
-        }
+        addAttribute(BM, BM, Double.class);
     }
 
     @Override

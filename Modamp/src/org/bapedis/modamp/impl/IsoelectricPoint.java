@@ -5,9 +5,7 @@
  */
 package org.bapedis.modamp.impl;
 
-import java.util.List;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.scales.PkaValues;
 
@@ -25,9 +23,7 @@ public class IsoelectricPoint extends AbstractModamp {
 
     @Override
     protected void initMD() {
-        if (!hasAttribute(pI)) {
-            addAttribute(pI, pI, Double.class);
-        }
+        addAttribute(pI, pI, Double.class);
     }
 
     @Override

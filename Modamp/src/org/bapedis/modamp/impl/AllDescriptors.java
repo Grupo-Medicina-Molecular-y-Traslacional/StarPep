@@ -5,6 +5,8 @@
  */
 package org.bapedis.modamp.impl;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,7 +26,7 @@ import org.openide.util.NbBundle;
  *
  * @author beltran, loge
  */
-public class AllDescriptors extends AbstractModamp {
+public class AllDescriptors extends AbstractModamp implements PropertyChangeListener {
 
     private final List<AlgorithmProperty> properties;
     private boolean aaComposition, aIndex, avgHydrophilicity, bIndex,
@@ -299,17 +301,14 @@ public class AllDescriptors extends AbstractModamp {
 
         // Init all algoritms
         for (AbstractModamp algo : map.values()) {
-            algo.initAlgo();
-            for(PeptideAttribute attr: algo.getMolecularDescriptors()){
-                addAttribute(attr);
-            }
+            algo.addMolecularDescriptorChangeListener(this);
+            algo.initAlgo();        
         }
-
     }
 
     @Override
     protected void compute(Peptide peptide) {
-        for (AbstractModamp algo : map.values()) {
+        for (AbstractModamp algo : map.values()) {            
             algo.compute(peptide);
         }
     }
@@ -318,13 +317,22 @@ public class AllDescriptors extends AbstractModamp {
     public void endMD() {
         // Init all algoritms
         for (AbstractModamp algo : map.values()) {
-            algo.endMD();
+            algo.removeMolecularDescriptorChangeListener(this);
+            algo.endMD();            
         }
     }
 
     @Override
     public AlgorithmProperty[] getProperties() {
         return properties.toArray(new AlgorithmProperty[0]);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(AbstractModamp.MD_ADDED) &&
+            evt.getNewValue() != null){
+            addAttribute((PeptideAttribute)evt.getNewValue());
+        }
     }
 
 }

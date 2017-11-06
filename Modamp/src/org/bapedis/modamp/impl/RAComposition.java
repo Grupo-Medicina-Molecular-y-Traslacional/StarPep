@@ -175,17 +175,6 @@ public class RAComposition extends AbstractModamp {
         if (sa) {
             alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
         }
-
-        String key;
-        for (ReduceAlphabet ra : alphabets) {
-            Iterator<String> it = ra.getCount().keySet().iterator();
-            while (it.hasNext()) {
-                key = String.format("%s[%s]", ra.getName(), it.next());
-                if (!hasAttribute(key)) {
-                    addAttribute(key, key, Double.class);
-                }
-            }
-        }
     }
 
     @Override
@@ -200,11 +189,19 @@ public class RAComposition extends AbstractModamp {
             Iterator<String> it = aminoAcidComposition.keySet().iterator();
             double val;
             String attrName, key;
+            PeptideAttribute attr;
             while (it.hasNext()) {
                 key = it.next();
-                attrName = String.format("%s[%s]", ra.getName(), key);
                 val = aminoAcidComposition.get(key);
-                peptide.setAttributeValue(getAttribute(attrName), val);
+                if (val > 0) {
+                    attrName = String.format("%s[%s]", ra.getName(), key);
+                    attr = getAttribute(attrName);
+                    if (attr == null) {
+                        attr = addAttribute(attrName, attrName, Double.class);
+                        attr.setDefaultValue(0.);
+                    }
+                    peptide.setAttributeValue(attr, val);
+                }
             }
         }
     }

@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.scales.HydrophobicityScale;
 import org.openide.util.Exceptions;
@@ -129,14 +128,10 @@ public class HydrophobicMoment extends AbstractModamp {
             if (scale[i]) {
                 for (int j = 0; j < angle.length; j++) {
                     if (angle[j]) {
-                        if (!hasAttribute(attrNames[i][j])) {
-                            addAttribute(attrNames[i][j], attrNames[i][j], Double.class);
-                        } 
+                        addAttribute(attrNames[i][j], attrNames[i][j], Double.class); 
                     }
                 }
-                if (!hasAttribute(AVGH[i])) {
-                    addAttribute(AVGH[i], AVGH[i], Double.class);
-                } 
+                addAttribute(AVGH[i], AVGH[i], Double.class);
             }
         }
     }

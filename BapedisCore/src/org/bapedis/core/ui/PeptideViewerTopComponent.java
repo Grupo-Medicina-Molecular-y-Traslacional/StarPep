@@ -193,9 +193,8 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
     private void populateVisibleColumns(AttributesModel attrModel) {
         if (attrModel != null) {
-            Set<PeptideAttribute> availableColumnsModel = attrModel.getDisplayedColumns();
             List<String> columns = new LinkedList<>();
-            for (PeptideAttribute attr : availableColumnsModel) {
+            for (PeptideAttribute attr : attrModel.getDisplayedColumns()) {
                 columns.add(attr.getId());
                 columns.add(attr.getDisplayName());
             }

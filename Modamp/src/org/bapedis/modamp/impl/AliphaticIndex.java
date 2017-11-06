@@ -23,9 +23,7 @@ public class AliphaticIndex extends AbstractModamp {
 
     @Override
     protected void initMD() {
-        if (!hasAttribute(AI)) {
-            addAttribute(AI, AI, Double.class);
-        }
+         addAttribute(AI, AI, Double.class);
     }
 
     @Override

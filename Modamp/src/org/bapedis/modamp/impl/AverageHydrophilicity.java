@@ -63,20 +63,14 @@ public class AverageHydrophilicity extends AbstractModamp {
     @Override
     protected void initMD() {
         if (HOPT810101) {
-            if (!hasAttribute(HOPT810101_NAME)) {
-                addAttribute(HOPT810101_NAME, HOPT810101_NAME, Double.class);
-            } 
+            addAttribute(HOPT810101_NAME, HOPT810101_NAME, Double.class);
         }
 
         if (KUHL950101) {
-            if (!hasAttribute(KUHL950101_NAME)) {
-                addAttribute(KUHL950101_NAME, KUHL950101_NAME, Double.class);
-            } 
+            addAttribute(KUHL950101_NAME, KUHL950101_NAME, Double.class);
         }
 
-        if (!hasAttribute(GRAVY)) {
-            addAttribute(GRAVY, GRAVY, Double.class);
-        } 
+        addAttribute(GRAVY, GRAVY, Double.class);
     }
 
     @Override

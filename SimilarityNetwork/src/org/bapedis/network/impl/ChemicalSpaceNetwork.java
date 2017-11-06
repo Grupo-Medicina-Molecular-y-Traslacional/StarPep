@@ -51,7 +51,7 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
                                 break;
                             }
                             for (Peptide pept : attrModel.getPeptides()) {
-                                if (!pept.hasAttribute(attr)) {
+                                if (pept.getAttributeValue(attr) == null) {
                                     DialogDisplayer.getDefault().notify(notFound);
                                     cancel();
                                     break;

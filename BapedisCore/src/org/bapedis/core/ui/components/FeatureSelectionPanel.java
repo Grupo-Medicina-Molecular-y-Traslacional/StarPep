@@ -5,18 +5,80 @@
  */
 package org.bapedis.core.ui.components;
 
+import java.awt.BorderLayout;
+import java.util.Collection;
+import java.util.Set;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableModel;
+import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.services.ProjectManager;
+import org.openide.util.Lookup;
+import org.openide.util.LookupEvent;
+import org.openide.util.LookupListener;
+
 /**
  *
  * @author loge
  */
-public class FeatureSelectionPanel extends javax.swing.JPanel {
+public class FeatureSelectionPanel extends javax.swing.JPanel implements LookupListener {
 
-    /**
-     * Creates new form FeatureSelectionPanel
-     */
+    protected final ProjectManager pc;
+    Lookup.Result<AttributesModel> peptideLkpResult;
+    
     public FeatureSelectionPanel() {
         initComponents();
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
+//        DescriptorSelectionPanel selectionPanel = new DescriptorSelectionPanel(pc.getAttributesModel());
+//        centerPanel.add(selectionPanel, BorderLayout.CENTER);
+        
+        
+        addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent event) {
+//                setMolecularDescriptors(pc.getAttributesModel());
+                peptideLkpResult = pc.getCurrentWorkspace().getLookup().lookupResult(AttributesModel.class);
+                peptideLkpResult.addLookupListener(FeatureSelectionPanel.this);
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+                if (peptideLkpResult != null) {
+                    peptideLkpResult.removeLookupListener(FeatureSelectionPanel.this);
+                    peptideLkpResult = null;
+                }
+            }
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) {
+            }
+        });        
     }
+    
+//    private void setMolecularDescriptors(AttributesModel attrModel) {
+//        descriptorsPanel.removeAll();
+//        DescriptorSelectionPanel selectionPanel = new DescriptorSelectionPanel(attrModel);
+//        final Set<String> keys = csnAlgo.getSelectedKeys();
+//        selectionPanel.setSelectedDescriptorKeys(keys);
+//        selectionPanel.addTableModelListener(new TableModelListener() {
+//            @Override
+//            public void tableChanged(TableModelEvent e) {
+//                TableModel model = (TableModel) e.getSource();
+//                for (int row = 0; row < model.getRowCount(); row++) {
+//                    if ((boolean) model.getValueAt(row, 0)) {
+//                        keys.add((String) model.getValueAt(row, 1));
+//                    } else {
+//                        keys.remove((String) model.getValueAt(row, 1));
+//                    }
+//                }
+//            }
+//        });
+//        descriptorsPanel.add(selectionPanel, BorderLayout.CENTER);
+//        descriptorsPanel.revalidate();
+//        descriptorsPanel.repaint();
+//    }    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -132,4 +194,15 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
     private javax.swing.JRadioButton option3Button;
     private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void resultChanged(LookupEvent le) {
+        if (le.getSource().equals(peptideLkpResult)){
+            Collection<? extends AttributesModel> attrModels = peptideLkpResult.allInstances();
+             if (!attrModels.isEmpty()){
+//                 csnAlgo.getSelectedKeys().clear();
+//                 setMolecularDescriptors(attrModels.iterator().next());
+             }
+        }
+    }
 }

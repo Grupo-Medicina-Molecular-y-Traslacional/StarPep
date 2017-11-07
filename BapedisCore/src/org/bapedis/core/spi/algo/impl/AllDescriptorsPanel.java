@@ -51,7 +51,7 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
         };
         table.setGridColor(Color.LIGHT_GRAY);
         table.setRowSelectionAllowed(false);
-        table.setTableHeader(null);
+        table.setTableHeader(null);                
 
         scrollPane.setViewportView(table);
 
@@ -132,15 +132,11 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
 
         buttonGroup = new javax.swing.ButtonGroup();
         topPanel = new javax.swing.JPanel();
-        featurePanel = new javax.swing.JPanel();
-        selectAllRButton = new javax.swing.JRadioButton();
-        removeUselessRButton = new javax.swing.JRadioButton();
-        selectRankedRButton = new javax.swing.JRadioButton();
         scrollPane = new javax.swing.JScrollPane();
 
         setLayout(new java.awt.GridBagLayout());
 
-        java.awt.FlowLayout flowLayout1 = new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 20, 2);
+        java.awt.FlowLayout flowLayout1 = new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 20, 2);
         flowLayout1.setAlignOnBaseline(true);
         topPanel.setLayout(flowLayout1);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -149,42 +145,6 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 5, 0);
         add(topPanel, gridBagConstraints);
-
-        featurePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.featurePanel.border.title"))); // NOI18N
-        featurePanel.setLayout(new javax.swing.BoxLayout(featurePanel, javax.swing.BoxLayout.Y_AXIS));
-
-        buttonGroup.add(selectAllRButton);
-        org.openide.awt.Mnemonics.setLocalizedText(selectAllRButton, org.openide.util.NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.selectAllRButton.text")); // NOI18N
-        selectAllRButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                selectAllRButtonActionPerformed(evt);
-            }
-        });
-        featurePanel.add(selectAllRButton);
-
-        buttonGroup.add(removeUselessRButton);
-        org.openide.awt.Mnemonics.setLocalizedText(removeUselessRButton, org.openide.util.NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.removeUselessRButton.text")); // NOI18N
-        removeUselessRButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                removeUselessRButtonActionPerformed(evt);
-            }
-        });
-        featurePanel.add(removeUselessRButton);
-
-        buttonGroup.add(selectRankedRButton);
-        org.openide.awt.Mnemonics.setLocalizedText(selectRankedRButton, org.openide.util.NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.selectRankedRButton.text")); // NOI18N
-        selectRankedRButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                selectRankedRButtonActionPerformed(evt);
-            }
-        });
-        featurePanel.add(selectRankedRButton);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        add(featurePanel, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -194,57 +154,35 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
         add(scrollPane, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void selectAllRButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectAllRButtonActionPerformed
-        if (algo != null) {
-            algo.setButtonGroupIndex(0);
-        }
-    }//GEN-LAST:event_selectAllRButtonActionPerformed
-
-    private void removeUselessRButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeUselessRButtonActionPerformed
-        if (algo != null) {
-            algo.setButtonGroupIndex(1);
-        }
-    }//GEN-LAST:event_removeUselessRButtonActionPerformed
-
-    private void selectRankedRButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectRankedRButtonActionPerformed
-        if (algo != null) {
-            algo.setButtonGroupIndex(2);
-        }
-    }//GEN-LAST:event_selectRankedRButtonActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup;
-    private javax.swing.JPanel featurePanel;
-    private javax.swing.JRadioButton removeUselessRButton;
     private javax.swing.JScrollPane scrollPane;
-    private javax.swing.JRadioButton selectAllRButton;
-    private javax.swing.JRadioButton selectRankedRButton;
     private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public JPanel getEditPanel(Algorithm algo) {
         this.algo = (AllDescriptors) algo;
-        table.setModel(new MyTableModel());
-        setSelectedGroupIndex(this.algo.getButtonGroupIndex());
+        table.setModel(new MyTableModel());        
+//        setSelectedGroupIndex(this.algo.getButtonGroupIndex());
 
         return this;
     }
 
-    private void setSelectedGroupIndex(int index) {
-        switch (index) {
-            case 0:
-                selectAllRButton.setSelected(true);
-                break;
-            case 1:
-                removeUselessRButton.setSelected(true);
-                break;
-            case 2:
-                selectRankedRButton.setSelected(true);
-                break;
-        }
-    }
+//    private void setSelectedGroupIndex(int index) {
+//        switch (index) {
+//            case 0:
+//                selectAllRButton.setSelected(true);
+//                break;
+//            case 1:
+//                removeUselessRButton.setSelected(true);
+//                break;
+//            case 2:
+//                selectRankedRButton.setSelected(true);
+//                break;
+//        }
+//    }
 
     class MyTableModel extends AbstractTableModel {
 

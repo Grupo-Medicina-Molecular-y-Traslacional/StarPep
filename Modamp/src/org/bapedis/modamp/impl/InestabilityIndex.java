@@ -5,6 +5,7 @@
  */
 package org.bapedis.modamp.impl;
 
+import org.bapedis.core.spi.algo.impl.AbstractMD;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.modamp.MD;
@@ -13,7 +14,7 @@ import org.bapedis.modamp.MD;
  *
  * @author beltran, loge
  */
-public class InestabilityIndex extends AbstractModamp {
+public class InestabilityIndex extends AbstractMD {
 
     protected final String II = "II";
     protected final String PS = "Stable";

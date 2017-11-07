@@ -5,6 +5,7 @@
  */
 package org.bapedis.modamp.impl;
 
+import org.bapedis.core.spi.algo.impl.AbstractMD;
 import java.util.Iterator;
 import java.util.Map;
 import org.bapedis.core.model.Peptide;
@@ -18,7 +19,7 @@ import org.bapedis.modamp.scales.ReducedAlphabets;
  *
  * @author beltran, loge
  */
-public class AAComposition extends AbstractModamp {
+public class AAComposition extends AbstractMD {
 
     private ReduceAlphabet ra;
 

@@ -3,38 +3,66 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.modamp.impl;
+package org.bapedis.core.spi.algo.impl;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.util.ArrayList;
+import java.util.Iterator;
 import javax.swing.JPanel;
-import org.bapedis.core.model.AlgorithmNode;
+import javax.swing.event.TableModelEvent;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
+import org.bapedis.core.model.AlgorithmCategory;
+import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
 import org.jdesktop.swingx.JXHyperlink;
-import org.openide.explorer.propertysheet.PropertySheet;
-import org.openide.nodes.Node;
+import org.jdesktop.swingx.JXTable;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author loge
  */
-public class AllDescriptorsPanel extends javax.swing.JPanel implements AlgorithmSetupUI{
+public class AllDescriptorsPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
 
     private AllDescriptors algo;
     JXHyperlink checkAll, uncheckAll, subset;
+    protected JXTable table;
 
     public AllDescriptorsPanel() {
         initComponents();
-        
-        ((PropertySheet) propSheetPanel).setDescriptionAreaVisible(false);
+
+        table = new JXTable() {
+            @Override
+            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+                Component c = super.prepareRenderer(renderer, row, column);
+                TableModel tableModel = table.getModel();
+                if ((boolean) tableModel.getValueAt(table.convertRowIndexToModel(row), 1)) {
+                    c.setForeground(Color.BLUE);
+                }
+                return c;
+            }
+
+        };
+        table.setGridColor(Color.LIGHT_GRAY);
+        table.setRowSelectionAllowed(false);
+        table.setTableHeader(null);
+
+        scrollPane.setViewportView(table);
+
         checkAll = new JXHyperlink();
         checkAll.setText(NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.checkAll.text"));
-        checkAll.setToolTipText(org.openide.util.NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.checkAll.toolTipText"));         
+        checkAll.setToolTipText(org.openide.util.NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.checkAll.toolTipText"));
         checkAll.setClickedColor(new java.awt.Color(0, 51, 255));
         checkAll.setFocusPainted(false);
         checkAll.setFocusable(false);
         checkAll.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        checkAll.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);        
+        checkAll.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         checkAll.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -45,12 +73,12 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
 
         uncheckAll = new JXHyperlink();
         uncheckAll.setText(NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.unCheckAll.text"));
-        uncheckAll.setToolTipText(org.openide.util.NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.unCheckAll.toolTipText"));       
+        uncheckAll.setToolTipText(org.openide.util.NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.unCheckAll.toolTipText"));
         uncheckAll.setClickedColor(new java.awt.Color(0, 51, 255));
         uncheckAll.setFocusPainted(false);
         uncheckAll.setFocusable(false);
         uncheckAll.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        uncheckAll.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);                
+        uncheckAll.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         uncheckAll.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -58,15 +86,15 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
             }
         });
         topPanel.add(uncheckAll);
-        
+
         subset = new JXHyperlink();
         subset.setText(NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.subset.text"));
-        subset.setToolTipText(org.openide.util.NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.subset.toolTipText"));       
+        subset.setToolTipText(org.openide.util.NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.subset.toolTipText"));
         subset.setClickedColor(new java.awt.Color(0, 51, 255));
         subset.setFocusPainted(false);
         subset.setFocusable(false);
         subset.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        subset.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);                
+        subset.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         subset.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -74,28 +102,24 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
             }
         });
         topPanel.add(subset);
-        
+
     }
 
     private void checkAll(boolean selected) {
-        if (algo != null){
-            algo.setAllMD(selected);
-            propSheetPanel.repaint();
+        if (algo != null) {
+            TableModel model = table.getModel();
+            for (int row = 0; row < model.getRowCount(); row++){
+                model.setValueAt(selected, row, 1);
+            }
         }
     }
-    
-    private void setSubset(){
-        if (algo != null){            
-            algo.setAllMD(true);
-            algo.setAaComposition(false);
-            algo.setdComposition(false);
-            algo.setRaComposition(false);
-            algo.setRaDistribution(false);
-            algo.setRaTransition(false);
-            algo.setTriComposition(false);
-            propSheetPanel.repaint();
-        }        
-    }    
+
+    private void setSubset() {
+        if (algo != null) {
+
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -108,32 +132,23 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
 
         buttonGroup = new javax.swing.ButtonGroup();
         topPanel = new javax.swing.JPanel();
-        propSheetPanel = new PropertySheet();
         featurePanel = new javax.swing.JPanel();
         selectAllRButton = new javax.swing.JRadioButton();
         removeUselessRButton = new javax.swing.JRadioButton();
         selectRankedRButton = new javax.swing.JRadioButton();
+        scrollPane = new javax.swing.JScrollPane();
 
         setLayout(new java.awt.GridBagLayout());
 
-        topPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        java.awt.FlowLayout flowLayout1 = new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 20, 2);
+        flowLayout1.setAlignOnBaseline(true);
+        topPanel.setLayout(flowLayout1);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 5, 0);
         add(topPanel, gridBagConstraints);
-
-        propSheetPanel.setMinimumSize(new java.awt.Dimension(200, 10));
-        propSheetPanel.setPreferredSize(new java.awt.Dimension(246, 10));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
-        add(propSheetPanel, gridBagConstraints);
 
         featurePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.featurePanel.border.title"))); // NOI18N
         featurePanel.setLayout(new javax.swing.BoxLayout(featurePanel, javax.swing.BoxLayout.Y_AXIS));
@@ -170,6 +185,13 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         add(featurePanel, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(scrollPane, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void selectAllRButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectAllRButtonActionPerformed
@@ -194,8 +216,8 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup;
     private javax.swing.JPanel featurePanel;
-    private javax.swing.JPanel propSheetPanel;
     private javax.swing.JRadioButton removeUselessRButton;
+    private javax.swing.JScrollPane scrollPane;
     private javax.swing.JRadioButton selectAllRButton;
     private javax.swing.JRadioButton selectRankedRButton;
     private javax.swing.JPanel topPanel;
@@ -203,13 +225,13 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
 
     @Override
     public JPanel getEditPanel(Algorithm algo) {
-        this.algo = (AllDescriptors)algo;
-        ((PropertySheet) propSheetPanel).setNodes(new Node[]{new AlgorithmNode(this.algo)});
+        this.algo = (AllDescriptors) algo;
+        table.setModel(new MyTableModel());
         setSelectedGroupIndex(this.algo.getButtonGroupIndex());
-        
+
         return this;
     }
-    
+
     private void setSelectedGroupIndex(int index) {
         switch (index) {
             case 0:
@@ -222,5 +244,68 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
                 selectRankedRButton.setSelected(true);
                 break;
         }
-    }    
+    }
+
+    class MyTableModel extends AbstractTableModel {
+
+        private final ArrayList<Object[]> data;
+
+        public MyTableModel() {
+            data = new ArrayList<>();
+            if (algo != null) {
+                ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+                for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
+                    final AlgorithmFactory f = it.next();
+                    if (!f.equals(algo.getFactory()) && f.getCategory() == AlgorithmCategory.MolecularDescriptor) {
+                        data.add(new Object[]{f.getName(), algo.isIncluded(f.getName())});
+                    }
+                }
+            }
+        }
+
+        @Override
+        public int getColumnCount() {
+            return 2;
+        }
+
+        @Override
+        public Class getColumnClass(int c) {
+            switch (c) {
+                case 0:
+                    return String.class;
+                case 1:
+                    return Boolean.class;
+            }
+            return null;
+        }
+
+        @Override
+        public int getRowCount() {
+            return data.size();
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            return data.get(rowIndex)[columnIndex];
+        }
+
+        @Override
+        public boolean isCellEditable(int row, int col) {
+            return col == 1;
+        }
+
+        @Override
+        public void setValueAt(Object value, int row, int col) {
+            if (algo != null) {
+                data.get(row)[col] = value;
+                if ((boolean)value){
+                    algo.includeAlgorithm((String)data.get(row)[0]);
+                }else{
+                    algo.excludeAlgorithm((String)data.get(row)[0]);
+                }
+                fireTableChanged(new TableModelEvent(this, row));
+            }
+        }
+
+    }
 }

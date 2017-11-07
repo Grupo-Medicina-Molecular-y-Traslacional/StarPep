@@ -3,11 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.modamp.impl;
+package org.bapedis.core.spi.algo.impl;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -27,7 +26,7 @@ import org.openide.util.Lookup;
  *
  * @author beltran, loge
  */
-public abstract class AbstractModamp implements Algorithm {
+public abstract class AbstractMD implements Algorithm {
 
     protected final ProjectManager pc;
     protected AttributesModel attrModel;
@@ -39,7 +38,7 @@ public abstract class AbstractModamp implements Algorithm {
     public static final String MD_ADDED = "md_added";
     protected final PropertyChangeSupport propertyChangeSupport;
 
-    public AbstractModamp(AlgorithmFactory factory) {
+    public AbstractMD(AlgorithmFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         this.factory = factory;
         map = new LinkedHashMap<>();
@@ -132,30 +131,6 @@ public abstract class AbstractModamp implements Algorithm {
                     attrModel.addMolecularDescriptors(entry.getKey(), entry.getValue().toArray(new PeptideAttribute[0]));
                 }
                 progressTicket.progress();
-            }
-
-            // Calculating max and min values for molecular descriptors
-            // Usefull to normalize values
-            double val, max, min;
-            for (PeptideAttribute descriptor : map.values()) {
-                if (stopRun) {
-                    break;
-                }
-                max = Double.MIN_VALUE;
-                min = Double.MAX_VALUE;
-                for (int i = 0; i < peptides.length && !stopRun; i++) {
-                    if (peptides[i].getAttributeValue(descriptor) != null) {
-                        val = PeptideAttribute.convertToDouble(peptides[i].getAttributeValue(descriptor));
-                        if (val < min) {
-                            min = val;
-                        }
-                        if (val > max) {
-                            max = val;
-                        }
-                    }
-                }
-                descriptor.setMaxValue(max);
-                descriptor.setMinValue(min);
             }
         }
     }

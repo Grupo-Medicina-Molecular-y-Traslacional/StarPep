@@ -5,6 +5,7 @@
  */
 package org.bapedis.modamp.impl;
 
+import org.bapedis.core.spi.algo.impl.AbstractMD;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ import org.openide.util.NbBundle;
  *
  * @author beltran, loge
  */
-public class HydrophobicMoment extends AbstractModamp {
+public class HydrophobicMoment extends AbstractMD {
 
     private final List<AlgorithmProperty> properties;
     private final boolean[] angle; // 100, 160, 180

@@ -46,17 +46,27 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
             for (String key : selectedKeys) {
                 if (!stopRun) {
                     if (attrModel.hasMolecularDescriptors(key)) {
+                        Peptide[] peptides = attrModel.getPeptides();
+                        double val, max, min;
                         for (PeptideAttribute attr : attrModel.getMolecularDescriptors(key)) {
-                            if (stopRun) {
-                                break;
-                            }
-                            for (Peptide pept : attrModel.getPeptides()) {
-                                if (pept.getAttributeValue(attr) == null) {
+                            max = Double.MIN_VALUE;
+                            min = Double.MAX_VALUE;
+                            for (int i = 0; i < peptides.length && !stopRun; i++) {
+                                if (peptides[i].getAttributeValue(attr) != null) {
+                                    val = PeptideAttribute.convertToDouble(peptides[i].getAttributeValue(attr));
+                                    if (val < min) {
+                                        min = val;
+                                    }
+                                    if (val > max) {
+                                        max = val;
+                                    }
+                                } else {
                                     DialogDisplayer.getDefault().notify(notFound);
                                     cancel();
-                                    break;
                                 }
                             }
+                            attr.setMaxValue(max);
+                            attr.setMinValue(min);
                         }
                     } else {
                         DialogDisplayer.getDefault().notify(notFound);

@@ -1,6 +1,6 @@
 package org.bapedis.modamp.impl;
 
-import org.bapedis.modamp.impl.AbstractModamp;
+import org.bapedis.core.spi.algo.impl.AbstractMD;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.modamp.MD;
 
@@ -13,7 +13,7 @@ import org.bapedis.modamp.MD;
  *
  * @author beltran, loge
  */
-public class MolecularWeight extends AbstractModamp {
+public class MolecularWeight extends AbstractMD {
 
     protected final String MW = "mw";
 

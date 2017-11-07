@@ -72,14 +72,7 @@ public class Peptide {
 
     public Object getAttributeValue(PeptideAttribute attr) {
         Object val = attrsValue.get(attr);
-        if (val != null) {
-            return val;
-        }
-        val = attr.getDefaultValue();
-        if (val != null) {
-            return val;
-        }
-        return null;
+        return (val != null) ? val: attr.getDefaultValue();
     }
 
     public void deleteAttribute(PeptideAttribute attr) {

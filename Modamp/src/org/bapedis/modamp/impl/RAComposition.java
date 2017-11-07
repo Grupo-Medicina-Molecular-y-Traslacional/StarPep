@@ -5,6 +5,7 @@
  */
 package org.bapedis.modamp.impl;
 
+import org.bapedis.core.spi.algo.impl.AbstractMD;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +24,7 @@ import org.openide.util.NbBundle;
  *
  * @author beltran, loge
  */
-public class RAComposition extends AbstractModamp {
+public class RAComposition extends AbstractMD {
 
     protected boolean hyR, b50, cs, hydT, vw, pol, polz, chrg, ss, sa;
     private final List<AlgorithmProperty> properties;

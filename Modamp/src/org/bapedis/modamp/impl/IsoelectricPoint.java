@@ -5,6 +5,7 @@
  */
 package org.bapedis.modamp.impl;
 
+import org.bapedis.core.spi.algo.impl.AbstractMD;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.scales.PkaValues;
@@ -13,7 +14,7 @@ import org.bapedis.modamp.scales.PkaValues;
  *
  * @author beltran, loge
  */
-public class IsoelectricPoint extends AbstractModamp {
+public class IsoelectricPoint extends AbstractMD {
 
     protected final String pI = "pI";
 

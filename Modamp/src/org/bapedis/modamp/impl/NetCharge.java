@@ -5,6 +5,7 @@
  */
 package org.bapedis.modamp.impl;
 
+import org.bapedis.core.spi.algo.impl.AbstractMD;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
@@ -20,7 +21,7 @@ import org.openide.util.NbBundle;
  *
  * @author beltran, loge
  */
-public class NetCharge extends AbstractModamp {
+public class NetCharge extends AbstractMD {
 
     protected final String Z5, Z7, Z9;
     protected boolean ph5, ph7, ph9;

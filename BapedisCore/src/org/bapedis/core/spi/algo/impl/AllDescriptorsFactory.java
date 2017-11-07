@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.modamp.impl;
+package org.bapedis.core.spi.algo.impl;
 
 import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.algo.Algorithm;
@@ -44,7 +44,6 @@ public class AllDescriptorsFactory implements AlgorithmFactory {
     @Override
     public Algorithm createAlgorithm() {
         AllDescriptors algo = new AllDescriptors(this);
-        algo.setAllMD(true);
         return algo;
     }
 

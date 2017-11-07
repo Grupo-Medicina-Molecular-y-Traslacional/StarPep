@@ -5,6 +5,7 @@
  */
 package org.bapedis.modamp.impl;
 
+import org.bapedis.core.spi.algo.impl.AbstractMD;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
@@ -19,7 +20,7 @@ import org.openide.util.NbBundle;
  *
  * @author beltran, loge
  */
-public class AverageHydrophilicity extends AbstractModamp {
+public class AverageHydrophilicity extends AbstractMD {
 
     protected final String HOPT810101_NAME = "AvgHydrophilicity(HOPT810101)";
     protected final String KUHL950101_NAME = "AvgHydrophilicity(KUHL950101)";

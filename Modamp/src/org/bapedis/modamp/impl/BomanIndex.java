@@ -5,6 +5,7 @@
  */
 package org.bapedis.modamp.impl;
 
+import org.bapedis.core.spi.algo.impl.AbstractMD;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.modamp.MD;
 
@@ -12,7 +13,7 @@ import org.bapedis.modamp.MD;
  *
  * @author beltran, loge
  */
-public class BomanIndex extends AbstractModamp {
+public class BomanIndex extends AbstractMD {
 
     protected final String BM = "Boman";
 

@@ -16,7 +16,7 @@ public class PeptideAttribute {
 
     protected String id;
     protected String displayName;
-    protected Class<?> type;    
+    protected Class<?> type;
     protected double maxValue, minValue;
     protected final boolean md;
     protected String category;
@@ -84,14 +84,17 @@ public class PeptideAttribute {
 
     public void setDefaultValue(Double defaultValue) {
         this.defaultValue = defaultValue;
-    }        
+    }
 
     public double normalize(Object value) {
         if (!md) {
             throw new UnsupportedOperationException("The attribute " + displayName + " can't be normalized because it is not a molecular descriptor.");
         }
-        double val = convertToDouble(value);
-        return (val - minValue) / (maxValue - minValue);
+        if (maxValue != minValue) {
+            double val = convertToDouble(value);
+            return (val - minValue) / (maxValue - minValue);
+        }
+        return 0.;
     }
 
     public static double convertToDouble(Object value) {

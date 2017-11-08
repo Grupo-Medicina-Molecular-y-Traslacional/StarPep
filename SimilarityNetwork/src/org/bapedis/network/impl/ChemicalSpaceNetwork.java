@@ -7,6 +7,7 @@ package org.bapedis.network.impl;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import org.bapedis.core.model.FeatureSelectionModel;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -20,61 +21,61 @@ import org.openide.util.NbBundle;
  */
 public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
 
-    protected final Set<String> selectedKeys;
+    protected final FeatureSelectionModel featureSelectionModel;
     protected final boolean normalize;
     protected final NotifyDescriptor emptyKeys, notFound;
 
     public ChemicalSpaceNetwork(AlgorithmFactory factory) {
         super(factory);
         normalize = true;
-        selectedKeys = new LinkedHashSet<>();
+        featureSelectionModel = new FeatureSelectionModel();
         emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(ChemicalSpaceNetwork.class, "ChemicalSpaceNetwork.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
         notFound = new NotifyDescriptor.Message(NbBundle.getMessage(ChemicalSpaceNetwork.class, "ChemicalSpaceNetwork.key.notFound"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
-    public Set<String> getSelectedKeys() {
-        return selectedKeys;
-    }
+    public FeatureSelectionModel getFeatureSelectionModel() {
+        return featureSelectionModel;
+    }    
 
     @Override
     public void initAlgo() {
         super.initAlgo();
-        if (selectedKeys.isEmpty()) {
-            DialogDisplayer.getDefault().notify(emptyKeys);
-            cancel();
-        } else {
-            for (String key : selectedKeys) {
-                if (!stopRun) {
-                    if (attrModel.hasMolecularDescriptors(key)) {
-                        Peptide[] peptides = attrModel.getPeptides();
-                        double val, max, min;
-                        for (PeptideAttribute attr : attrModel.getMolecularDescriptors(key)) {
-                            max = Double.MIN_VALUE;
-                            min = Double.MAX_VALUE;
-                            for (int i = 0; i < peptides.length && !stopRun; i++) {
-                                if (peptides[i].getAttributeValue(attr) != null) {
-                                    val = PeptideAttribute.convertToDouble(peptides[i].getAttributeValue(attr));
-                                    if (val < min) {
-                                        min = val;
-                                    }
-                                    if (val > max) {
-                                        max = val;
-                                    }
-                                } else {
-                                    DialogDisplayer.getDefault().notify(notFound);
-                                    cancel();
-                                }
-                            }
-                            attr.setMaxValue(max);
-                            attr.setMinValue(min);
-                        }
-                    } else {
-                        DialogDisplayer.getDefault().notify(notFound);
-                        cancel();
-                    }
-                }
-            }
-        }
+//        if (selectedKeys.isEmpty()) {
+//            DialogDisplayer.getDefault().notify(emptyKeys);
+//            cancel();
+//        } else {
+//            for (String key : selectedKeys) {
+//                if (!stopRun) {
+//                    if (attrModel.hasMolecularDescriptors(key)) {
+//                        Peptide[] peptides = attrModel.getPeptides();
+//                        double val, max, min;
+//                        for (PeptideAttribute attr : attrModel.getMolecularDescriptors(key)) {
+//                            max = Double.MIN_VALUE;
+//                            min = Double.MAX_VALUE;
+//                            for (int i = 0; i < peptides.length && !stopRun; i++) {
+//                                if (peptides[i].getAttributeValue(attr) != null) {
+//                                    val = PeptideAttribute.convertToDouble(peptides[i].getAttributeValue(attr));
+//                                    if (val < min) {
+//                                        min = val;
+//                                    }
+//                                    if (val > max) {
+//                                        max = val;
+//                                    }
+//                                } else {
+//                                    DialogDisplayer.getDefault().notify(notFound);
+//                                    cancel();
+//                                }
+//                            }
+//                            attr.setMaxValue(max);
+//                            attr.setMinValue(min);
+//                        }
+//                    } else {
+//                        DialogDisplayer.getDefault().notify(notFound);
+//                        cancel();
+//                    }
+//                }
+//            }
+//        }
     }
 
     @Override
@@ -84,7 +85,7 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
         double a2 = 0.0;
         double b2 = 0.0;
         double val1, val2;
-        for (String key : selectedKeys) {
+        for (String key : featureSelectionModel.getSelectedKeys()) {
             for (PeptideAttribute descriptor : attrModel.getMolecularDescriptors(key)) {
                 val1 = normalize ? descriptor.normalize(peptide1.getAttributeValue(descriptor)) : PeptideAttribute.convertToDouble(peptide1.getAttributeValue(descriptor));
                 val2 = normalize ? descriptor.normalize(peptide2.getAttributeValue(descriptor)) : PeptideAttribute.convertToDouble(peptide2.getAttributeValue(descriptor));

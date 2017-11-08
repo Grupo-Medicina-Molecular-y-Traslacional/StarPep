@@ -54,6 +54,10 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
         this.threshold = value;
         propertyChangeSupport.firePropertyChange(CHANGED_THRESHOLD_VALUE, oldValue, threshold);
     }
+    
+    public SimilarityMeasure getSimilarityMeasure(){
+        return this;
+    }
 
     @Override
     public JQuickHistogram getHistogram() {
@@ -74,7 +78,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
             SimilarityGraphEdgeBuilder.progressTicket = progressTicket;
             SimilarityGraphEdgeBuilder.mainGraph = graphModel.getGraph();
             SimilarityGraphEdgeBuilder.csnGraph = graphModel.getGraph(attrModel.getCsnView());
-            SimilarityGraphEdgeBuilder.similarityMeasure = this;
+            SimilarityGraphEdgeBuilder.similarityMeasure = getSimilarityMeasure();
             SimilarityGraphEdgeBuilder.edgeList = new LinkedList<>();
         }
     }

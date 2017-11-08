@@ -31,7 +31,7 @@ import org.openide.util.NbBundle;
 public class AllDescriptorsPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
 
     private AllDescriptors algo;
-    JXHyperlink checkAll, uncheckAll, subset;
+    private final JXHyperlink checkAll, uncheckAll;
     protected JXTable table;
 
     public AllDescriptorsPanel() {
@@ -86,23 +86,6 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
             }
         });
         topPanel.add(uncheckAll);
-
-        subset = new JXHyperlink();
-        subset.setText(NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.subset.text"));
-        subset.setToolTipText(org.openide.util.NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.subset.toolTipText"));
-        subset.setClickedColor(new java.awt.Color(0, 51, 255));
-        subset.setFocusPainted(false);
-        subset.setFocusable(false);
-        subset.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        subset.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        subset.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                setSubset();
-            }
-        });
-        topPanel.add(subset);
-
     }
 
     private void checkAll(boolean selected) {

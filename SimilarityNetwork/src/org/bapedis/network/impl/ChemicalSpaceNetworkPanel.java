@@ -21,6 +21,7 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
      * Creates new form ChemicalSpaceNetworkPanel
      */
     protected ChemicalSpaceNetwork csnAlgo;
+    protected final FeatureSelectionPanel featureSelecPanel;
     protected final ThresholdRangePanel thresholdPanel;
 
 
@@ -30,7 +31,8 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
         thresholdPanel = new ThresholdRangePanel();
         southPanel.add(thresholdPanel, BorderLayout.CENTER);
         
-        descriptorsPanel.add(new FeatureSelectionPanel(), BorderLayout.CENTER);
+        featureSelecPanel = new FeatureSelectionPanel();
+        descriptorsPanel.add(featureSelecPanel, BorderLayout.CENTER);
     }
 
     /**
@@ -48,9 +50,8 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
 
         setLayout(new java.awt.GridBagLayout());
 
-        descriptorsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ChemicalSpaceNetworkPanel.class, "ChemicalSpaceNetworkPanel.descriptorsPanel.border.title"))); // NOI18N
-        descriptorsPanel.setMinimumSize(new java.awt.Dimension(442, 180));
-        descriptorsPanel.setPreferredSize(new java.awt.Dimension(442, 180));
+        descriptorsPanel.setMinimumSize(new java.awt.Dimension(442, 137));
+        descriptorsPanel.setPreferredSize(new java.awt.Dimension(442, 137));
         descriptorsPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -75,8 +76,8 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
     @Override
     public JPanel getEditPanel(Algorithm algo) {
         this.csnAlgo = (ChemicalSpaceNetwork) algo;
-        thresholdPanel.setup(csnAlgo);
-        
+        featureSelecPanel.setup(csnAlgo.getFeatureSelectionModel());
+        thresholdPanel.setup(csnAlgo.getSimilarityMeasure());        
         return this;
     }
 

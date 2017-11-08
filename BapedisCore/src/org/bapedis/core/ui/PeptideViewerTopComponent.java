@@ -15,7 +15,6 @@ import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;

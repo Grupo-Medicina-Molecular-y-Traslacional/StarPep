@@ -163,10 +163,10 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         scrollPane = new javax.swing.JScrollPane();
 
+        setPreferredSize(new java.awt.Dimension(440, 380));
         setLayout(new java.awt.BorderLayout());
         add(scrollPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents

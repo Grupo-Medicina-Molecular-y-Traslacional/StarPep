@@ -39,7 +39,7 @@ public class HydrophobicMoment extends AbstractMD {
         angle = new boolean[]{true, true, true};
         angleVal = new int[]{100, 160, 180};
 
-        scale = new boolean[]{false, false, true};
+        scale = new boolean[]{true, true, true};
         scaleVal = new Map[]{HydrophobicityScale.kyte_doolittle_hydrov_hash(), HydrophobicityScale.tossi_hydrov_hash(), HydrophobicityScale.eisenberg_hydrov_hash()};
 
         attrNames = new String[][]{{"\u03BCH(angle=100,scale=KYTJ820101)", "\u03BCH(angle=160,scale=KYTJ820101)", "\u03BCH(angle=180,scale=KYTJ820101)"},

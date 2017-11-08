@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.model;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -13,8 +12,39 @@ import java.util.Set;
  * @author loge
  */
 public class FeatureSelectionModel {
- 
-    public Set<String> getSelectedKeys(){
-        return new HashSet<>();                
+    private Set<String> descriptorKeys;    
+    public static final int[] ENTROPY_THRESHOLD = new int[]{10, 20, 30};
+    public static final int[] CORRELATION_THRESHOLD = new int[]{10, 20, 30};
+
+    private int entropyThreshold, correlationThreshold;
+
+    public FeatureSelectionModel() {
+        entropyThreshold = ENTROPY_THRESHOLD[0];
+        correlationThreshold = CORRELATION_THRESHOLD[0];
     }
+    
+    public int getEntropyThreshold() {
+        return entropyThreshold;
+    }
+
+    public void setEntropyThreshold(int entropyThreshold) {
+        this.entropyThreshold = entropyThreshold;
+    }
+
+    public int getCorrelationThreshold() {
+        return correlationThreshold;
+    }
+
+    public void setCorrelationThreshold(int correlationThreshold) {
+        this.correlationThreshold = correlationThreshold;
+    }
+
+    public Set<String> getDescriptorKeys() {
+        return descriptorKeys;
+    }
+
+    public void setDescriptorKeys(Set<String> descriptorKeys) {
+        this.descriptorKeys = descriptorKeys;
+    }
+      
 }

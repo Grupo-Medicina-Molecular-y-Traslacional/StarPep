@@ -31,7 +31,7 @@ public class AverageHydrophilicity extends AbstractMD {
     public AverageHydrophilicity(AlgorithmFactory factory) {
         super(factory);
         HOPT810101 = true;
-        KUHL950101 = false;
+        KUHL950101 = true;
         properties = new LinkedList<>();
         populateProperties();
     }

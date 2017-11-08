@@ -5,13 +5,10 @@
  */
 package org.bapedis.network.impl;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
 import org.bapedis.core.model.FeatureSelectionModel;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 
@@ -85,7 +82,7 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
         double a2 = 0.0;
         double b2 = 0.0;
         double val1, val2;
-        for (String key : featureSelectionModel.getSelectedKeys()) {
+        for (String key : featureSelectionModel.getDescriptorKeys()) {
             for (PeptideAttribute descriptor : attrModel.getMolecularDescriptors(key)) {
                 val1 = normalize ? descriptor.normalize(peptide1.getAttributeValue(descriptor)) : PeptideAttribute.convertToDouble(peptide1.getAttributeValue(descriptor));
                 val2 = normalize ? descriptor.normalize(peptide2.getAttributeValue(descriptor)) : PeptideAttribute.convertToDouble(peptide2.getAttributeValue(descriptor));

@@ -50,8 +50,8 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
 
         setLayout(new java.awt.GridBagLayout());
 
-        descriptorsPanel.setMinimumSize(new java.awt.Dimension(442, 137));
-        descriptorsPanel.setPreferredSize(new java.awt.Dimension(442, 137));
+        descriptorsPanel.setMinimumSize(new java.awt.Dimension(442, 190));
+        descriptorsPanel.setPreferredSize(new java.awt.Dimension(442, 190));
         descriptorsPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

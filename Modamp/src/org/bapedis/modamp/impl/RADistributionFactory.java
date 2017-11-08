@@ -31,7 +31,7 @@ public class RADistributionFactory implements AlgorithmFactory{
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(RADistributionFactory.class, "RADistribution.desc");
+        return NbBundle.getMessage(RADistributionFactory.class, "RA​​Distribution.desc");
     }
 
     @Override

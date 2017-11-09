@@ -13,8 +13,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -117,7 +117,7 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(AbstractMD.MD_ADDED)
                 && evt.getNewValue() != null) {
-            addAttribute((PeptideAttribute) evt.getNewValue());
+            addAttribute((MolecularDescriptor) evt.getNewValue());
         }
     }
 

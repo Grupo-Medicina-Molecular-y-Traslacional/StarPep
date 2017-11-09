@@ -10,8 +10,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import javax.swing.Action;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.ui.actions.SelectNodeOnGraph;
@@ -136,16 +134,16 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
 //        sheet.put(set);
         // Descriptors
         for (PeptideAttribute attr : peptide.getAttributes()) {
-            if (attr.isMolecularDescriptor()) {
-                setMolecularFeature(attr);
+            if (attr instanceof MolecularDescriptor) {
+                setMolecularFeature((MolecularDescriptor)attr);
             }
         }
 
         return sheet;
     }
 
-    private void setMolecularFeature(PeptideAttribute attr) {
-        String category = attr.getCategory() != null ? attr.getCategory():AttributesModel.DEFAULT_CATEGORY;
+    private void setMolecularFeature(MolecularDescriptor attr) {
+        String category = attr.getCategory();
         Sheet.Set set = sheet.get(category);
         if (set == null) {
             set = Sheet.createPropertiesSet();
@@ -192,17 +190,18 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
             if (evt.getPropertyName().equals(Peptide.CHANGED_ATTRIBUTE)) {
                 if (evt.getNewValue() != null) {
                     PeptideAttribute attr = (PeptideAttribute) evt.getNewValue();
-                    if (attr.isMolecularDescriptor()) {
-                        setMolecularFeature(attr);
+                    if (attr instanceof MolecularDescriptor) {
+                        setMolecularFeature((MolecularDescriptor)attr);
                     }
                 } else if (evt.getOldValue() != null) {
                     PeptideAttribute attr = (PeptideAttribute) evt.getOldValue();
-                    if (attr.isMolecularDescriptor()) {
-                        Sheet.Set set = sheet.get(attr.getCategory());
+                    if (attr instanceof MolecularDescriptor) {
+                        String category = ((MolecularDescriptor)attr).getCategory();
+                        Sheet.Set set = sheet.get(category);
                         if (set != null) {
                             set.remove(attr.getId());
                             if (set.getProperties().length == 0) {
-                                sheet.remove(attr.getCategory());
+                                sheet.remove(category);
                             }
                         }
                     }

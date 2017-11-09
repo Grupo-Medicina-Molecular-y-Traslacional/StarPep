@@ -6,6 +6,7 @@
 package org.bapedis.network.impl;
 
 import org.bapedis.core.model.FeatureSelectionModel;
+import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -83,12 +84,12 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
         double b2 = 0.0;
         double val1, val2;
         for (String key : featureSelectionModel.getDescriptorKeys()) {
-            for (PeptideAttribute descriptor : attrModel.getMolecularDescriptors(key)) {
-                val1 = normalize ? descriptor.normalize(peptide1.getAttributeValue(descriptor)) : PeptideAttribute.convertToDouble(peptide1.getAttributeValue(descriptor));
-                val2 = normalize ? descriptor.normalize(peptide2.getAttributeValue(descriptor)) : PeptideAttribute.convertToDouble(peptide2.getAttributeValue(descriptor));
-                ab += val1 * val2;
-                a2 += val1 * val1;
-                b2 += val2 * val2;
+            for (MolecularDescriptor descriptor : attrModel.getMolecularDescriptors(key)) {
+//                val1 = normalize ? descriptor.normalize(peptide1.getAttributeValue(descriptor)) : PeptideAttribute.convertToDouble(peptide1.getAttributeValue(descriptor));
+//                val2 = normalize ? descriptor.normalize(peptide2.getAttributeValue(descriptor)) : PeptideAttribute.convertToDouble(peptide2.getAttributeValue(descriptor));
+//                ab += val1 * val2;
+//                a2 += val1 * val1;
+//                b2 += val2 * val2;
             }
         }
         return (float) ab / (float) (a2 + b2 - ab);

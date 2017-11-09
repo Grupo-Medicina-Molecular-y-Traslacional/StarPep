@@ -31,7 +31,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.PeptideAttribute;
+import org.bapedis.core.model.MolecularDescriptor;
 import org.jdesktop.swingx.JXTable;
 import org.openide.util.NbBundle;
 
@@ -109,10 +109,10 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
         String[] columnNames = {"", NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.table.columnName.first"),
             NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.table.columnName.second")};
 
-        HashMap<String, PeptideAttribute[]> map = attrModel.getMolecularDescriptors();
+        HashMap<String, MolecularDescriptor[]> map = attrModel.getAllMolecularDescriptors();
         ArrayList<Object[]> data = new ArrayList(map.size());
         Object[] dataRow;
-        for (Map.Entry<String, PeptideAttribute[]> entry : map.entrySet()) {
+        for (Map.Entry<String, MolecularDescriptor[]> entry : map.entrySet()) {
             dataRow = new Object[3];
             dataRow[0] = false;
             dataRow[1] = entry.getKey();

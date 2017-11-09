@@ -17,24 +17,12 @@ public class PeptideAttribute {
     protected String id;
     protected String displayName;
     protected Class<?> type;
-    protected double maxValue, minValue;
-    protected final boolean md;
-    protected String category;
     protected Double defaultValue;
 
     public PeptideAttribute(String id, String displayName, Class<?> type) {
-        this(id, displayName, type, true);
-
-    }
-
-    public PeptideAttribute(String id, String displayName, Class<?> type, boolean md) {
         this.id = id;
         this.displayName = displayName;
         this.type = type;
-        this.md = md;
-        maxValue = Double.MAX_VALUE;
-        minValue = Double.MIN_VALUE;
-        category = null;
         defaultValue = null;
     }
 
@@ -48,35 +36,7 @@ public class PeptideAttribute {
 
     public Class<?> getType() {
         return type;
-    }
-
-    public boolean isMolecularDescriptor() {
-        return md;
-    }
-
-    public double getMaxValue() {
-        return maxValue;
-    }
-
-    public void setMaxValue(double maxValue) {
-        this.maxValue = maxValue;
-    }
-
-    public double getMinValue() {
-        return minValue;
-    }
-
-    public void setMinValue(double minValue) {
-        this.minValue = minValue;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
+    }  
 
     public Double getDefaultValue() {
         return defaultValue;
@@ -84,27 +44,7 @@ public class PeptideAttribute {
 
     public void setDefaultValue(Double defaultValue) {
         this.defaultValue = defaultValue;
-    }
-
-    public double normalize(Object value) {
-        if (!md) {
-            throw new UnsupportedOperationException("The attribute " + displayName + " can't be normalized because it is not a molecular descriptor.");
-        }
-        if (maxValue != minValue) {
-            double val = convertToDouble(value);
-            return (val - minValue) / (maxValue - minValue);
-        }
-        return 0.;
-    }
-
-    public static double convertToDouble(Object value) {
-        if (value instanceof Double) {
-            return (double) value;
-        } else if (value instanceof Integer) {
-            return ((Integer) value).doubleValue();
-        }
-        throw new IllegalArgumentException("Unknown double value : " + value);
-    }
+    }        
 
     @Override
     public boolean equals(Object obj) {

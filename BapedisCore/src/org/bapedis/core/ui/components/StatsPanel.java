@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.jdesktop.swingx.JXBusyLabel;
@@ -41,7 +42,7 @@ public class StatsPanel extends javax.swing.JPanel {
      * @param attrModel
      * @param attribute
      */
-    public StatsPanel(final AttributesModel attrModel, final PeptideAttribute attribute) {
+    public StatsPanel(final AttributesModel attrModel, final MolecularDescriptor attribute) {
         initComponents();
         this.attrModel = attrModel;
         this.attribute = attribute;
@@ -60,18 +61,12 @@ public class StatsPanel extends javax.swing.JPanel {
             @Override
             protected ChartPanel doInBackground() throws Exception {
                 Peptide[] peptides = attrModel.getPeptides();
-                double[] data = new double[peptides.length];
-                int pos = 0;
-                Object val;
-                for (Peptide pept : peptides) {
-                    val = pept.getAttributeValue(attribute);
-                    data[pos++] = val == null ? Double.NaN: PeptideAttribute.convertToDouble(val);
-                }
-                max = Stats.max(data);
-                min = Stats.min(data);
-                mean = Stats.mean(data);
-                std = Stats.stddevp(data);
-                return Stats.createHistogramPanel(data, visualizationPanel.getWidth(), visualizationPanel.getHeight());
+                attribute.resetSummaryStats(peptides);
+                min = attribute.getMin();
+                max = attribute.getMax();
+                mean = attribute.getMean();
+                std = attribute.getStd();
+                return createHistogramPanel(peptides, attribute, min, max, visualizationPanel.getWidth(), visualizationPanel.getHeight());
             }
 
             @Override
@@ -82,7 +77,7 @@ public class StatsPanel extends javax.swing.JPanel {
                     minLabel.setText(formatter.format(min));
                     meanLabel.setText(formatter.format(mean));
                     stdLabel.setText(formatter.format(std));
-                    
+
                     visualizationPanel.remove(busyLabel);
                     visualizationPanel.add(chartPanel, BorderLayout.CENTER);
                     visualizationPanel.revalidate();
@@ -91,7 +86,7 @@ public class StatsPanel extends javax.swing.JPanel {
                     Exceptions.printStackTrace(ex);
                 } catch (ExecutionException ex) {
                     Exceptions.printStackTrace(ex);
-                } finally{
+                } finally {
                     busyLabel.setBusy(false);
                 }
             }
@@ -99,6 +94,35 @@ public class StatsPanel extends javax.swing.JPanel {
         };
         busyLabel.setBusy(true);
         sw.execute();
+    }
+
+    private ChartPanel createHistogramPanel(Peptide[] peptides, MolecularDescriptor attribute, double min, double max, int width, int height) {
+        double[] data = new double[peptides.length];
+        int pos = 0;
+        for (Peptide pept : peptides) {
+            data[pos++] = MolecularDescriptor.getDoubleValue(pept, attribute);
+        }
+        
+        HistogramDataset dataset = new HistogramDataset();
+        dataset.setType(HistogramType.FREQUENCY);
+        dataset.addSeries("Histogram", data, 50, min, max);
+
+        JFreeChart chart = ChartFactory.createHistogram(
+                "", // chart title
+                "", // domain axis label
+                "Frequency", // range axis label
+                dataset, // data
+                PlotOrientation.HORIZONTAL.VERTICAL, // orientation
+                false, // include legend
+                false, // tooltips?
+                false // URLs?
+        );
+
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setPreferredSize(new Dimension(width, height));
+        chartPanel.setMinimumSize(new Dimension(width, height));
+
+        return chartPanel;
     }
 
     /**
@@ -237,173 +261,4 @@ public class StatsPanel extends javax.swing.JPanel {
     private javax.swing.JPanel summaryPanel;
     private javax.swing.JPanel visualizationPanel;
     // End of variables declaration//GEN-END:variables
-}
-
-/**
- * The {@code StdStats} class provides static methods for computing statistics
- * such as min, max, mean, sample standard deviation, and sample variance.
- * <p>
- * For additional documentation, see
- * <a href="https://introcs.cs.princeton.edu/22library">Section 2.2</a> of
- * <i>Computer Science: An Interdisciplinary Approach</i>
- * by Robert Sedgewick and Kevin Wayne.
- *
- * @author Robert Sedgewick
- * @author Kevin Wayne
- */
-final class Stats {
-
-    /**
-     * Returns the maximum value in the specified array.
-     *
-     * @param a the array
-     * @return the maximum value in the array {@code a[]};
-     *         {@code Double.NEGATIVE_INFINITY} if no such value
-     */
-    public static double max(double[] a) {
-        double max = Double.NEGATIVE_INFINITY;
-        for (int i = 0; i < a.length; i++) {
-            if (Double.isNaN(a[i])) {
-                return Double.NaN;
-            }
-            if (a[i] > max) {
-                max = a[i];
-            }
-        }
-        return max;
-    }
-
-    /**
-     * Returns the minimum value in the specified array.
-     *
-     * @param a the array
-     * @return the minimum value in the array {@code a[]};
-     *         {@code Double.POSITIVE_INFINITY} if no such value
-     */
-    public static double min(double[] a) {
-        double min = Double.POSITIVE_INFINITY;
-        for (int i = 0; i < a.length; i++) {
-            if (Double.isNaN(a[i])) {
-                return Double.NaN;
-            }
-            if (a[i] < min) {
-                min = a[i];
-            }
-        }
-        return min;
-    }
-
-    /**
-     * Returns the average value in the specified array.
-     *
-     * @param a the array
-     * @return the average value in the array {@code a[]};
-     *         {@code Double.NaN} if no such value
-     */
-    public static double mean(double[] a) {
-        if (a.length == 0) {
-            return Double.NaN;
-        }
-        double sum = sum(a);
-        return sum / a.length;
-    }
-
-    /**
-     * Returns the sample variance in the specified array.
-     *
-     * @param a the array
-     * @return the sample variance in the array {@code a[]};
-     *         {@code Double.NaN} if no such value
-     */
-    public static double var(double[] a) {
-        if (a.length == 0) {
-            return Double.NaN;
-        }
-        double avg = mean(a);
-        double sum = 0.0;
-        for (int i = 0; i < a.length; i++) {
-            sum += (a[i] - avg) * (a[i] - avg);
-        }
-        return sum / (a.length - 1);
-    }
-
-    /**
-     * Returns the population variance in the specified array.
-     *
-     * @param a the array
-     * @return the population variance in the array {@code a[]};
-     *         {@code Double.NaN} if no such value
-     */
-    public static double varp(double[] a) {
-        if (a.length == 0) {
-            return Double.NaN;
-        }
-        double avg = mean(a);
-        double sum = 0.0;
-        for (int i = 0; i < a.length; i++) {
-            sum += (a[i] - avg) * (a[i] - avg);
-        }
-        return sum / a.length;
-    }
-
-    /**
-     * Returns the sample standard deviation in the specified array.
-     *
-     * @param a the array
-     * @return the sample standard deviation in the array {@code a[]};
-     *         {@code Double.NaN} if no such value
-     */
-    public static double stddev(double[] a) {
-        return Math.sqrt(var(a));
-    }
-
-    /**
-     * Returns the population standard deviation in the specified array.
-     *
-     * @param a the array
-     * @return the population standard deviation in the array;
-     * {@code Double.NaN} if no such value
-     */
-    public static double stddevp(double[] a) {
-        return Math.sqrt(varp(a));
-    }
-
-    /**
-     * Returns the sum of all values in the specified array.
-     *
-     * @param a the array
-     * @return the sum of all values in the array {@code a[]};
-     *         {@code 0.0} if no such value
-     */
-    private static double sum(double[] a) {
-        double sum = 0.0;
-        for (int i = 0; i < a.length; i++) {
-            sum += a[i];
-        }
-        return sum;
-    }
-
-    public static ChartPanel createHistogramPanel(double[] data, int width, int height) {
-        HistogramDataset dataset = new HistogramDataset();
-        dataset.setType(HistogramType.FREQUENCY);
-        dataset.addSeries("Histogram", data, 50);
-
-        JFreeChart chart = ChartFactory.createHistogram(
-                "", // chart title
-                "", // domain axis label
-                "Frequency", // range axis label
-                dataset, // data
-                PlotOrientation.HORIZONTAL.VERTICAL, // orientation
-                false, // include legend
-                false, // tooltips?
-                false // URLs?
-        );
-
-        ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new Dimension(width, height));
-        chartPanel.setMinimumSize(new Dimension(width, height));
-        
-        return chartPanel;
-    }
-
 }

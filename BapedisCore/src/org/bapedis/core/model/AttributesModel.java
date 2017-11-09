@@ -26,7 +26,7 @@ import org.openide.nodes.Node;
  */
 public class AttributesModel {
 
-    protected final LinkedHashMap<String, PeptideAttribute[]> mdMap;
+    protected final LinkedHashMap<String, MolecularDescriptor[]> mdMap;
     protected final Set<PeptideAttribute> displayedColumnsModel;
     private static final int MAX_AVAILABLE_COLUMNS = 6;
     protected List<PeptideNode> nodeList;
@@ -38,8 +38,7 @@ public class AttributesModel {
     public static final String DISPLAY_ATTR_REMOVED = "display_attribute_remove";
     public static final String MD_ATTR_ADDED = "md_attribute_add";
     public static final String MD_ATTR_REMOVED = "md_attribute_remove";
-    public static final String CHANGED_GVIEW = "changed_graphview";
-    public static final String DEFAULT_CATEGORY = "Default";
+    public static final String CHANGED_GVIEW = "changed_graphview";    
     protected transient final PropertyChangeSupport propertyChangeSupport;
     protected Node rootNode;
     public static final int GRAPH_DB_VIEW = 1;
@@ -60,7 +59,7 @@ public class AttributesModel {
         displayedColumnsModel.add(Peptide.SEQ);
         displayedColumnsModel.add(Peptide.LENGHT);
 
-        mdMap.put(DEFAULT_CATEGORY, new PeptideAttribute[]{Peptide.LENGHT});
+        mdMap.put(Peptide.LENGHT.getCategory(), new MolecularDescriptor[]{Peptide.LENGHT});
 
         mainGView = CSN_VIEW;
     }
@@ -126,11 +125,11 @@ public class AttributesModel {
         return false;
     }
 
-    public LinkedHashMap<String, PeptideAttribute[]> getMolecularDescriptors() {
+    public LinkedHashMap<String, MolecularDescriptor[]> getAllMolecularDescriptors() {
         return mdMap;
     }
 
-    public synchronized PeptideAttribute[] getMolecularDescriptors(String category) {
+    public synchronized MolecularDescriptor[] getMolecularDescriptors(String category) {
         return mdMap.get(category);
     }
 
@@ -138,13 +137,13 @@ public class AttributesModel {
         return mdMap.containsKey(category);
     }
 
-    public synchronized void addMolecularDescriptors(String category, PeptideAttribute[] features) {
+    public synchronized void addMolecularDescriptors(String category, MolecularDescriptor[] features) {
         if (mdMap.containsKey(category)){
-            PeptideAttribute[] oldAttrs = mdMap.get(category);
+            MolecularDescriptor[] oldAttrs = mdMap.get(category);
             boolean removed;
-            for(PeptideAttribute oldAttr: oldAttrs){
+            for(MolecularDescriptor oldAttr: oldAttrs){
                 removed= true;
-                for(PeptideAttribute newAttr: features){
+                for(MolecularDescriptor newAttr: features){
                     if (oldAttr.equals(newAttr)){
                         removed = false;
                         break;
@@ -159,8 +158,8 @@ public class AttributesModel {
         propertyChangeSupport.firePropertyChange(MD_ATTR_ADDED, null, category);
     }
 
-    public synchronized void deleteMolecularDescriptors(String category) {
-        if (!category.equals(DEFAULT_CATEGORY)) {
+    public synchronized void deleteAllMolecularDescriptors(String category) {
+        if (!category.equals(MolecularDescriptor.DEFAULT_CATEGORY)) {
             PeptideAttribute[] features = mdMap.remove(category);
             for(PeptideAttribute attr: features){
                 deleteAttribute(attr);

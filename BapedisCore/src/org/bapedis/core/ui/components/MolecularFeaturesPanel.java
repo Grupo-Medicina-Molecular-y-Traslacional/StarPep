@@ -16,6 +16,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.PeptideAttribute;
 import org.jdesktop.swingx.JXList;
 import org.openide.util.ImageUtilities;
@@ -27,12 +28,12 @@ import org.openide.util.NbBundle;
  */
 public class MolecularFeaturesPanel extends javax.swing.JPanel {
 
-    protected final JList<PeptideAttribute> leftList, rightList;
-    protected final DefaultListModel<PeptideAttribute> leftListModel, rightListModel;
+    protected final JList<MolecularDescriptor> leftList, rightList;
+    protected final DefaultListModel<MolecularDescriptor> leftListModel, rightListModel;
     protected final AttributesModel attrModel;
     protected final JButton findButton;
     protected final String ALL_SELECTION;
-    protected final HashMap<PeptideAttribute, StatsPanel> map;
+    protected final HashMap<MolecularDescriptor, StatsPanel> map;
 
     /**
      * Creates new form MolecularFeaturesPanel
@@ -55,8 +56,8 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         DefaultComboBoxModel comboModel = (DefaultComboBoxModel) descriptorComboBox.getModel();
         comboModel.addElement(ALL_SELECTION);
         comboModel.setSelectedItem(ALL_SELECTION);
-        HashMap<String, PeptideAttribute[]> mdMap = attrModel.getMolecularDescriptors();
-        for (Map.Entry<String, PeptideAttribute[]> entry : mdMap.entrySet()) {
+        HashMap<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
+        for (Map.Entry<String, MolecularDescriptor[]> entry : mdMap.entrySet()) {
             String key = entry.getKey();
             comboModel.addElement(key);
         }
@@ -71,8 +72,8 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
 
         // Fill displayed column list
         for (PeptideAttribute attr : attrModel.getDisplayedColumns()) {
-            if (attr.isMolecularDescriptor()) {
-                rightListModel.addElement(attr);
+            if (attr instanceof MolecularDescriptor) {
+                rightListModel.addElement((MolecularDescriptor)attr);
             }
         }
 
@@ -112,7 +113,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         map = new HashMap<>();
     }
 
-    private void setStats(PeptideAttribute attribute) {
+    private void setStats(MolecularDescriptor attribute) {
         rightBottomPanel.removeAll();
         if (map.containsKey(attribute)) {
             featureTextField.setText(attribute.getDisplayName());
@@ -380,14 +381,14 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         leftListModel.clear();
         String selectedKey = (String) descriptorComboBox.getSelectedItem();
         if (selectedKey.equals(ALL_SELECTION)) {
-            HashMap<String, PeptideAttribute[]> mdMap = attrModel.getMolecularDescriptors();
-            for (Map.Entry<String, PeptideAttribute[]> entry : mdMap.entrySet()) {
-                for (PeptideAttribute attr : entry.getValue()) {
+            HashMap<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
+            for (Map.Entry<String, MolecularDescriptor[]> entry : mdMap.entrySet()) {
+                for (MolecularDescriptor attr : entry.getValue()) {
                     leftListModel.addElement(attr);
                 }
             }
         } else {
-            for (PeptideAttribute attr : attrModel.getMolecularDescriptors(selectedKey)) {
+            for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(selectedKey)) {
                 leftListModel.addElement(attr);
             }
         }
@@ -396,7 +397,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
 
     private void loadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadButtonActionPerformed
         int[] indices = null;
-        DefaultListModel<PeptideAttribute> listModel = null;
+        DefaultListModel<MolecularDescriptor> listModel = null;
         if (!leftList.getSelectionModel().isSelectionEmpty()) {
             indices = leftList.getSelectedIndices();
             listModel = leftListModel;
@@ -405,7 +406,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
             listModel = rightListModel;
         }
         if (indices != null && listModel != null) {
-            PeptideAttribute attribute;
+            MolecularDescriptor attribute;
             StatsPanel panel;
             for (int i = 0; i < indices.length; i++) {
                 attribute = listModel.get(indices[i]);

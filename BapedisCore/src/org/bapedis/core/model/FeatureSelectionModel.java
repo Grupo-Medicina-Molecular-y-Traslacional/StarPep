@@ -13,15 +13,17 @@ import java.util.Set;
  */
 public class FeatureSelectionModel {
     private Set<String> descriptorKeys;    
-    public static final int[] ENTROPY_CUTOFF = new int[]{1, 5, 10};
-    public static final int[] TANIMOTO_CUTOFF = new int[]{90, 95, 98};
+    //Entropy cut off labels: Very weak, Weak and Moderate
+    public static final int[] ENTROPY_CUTOFF_REFS = new int[]{1, 5, 10};
+    //Tanimoto cut off labels: Strong and Moderate    
+    public static final int[] TANIMOTO_CUTOFF_REFS = new int[]{90, 98};
 
     private boolean removeUseless, removeRedundant;
     private int entropyCutoff, tanimotoCutoff;
 
     public FeatureSelectionModel() {
-        entropyCutoff = ENTROPY_CUTOFF[0];
-        tanimotoCutoff = TANIMOTO_CUTOFF[2];
+        entropyCutoff = ENTROPY_CUTOFF_REFS[0];
+        tanimotoCutoff = TANIMOTO_CUTOFF_REFS[1];
         removeUseless = true;
         removeRedundant = true;
     }

@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -34,7 +34,7 @@ public abstract class AbstractMD implements Algorithm {
     protected final AlgorithmFactory factory;
     protected ProgressTicket progressTicket;
     protected final String PRO_CATEGORY = "Properties";
-    private final HashMap<String, PeptideAttribute> map;
+    private final HashMap<String, MolecularDescriptor> map;
     public static final String MD_ADDED = "md_added";
     protected final PropertyChangeSupport propertyChangeSupport;
 
@@ -43,26 +43,23 @@ public abstract class AbstractMD implements Algorithm {
         this.factory = factory;
         map = new LinkedHashMap<>();
         propertyChangeSupport = new PropertyChangeSupport(this);
-    }
+    }        
 
-    protected PeptideAttribute addAttribute(String id, String displayName, Class<?> cclass) {
-        PeptideAttribute attr = new PeptideAttribute(id, displayName, cclass);
+    protected MolecularDescriptor addAttribute(String id, String displayName, Class<?> type) {
+        MolecularDescriptor attr = new MolecularDescriptor(id, displayName, type, factory.getName());
         addAttribute(attr);
         return attr;
     }
 
-    protected void addAttribute(PeptideAttribute attr) {
+    protected void addAttribute(MolecularDescriptor attr) {
         if (map.containsKey(attr.getId())) {
             throw new IllegalArgumentException("Duplicated attribute: " + attr.getId());
-        }
-        if (attr.getCategory() == null) {
-            attr.setCategory(factory.getName());
         }
         map.put(attr.getId(), attr);
         propertyChangeSupport.firePropertyChange(MD_ADDED, null, attr);
     }
 
-    public PeptideAttribute getAttribute(String id) {
+    public MolecularDescriptor getAttribute(String id) {
         return map.get(id);
     }
 
@@ -116,19 +113,19 @@ public abstract class AbstractMD implements Algorithm {
                 }
             } finally {
                 //Add molecular descriptors to attributes model
-                HashMap<String, List<PeptideAttribute>> mdMap = new LinkedHashMap<>();
+                HashMap<String, List<MolecularDescriptor>> mdMap = new LinkedHashMap<>();
                 String category;
-                List<PeptideAttribute> list;
-                for (PeptideAttribute attr : map.values()) {
+                List<MolecularDescriptor> list;
+                for (MolecularDescriptor attr : map.values()) {
                     category = attr.getCategory();
                     if (!mdMap.containsKey(category)) {
-                        mdMap.put(category, new LinkedList<PeptideAttribute>());
+                        mdMap.put(category, new LinkedList<MolecularDescriptor>());
                     }
                     list = mdMap.get(category);
                     list.add(attr);
                 }
-                for (Map.Entry<String, List<PeptideAttribute>> entry : mdMap.entrySet()) {
-                    attrModel.addMolecularDescriptors(entry.getKey(), entry.getValue().toArray(new PeptideAttribute[0]));
+                for (Map.Entry<String, List<MolecularDescriptor>> entry : mdMap.entrySet()) {
+                    attrModel.addMolecularDescriptors(entry.getKey(), entry.getValue().toArray(new MolecularDescriptor[0]));
                 }
                 progressTicket.progress();
             }

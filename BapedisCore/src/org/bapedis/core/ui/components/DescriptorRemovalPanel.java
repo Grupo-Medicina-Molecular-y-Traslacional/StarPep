@@ -16,6 +16,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.MolecularDescriptor;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
@@ -35,7 +36,7 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
         this.attrModel = attrModel;
         
         selectionPanel = new DescriptorSelectionPanel(attrModel, Color.RED);
-        selectionPanel.removeDescriptorRow(AttributesModel.DEFAULT_CATEGORY);
+        selectionPanel.removeDescriptorRow(MolecularDescriptor.DEFAULT_CATEGORY);
         
         centerPanel.add(selectionPanel, BorderLayout.CENTER);
         
@@ -128,7 +129,7 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
                 Set<String> keys = selectionPanel.getSelectedDescriptorKeys();
                 for (String key : keys) {
                     if (attrModel.hasMolecularDescriptors(key)) {
-                        attrModel.deleteMolecularDescriptors(key);
+                        attrModel.deleteAllMolecularDescriptors(key);
                     }
                 }
                 return null;

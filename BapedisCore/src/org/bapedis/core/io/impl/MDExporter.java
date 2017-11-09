@@ -11,8 +11,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.bapedis.core.io.Exporter;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideAttribute;
 
 /**
  *
@@ -31,11 +31,11 @@ public class MDExporter implements Exporter {
     public void exportTo(File file) throws Exception {
         PrintWriter pw = new PrintWriter(file);
         try {
-            LinkedHashMap<String, PeptideAttribute[]> map = attrModel.getMolecularDescriptors();
+            LinkedHashMap<String, MolecularDescriptor[]> map = attrModel.getAllMolecularDescriptors();
             //Write header            
             pw.format("\"%s\"", Peptide.ID.getDisplayName());
-            for (Map.Entry<String, PeptideAttribute[]> entry : map.entrySet()) {
-                for (PeptideAttribute attr : entry.getValue()) {
+            for (Map.Entry<String, MolecularDescriptor[]> entry : map.entrySet()) {
+                for (MolecularDescriptor attr : entry.getValue()) {
                     pw.write(separator);
                     pw.format("\"%s\"", attr.getDisplayName());
                 }
@@ -44,8 +44,8 @@ public class MDExporter implements Exporter {
             // Write data
             for (Peptide pept : attrModel.getPeptides()) {
                 pw.format("\"%s\"", pept.getId());
-                for (Map.Entry<String, PeptideAttribute[]> entry : map.entrySet()) {
-                    for (PeptideAttribute attr : entry.getValue()) {
+                for (Map.Entry<String, MolecularDescriptor[]> entry : map.entrySet()) {
+                    for (MolecularDescriptor attr : entry.getValue()) {
                         Object val = pept.getAttributeValue(attr);
                         pw.write(separator);
                         pw.format("\"%s\"", val != null ? val.toString() : "");

@@ -57,26 +57,32 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         topPanel.add(select);
 
         // Configure sliders        
-        uselessSlider.setMinimum(FeatureSelectionModel.ENTROPY_CUTOFF[0]);
-        uselessSlider.setMaximum(FeatureSelectionModel.ENTROPY_CUTOFF[2]);
-        uselessSlider.setValue(FeatureSelectionModel.ENTROPY_CUTOFF[1]);
+        uselessSlider.setMinimum(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[0]);
+        uselessSlider.setMaximum(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[2]);
+        uselessSlider.setValue(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[0]);
         uselessSlider.setMajorTickSpacing(5);
         uselessSlider.setMinorTickSpacing(1);
-
-        ChangeListener uselessListener = new ChangeListener() {
+        uselessSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
                 int val = (int) source.getValue();
                 setEntropyCutoff(val);
             }
-        };
-        uselessSlider.addChangeListener(uselessListener);
+        });
+        
+        Hashtable<Integer, JLabel> uselessLabelTable = new Hashtable<>();
+        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.veryWeak")));
+        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.weak")));
+        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.moderate")));
 
-        redundantSlider.setMinimum(FeatureSelectionModel.TANIMOTO_CUTOFF[0]);
-        redundantSlider.setMaximum(FeatureSelectionModel.TANIMOTO_CUTOFF[2]);
-        redundantSlider.setValue(FeatureSelectionModel.TANIMOTO_CUTOFF[1]);
-        redundantSlider.setMajorTickSpacing(5);
+        uselessSlider.setLabelTable(uselessLabelTable);
+        
+
+        redundantSlider.setMinimum(FeatureSelectionModel.TANIMOTO_CUTOFF_REFS[0]);
+        redundantSlider.setMaximum(FeatureSelectionModel.TANIMOTO_CUTOFF_REFS[1]);
+        redundantSlider.setValue(FeatureSelectionModel.TANIMOTO_CUTOFF_REFS[0]);
+        redundantSlider.setMajorTickSpacing(8);
         redundantSlider.setMinorTickSpacing(1);
         redundantSlider.addChangeListener(new ChangeListener() {
             @Override
@@ -87,17 +93,9 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
             }
         });
 
-        Hashtable<Integer, JLabel> uselessLabelTable = new Hashtable<>();
-        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.veryWeak")));
-        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.weak")));
-        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF[2], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.moderate")));
-
-        uselessSlider.setLabelTable(uselessLabelTable);
-
         Hashtable<Integer, JLabel> redundantLabelTable = new Hashtable<>();
-        redundantLabelTable.put(FeatureSelectionModel.TANIMOTO_CUTOFF[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.veryStrong")));
-        redundantLabelTable.put(FeatureSelectionModel.TANIMOTO_CUTOFF[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.strong")));
-        redundantLabelTable.put(FeatureSelectionModel.TANIMOTO_CUTOFF[2], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.moderate")));
+        redundantLabelTable.put(FeatureSelectionModel.TANIMOTO_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.strong")));
+        redundantLabelTable.put(FeatureSelectionModel.TANIMOTO_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.moderate")));
 
         redundantSlider.setLabelTable(redundantLabelTable);
     }
@@ -105,8 +103,14 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
     public void setup(FeatureSelectionModel model) {
         this.model = model;
         setInputText();
-        uselessSlider.setValue(model.getEntropyCutoff());
-        redundantSlider.setValue(model.getTanimotoCutoff());
+        
+        int entropyCutoff = model.getEntropyCutoff();
+        uselessSlider.setValue(entropyCutoff);
+        setEntropyCutoff(entropyCutoff);
+        
+        int tanimotoCutoff = model.getTanimotoCutoff();
+        redundantSlider.setValue(tanimotoCutoff);
+        setTanimotoCutoff(tanimotoCutoff);
 
         if (model.isRemoveUseless()) {
             if (model.isRemoveRedundant()) {

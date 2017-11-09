@@ -97,12 +97,6 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
         }
     }
 
-    private void setSubset() {
-        if (algo != null) {
-
-        }
-    }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -113,7 +107,6 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        buttonGroup = new javax.swing.ButtonGroup();
         topPanel = new javax.swing.JPanel();
         scrollPane = new javax.swing.JScrollPane();
 
@@ -139,7 +132,6 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroup;
     private javax.swing.JScrollPane scrollPane;
     private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
@@ -148,24 +140,10 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
     public JPanel getEditPanel(Algorithm algo) {
         this.algo = (AllDescriptors) algo;
         table.setModel(new MyTableModel());        
-//        setSelectedGroupIndex(this.algo.getButtonGroupIndex());
-
         return this;
     }
 
-//    private void setSelectedGroupIndex(int index) {
-//        switch (index) {
-//            case 0:
-//                selectAllRButton.setSelected(true);
-//                break;
-//            case 1:
-//                removeUselessRButton.setSelected(true);
-//                break;
-//            case 2:
-//                selectRankedRButton.setSelected(true);
-//                break;
-//        }
-//    }
+
 
     class MyTableModel extends AbstractTableModel {
 

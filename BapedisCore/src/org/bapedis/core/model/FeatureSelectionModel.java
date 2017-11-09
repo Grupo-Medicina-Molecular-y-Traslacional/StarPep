@@ -13,31 +13,50 @@ import java.util.Set;
  */
 public class FeatureSelectionModel {
     private Set<String> descriptorKeys;    
-    public static final int[] ENTROPY_THRESHOLD = new int[]{10, 20, 30};
-    public static final int[] CORRELATION_THRESHOLD = new int[]{10, 20, 30};
+    public static final int[] ENTROPY_CUTOFF = new int[]{1, 5, 10};
+    public static final int[] TANIMOTO_CUTOFF = new int[]{90, 95, 98};
 
-    private int entropyThreshold, correlationThreshold;
+    private boolean removeUseless, removeRedundant;
+    private int entropyCutoff, tanimotoCutoff;
 
     public FeatureSelectionModel() {
-        entropyThreshold = ENTROPY_THRESHOLD[0];
-        correlationThreshold = CORRELATION_THRESHOLD[0];
-    }
-    
-    public int getEntropyThreshold() {
-        return entropyThreshold;
+        entropyCutoff = ENTROPY_CUTOFF[0];
+        tanimotoCutoff = TANIMOTO_CUTOFF[2];
+        removeUseless = true;
+        removeRedundant = true;
     }
 
-    public void setEntropyThreshold(int entropyThreshold) {
-        this.entropyThreshold = entropyThreshold;
+    public boolean isRemoveUseless() {
+        return removeUseless;
     }
 
-    public int getCorrelationThreshold() {
-        return correlationThreshold;
+    public void setRemoveUseless(boolean removeUseless) {
+        this.removeUseless = removeUseless;
     }
 
-    public void setCorrelationThreshold(int correlationThreshold) {
-        this.correlationThreshold = correlationThreshold;
+    public boolean isRemoveRedundant() {
+        return removeRedundant;
     }
+
+    public void setRemoveRedundant(boolean removeRedundant) {
+        this.removeRedundant = removeRedundant;
+    }
+
+    public int getEntropyCutoff() {
+        return entropyCutoff;
+    }
+
+    public void setEntropyCutoff(int entropyCutoff) {
+        this.entropyCutoff = entropyCutoff;
+    }
+
+    public int getTanimotoCutoff() {
+        return tanimotoCutoff;
+    }
+
+    public void setTanimotoCutoff(int tanimotoCutoff) {
+        this.tanimotoCutoff = tanimotoCutoff;
+    }    
 
     public Set<String> getDescriptorKeys() {
         return descriptorKeys;

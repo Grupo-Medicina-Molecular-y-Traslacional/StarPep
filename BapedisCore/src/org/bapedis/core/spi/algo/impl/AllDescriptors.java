@@ -18,6 +18,9 @@ import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -26,26 +29,28 @@ import org.bapedis.core.spi.algo.AlgorithmFactory;
 public class AllDescriptors extends AbstractMD implements PropertyChangeListener {
 
     private final List<AbstractMD> algorithms;
-    private final Set<String> selected;
+    private final Set<String> descriptorKeys;
     private int buttonGroupIndex;
+    protected final NotifyDescriptor emptyKeys;
 
     public AllDescriptors(AlgorithmFactory factory) {
         super(factory);
         algorithms = new LinkedList<>();
         buttonGroupIndex = 0;
-        selected = new HashSet<>();
+        descriptorKeys = new HashSet<>();
+        emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(AllDescriptors.class, "AllDescriptors.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
     public void includeAlgorithm(String algoName) {
-        selected.add(algoName);
+        descriptorKeys.add(algoName);
     }
 
     public void excludeAlgorithm(String algoName) {
-        selected.remove(algoName);
+        descriptorKeys.remove(algoName);
     }
 
     public boolean isIncluded(String algoName) {
-        return selected.contains(algoName);
+        return descriptorKeys.contains(algoName);
     }
 
     public int getButtonGroupIndex() {
@@ -59,31 +64,36 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
     @Override
     protected void initMD() {
         algorithms.clear();
-        // fill hashmap
-        Workspace currentWs = pc.getCurrentWorkspace();
-        for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
-            final AlgorithmFactory f = it.next();
-            if (this.factory != f && selected.contains(f.getName())) {
-                Algorithm algorithm = f.createAlgorithm();
-                if (algorithm instanceof AbstractMD) {
-                    AbstractMD algoModamp = (AbstractMD) algorithm;
-                    // check for an existing algorithm 
-                    Collection<? extends Algorithm> savedAlgo = currentWs.getLookup().lookupAll(Algorithm.class);
-                    for (Algorithm algo : savedAlgo) {
-                        if (algo instanceof AbstractMD && algo.getFactory() == f) {
-                            algoModamp = (AbstractMD) algo;
-                            break;
+        if (descriptorKeys.isEmpty()) {
+            DialogDisplayer.getDefault().notify(emptyKeys);
+            cancel();
+        } else {
+            // fill hashmap
+            Workspace currentWs = pc.getCurrentWorkspace();
+            for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
+                final AlgorithmFactory f = it.next();
+                if (this.factory != f && descriptorKeys.contains(f.getName())) {
+                    Algorithm algorithm = f.createAlgorithm();
+                    if (algorithm instanceof AbstractMD) {
+                        AbstractMD algoModamp = (AbstractMD) algorithm;
+                        // check for an existing algorithm 
+                        Collection<? extends Algorithm> savedAlgo = currentWs.getLookup().lookupAll(Algorithm.class);
+                        for (Algorithm algo : savedAlgo) {
+                            if (algo instanceof AbstractMD && algo.getFactory() == f) {
+                                algoModamp = (AbstractMD) algo;
+                                break;
+                            }
                         }
+                        algorithms.add(algoModamp);
                     }
-                    algorithms.add(algoModamp);
                 }
             }
-        }
 
-        // Init all algoritms
-        for (AbstractMD algo : algorithms) {
-            algo.addMolecularDescriptorChangeListener(this);
-            algo.initAlgo();
+            // Init all algoritms
+            for (AbstractMD algo : algorithms) {
+                algo.addMolecularDescriptorChangeListener(this);
+                algo.initAlgo();
+            }
         }
     }
 

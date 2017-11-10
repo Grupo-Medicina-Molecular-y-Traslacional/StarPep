@@ -36,7 +36,7 @@ import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.GraphElementNavigatorLookupHint;
 import org.bapedis.core.ui.MetadataNavigatorLookupHint;
 import org.gephi.graph.api.Node;

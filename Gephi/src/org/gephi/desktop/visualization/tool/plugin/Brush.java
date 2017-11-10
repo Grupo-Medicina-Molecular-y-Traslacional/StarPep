@@ -44,7 +44,7 @@ package org.gephi.desktop.visualization.tool.plugin;
 import java.awt.Color;
 import javax.swing.Icon;
 import javax.swing.JPanel;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.desktop.visualization.tool.NodePressingEventListener;

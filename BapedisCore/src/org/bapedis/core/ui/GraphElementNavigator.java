@@ -38,7 +38,7 @@ import org.bapedis.core.model.GraphElementType;
 import org.bapedis.core.model.GraphElementsDataTable;
 import org.bapedis.core.model.GraphNodeWrapper;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.actions.CenterNodeOnGraph;
 import org.bapedis.core.ui.actions.SelectEdgeOnGraph;
 import org.bapedis.core.ui.actions.SelectNodeOnGraph;

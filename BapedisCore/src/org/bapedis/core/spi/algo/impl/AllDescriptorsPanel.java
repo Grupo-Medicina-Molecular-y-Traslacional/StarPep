@@ -10,16 +10,17 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.swing.JPanel;
-import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import org.bapedis.core.model.AlgorithmCategory;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
-import org.jdesktop.swingx.JXHyperlink;
+import org.bapedis.core.ui.components.CheckBoxHeader;
 import org.jdesktop.swingx.JXTable;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -31,13 +32,14 @@ import org.openide.util.NbBundle;
 public class AllDescriptorsPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
 
     private AllDescriptors algo;
-    private final JXHyperlink checkAll, uncheckAll;
     protected JXTable table;
+    private ProjectManager pc;
 
     public AllDescriptorsPanel() {
         initComponents();
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
 
-        table = new JXTable() {
+        table = new JXTable(new MyTableModel()) {
             @Override
             public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
                 Component c = super.prepareRenderer(renderer, row, column);
@@ -49,52 +51,27 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
             }
 
         };
+
+        // Column 0: CheckBox Header
+        TableColumn tc = table.getColumn(1);
+        tc.setHeaderRenderer(new CheckBoxHeader(table.getTableHeader(), 1));
+        tc.setPreferredWidth(30);
+
         table.setGridColor(Color.LIGHT_GRAY);
+        table.setColumnControlVisible(false);
+        table.setSortable(true);
+        table.setAutoCreateRowSorter(true);
         table.setRowSelectionAllowed(false);
-        table.setTableHeader(null);                
+
+        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel()) {
+            @Override
+            public boolean isSortable(int column) {
+                return column == 0;
+            }
+        };
+        table.setRowSorter(sorter);
 
         scrollPane.setViewportView(table);
-
-        checkAll = new JXHyperlink();
-        checkAll.setText(NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.checkAll.text"));
-        checkAll.setToolTipText(org.openide.util.NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.checkAll.toolTipText"));
-        checkAll.setClickedColor(new java.awt.Color(0, 51, 255));
-        checkAll.setFocusPainted(false);
-        checkAll.setFocusable(false);
-        checkAll.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        checkAll.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        checkAll.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                checkAll(true);
-            }
-        });
-        topPanel.add(checkAll);
-
-        uncheckAll = new JXHyperlink();
-        uncheckAll.setText(NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.unCheckAll.text"));
-        uncheckAll.setToolTipText(org.openide.util.NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.unCheckAll.toolTipText"));
-        uncheckAll.setClickedColor(new java.awt.Color(0, 51, 255));
-        uncheckAll.setFocusPainted(false);
-        uncheckAll.setFocusable(false);
-        uncheckAll.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        uncheckAll.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        uncheckAll.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                checkAll(false);
-            }
-        });
-        topPanel.add(uncheckAll);
-    }
-
-    private void checkAll(boolean selected) {
-        if (algo != null) {
-            TableModel model = table.getModel();
-            for (int row = 0; row < model.getRowCount(); row++){
-                model.setValueAt(selected, row, 1);
-            }
-        }
     }
 
     /**
@@ -107,20 +84,9 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        topPanel = new javax.swing.JPanel();
         scrollPane = new javax.swing.JScrollPane();
 
         setLayout(new java.awt.GridBagLayout());
-
-        java.awt.FlowLayout flowLayout1 = new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 20, 2);
-        flowLayout1.setAlignOnBaseline(true);
-        topPanel.setLayout(flowLayout1);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 5, 0);
-        add(topPanel, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -133,17 +99,14 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane scrollPane;
-    private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public JPanel getEditPanel(Algorithm algo) {
         this.algo = (AllDescriptors) algo;
-        table.setModel(new MyTableModel());        
+        ((MyTableModel)table.getModel()).refresh();
         return this;
     }
-
-
 
     class MyTableModel extends AbstractTableModel {
 
@@ -151,20 +114,37 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
 
         public MyTableModel() {
             data = new ArrayList<>();
+            String fName = NbBundle.getMessage(AllDescriptorsFactory.class, "AllDescriptors.name");
+            for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
+                final AlgorithmFactory f = it.next();
+                if (!f.getName().equals(fName) && f.getCategory() == AlgorithmCategory.MolecularDescriptor) {
+                    data.add(new Object[]{f.getName(), false});
+                }
+            }
+        }
+
+        public void refresh() {
             if (algo != null) {
-                ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-                for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
-                    final AlgorithmFactory f = it.next();
-                    if (!f.equals(algo.getFactory()) && f.getCategory() == AlgorithmCategory.MolecularDescriptor) {
-                        data.add(new Object[]{f.getName(), algo.isIncluded(f.getName())});
+                boolean flag;
+                for (int row = 0; row < data.size(); row++) {
+                    flag = algo.isIncluded((String) data.get(row)[0]);
+                    if (((boolean)data.get(row)[1]) != flag){
+                        data.get(row)[1] = flag;
+                        fireTableCellUpdated(row, 1);
                     }
                 }
+                
             }
         }
 
         @Override
         public int getColumnCount() {
             return 2;
+        }
+
+        @Override
+        public String getColumnName(int col) {
+            return "";
         }
 
         @Override
@@ -197,12 +177,12 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
         public void setValueAt(Object value, int row, int col) {
             if (algo != null) {
                 data.get(row)[col] = value;
-                if ((boolean)value){
-                    algo.includeAlgorithm((String)data.get(row)[0]);
-                }else{
-                    algo.excludeAlgorithm((String)data.get(row)[0]);
+                if ((boolean) value) {
+                    algo.includeAlgorithm((String) data.get(row)[0]);
+                } else {
+                    algo.excludeAlgorithm((String) data.get(row)[0]);
                 }
-                fireTableChanged(new TableModelEvent(this, row));
+                fireTableCellUpdated(row, col);
             }
         }
 

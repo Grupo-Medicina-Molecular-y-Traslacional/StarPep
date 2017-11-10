@@ -12,7 +12,7 @@ import org.bapedis.core.io.Exporter;
 import org.bapedis.core.model.AnnotationType;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.NodeIterable;

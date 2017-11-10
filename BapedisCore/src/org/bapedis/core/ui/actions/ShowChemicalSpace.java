@@ -8,7 +8,7 @@ package org.bapedis.core.ui.actions;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;

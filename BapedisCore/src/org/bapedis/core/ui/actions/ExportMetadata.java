@@ -10,7 +10,7 @@ import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.io.impl.FileExporterUI;
 import org.bapedis.core.io.impl.MDExporter;
 import org.bapedis.core.io.impl.MetadataExporter;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.components.SetupDialog;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;

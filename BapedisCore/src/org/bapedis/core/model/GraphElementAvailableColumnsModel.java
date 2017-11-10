@@ -43,7 +43,7 @@ package org.bapedis.core.model;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.Table;
 

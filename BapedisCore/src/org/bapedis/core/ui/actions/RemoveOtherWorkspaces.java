@@ -10,7 +10,7 @@ import java.util.Collection;
 import javax.swing.AbstractAction;
 import static javax.swing.Action.NAME;
 import static javax.swing.Action.SMALL_ICON;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.model.Workspace;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;

@@ -59,7 +59,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;

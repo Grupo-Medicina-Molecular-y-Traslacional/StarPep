@@ -184,7 +184,7 @@
                 <package>org.bapedis.core.io</package>
                 <package>org.bapedis.core.io.impl</package>
                 <package>org.bapedis.core.model</package>
-                <package>org.bapedis.core.services</package>
+                <package>org.bapedis.core.project</package>
                 <package>org.bapedis.core.spi</package>
                 <package>org.bapedis.core.spi.algo</package>
                 <package>org.bapedis.core.spi.algo.impl</package>

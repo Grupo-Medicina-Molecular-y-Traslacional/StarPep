@@ -7,7 +7,7 @@ package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.Collection;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.QueryModel;
 import org.openide.awt.ActionID;

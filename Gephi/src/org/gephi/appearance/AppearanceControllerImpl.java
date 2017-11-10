@@ -42,7 +42,7 @@
 package org.gephi.appearance;
 
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.gephi.appearance.api.AppearanceController;
 import org.gephi.appearance.api.Function;
 import org.gephi.appearance.spi.Transformer;

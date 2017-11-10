@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.gephi.appearance.api.AppearanceModel;
 import org.gephi.appearance.api.AttributeFunction;
 import org.gephi.appearance.api.Function;

@@ -8,9 +8,10 @@ package org.bapedis.network.impl;
 import org.bapedis.core.model.FeatureSelectionModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideAttribute;
+import org.bapedis.core.task.FeatureSelector;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.openide.NotifyDescriptor;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
@@ -19,12 +20,14 @@ import org.openide.util.NbBundle;
  */
 public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
 
+    protected final FeatureSelector featureSelection;
     protected final FeatureSelectionModel featureSelectionModel;
     protected final boolean normalize;
     protected final NotifyDescriptor emptyKeys, notFound;
 
     public ChemicalSpaceNetwork(AlgorithmFactory factory) {
         super(factory);
+        featureSelection = Lookup.getDefault().lookup(FeatureSelector.class);
         normalize = true;
         featureSelectionModel = new FeatureSelectionModel();
         emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(ChemicalSpaceNetwork.class, "ChemicalSpaceNetwork.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
@@ -38,6 +41,7 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
     @Override
     public void initAlgo() {
         super.initAlgo();
+        featureSelection.doSelection(featureSelectionModel);
 //        if (selectedKeys.isEmpty()) {
 //            DialogDisplayer.getDefault().notify(emptyKeys);
 //            cancel();
@@ -83,15 +87,15 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
         double a2 = 0.0;
         double b2 = 0.0;
         double val1, val2;
-        for (String key : featureSelectionModel.getDescriptorKeys()) {
-            for (MolecularDescriptor descriptor : attrModel.getMolecularDescriptors(key)) {
+//        for (String key : featureSelectionModel.getDescriptorKeys()) {
+//            for (MolecularDescriptor descriptor : attrModel.getMolecularDescriptors(key)) {
 //                val1 = normalize ? descriptor.normalize(peptide1.getAttributeValue(descriptor)) : PeptideAttribute.convertToDouble(peptide1.getAttributeValue(descriptor));
 //                val2 = normalize ? descriptor.normalize(peptide2.getAttributeValue(descriptor)) : PeptideAttribute.convertToDouble(peptide2.getAttributeValue(descriptor));
 //                ab += val1 * val2;
 //                a2 += val1 * val1;
 //                b2 += val2 * val2;
-            }
-        }
+//            }
+//        }
         return (float) ab / (float) (a2 + b2 - ab);
     }
 

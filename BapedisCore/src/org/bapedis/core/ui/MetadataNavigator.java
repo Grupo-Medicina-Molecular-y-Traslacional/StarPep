@@ -37,7 +37,7 @@ import org.bapedis.core.model.MetadataNavigatorModel;
 import org.bapedis.core.model.MetadataNode;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.data.MetadataDAO;
 import org.bapedis.core.ui.actions.AddToQueryModel;
 import org.bapedis.core.ui.actions.CenterNodeOnGraph;

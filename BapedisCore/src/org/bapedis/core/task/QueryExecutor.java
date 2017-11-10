@@ -14,7 +14,7 @@ import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.data.PeptideDAO;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;

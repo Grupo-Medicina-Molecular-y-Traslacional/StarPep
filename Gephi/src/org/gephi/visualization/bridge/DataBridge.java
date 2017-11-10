@@ -42,7 +42,7 @@
 package org.gephi.visualization.bridge;
 
 import java.util.Arrays;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.ColumnObserver;
 import org.gephi.graph.api.GraphView;

@@ -15,7 +15,7 @@ import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.spi.data.PeptideDAO;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.RestrictionLevel;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.db.Neo4jDB;
 import org.bapedis.db.model.MyLabel;
 import org.bapedis.db.model.MyRelationship;

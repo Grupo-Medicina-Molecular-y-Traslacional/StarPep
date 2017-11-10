@@ -13,7 +13,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FeatureSelectionModel;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.jdesktop.swingx.JXHyperlink;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;

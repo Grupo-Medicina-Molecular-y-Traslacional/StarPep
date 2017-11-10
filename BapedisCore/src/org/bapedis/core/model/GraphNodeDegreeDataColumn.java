@@ -5,7 +5,7 @@
  */
 package org.bapedis.core.model;
 
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.Element;
 import org.gephi.graph.api.Graph;

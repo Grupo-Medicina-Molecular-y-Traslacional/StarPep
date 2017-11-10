@@ -7,18 +7,22 @@ package org.bapedis.core.ui.components;
 
 import java.awt.BorderLayout;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.PeptideAttribute;
 import org.jdesktop.swingx.JXList;
+import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
@@ -73,7 +77,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         // Fill displayed column list
         for (PeptideAttribute attr : attrModel.getDisplayedColumns()) {
             if (attr instanceof MolecularDescriptor) {
-                rightListModel.addElement((MolecularDescriptor)attr);
+                rightListModel.addElement((MolecularDescriptor) attr);
             }
         }
 
@@ -83,26 +87,30 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         leftList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-                if (!lsm.isSelectionEmpty()) {
-                    rightList.clearSelection();
-                    setStats(leftListModel.get(leftList.getSelectedIndex()));
-                    loadButton.setEnabled(true);
+                if (!e.getValueIsAdjusting()) {
+                    ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+                    if (!lsm.isSelectionEmpty()) {
+                        rightList.clearSelection();
+                        setStats(leftListModel.get(leftList.getSelectedIndex()));
+                        loadButton.setEnabled(true);
+                    }
+                    addToDisplayButton.setEnabled(!lsm.isSelectionEmpty() && attrModel.canAddDisplayColumn());
                 }
-                addToDisplayButton.setEnabled(!lsm.isSelectionEmpty() && attrModel.canAddDisplayColumn());
             }
         });
 
         rightList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-                if (!lsm.isSelectionEmpty()) {
-                    leftList.clearSelection();
-                    setStats(rightListModel.get(rightList.getSelectedIndex()));
-                    loadButton.setEnabled(true);
+                if (!e.getValueIsAdjusting()) {
+                    ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+                    if (!lsm.isSelectionEmpty()) {
+                        leftList.clearSelection();
+                        setStats(rightListModel.get(rightList.getSelectedIndex()));
+                        loadButton.setEnabled(true);
+                    }
+                    removeFromDisplayButton.setEnabled(!lsm.isSelectionEmpty());
                 }
-                removeFromDisplayButton.setEnabled(!lsm.isSelectionEmpty());
             }
         });
 
@@ -378,21 +386,47 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_removeFromDisplayButtonActionPerformed
 
     private void descriptorComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_descriptorComboBoxActionPerformed
+        leftList.clearSelection();
         leftListModel.clear();
-        String selectedKey = (String) descriptorComboBox.getSelectedItem();
-        if (selectedKey.equals(ALL_SELECTION)) {
-            HashMap<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
-            for (Map.Entry<String, MolecularDescriptor[]> entry : mdMap.entrySet()) {
-                for (MolecularDescriptor attr : entry.getValue()) {
+        final String selectedKey = (String) descriptorComboBox.getSelectedItem();
+        SwingWorker<Void, MolecularDescriptor> sw = new SwingWorker<Void, MolecularDescriptor>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                if (selectedKey.equals(ALL_SELECTION)) {
+                    HashMap<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
+                    for (Map.Entry<String, MolecularDescriptor[]> entry : mdMap.entrySet()) {
+                        for (MolecularDescriptor attr : entry.getValue()) {
+                            publish(attr);
+                        }
+                    }
+                } else {
+                    for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(selectedKey)) {
+                        publish(attr);
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            protected void process(List<MolecularDescriptor> chunks) {
+                for (MolecularDescriptor attr : chunks) {
                     leftListModel.addElement(attr);
                 }
             }
-        } else {
-            for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(selectedKey)) {
-                leftListModel.addElement(attr);
+
+            @Override
+            protected void done() {
+                try {
+                    get();
+                } catch (InterruptedException | ExecutionException ex) {
+                    Exceptions.printStackTrace(ex);
+                } finally {
+                    sizeLabel.setText(NbBundle.getMessage(MolecularFeaturesPanel.class, "MolecularFeaturesPanel.sizeLabel.text", leftListModel.size()));
+                }
             }
-        }
-        sizeLabel.setText(NbBundle.getMessage(MolecularFeaturesPanel.class, "MolecularFeaturesPanel.sizeLabel.text", leftListModel.size()));
+
+        };
+        sw.execute();
     }//GEN-LAST:event_descriptorComboBoxActionPerformed
 
     private void loadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadButtonActionPerformed

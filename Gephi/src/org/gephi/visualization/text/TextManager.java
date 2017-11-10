@@ -50,7 +50,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.gephi.graph.api.AttributeUtils;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.Edge;

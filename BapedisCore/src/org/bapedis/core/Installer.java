@@ -5,9 +5,9 @@
  */
 package org.bapedis.core;
 
+import org.bapedis.core.project.ProjectManager;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import org.bapedis.core.services.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.openide.awt.Toolbar;

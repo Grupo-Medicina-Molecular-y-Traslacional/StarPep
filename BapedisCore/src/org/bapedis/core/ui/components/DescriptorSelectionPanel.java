@@ -60,7 +60,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
 
             @Override
             public void ancestorRemoved(AncestorEvent event) {
-               attrModel.removeMolecularDescriptorChangeListener(DescriptorSelectionPanel.this);
+                attrModel.removeMolecularDescriptorChangeListener(DescriptorSelectionPanel.this);
             }
 
             @Override
@@ -81,7 +81,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
 
         };
         table.setGridColor(Color.LIGHT_GRAY);
-        // Column 0
+        // Column 0: CheckBox Header
         TableColumn tc = table.getColumn(0);
         tc.setHeaderRenderer(new CheckBoxHeader(table.getTableHeader(), 0));
         tc.setPreferredWidth(30);
@@ -121,10 +121,10 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
         }
         return new MyTableModel(columnNames, data);
     }
-    
+
     public void addTableModelListener(TableModelListener listener) {
         table.getModel().addTableModelListener(listener);
-    }    
+    }
 
     public void setSelectedDescriptorKeys(Set<String> keys) {
         TableModel model = table.getModel();
@@ -191,112 +191,74 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
         }
 
     }
-}
 
-class MyTableModel extends AbstractTableModel {
+    class MyTableModel extends AbstractTableModel {
 
-    private final String[] columnNames;
-    private final ArrayList<Object[]> data;
+        private final String[] columnNames;
+        private final ArrayList<Object[]> data;
 
-    public MyTableModel(String[] columnNames, ArrayList<Object[]> data) {
-        this.columnNames = columnNames;
-        this.data = data;
-    }
-
-    @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    @Override
-    public int getRowCount() {
-        return data.size();
-    }
-
-    @Override
-    public String getColumnName(int col) {
-        return columnNames[col];
-    }
-
-    @Override
-    public Object getValueAt(int row, int col) {
-        return data.get(row)[col];
-    }
-
-    @Override
-    public Class getColumnClass(int c) {
-        switch (c) {
-            case 0:
-                return Boolean.class;
-            case 1:
-                return String.class;
-            case 2:
-                return Integer.class;
+        public MyTableModel(String[] columnNames, ArrayList<Object[]> data) {
+            this.columnNames = columnNames;
+            this.data = data;
         }
-        return null;
-    }
 
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return col == 0;
-    }
+        @Override
+        public int getColumnCount() {
+            return columnNames.length;
+        }
 
-    @Override
-    public void setValueAt(Object value, int row, int col) {
-        data.get(row)[col] = value;
-        fireTableChanged(new TableModelEvent(this, row));
-    }
+        @Override
+        public int getRowCount() {
+            return data.size();
+        }
 
-    public void addRow(boolean flag, String category, int size) {
-        Object[] dataRow = new Object[3];
-        dataRow[0] = flag;
-        dataRow[1] = category;
-        dataRow[2] = size;
-        data.add(dataRow);
-        int row = data.size() - 1;
-        fireTableRowsInserted(row, row);
-    }
+        @Override
+        public String getColumnName(int col) {
+            return columnNames[col];
+        }
 
-    public void removeRow(int row) {
-        this.data.remove(row);
-        fireTableRowsDeleted(row, row);
-    }
-}
+        @Override
+        public Object getValueAt(int row, int col) {
+            return data.get(row)[col];
+        }
 
-class CheckBoxHeader extends JCheckBox implements TableCellRenderer {
-
-    CheckBoxHeader(JTableHeader header, final int index) {
-        setOpaque(false);
-        setFont(header.getFont());
-        setHorizontalAlignment(SwingConstants.CENTER);
-        setToolTipText(NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.checkAll.text"));
-        header.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                JTable table = ((JTableHeader) e.getSource()).getTable();
-                TableColumnModel columnModel = table.getColumnModel();
-                int viewColumn = columnModel.getColumnIndexAtX(e.getX());
-                int modelColumn = table.convertColumnIndexToModel(viewColumn);
-                if (modelColumn == index) {
-                    doClick();
-                    TableModel m = table.getModel();
-                    boolean flag = isSelected();
-                    for (int i = 0; i < m.getRowCount(); i++) {
-                        m.setValueAt(flag, i, index);
-                    }
-                    ((JTableHeader) e.getSource()).repaint();
-                }
+        @Override
+        public Class getColumnClass(int c) {
+            switch (c) {
+                case 0:
+                    return Boolean.class;
+                case 1:
+                    return String.class;
+                case 2:
+                    return Integer.class;
             }
-        });
-    }
+            return null;
+        }
 
-    @Override
-    public Component getTableCellRendererComponent(JTable table, Object value,
-            boolean isSelected, boolean hasFocus, int row, int column) {
-        JTableHeader header = table.getTableHeader();
-        Color bg = header.getBackground();
-        setBackground(new Color(bg.getRed(), bg.getGreen(), bg.getBlue()));
-        return this;
+        @Override
+        public boolean isCellEditable(int row, int col) {
+            return col == 0;
+        }
+
+        @Override
+        public void setValueAt(Object value, int row, int col) {
+            data.get(row)[col] = value;
+            fireTableCellUpdated(row, col);
+        }
+
+        public void addRow(boolean flag, String category, int size) {
+            Object[] dataRow = new Object[3];
+            dataRow[0] = flag;
+            dataRow[1] = category;
+            dataRow[2] = size;
+            data.add(dataRow);
+            int row = data.size() - 1;
+            fireTableRowsInserted(row, row);
+        }
+
+        public void removeRow(int row) {
+            this.data.remove(row);
+            fireTableRowsDeleted(row, row);
+        }
     }
 }

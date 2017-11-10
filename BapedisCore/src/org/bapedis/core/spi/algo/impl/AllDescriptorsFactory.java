@@ -19,7 +19,7 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service = AlgorithmFactory.class, position = 0)
 public class AllDescriptorsFactory implements AlgorithmFactory {
 
-    private final AllDescriptorsPanel panel = new AllDescriptorsPanel();
+    private AllDescriptorsPanel panel;
     
     @Override
     public AlgorithmCategory getCategory() {
@@ -38,6 +38,9 @@ public class AllDescriptorsFactory implements AlgorithmFactory {
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
+        if (panel == null){
+             panel = new AllDescriptorsPanel();
+        }
         return panel;
     }
 

@@ -7,7 +7,7 @@ package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.Collection;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.model.FilterModel;
 import org.openide.awt.ActionID;

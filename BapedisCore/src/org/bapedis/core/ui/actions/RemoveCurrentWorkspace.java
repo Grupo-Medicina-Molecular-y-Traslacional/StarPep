@@ -2,7 +2,7 @@ package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.model.Workspace;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;

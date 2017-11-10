@@ -49,7 +49,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.gephi.io.exporter.api.ExportController;
 import org.gephi.io.exporter.api.FileType;
 import org.gephi.io.exporter.spi.ByteExporter;

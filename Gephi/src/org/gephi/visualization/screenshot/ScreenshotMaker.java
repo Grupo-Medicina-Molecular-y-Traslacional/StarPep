@@ -59,7 +59,7 @@ import java.util.Calendar;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.gephi.ui.utils.DialogFileFilter;
 import org.bapedis.core.task.AlgorithmExecutor;
 import org.bapedis.core.task.Progress;

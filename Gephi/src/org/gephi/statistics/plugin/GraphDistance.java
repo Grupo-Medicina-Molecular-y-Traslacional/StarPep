@@ -48,7 +48,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Stack;
 import org.bapedis.core.model.AlgorithmProperty;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;

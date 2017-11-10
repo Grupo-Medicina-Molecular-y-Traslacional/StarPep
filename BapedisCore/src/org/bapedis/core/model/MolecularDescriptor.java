@@ -13,7 +13,7 @@ public class MolecularDescriptor extends PeptideAttribute {
 
     public static final String DEFAULT_CATEGORY = "Default";
     protected final String category;
-    protected double max, min, mean, std;
+    protected double max, min, mean, var, std;
 
     public MolecularDescriptor(String id, String displayName, Class<?> type) {
         this(id, displayName, type, DEFAULT_CATEGORY);
@@ -41,8 +41,9 @@ public class MolecularDescriptor extends PeptideAttribute {
         min = min(data);
         max = max(data);
         mean = mean(data);
-        std = stddevp(data);
-    }
+        var = varp(data, mean);
+        std = Math.sqrt(var);
+    }        
 
     public double getMax() {
         return max;
@@ -55,6 +56,10 @@ public class MolecularDescriptor extends PeptideAttribute {
     public double getMean() {
         return mean;
     }
+
+    public double getVar() {
+        return var;
+    }        
 
     public double getStd() {
         return std;
@@ -79,61 +84,51 @@ public class MolecularDescriptor extends PeptideAttribute {
         throw new IllegalArgumentException("Unknown double value : " + value);
     }
 
-    private static double max(double[] a) {
+    private static double max(double[] data) {
         double max = Double.NEGATIVE_INFINITY;
-        for (int i = 0; i < a.length; i++) {
-            if (Double.isNaN(a[i])) {
+        for (int i = 0; i < data.length; i++) {
+            if (Double.isNaN(data[i])) {
                 return Double.NaN;
             }
-            if (a[i] > max) {
-                max = a[i];
+            if (data[i] > max) {
+                max = data[i];
             }
         }
         return max;
     }
 
-    private static double min(double[] a) {
+    private static double min(double[] data) {
         double min = Double.POSITIVE_INFINITY;
-        for (int i = 0; i < a.length; i++) {
-            if (Double.isNaN(a[i])) {
+        for (int i = 0; i < data.length; i++) {
+            if (Double.isNaN(data[i])) {
                 return Double.NaN;
             }
-            if (a[i] < min) {
-                min = a[i];
+            if (data[i] < min) {
+                min = data[i];
             }
         }
         return min;
     }
 
-    private static double mean(double[] a) {
-        if (a.length == 0) {
+    private static double mean(double[] data) {
+        if (data.length == 0) {
             return Double.NaN;
         }
-        double sum = sum(a);
-        return sum / a.length;
+        double sum = 0.0;
+        for (int i = 0; i < data.length; i++) {
+            sum += data[i];
+        }
+        return sum / data.length;
     }
 
-    private static double varp(double[] a) {
-        if (a.length == 0) {
+    private static double varp(double[] data, double avg) {
+        if (data.length == 0) {
             return Double.NaN;
         }
-        double avg = mean(a);
         double sum = 0.0;
-        for (int i = 0; i < a.length; i++) {
-            sum += (a[i] - avg) * (a[i] - avg);
+        for (int i = 0; i < data.length; i++) {
+            sum += (data[i] - avg) * (data[i] - avg);
         }
-        return sum / a.length;
-    }
-
-    private static double stddevp(double[] a) {
-        return Math.sqrt(varp(a));
-    }
-
-    private static double sum(double[] a) {
-        double sum = 0.0;
-        for (int i = 0; i < a.length; i++) {
-            sum += a[i];
-        }
-        return sum;
+        return sum / data.length;
     }
 }

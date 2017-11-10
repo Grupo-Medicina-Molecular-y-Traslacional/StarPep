@@ -5,7 +5,7 @@
  */
 package org.bapedis.core.model;
 
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.gephi.graph.api.Edge;
 import org.openide.nodes.Sheet;
 import org.openide.util.Exceptions;

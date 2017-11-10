@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.services;
+package org.bapedis.core.project;
 
 import java.awt.Color;
 import java.io.File;

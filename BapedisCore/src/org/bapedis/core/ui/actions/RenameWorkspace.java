@@ -3,7 +3,7 @@ package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.model.Workspace;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;

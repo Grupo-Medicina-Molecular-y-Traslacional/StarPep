@@ -10,7 +10,7 @@ import javax.swing.AbstractAction;
 import static javax.swing.Action.NAME;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.QueryModel;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 

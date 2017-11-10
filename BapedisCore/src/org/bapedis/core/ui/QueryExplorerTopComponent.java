@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.model.QueryModel;

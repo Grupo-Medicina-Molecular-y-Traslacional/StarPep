@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.services;
+package org.bapedis.core.task;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -13,19 +13,18 @@ import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FeatureSelectionModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.project.ProjectManager;
 import org.openide.util.Lookup;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author loge
  */
-@ServiceProvider(service = FeatureSelection.class)
-public class FeatureSelection {
+public class FeatureSelector {
 
     private final ProjectManager pc;
 
-    public FeatureSelection() {
+    public FeatureSelector() {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
     }
 
@@ -48,6 +47,8 @@ public class FeatureSelection {
         double threshold = fsModel.getEntropyCutoff() * maxScore / 100;
         double score, min = Double.MAX_VALUE;
         double max = Double.MIN_VALUE;
+        String maxName = "";
+        String minName = "";
         System.out.println("Max score: " + maxScore);
         System.out.println("cut off: " + threshold);
         for (MolecularDescriptor descriptor : allFeatures) {
@@ -59,13 +60,15 @@ public class FeatureSelection {
             }
             if (score < min) {
                 min = score;
+                minName = descriptor.getDisplayName();
             }
             if (score > max) {
                 max = score;
+                maxName = descriptor.getDisplayName();
             }
         }
-        System.out.println("max: " + max);
-        System.out.println("min: " + min);
+        System.out.println("max: " + maxName + ": " + max);
+        System.out.println("min: " + minName + ": " + min);
     }
 
     private void fillBins(MolecularDescriptor descriptor, Peptide[] peptides, Bin[] bins) {
@@ -73,7 +76,7 @@ public class FeatureSelection {
         double binWidth, lower, upper, min, max, val;
         int binIndex;
         min = descriptor.getMin();
-        max = descriptor.getMax();
+        max = descriptor.getMax();        
         binWidth = (max - min) / bins.length;
         lower = min;
 

@@ -7,7 +7,7 @@ package org.bapedis.core.ui.actions;
 
 import java.util.Collection;
 import javax.swing.AbstractAction;
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.openide.util.Lookup;

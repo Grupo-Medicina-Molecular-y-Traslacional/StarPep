@@ -41,7 +41,7 @@ Portions Copyrighted 2011 Gephi Consortium.
  */
 package org.gephi.desktop.io.export;
 
-import org.bapedis.core.services.ProjectManager;
+import org.bapedis.core.project.ProjectManager;
 import org.gephi.io.exporter.api.ExportController;
 import org.gephi.io.exporter.spi.Exporter;
 import org.bapedis.core.task.AlgorithmExecutor;

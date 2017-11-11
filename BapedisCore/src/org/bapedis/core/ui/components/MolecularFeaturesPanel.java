@@ -7,7 +7,6 @@ package org.bapedis.core.ui.components;
 
 import java.awt.BorderLayout;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import javax.swing.DefaultComboBoxModel;
@@ -33,7 +32,7 @@ import org.openide.util.NbBundle;
 public class MolecularFeaturesPanel extends javax.swing.JPanel {
 
     protected final JList<MolecularDescriptor> leftList, rightList;
-    protected final DefaultListModel<MolecularDescriptor> leftListModel, rightListModel;
+    protected final DefaultListModel<MolecularDescriptor> rightListModel;
     protected final AttributesModel attrModel;
     protected final JButton findButton;
     protected final String ALL_SELECTION;
@@ -47,8 +46,8 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
     public MolecularFeaturesPanel(final AttributesModel attrModel) {
         initComponents();
         this.attrModel = attrModel;
-        leftListModel = new DefaultListModel<>();
-        leftList = new JXList(leftListModel);
+        
+        leftList = new JXList();
         leftScrollPane.setViewportView(leftList);
 
         rightListModel = new DefaultListModel<>();
@@ -91,7 +90,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
                     ListSelectionModel lsm = (ListSelectionModel) e.getSource();
                     if (!lsm.isSelectionEmpty()) {
                         rightList.clearSelection();
-                        setStats(leftListModel.get(leftList.getSelectedIndex()));
+                        setStats(((DefaultListModel<MolecularDescriptor>)leftList.getModel()).get(leftList.getSelectedIndex()));
                         loadButton.setEnabled(true);
                     }
                     addToDisplayButton.setEnabled(!lsm.isSelectionEmpty() && attrModel.canAddDisplayColumn());
@@ -137,6 +136,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
 
     private void addToDisplayedColumns() {
         int[] indices = leftList.getSelectedIndices();
+        DefaultListModel<MolecularDescriptor> leftListModel = (DefaultListModel<MolecularDescriptor>)leftList.getModel();
         for (int i = 0; i < indices.length && attrModel.canAddDisplayColumn(); i++) {
             if (rightListModel.indexOf(leftListModel.get(indices[i])) < 0) {
                 attrModel.addDisplayedColumn(leftListModel.get(indices[i]));
@@ -386,38 +386,31 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_removeFromDisplayButtonActionPerformed
 
     private void descriptorComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_descriptorComboBoxActionPerformed
-        leftList.clearSelection();
-        leftListModel.clear();
+        final DefaultListModel<MolecularDescriptor> leftListModel = new DefaultListModel<>();
         final String selectedKey = (String) descriptorComboBox.getSelectedItem();
-        SwingWorker<Void, MolecularDescriptor> sw = new SwingWorker<Void, MolecularDescriptor>() {
+        SwingWorker<Void, Void> sw = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
                 if (selectedKey.equals(ALL_SELECTION)) {
                     HashMap<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
                     for (Map.Entry<String, MolecularDescriptor[]> entry : mdMap.entrySet()) {
                         for (MolecularDescriptor attr : entry.getValue()) {
-                            publish(attr);
+                            leftListModel.addElement(attr);
                         }
                     }
                 } else {
                     for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(selectedKey)) {
-                        publish(attr);
+                        leftListModel.addElement(attr);
                     }
                 }
                 return null;
             }
 
             @Override
-            protected void process(List<MolecularDescriptor> chunks) {
-                for (MolecularDescriptor attr : chunks) {
-                    leftListModel.addElement(attr);
-                }
-            }
-
-            @Override
             protected void done() {
                 try {
                     get();
+                    leftList.setModel(leftListModel);
                 } catch (InterruptedException | ExecutionException ex) {
                     Exceptions.printStackTrace(ex);
                 } finally {
@@ -434,7 +427,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         DefaultListModel<MolecularDescriptor> listModel = null;
         if (!leftList.getSelectionModel().isSelectionEmpty()) {
             indices = leftList.getSelectedIndices();
-            listModel = leftListModel;
+            listModel = (DefaultListModel<MolecularDescriptor>)leftList.getModel();
         } else if (!rightList.getSelectionModel().isSelectionEmpty()) {
             indices = rightList.getSelectedIndices();
             listModel = rightListModel;

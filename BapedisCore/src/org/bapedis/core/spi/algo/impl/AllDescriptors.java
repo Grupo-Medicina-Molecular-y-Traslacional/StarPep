@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
@@ -37,8 +38,14 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
         super(factory);
         algorithms = new LinkedList<>();
         buttonGroupIndex = 0;
-        descriptorKeys = new HashSet<>();
         emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(AllDescriptors.class, "AllDescriptors.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
+        descriptorKeys = new HashSet<>();
+        for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
+            final AlgorithmFactory f = it.next();
+            if (!f.equals(factory) && f.getCategory() == AlgorithmCategory.MolecularDescriptor) {
+                descriptorKeys.add(f.getName());
+            }
+        }
     }
 
     public void includeAlgorithm(String algoName) {

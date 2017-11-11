@@ -9,6 +9,7 @@ import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+import org.bapedis.core.spi.algo.ToolMenuItem;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -17,7 +18,7 @@ import org.openide.util.lookup.ServiceProvider;
  * @author beltran, loge
  */
 @ServiceProvider(service = AlgorithmFactory.class, position = 0)
-public class AllDescriptorsFactory implements AlgorithmFactory {
+public class AllDescriptorsFactory implements AlgorithmFactory, ToolMenuItem {
 
     private AllDescriptorsPanel panel;
     
@@ -58,6 +59,16 @@ public class AllDescriptorsFactory implements AlgorithmFactory {
     @Override
     public int getSpeedRank() {
         return -1;
+    }
+
+    @Override
+    public boolean addSeparatorBefore() {
+        return false;
+    }
+
+    @Override
+    public boolean addSeparatorAfter() {
+        return true;
     }
     
 }

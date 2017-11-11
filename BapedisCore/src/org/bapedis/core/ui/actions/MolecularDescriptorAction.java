@@ -29,5 +29,5 @@ public class MolecularDescriptorAction extends ToolAction{
     public MolecularDescriptorAction() {
         super(AlgorithmCategory.MolecularDescriptor);
     }
-    
+          
 }

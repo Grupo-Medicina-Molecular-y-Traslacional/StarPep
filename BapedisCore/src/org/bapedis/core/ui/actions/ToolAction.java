@@ -17,8 +17,10 @@ import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.algo.ToolMenuItem;
 import org.openide.DialogDisplayer;
 import org.openide.util.actions.Presenter;
+import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
@@ -88,7 +90,14 @@ public class ToolAction extends WorkspaceContextSensitiveAction<AttributesModel>
                         }
                     }
                 });
+                ToolMenuItem toolItem = factory instanceof ToolMenuItem ? (ToolMenuItem) factory : null;
+                if (toolItem != null && toolItem.addSeparatorBefore()){
+                    main.addSeparator();
+                }
                 main.add(item);
+                if (toolItem != null && toolItem.addSeparatorAfter()){
+                    main.addSeparator();
+                }                
             }
         }
         return main;

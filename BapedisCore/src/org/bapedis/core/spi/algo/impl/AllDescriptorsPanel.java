@@ -9,8 +9,12 @@ import java.awt.Color;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Iterator;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
@@ -44,17 +48,30 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
             public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
                 Component c = super.prepareRenderer(renderer, row, column);
                 TableModel tableModel = table.getModel();
-                if ((boolean) tableModel.getValueAt(table.convertRowIndexToModel(row), 1)) {
+                if ((boolean) tableModel.getValueAt(table.convertRowIndexToModel(row), 2)) {
                     c.setForeground(Color.BLUE);
                 }
                 return c;
             }
 
         };
+        //Column 0
+        TableColumn tc = table.getColumn(0);
+        tc.setCellRenderer(new DefaultTableCellRenderer(){
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel renderedLabel = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column); //To change body of generated methods, choose Tools | Templates.
+                renderedLabel.setHorizontalAlignment(SwingConstants.LEFT);
+                return renderedLabel;
+            }
+            
+        });
+        tc.setPreferredWidth(20);
 
-        // Column 0: CheckBox Header
-        TableColumn tc = table.getColumn(1);
-        tc.setHeaderRenderer(new CheckBoxHeader(table.getTableHeader(), 1));
+        
+        // Column 2: CheckBox Header
+        tc = table.getColumn(2);
+        tc.setHeaderRenderer(new CheckBoxHeader(table.getTableHeader(), 2));
         tc.setPreferredWidth(30);
 
         table.setGridColor(Color.LIGHT_GRAY);
@@ -66,7 +83,7 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
         TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel()) {
             @Override
             public boolean isSortable(int column) {
-                return column == 0;
+                return column < 2;
             }
         };
         table.setRowSorter(sorter);
@@ -104,7 +121,7 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
     @Override
     public JPanel getEditPanel(Algorithm algo) {
         this.algo = (AllDescriptors) algo;
-        ((MyTableModel)table.getModel()).refresh();
+        ((MyTableModel) table.getModel()).refresh();
         return this;
     }
 
@@ -115,10 +132,11 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
         public MyTableModel() {
             data = new ArrayList<>();
             String fName = NbBundle.getMessage(AllDescriptorsFactory.class, "AllDescriptors.name");
+            int no = 1;
             for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
                 final AlgorithmFactory f = it.next();
                 if (!f.getName().equals(fName) && f.getCategory() == AlgorithmCategory.MolecularDescriptor) {
-                    data.add(new Object[]{f.getName(), false});
+                    data.add(new Object[]{no++, f.getName(), false});
                 }
             }
         }
@@ -127,23 +145,28 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
             if (algo != null) {
                 boolean flag;
                 for (int row = 0; row < data.size(); row++) {
-                    flag = algo.isIncluded((String) data.get(row)[0]);
-                    if (((boolean)data.get(row)[1]) != flag){
-                        data.get(row)[1] = flag;
-                        fireTableCellUpdated(row, 1);
-                    }
+                    flag = algo.isIncluded((String) data.get(row)[1]);
+                    if (((boolean) data.get(row)[2]) != flag) {
+                        data.get(row)[2] = flag;
+                        fireTableCellUpdated(row, 2);
+                    }                    
                 }
-                
             }
         }
 
         @Override
         public int getColumnCount() {
-            return 2;
+            return 3;
         }
 
         @Override
         public String getColumnName(int col) {
+            switch (col) {
+                case 0:
+                    return NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.table.firstColumn");
+                case 1:
+                    return NbBundle.getMessage(AllDescriptorsPanel.class, "AllDescriptorsPanel.table.secondColumn");
+            }
             return "";
         }
 
@@ -151,8 +174,10 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
         public Class getColumnClass(int c) {
             switch (c) {
                 case 0:
-                    return String.class;
+                    return Integer.class;
                 case 1:
+                    return String.class;
+                case 2:
                     return Boolean.class;
             }
             return null;
@@ -170,7 +195,7 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
 
         @Override
         public boolean isCellEditable(int row, int col) {
-            return col == 1;
+            return col == 2;
         }
 
         @Override
@@ -178,9 +203,9 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
             if (algo != null) {
                 data.get(row)[col] = value;
                 if ((boolean) value) {
-                    algo.includeAlgorithm((String) data.get(row)[0]);
+                    algo.includeAlgorithm((String) data.get(row)[1]);
                 } else {
-                    algo.excludeAlgorithm((String) data.get(row)[0]);
+                    algo.excludeAlgorithm((String) data.get(row)[1]);
                 }
                 fireTableCellUpdated(row, col);
             }

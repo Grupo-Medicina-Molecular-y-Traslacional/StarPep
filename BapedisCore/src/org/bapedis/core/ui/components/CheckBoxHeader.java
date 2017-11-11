@@ -12,6 +12,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
@@ -24,13 +26,13 @@ import org.openide.util.NbBundle;
  */
 public class CheckBoxHeader extends JCheckBox implements TableCellRenderer {
 
-    public CheckBoxHeader(JTableHeader header, final int index) {
+    public CheckBoxHeader(final JTableHeader header, final int index) {
         setOpaque(false);
         setFont(header.getFont());
         setHorizontalAlignment(SwingConstants.CENTER);
         setToolTipText(NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.checkAll.text"));
-        header.addMouseListener(new MouseAdapter() {
 
+        header.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 JTable table = ((JTableHeader) e.getSource()).getTable();
@@ -45,6 +47,21 @@ public class CheckBoxHeader extends JCheckBox implements TableCellRenderer {
                         m.setValueAt(flag, i, index);
                     }
                     ((JTableHeader) e.getSource()).repaint();
+                }
+            }
+        });
+
+        header.getTable().getModel().addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                TableModel model = (TableModel) e.getSource();
+                if (model.getRowCount() > 0) {
+                    boolean flag = (boolean) model.getValueAt(0, index);
+                    for (int row = 1; row < model.getRowCount() && flag; row++) {
+                        flag = flag && (boolean) model.getValueAt(row, index);
+                    }
+                    setSelected(flag);
+                    header.repaint();
                 }
             }
         });

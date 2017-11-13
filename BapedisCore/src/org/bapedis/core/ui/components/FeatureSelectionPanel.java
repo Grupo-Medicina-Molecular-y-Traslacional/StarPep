@@ -6,17 +6,14 @@
 package org.bapedis.core.ui.components;
 
 import java.util.Hashtable;
-import java.util.Set;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FeatureSelectionModel;
 import org.bapedis.core.project.ProjectManager;
-import org.jdesktop.swingx.JXHyperlink;
-import org.openide.DialogDescriptor;
-import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -27,40 +24,19 @@ import org.openide.util.NbBundle;
 public class FeatureSelectionPanel extends javax.swing.JPanel {
 
     protected final ProjectManager pc;
-    protected Lookup.Result<AttributesModel> peptideLkpResult;
-    protected final JXHyperlink select;
-    protected final JLabel inputText;
+    protected Lookup.Result<AttributesModel> peptideLkpResult;       
     protected FeatureSelectionModel model;
 
     public FeatureSelectionPanel() {
         initComponents();
         pc = Lookup.getDefault().lookup(ProjectManager.class);
 
-        select = new JXHyperlink();
-        select.setText(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.select.text"));
-        select.setToolTipText(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.select.toolTipText"));
-        select.setClickedColor(new java.awt.Color(0, 51, 255));
-        select.setFocusPainted(false);
-        select.setFocusable(false);
-        select.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        select.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        select.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                setMolecularDescriptors();
-            }
-        });
-
-        inputText = new JLabel();
-        topPanel.add(new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.input.label")));
-        topPanel.add(inputText);
-        topPanel.add(select);
 
         // Configure sliders        
         uselessSlider.setMinimum(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[0]);
-        uselessSlider.setMaximum(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[2]);
+        uselessSlider.setMaximum(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[1]);
         uselessSlider.setValue(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[0]);
-        uselessSlider.setMajorTickSpacing(5);
+        uselessSlider.setMajorTickSpacing(10);
         uselessSlider.setMinorTickSpacing(1);
         uselessSlider.addChangeListener(new ChangeListener() {
             @Override
@@ -72,9 +48,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         });
         
         Hashtable<Integer, JLabel> uselessLabelTable = new Hashtable<>();
-        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.veryWeak")));
-        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.weak")));
-        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.moderate")));
+        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.weak")));
+        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.moderate")));
 
         uselessSlider.setLabelTable(uselessLabelTable);
         
@@ -99,10 +74,13 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
 
         redundantSlider.setLabelTable(redundantLabelTable);
     }
+    
+    static {
+        UIManager.put("Slider.paintValue", false);
+    }    
 
     public void setup(FeatureSelectionModel model) {
         this.model = model;
-        setInputText();
         
         int entropyCutoff = model.getEntropyCutoff();
         uselessSlider.setValue(entropyCutoff);
@@ -119,16 +97,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
                 option2Button.setSelected(true);
             }
         } else {
-            option1Button.setSelected(true);
-        }
-    }
-
-    private void setInputText() {
-        Set<String> descriptorKeys = model.getDescriptorKeys();
-        if (descriptorKeys == null || descriptorKeys.isEmpty()) {
-            inputText.setText(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.input.empty"));
-        } else {
-            inputText.setText(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.input.text", descriptorKeys.size()));
+//            option1Button.setSelected(true);
         }
     }
 
@@ -146,22 +115,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         redundantLabel.setText(val + "%");
     }
 
-    private void setMolecularDescriptors() {
-        AttributesModel attrModel = pc.getAttributesModel();
-        if (attrModel != null && model != null) {
-            DescriptorSelectionPanel selectionPanel = new DescriptorSelectionPanel(attrModel);
-            if (model.getDescriptorKeys() != null) {
-                selectionPanel.setSelectedDescriptorKeys(model.getDescriptorKeys());
-            }
-            DialogDescriptor dd = new DialogDescriptor(selectionPanel, NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.DescriptorSelectionPanel.title"));
-            dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION});
-            if (DialogDisplayer.getDefault().notify(dd) == DialogDescriptor.OK_OPTION) {
-                Set<String> selected = selectionPanel.getSelectedDescriptorKeys();
-                model.setDescriptorKeys(selected);
-                setInputText();
-            }
-        }
-    }
+
 
     private void refreshInternalPanels() {
         boolean entropy = option3Button.isSelected() || option2Button.isSelected();
@@ -188,52 +142,26 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        topPanel = new javax.swing.JPanel();
         featurePanel = new javax.swing.JPanel();
-        option1Button = new javax.swing.JRadioButton();
         option2Button = new javax.swing.JRadioButton();
         option3Button = new javax.swing.JRadioButton();
         entropyPanel = new javax.swing.JPanel();
         uselessSlider = new javax.swing.JSlider();
         uselessLabel = new javax.swing.JLabel();
         entropyInfoLabel = new javax.swing.JLabel();
+        extLabel1 = new javax.swing.JLabel();
         tanimotoPanel = new javax.swing.JPanel();
         redundantSlider = new javax.swing.JSlider();
         redundantLabel = new javax.swing.JLabel();
         tanimotoInfoLabel = new javax.swing.JLabel();
+        extLabel2 = new javax.swing.JLabel();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.border.title"))); // NOI18N
         setPreferredSize(new java.awt.Dimension(380, 160));
         setLayout(new java.awt.GridBagLayout());
 
-        java.awt.FlowLayout flowLayout1 = new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 5);
-        flowLayout1.setAlignOnBaseline(true);
-        topPanel.setLayout(flowLayout1);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weightx = 1.0;
-        add(topPanel, gridBagConstraints);
-
         featurePanel.setPreferredSize(new java.awt.Dimension(259, 130));
         featurePanel.setLayout(new java.awt.GridBagLayout());
-
-        buttonGroup1.add(option1Button);
-        org.openide.awt.Mnemonics.setLocalizedText(option1Button, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.option1Button.text")); // NOI18N
-        option1Button.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                option1ButtonActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        featurePanel.add(option1Button, gridBagConstraints);
 
         buttonGroup1.add(option2Button);
         org.openide.awt.Mnemonics.setLocalizedText(option2Button, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.removeUselessRButton.text")); // NOI18N
@@ -283,22 +211,22 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         uselessSlider.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.toolTipText")); // NOI18N
         uselessSlider.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         entropyPanel.add(uselessSlider, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(uselessLabel, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessLabel.text")); // NOI18N
-        uselessLabel.setMaximumSize(new java.awt.Dimension(23, 14));
-        uselessLabel.setMinimumSize(new java.awt.Dimension(23, 14));
-        uselessLabel.setPreferredSize(new java.awt.Dimension(23, 14));
+        uselessLabel.setMaximumSize(new java.awt.Dimension(31, 14));
+        uselessLabel.setMinimumSize(new java.awt.Dimension(31, 14));
+        uselessLabel.setPreferredSize(new java.awt.Dimension(31, 14));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
         entropyPanel.add(uselessLabel, gridBagConstraints);
 
@@ -307,8 +235,17 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
         entropyPanel.add(entropyInfoLabel, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(extLabel1, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.extLabel1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        entropyPanel.add(extLabel1, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -327,18 +264,17 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         redundantSlider.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.toolTipText")); // NOI18N
         redundantSlider.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         tanimotoPanel.add(redundantSlider, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(redundantLabel, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantLabel.text")); // NOI18N
-        redundantLabel.setMaximumSize(new java.awt.Dimension(23, 14));
-        redundantLabel.setMinimumSize(new java.awt.Dimension(23, 14));
-        redundantLabel.setPreferredSize(new java.awt.Dimension(23, 14));
+        redundantLabel.setMaximumSize(new java.awt.Dimension(31, 14));
+        redundantLabel.setMinimumSize(new java.awt.Dimension(31, 14));
+        redundantLabel.setPreferredSize(new java.awt.Dimension(31, 14));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -354,6 +290,14 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
         tanimotoPanel.add(tanimotoInfoLabel, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(extLabel2, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.extLabel2.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        tanimotoPanel.add(extLabel2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -388,13 +332,6 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_option2ButtonActionPerformed
 
-    private void option1ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_option1ButtonActionPerformed
-        if (model != null) {
-            model.setRemoveUseless(false);
-            model.setRemoveRedundant(false);
-        }
-    }//GEN-LAST:event_option1ButtonActionPerformed
-
     private void option3ButtonItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_option3ButtonItemStateChanged
         refreshInternalPanels();
     }//GEN-LAST:event_option3ButtonItemStateChanged
@@ -408,15 +345,15 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel entropyInfoLabel;
     private javax.swing.JPanel entropyPanel;
+    private javax.swing.JLabel extLabel1;
+    private javax.swing.JLabel extLabel2;
     private javax.swing.JPanel featurePanel;
-    private javax.swing.JRadioButton option1Button;
     private javax.swing.JRadioButton option2Button;
     private javax.swing.JRadioButton option3Button;
     private javax.swing.JLabel redundantLabel;
     private javax.swing.JSlider redundantSlider;
     private javax.swing.JLabel tanimotoInfoLabel;
     private javax.swing.JPanel tanimotoPanel;
-    private javax.swing.JPanel topPanel;
     private javax.swing.JLabel uselessLabel;
     private javax.swing.JSlider uselessSlider;
     // End of variables declaration//GEN-END:variables

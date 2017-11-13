@@ -5,13 +5,11 @@
  */
 package org.bapedis.network.impl;
 
-import org.bapedis.core.model.FeatureSelectionModel;
-import org.bapedis.core.model.MolecularDescriptor;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.task.FeatureSelector;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.openide.NotifyDescriptor;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
@@ -20,28 +18,26 @@ import org.openide.util.NbBundle;
  */
 public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
 
-    protected final FeatureSelector featureSelection;
-    protected final FeatureSelectionModel featureSelectionModel;
+    protected final Set<String> descriptorKeys;
     protected final boolean normalize;
     protected final NotifyDescriptor emptyKeys, notFound;
 
     public ChemicalSpaceNetwork(AlgorithmFactory factory) {
         super(factory);
-        featureSelection = Lookup.getDefault().lookup(FeatureSelector.class);
         normalize = true;
-        featureSelectionModel = new FeatureSelectionModel();
+        descriptorKeys = new LinkedHashSet<>();
         emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(ChemicalSpaceNetwork.class, "ChemicalSpaceNetwork.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
         notFound = new NotifyDescriptor.Message(NbBundle.getMessage(ChemicalSpaceNetwork.class, "ChemicalSpaceNetwork.key.notFound"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
-    public FeatureSelectionModel getFeatureSelectionModel() {
-        return featureSelectionModel;
-    }    
+    public Set<String> getDescriptorKeys() {
+        return descriptorKeys;
+    }        
+
 
     @Override
     public void initAlgo() {
         super.initAlgo();
-        featureSelection.doSelection(featureSelectionModel);
 //        if (selectedKeys.isEmpty()) {
 //            DialogDisplayer.getDefault().notify(emptyKeys);
 //            cancel();

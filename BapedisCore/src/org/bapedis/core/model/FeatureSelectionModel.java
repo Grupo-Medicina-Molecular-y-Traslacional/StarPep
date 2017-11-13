@@ -14,7 +14,7 @@ import java.util.Set;
 public class FeatureSelectionModel {
     private Set<String> descriptorKeys;    
     //Entropy cut off labels: Very weak, Weak and Moderate
-    public static final int[] ENTROPY_CUTOFF_REFS = new int[]{1, 5, 10};
+    public static final int[] ENTROPY_CUTOFF_REFS = new int[]{1, 10};
     //Tanimoto cut off labels: Strong and Moderate    
     public static final int[] TANIMOTO_CUTOFF_REFS = new int[]{90, 98};
 

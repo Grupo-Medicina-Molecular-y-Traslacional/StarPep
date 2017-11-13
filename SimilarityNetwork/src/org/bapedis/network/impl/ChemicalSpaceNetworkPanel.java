@@ -9,7 +9,7 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
-import org.bapedis.core.ui.components.FeatureSelectionPanel;
+import org.bapedis.core.ui.components.FeatureInputPanel;
 
 /**
  *
@@ -21,7 +21,7 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
      * Creates new form ChemicalSpaceNetworkPanel
      */
     protected ChemicalSpaceNetwork csnAlgo;
-    protected final FeatureSelectionPanel featureSelecPanel;
+    protected final FeatureInputPanel featureInputPanel;
     protected final ThresholdRangePanel thresholdPanel;
 
 
@@ -31,8 +31,8 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
         thresholdPanel = new ThresholdRangePanel();
         southPanel.add(thresholdPanel, BorderLayout.CENTER);
         
-        featureSelecPanel = new FeatureSelectionPanel();
-        descriptorsPanel.add(featureSelecPanel, BorderLayout.CENTER);
+        featureInputPanel = new FeatureInputPanel();
+        descriptorsPanel.add(featureInputPanel, BorderLayout.CENTER);
     }
 
     /**
@@ -50,8 +50,8 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
 
         setLayout(new java.awt.GridBagLayout());
 
-        descriptorsPanel.setMinimumSize(new java.awt.Dimension(442, 190));
-        descriptorsPanel.setPreferredSize(new java.awt.Dimension(442, 190));
+        descriptorsPanel.setMinimumSize(new java.awt.Dimension(442, 137));
+        descriptorsPanel.setPreferredSize(new java.awt.Dimension(442, 137));
         descriptorsPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -76,7 +76,7 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
     @Override
     public JPanel getEditPanel(Algorithm algo) {
         this.csnAlgo = (ChemicalSpaceNetwork) algo;
-        featureSelecPanel.setup(csnAlgo.getFeatureSelectionModel());
+        featureInputPanel.setup(csnAlgo.getDescriptorKeys());
         thresholdPanel.setup(csnAlgo.getSimilarityMeasure());        
         return this;
     }

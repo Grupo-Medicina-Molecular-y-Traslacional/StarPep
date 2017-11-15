@@ -10,10 +10,13 @@ import java.awt.Dimension;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.concurrent.ExecutionException;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
+import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.jdesktop.swingx.JXBusyLabel;
@@ -23,18 +26,16 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
+import org.openide.util.ImageUtilities;
 
 /**
  *
  * @author loge
  */
 public class StatsPanel extends javax.swing.JPanel {
-
-    protected final AttributesModel attrModel;
-    protected final PeptideAttribute attribute;
-    protected final JXBusyLabel busyLabel;
-    private final DecimalFormat formatter;
 
     /**
      * Creates new form StatsPanel
@@ -44,16 +45,14 @@ public class StatsPanel extends javax.swing.JPanel {
      */
     public StatsPanel(final AttributesModel attrModel, final MolecularDescriptor attribute) {
         initComponents();
-        this.attrModel = attrModel;
-        this.attribute = attribute;
 
-        busyLabel = new JXBusyLabel(new Dimension(20, 20));
+        final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         visualizationPanel.add(busyLabel, BorderLayout.CENTER);
 
         DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
         symbols.setDecimalSeparator('.');
-        formatter = new DecimalFormat("#.###", symbols);
+        final DecimalFormat formatter = new DecimalFormat("#.###", symbols);
 
         SwingWorker sw = new SwingWorker<ChartPanel, Void>() {
             private double max, min, mean, std;
@@ -78,16 +77,21 @@ public class StatsPanel extends javax.swing.JPanel {
                     meanLabel.setText(formatter.format(mean));
                     stdLabel.setText(formatter.format(std));
 
-                    visualizationPanel.remove(busyLabel);
+                    visualizationPanel.removeAll();
                     visualizationPanel.add(chartPanel, BorderLayout.CENTER);
-                    visualizationPanel.revalidate();
-                    visualizationPanel.repaint();
-                } catch (InterruptedException ex) {
-                    Exceptions.printStackTrace(ex);
-                } catch (ExecutionException ex) {
-                    Exceptions.printStackTrace(ex);
+                } catch (InterruptedException | ExecutionException ex) {
+                    if (ex.getCause() instanceof MolecularDescriptorNotFoundException) {
+                        NotifyDescriptor errorND = ((MolecularDescriptorNotFoundException) ex.getCause()).getErrorND();
+                        DialogDisplayer.getDefault().notify(errorND);
+                    } else {
+                        Exceptions.printStackTrace(ex);
+                    }
+                    visualizationPanel.removeAll();
+                    visualizationPanel.add(new JLabel("Error", new ImageIcon(ImageUtilities.loadImage("org/bapedis/core/resources/sad.png", true)), JLabel.CENTER));
                 } finally {
                     busyLabel.setBusy(false);
+                    visualizationPanel.revalidate();
+                    visualizationPanel.repaint();
                 }
             }
 
@@ -96,13 +100,13 @@ public class StatsPanel extends javax.swing.JPanel {
         sw.execute();
     }
 
-    private ChartPanel createHistogramPanel(Peptide[] peptides, MolecularDescriptor attribute, double min, double max, int width, int height) {
+    private ChartPanel createHistogramPanel(Peptide[] peptides, MolecularDescriptor attribute, double min, double max, int width, int height) throws MolecularDescriptorNotFoundException {
         double[] data = new double[peptides.length];
         int pos = 0;
         for (Peptide pept : peptides) {
             data[pos++] = MolecularDescriptor.getDoubleValue(pept, attribute);
         }
-        
+
         HistogramDataset dataset = new HistogramDataset();
         dataset.setType(HistogramType.FREQUENCY);
         dataset.addSeries("Histogram", data, 50, min, max);

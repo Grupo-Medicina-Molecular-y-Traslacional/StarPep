@@ -23,7 +23,7 @@ public class MolecularDescriptor extends PeptideAttribute {
         super(id, displayName, type);
         this.category = category;
         min = Double.NaN;
-        max = Double.NaN;        
+        max = Double.NaN;
         mean = Double.NaN;
         std = Double.NaN;
     }
@@ -32,7 +32,7 @@ public class MolecularDescriptor extends PeptideAttribute {
         return category;
     }
 
-    public void resetSummaryStats(Peptide[] peptides) {
+    public void resetSummaryStats(Peptide[] peptides) throws MolecularDescriptorNotFoundException {
         double[] data = new double[peptides.length];
         int pos = 0;
         for (Peptide pept : peptides) {
@@ -43,7 +43,7 @@ public class MolecularDescriptor extends PeptideAttribute {
         mean = mean(data);
         var = varp(data, mean);
         std = Math.sqrt(var);
-    }        
+    }
 
     public double getMax() {
         return max;
@@ -59,20 +59,34 @@ public class MolecularDescriptor extends PeptideAttribute {
 
     public double getVar() {
         return var;
-    }        
+    }
 
     public double getStd() {
         return std;
     }
-
-    public static double normalizationMinMax(Object value, double min, double max) {
-        double val = convertToDouble(value);
-        return (val - min) / (max - min);
+    
+    public double getNormalizedMinMaxValue(Peptide peptide) throws MolecularDescriptorNotFoundException{
+       if (Double.isNaN(min) || Double.isNaN(max)){
+         throw new UnsupportedOperationException("The min and max values have not been calculated for molecular feature: " + displayName);
+       }
+       double val = getDoubleValue(peptide, this);
+       return (val - min) / (max - min);
+    }
+    
+    public double getNormalizedZscoreValue(Peptide peptide) throws MolecularDescriptorNotFoundException{
+       if (Double.isNaN(mean) || Double.isNaN(std)){
+         throw new UnsupportedOperationException("The mean and std values have not been calculated for molecular feature: " + displayName);
+       } 
+       double val = getDoubleValue(peptide, this);
+       return (val - mean) / std;
     }
 
-    public static double getDoubleValue(Peptide pept, MolecularDescriptor attribute) {
+    public static double getDoubleValue(Peptide pept, MolecularDescriptor attribute) throws MolecularDescriptorNotFoundException {
         Object val = pept.getAttributeValue(attribute);
-        return val == null ? Double.NaN : convertToDouble(val);
+        if (val == null) {
+            throw new MolecularDescriptorNotFoundException(pept, attribute);
+        }
+        return convertToDouble(val);
     }
 
     private static double convertToDouble(Object value) {

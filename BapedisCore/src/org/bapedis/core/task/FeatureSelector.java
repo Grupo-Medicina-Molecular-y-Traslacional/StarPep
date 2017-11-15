@@ -12,6 +12,7 @@ import java.util.Map;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FeatureSelectionModel;
 import org.bapedis.core.model.MolecularDescriptor;
+import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.project.ProjectManager;
 import org.openide.util.Lookup;
@@ -28,7 +29,7 @@ public class FeatureSelector {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
     }
 
-    public void doSelection(FeatureSelectionModel fsModel) {
+    public void doSelection(FeatureSelectionModel fsModel) throws MolecularDescriptorNotFoundException {
         if (!fsModel.isRemoveUseless()) {
             return;
         }
@@ -71,7 +72,7 @@ public class FeatureSelector {
         System.out.println("min: " + minName + ": " + min);
     }
 
-    private void fillBins(MolecularDescriptor descriptor, Peptide[] peptides, Bin[] bins) {
+    private void fillBins(MolecularDescriptor descriptor, Peptide[] peptides, Bin[] bins) throws MolecularDescriptorNotFoundException {
         Bin bin;
         double binWidth, lower, upper, min, max, val;
         int binIndex;

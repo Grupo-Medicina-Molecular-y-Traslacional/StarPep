@@ -14,6 +14,7 @@ public class MolecularDescriptor extends PeptideAttribute {
     public static final String DEFAULT_CATEGORY = "Default";
     protected final String category;
     protected double max, min, mean, var, std;
+    protected double score;
 
     public MolecularDescriptor(String id, String displayName, Class<?> type) {
         this(id, displayName, type, DEFAULT_CATEGORY);
@@ -26,6 +27,7 @@ public class MolecularDescriptor extends PeptideAttribute {
         max = Double.NaN;
         mean = Double.NaN;
         std = Double.NaN;
+        score = Double.NaN;
     }
 
     public String getCategory() {
@@ -64,6 +66,14 @@ public class MolecularDescriptor extends PeptideAttribute {
     public double getStd() {
         return std;
     }
+
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
+    }        
     
     public double getNormalizedMinMaxValue(Peptide peptide) throws MolecularDescriptorNotFoundException{
        if (Double.isNaN(min) || Double.isNaN(max)){
@@ -98,7 +108,7 @@ public class MolecularDescriptor extends PeptideAttribute {
         throw new IllegalArgumentException("Unknown double value : " + value);
     }
 
-    private static double max(double[] data) {
+    public static double max(double[] data) {
         double max = Double.NEGATIVE_INFINITY;
         for (int i = 0; i < data.length; i++) {
             if (Double.isNaN(data[i])) {
@@ -111,7 +121,7 @@ public class MolecularDescriptor extends PeptideAttribute {
         return max;
     }
 
-    private static double min(double[] data) {
+    public static double min(double[] data) {
         double min = Double.POSITIVE_INFINITY;
         for (int i = 0; i < data.length; i++) {
             if (Double.isNaN(data[i])) {
@@ -124,7 +134,7 @@ public class MolecularDescriptor extends PeptideAttribute {
         return min;
     }
 
-    private static double mean(double[] data) {
+    public static double mean(double[] data) {
         if (data.length == 0) {
             return Double.NaN;
         }
@@ -135,13 +145,14 @@ public class MolecularDescriptor extends PeptideAttribute {
         return sum / data.length;
     }
 
-    private static double varp(double[] data, double avg) {
+    public static double varp(double[] data, double avg) {
         if (data.length == 0) {
             return Double.NaN;
         }
-        double sum = 0.0;
+        double sum = 0.0, diff;
         for (int i = 0; i < data.length; i++) {
-            sum += (data[i] - avg) * (data[i] - avg);
+            diff = (data[i] - avg);
+            sum += diff * diff;
         }
         return sum / data.length;
     }

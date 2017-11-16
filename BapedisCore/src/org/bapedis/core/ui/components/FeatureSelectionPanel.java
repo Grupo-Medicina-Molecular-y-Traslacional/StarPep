@@ -6,8 +6,12 @@
 package org.bapedis.core.ui.components;
 
 import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -379,112 +383,192 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         if (workspace.isBusy()) {
             DialogDisplayer.getDefault().notify(workspace.getBusyNotifyDescriptor());
         } else {
-            SwingWorker sw = new SwingWorker<Void, Void>() {
-                private boolean stopRun = false;
-                ProgressTicket ticket = new ProgressTicket(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.removing.task"), new Cancellable() {
-                    @Override
-                    public boolean cancel() {
-                        stopRun = true;
-                        return true;
-                    }
-                });
-
-                @Override
-                protected Void doInBackground() throws Exception {
-                    if (!model.isRemoveUseless()) {
-                        return null;
-                    }
-                    ticket.start();
-                    List<MolecularDescriptor> allFeatures = new LinkedList<>();
-                    HashMap<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
-                    for (Map.Entry<String, MolecularDescriptor[]> entry : mdMap.entrySet()) {
-                        for (MolecularDescriptor attr : entry.getValue()) {
-                            allFeatures.add(attr);
-                        }
-                    }
-                    Peptide[] peptides = attrModel.getPeptides();
-                    ticket.switchToDeterminate(allFeatures.size());
-
-                    Bin[] bins = new Bin[peptides.length];
-                    double maxScore = Math.log(peptides.length);
-                    double threshold = model.getEntropyCutoff() * maxScore / 100;
-                    double score, min = Double.MAX_VALUE;
-                    double max = Double.MIN_VALUE;
-                    String maxName = "";
-                    String minName = "";
-                    System.out.println("Max score: " + maxScore);
-                    System.out.println("cut off: " + threshold);
-                    for (MolecularDescriptor descriptor : allFeatures) {
-                        if (!stopRun) {
-                            descriptor.resetSummaryStats(peptides);
-                            fillBins(descriptor, peptides, bins);
-                            score = calculateEntropy(bins);
-                            if (score < threshold) {
-                                System.out.println("Removed: " + descriptor.getDisplayName() + " - score: " + score);
-                            }
-                            if (score < min) {
-                                min = score;
-                                minName = descriptor.getDisplayName();
-                            }
-                            if (score > max) {
-                                max = score;
-                                maxName = descriptor.getDisplayName();
-                            }
-                            ticket.progress();
-                        }
-                    }
-                    System.out.println("max: " + maxName + ": " + max);
-                    System.out.println("min: " + minName + ": " + min);
-
-                    // Tanimoto
-                    System.out.println("---------------Tanimoto--------------");
-                    min = Double.MAX_VALUE;
-                    max = Double.MIN_VALUE;
-                    for (MolecularDescriptor descriptor1 : allFeatures) {
-                        for (MolecularDescriptor descriptor2 : allFeatures) {
-                            if (descriptor1 != descriptor2) {
-                                score = calculateTanimoto(descriptor1, descriptor2, peptides);
-                                if (score < min) {
-                                    min = score;
-                                }
-                                if (score > max) {
-                                    max = score;
-                                }
-                            }
-                        }
-                    }
-                    System.out.println("max: " + max);
-                    System.out.println("min: " + min);
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        get();
-                    } catch (InterruptedException | ExecutionException ex) {
-                        if (ex.getCause() instanceof MolecularDescriptorNotFoundException) {
-                            NotifyDescriptor errorND = ((MolecularDescriptorNotFoundException) ex.getCause()).getErrorND();
-                            DialogDisplayer.getDefault().notify(errorND);
-                        } else {
-                            Exceptions.printStackTrace(ex);
-                        }
-                    } finally {
-                        busyLabel.setBusy(false);
-                        busyLabel.setVisible(false);
-                        removeButton.setEnabled(true);
-                        workspace.setBusy(false);
-                        ticket.finish();
-                    }
-                }
-            };
-            busyLabel.setBusy(true);
-            busyLabel.setVisible(true);
-            removeButton.setEnabled(false);
-            workspace.setBusy(true);
-            sw.execute();
+            FeatureSelector selector = new FeatureSelector(attrModel, workspace, busyLabel);
+            selector.execute();
         }
     }//GEN-LAST:event_removeButtonActionPerformed
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JPanel centerPanel;
+    private javax.swing.JLabel entropyInfoLabel;
+    private javax.swing.JPanel entropyPanel;
+    private javax.swing.JLabel extLabel1;
+    private javax.swing.JLabel extLabel2;
+    private javax.swing.JRadioButton option1Button;
+    private javax.swing.JRadioButton option2Button;
+    private javax.swing.JLabel redundantLabel;
+    private javax.swing.JSlider redundantSlider;
+    private javax.swing.JButton removeButton;
+    private javax.swing.JPanel rightPanel;
+    private javax.swing.JLabel tanimotoInfoLabel;
+    private javax.swing.JPanel tanimotoPanel;
+    private javax.swing.JLabel uselessLabel;
+    private javax.swing.JSlider uselessSlider;
+    // End of variables declaration//GEN-END:variables
+
+}
+
+class FeatureSelector extends SwingWorker<Void, String> {
+
+    private boolean stopRun;
+    private final ProgressTicket ticket;
+    private final JXBusyLabel busyLabel;
+    private final Workspace workspace;
+    private final AttributesModel attrModel;
+    private final FeatureSelectionModel model;
+
+    public FeatureSelector(AttributesModel attrModel, Workspace workspace, JXBusyLabel busyLabel) {
+        this.attrModel = attrModel;
+        this.workspace = workspace;
+        this.busyLabel = busyLabel;
+        model = workspace.getLookup().lookup(FeatureSelectionModel.class);
+        stopRun = false;
+        ticket = new ProgressTicket(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.removing.task"), new Cancellable() {
+            @Override
+            public boolean cancel() {
+                stopRun = true;
+                return true;
+            }
+        });
+    }
+
+    @Override
+    protected Void doInBackground() throws Exception {
+        if (!model.isRemoveUseless()) {
+            return null;
+        }
+        ticket.start();
+        publish("start");
+        List<MolecularDescriptor> allFeatures = new LinkedList<>();
+        HashMap<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
+        for (Map.Entry<String, MolecularDescriptor[]> entry : mdMap.entrySet()) {
+            for (MolecularDescriptor attr : entry.getValue()) {
+                allFeatures.add(attr);
+            }
+        }
+        Peptide[] peptides = attrModel.getPeptides();
+        ticket.switchToDeterminate(allFeatures.size());
+
+        Bin[] bins = new Bin[peptides.length];
+        double maxScore = Math.log(peptides.length);
+        double threshold = model.getEntropyCutoff() * maxScore / 100;
+        double score, min = Double.MAX_VALUE;
+        double max = Double.MIN_VALUE;
+        String maxName = "";
+        String minName = "";
+        System.out.println("Max score: " + maxScore);
+        System.out.println("cut off: " + threshold);
+        LinkedList<MolecularDescriptor> toRemove = new LinkedList<>();
+        for (MolecularDescriptor descriptor : allFeatures) {
+            if (!stopRun) {
+                descriptor.resetSummaryStats(peptides);
+                fillBins(descriptor, peptides, bins);
+                score = calculateEntropy(bins);
+                descriptor.setScore(score);
+                if (score < threshold) {
+                    toRemove.add(descriptor);
+                    System.out.println("Removed: " + descriptor.getDisplayName() + " - score: " + score);
+                }
+                if (score < min) {
+                    min = score;
+                    minName = descriptor.getDisplayName();
+                }
+                if (score > max) {
+                    max = score;
+                    maxName = descriptor.getDisplayName();
+                }
+                ticket.progress();
+            }
+        }
+        allFeatures.removeAll(toRemove);
+        System.out.println("max: " + maxName + ": " + max);
+        System.out.println("min: " + minName + ": " + min);
+
+        // Correlation
+        System.out.println("---------------Spearman Correlation--------------");
+        min = Double.MAX_VALUE;
+        max = Double.MIN_VALUE;
+//                    ticket.start();
+        MolecularDescriptor[] rankedFeatures = allFeatures.toArray(new MolecularDescriptor[0]);
+        Arrays.sort(rankedFeatures, new Comparator<MolecularDescriptor>() {
+            @Override
+            public int compare(MolecularDescriptor o1, MolecularDescriptor o2) {
+                if (o1.getScore() < o2.getScore()) {
+                    return -1;
+                }
+                if (o1.getScore() > o2.getScore()) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
+        ticket.progress("Spearman Correlation");
+        ticket.switchToDeterminate(rankedFeatures.length * rankedFeatures.length);
+        toRemove.clear();
+        double[] column1 = new double[peptides.length];
+        double[] column2 = new double[peptides.length];
+        double[] rank1, rank2;
+        for (int i = 0; i < rankedFeatures.length - 1; i++) {
+            if (rankedFeatures[i] != null) {
+                for (int k = 0; k < column1.length; k++) {
+                    column1[k] = MolecularDescriptor.getDoubleValue(peptides[k], rankedFeatures[i]);
+                }
+                rank1 = rank(column1);
+                for (int j = i + 1; j < rankedFeatures.length; j++) {
+                    if (rankedFeatures[j] != null) {
+                        for (int k = 0; k < column2.length; k++) {
+                            column2[k] = MolecularDescriptor.getDoubleValue(peptides[k], rankedFeatures[j]);
+                        }
+                        rank2 = rank(column2);
+                        score = calculatePearsonCorrelation(rank1, rank2);
+                        if (score >= 0.4) {
+                            System.out.println(">0.4=" + score + ": " + rankedFeatures[i].getDisplayName() + " - " + rankedFeatures[j].getDisplayName());
+                            toRemove.add(rankedFeatures[j]);
+                            rankedFeatures[j] = null;
+                        }
+                        if (score < min) {
+                            min = score;
+                        }
+                        if (score > max) {
+                            max = score;
+                        }
+                    }
+                    ticket.progress();
+                }
+            }
+        }
+        System.out.println("max: " + max);
+        System.out.println("min: " + min);
+        System.out.println("Removed: " + toRemove.size());
+        return null;
+    }
+
+    @Override
+    protected void process(List<String> chunks) {
+        busyLabel.setBusy(true);
+        busyLabel.setVisible(true);
+        workspace.setBusy(true);
+    }
+
+    @Override
+    protected void done() {
+        try {
+            get();
+        } catch (InterruptedException | ExecutionException ex) {
+            if (ex.getCause() instanceof MolecularDescriptorNotFoundException) {
+                NotifyDescriptor errorND = ((MolecularDescriptorNotFoundException) ex.getCause()).getErrorND();
+                DialogDisplayer.getDefault().notify(errorND);
+            } else {
+                Exceptions.printStackTrace(ex);
+            }
+        } finally {
+            busyLabel.setBusy(false);
+            busyLabel.setVisible(false);
+            workspace.setBusy(false);
+            ticket.finish();
+        }
+    }
 
     private void fillBins(MolecularDescriptor descriptor, Peptide[] peptides, Bin[] bins) throws MolecularDescriptorNotFoundException {
         Bin bin;
@@ -539,40 +623,98 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         return entropy;
     }
 
-    private float calculateTanimoto(MolecularDescriptor descriptor1, MolecularDescriptor descriptor2, Peptide[] peptides) throws MolecularDescriptorNotFoundException {
-        // Evaluates the continuous Tanimoto coefficient
-        double ab = 0.0;
-        double a2 = 0.0;
-        double b2 = 0.0;
-        double val1, val2;
-        for (Peptide peptide : peptides) {
-            val1 = Math.abs(descriptor1.getNormalizedZscoreValue(peptide));
-            val2 = Math.abs(descriptor2.getNormalizedZscoreValue(peptide));
-            ab += val1 * val2;
-            a2 += val1 * val1;
-            b2 += val2 * val2;
+    public double[] rank(double[] data) {
+        // Array recording initial positions of data to be ranked
+        IntDoublePair[] ranks = new IntDoublePair[data.length];
+        for (int i = 0; i < data.length; i++) {
+            ranks[i] = new IntDoublePair(data[i], i);
         }
-        return (float) ab / (float) (a2 + b2 - ab);
+
+        // Sort the IntDoublePairs
+        Arrays.sort(ranks);
+
+        // Walk the sorted array, filling output array using sorted positions,
+        // resolving ties as we go
+        double[] out = new double[ranks.length];
+        int pos = 1;  // position in sorted array
+        out[ranks[0].getPosition()] = pos;
+        List<Integer> tiesTrace = new LinkedList<>();
+        tiesTrace.add(ranks[0].getPosition());
+        for (int i = 1; i < ranks.length; i++) {
+            if (Double.compare(ranks[i].getValue(), ranks[i - 1].getValue()) > 0) {
+                // tie sequence has ended (or had length 1)
+                pos = i + 1;
+                if (tiesTrace.size() > 1) {  // if seq is nontrivial, resolve
+                    resolveTie(out, tiesTrace);
+                }
+                tiesTrace = new LinkedList<>();
+                tiesTrace.add(ranks[i].getPosition());
+            } else {
+                // tie sequence continues
+                tiesTrace.add(ranks[i].getPosition());
+            }
+            out[ranks[i].getPosition()] = pos;
+        }
+        if (tiesTrace.size() > 1) {  // handle tie sequence at end
+            resolveTie(out, tiesTrace);
+        }
+        return out;
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JPanel centerPanel;
-    private javax.swing.JLabel entropyInfoLabel;
-    private javax.swing.JPanel entropyPanel;
-    private javax.swing.JLabel extLabel1;
-    private javax.swing.JLabel extLabel2;
-    private javax.swing.JRadioButton option1Button;
-    private javax.swing.JRadioButton option2Button;
-    private javax.swing.JLabel redundantLabel;
-    private javax.swing.JSlider redundantSlider;
-    private javax.swing.JButton removeButton;
-    private javax.swing.JPanel rightPanel;
-    private javax.swing.JLabel tanimotoInfoLabel;
-    private javax.swing.JPanel tanimotoPanel;
-    private javax.swing.JLabel uselessLabel;
-    private javax.swing.JSlider uselessSlider;
-    // End of variables declaration//GEN-END:variables
+    private double calculatePearsonCorrelation(double[] xArray, double[] yArray) {
+        if (xArray.length != yArray.length) {
+            throw new IllegalArgumentException("Array dimensions mismatch");
+        } else if (xArray.length < 2) {
+            throw new IllegalArgumentException("Insufficient array dimension");
+        }
+
+        double diff1, diff2, num = 0.0, sx = 0.0, sy = 0.0;
+        double xMean = MolecularDescriptor.mean(xArray), yMean = MolecularDescriptor.mean(yArray);
+
+        for (int i = 0; i < xArray.length; i++) {
+            diff1 = xArray[i] - xMean;
+            diff2 = yArray[i] - yMean;
+            num += (diff1 * diff2);
+            sx += (diff1 * diff1);
+            sy += (diff2 * diff2);
+        }
+        return num / Math.sqrt(sx * sy);
+    }
+    
+ /**
+     * Resolve a sequence of ties, using the configured {@link TiesStrategy}.
+     * The input <code>ranks</code> array is expected to take the same value
+     * for all indices in <code>tiesTrace</code>.  The common value is recoded
+     * according to the tiesStrategy. For example, if ranks = <5,8,2,6,2,7,1,2>,
+     * tiesTrace = <2,4,7> and tiesStrategy is MINIMUM, ranks will be unchanged.
+     * The same array and trace with tiesStrategy AVERAGE will come out
+     * <5,8,3,6,3,7,1,3>.
+     *
+     * @param ranks array of ranks
+     * @param tiesTrace list of indices where <code>ranks</code> is constant
+     * -- that is, for any i and j in TiesTrace, <code> ranks[i] == ranks[j]
+     * </code>
+     */
+    private void resolveTie(double[] ranks, List<Integer> tiesTrace){
+//        // constant value of ranks over tiesTrace
+        final double c = ranks[tiesTrace.get(0)];
+
+        // length of sequence of tied ranks
+        final int length = tiesTrace.size();
+        
+        // Replace ranks with average 
+        double value = (2 * c + length - 1) / 2d;        
+        double sum = 0;
+        for(int pos: tiesTrace){
+            sum+= pos;
+        }
+        double avg = sum/length; 
+                
+        Iterator<Integer> iterator = tiesTrace.iterator();
+        while (iterator.hasNext()) {
+            ranks[iterator.next()] = value;
+        }        
+    }    
 
 }
 
@@ -652,4 +794,64 @@ class Bin {
         return this.endBoundary - this.startBoundary;
     }
 
+}
+
+/**
+ * Represents the position of a double value in an ordering. Comparable
+ * interface is implemented so Arrays.sort can be used to sort an array of
+ * IntDoublePairs by value. Note that the implicitly defined natural ordering is
+ * NOT consistent with equals.
+ */
+class IntDoublePair implements Comparable<IntDoublePair> {
+
+    /**
+     * Value of the pair
+     */
+    private final double value;
+
+    /**
+     * Original position of the pair
+     */
+    private final int position;
+
+    /**
+     * Construct an IntDoublePair with the given value and position.
+     *
+     * @param value the value of the pair
+     * @param position the original position
+     */
+    IntDoublePair(double value, int position) {
+        this.value = value;
+        this.position = position;
+    }
+
+    /**
+     * Compare this IntDoublePair to another pair. Only the
+     * <strong>values</strong> are compared.
+     *
+     * @param other the other pair to compare this to
+     * @return result of <code>Double.compare(value, other.value)</code>
+     */
+    public int compareTo(IntDoublePair other) {
+        return Double.compare(value, other.value);
+    }
+
+    // N.B. equals() and hashCode() are not implemented; see MATH-610 for discussion.
+    /**
+     * Returns the value of the pair.
+     *
+     * @return value
+     */
+    public double getValue() {
+        return value;
+    }
+
+    /**
+     * Returns the original position of the pair.
+     *
+     * @return position
+     */
+    public int getPosition() {
+        return position;
+    }
 }

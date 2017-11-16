@@ -27,6 +27,7 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.FeatureSelectionModel;
 import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.QueryModel;
@@ -35,7 +36,8 @@ import org.bapedis.core.spi.filters.impl.AttributeFilter;
 import org.bapedis.core.spi.filters.impl.FilterHelper;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
 import org.bapedis.core.ui.actions.MolecularDescriptorAction;
-import org.bapedis.core.ui.components.DescriptorRemovalPanel;
+import org.bapedis.core.ui.components.DeleteDescriptorPanel;
+import org.bapedis.core.ui.components.FeatureSelectionPanel;
 import org.bapedis.core.ui.components.MolecularFeaturesPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.netbeans.swing.etable.ETableColumn;
@@ -245,6 +247,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         topPanel = new javax.swing.JPanel();
         leftToolBar = new javax.swing.JToolBar();
         delMDButton = new javax.swing.JButton();
+        selectButton = new javax.swing.JButton();
         columnsButton = new javax.swing.JButton();
         rightPanel = new javax.swing.JPanel();
         jLabelFilter = new javax.swing.JLabel();
@@ -276,6 +279,19 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             }
         });
         leftToolBar.add(delMDButton);
+
+        selectButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/table_star.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(selectButton, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.selectButton.text")); // NOI18N
+        selectButton.setToolTipText(org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.selectButton.toolTipText")); // NOI18N
+        selectButton.setFocusable(false);
+        selectButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        selectButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        selectButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selectButtonActionPerformed(evt);
+            }
+        });
+        leftToolBar.add(selectButton);
 
         columnsButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/select_md.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(columnsButton, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.columnsButton.text")); // NOI18N
@@ -416,11 +432,17 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }//GEN-LAST:event_columnsButtonActionPerformed
 
     private void delMDButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delMDButtonActionPerformed
-        DialogDescriptor dd = new DialogDescriptor(new DescriptorRemovalPanel(currentModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.DescriptorRemovalPanel.title"));
+        DialogDescriptor dd = new DialogDescriptor(new DeleteDescriptorPanel(currentModel, pc.getCurrentWorkspace()), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.DeleteDescriptorPanel.title"));
         dd.setOptions(new Object[]{DialogDescriptor.CLOSED_OPTION});
         DialogDisplayer.getDefault().notify(dd);
         populateVisibleColumns(currentModel);
     }//GEN-LAST:event_delMDButtonActionPerformed
+
+    private void selectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectButtonActionPerformed
+        DialogDescriptor dd = new DialogDescriptor(new FeatureSelectionPanel(currentModel, pc.getCurrentWorkspace()), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.FeatureSelectionPanel.title"));
+        dd.setOptions(new Object[]{DialogDescriptor.CLOSED_OPTION});
+        DialogDisplayer.getDefault().notify(dd);
+    }//GEN-LAST:event_selectButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
@@ -434,6 +456,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     private javax.swing.JToolBar leftToolBar;
     private javax.swing.JPanel rightPanel;
     private javax.swing.JScrollPane scrollPane;
+    private javax.swing.JButton selectButton;
     private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
     @Override

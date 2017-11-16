@@ -17,7 +17,11 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
+import org.bapedis.core.model.Workspace;
+import org.bapedis.core.task.ProgressTicket;
 import org.jdesktop.swingx.JXBusyLabel;
+import org.openide.DialogDisplayer;
+import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
@@ -25,15 +29,17 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class DescriptorRemovalPanel extends javax.swing.JPanel {
+public class DeleteDescriptorPanel extends javax.swing.JPanel {
     
     protected final DescriptorSelectionPanel selectionPanel;
     protected final JXBusyLabel busyLabel;
     protected final AttributesModel attrModel;
+    protected final Workspace workspace;
     
-    public DescriptorRemovalPanel(AttributesModel attrModel) {
+    public DeleteDescriptorPanel(AttributesModel attrModel, Workspace workspace) {
         initComponents();
         this.attrModel = attrModel;
+        this.workspace = workspace;
         
         selectionPanel = new DescriptorSelectionPanel(attrModel, Color.RED);
         selectionPanel.removeDescriptorRow(MolecularDescriptor.DEFAULT_CATEGORY);
@@ -41,7 +47,7 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
         centerPanel.add(selectionPanel, BorderLayout.CENTER);
         
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
-        busyLabel.setText(NbBundle.getMessage(DescriptorRemovalPanel.class, "DescriptorRemovalPanel.deleting.text"));
+        busyLabel.setText(NbBundle.getMessage(DeleteDescriptorPanel.class, "DeleteDescriptorPanel.deleting.text"));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         busyLabel.setBusy(false);
         busyLabel.setVisible(false);
@@ -89,7 +95,7 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
         rightPanel.setLayout(new javax.swing.BoxLayout(rightPanel, javax.swing.BoxLayout.Y_AXIS));
 
         deleteButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/delete.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(deleteButton, org.openide.util.NbBundle.getMessage(DescriptorRemovalPanel.class, "DescriptorRemovalPanel.deleteButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(deleteButton, org.openide.util.NbBundle.getMessage(DeleteDescriptorPanel.class, "DeleteDescriptorPanel.deleteButton.text")); // NOI18N
         deleteButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         deleteButton.setMaximumSize(new java.awt.Dimension(99, 29));
         deleteButton.setMinimumSize(new java.awt.Dimension(99, 29));
@@ -105,7 +111,7 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(25, 5, 0, 5);
+        gridBagConstraints.insets = new java.awt.Insets(10, 5, 0, 0);
         add(rightPanel, gridBagConstraints);
 
         centerPanel.setMinimumSize(new java.awt.Dimension(275, 10));
@@ -118,40 +124,59 @@ public class DescriptorRemovalPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 2, 0);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(centerPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
-        SwingWorker sw = new SwingWorker<Void, Void>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                Set<String> keys = selectionPanel.getSelectedDescriptorKeys();
-                for (String key : keys) {
-                    if (attrModel.hasMolecularDescriptors(key)) {
-                        attrModel.deleteAllMolecularDescriptors(key);
+        if (workspace.isBusy()) {
+            DialogDisplayer.getDefault().notify(workspace.getBusyNotifyDescriptor());
+        } else {
+            SwingWorker<Void, Void> sw = new SwingWorker() {
+                private boolean stopRun = false;
+                ProgressTicket ticket = new ProgressTicket(NbBundle.getMessage(DeleteDescriptorPanel.class, "DeleteDescriptorPanel.deleting.task"), new Cancellable() {
+                    @Override
+                    public boolean cancel() {
+                        stopRun = true;                        
+                        return true;
+                    }
+                });
+                
+                @Override
+                protected Void doInBackground() throws Exception {
+                    Set<String> keys = selectionPanel.getSelectedDescriptorKeys();
+                    ticket.start(keys.size());
+                    for (String key : keys) {
+                        if (!stopRun) {
+                            if (attrModel.hasMolecularDescriptors(key)) {
+                                attrModel.deleteAllMolecularDescriptors(key);
+                            }
+                            ticket.progress();
+                        }
+                    }
+                    return null;
+                }
+                
+                @Override
+                protected void done() {
+                    try {
+                        get();
+                    } catch (InterruptedException | ExecutionException ex) {
+                        Exceptions.printStackTrace(ex);
+                    } finally {
+                        busyLabel.setBusy(false);
+                        busyLabel.setVisible(false);
+                        workspace.setBusy(false);
+                        ticket.finish();
                     }
                 }
-                return null;
-            }
-            
-            @Override
-            protected void done() {
-                try {
-                    get();
-                } catch (InterruptedException | ExecutionException ex) {
-                    Exceptions.printStackTrace(ex);
-                } finally {
-                    busyLabel.setBusy(false);
-                    busyLabel.setVisible(false);
-                }
-            }
-        };
-        busyLabel.setBusy(true);
-        busyLabel.setVisible(true);
-        deleteButton.setEnabled(false);
-        deleteButton.setEnabled(false);
-        sw.execute();
+            };
+            workspace.setBusy(true);
+            busyLabel.setBusy(true);
+            busyLabel.setVisible(true);
+            deleteButton.setEnabled(false);            
+            sw.execute();
+        }
     }//GEN-LAST:event_deleteButtonActionPerformed
 
 

@@ -151,10 +151,8 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
             }
             throw new IllegalStateException("Unknown value for metric index: " + metricIndex);
         } catch (MolecularDescriptorNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
-            cancel();
+            throw new IllegalStateException(ex);
         }
-        return Float.NaN;
     }
 
     private float calculateTanimoto(Peptide peptide1, Peptide peptide2) throws MolecularDescriptorNotFoundException {

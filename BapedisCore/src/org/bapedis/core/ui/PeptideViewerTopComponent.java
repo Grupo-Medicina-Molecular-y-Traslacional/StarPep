@@ -27,6 +27,7 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.DeleteDescriptorModel;
 import org.bapedis.core.model.FeatureSelectionModel;
 import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.PeptideAttribute;
@@ -432,7 +433,13 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }//GEN-LAST:event_columnsButtonActionPerformed
 
     private void delMDButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delMDButtonActionPerformed
-        DialogDescriptor dd = new DialogDescriptor(new DeleteDescriptorPanel(currentModel, pc.getCurrentWorkspace()), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.DeleteDescriptorPanel.title"));
+        Workspace currentWS = pc.getCurrentWorkspace();
+        DeleteDescriptorModel deleteModel = currentWS.getLookup().lookup(DeleteDescriptorModel.class);
+        if (deleteModel == null){
+            deleteModel = new DeleteDescriptorModel(currentWS);
+            currentWS.add(deleteModel);
+        }
+        DialogDescriptor dd = new DialogDescriptor(new DeleteDescriptorPanel(currentModel, deleteModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.DeleteDescriptorPanel.title"));
         dd.setOptions(new Object[]{DialogDescriptor.CLOSED_OPTION});
         DialogDisplayer.getDefault().notify(dd);
         populateVisibleColumns(currentModel);

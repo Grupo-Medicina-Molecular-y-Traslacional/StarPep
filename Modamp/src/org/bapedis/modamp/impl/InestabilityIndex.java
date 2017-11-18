@@ -17,29 +17,26 @@ import org.bapedis.modamp.MD;
 public class InestabilityIndex extends AbstractMD {
 
     protected final String II = "II";
-    protected final String PS = "Stable";
+//    protected final String PS = "Stable";
 
     public InestabilityIndex(AlgorithmFactory factory) {
         super(factory);
     }
 
     @Override
-    protected void initMD() {
+    public void initAlgo() {
+        super.initAlgo(); 
         addAttribute(II, II, Double.class);
-        addAttribute(PS, PS, Integer.class);
+//        addAttribute(PS, PS, Integer.class);        
     }
-
+    
     @Override
     protected void compute(Peptide peptide) {
         double val = MD.inestabilityIndex(peptide.getSequence());
         peptide.setAttributeValue(getAttribute(II), val);
 
-        int isPS = MD.isProteinStable(val);
-        peptide.setAttributeValue(getAttribute(PS), isPS);
-    }
-
-    @Override
-    protected void endMD() {
+//        int isPS = MD.isProteinStable(val);
+//        peptide.setAttributeValue(getAttribute(PS), isPS);
     }
 
 }

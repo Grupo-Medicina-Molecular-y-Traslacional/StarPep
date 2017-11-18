@@ -69,7 +69,8 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
     }
 
     @Override
-    protected void initMD() {
+    public void initAlgo() {
+        super.initAlgo(); 
         algorithms.clear();
         if (descriptorKeys.isEmpty()) {
             DialogDisplayer.getDefault().notify(emptyKeys);
@@ -101,9 +102,10 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
                 algo.addMolecularDescriptorChangeListener(this);
                 algo.initAlgo();
             }
-        }
+        }        
     }
-
+    
+    
     @Override
     protected void compute(Peptide peptide) {
         for (AbstractMD algo : algorithms) {
@@ -112,13 +114,16 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
     }
 
     @Override
-    public void endMD() {
-        // Init all algoritms
+    public void endAlgo() {
+        super.endAlgo(); 
+        // End all algoritms
         for (AbstractMD algo : algorithms) {
             algo.removeMolecularDescriptorChangeListener(this);
-            algo.endMD();
-        }
+            algo.endAlgo();
+        }        
     }
+
+    
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {

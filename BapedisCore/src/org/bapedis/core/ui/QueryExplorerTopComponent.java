@@ -1,14 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Prop                @Override
-                public <T> T lookup(Class<T> type) {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
-
-                @Override
-                public <T> Lookup.Result<T> lookup(Lookup.Template<T> tmplt) {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
-            }rties.
+ * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */

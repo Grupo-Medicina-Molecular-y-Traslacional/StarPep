@@ -22,9 +22,11 @@ public class BomanIndex extends AbstractMD {
     }
 
     @Override
-    protected void initMD() {
+    public void initAlgo() {
+        super.initAlgo(); 
         addAttribute(BM, BM, Double.class);
     }
+    
 
     @Override
     protected void compute(Peptide peptide) {
@@ -33,8 +35,5 @@ public class BomanIndex extends AbstractMD {
 
     }
 
-    @Override
-    protected void endMD() {
-    }
 
 }

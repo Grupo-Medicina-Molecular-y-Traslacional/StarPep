@@ -569,7 +569,6 @@ public class MD {
      * @return Map with the frequency for each amino acid.
      */
     public static Map<String, Double> compositionReducedAlphabet(String seq, ReduceAlphabet ra) {
-        ra.init();
         Map<String, Double> count = ra.getCount();
         
         for (int i = 0; i < seq.length(); i++) {

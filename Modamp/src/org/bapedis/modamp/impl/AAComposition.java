@@ -21,19 +21,13 @@ import org.bapedis.modamp.scales.ReducedAlphabets;
  */
 public class AAComposition extends AbstractMD {
 
-    private ReduceAlphabet ra;
-
     public AAComposition(AlgorithmFactory factory) {
         super(factory);
-    }
-
-    @Override
-    protected void initMD() {
-        ra = ReducedAlphabets.stdAminoAcids();
-    }
-
+    }    
+    
     @Override
     protected void compute(Peptide peptide) {
+        ReduceAlphabet ra = ReducedAlphabets.stdAminoAcids();
         Map<String, Double> aminoAcidComposition = MD.compositionReducedAlphabet(peptide.getSequence(), ra);
         Iterator<String> it = aminoAcidComposition.keySet().iterator();
         String attrName, key;
@@ -44,19 +38,11 @@ public class AAComposition extends AbstractMD {
             val = aminoAcidComposition.get(key);
             if (val > 0) {
                 attrName = String.format("%s[%s]", ra.getName(), key);
-                attr = getAttribute(attrName);
-                if (attr == null) {
-                    attr = addAttribute(attrName, attrName, Double.class);
-                    attr.setDefaultValue(0.);
-                }
+                attr = getOrAddAttribute(attrName, attrName, Double.class, 0.);
                 peptide.setAttributeValue(attr, val);
             }
         }
     }
 
-    @Override
-    public void endMD() {
-        ra = null;
-    }
 
 }

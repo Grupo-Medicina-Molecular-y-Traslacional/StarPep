@@ -9,6 +9,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -18,7 +19,6 @@ import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideAttribute;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -59,7 +59,7 @@ public class StatsPanel extends javax.swing.JPanel {
 
             @Override
             protected ChartPanel doInBackground() throws Exception {
-                Peptide[] peptides = attrModel.getPeptides();
+                List<Peptide> peptides = attrModel.getPeptides();
                 attribute.resetSummaryStats(peptides);
                 min = attribute.getMin();
                 max = attribute.getMax();
@@ -100,8 +100,8 @@ public class StatsPanel extends javax.swing.JPanel {
         sw.execute();
     }
 
-    private ChartPanel createHistogramPanel(Peptide[] peptides, MolecularDescriptor attribute, double min, double max, int width, int height) throws MolecularDescriptorNotFoundException {
-        double[] data = new double[peptides.length];
+    private ChartPanel createHistogramPanel(List<Peptide> peptides, MolecularDescriptor attribute, double min, double max, int width, int height) throws MolecularDescriptorNotFoundException {
+        double[] data = new double[peptides.size()];
         int pos = 0;
         for (Peptide pept : peptides) {
             data[pos++] = MolecularDescriptor.getDoubleValue(pept, attribute);

@@ -6,10 +6,8 @@
 package org.bapedis.core.ui.components;
 
 import java.awt.Dimension;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -441,17 +439,17 @@ class FeatureSelector extends SwingWorker<Void, String> {
         ticket.start();
         publish("start");
         List<MolecularDescriptor> allFeatures = new LinkedList<>();
-        HashMap<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
+        Map<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
         for (Map.Entry<String, MolecularDescriptor[]> entry : mdMap.entrySet()) {
             for (MolecularDescriptor attr : entry.getValue()) {
                 allFeatures.add(attr);
             }
         }
-        Peptide[] peptides = attrModel.getPeptides();
+        List<Peptide> peptides = attrModel.getPeptides();
         ticket.switchToDeterminate(allFeatures.size());
 
-        Bin[] bins = new Bin[peptides.length];
-        double maxScore = Math.log(peptides.length);
+        Bin[] bins = new Bin[peptides.size()];
+        double maxScore = Math.log(peptides.size());
         double threshold = model.getEntropyCutoff() * maxScore / 100;
         double score, min = Double.MAX_VALUE;
         double max = Double.MIN_VALUE;
@@ -506,19 +504,22 @@ class FeatureSelector extends SwingWorker<Void, String> {
         ticket.progress("Spearman Correlation");
         ticket.switchToDeterminate(rankedFeatures.length * rankedFeatures.length);
         toRemove.clear();
-        double[] column1 = new double[peptides.length];
-        double[] column2 = new double[peptides.length];
+        double[] column1 = new double[peptides.size()];
+        double[] column2 = new double[peptides.size()];
         double[] rank1, rank2;
+        int k;
         for (int i = 0; i < rankedFeatures.length - 1; i++) {
             if (rankedFeatures[i] != null) {
-                for (int k = 0; k < column1.length; k++) {
-                    column1[k] = MolecularDescriptor.getDoubleValue(peptides[k], rankedFeatures[i]);
+                k = 0;
+                for (Peptide peptide: peptides) {
+                    column1[k++] = MolecularDescriptor.getDoubleValue(peptide, rankedFeatures[i]);
                 }
                 rank1 = rank(column1);
                 for (int j = i + 1; j < rankedFeatures.length; j++) {
                     if (rankedFeatures[j] != null) {
-                        for (int k = 0; k < column2.length; k++) {
-                            column2[k] = MolecularDescriptor.getDoubleValue(peptides[k], rankedFeatures[j]);
+                        k = 0;
+                        for (Peptide peptide: peptides) {
+                            column2[k++] = MolecularDescriptor.getDoubleValue(peptide, rankedFeatures[j]);
                         }
                         rank2 = rank(column2);
                         score = calculatePearsonCorrelation(rank1, rank2);
@@ -570,7 +571,7 @@ class FeatureSelector extends SwingWorker<Void, String> {
         }
     }
 
-    private void fillBins(MolecularDescriptor descriptor, Peptide[] peptides, Bin[] bins) throws MolecularDescriptorNotFoundException {
+    private void fillBins(MolecularDescriptor descriptor, List<Peptide> peptides, Bin[] bins) throws MolecularDescriptorNotFoundException {
         Bin bin;
         double binWidth, lower, upper, min, max, val;
         int binIndex;
@@ -590,9 +591,9 @@ class FeatureSelector extends SwingWorker<Void, String> {
             bins[i] = bin;
         }
 
-        for (int i = 0; i < peptides.length; i++) {
+        for (Peptide peptide: peptides) {
             binIndex = bins.length - 1;
-            val = MolecularDescriptor.getDoubleValue(peptides[i], descriptor);
+            val = MolecularDescriptor.getDoubleValue(peptide, descriptor);
             if (val < max) {
                 double fraction = (val - min) / (max - min);
                 if (fraction < 0.0) {

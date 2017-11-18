@@ -8,53 +8,52 @@ package org.bapedis.core.ui.components;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import javax.swing.SwingConstants;
-import javax.swing.SwingWorker;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.DeleteDescriptorModel;
 import org.bapedis.core.model.MolecularDescriptor;
-import org.bapedis.core.model.Workspace;
-import org.bapedis.core.task.ProgressTicket;
+import org.bapedis.core.task.DeleteDescriptor;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.openide.DialogDisplayer;
-import org.openide.util.Cancellable;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
- *
  * @author loge
  */
-public class DeleteDescriptorPanel extends javax.swing.JPanel {
-    
+public class DeleteDescriptorPanel extends javax.swing.JPanel implements PropertyChangeListener {
+
     protected final DescriptorSelectionPanel selectionPanel;
     protected final JXBusyLabel busyLabel;
     protected final AttributesModel attrModel;
-    protected final Workspace workspace;
-    
-    public DeleteDescriptorPanel(AttributesModel attrModel, Workspace workspace) {
+    protected final DeleteDescriptorModel deleteModel;
+
+    public DeleteDescriptorPanel(AttributesModel attrModel, final DeleteDescriptorModel deleteModel) {
         initComponents();
         this.attrModel = attrModel;
-        this.workspace = workspace;
-        
+        this.deleteModel = deleteModel;
+
         selectionPanel = new DescriptorSelectionPanel(attrModel, Color.RED);
         selectionPanel.removeDescriptorRow(MolecularDescriptor.DEFAULT_CATEGORY);
-        
+
         centerPanel.add(selectionPanel, BorderLayout.CENTER);
-        
+
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setText(NbBundle.getMessage(DeleteDescriptorPanel.class, "DeleteDescriptorPanel.deleting.text"));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        busyLabel.setBusy(false);
-        busyLabel.setVisible(false);
+        boolean running = deleteModel.isRunning();
+        busyLabel.setBusy(running);
+        busyLabel.setVisible(running);
         rightPanel.add(busyLabel);
-        
+
         deleteButton.setEnabled(false);
-        
+
         selectionPanel.addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
@@ -69,6 +68,22 @@ public class DeleteDescriptorPanel extends javax.swing.JPanel {
                 deleteButton.setEnabled(flag);
             }
         });
+        
+        addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent event) {
+                deleteModel.addPropertyChangeListener(DeleteDescriptorPanel.this);
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+                deleteModel.removePropertyChangeListener(DeleteDescriptorPanel.this);
+            }
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) {
+            }
+        });        
     }
 
     /**
@@ -129,53 +144,12 @@ public class DeleteDescriptorPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
-        if (workspace.isBusy()) {
-            DialogDisplayer.getDefault().notify(workspace.getBusyNotifyDescriptor());
+        if (deleteModel.getOwnerWS().isBusy()) {
+            DialogDisplayer.getDefault().notify(deleteModel.getOwnerWS().getBusyNotifyDescriptor());
         } else {
-            SwingWorker<Void, Void> sw = new SwingWorker() {
-                private boolean stopRun = false;
-                ProgressTicket ticket = new ProgressTicket(NbBundle.getMessage(DeleteDescriptorPanel.class, "DeleteDescriptorPanel.deleting.task"), new Cancellable() {
-                    @Override
-                    public boolean cancel() {
-                        stopRun = true;                        
-                        return true;
-                    }
-                });
-                
-                @Override
-                protected Void doInBackground() throws Exception {
-                    Set<String> keys = selectionPanel.getSelectedDescriptorKeys();
-                    ticket.start(keys.size());
-                    for (String key : keys) {
-                        if (!stopRun) {
-                            if (attrModel.hasMolecularDescriptors(key)) {
-                                attrModel.deleteAllMolecularDescriptors(key);
-                            }
-                            ticket.progress();
-                        }
-                    }
-                    return null;
-                }
-                
-                @Override
-                protected void done() {
-                    try {
-                        get();
-                    } catch (InterruptedException | ExecutionException ex) {
-                        Exceptions.printStackTrace(ex);
-                    } finally {
-                        busyLabel.setBusy(false);
-                        busyLabel.setVisible(false);
-                        workspace.setBusy(false);
-                        ticket.finish();
-                    }
-                }
-            };
-            workspace.setBusy(true);
-            busyLabel.setBusy(true);
-            busyLabel.setVisible(true);
+            DeleteDescriptor deleteTask = new DeleteDescriptor(deleteModel, attrModel, selectionPanel.getSelectedDescriptorKeys());
+            deleteTask.execute();
             deleteButton.setEnabled(false);            
-            sw.execute();
         }
     }//GEN-LAST:event_deleteButtonActionPerformed
 
@@ -185,4 +159,13 @@ public class DeleteDescriptorPanel extends javax.swing.JPanel {
     private javax.swing.JButton deleteButton;
     private javax.swing.JPanel rightPanel;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getSource().equals(deleteModel) && evt.getPropertyName().equals(DeleteDescriptorModel.RUNNING)){
+            boolean running = deleteModel.isRunning();
+            busyLabel.setBusy(running);
+            busyLabel.setVisible(running);            
+        }
+    }
 }

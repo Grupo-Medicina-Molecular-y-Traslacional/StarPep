@@ -72,7 +72,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
         if (attrModel != null) {
             GraphModel graphModel = pc.getGraphModel();
             SimilarityGraphEdgeBuilder.attrModel = attrModel;
-            SimilarityGraphEdgeBuilder.peptides = attrModel.getPeptides();
+            SimilarityGraphEdgeBuilder.peptides = attrModel.getPeptides().toArray(new Peptide[0]);
             SimilarityGraphEdgeBuilder.graphModel = graphModel;
             SimilarityGraphEdgeBuilder.setStopRun(stopRun);
             SimilarityGraphEdgeBuilder.progressTicket = progressTicket;

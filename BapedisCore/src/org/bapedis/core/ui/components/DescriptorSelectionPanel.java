@@ -10,10 +10,10 @@ import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.JLabel;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.TableModelListener;
@@ -34,6 +34,7 @@ import org.openide.util.NbBundle;
 public class DescriptorSelectionPanel extends javax.swing.JPanel implements PropertyChangeListener {
 
     protected final AttributesModel attrModel;
+    protected final MyTableModel tableModel;
     protected JXTable table;
 
     public DescriptorSelectionPanel(final AttributesModel attrModel) {
@@ -60,15 +61,20 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
             }
         });
 
-        final TableModel tableModel = createTableModel();
+        tableModel = createTableModel();
         table = new JXTable(tableModel) {
             @Override
             public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
-                Component c = super.prepareRenderer(renderer, row, column); //To change body of generated methods, choose Tools | Templates.
-                if ((boolean) tableModel.getValueAt(table.convertRowIndexToModel(row), 0)) {
-                    c.setForeground(fgColor);
+                synchronized (tableModel) {
+                    if (row < 0 || row >= table.getRowCount()) {
+                        return new JLabel();
+                    }
+                    Component c = super.prepareRenderer(renderer, row, column); //To change body of generated methods, choose Tools | Templates.
+                    if ((boolean) tableModel.getValueAt(table.convertRowIndexToModel(row), 0)) {
+                        c.setForeground(fgColor);
+                    }
+                    return c;
                 }
-                return c;
             }
 
         };
@@ -87,7 +93,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
         table.setAutoCreateRowSorter(true);
         table.setRowSelectionAllowed(false);
 
-        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel()) {
+        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(tableModel) {
             @Override
             public boolean isSortable(int column) {
                 return column > 0;
@@ -97,11 +103,11 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
         scrollPane.setViewportView(table);
     }
 
-    private TableModel createTableModel() {
+    private MyTableModel createTableModel() {
         String[] columnNames = {"", NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.table.columnName.first"),
             NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.table.columnName.second")};
 
-        HashMap<String, MolecularDescriptor[]> map = attrModel.getAllMolecularDescriptors();
+        Map<String, MolecularDescriptor[]> map = attrModel.getAllMolecularDescriptors();
         ArrayList<Object[]> data = new ArrayList(map.size());
         Object[] dataRow;
         for (Map.Entry<String, MolecularDescriptor[]> entry : map.entrySet()) {
@@ -115,34 +121,35 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
     }
 
     public void addTableModelListener(TableModelListener listener) {
-        table.getModel().addTableModelListener(listener);
+        tableModel.addTableModelListener(listener);
     }
 
     public void setSelectedDescriptorKeys(Set<String> keys) {
-        TableModel model = table.getModel();
-        for (int row = 0; row < model.getRowCount(); row++) {
-            model.setValueAt(keys.contains((String) model.getValueAt(row, 1)), row, 0);
+        synchronized (tableModel) {
+            for (int row = 0; row < tableModel.getRowCount(); row++) {
+                tableModel.setValueAt(keys.contains((String) tableModel.getValueAt(row, 1)), row, 0);
+            }
         }
     }
 
     public Set<String> getSelectedDescriptorKeys() {
-        Set<String> keys = new LinkedHashSet<>();
-        TableModel model = table.getModel();
-        String key;
-        for (int row = 0; row < model.getRowCount(); row++) {
-            if ((boolean) model.getValueAt(row, 0)) {
-                key = (String) model.getValueAt(row, 1);
-                keys.add(key);
+        synchronized (tableModel) {
+            Set<String> keys = new LinkedHashSet<>();
+            String key;
+            for (int row = 0; row < tableModel.getRowCount(); row++) {
+                if ((boolean) tableModel.getValueAt(row, 0)) {
+                    key = (String) tableModel.getValueAt(row, 1);
+                    keys.add(key);
+                }
             }
+            return keys;
         }
-        return keys;
     }
 
     public void removeDescriptorRow(String key) {
-        MyTableModel model = (MyTableModel) table.getModel();
-        for (int row = 0; row < model.getRowCount(); row++) {
-            if (model.getValueAt(row, 1).equals(key)) {
-                model.removeRow(row);
+        for (int row = 0; row < tableModel.getRowCount(); row++) {
+            if (tableModel.getValueAt(row, 1).equals(key)) {
+                tableModel.removeRow(row);
             }
         }
     }
@@ -173,7 +180,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
         if (evt.getPropertyName().equals(AttributesModel.MD_ATTR_ADDED)) {
             if (evt.getNewValue() != null) {
                 String category = (String) evt.getNewValue();
-                ((MyTableModel) table.getModel()).addRow(false, category, attrModel.getMolecularDescriptors(category).length);
+                tableModel.addRow(false, category, attrModel.getMolecularDescriptors(category).length);
             }
         } else if (evt.getPropertyName().equals(AttributesModel.MD_ATTR_REMOVED)) {
             if (evt.getOldValue() != null) {
@@ -238,7 +245,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
             fireTableCellUpdated(row, col);
         }
 
-        public void addRow(boolean flag, String category, int size) {
+        public synchronized void addRow(boolean flag, String category, int size) {
             Object[] dataRow = new Object[3];
             dataRow[0] = flag;
             dataRow[1] = category;
@@ -248,7 +255,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
             fireTableRowsInserted(row, row);
         }
 
-        public void removeRow(int row) {
+        public synchronized void removeRow(int row) {
             this.data.remove(row);
             fireTableRowsDeleted(row, row);
         }

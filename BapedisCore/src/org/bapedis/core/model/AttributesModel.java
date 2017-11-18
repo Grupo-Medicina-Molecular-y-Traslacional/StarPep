@@ -8,10 +8,12 @@ package org.bapedis.core.model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.gephi.graph.api.GraphView;
 import org.netbeans.swing.etable.QuickFilter;
@@ -26,12 +28,12 @@ import org.openide.nodes.Node;
  */
 public class AttributesModel {
 
-    protected final LinkedHashMap<String, MolecularDescriptor[]> mdMap;
+    protected final Map<String, MolecularDescriptor[]> mdMap;
     protected final Set<PeptideAttribute> displayedColumnsModel;
     private static final int MAX_AVAILABLE_COLUMNS = 6;
     protected List<PeptideNode> nodeList;
     private final PeptideNodeContainer container;
-    private Peptide[] filteredPept;
+    private List<Peptide> filteredPept;
     protected QuickFilter quickFilter;
     public static final String CHANGED_FILTER = "quickFilter";
     public static final String DISPLAY_ATTR_ADDED = "display_attribute_add";
@@ -125,19 +127,19 @@ public class AttributesModel {
         return false;
     }
 
-    public LinkedHashMap<String, MolecularDescriptor[]> getAllMolecularDescriptors() {
+    public Map<String, MolecularDescriptor[]> getAllMolecularDescriptors() {
         return mdMap;
     }
 
-    public synchronized MolecularDescriptor[] getMolecularDescriptors(String category) {
+    public MolecularDescriptor[] getMolecularDescriptors(String category) {
         return mdMap.get(category);
     }
 
-    public synchronized boolean hasMolecularDescriptors(String category) {
+    public boolean hasMolecularDescriptors(String category) {
         return mdMap.containsKey(category);
     }
 
-    public synchronized void addMolecularDescriptors(String category, MolecularDescriptor[] features) {
+    public void addMolecularDescriptors(String category, MolecularDescriptor[] features) {
         if (mdMap.containsKey(category)){
             MolecularDescriptor[] oldAttrs = mdMap.get(category);
             boolean removed;
@@ -158,7 +160,7 @@ public class AttributesModel {
         propertyChangeSupport.firePropertyChange(MD_ATTR_ADDED, null, category);
     }
 
-    public synchronized void deleteAllMolecularDescriptors(String category) {
+    public void deleteAllMolecularDescriptors(String category) {
         if (!category.equals(MolecularDescriptor.DEFAULT_CATEGORY)) {
             PeptideAttribute[] features = mdMap.remove(category);
             for(PeptideAttribute attr: features){
@@ -175,7 +177,7 @@ public class AttributesModel {
         removeDisplayedColumn(attr);
     }
     
-    public synchronized Peptide[] getPeptides() {
+    public synchronized List<Peptide> getPeptides() {
         if (filteredPept != null) {
             return filteredPept;
         }
@@ -187,8 +189,8 @@ public class AttributesModel {
                 peptides.add(pNode.getPeptide());
             }
         }
-        filteredPept = peptides.toArray(new Peptide[0]);
-        return filteredPept;
+        filteredPept = Collections.unmodifiableList(peptides);
+        return peptides;
     }
 
     public void refresh() {

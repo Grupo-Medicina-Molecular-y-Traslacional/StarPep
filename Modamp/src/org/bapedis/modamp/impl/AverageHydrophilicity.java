@@ -62,7 +62,8 @@ public class AverageHydrophilicity extends AbstractMD {
     }
 
     @Override
-    protected void initMD() {
+    public void initAlgo() {
+        super.initAlgo(); 
         if (HOPT810101) {
             addAttribute(HOPT810101_NAME, HOPT810101_NAME, Double.class);
         }
@@ -71,9 +72,10 @@ public class AverageHydrophilicity extends AbstractMD {
             addAttribute(KUHL950101_NAME, KUHL950101_NAME, Double.class);
         }
 
-        addAttribute(GRAVY, GRAVY, Double.class);
+        addAttribute(GRAVY, GRAVY, Double.class);        
     }
-
+    
+    
     @Override
     protected void compute(Peptide peptide) {
         double val;
@@ -96,8 +98,5 @@ public class AverageHydrophilicity extends AbstractMD {
         return properties.toArray(new AlgorithmProperty[0]);
     }
 
-    @Override
-    protected void endMD() {
-    }
 
 }

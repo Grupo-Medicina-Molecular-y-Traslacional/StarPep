@@ -50,11 +50,12 @@ public class HydrophobicPeriodicity extends AbstractMD {
     }
 
     @Override
-    protected void initMD() {
+    public void initAlgo() {
+        super.initAlgo(); 
         String name = getProName();
-        addAttribute(name, name, Double.class);
+        addAttribute(name, name, Double.class);        
     }
-
+    
     @Override
     protected void compute(Peptide peptide) {
         double val = MD.A_m(peptide.getSequence(), window);
@@ -69,10 +70,6 @@ public class HydrophobicPeriodicity extends AbstractMD {
     @Override
     public AlgorithmProperty[] getProperties() {
         return properties.toArray(new AlgorithmProperty[0]);
-    }
-
-    @Override
-    protected void endMD() {
     }
 
 }

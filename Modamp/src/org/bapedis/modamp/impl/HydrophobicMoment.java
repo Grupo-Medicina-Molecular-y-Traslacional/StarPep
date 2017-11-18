@@ -26,7 +26,6 @@ public class HydrophobicMoment extends AbstractMD {
     private final boolean[] angle; // 100, 160, 180
     private final int[] angleVal;
     private final boolean[] scale;
-    private final Map<String, Double>[] scaleVal;
     private final String[][] attrNames;
     private final String[] AVGH;
 
@@ -40,7 +39,6 @@ public class HydrophobicMoment extends AbstractMD {
         angleVal = new int[]{100, 160, 180};
 
         scale = new boolean[]{true, true, true};
-        scaleVal = new Map[]{HydrophobicityScale.kyte_doolittle_hydrov_hash(), HydrophobicityScale.tossi_hydrov_hash(), HydrophobicityScale.eisenberg_hydrov_hash()};
 
         attrNames = new String[][]{{"\u03BCH(angle=100,scale=KYTJ820101)", "\u03BCH(angle=160,scale=KYTJ820101)", "\u03BCH(angle=180,scale=KYTJ820101)"},
         {"\u03BCH(angle=100,scale=Tossi12)", "\u03BCH(angle=160,scale=Tossi12)", "\u03BCH(angle=180,scale=Tossi12)"},
@@ -124,12 +122,13 @@ public class HydrophobicMoment extends AbstractMD {
     }
 
     @Override
-    protected void initMD() {
+    public void initAlgo() {
+        super.initAlgo();
         for (int i = 0; i < scale.length; i++) {
             if (scale[i]) {
                 for (int j = 0; j < angle.length; j++) {
                     if (angle[j]) {
-                        addAttribute(attrNames[i][j], attrNames[i][j], Double.class); 
+                        addAttribute(attrNames[i][j], attrNames[i][j], Double.class);
                     }
                 }
                 addAttribute(AVGH[i], AVGH[i], Double.class);
@@ -139,6 +138,7 @@ public class HydrophobicMoment extends AbstractMD {
 
     @Override
     protected void compute(Peptide peptide) {
+        Map<String, Double>[] scaleVal = new Map[]{HydrophobicityScale.kyte_doolittle_hydrov_hash(), HydrophobicityScale.tossi_hydrov_hash(), HydrophobicityScale.eisenberg_hydrov_hash()};
         double val;
         for (int i = 0; i < scale.length; i++) {
             if (scale[i]) {
@@ -157,10 +157,6 @@ public class HydrophobicMoment extends AbstractMD {
     @Override
     public AlgorithmProperty[] getProperties() {
         return properties.toArray(new AlgorithmProperty[0]);
-    }
-
-    @Override
-    protected void endMD() {
     }
 
 }

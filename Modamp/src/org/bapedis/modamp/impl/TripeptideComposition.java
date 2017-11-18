@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
@@ -29,7 +28,6 @@ public class TripeptideComposition extends AbstractMD {
 
     protected boolean hyR, b50, cs, hydT, vw, pol, polz, chrg, ss, sa;
     private final List<AlgorithmProperty> properties;
-    private final List<ReduceAlphabet> alphabets;
 
     public TripeptideComposition(AlgorithmFactory factory) {
         super(factory);
@@ -45,7 +43,6 @@ public class TripeptideComposition extends AbstractMD {
         sa = true;
         properties = new LinkedList<>();
         populateProperties();
-        alphabets = new LinkedList<>();
     }
 
     private void populateProperties() {
@@ -144,9 +141,8 @@ public class TripeptideComposition extends AbstractMD {
     public void setSa(Boolean sa) {
         this.sa = sa;
     }
-
-    @Override
-    protected void initMD() {
+    
+    private void initAlphabets(List<ReduceAlphabet> alphabets){
         if (hyR) {
             alphabets.add(ReducedAlphabets.ra_hydrop_Rose());
         }
@@ -176,11 +172,13 @@ public class TripeptideComposition extends AbstractMD {
         }
         if (sa) {
             alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
-        }
+        }    
     }
 
     @Override
     protected void compute(Peptide peptide) {
+        List<ReduceAlphabet> alphabets = new LinkedList<>();
+        initAlphabets(alphabets);        
         String attrName;
         for (ReduceAlphabet ra : alphabets) {
             Map<String, Double> aminoAcidComposition = MD.tripeptideComposition(peptide.getSequence(), ra);
@@ -193,20 +191,11 @@ public class TripeptideComposition extends AbstractMD {
                 val = aminoAcidComposition.get(key);
                 if (val > 0) {
                     attrName = String.format("%s(%s)", ra.getName(), key);
-                    attr = getAttribute(attrName);
-                    if (attr == null) {
-                        attr = addAttribute(attrName, attrName, Double.class);
-                        attr.setDefaultValue(0.);
-                    }
+                    attr = getOrAddAttribute(attrName, attrName, Double.class, 0.);
                     peptide.setAttributeValue(attr, val);
                 }
             }
         }
-    }
-
-    @Override
-    public void endMD() {
-        alphabets.clear();
     }
 
     @Override

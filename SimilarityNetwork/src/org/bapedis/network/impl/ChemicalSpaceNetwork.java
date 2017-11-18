@@ -5,7 +5,6 @@
  */
 package org.bapedis.network.impl;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +16,6 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -82,7 +80,7 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
         super.initAlgo();
         featureList.clear();
         // Fill the feature list
-        LinkedHashMap<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
+        Map<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
         if (optionIndex == AllOption) {
             for (Map.Entry<String, MolecularDescriptor[]> entry : mdMap.entrySet()) {
                 MolecularDescriptor[] descriptors = entry.getValue();
@@ -112,7 +110,7 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
         }
         //Preprocess feature list
         if (!stopRun) {
-            Peptide[] peptides = attrModel.getPeptides();
+            List<Peptide> peptides = attrModel.getPeptides();
             try {
                 // Compute max, min, mean and std
                 for (MolecularDescriptor attr : featureList) {

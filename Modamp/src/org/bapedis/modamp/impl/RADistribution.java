@@ -28,7 +28,6 @@ public class RADistribution extends AbstractMD {
 
     protected boolean hydT, vw, pol, polz, chrg, ss, sa;
     private final List<AlgorithmProperty> properties;
-    private final List<ReduceAlphabet> alphabets;
 
     public RADistribution(AlgorithmFactory factory) {
         super(factory);
@@ -41,7 +40,6 @@ public class RADistribution extends AbstractMD {
         sa = true;
         properties = new LinkedList<>();
         populateProperties();
-        alphabets = new LinkedList<>();
     }
 
     private void populateProperties() {
@@ -119,8 +117,7 @@ public class RADistribution extends AbstractMD {
         return properties.toArray(new AlgorithmProperty[0]);
     }
 
-    @Override
-    protected void initMD() {
+    private void initAlphabets(List<ReduceAlphabet> alphabets){
         if (hydT) {
             alphabets.add(ReducedAlphabets.ra_Hydrophobicity_Tomii());
         }
@@ -141,11 +138,13 @@ public class RADistribution extends AbstractMD {
         }
         if (sa) {
             alphabets.add(ReducedAlphabets.ra_solventAccessibility_Tomii());
-        }
+        }    
     }
-
+    
     @Override
     protected void compute(Peptide peptide) {
+        List<ReduceAlphabet> alphabets = new LinkedList<>();
+        initAlphabets(alphabets);
         for (ReduceAlphabet ra : alphabets) {
             for (int percent = 0; percent <= 100; percent += 25) {
                 Map<String, Double> aminoAcidComposition = MD.distributionReducedAlphabet(peptide.getSequence(), ra, percent);
@@ -157,19 +156,11 @@ public class RADistribution extends AbstractMD {
                     key = it.next();
                     val = aminoAcidComposition.get(key);
                     attrName = String.format("D_%s_%d[%s]", ra.getName(), percent, key);
-                    attr = getAttribute(attrName);
-                    if (attr == null) {
-                        attr = addAttribute(attrName, attrName, Double.class);
-                    }
+                    attr = getOrAddAttribute(attrName, attrName, Double.class, null);
                     peptide.setAttributeValue(attr, val);
                 }
             }
         }
-    }
-
-    @Override
-    public void endMD() {
-        alphabets.clear();
     }
 
 }

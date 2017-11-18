@@ -23,18 +23,15 @@ public class IsoelectricPoint extends AbstractMD {
     }
 
     @Override
-    protected void initMD() {
+    public void initAlgo() {
+        super.initAlgo(); //To change body of generated methods, choose Tools | Templates.
         addAttribute(pI, pI, Double.class);
     }
-
+    
     @Override
     protected void compute(Peptide peptide) {
         double val = MD.isoelectricPoint(peptide.getSequence(), PkaValues.IPC_peptide());
         peptide.setAttributeValue(getAttribute(pI), val);
-    }
-
-    @Override
-    protected void endMD() {
     }
 
 }

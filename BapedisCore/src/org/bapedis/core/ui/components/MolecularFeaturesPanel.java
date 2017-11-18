@@ -59,7 +59,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         DefaultComboBoxModel comboModel = (DefaultComboBoxModel) descriptorComboBox.getModel();
         comboModel.addElement(ALL_SELECTION);
         comboModel.setSelectedItem(ALL_SELECTION);
-        HashMap<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
+        Map<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
         for (Map.Entry<String, MolecularDescriptor[]> entry : mdMap.entrySet()) {
             String key = entry.getKey();
             comboModel.addElement(key);
@@ -392,7 +392,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
             @Override
             protected Void doInBackground() throws Exception {
                 if (selectedKey.equals(ALL_SELECTION)) {
-                    HashMap<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
+                    Map<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
                     for (Map.Entry<String, MolecularDescriptor[]> entry : mdMap.entrySet()) {
                         for (MolecularDescriptor attr : entry.getValue()) {
                             leftListModel.addElement(attr);

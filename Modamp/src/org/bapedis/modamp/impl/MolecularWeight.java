@@ -22,18 +22,15 @@ public class MolecularWeight extends AbstractMD {
     }
 
     @Override
-    protected void initMD() {
+    public void initAlgo() {
+        super.initAlgo(); //To change body of generated methods, choose Tools | Templates.
         addAttribute(MW, MW, Double.class);
     }
-
+    
     @Override
     protected void compute(Peptide peptide) {
         double val = MD.mw(peptide.getSequence());
         peptide.setAttributeValue(getAttribute(MW), val);
-    }
-
-    @Override
-    protected void endMD() {
     }
 
 }

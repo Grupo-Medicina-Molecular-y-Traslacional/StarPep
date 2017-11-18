@@ -7,10 +7,11 @@ package org.bapedis.core.model;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.bapedis.core.project.ProjectManager;
@@ -36,13 +37,13 @@ public class Peptide {
 
     protected final Node graphNode;
     protected final Graph graph;
-    protected HashMap<PeptideAttribute, Object> attrsValue;
+    protected Map<PeptideAttribute, Object> attrsValue;
     protected ProteinSequence biojavaSeq;
 
     public Peptide(Node graphNode, Graph graph) {
         this.graphNode = graphNode;
         this.graph = graph;
-        attrsValue = new LinkedHashMap<>();
+        attrsValue = Collections.synchronizedMap(new LinkedHashMap<>());
         propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
@@ -82,8 +83,8 @@ public class Peptide {
         }
     }
 
-    public Set<PeptideAttribute> getAttributes() {
-        return attrsValue.keySet();
+    public PeptideAttribute[] getAttributes() {
+        return attrsValue.keySet().toArray(new PeptideAttribute[0]);
     }
 
     public Node getGraphNode() {

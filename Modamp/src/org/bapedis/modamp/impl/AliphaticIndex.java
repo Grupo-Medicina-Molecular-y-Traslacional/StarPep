@@ -23,9 +23,11 @@ public class AliphaticIndex extends AbstractMD {
     }
 
     @Override
-    protected void initMD() {
+    public void initAlgo() {
+        super.initAlgo(); 
          addAttribute(AI, AI, Double.class);
     }
+    
 
     @Override
     protected void compute(Peptide peptide) {
@@ -33,8 +35,5 @@ public class AliphaticIndex extends AbstractMD {
         peptide.setAttributeValue(getAttribute(AI), val);
     }
 
-    @Override
-    protected void endMD() {
-    }
 
 }

@@ -113,7 +113,8 @@ public class NetCharge extends AbstractMD {
     }
 
     @Override
-    protected void initMD() {
+    public void initAlgo() {
+        super.initAlgo(); //To change body of generated methods, choose Tools | Templates.
         if (ph5) {
             addAttribute(Z5, Z5, Double.class);
         }
@@ -139,9 +140,9 @@ public class NetCharge extends AbstractMD {
         if (CHAM830108) {
             addAttribute(CHAM830108_NAME, CHAM830108_NAME, Double.class);
             addAttribute(CHAM830108_AVG, CHAM830108_AVG, Double.class);
-        }
+        }        
     }
-
+    
     @Override
     protected void compute(Peptide peptide) {
         double val;
@@ -179,10 +180,6 @@ public class NetCharge extends AbstractMD {
     @Override
     public AlgorithmProperty[] getProperties() {
         return properties.toArray(new AlgorithmProperty[0]);
-    }
-
-    @Override
-    protected void endMD() {
     }
 
 }

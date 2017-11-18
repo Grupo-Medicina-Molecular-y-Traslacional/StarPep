@@ -31,7 +31,7 @@ public class DeleteDescriptor extends SwingWorker<Void, String> {
         this.keys = keys;
         this.attrModel = attrModel;
         this.model = model;
-        ticket = new ProgressTicket(NbBundle.getMessage(DeleteDescriptor.class, "DeleteDescriptor.deleting.task"), new Cancellable() {
+        ticket = new ProgressTicket(NbBundle.getMessage(DeleteDescriptor.class, "DeleteDescriptor.task.name", model.getOwnerWS().getName()), new Cancellable() {
             @Override
             public boolean cancel() {
                 stopRun = true;
@@ -58,8 +58,7 @@ public class DeleteDescriptor extends SwingWorker<Void, String> {
     @Override
     protected void process(List<String> chunks) {
         model.setRunning(true);
-    }
-    
+    }    
     
 
     @Override

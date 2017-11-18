@@ -446,7 +446,13 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }//GEN-LAST:event_delMDButtonActionPerformed
 
     private void selectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectButtonActionPerformed
-        DialogDescriptor dd = new DialogDescriptor(new FeatureSelectionPanel(currentModel, pc.getCurrentWorkspace()), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.FeatureSelectionPanel.title"));
+        Workspace currentWS = pc.getCurrentWorkspace();
+        FeatureSelectionModel featureModel = currentWS.getLookup().lookup(FeatureSelectionModel.class);
+        if (featureModel == null) {
+            featureModel = new FeatureSelectionModel(currentWS);
+            currentWS.add(featureModel);
+        }        
+        DialogDescriptor dd = new DialogDescriptor(new FeatureSelectionPanel(featureModel, currentModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.FeatureSelectionPanel.title"));
         dd.setOptions(new Object[]{DialogDescriptor.CLOSED_OPTION});
         DialogDisplayer.getDefault().notify(dd);
     }//GEN-LAST:event_selectButtonActionPerformed

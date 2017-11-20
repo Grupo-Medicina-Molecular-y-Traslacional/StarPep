@@ -131,7 +131,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         entropyInfoLabel.setEnabled(enabled);
 
         enabled = option2Button.isSelected() && !model.isRunning();
-        tanimotoPanel.setEnabled(enabled);
+        correlationPanel.setEnabled(enabled);
         redundantSlider.setEnabled(enabled);
         redundantLabel.setEnabled(enabled);
         tanimotoInfoLabel.setEnabled(enabled);
@@ -156,7 +156,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         uselessLabel = new javax.swing.JLabel();
         entropyInfoLabel = new javax.swing.JLabel();
         extLabel1 = new javax.swing.JLabel();
-        tanimotoPanel = new javax.swing.JPanel();
+        correlationPanel = new javax.swing.JPanel();
         redundantSlider = new javax.swing.JSlider();
         redundantLabel = new javax.swing.JLabel();
         tanimotoInfoLabel = new javax.swing.JLabel();
@@ -266,8 +266,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints.insets = new java.awt.Insets(5, 2, 0, 0);
         centerPanel.add(entropyPanel, gridBagConstraints);
 
-        tanimotoPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.tanimotoPanel.border.title"))); // NOI18N
-        tanimotoPanel.setLayout(new java.awt.GridBagLayout());
+        correlationPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.correlationPanel.border.title"))); // NOI18N
+        correlationPanel.setLayout(new java.awt.GridBagLayout());
 
         redundantSlider.setPaintLabels(true);
         redundantSlider.setPaintTicks(true);
@@ -281,7 +281,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        tanimotoPanel.add(redundantSlider, gridBagConstraints);
+        correlationPanel.add(redundantSlider, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(redundantLabel, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantLabel.text")); // NOI18N
         redundantLabel.setMaximumSize(new java.awt.Dimension(31, 14));
@@ -292,7 +292,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
-        tanimotoPanel.add(redundantLabel, gridBagConstraints);
+        correlationPanel.add(redundantLabel, gridBagConstraints);
 
         tanimotoInfoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(tanimotoInfoLabel, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.tanimotoInfoLabel.text")); // NOI18N
@@ -301,7 +301,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
-        tanimotoPanel.add(tanimotoInfoLabel, gridBagConstraints);
+        correlationPanel.add(tanimotoInfoLabel, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(extLabel2, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.extLabel2.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -309,7 +309,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        tanimotoPanel.add(extLabel2, gridBagConstraints);
+        correlationPanel.add(extLabel2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -318,7 +318,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        centerPanel.add(tanimotoPanel, gridBagConstraints);
+        centerPanel.add(correlationPanel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -392,6 +392,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel centerPanel;
+    private javax.swing.JPanel correlationPanel;
     private javax.swing.JLabel entropyInfoLabel;
     private javax.swing.JPanel entropyPanel;
     private javax.swing.JLabel extLabel1;
@@ -403,7 +404,6 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
     private javax.swing.JButton removeButton;
     private javax.swing.JPanel rightPanel;
     private javax.swing.JLabel tanimotoInfoLabel;
-    private javax.swing.JPanel tanimotoPanel;
     private javax.swing.JLabel uselessLabel;
     private javax.swing.JSlider uselessSlider;
     // End of variables declaration//GEN-END:variables

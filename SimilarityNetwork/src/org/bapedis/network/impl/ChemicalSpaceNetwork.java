@@ -8,7 +8,6 @@ package org.bapedis.network.impl;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
@@ -80,11 +79,9 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
         super.initAlgo();
         featureList.clear();
         // Fill the feature list
-        Map<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
         if (optionIndex == AllOption) {
-            for (Map.Entry<String, MolecularDescriptor[]> entry : mdMap.entrySet()) {
-                MolecularDescriptor[] descriptors = entry.getValue();
-                for (MolecularDescriptor desc : descriptors) {
+            for (String key: attrModel.getMolecularDescriptorKeys()) {
+                for (MolecularDescriptor desc : attrModel.getMolecularDescriptors(key)) {
                     featureList.add(desc);
                 }
             }

@@ -10,7 +10,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 import org.bapedis.core.model.AttributesModel;
@@ -29,11 +28,12 @@ import org.openide.util.NbBundle;
  * @author loge
  */
 public class FeatureSelector extends SwingWorker<Void, String> {
+
     private boolean stopRun;
     private final ProgressTicket ticket;
     private final AttributesModel attrModel;
     private final FeatureSelectionModel model;
-    
+
     public FeatureSelector(FeatureSelectionModel model, AttributesModel attrModel) {
         this.attrModel = attrModel;
         this.model = model;
@@ -46,7 +46,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
             }
         });
     }
-    
+
     @Override
     protected Void doInBackground() throws Exception {
         if (!model.isRemoveUseless()) {
@@ -55,9 +55,8 @@ public class FeatureSelector extends SwingWorker<Void, String> {
         ticket.start();
         publish("start");
         List<MolecularDescriptor> allFeatures = new LinkedList<>();
-        Map<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
-        for (Map.Entry<String, MolecularDescriptor[]> entry : mdMap.entrySet()) {
-            for (MolecularDescriptor attr : entry.getValue()) {
+        for (String key : attrModel.getMolecularDescriptorKeys()) {
+            for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
                 allFeatures.add(attr);
             }
         }
@@ -82,6 +81,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                 descriptor.setScore(score);
                 if (score < threshold) {
                     toRemove.add(descriptor);
+                    attrModel.deleteAttribute(descriptor);
                     System.out.println("Removed: " + descriptor.getDisplayName() + " - score: " + score);
                 }
                 if (score < min) {
@@ -99,65 +99,69 @@ public class FeatureSelector extends SwingWorker<Void, String> {
         System.out.println("max: " + maxName + ": " + max);
         System.out.println("min: " + minName + ": " + min);
 
-        // Correlation
-        System.out.println("---------------Spearman Correlation--------------");
-        min = Double.MAX_VALUE;
-        max = Double.MIN_VALUE;
+        if (model.isRemoveRedundant()) {
+            // Correlation
+            System.out.println("---------------Spearman Correlation--------------");
+            threshold = model.getCorrelationCutoff() / 100.;
+            min = Double.MAX_VALUE;
+            max = Double.MIN_VALUE;
 //                    ticket.start();
-        MolecularDescriptor[] rankedFeatures = allFeatures.toArray(new MolecularDescriptor[0]);
-        Arrays.sort(rankedFeatures, new Comparator<MolecularDescriptor>() {
-            @Override
-            public int compare(MolecularDescriptor o1, MolecularDescriptor o2) {
-                if (o1.getScore() < o2.getScore()) {
-                    return -1;
-                }
-                if (o1.getScore() > o2.getScore()) {
-                    return 1;
-                }
-                return 0;
-            }
-        });
-        ticket.progress("Spearman Correlation");
-        ticket.switchToDeterminate(rankedFeatures.length * rankedFeatures.length);
-        toRemove.clear();
-        double[] column1 = new double[peptides.size()];
-        double[] column2 = new double[peptides.size()];
-        double[] rank1, rank2;
-        int k;
-        for (int i = 0; i < rankedFeatures.length - 1; i++) {
-            if (rankedFeatures[i] != null) {
-                k = 0;
-                for (Peptide peptide: peptides) {
-                    column1[k++] = MolecularDescriptor.getDoubleValue(peptide, rankedFeatures[i]);
-                }
-                rank1 = rank(column1);
-                for (int j = i + 1; j < rankedFeatures.length; j++) {
-                    if (rankedFeatures[j] != null) {
-                        k = 0;
-                        for (Peptide peptide: peptides) {
-                            column2[k++] = MolecularDescriptor.getDoubleValue(peptide, rankedFeatures[j]);
-                        }
-                        rank2 = rank(column2);
-                        score = calculatePearsonCorrelation(rank1, rank2);
-                        if (score >= 0.4) {
-                            System.out.println(">0.4=" + score + ": " + rankedFeatures[i].getDisplayName() + " - " + rankedFeatures[j].getDisplayName());
-                            toRemove.add(rankedFeatures[j]);
-                            rankedFeatures[j] = null;
-                        }
-                        if (score < min) {
-                            min = score;
-                        }
-                        if (score > max) {
-                            max = score;
-                        }
+            MolecularDescriptor[] rankedFeatures = allFeatures.toArray(new MolecularDescriptor[0]);
+            Arrays.sort(rankedFeatures, new Comparator<MolecularDescriptor>() {
+                @Override
+                public int compare(MolecularDescriptor o1, MolecularDescriptor o2) {
+                    if (o1.getScore() < o2.getScore()) {
+                        return -1;
                     }
-                    ticket.progress();
+                    if (o1.getScore() > o2.getScore()) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            });
+            ticket.progress("Spearman Correlation");
+            ticket.switchToDeterminate(rankedFeatures.length * rankedFeatures.length);
+            toRemove.clear();
+            double[] column1 = new double[peptides.size()];
+            double[] column2 = new double[peptides.size()];
+            double[] rank1, rank2;
+            int k;
+            for (int i = 0; i < rankedFeatures.length - 1; i++) {
+                if (rankedFeatures[i] != null) {
+                    k = 0;
+                    for (Peptide peptide : peptides) {
+                        column1[k++] = MolecularDescriptor.getDoubleValue(peptide, rankedFeatures[i]);
+                    }
+                    rank1 = rank(column1);
+                    for (int j = i + 1; j < rankedFeatures.length; j++) {
+                        if (rankedFeatures[j] != null) {
+                            k = 0;
+                            for (Peptide peptide : peptides) {
+                                column2[k++] = MolecularDescriptor.getDoubleValue(peptide, rankedFeatures[j]);
+                            }
+                            rank2 = rank(column2);
+                            score = calculatePearsonCorrelation(rank1, rank2);
+                            if (score >= threshold) {
+                                System.out.println(">0.4=" + score + ": " + rankedFeatures[i].getDisplayName() + " - " + rankedFeatures[j].getDisplayName());
+                                attrModel.deleteAttribute(rankedFeatures[j]);
+                                toRemove.add(rankedFeatures[j]);
+                                rankedFeatures[j] = null;
+                            }
+                            if (score < min) {
+                                min = score;
+                            }
+                            if (score > max) {
+                                max = score;
+                            }
+                        }
+                        ticket.progress();
+                    }
                 }
             }
+            System.out.println("max: " + max);
+            System.out.println("min: " + min);
+            System.out.println("Removed: " + toRemove.size());
         }
-        System.out.println("max: " + max);
-        System.out.println("min: " + min);
-        System.out.println("Removed: " + toRemove.size());
         return null;
     }
 
@@ -203,7 +207,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
             bins[i] = bin;
         }
 
-        for (Peptide peptide: peptides) {
+        for (Peptide peptide : peptides) {
             binIndex = bins.length - 1;
             val = MolecularDescriptor.getDoubleValue(peptide, descriptor);
             if (val < max) {
@@ -293,41 +297,41 @@ public class FeatureSelector extends SwingWorker<Void, String> {
         }
         return num / Math.sqrt(sx * sy);
     }
-    
- /**
+
+    /**
      * Resolve a sequence of ties, using the configured {@link TiesStrategy}.
-     * The input <code>ranks</code> array is expected to take the same value
-     * for all indices in <code>tiesTrace</code>.  The common value is recoded
+     * The input <code>ranks</code> array is expected to take the same value for
+     * all indices in <code>tiesTrace</code>. The common value is recoded
      * according to the tiesStrategy. For example, if ranks = <5,8,2,6,2,7,1,2>,
      * tiesTrace = <2,4,7> and tiesStrategy is MINIMUM, ranks will be unchanged.
      * The same array and trace with tiesStrategy AVERAGE will come out
      * <5,8,3,6,3,7,1,3>.
      *
      * @param ranks array of ranks
-     * @param tiesTrace list of indices where <code>ranks</code> is constant
-     * -- that is, for any i and j in TiesTrace, <code> ranks[i] == ranks[j]
+     * @param tiesTrace list of indices where <code>ranks</code> is constant --
+     * that is, for any i and j in TiesTrace, <code> ranks[i] == ranks[j]
      * </code>
      */
-    private void resolveTie(double[] ranks, List<Integer> tiesTrace){
+    private void resolveTie(double[] ranks, List<Integer> tiesTrace) {
 //        // constant value of ranks over tiesTrace
         final double c = ranks[tiesTrace.get(0)];
 
         // length of sequence of tied ranks
         final int length = tiesTrace.size();
-        
+
         // Replace ranks with average 
-        double value = (2 * c + length - 1) / 2d;        
+        double value = (2 * c + length - 1) / 2d;
         double sum = 0;
-        for(int pos: tiesTrace){
-            sum+= pos;
+        for (int pos : tiesTrace) {
+            sum += pos;
         }
-        double avg = sum/length; 
-                
+        double avg = sum / length;
+
         Iterator<Integer> iterator = tiesTrace.iterator();
         while (iterator.hasNext()) {
             ranks[iterator.next()] = value;
-        }        
-    }    
+        }
+    }
 
 }
 

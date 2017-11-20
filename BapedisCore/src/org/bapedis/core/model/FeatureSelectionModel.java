@@ -32,7 +32,7 @@ public class FeatureSelectionModel {
         entropyCutoff = ENTROPY_CUTOFF_REFS[0];
         correlationCutoff = CORRELATION_CUTOFF_REFS[1];
         removeUseless = true;
-        removeRedundant = true;
+        removeRedundant = false;
         this.running = new AtomicBoolean(false);
         propertyChangeSupport = new PropertyChangeSupport(this);        
     }

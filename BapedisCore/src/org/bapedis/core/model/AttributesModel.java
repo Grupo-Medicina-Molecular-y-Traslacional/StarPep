@@ -28,7 +28,7 @@ import org.openide.nodes.Node;
  */
 public class AttributesModel {
 
-    protected final Map<String, MolecularDescriptor[]> mdMap;
+    protected final Map<String, List<MolecularDescriptor>> mdMap;
     protected final Set<PeptideAttribute> displayedColumnsModel;
     private static final int MAX_AVAILABLE_COLUMNS = 6;
     protected List<PeptideNode> nodeList;
@@ -61,7 +61,9 @@ public class AttributesModel {
         displayedColumnsModel.add(Peptide.SEQ);
         displayedColumnsModel.add(Peptide.LENGHT);
 
-        mdMap.put(Peptide.LENGHT.getCategory(), new MolecularDescriptor[]{Peptide.LENGHT});
+        List<MolecularDescriptor> list = new LinkedList<>();
+        list.add(Peptide.LENGHT);
+        mdMap.put(Peptide.LENGHT.getCategory(), list);
 
         mainGView = CSN_VIEW;
     }
@@ -127,32 +129,23 @@ public class AttributesModel {
         return false;
     }
 
-    public Map<String, MolecularDescriptor[]> getAllMolecularDescriptors() {
-        return mdMap;
+    public Set<String> getMolecularDescriptorKeys() {
+        return mdMap.keySet();
     }
 
-    public MolecularDescriptor[] getMolecularDescriptors(String category) {
-        return mdMap.get(category);
+    public List<MolecularDescriptor> getMolecularDescriptors(String category) {
+        return Collections.unmodifiableList(mdMap.get(category));
     }
 
     public boolean hasMolecularDescriptors(String category) {
         return mdMap.containsKey(category);
     }
 
-    public void addMolecularDescriptors(String category, MolecularDescriptor[] features) {
+    public void addMolecularDescriptors(String category, List<MolecularDescriptor> features) {
         if (mdMap.containsKey(category)){
-            MolecularDescriptor[] oldAttrs = mdMap.get(category);
-            boolean removed;
-            for(MolecularDescriptor oldAttr: oldAttrs){
-                removed= true;
-                for(MolecularDescriptor newAttr: features){
-                    if (oldAttr.equals(newAttr)){
-                        removed = false;
-                        break;
-                    }
-                }
-                if(removed){
-                    deleteAttribute(oldAttr);
+            for(MolecularDescriptor oldAttr: mdMap.get(category)){
+                if(!features.contains(oldAttr)){
+                    delete(oldAttr);
                 }
             }
         }
@@ -162,15 +155,25 @@ public class AttributesModel {
 
     public void deleteAllMolecularDescriptors(String category) {
         if (!category.equals(MolecularDescriptor.DEFAULT_CATEGORY)) {
-            PeptideAttribute[] features = mdMap.remove(category);
-            for(PeptideAttribute attr: features){
-                deleteAttribute(attr);
+            for(PeptideAttribute attr: mdMap.remove(category)){
+                delete(attr);
             }
             propertyChangeSupport.firePropertyChange(MD_ATTR_REMOVED, category, null);
         }
     }
+    
+    public void deleteAttribute(MolecularDescriptor attr){
+        String category = attr.getCategory();
+        if (mdMap.containsKey(category)){
+            List<MolecularDescriptor> list = mdMap.get(category);
+            delete(attr);
+            list.remove(attr);
+        }else{
+            throw new IllegalArgumentException("Unknown molecular descriptor category: " + category);
+        }
+    }
 
-    private void deleteAttribute(PeptideAttribute attr) {
+    private void delete(PeptideAttribute attr) {
         for (PeptideNode pNode : nodeList) {
             pNode.getPeptide().deleteAttribute(attr);
         }

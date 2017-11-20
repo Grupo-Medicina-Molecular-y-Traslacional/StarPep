@@ -11,7 +11,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 import javax.swing.JLabel;
 import javax.swing.event.AncestorEvent;
@@ -23,7 +22,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.MolecularDescriptor;
 import org.jdesktop.swingx.JXTable;
 import org.openide.util.NbBundle;
 
@@ -107,14 +105,14 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
         String[] columnNames = {"", NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.table.columnName.first"),
             NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.table.columnName.second")};
 
-        Map<String, MolecularDescriptor[]> map = attrModel.getAllMolecularDescriptors();
-        ArrayList<Object[]> data = new ArrayList(map.size());
+        Set<String> keys = attrModel.getMolecularDescriptorKeys();
+        ArrayList<Object[]> data = new ArrayList(keys.size());
         Object[] dataRow;
-        for (Map.Entry<String, MolecularDescriptor[]> entry : map.entrySet()) {
+        for (String key : keys) {
             dataRow = new Object[3];
             dataRow[0] = false;
-            dataRow[1] = entry.getKey();
-            dataRow[2] = entry.getValue().length;
+            dataRow[1] = key;
+            dataRow[2] = attrModel.getMolecularDescriptors(key).size();
             data.add(dataRow);
         }
         return new MyTableModel(columnNames, data);
@@ -180,7 +178,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
         if (evt.getPropertyName().equals(AttributesModel.MD_ATTR_ADDED)) {
             if (evt.getNewValue() != null) {
                 String category = (String) evt.getNewValue();
-                tableModel.addRow(false, category, attrModel.getMolecularDescriptors(category).length);
+                tableModel.addRow(false, category, attrModel.getMolecularDescriptors(category).size());
             }
         } else if (evt.getPropertyName().equals(AttributesModel.MD_ATTR_REMOVED)) {
             if (evt.getOldValue() != null) {

@@ -7,7 +7,6 @@ package org.bapedis.core.ui.components;
 
 import java.awt.BorderLayout;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -59,9 +58,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         DefaultComboBoxModel comboModel = (DefaultComboBoxModel) descriptorComboBox.getModel();
         comboModel.addElement(ALL_SELECTION);
         comboModel.setSelectedItem(ALL_SELECTION);
-        Map<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
-        for (Map.Entry<String, MolecularDescriptor[]> entry : mdMap.entrySet()) {
-            String key = entry.getKey();
+        for (String key : attrModel.getMolecularDescriptorKeys()) {
             comboModel.addElement(key);
         }
         // Add tool bar buttons
@@ -392,9 +389,8 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
             @Override
             protected Void doInBackground() throws Exception {
                 if (selectedKey.equals(ALL_SELECTION)) {
-                    Map<String, MolecularDescriptor[]> mdMap = attrModel.getAllMolecularDescriptors();
-                    for (Map.Entry<String, MolecularDescriptor[]> entry : mdMap.entrySet()) {
-                        for (MolecularDescriptor attr : entry.getValue()) {
+                    for (String key: attrModel.getMolecularDescriptorKeys()) {
+                        for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
                             leftListModel.addElement(attr);
                         }
                     }

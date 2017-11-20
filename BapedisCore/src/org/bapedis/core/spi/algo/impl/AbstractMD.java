@@ -137,7 +137,7 @@ public abstract class AbstractMD implements Algorithm {
                     list.add(attr);
                 }
                 for (Map.Entry<String, List<MolecularDescriptor>> entry : byCategory.entrySet()) {
-                    attrModel.addMolecularDescriptors(entry.getKey(), entry.getValue().toArray(new MolecularDescriptor[0]));
+                    attrModel.addMolecularDescriptors(entry.getKey(), entry.getValue());
                 }
                 progressTicket.progress();
             }

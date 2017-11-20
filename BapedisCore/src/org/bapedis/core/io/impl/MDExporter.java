@@ -7,7 +7,7 @@ package org.bapedis.core.io.impl;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.Map;
+import java.util.Set;
 import org.bapedis.core.io.Exporter;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
@@ -30,11 +30,11 @@ public class MDExporter implements Exporter {
     public void exportTo(File file) throws Exception {
         PrintWriter pw = new PrintWriter(file);
         try {
-            Map<String, MolecularDescriptor[]> map = attrModel.getAllMolecularDescriptors();
+            Set<String> keys = attrModel.getMolecularDescriptorKeys();
             //Write header            
             pw.format("\"%s\"", Peptide.ID.getDisplayName());
-            for (Map.Entry<String, MolecularDescriptor[]> entry : map.entrySet()) {
-                for (MolecularDescriptor attr : entry.getValue()) {
+            for (String key : keys) {
+                for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
                     pw.write(separator);
                     pw.format("\"%s\"", attr.getDisplayName());
                 }
@@ -43,8 +43,8 @@ public class MDExporter implements Exporter {
             // Write data
             for (Peptide pept : attrModel.getPeptides()) {
                 pw.format("\"%s\"", pept.getId());
-                for (Map.Entry<String, MolecularDescriptor[]> entry : map.entrySet()) {
-                    for (MolecularDescriptor attr : entry.getValue()) {
+                for (String key: keys) {
+                    for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
                         Object val = pept.getAttributeValue(attr);
                         pw.write(separator);
                         pw.format("\"%s\"", val != null ? val.toString() : "");

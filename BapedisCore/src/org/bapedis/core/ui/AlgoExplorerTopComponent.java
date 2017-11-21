@@ -105,7 +105,6 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     protected final AlgorithmExecutor executor;
     private RichTooltip richTooltip;
     private final AlgoPresetPersistence algoPresetPersistence;
-    private final AlgorithmListener algoListener;
     protected Lookup.Result<AttributesModel> peptideLkpResult;
     protected final String NO_SELECTION;
 
@@ -116,7 +115,6 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
         algoPresetPersistence = new AlgoPresetPersistence();
-        algoListener = new AlgorithmListenerImpl();
         ((PropertySheet) propSheetPanel).setDescriptionAreaVisible(false);
         NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text");
         DefaultComboBoxModel comboBoxModel =  new DefaultComboBoxModel();
@@ -342,7 +340,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                     DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
                 } else {
                     algoModel.setRunning(true);
-                    executor.execute(algo, algoListener, null);
+                    executor.execute(algo);
                 }
             }
         }
@@ -635,24 +633,6 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 }
             }
         }
-    }
-
-    private static class AlgorithmListenerImpl implements AlgorithmListener {
-
-        private final ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
-
-        @Override
-        public void algorithmFinished(Algorithm algo) {
-            AlgorithmModel algoModel;
-            for (Iterator<? extends Workspace> it = pm.getWorkspaceIterator(); it.hasNext();) {
-                Workspace workspace = it.next();
-                algoModel = pm.getAlgorithmModel(workspace);
-                if (algoModel.getSelectedAlgorithm() != null && algoModel.getSelectedAlgorithm().equals(algo)) {
-                    algoModel.setRunning(false);
-                }
-            }
-        }
-
     }
 }
 

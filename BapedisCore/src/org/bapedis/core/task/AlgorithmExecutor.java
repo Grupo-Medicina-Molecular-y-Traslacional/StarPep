@@ -42,6 +42,7 @@
 package org.bapedis.core.task;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -51,10 +52,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingWorker;
+import org.bapedis.core.model.AlgorithmModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.openide.util.Cancellable;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
@@ -74,6 +78,8 @@ public final class AlgorithmExecutor {
     private final ProjectManager pc;
     private final ThreadPoolExecutor executor;
     private final List<AlgoExecutor> taskList;
+    private final AlgorithmListener defaultAlgoListener;
+    private final AlgorithmErrorHandler defaultErrorHandler;
 
     /**
      * Creates a new task executor.
@@ -85,12 +91,14 @@ public final class AlgorithmExecutor {
         int maximumPoolSize = numberOfCPUs + 1;
         this.executor = new ThreadPoolExecutor(0, maximumPoolSize, 15, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
         taskList = new LinkedList<>();
+        defaultAlgoListener = new AlgorithmListenerImpl();
+        defaultErrorHandler = new AlgorithmErrorHandlerImpl();
     }
 
     /**
      * Execute an algorithm with cancel and progress support.
      *
-     * @param workspace the workspace containing the algorithm 
+     * @param workspace the workspace containing the algorithm
      * @param algorithm the algorithm to be executed
      * @param listener the listener to this executor. The listener is called
      * when the task is finished.
@@ -100,7 +108,7 @@ public final class AlgorithmExecutor {
      */
     public synchronized void execute(Workspace workspace, final Algorithm algorithm, AlgorithmListener listener, AlgorithmErrorHandler errorHandler) {
         Collection<? extends Algorithm> algorithms = workspace.getLookup().lookupAll(Algorithm.class);
-        if (!algorithms.contains(algorithm)){
+        if (!algorithms.contains(algorithm)) {
             throw new IllegalArgumentException("The workspace does not contains the algorithm to be executed");
         }
         String taskName = NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.name", workspace.getName(), algorithm.getFactory().getName());
@@ -123,7 +131,7 @@ public final class AlgorithmExecutor {
      * @throws NullPointerException if <code>algorithm</code> is null
      */
     public synchronized void execute(Algorithm algorithm, AlgorithmListener listener, AlgorithmErrorHandler errorHandler) {
-        execute(pc.getCurrentWorkspace(),algorithm, listener, errorHandler);
+        execute(pc.getCurrentWorkspace(), algorithm, listener, errorHandler);
     }
 
     /**
@@ -133,8 +141,8 @@ public final class AlgorithmExecutor {
      * @throws NullPointerException if <code>algorithm</code> is null
      */
     public synchronized void execute(Algorithm algorithm) {
-        execute(algorithm, null, null);
-    }
+        execute(algorithm, defaultAlgoListener, defaultErrorHandler);
+    }    
 
     /**
      * Cancel an algorithm.
@@ -154,16 +162,6 @@ public final class AlgorithmExecutor {
             }
         }
         return false;
-    }
-
-    private synchronized void finished(AlgoExecutor runnable) {
-        if (taskList.remove(runnable)) {
-            runnable.algorithm.endAlgo();
-            runnable.progress.finish();
-            if (runnable.listener != null) {
-                runnable.listener.algorithmFinished(runnable.algorithm);
-            }
-        }
     }
 
     /**
@@ -209,7 +207,7 @@ public final class AlgorithmExecutor {
                     Logger.getLogger(AlgoExecutor.class.getName()).log(Level.SEVERE, "", e);
                 }
             } finally {
-                finished(this);
+                finish();
             }
         }
 
@@ -219,11 +217,49 @@ public final class AlgorithmExecutor {
             if (!running.get()) {
                 isCancelled = future.cancel(true);
                 if (isCancelled) {
-                    finished(this);
+                    finish();
                 }
             }
             return isCancelled;
         }
+
+        private void finish() {
+            if (taskList.remove(this)) {
+                algorithm.endAlgo();
+                progress.finish();
+                if (listener != null) {                     
+                    listener.algorithmFinished(algorithm);
+                }
+            }
+        }
+    }
+
+    private class AlgorithmListenerImpl implements AlgorithmListener {
+
+        @Override
+        public void algorithmFinished(Algorithm algo) {
+            AlgorithmModel algoModel;
+            for (Iterator<? extends Workspace> it = pc.getWorkspaceIterator(); it.hasNext();) {
+                Workspace workspace = it.next();
+                algoModel = pc.getAlgorithmModel(workspace);
+                if (algoModel.getSelectedAlgorithm() != null && algoModel.getSelectedAlgorithm().equals(algo)) {
+                    algoModel.setRunning(false);
+                    if (pc.getCurrentWorkspace() != workspace) {
+                        pc.workspaceChangeNotification("The algorithm has finished", workspace);
+                    }
+                }
+            }
+        }
+
+    }
+
+    private class AlgorithmErrorHandlerImpl implements AlgorithmErrorHandler {
+
+        @Override
+        public void fatalError(Throwable t) {
+            Exceptions.printStackTrace(t);
+        }
+
     }
 
 }

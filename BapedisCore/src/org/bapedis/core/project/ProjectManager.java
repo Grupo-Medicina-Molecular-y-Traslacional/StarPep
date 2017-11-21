@@ -6,6 +6,8 @@
 package org.bapedis.core.project;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
@@ -23,6 +25,8 @@ import org.gephi.graph.api.Configuration;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Origin;
 import org.gephi.graph.api.Table;
+import org.openide.awt.NotificationDisplayer;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.AbstractLookup;
@@ -136,7 +140,17 @@ public class ProjectManager implements Lookup.Provider {
         }
         setCurrentWorkspace(defaultWorkspace);
     }
+    
+    public void workspaceChangeNotification(String text, Workspace ws){
+        NotificationDisplayer.getDefault().notify(text, ImageUtilities.loadImageIcon("org/bapedis/core/resources/balloon.png", true), "Click here to change workspace", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setCurrentWorkspace(ws);
+            }
+        });
+    }
 
+    // Factory Iterators
     public Iterator<? extends FilterFactory> getFilterFactoryIterator() {
         Collection<? extends FilterFactory> factories = Lookup.getDefault().lookupAll(FilterFactory.class);
         return factories.iterator();

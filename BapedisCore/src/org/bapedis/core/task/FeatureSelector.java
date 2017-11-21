@@ -17,11 +17,15 @@ import org.bapedis.core.model.FeatureSelectionModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.project.ProjectManager;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.windows.IOProvider;
+import org.openide.windows.InputOutput;
 
 /**
  *
@@ -33,6 +37,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
     private final ProgressTicket ticket;
     private final AttributesModel attrModel;
     private final FeatureSelectionModel model;
+    private final InputOutput io;
 
     public FeatureSelector(FeatureSelectionModel model, AttributesModel attrModel) {
         this.attrModel = attrModel;
@@ -45,6 +50,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                 return true;
             }
         });
+        io = IOProvider.getDefault().getIO(model.getOwnerWS().getName(), false);        
     }
 
     @Override
@@ -70,8 +76,9 @@ public class FeatureSelector extends SwingWorker<Void, String> {
         double max = Double.MIN_VALUE;
         String maxName = "";
         String minName = "";
-        System.out.println("Max score: " + maxScore);
-        System.out.println("cut off: " + threshold);
+                
+        io.getOut().println("Max score: " + maxScore);
+        io.getOut().println("cut off: " + threshold);
         LinkedList<MolecularDescriptor> toRemove = new LinkedList<>();
         for (MolecularDescriptor descriptor : allFeatures) {
             if (!stopRun) {
@@ -82,7 +89,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                 if (score < threshold) {
                     toRemove.add(descriptor);
                     attrModel.deleteAttribute(descriptor);
-                    System.out.println("Removed: " + descriptor.getDisplayName() + " - score: " + score);
+                    io.getOut().println("Removed: " + descriptor.getDisplayName() + " - score: " + score);
                 }
                 if (score < min) {
                     min = score;
@@ -96,16 +103,15 @@ public class FeatureSelector extends SwingWorker<Void, String> {
             }
         }
         allFeatures.removeAll(toRemove);
-        System.out.println("max: " + maxName + ": " + max);
-        System.out.println("min: " + minName + ": " + min);
+        io.getOut().println("max: " + maxName + ": " + max);
+        io.getOut().println("min: " + minName + ": " + min);
 
         if (model.isRemoveRedundant()) {
             // Correlation
-            System.out.println("---------------Spearman Correlation--------------");
+            io.getOut().println("---------------Spearman Correlation--------------");
             threshold = model.getCorrelationCutoff() / 100.;
             min = Double.MAX_VALUE;
             max = Double.MIN_VALUE;
-//                    ticket.start();
             MolecularDescriptor[] rankedFeatures = allFeatures.toArray(new MolecularDescriptor[0]);
             Arrays.sort(rankedFeatures, new Comparator<MolecularDescriptor>() {
                 @Override
@@ -119,6 +125,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                     return 0;
                 }
             });
+            io.getOut().println("max: " + rankedFeatures[0]);
             ticket.progress("Spearman Correlation");
             ticket.switchToDeterminate(rankedFeatures.length * rankedFeatures.length);
             toRemove.clear();
@@ -142,7 +149,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                             rank2 = rank(column2);
                             score = calculatePearsonCorrelation(rank1, rank2);
                             if (score >= threshold) {
-                                System.out.println(">0.4=" + score + ": " + rankedFeatures[i].getDisplayName() + " - " + rankedFeatures[j].getDisplayName());
+                                io.getOut().println(">0.4=" + score + ": " + rankedFeatures[i].getDisplayName() + " - " + rankedFeatures[j].getDisplayName());
                                 attrModel.deleteAttribute(rankedFeatures[j]);
                                 toRemove.add(rankedFeatures[j]);
                                 rankedFeatures[j] = null;
@@ -158,9 +165,8 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                     }
                 }
             }
-            System.out.println("max: " + max);
-            System.out.println("min: " + min);
-            System.out.println("Removed: " + toRemove.size());
+            io.getOut().println("max: " + max);
+            io.getOut().println("Removed: " + toRemove.size());
         }
         return null;
     }
@@ -184,6 +190,11 @@ public class FeatureSelector extends SwingWorker<Void, String> {
         } finally {
             model.setRunning(false);
             ticket.finish();
+            io.getOut().close();
+            ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);            
+            if (pc.getCurrentWorkspace() != model.getOwnerWS()){
+                pc.workspaceChangeNotification("Finished", model.getOwnerWS());
+            }
         }
     }
 

@@ -3,23 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.ui;
+package org.bapedis.core.ui.components;
 
-import java.awt.Component;
-import org.openide.awt.StatusLineElementProvider;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author loge
  */
-//@ServiceProvider(service = StatusLineElementProvider.class, position = 10)
-public class ContextStatusBar extends javax.swing.JPanel implements StatusLineElementProvider{
+public class ContextPanel extends javax.swing.JPanel{
 
     /**
      * Creates new form ContextStatusBar
      */
-    public ContextStatusBar() {
+    public ContextPanel() {
         initComponents();
     }
 
@@ -50,13 +46,13 @@ public class ContextStatusBar extends javax.swing.JPanel implements StatusLineEl
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
         peptidePanel.add(jSeparator1, java.awt.BorderLayout.WEST);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(ContextStatusBar.class, "ContextStatusBar.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(ContextPanel.class, "ContextPanel.jLabel1.text")); // NOI18N
         centerPanel1.add(jLabel1);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(ContextStatusBar.class, "ContextStatusBar.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(ContextPanel.class, "ContextPanel.jLabel2.text")); // NOI18N
         centerPanel1.add(jLabel2);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(ContextStatusBar.class, "ContextStatusBar.jLabel3.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(ContextPanel.class, "ContextPanel.jLabel3.text")); // NOI18N
         centerPanel1.add(jLabel3);
 
         peptidePanel.add(centerPanel1, java.awt.BorderLayout.CENTER);
@@ -68,13 +64,13 @@ public class ContextStatusBar extends javax.swing.JPanel implements StatusLineEl
         jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
         graphPanel.add(jSeparator2, java.awt.BorderLayout.WEST);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(ContextStatusBar.class, "ContextStatusBar.jLabel4.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(ContextPanel.class, "ContextPanel.jLabel4.text")); // NOI18N
         centerPanel2.add(jLabel4);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(ContextStatusBar.class, "ContextStatusBar.jLabel5.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(ContextPanel.class, "ContextPanel.jLabel5.text")); // NOI18N
         centerPanel2.add(jLabel5);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(ContextStatusBar.class, "ContextStatusBar.jLabel6.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(ContextPanel.class, "ContextPanel.jLabel6.text")); // NOI18N
         centerPanel2.add(jLabel6);
 
         graphPanel.add(centerPanel2, java.awt.BorderLayout.CENTER);
@@ -82,10 +78,6 @@ public class ContextStatusBar extends javax.swing.JPanel implements StatusLineEl
         add(graphPanel);
     }// </editor-fold>//GEN-END:initComponents
 
-    @Override
-    public Component getStatusLineElement() {
-        return this;
-    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

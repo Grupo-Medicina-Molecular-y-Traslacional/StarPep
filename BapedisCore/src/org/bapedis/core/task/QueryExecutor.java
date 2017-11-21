@@ -15,6 +15,7 @@ import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
+import org.bapedis.core.project.StatusBarClock;
 import org.bapedis.core.spi.data.PeptideDAO;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
@@ -68,6 +69,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
     protected void process(List<String> chunks) {
         queryModel.setRunning(true);
         WindowManager.getDefault().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        io.getOut().println(StatusBarClock.getStrTime() + " " + NbBundle.getMessage(QueryExecutor.class, "Workspace.task.begin", "Query"));
     }
 
     @Override
@@ -109,6 +111,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
                 String txt = NbBundle.getMessage(QueryExecutor.class, "Workspace.task.finish", "Query");
                 pc.workspaceChangeNotification(txt, workspace);
             }
+            io.getOut().println(StatusBarClock.getStrTime() + " " +NbBundle.getMessage(QueryExecutor.class, "Workspace.task.finish", "Query"));
             io.getOut().close();
             io.getErr().close();
         }

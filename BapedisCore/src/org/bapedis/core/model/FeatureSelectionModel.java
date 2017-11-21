@@ -14,10 +14,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author loge
  */
 public class FeatureSelectionModel {
-    //Entropy cut off labels: Very weak, Weak and Moderate
-    public static final int[] ENTROPY_CUTOFF_REFS = new int[]{1, 10};
-    //Tanimoto cut off labels: Strong and Moderate    
-    public static final int[] CORRELATION_CUTOFF_REFS = new int[]{90, 98};
+    //Entropy cutoff for reference: Very weak, Weak and Moderate
+    public static final int[] ENTROPY_CUTOFF_REFS = new int[]{1, 5, 10};
+    public static final int ENTROPY_CUTOFF_MIN=1;
+    public static final int ENTROPY_CUTOFF_MAX=10;
+    public static final int ENTROPY_MAJORTICKSPACING=9;
+    public static final int ENTROPY_MINORTICKSPACING=1;
+    
+    //Correlation cutoff for references: Moderate, Strong and Very Strong    
+    public static final int[] CORRELATION_CUTOFF_REFS = new int[]{40, 60, 80};
+    public static final int CORRELATION_CUTOFF_MIN=40;
+    public static final int CORRELATION_CUTOFF_MAX=100;
+    public static final int CORRELATION_MAJORTICKSPACING=20;
+    public static final int CORRELATION_MINORTICKSPACING=5;    
     
     protected final Workspace owner;
     public static final String RUNNING = "RUNNING";

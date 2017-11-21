@@ -133,14 +133,14 @@ public class FeatureSelector extends SwingWorker<Void, String> {
             double[] column2 = new double[peptides.size()];
             double[] rank1, rank2;
             int k;
-            for (int i = 0; i < rankedFeatures.length - 1; i++) {
+            for (int i = 0; i < rankedFeatures.length - 1 && !stopRun; i++) {
                 if (rankedFeatures[i] != null) {
                     k = 0;
                     for (Peptide peptide : peptides) {
                         column1[k++] = MolecularDescriptor.getDoubleValue(peptide, rankedFeatures[i]);
                     }
                     rank1 = rank(column1);
-                    for (int j = i + 1; j < rankedFeatures.length; j++) {
+                    for (int j = i + 1; j < rankedFeatures.length && !stopRun; j++) {
                         if (rankedFeatures[j] != null) {
                             k = 0;
                             for (Peptide peptide : peptides) {
@@ -149,7 +149,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                             rank2 = rank(column2);
                             score = calculatePearsonCorrelation(rank1, rank2);
                             if (score >= threshold) {
-                                io.getOut().println(">0.4=" + score + ": " + rankedFeatures[i].getDisplayName() + " - " + rankedFeatures[j].getDisplayName());
+                                io.getOut().println(">=" + score + ": " + rankedFeatures[i].getDisplayName() + " - " + rankedFeatures[j].getDisplayName());
                                 attrModel.deleteAttribute(rankedFeatures[j]);
                                 toRemove.add(rankedFeatures[j]);
                                 rankedFeatures[j] = null;

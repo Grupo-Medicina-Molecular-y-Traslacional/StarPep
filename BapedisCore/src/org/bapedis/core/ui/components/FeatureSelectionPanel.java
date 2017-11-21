@@ -40,10 +40,10 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         this.model = model;
 
         // Configure sliders        
-        uselessSlider.setMinimum(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[0]);
-        uselessSlider.setMaximum(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[1]);
-        uselessSlider.setMajorTickSpacing(10);
-        uselessSlider.setMinorTickSpacing(1);
+        uselessSlider.setMinimum(FeatureSelectionModel.ENTROPY_CUTOFF_MIN);
+        uselessSlider.setMaximum(FeatureSelectionModel.ENTROPY_CUTOFF_MAX);
+        uselessSlider.setMajorTickSpacing(FeatureSelectionModel.ENTROPY_MAJORTICKSPACING);
+        uselessSlider.setMinorTickSpacing(FeatureSelectionModel.ENTROPY_MINORTICKSPACING);
         int val = model.getEntropyCutoff();
         uselessSlider.setValue(val);
         uselessLabel.setText(val + "%");
@@ -57,15 +57,16 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         });
 
         Hashtable<Integer, JLabel> uselessLabelTable = new Hashtable<>();
-        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.weak")));
-        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.moderate")));
+        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.low")));
+        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.middle")));
+        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.high")));
 
         uselessSlider.setLabelTable(uselessLabelTable);
 
-        redundantSlider.setMinimum(FeatureSelectionModel.CORRELATION_CUTOFF_REFS[0]);
-        redundantSlider.setMaximum(FeatureSelectionModel.CORRELATION_CUTOFF_REFS[1]);
-        redundantSlider.setMajorTickSpacing(8);
-        redundantSlider.setMinorTickSpacing(1);
+        redundantSlider.setMinimum(FeatureSelectionModel.CORRELATION_CUTOFF_MIN);
+        redundantSlider.setMaximum(FeatureSelectionModel.CORRELATION_CUTOFF_MAX);
+        redundantSlider.setMajorTickSpacing(FeatureSelectionModel.CORRELATION_MAJORTICKSPACING);
+        redundantSlider.setMinorTickSpacing(FeatureSelectionModel.CORRELATION_MINORTICKSPACING);
         val = model.getCorrelationCutoff();
         redundantSlider.setValue(val);
         redundantLabel.setText(val + "%");
@@ -79,8 +80,9 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         });
 
         Hashtable<Integer, JLabel> redundantLabelTable = new Hashtable<>();
-        redundantLabelTable.put(FeatureSelectionModel.CORRELATION_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.strong")));
-        redundantLabelTable.put(FeatureSelectionModel.CORRELATION_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.moderate")));
+        redundantLabelTable.put(FeatureSelectionModel.CORRELATION_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.low")));
+        redundantLabelTable.put(FeatureSelectionModel.CORRELATION_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.middle")));
+        redundantLabelTable.put(FeatureSelectionModel.CORRELATION_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.high")));
 
         redundantSlider.setLabelTable(redundantLabelTable);
 
@@ -164,8 +166,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         rightPanel = new javax.swing.JPanel();
         removeButton = new javax.swing.JButton();
 
-        setMinimumSize(new java.awt.Dimension(440, 250));
-        setPreferredSize(new java.awt.Dimension(440, 250));
+        setMinimumSize(new java.awt.Dimension(440, 290));
+        setPreferredSize(new java.awt.Dimension(540, 320));
         setLayout(new java.awt.GridBagLayout());
 
         centerPanel.setPreferredSize(new java.awt.Dimension(259, 130));
@@ -236,6 +238,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
         entropyPanel.add(uselessLabel, gridBagConstraints);
@@ -260,9 +264,10 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 2, 0, 0);
         centerPanel.add(entropyPanel, gridBagConstraints);
 
@@ -290,6 +295,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
         correlationPanel.add(redundantLabel, gridBagConstraints);
@@ -314,9 +321,10 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         centerPanel.add(correlationPanel, gridBagConstraints);
 

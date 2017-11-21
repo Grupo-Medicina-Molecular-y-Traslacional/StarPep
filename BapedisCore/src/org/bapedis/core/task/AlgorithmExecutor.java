@@ -52,7 +52,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.SwingWorker;
 import org.bapedis.core.model.AlgorithmModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
@@ -245,7 +244,8 @@ public final class AlgorithmExecutor {
                 if (algoModel.getSelectedAlgorithm() != null && algoModel.getSelectedAlgorithm().equals(algo)) {
                     algoModel.setRunning(false);
                     if (pc.getCurrentWorkspace() != workspace) {
-                        pc.workspaceChangeNotification("The algorithm has finished", workspace);
+                        String txt = NbBundle.getMessage(AlgorithmExecutor.class, "Workspace.task.finish", algo.getFactory().getName() );
+                        pc.workspaceChangeNotification(txt, workspace);
                     }
                 }
             }

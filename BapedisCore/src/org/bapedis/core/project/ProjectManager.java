@@ -142,7 +142,9 @@ public class ProjectManager implements Lookup.Provider {
     }
     
     public void workspaceChangeNotification(String text, Workspace ws){
-        NotificationDisplayer.getDefault().notify(text, ImageUtilities.loadImageIcon("org/bapedis/core/resources/balloon.png", true), "Click here to change workspace", new ActionListener() {
+        String reason = NbBundle.getMessage(ProjectManager.class, "ChangeWorkspace.notification.reason", ws.getName(), text);
+        String action = NbBundle.getMessage(ProjectManager.class, "ChangeWorkspace.notification.action");
+        NotificationDisplayer.getDefault().notify(reason, ImageUtilities.loadImageIcon("org/bapedis/core/resources/balloon.png", true), action, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setCurrentWorkspace(ws);

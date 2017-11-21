@@ -109,10 +109,6 @@ public class AttributeFilter implements Filter {
         } else {
             accepted = operator.applyTo(objValue, value, matchCase);
         }
-//        try {
-//            Thread.sleep(1);
-//        } catch (InterruptedException ex) {
-//        }
         return negative ? !accepted : accepted;
     }
 

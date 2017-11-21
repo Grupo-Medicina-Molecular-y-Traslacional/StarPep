@@ -20,6 +20,7 @@ import org.bapedis.core.model.PeptideNode;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.filters.Filter;
+import static org.bapedis.core.task.QueryExecutor.pc;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
@@ -164,7 +165,6 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
             subGraphDB.removeAllNodes(metadataNodes);
         }
         ticket.progress();
-
         return set;
     }
 
@@ -209,6 +209,10 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
             ticket.finish();
             workspace.remove(this);
             filterModel.setRunning(false);
+            if (pc.getCurrentWorkspace() != workspace) {
+                String txt = NbBundle.getMessage(FilterExecutor.class, "Workspace.task.finish", "Filter");
+                pc.workspaceChangeNotification(txt, workspace);
+            }            
         }
     }
 

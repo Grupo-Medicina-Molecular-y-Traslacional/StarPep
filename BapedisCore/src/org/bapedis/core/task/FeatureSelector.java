@@ -191,10 +191,11 @@ public class FeatureSelector extends SwingWorker<Void, String> {
             model.setRunning(false);
             ticket.finish();
             io.getOut().close();
-            ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);            
-            if (pc.getCurrentWorkspace() != model.getOwnerWS()){
-                pc.workspaceChangeNotification("Finished", model.getOwnerWS());
-            }
+            ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+            if (pc.getCurrentWorkspace() != model.getOwnerWS()) {
+                String txt = NbBundle.getMessage(FeatureSelector.class, "Workspace.task.finish", "Feature selection");
+                pc.workspaceChangeNotification(txt, model.getOwnerWS());
+            }  
         }
     }
 

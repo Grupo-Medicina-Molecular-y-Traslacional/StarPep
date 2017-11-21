@@ -11,8 +11,10 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.DeleteDescriptorModel;
+import org.bapedis.core.project.ProjectManager;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
@@ -26,6 +28,7 @@ public class DeleteDescriptor extends SwingWorker<Void, String> {
     private boolean stopRun = false;
     private final ProgressTicket ticket;
     private final DeleteDescriptorModel model;
+    
 
     public DeleteDescriptor(DeleteDescriptorModel model, AttributesModel attrModel, Set<String> keys) {
         this.keys = keys;
@@ -70,6 +73,11 @@ public class DeleteDescriptor extends SwingWorker<Void, String> {
         } finally {
             model.setRunning(false);
             ticket.finish();
+            ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+            if (pc.getCurrentWorkspace() != model.getOwnerWS()) {
+                String txt = NbBundle.getMessage(DeleteDescriptor.class, "Workspace.task.finish", "Deleting molecular descriptors");
+                pc.workspaceChangeNotification(txt, model.getOwnerWS());
+            }             
         }
     }
 

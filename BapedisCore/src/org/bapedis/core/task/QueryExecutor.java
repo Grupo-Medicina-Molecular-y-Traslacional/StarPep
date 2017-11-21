@@ -20,6 +20,7 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 
 /**
@@ -73,9 +74,9 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
             if (oldModel != null) {
                 workspace.remove(oldModel);
                 newModel.setMainGView(oldModel.getMainGView());
-            }                                                                   
+            }
             workspace.add(newModel);
-            
+
             // Set new view            
             switch (newModel.getMainGView()) {
                 case AttributesModel.GRAPH_DB_VIEW:
@@ -84,7 +85,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
                 case AttributesModel.CSN_VIEW:
                     graphModel.setVisibleView(newModel.getCsnView());
                     break;
-            }            
+            }
             newModel.fireChangedGraphView();
 
             // Destroy old graph model       
@@ -97,6 +98,10 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
         } finally {
             queryModel.setRunning(false);
             WindowManager.getDefault().getMainWindow().setCursor(Cursor.getDefaultCursor());
+            if (pc.getCurrentWorkspace() != workspace) {
+                String txt = NbBundle.getMessage(QueryExecutor.class, "Workspace.task.finish", "Query");
+                pc.workspaceChangeNotification(txt, workspace);
+            }
         }
     }
 

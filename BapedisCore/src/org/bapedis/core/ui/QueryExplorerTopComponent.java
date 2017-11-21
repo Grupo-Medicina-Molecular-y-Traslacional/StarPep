@@ -314,9 +314,10 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
             oldModel.removePropertyChangeListener(this);
         }
         QueryModel newModel = pc.getQueryModel(newWs);
-        newModel.addPropertyChangeListener(this);
         restrictiveComboBox.setSelectedItem(newModel.getRestriction());
         explorerMgr.setRootContext(newModel.getRootContext());
+        refreshRunningState(newModel.isRunning());
+        newModel.addPropertyChangeListener(this);        
     }
 
     @Override

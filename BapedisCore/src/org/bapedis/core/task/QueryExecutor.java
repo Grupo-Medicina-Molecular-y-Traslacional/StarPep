@@ -21,6 +21,8 @@ import org.gephi.graph.api.GraphModel;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.windows.IOProvider;
+import org.openide.windows.InputOutput;
 import org.openide.windows.WindowManager;
 
 /**
@@ -31,6 +33,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
 
     protected static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected final Workspace workspace;
+    protected final InputOutput io;
     protected final QueryModel queryModel;
     protected final GraphModel graphModel;
     protected final AttributesModel oldModel;
@@ -44,6 +47,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
         queryModel = pc.getQueryModel(workspace);
         graphModel = pc.getGraphModel(workspace);
         oldModel = pc.getAttributesModel(workspace);
+        io = IOProvider.getDefault().getIO(workspace.getName(), false);
     }
 
     @Override
@@ -93,8 +97,11 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
                 graphModel.destroyView(oldModel.getCsnView());
                 graphModel.destroyView(oldModel.getGraphDBView());
             }
+            
+            io.getOut().println(NbBundle.getMessage(QueryExecutor.class, "QueryExecutor.output.text", newModel.getNodeList().size()));
         } catch (InterruptedException | ExecutionException ex) {
             Exceptions.printStackTrace(ex);
+            io.getErr().println(ex.getCause());
         } finally {
             queryModel.setRunning(false);
             WindowManager.getDefault().getMainWindow().setCursor(Cursor.getDefaultCursor());
@@ -102,6 +109,8 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
                 String txt = NbBundle.getMessage(QueryExecutor.class, "Workspace.task.finish", "Query");
                 pc.workspaceChangeNotification(txt, workspace);
             }
+            io.getOut().close();
+            io.getErr().close();
         }
     }
 

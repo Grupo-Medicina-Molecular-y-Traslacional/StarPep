@@ -17,6 +17,7 @@ import org.bapedis.core.model.FeatureSelectionModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -36,12 +37,16 @@ public class FeatureSelector extends SwingWorker<Void, String> {
     private final AttributesModel attrModel;
     private final FeatureSelectionModel model;
     private final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+    private final String taskName = "Feature Selection";
+    private final Workspace workspace;
+    private final int rankView = 3;
 
     public FeatureSelector(FeatureSelectionModel model, AttributesModel attrModel) {
         this.attrModel = attrModel;
         this.model = model;
+        workspace = model.getOwnerWS();
         stopRun = false;
-        ticket = new ProgressTicket(NbBundle.getMessage(FeatureSelector.class, "FeatureSelector.task.name", model.getOwnerWS().getName()), new Cancellable() {
+        ticket = new ProgressTicket(NbBundle.getMessage(FeatureSelector.class, "FeatureSelector.task.name", workspace.getName()), new Cancellable() {
             @Override
             public boolean cancel() {
                 stopRun = true;
@@ -51,31 +56,35 @@ public class FeatureSelector extends SwingWorker<Void, String> {
     }
 
     @Override
-    protected Void doInBackground() throws Exception {        
+    protected Void doInBackground() throws Exception {
         if (!model.isRemoveUseless()) {
             return null;
         }
         ticket.start();
         publish("start");
+        pc.reportRunningTask(taskName, workspace);
+
         List<MolecularDescriptor> allFeatures = new LinkedList<>();
         for (String key : attrModel.getMolecularDescriptorKeys()) {
             for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
                 allFeatures.add(attr);
             }
         }
+
+        //---------------Remove Useless--------------
         List<Peptide> peptides = attrModel.getPeptides();
+        String state1 = NbBundle.getMessage(FeatureSelector.class, "FeatureSelector.task.removeUseless");
+        pc.reportMsg(state1 + System.getProperty("line.separator"), workspace);
+        ticket.progress(state1);
         ticket.switchToDeterminate(allFeatures.size());
 
         Bin[] bins = new Bin[peptides.size()];
         double maxScore = Math.log(peptides.size());
         double threshold = model.getEntropyCutoff() * maxScore / 100;
-        double score, min = Double.MAX_VALUE;
-        double max = Double.MIN_VALUE;
-        String maxName = "";
-        String minName = "";
-                
-        pc.reportMsg("Max score: " + maxScore, model.getOwnerWS());
-        pc.reportMsg("cut off: " + threshold, model.getOwnerWS());
+        double score;
+
+        pc.reportMsg("Entropy max score: " + maxScore, workspace);
+        pc.reportMsg("Entropy cutoff value: " + threshold + System.getProperty("line.separator"), workspace);
         LinkedList<MolecularDescriptor> toRemove = new LinkedList<>();
         for (MolecularDescriptor descriptor : allFeatures) {
             if (!stopRun) {
@@ -86,49 +95,53 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                 if (score < threshold) {
                     toRemove.add(descriptor);
                     attrModel.deleteAttribute(descriptor);
-                    pc.reportMsg("Removed: " + descriptor.getDisplayName() + " - score: " + score, model.getOwnerWS());
-                }
-                if (score < min) {
-                    min = score;
-                    minName = descriptor.getDisplayName();
-                }
-                if (score > max) {
-                    max = score;
-                    maxName = descriptor.getDisplayName();
+                    pc.reportMsg("Removed: " + descriptor.getDisplayName() + " - score: " + score, workspace);
                 }
                 ticket.progress();
             }
         }
         allFeatures.removeAll(toRemove);
-        pc.reportMsg("max: " + maxName + ": " + max, model.getOwnerWS());
-        pc.reportMsg("min: " + minName + ": " + min, model.getOwnerWS());
+        pc.reportMsg(System.getProperty("line.separator"), workspace);
+        pc.reportMsg("Useless features removed:" + toRemove.size() + System.getProperty("line.separator"), workspace);
 
-        if (model.isRemoveRedundant()) {
-            // Correlation
-            pc.reportMsg("---------------Spearman Correlation--------------", model.getOwnerWS());
-            threshold = model.getCorrelationCutoff() / 100.;
-            min = Double.MAX_VALUE;
-            max = Double.MIN_VALUE;
-            MolecularDescriptor[] rankedFeatures = allFeatures.toArray(new MolecularDescriptor[0]);
-            Arrays.sort(rankedFeatures, new Comparator<MolecularDescriptor>() {
-                @Override
-                public int compare(MolecularDescriptor o1, MolecularDescriptor o2) {
-                    if (o1.getScore() < o2.getScore()) {
-                        return -1;
-                    }
-                    if (o1.getScore() > o2.getScore()) {
-                        return 1;
-                    }
-                    return 0;
+        pc.reportMsg("Top 5", workspace);
+        MolecularDescriptor[] rankedFeatures = allFeatures.toArray(new MolecularDescriptor[0]);
+        Arrays.sort(rankedFeatures, new Comparator<MolecularDescriptor>() {
+            @Override
+            public int compare(MolecularDescriptor o1, MolecularDescriptor o2) {
+                if (o1.getScore() > o2.getScore()) {
+                    return -1;
                 }
-            });
-            pc.reportMsg("max: " + rankedFeatures[0], model.getOwnerWS());
-            ticket.progress("Spearman Correlation");
-            ticket.switchToDeterminate(rankedFeatures.length * rankedFeatures.length);
+                if (o1.getScore() < o2.getScore()) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
+        for(int i=0; i<rankedFeatures.length && i < 5; i++){
+            pc.reportMsg(rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+        }
+        pc.reportMsg("...", workspace);
+        pc.reportMsg("Bottom 3", workspace);
+        for(int i=Math.max(rankedFeatures.length - 3, 0); i<rankedFeatures.length; i++){
+            pc.reportMsg(rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+        }         
+
+        //---------------Remove Redundant--------------
+        if (model.isRemoveRedundant()) {
             toRemove.clear();
+            String state2 = NbBundle.getMessage(FeatureSelector.class, "FeatureSelector.task.removeRedundant");
+            pc.reportMsg(System.getProperty("line.separator"), workspace);
+            pc.reportMsg(state2 + System.getProperty("line.separator"), workspace);
+            
+            threshold = model.getCorrelationCutoff() / 100.;
+            pc.reportMsg("Correlation cutoff value: " + threshold + System.getProperty("line.separator"), workspace);
+            ticket.progress(state2);
+            ticket.switchToDeterminate(rankedFeatures.length * rankedFeatures.length);
             double[] column1 = new double[peptides.size()];
             double[] column2 = new double[peptides.size()];
             double[] rank1, rank2;
+            double max = Double.MIN_VALUE, min = Double.MAX_VALUE;
             int k;
             for (int i = 0; i < rankedFeatures.length - 1 && !stopRun; i++) {
                 if (rankedFeatures[i] != null) {
@@ -146,7 +159,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                             rank2 = rank(column2);
                             score = calculatePearsonCorrelation(rank1, rank2);
                             if (score >= threshold) {
-                                pc.reportMsg(">=" + score + ": " + rankedFeatures[i].getDisplayName() + " - " + rankedFeatures[j].getDisplayName(), model.getOwnerWS());
+                                pc.reportMsg("Removed: " + rankedFeatures[j].getDisplayName() + " - " + score + " : " + rankedFeatures[i].getDisplayName(), workspace);
                                 attrModel.deleteAttribute(rankedFeatures[j]);
                                 toRemove.add(rankedFeatures[j]);
                                 rankedFeatures[j] = null;
@@ -162,8 +175,9 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                     }
                 }
             }
-            pc.reportMsg("max: " + max, model.getOwnerWS());
-            pc.reportMsg("Removed: " + toRemove.size(), model.getOwnerWS());
+            pc.reportMsg("max: " + max, workspace);
+            pc.reportMsg("min: " + min, workspace);
+            pc.reportMsg("Redundant features removed:" + toRemove.size(), workspace);
         }
         return null;
     }
@@ -184,13 +198,15 @@ public class FeatureSelector extends SwingWorker<Void, String> {
             } else {
                 Exceptions.printStackTrace(ex);
             }
+            pc.reportError(ex.getCause().toString(), workspace);
         } finally {
             model.setRunning(false);
-            ticket.finish();            
-            if (pc.getCurrentWorkspace() != model.getOwnerWS()) {
-                String txt = NbBundle.getMessage(FeatureSelector.class, "Workspace.notify.finishedTask", "Feature selection");
-                pc.workspaceChangeNotification(txt, model.getOwnerWS());
-            }  
+            ticket.finish();
+            if (pc.getCurrentWorkspace() != workspace) {
+                String txt = NbBundle.getMessage(FeatureSelector.class, "Workspace.notify.finishedTask", taskName);
+                pc.workspaceChangeNotification(txt, workspace);
+            }
+            pc.reportFinishedTask(taskName, workspace);
         }
     }
 

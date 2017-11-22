@@ -34,6 +34,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
     protected final QueryModel queryModel;
     protected final GraphModel graphModel;
     protected final AttributesModel oldModel;
+    protected final String taskName = "Query";
 
     public QueryExecutor() {
         this(pc.getCurrentWorkspace());
@@ -49,6 +50,8 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
     @Override
     protected AttributesModel doInBackground() throws Exception {
         publish("start");
+        pc.reportRunningTask(taskName, workspace);
+        
         PeptideDAO dao = Lookup.getDefault().lookup(PeptideDAO.class);
         AttributesModel model = dao.getPeptides(queryModel, graphModel);
         Graph graph = graphModel.getGraph(model.getGraphDBView());
@@ -63,8 +66,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
     @Override
     protected void process(List<String> chunks) {
         queryModel.setRunning(true);
-        WindowManager.getDefault().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        pc.reportRunningTask("Query", workspace);
+        WindowManager.getDefault().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));        
     }
 
     @Override
@@ -103,10 +105,10 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
             queryModel.setRunning(false);
             WindowManager.getDefault().getMainWindow().setCursor(Cursor.getDefaultCursor());
             if (pc.getCurrentWorkspace() != workspace) {
-                String txt = NbBundle.getMessage(QueryExecutor.class, "Workspace.notify.finishedTask", "Query");
+                String txt = NbBundle.getMessage(QueryExecutor.class, "Workspace.notify.finishedTask", taskName);
                 pc.workspaceChangeNotification(txt, workspace);
             }
-            pc.reportFinishedTask("Query", workspace);
+            pc.reportFinishedTask(taskName, workspace);
         }
     }
 

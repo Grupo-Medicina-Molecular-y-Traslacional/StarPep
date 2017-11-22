@@ -17,6 +17,7 @@ import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -31,6 +32,7 @@ public abstract class AbstractMD implements Algorithm {
 
     protected final ProjectManager pc;
     protected AttributesModel attrModel;
+    protected Workspace workspace;
     protected boolean stopRun;
     protected final AlgorithmFactory factory;
     protected ProgressTicket progressTicket;
@@ -45,10 +47,10 @@ public abstract class AbstractMD implements Algorithm {
         map = Collections.synchronizedMap(new LinkedHashMap<>());
         propertyChangeSupport = new PropertyChangeSupport(this);
     }
-    
-    protected void addAttribute(String id, String displayName, Class<?> type){
+
+    protected void addAttribute(String id, String displayName, Class<?> type) {
         MolecularDescriptor attr = new MolecularDescriptor(id, displayName, type, factory.getName());
-        addAttribute(attr);        
+        addAttribute(attr);
     }
 
     protected MolecularDescriptor getOrAddAttribute(String id, String displayName, Class<?> type, Double defaultValue) {
@@ -61,7 +63,7 @@ public abstract class AbstractMD implements Algorithm {
                 propertyChangeSupport.firePropertyChange(MD_ADDED, null, attr);
             }
             return attr;
-        }        
+        }
     }
 
     protected void addAttribute(MolecularDescriptor attr) {
@@ -82,6 +84,7 @@ public abstract class AbstractMD implements Algorithm {
     public void initAlgo() {
         map.clear();
         attrModel = pc.getAttributesModel();
+        workspace = pc.getCurrentWorkspace();
         stopRun = false;
     }
 
@@ -136,9 +139,33 @@ public abstract class AbstractMD implements Algorithm {
                     list = byCategory.get(category);
                     list.add(attr);
                 }
+                String key;
+                int maxKeyLength = 0;
                 for (Map.Entry<String, List<MolecularDescriptor>> entry : byCategory.entrySet()) {
-                    attrModel.addMolecularDescriptors(entry.getKey(), entry.getValue());
+                    key = entry.getKey();
+                    attrModel.addMolecularDescriptors(key, entry.getValue());
+                    if (key.length() > maxKeyLength) {
+                        maxKeyLength = key.length();
+                    }
                 }
+                //Report messages
+                StringBuilder msg;
+                int total = 0, size;
+                for (Map.Entry<String, List<MolecularDescriptor>> entry : byCategory.entrySet()) {
+                    key = entry.getKey();
+                    size = entry.getValue().size();
+                    msg = new StringBuilder(key);
+                    for (int i = key.length() + 1; i <= maxKeyLength; i++) {
+                        msg.append(' ');
+                    }
+                    msg.append(" :");
+                    msg.append(size);
+                    msg.append(size > 1 ? " features" : " feature");
+                    pc.reportMsg(msg.toString(), workspace);
+                    total += size;
+                }
+                pc.reportMsg(System.getProperty("line.separator"), workspace);
+                pc.reportMsg("Total of calculated features: " + total, workspace);
                 progressTicket.progress();
             }
         }

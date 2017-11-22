@@ -41,7 +41,10 @@
  */
 package org.bapedis.core.task;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -89,7 +92,7 @@ public final class AlgorithmExecutor {
         int numberOfCPUs = Runtime.getRuntime().availableProcessors();
         int maximumPoolSize = numberOfCPUs + 1;
         this.executor = new ThreadPoolExecutor(0, maximumPoolSize, 15, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
-        taskList = new LinkedList<>();
+        taskList = Collections.synchronizedList(new LinkedList<>());
         defaultAlgoListener = new AlgorithmListenerImpl();
         defaultErrorHandler = new AlgorithmErrorHandlerImpl();
     }
@@ -110,8 +113,8 @@ public final class AlgorithmExecutor {
         if (!algorithms.contains(algorithm)) {
             throw new IllegalArgumentException("The workspace does not contains the algorithm to be executed");
         }
-        String taskName = NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.name", workspace.getName(), algorithm.getFactory().getName());
-        AlgoExecutor runnable = new AlgoExecutor(algorithm, taskName, listener, errorHandler);
+
+        AlgoExecutor runnable = new AlgoExecutor(workspace, algorithm, listener, errorHandler);
         runnable.progress.start();
         runnable.progress.progress(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.submitted"));
         runnable.future = executor.submit(runnable);
@@ -141,7 +144,7 @@ public final class AlgorithmExecutor {
      */
     public synchronized void execute(Algorithm algorithm) {
         execute(algorithm, defaultAlgoListener, defaultErrorHandler);
-    }    
+    }
 
     /**
      * Cancel an algorithm.
@@ -168,20 +171,21 @@ public final class AlgorithmExecutor {
      */
     private class AlgoExecutor implements Runnable {
 
-        private final String taskName;
         private final Algorithm algorithm;
         private Future<?> future;
         private final ProgressTicket progress;
         private final AlgorithmListener listener;
         private final AlgorithmErrorHandler errorHandler;
         private final AtomicBoolean running;
+        private final Workspace workspace;
 
-        public AlgoExecutor(Algorithm algorithm, String taskName, AlgorithmListener listener, AlgorithmErrorHandler errorHandler) {
+        public AlgoExecutor(Workspace workspace, Algorithm algorithm, AlgorithmListener listener, AlgorithmErrorHandler errorHandler) {
+            this.workspace = workspace;
             this.algorithm = algorithm;
-            this.taskName = taskName;
             this.listener = listener;
             this.errorHandler = errorHandler;
             this.running = new AtomicBoolean(false);
+            String taskName = NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.name", workspace.getName(), algorithm.getFactory().getName());
             this.progress = new ProgressTicket(taskName, new Cancellable() {
                 @Override
                 public boolean cancel() {
@@ -196,6 +200,7 @@ public final class AlgorithmExecutor {
         public void run() {
             running.set(true);
             progress.progress(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.running"));
+            pc.reportRunningTask(algorithm.getFactory().getName(), workspace);
             try {
                 algorithm.initAlgo();
                 algorithm.run();
@@ -205,6 +210,9 @@ public final class AlgorithmExecutor {
                 } else {
                     Logger.getLogger(AlgoExecutor.class.getName()).log(Level.SEVERE, "", e);
                 }
+                StringWriter errors = new StringWriter();
+                e.printStackTrace(new PrintWriter(errors));
+                pc.reportError(errors.toString(), workspace);
             } finally {
                 finish();
             }
@@ -226,9 +234,10 @@ public final class AlgorithmExecutor {
             if (taskList.remove(this)) {
                 algorithm.endAlgo();
                 progress.finish();
-                if (listener != null) {                     
+                if (listener != null) {
                     listener.algorithmFinished(algorithm);
                 }
+                pc.reportFinishedTask(algorithm.getFactory().getName(), workspace);
             }
         }
     }
@@ -244,7 +253,7 @@ public final class AlgorithmExecutor {
                 if (algoModel.getSelectedAlgorithm() != null && algoModel.getSelectedAlgorithm().equals(algo)) {
                     algoModel.setRunning(false);
                     if (pc.getCurrentWorkspace() != workspace) {
-                        String txt = NbBundle.getMessage(AlgorithmExecutor.class, "Workspace.notify.finishedTask", algo.getFactory().getName() );
+                        String txt = NbBundle.getMessage(AlgorithmExecutor.class, "Workspace.notify.finishedTask", algo.getFactory().getName());
                         pc.workspaceChangeNotification(txt, workspace);
                     }
                 }

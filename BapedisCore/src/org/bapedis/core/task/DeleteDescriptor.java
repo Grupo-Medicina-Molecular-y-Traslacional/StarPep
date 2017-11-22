@@ -12,6 +12,7 @@ import javax.swing.SwingWorker;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.DeleteDescriptorModel;
 import org.bapedis.core.project.ProjectManager;
+import static org.bapedis.core.task.QueryExecutor.pc;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
@@ -29,6 +30,7 @@ public class DeleteDescriptor extends SwingWorker<Void, String> {
     private final ProgressTicket ticket;
     private final DeleteDescriptorModel model;
     private final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+    private final String taskName = "Deleting molecular descriptors";
 
     public DeleteDescriptor(DeleteDescriptorModel model, AttributesModel attrModel, Set<String> keys) {
         this.keys = keys;
@@ -40,17 +42,20 @@ public class DeleteDescriptor extends SwingWorker<Void, String> {
                 stopRun = true;
                 return true;
             }
-        });
+        });        
     }
 
     @Override
     protected Void doInBackground() throws Exception {
         publish("start");
+        pc.reportRunningTask(taskName, model.getOwnerWS());
+        
         ticket.start(keys.size());
         for (String key : keys) {
             if (!stopRun) {
                 if (attrModel.hasMolecularDescriptors(key)) {
                     attrModel.deleteAllMolecularDescriptors(key);
+                    pc.reportMsg("Deleted: " + key, model.getOwnerWS());
                 }
                 ticket.progress();
             }
@@ -66,16 +71,18 @@ public class DeleteDescriptor extends SwingWorker<Void, String> {
     @Override
     protected void done() {
         try {
-            get();
+            get();            
         } catch (InterruptedException | ExecutionException ex) {
             Exceptions.printStackTrace(ex);
+            pc.reportError(ex.getCause().toString(), model.getOwnerWS());
         } finally {
             model.setRunning(false);
             ticket.finish();
             if (pc.getCurrentWorkspace() != model.getOwnerWS()) {
-                String txt = NbBundle.getMessage(DeleteDescriptor.class, "Workspace.notify.finishedTask", "Deleting molecular descriptors");
+                String txt = NbBundle.getMessage(DeleteDescriptor.class, "Workspace.notify.finishedTask", taskName);
                 pc.workspaceChangeNotification(txt, model.getOwnerWS());
             }
+            pc.reportFinishedTask(taskName, model.getOwnerWS());
         }
     }
 

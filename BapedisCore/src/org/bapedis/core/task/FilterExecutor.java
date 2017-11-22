@@ -45,6 +45,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
     protected GraphView graphDBView, csnView;
     protected final ProgressTicket ticket;
     protected final AtomicBoolean stopRun;
+    protected final String taskName = "Filter";
 
     public FilterExecutor() {
         this(pc.getCurrentWorkspace());
@@ -56,7 +57,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
         this.graphModel = pc.getGraphModel(workspace);
         this.filterModel = pc.getFilterModel(workspace);
         stopRun = new AtomicBoolean(false);
-        ticket = new ProgressTicket(NbBundle.getMessage(FilterExecutor.class, "FilterWorker.name"), new Cancellable() {
+        ticket = new ProgressTicket(NbBundle.getMessage(FilterExecutor.class, "FilterWorker.name", workspace.getName()), new Cancellable() {
             @Override
             public boolean cancel() {
                 stopRun.set(true);
@@ -68,6 +69,8 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
     @Override
     protected TreeSet<String> doInBackground() throws Exception {
         publish("start");
+        pc.reportRunningTask(taskName, workspace);
+        
         ticket.start(attrModel.getNodeList().size() + 2); // plus add and remove nodes
         ticket.progress(NbBundle.getMessage(FilterExecutor.class, "FilterWorker.running"));
 
@@ -164,6 +167,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
             subGraphDB.removeAllNodes(metadataNodes);
         }
         ticket.progress();
+
         return set;
     }
 
@@ -171,7 +175,6 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
     protected void process(List<String> chunks) {
         workspace.add(this);
         filterModel.setRunning(true);
-        pc.reportRunningTask("Filter", workspace);
     }
 
     @Override
@@ -214,10 +217,10 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
             workspace.remove(this);
             filterModel.setRunning(false);
             if (pc.getCurrentWorkspace() != workspace) {
-                String txt = NbBundle.getMessage(FilterExecutor.class, "Workspace.notify.finishedTask", "Filter");
+                String txt = NbBundle.getMessage(FilterExecutor.class, "Workspace.notify.finishedTask", taskName);
                 pc.workspaceChangeNotification(txt, workspace);
             }
-            pc.reportFinishedTask("Filter", workspace);
+            pc.reportFinishedTask(taskName, workspace);
         }
     }
 

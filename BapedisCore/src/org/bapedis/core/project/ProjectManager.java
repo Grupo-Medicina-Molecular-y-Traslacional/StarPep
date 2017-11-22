@@ -161,16 +161,26 @@ public class ProjectManager implements Lookup.Provider {
 
     public void reportRunningTask(String taskName, Workspace workspace) {
         InputOutput io = IOProvider.getDefault().getIO(workspace.getName(), false);
-        io.getOut().println(dataFormat.format(new Date()) + " - " + NbBundle.getMessage(ProjectManager.class, "Workspace.task.begin", taskName));
+        String text = dataFormat.format(new Date()) + " - " + NbBundle.getMessage(ProjectManager.class, "Workspace.task.begin", taskName);
+        for (int i = 0; i < text.length(); i++) {
+            if (i == text.length() - 1) {
+                io.getOut().println('-');
+            } else {
+                io.getOut().print('-');
+            }
+        }
+        io.getOut().println(text);
+        io.getOut().println();
         io.getOut().close();
     }
-    
+
     public void reportFinishedTask(String taskName, Workspace workspace) {
         InputOutput io = IOProvider.getDefault().getIO(workspace.getName(), false);
+        io.getOut().println();
         io.getOut().println(dataFormat.format(new Date()) + " - " + NbBundle.getMessage(ProjectManager.class, "Workspace.task.finish", taskName));
         io.getOut().println();
         io.getOut().close();
-    }    
+    }
 
     public void reportMsg(String msg, Workspace workspace) {
         InputOutput io = IOProvider.getDefault().getIO(workspace.getName(), false);

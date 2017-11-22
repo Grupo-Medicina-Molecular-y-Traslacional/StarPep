@@ -24,8 +24,6 @@ import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.windows.IOProvider;
-import org.openide.windows.InputOutput;
 
 /**
  *
@@ -37,7 +35,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
     private final ProgressTicket ticket;
     private final AttributesModel attrModel;
     private final FeatureSelectionModel model;
-    private final InputOutput io;
+    private final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
 
     public FeatureSelector(FeatureSelectionModel model, AttributesModel attrModel) {
         this.attrModel = attrModel;
@@ -50,11 +48,10 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                 return true;
             }
         });
-        io = IOProvider.getDefault().getIO(model.getOwnerWS().getName(), false);        
     }
 
     @Override
-    protected Void doInBackground() throws Exception {
+    protected Void doInBackground() throws Exception {        
         if (!model.isRemoveUseless()) {
             return null;
         }
@@ -77,8 +74,8 @@ public class FeatureSelector extends SwingWorker<Void, String> {
         String maxName = "";
         String minName = "";
                 
-        io.getOut().println("Max score: " + maxScore);
-        io.getOut().println("cut off: " + threshold);
+        pc.reportMsg("Max score: " + maxScore, model.getOwnerWS());
+        pc.reportMsg("cut off: " + threshold, model.getOwnerWS());
         LinkedList<MolecularDescriptor> toRemove = new LinkedList<>();
         for (MolecularDescriptor descriptor : allFeatures) {
             if (!stopRun) {
@@ -89,7 +86,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                 if (score < threshold) {
                     toRemove.add(descriptor);
                     attrModel.deleteAttribute(descriptor);
-                    io.getOut().println("Removed: " + descriptor.getDisplayName() + " - score: " + score);
+                    pc.reportMsg("Removed: " + descriptor.getDisplayName() + " - score: " + score, model.getOwnerWS());
                 }
                 if (score < min) {
                     min = score;
@@ -103,12 +100,12 @@ public class FeatureSelector extends SwingWorker<Void, String> {
             }
         }
         allFeatures.removeAll(toRemove);
-        io.getOut().println("max: " + maxName + ": " + max);
-        io.getOut().println("min: " + minName + ": " + min);
+        pc.reportMsg("max: " + maxName + ": " + max, model.getOwnerWS());
+        pc.reportMsg("min: " + minName + ": " + min, model.getOwnerWS());
 
         if (model.isRemoveRedundant()) {
             // Correlation
-            io.getOut().println("---------------Spearman Correlation--------------");
+            pc.reportMsg("---------------Spearman Correlation--------------", model.getOwnerWS());
             threshold = model.getCorrelationCutoff() / 100.;
             min = Double.MAX_VALUE;
             max = Double.MIN_VALUE;
@@ -125,7 +122,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                     return 0;
                 }
             });
-            io.getOut().println("max: " + rankedFeatures[0]);
+            pc.reportMsg("max: " + rankedFeatures[0], model.getOwnerWS());
             ticket.progress("Spearman Correlation");
             ticket.switchToDeterminate(rankedFeatures.length * rankedFeatures.length);
             toRemove.clear();
@@ -149,7 +146,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                             rank2 = rank(column2);
                             score = calculatePearsonCorrelation(rank1, rank2);
                             if (score >= threshold) {
-                                io.getOut().println(">=" + score + ": " + rankedFeatures[i].getDisplayName() + " - " + rankedFeatures[j].getDisplayName());
+                                pc.reportMsg(">=" + score + ": " + rankedFeatures[i].getDisplayName() + " - " + rankedFeatures[j].getDisplayName(), model.getOwnerWS());
                                 attrModel.deleteAttribute(rankedFeatures[j]);
                                 toRemove.add(rankedFeatures[j]);
                                 rankedFeatures[j] = null;
@@ -165,8 +162,8 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                     }
                 }
             }
-            io.getOut().println("max: " + max);
-            io.getOut().println("Removed: " + toRemove.size());
+            pc.reportMsg("max: " + max, model.getOwnerWS());
+            pc.reportMsg("Removed: " + toRemove.size(), model.getOwnerWS());
         }
         return null;
     }
@@ -189,9 +186,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
             }
         } finally {
             model.setRunning(false);
-            ticket.finish();
-            io.getOut().close();
-            ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+            ticket.finish();            
             if (pc.getCurrentWorkspace() != model.getOwnerWS()) {
                 String txt = NbBundle.getMessage(FeatureSelector.class, "Workspace.task.finish", "Feature selection");
                 pc.workspaceChangeNotification(txt, model.getOwnerWS());

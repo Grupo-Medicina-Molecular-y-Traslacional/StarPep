@@ -23,7 +23,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author loge
  */
-@ServiceProvider(service = StatusLineElementProvider.class)
+//@ServiceProvider(service = StatusLineElementProvider.class)
 public class StatusBarClock implements StatusLineElementProvider {
 
     public static final DateFormat format = DateFormat.getTimeInstance(DateFormat.MEDIUM);

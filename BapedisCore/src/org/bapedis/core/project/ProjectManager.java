@@ -9,7 +9,9 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.text.DateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +34,8 @@ import org.openide.util.NbBundle;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.windows.IOProvider;
+import org.openide.windows.InputOutput;
 
 /**
  *
@@ -46,6 +50,7 @@ public class ProjectManager implements Lookup.Provider {
     protected InstanceContent content;
     protected Workspace currentWS;
     protected List<WorkspaceEventListener> wsListeners;
+    public static final DateFormat dataFormat = DateFormat.getTimeInstance(DateFormat.MEDIUM);
     
     public static final float GRAPH_NODE_SIZE = 10f;
     public static final Color GRAPH_NODE_COLOR = new Color(0.6f, 0.6f, 0.6f);
@@ -151,6 +156,18 @@ public class ProjectManager implements Lookup.Provider {
             }
         });
     }
+    
+    public void reportMsg(String msg, Workspace workspace){
+       InputOutput io = IOProvider.getDefault().getIO(workspace.getName(), false);
+       io.getOut().println( dataFormat.format(new Date()) + " - " + msg);
+       io.getOut().close();
+    }
+    
+    public void reportError(String error, Workspace workspace){
+       InputOutput io = IOProvider.getDefault().getIO(workspace.getName(), false);
+       io.getErr().println( dataFormat.format(new Date()) + " - " + error);
+       io.getErr().close();
+    }    
 
     // Factory Iterators
     public Iterator<? extends FilterFactory> getFilterFactoryIterator() {

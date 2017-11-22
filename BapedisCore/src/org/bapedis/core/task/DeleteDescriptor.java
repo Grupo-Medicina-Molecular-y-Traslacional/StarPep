@@ -28,7 +28,7 @@ public class DeleteDescriptor extends SwingWorker<Void, String> {
     private boolean stopRun = false;
     private final ProgressTicket ticket;
     private final DeleteDescriptorModel model;
-    
+    private final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
 
     public DeleteDescriptor(DeleteDescriptorModel model, AttributesModel attrModel, Set<String> keys) {
         this.keys = keys;
@@ -61,8 +61,7 @@ public class DeleteDescriptor extends SwingWorker<Void, String> {
     @Override
     protected void process(List<String> chunks) {
         model.setRunning(true);
-    }    
-    
+    }
 
     @Override
     protected void done() {
@@ -73,11 +72,10 @@ public class DeleteDescriptor extends SwingWorker<Void, String> {
         } finally {
             model.setRunning(false);
             ticket.finish();
-            ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
             if (pc.getCurrentWorkspace() != model.getOwnerWS()) {
                 String txt = NbBundle.getMessage(DeleteDescriptor.class, "Workspace.task.finish", "Deleting molecular descriptors");
                 pc.workspaceChangeNotification(txt, model.getOwnerWS());
-            }             
+            }
         }
     }
 

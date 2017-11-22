@@ -15,15 +15,12 @@ import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
-import org.bapedis.core.project.StatusBarClock;
 import org.bapedis.core.spi.data.PeptideDAO;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.windows.IOProvider;
-import org.openide.windows.InputOutput;
 import org.openide.windows.WindowManager;
 
 /**
@@ -34,7 +31,6 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
 
     protected static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected final Workspace workspace;
-    protected final InputOutput io;
     protected final QueryModel queryModel;
     protected final GraphModel graphModel;
     protected final AttributesModel oldModel;
@@ -48,7 +44,6 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
         queryModel = pc.getQueryModel(workspace);
         graphModel = pc.getGraphModel(workspace);
         oldModel = pc.getAttributesModel(workspace);
-        io = IOProvider.getDefault().getIO(workspace.getName(), false);
     }
 
     @Override
@@ -69,7 +64,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
     protected void process(List<String> chunks) {
         queryModel.setRunning(true);
         WindowManager.getDefault().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        io.getOut().println(StatusBarClock.getStrTime() + " " + NbBundle.getMessage(QueryExecutor.class, "Workspace.task.begin", "Query"));
+        pc.reportMsg(NbBundle.getMessage(QueryExecutor.class, "Workspace.task.begin", "Query"), workspace);
     }
 
     @Override
@@ -100,10 +95,10 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
                 graphModel.destroyView(oldModel.getGraphDBView());
             }
             
-            io.getOut().println(NbBundle.getMessage(QueryExecutor.class, "QueryExecutor.output.text", newModel.getNodeList().size()));
+            pc.reportMsg(NbBundle.getMessage(QueryExecutor.class, "QueryExecutor.output.text", newModel.getNodeList().size()), workspace);
         } catch (InterruptedException | ExecutionException ex) {
             Exceptions.printStackTrace(ex);
-            io.getErr().println(ex.getCause());
+            pc.reportError(ex.getCause().toString(), workspace);
         } finally {
             queryModel.setRunning(false);
             WindowManager.getDefault().getMainWindow().setCursor(Cursor.getDefaultCursor());
@@ -111,9 +106,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
                 String txt = NbBundle.getMessage(QueryExecutor.class, "Workspace.task.finish", "Query");
                 pc.workspaceChangeNotification(txt, workspace);
             }
-            io.getOut().println(StatusBarClock.getStrTime() + " " +NbBundle.getMessage(QueryExecutor.class, "Workspace.task.finish", "Query"));
-            io.getOut().close();
-            io.getErr().close();
+            pc.reportMsg(NbBundle.getMessage(QueryExecutor.class, "Workspace.task.finish", "Query"), workspace);
         }
     }
 

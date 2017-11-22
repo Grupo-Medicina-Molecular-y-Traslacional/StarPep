@@ -19,7 +19,6 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideNode;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
-import org.bapedis.core.project.StatusBarClock;
 import org.bapedis.core.spi.filters.Filter;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.GraphModel;
@@ -31,8 +30,6 @@ import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.windows.IOProvider;
-import org.openide.windows.InputOutput;
 
 /**
  *
@@ -48,7 +45,6 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
     protected GraphView graphDBView, csnView;
     protected final ProgressTicket ticket;
     protected final AtomicBoolean stopRun;
-    protected final InputOutput io;
 
     public FilterExecutor() {
         this(pc.getCurrentWorkspace());
@@ -67,7 +63,6 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
                 return true;
             }
         });
-        io = IOProvider.getDefault().getIO(workspace.getName(), false);
     }
 
     @Override
@@ -176,7 +171,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
     protected void process(List<String> chunks) {
         workspace.add(this);
         filterModel.setRunning(true);
-        io.getOut().println(StatusBarClock.getStrTime() + " " + NbBundle.getMessage(QueryExecutor.class, "Workspace.task.begin", "Filter"));
+        pc.reportMsg(NbBundle.getMessage(QueryExecutor.class, "Workspace.task.begin", "Filter"), workspace);
     }
 
     @Override
@@ -207,13 +202,13 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
             graphModel.destroyView(oldGraphDBView);
 
             if (filterModel.isEmpty()) {
-                io.getOut().println(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.noFilter"));
+                pc.reportMsg(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.noFilter"), workspace);
             } else {
-                io.getOut().println(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.output.text", set.size()));
+                pc.reportMsg(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.output.text", set.size()), workspace);
             }
         } catch (InterruptedException | ExecutionException ex) {
             Exceptions.printStackTrace(ex);
-            io.getErr().println(ex.getCause());
+            pc.reportError(ex.getCause().toString(), workspace);
         } finally {
             ticket.finish();
             workspace.remove(this);
@@ -222,9 +217,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
                 String txt = NbBundle.getMessage(FilterExecutor.class, "Workspace.task.finish", "Filter");
                 pc.workspaceChangeNotification(txt, workspace);
             }
-            io.getOut().println(StatusBarClock.getStrTime() + " " +NbBundle.getMessage(QueryExecutor.class, "Workspace.task.finish", "Filter"));
-            io.getOut().close();
-            io.getErr().close();
+            pc.reportMsg(NbBundle.getMessage(QueryExecutor.class, "Workspace.task.finish", "Filter"), workspace);
         }
     }
 

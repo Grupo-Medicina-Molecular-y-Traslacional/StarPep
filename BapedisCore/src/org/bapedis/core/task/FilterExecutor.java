@@ -171,7 +171,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
     protected void process(List<String> chunks) {
         workspace.add(this);
         filterModel.setRunning(true);
-        pc.reportMsg(NbBundle.getMessage(QueryExecutor.class, "Workspace.task.begin", "Filter"), workspace);
+        pc.reportRunningTask("Filter", workspace);
     }
 
     @Override
@@ -214,10 +214,10 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
             workspace.remove(this);
             filterModel.setRunning(false);
             if (pc.getCurrentWorkspace() != workspace) {
-                String txt = NbBundle.getMessage(FilterExecutor.class, "Workspace.task.finish", "Filter");
+                String txt = NbBundle.getMessage(FilterExecutor.class, "Workspace.notify.finishedTask", "Filter");
                 pc.workspaceChangeNotification(txt, workspace);
             }
-            pc.reportMsg(NbBundle.getMessage(QueryExecutor.class, "Workspace.task.finish", "Filter"), workspace);
+            pc.reportFinishedTask("Filter", workspace);
         }
     }
 

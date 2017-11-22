@@ -244,7 +244,7 @@ public final class AlgorithmExecutor {
                 if (algoModel.getSelectedAlgorithm() != null && algoModel.getSelectedAlgorithm().equals(algo)) {
                     algoModel.setRunning(false);
                     if (pc.getCurrentWorkspace() != workspace) {
-                        String txt = NbBundle.getMessage(AlgorithmExecutor.class, "Workspace.task.finish", algo.getFactory().getName() );
+                        String txt = NbBundle.getMessage(AlgorithmExecutor.class, "Workspace.notify.finishedTask", algo.getFactory().getName() );
                         pc.workspaceChangeNotification(txt, workspace);
                     }
                 }

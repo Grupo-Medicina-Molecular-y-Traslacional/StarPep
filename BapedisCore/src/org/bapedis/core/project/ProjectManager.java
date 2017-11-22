@@ -51,17 +51,19 @@ public class ProjectManager implements Lookup.Provider {
     protected Workspace currentWS;
     protected List<WorkspaceEventListener> wsListeners;
     public static final DateFormat dataFormat = DateFormat.getTimeInstance(DateFormat.MEDIUM);
-    
+
     public static final float GRAPH_NODE_SIZE = 10f;
     public static final Color GRAPH_NODE_COLOR = new Color(0.6f, 0.6f, 0.6f);
-    public static final float GRAPH_EDGE_WEIGHT = 1f;    
+    public static final float GRAPH_EDGE_WEIGHT = 1f;
     public static final String GRAPH_EDGE_SIMALIRITY = "pairwise_similarity";
     public static final String NODE_TABLE_PRO_NAME = "name";
     public static final String NODE_TABLE_PRO_NAME_TITLE = NbBundle.getMessage(ProjectManager.class, "NodeTable.column.name.title");
     public static final String EDGE_TABLE_PRO_XREF = "xref";
     public static final String EDGE_TABLE_PRO_XREF_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.xref.title");
-    public static final String EDGE_TABLE_PRO_SIMILARITY="similarity";
-    public static final String EDGE_TABLE_PRO_SIMILARITY_TITLE=NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.similarity.title");;
+    public static final String EDGE_TABLE_PRO_SIMILARITY = "similarity";
+    public static final String EDGE_TABLE_PRO_SIMILARITY_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.similarity.title");
+
+    ;
 
     public ProjectManager() {
     }
@@ -145,8 +147,8 @@ public class ProjectManager implements Lookup.Provider {
         }
         setCurrentWorkspace(defaultWorkspace);
     }
-    
-    public void workspaceChangeNotification(String text, Workspace ws){
+
+    public void workspaceChangeNotification(String text, Workspace ws) {
         String reason = NbBundle.getMessage(ProjectManager.class, "ChangeWorkspace.notification.reason", ws.getName(), text);
         String action = NbBundle.getMessage(ProjectManager.class, "ChangeWorkspace.notification.action");
         NotificationDisplayer.getDefault().notify(reason, ImageUtilities.loadImageIcon("org/bapedis/core/resources/balloon.png", true), action, new ActionListener() {
@@ -156,29 +158,42 @@ public class ProjectManager implements Lookup.Provider {
             }
         });
     }
-    
-    public void reportMsg(String msg, Workspace workspace){
-       InputOutput io = IOProvider.getDefault().getIO(workspace.getName(), false);
-       io.getOut().println( dataFormat.format(new Date()) + " - " + msg);
-       io.getOut().close();
+
+    public void reportRunningTask(String taskName, Workspace workspace) {
+        InputOutput io = IOProvider.getDefault().getIO(workspace.getName(), false);
+        io.getOut().println(dataFormat.format(new Date()) + " - " + NbBundle.getMessage(ProjectManager.class, "Workspace.task.begin", taskName));
+        io.getOut().close();
     }
     
-    public void reportError(String error, Workspace workspace){
-       InputOutput io = IOProvider.getDefault().getIO(workspace.getName(), false);
-       io.getErr().println( dataFormat.format(new Date()) + " - " + error);
-       io.getErr().close();
+    public void reportFinishedTask(String taskName, Workspace workspace) {
+        InputOutput io = IOProvider.getDefault().getIO(workspace.getName(), false);
+        io.getOut().println(dataFormat.format(new Date()) + " - " + NbBundle.getMessage(ProjectManager.class, "Workspace.task.finish", taskName));
+        io.getOut().println();
+        io.getOut().close();
     }    
+
+    public void reportMsg(String msg, Workspace workspace) {
+        InputOutput io = IOProvider.getDefault().getIO(workspace.getName(), false);
+        io.getOut().println(msg);
+        io.getOut().close();
+    }
+
+    public void reportError(String error, Workspace workspace) {
+        InputOutput io = IOProvider.getDefault().getIO(workspace.getName(), false);
+        io.getErr().println(dataFormat.format(new Date()) + " - " + error);
+        io.getErr().close();
+    }
 
     // Factory Iterators
     public Iterator<? extends FilterFactory> getFilterFactoryIterator() {
         Collection<? extends FilterFactory> factories = Lookup.getDefault().lookupAll(FilterFactory.class);
         return factories.iterator();
     }
-    
+
     public Iterator<? extends AlgorithmFactory> getAlgorithmFactoryIterator() {
         Collection<? extends AlgorithmFactory> factories = Lookup.getDefault().lookupAll(AlgorithmFactory.class);
         return factories.iterator();
-    }    
+    }
 
     // Data Models
     public AttributesModel getAttributesModel() {
@@ -216,7 +231,7 @@ public class ProjectManager implements Lookup.Provider {
         }
         if (!edgeTable.hasColumn(EDGE_TABLE_PRO_SIMILARITY)) {
             edgeTable.addColumn(EDGE_TABLE_PRO_SIMILARITY, EDGE_TABLE_PRO_SIMILARITY_TITLE, Float.class, Origin.DATA, null, false);
-        }        
+        }
     }
 
     public QueryModel getQueryModel() {

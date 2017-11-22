@@ -64,7 +64,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
     protected void process(List<String> chunks) {
         queryModel.setRunning(true);
         WindowManager.getDefault().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        pc.reportMsg(NbBundle.getMessage(QueryExecutor.class, "Workspace.task.begin", "Query"), workspace);
+        pc.reportRunningTask("Query", workspace);
     }
 
     @Override
@@ -103,10 +103,10 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
             queryModel.setRunning(false);
             WindowManager.getDefault().getMainWindow().setCursor(Cursor.getDefaultCursor());
             if (pc.getCurrentWorkspace() != workspace) {
-                String txt = NbBundle.getMessage(QueryExecutor.class, "Workspace.task.finish", "Query");
+                String txt = NbBundle.getMessage(QueryExecutor.class, "Workspace.notify.finishedTask", "Query");
                 pc.workspaceChangeNotification(txt, workspace);
             }
-            pc.reportMsg(NbBundle.getMessage(QueryExecutor.class, "Workspace.task.finish", "Query"), workspace);
+            pc.reportFinishedTask("Query", workspace);
         }
     }
 

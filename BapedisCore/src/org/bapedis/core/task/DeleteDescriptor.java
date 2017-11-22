@@ -73,7 +73,7 @@ public class DeleteDescriptor extends SwingWorker<Void, String> {
             model.setRunning(false);
             ticket.finish();
             if (pc.getCurrentWorkspace() != model.getOwnerWS()) {
-                String txt = NbBundle.getMessage(DeleteDescriptor.class, "Workspace.task.finish", "Deleting molecular descriptors");
+                String txt = NbBundle.getMessage(DeleteDescriptor.class, "Workspace.notify.finishedTask", "Deleting molecular descriptors");
                 pc.workspaceChangeNotification(txt, model.getOwnerWS());
             }
         }

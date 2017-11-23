@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 import org.bapedis.core.model.AttributesModel;
@@ -101,8 +102,8 @@ public class FeatureSelector extends SwingWorker<Void, String> {
             }
         }
         allFeatures.removeAll(toRemove);
-        pc.reportMsg(System.getProperty("line.separator"), workspace);
-        pc.reportMsg("Useless features removed:" + toRemove.size() + System.getProperty("line.separator"), workspace);
+        int uselessRemovedSize = toRemove.size();
+        pc.reportMsg("Useless features removed: " + uselessRemovedSize + System.getProperty("line.separator"), workspace);
 
         pc.reportMsg("Top 5", workspace);
         MolecularDescriptor[] rankedFeatures = allFeatures.toArray(new MolecularDescriptor[0]);
@@ -118,22 +119,25 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                 return 0;
             }
         });
-        for(int i=0; i<rankedFeatures.length && i < 5; i++){
+        for (int i = 0; i < rankedFeatures.length && i < 5; i++) {
             pc.reportMsg(rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
         }
         pc.reportMsg("...", workspace);
         pc.reportMsg("Bottom 3", workspace);
-        for(int i=Math.max(rankedFeatures.length - 3, 0); i<rankedFeatures.length; i++){
+        for (int i = Math.max(rankedFeatures.length - 3, 0); i < rankedFeatures.length; i++) {
             pc.reportMsg(rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
-        }         
+        }
 
         //---------------Remove Redundant--------------
         if (model.isRemoveRedundant()) {
+            TreeSet<CorrelationPair> top5 = new TreeSet<>();
+            TreeSet<CorrelationPair> bottom3 = new TreeSet<>();
+
             toRemove.clear();
             String state2 = NbBundle.getMessage(FeatureSelector.class, "FeatureSelector.task.removeRedundant");
             pc.reportMsg(System.getProperty("line.separator"), workspace);
             pc.reportMsg(state2 + System.getProperty("line.separator"), workspace);
-            
+
             threshold = model.getCorrelationCutoff() / 100.;
             pc.reportMsg("Correlation cutoff value: " + threshold + System.getProperty("line.separator"), workspace);
             ticket.progress(state2);
@@ -141,7 +145,6 @@ public class FeatureSelector extends SwingWorker<Void, String> {
             double[] column1 = new double[peptides.size()];
             double[] column2 = new double[peptides.size()];
             double[] rank1, rank2;
-            double max = Double.MIN_VALUE, min = Double.MAX_VALUE;
             int k;
             for (int i = 0; i < rankedFeatures.length - 1 && !stopRun; i++) {
                 if (rankedFeatures[i] != null) {
@@ -159,25 +162,54 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                             rank2 = rank(column2);
                             score = calculatePearsonCorrelation(rank1, rank2);
                             if (score >= threshold) {
-                                pc.reportMsg("Removed: " + rankedFeatures[j].getDisplayName() + " - " + score + " : " + rankedFeatures[i].getDisplayName(), workspace);
+                                pc.reportMsg("Removed: " + rankedFeatures[j].getDisplayName() + " - " + String.format("rho(%s) = %f", rankedFeatures[i].getDisplayName(), score), workspace);
                                 attrModel.deleteAttribute(rankedFeatures[j]);
                                 toRemove.add(rankedFeatures[j]);
                                 rankedFeatures[j] = null;
-                            }
-                            if (score < min) {
-                                min = score;
-                            }
-                            if (score > max) {
-                                max = score;
+                                // Remove from Top 5 Bottom 3
+                                // to do.
+                            } else { // Add to the Top 5 Bottom 3
+                                if (top5.size() < 5) {
+                                    top5.add(new CorrelationPair(i, j, score));
+                                } else {
+                                    CorrelationPair lowest = top5.first();
+                                    if (score > lowest.getVal()) {
+                                        top5.remove(lowest);
+                                        top5.add(new CorrelationPair(i, j, score));
+                                    }
+                                }
+                                if (bottom3.size() < 3) {
+                                    bottom3.add(new CorrelationPair(i, j, score));
+                                } else {
+                                    CorrelationPair highest = bottom3.last();
+                                    if (score < highest.getVal()) {
+                                        bottom3.remove(highest);
+                                        bottom3.add(new CorrelationPair(i, j, score));
+                                    }
+                                }
                             }
                         }
                         ticket.progress();
                     }
                 }
             }
-            pc.reportMsg("max: " + max, workspace);
-            pc.reportMsg("min: " + min, workspace);
-            pc.reportMsg("Redundant features removed:" + toRemove.size(), workspace);
+
+            int redundantRemoveSize = toRemove.size();
+            pc.reportMsg("Redundant features removed: " + redundantRemoveSize + System.getProperty("line.separator"), workspace);
+
+            pc.reportMsg("Top 5", workspace);
+
+            for (CorrelationPair pair : top5.descendingSet()) {
+                pc.reportMsg(String.format("rho(%s, %s) = %f", rankedFeatures[pair.getI()].getDisplayName(), rankedFeatures[pair.getJ()].getDisplayName(), pair.getVal()), workspace);
+            }
+            pc.reportMsg("...", workspace);
+            pc.reportMsg("Bottom 3", workspace);
+            for (CorrelationPair pair : bottom3.descendingSet()) {
+                pc.reportMsg(String.format("rho(%s, %s) = %f", rankedFeatures[pair.getI()].getDisplayName(), rankedFeatures[pair.getJ()].getDisplayName(), pair.getVal()), workspace);
+            }
+
+            pc.reportMsg(System.getProperty("line.separator"), workspace);
+            pc.reportMsg("Total of removed features: " + (uselessRemovedSize + redundantRemoveSize), workspace);
         }
         return null;
     }
@@ -494,4 +526,34 @@ class IntDoublePair implements Comparable<IntDoublePair> {
     public int getPosition() {
         return position;
     }
+}
+
+class CorrelationPair implements Comparable<CorrelationPair> {
+
+    private final int i, j;
+    private final double val;
+
+    public CorrelationPair(int i, int j, double val) {
+        this.i = i;
+        this.j = j;
+        this.val = val;
+    }
+
+    public int getI() {
+        return i;
+    }
+
+    public int getJ() {
+        return j;
+    }
+
+    public double getVal() {
+        return val;
+    }
+
+    @Override
+    public int compareTo(CorrelationPair other) {
+        return Double.compare(val, other.val);
+    }
+
 }

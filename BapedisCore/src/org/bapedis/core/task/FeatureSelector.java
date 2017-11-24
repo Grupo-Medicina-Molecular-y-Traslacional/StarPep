@@ -130,9 +130,6 @@ public class FeatureSelector extends SwingWorker<Void, String> {
 
         //---------------Remove Redundant--------------
         if (model.isRemoveRedundant()) {
-            TreeSet<CorrelationPair> top5 = new TreeSet<>();
-            TreeSet<CorrelationPair> bottom3 = new TreeSet<>();
-
             toRemove.clear();
             String state2 = NbBundle.getMessage(FeatureSelector.class, "FeatureSelector.task.removeRedundant");
             pc.reportMsg(System.getProperty("line.separator"), workspace);
@@ -166,28 +163,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                                 attrModel.deleteAttribute(rankedFeatures[j]);
                                 toRemove.add(rankedFeatures[j]);
                                 rankedFeatures[j] = null;
-                                // Remove from Top 5 Bottom 3
-                                // to do.
-                            } else { // Add to the Top 5 Bottom 3
-                                if (top5.size() < 5) {
-                                    top5.add(new CorrelationPair(i, j, score));
-                                } else {
-                                    CorrelationPair lowest = top5.first();
-                                    if (score > lowest.getVal()) {
-                                        top5.remove(lowest);
-                                        top5.add(new CorrelationPair(i, j, score));
-                                    }
-                                }
-                                if (bottom3.size() < 3) {
-                                    bottom3.add(new CorrelationPair(i, j, score));
-                                } else {
-                                    CorrelationPair highest = bottom3.last();
-                                    if (score < highest.getVal()) {
-                                        bottom3.remove(highest);
-                                        bottom3.add(new CorrelationPair(i, j, score));
-                                    }
-                                }
-                            }
+                            } 
                         }
                         ticket.progress();
                     }
@@ -196,17 +172,6 @@ public class FeatureSelector extends SwingWorker<Void, String> {
 
             int redundantRemoveSize = toRemove.size();
             pc.reportMsg("Redundant features removed: " + redundantRemoveSize + System.getProperty("line.separator"), workspace);
-
-            pc.reportMsg("Top 5", workspace);
-
-            for (CorrelationPair pair : top5.descendingSet()) {
-                pc.reportMsg(String.format("rho(%s, %s) = %f", rankedFeatures[pair.getI()].getDisplayName(), rankedFeatures[pair.getJ()].getDisplayName(), pair.getVal()), workspace);
-            }
-            pc.reportMsg("...", workspace);
-            pc.reportMsg("Bottom 3", workspace);
-            for (CorrelationPair pair : bottom3.descendingSet()) {
-                pc.reportMsg(String.format("rho(%s, %s) = %f", rankedFeatures[pair.getI()].getDisplayName(), rankedFeatures[pair.getJ()].getDisplayName(), pair.getVal()), workspace);
-            }
 
             pc.reportMsg(System.getProperty("line.separator"), workspace);
             pc.reportMsg("Total of removed features: " + (uselessRemovedSize + redundantRemoveSize), workspace);

@@ -164,7 +164,6 @@ public abstract class AbstractMD implements Algorithm {
                     pc.reportMsg(msg.toString(), workspace);
                     total += size;
                 }
-                pc.reportMsg(System.getProperty("line.separator"), workspace);
                 pc.reportMsg("Total of calculated features: " + total, workspace);
                 progressTicket.progress();
             }

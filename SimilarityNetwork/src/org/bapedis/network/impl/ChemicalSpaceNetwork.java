@@ -8,7 +8,10 @@ package org.bapedis.network.impl;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
@@ -81,7 +84,7 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
         featureList.clear();
         // Fill the feature list
         if (optionIndex == AllOption) {
-            for (String key: attrModel.getMolecularDescriptorKeys()) {
+            for (String key : attrModel.getMolecularDescriptorKeys()) {
                 for (MolecularDescriptor desc : attrModel.getMolecularDescriptors(key)) {
                     featureList.add(desc);
                 }
@@ -108,6 +111,7 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
         } else {
             throw new IllegalStateException("Unknown value for option index: " + optionIndex);
         }
+        
         //Preprocess feature list
         if (!stopRun) {
             List<Peptide> peptides = attrModel.getPeptides();
@@ -128,7 +132,7 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
                     pc.reportMsg("Some molecular features (useless) remain constant for all peptides and they will be ignored.", workspace);
                 }
                 featureList.removeAll(toRemove);
-                for(MolecularDescriptor descriptor: toRemove){
+                for (MolecularDescriptor descriptor : toRemove) {
                     pc.reportMsg("Ignored: " + descriptor.getDisplayName(), workspace);
                 }
 
@@ -144,12 +148,31 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
                 cancel();
             }
         }
-        
-        //Print feature list size
-        if (!stopRun){
-            pc.reportMsg("\nTotal of available molecular features: "  + featureList.size(), workspace);
+
+        //Print feature list
+        if (!stopRun) {
+            Map<String, List<MolecularDescriptor>> byCategory = featureList.parallelStream()
+                    .collect(Collectors.groupingBy(MolecularDescriptor::getCategory));
+
+            int maxKeyLength = 0;
+            for (String key : attrModel.getMolecularDescriptorKeys()) {
+                if (key.length() > maxKeyLength) {
+                    maxKeyLength = key.length();
+                }
+            }
+            StringBuilder msg;
+            for (String key : attrModel.getMolecularDescriptorKeys()) {
+                msg = new StringBuilder(key);
+                for (int i = key.length() + 1; i <= maxKeyLength; i++) {
+                    msg.append(' ');
+                }
+                msg.append(" : "); 
+                msg.append(byCategory.containsKey(key)? byCategory.get(key).size(): 0);     
+                pc.reportMsg(msg.toString(), workspace);
+            }
+            pc.reportMsg("\nTotal of available molecular features: " + featureList.size(), workspace);
         }
-        
+
     }
 
     @Override
@@ -177,7 +200,7 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
             ab += val1 * val2;
             a2 += val1 * val1;
             b2 += val2 * val2;
-        }        
+        }
         return (float) ab / (float) (a2 + b2 - ab);
     }
 

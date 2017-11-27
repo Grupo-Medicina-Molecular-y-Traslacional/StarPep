@@ -5,6 +5,9 @@
  */
 package org.bapedis.network.impl;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -22,7 +25,7 @@ import org.openide.util.Exceptions;
  *
  * @author loge
  */
-public class SequenceSimilarityNetwork extends SimilarityNetworkAlgo{
+public class SequenceSimilarityNetwork extends SimilarityNetworkAlgo {
 
     public static final String[] Alignment_Type = new String[]{"Needleman-Wunsch", "Smith-Waterman"};
     public static final String[] Substitution_Matrix = new String[]{
@@ -37,7 +40,7 @@ public class SequenceSimilarityNetwork extends SimilarityNetworkAlgo{
     {"Positives / (Length of shorter sequence)", "Positives / Columns"}};
     protected int alignmentTypeIndex, substitutionMatrixIndex, similarityTypeIndex, similarityScoreIndex;
     protected SubstitutionMatrix<AminoAcidCompound> substitutionMatrix;
-    protected Alignments.PairwiseSequenceAlignerType alignerType;    
+    protected Alignments.PairwiseSequenceAlignerType alignerType;
 
     public SequenceSimilarityNetwork(AlgorithmFactory factory) {
         super(factory);
@@ -46,7 +49,7 @@ public class SequenceSimilarityNetwork extends SimilarityNetworkAlgo{
         substitutionMatrixIndex = 7; // Blosum 62 by Henikoff & Henikoff
         substitutionMatrix = getSubstitutionMatrix();
         similarityTypeIndex = 0;
-        similarityScoreIndex = 0;       
+        similarityScoreIndex = 0;
     }
 
     public int getAlignmentTypeIndex() {
@@ -146,9 +149,9 @@ public class SequenceSimilarityNetwork extends SimilarityNetworkAlgo{
         }
         return null;
     }
-    
-    private int getNumeratorValue(SequencePair<ProteinSequence, AminoAcidCompound> pair){
-        switch (Similarity_Type[similarityTypeIndex]){
+
+    private int getNumeratorValue(SequencePair<ProteinSequence, AminoAcidCompound> pair) {
+        switch (Similarity_Type[similarityTypeIndex]) {
             case "Percent sequence identity":
                 return pair.getNumIdenticals();
             case "Percent positive substitutions":
@@ -156,32 +159,49 @@ public class SequenceSimilarityNetwork extends SimilarityNetworkAlgo{
         }
         return 0;
     }
-    
-    private int getDenominatorValue(SequencePair<ProteinSequence, AminoAcidCompound> pair, Peptide peptide1, Peptide peptide2){
-        switch(Similarity_Score[similarityTypeIndex][similarityScoreIndex]){
+
+    private int getDenominatorValue(SequencePair<ProteinSequence, AminoAcidCompound> pair, Peptide peptide1, Peptide peptide2) {
+        switch (Similarity_Score[similarityTypeIndex][similarityScoreIndex]) {
             case "Identities / (Length of shorter sequence)":
             case "Positives / (Length of shorter sequence)":
                 return Math.min(peptide1.getSequence().length(), peptide2.getSequence().length());
             case "Identities / Columns":
             case "Positives / Columns":
                 return pair.getLength();
-        }       
+        }
         return 0;
     }
 
     @Override
-    public void initAlgo() {
-        super.initAlgo(); 
-        Workspace workspace = pc.getCurrentWorkspace();
-        pc.reportMsg("Alignment type: " + Alignment_Type[alignmentTypeIndex], workspace);
-        pc.reportMsg("Substitution matrix: " + Substitution_Matrix[substitutionMatrixIndex], workspace);
-        pc.reportMsg("Similarity: " + Similarity_Type[similarityTypeIndex], workspace);
-        pc.reportMsg("Score: " + Similarity_Score[similarityTypeIndex][similarityScoreIndex], workspace);
-        pc.reportMsg("Threshold: " + threshold, workspace);        
+    public void initAlgo(Workspace workspace) {
+        super.initAlgo(workspace);        
+        Map<String, String> outMap = new LinkedHashMap<>();
+        outMap.put("Alignment type", Alignment_Type[alignmentTypeIndex]);
+        outMap.put("Substitution matrix", Substitution_Matrix[substitutionMatrixIndex]);
+        outMap.put("Similarity", Similarity_Type[similarityTypeIndex]);
+        outMap.put("Score", Similarity_Score[similarityTypeIndex][similarityScoreIndex]);
+        outMap.put("Threshold", String.valueOf(threshold));
+
+        int maxKeyLength = 0;
+        for (String key : outMap.keySet()) {
+            if (key.length() > maxKeyLength) {
+                maxKeyLength = key.length();
+            }
+        }
+        
+        StringBuilder msg;
+        for (Map.Entry<String, String> entry : outMap.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            msg = new StringBuilder(key);
+            for (int i = key.length() + 1; i <= maxKeyLength; i++) {
+                msg.append(' ');
+            }
+            msg.append(" : ");
+            msg.append(value);
+            pc.reportMsg(msg.toString(), workspace);
+        }
     }
-    
-    
-    
 
     @Override
     public float computeSimilarity(Peptide peptide1, Peptide peptide2) {
@@ -194,7 +214,7 @@ public class SequenceSimilarityNetwork extends SimilarityNetworkAlgo{
             try {
                 pair = Alignments.getPairwiseAlignment(peptide1.getBiojavaSeq(), peptide2.getBiojavaSeq(),
                         alignerType, gapPenalty, substitutionMatrix);
-                score = ((float)getNumeratorValue(pair)) / getDenominatorValue(pair, peptide1, peptide2);
+                score = ((float) getNumeratorValue(pair)) / getDenominatorValue(pair, peptide1, peptide2);
             } catch (CompoundNotFoundException ex) {
 //                log.log(Level.SEVERE, "Compound Not Found Exception: {0}", ex.getMessage());
                 Exceptions.printStackTrace(ex);

@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.modamp.MD;
 import org.openide.util.Exceptions;
@@ -50,8 +51,8 @@ public class HydrophobicPeriodicity extends AbstractMD {
     }
 
     @Override
-    public void initAlgo() {
-        super.initAlgo(); 
+    public void initAlgo(Workspace workspace) {
+        super.initAlgo(workspace); 
         String name = getProName();
         addAttribute(name, name, Double.class);        
     }

@@ -6,6 +6,7 @@
 package org.bapedis.core.spi.algo;
 
 import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.task.ProgressTicket;
 
 /**
@@ -17,7 +18,7 @@ public interface Algorithm extends Runnable {
     /**
      * initAlgo() is called to initialize the algorithm (prepare to run).
      */
-    public abstract void initAlgo();
+    public abstract void initAlgo(Workspace workspace);
 
     /**
      * Called when the algorithm is finished.

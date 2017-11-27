@@ -202,7 +202,7 @@ public final class AlgorithmExecutor {
             progress.progress(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.running"));
             pc.reportRunningTask(algorithm.getFactory().getName(), workspace);
             try {
-                algorithm.initAlgo();
+                algorithm.initAlgo(workspace);
                 algorithm.run();
             } catch (Throwable e) {
                 if (errorHandler != null) {

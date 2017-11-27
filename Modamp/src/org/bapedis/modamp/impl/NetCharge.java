@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.scales.ChargeScale;
@@ -113,8 +114,8 @@ public class NetCharge extends AbstractMD {
     }
 
     @Override
-    public void initAlgo() {
-        super.initAlgo(); //To change body of generated methods, choose Tools | Templates.
+    public void initAlgo(Workspace workspace) {
+        super.initAlgo(workspace); //To change body of generated methods, choose Tools | Templates.
         if (ph5) {
             addAttribute(Z5, Z5, Double.class);
         }

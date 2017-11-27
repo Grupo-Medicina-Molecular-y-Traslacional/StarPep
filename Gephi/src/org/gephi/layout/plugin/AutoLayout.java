@@ -45,9 +45,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.project.ProjectManager;
 import org.gephi.graph.api.GraphModel;
 import org.openide.nodes.Node.Property;
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 
 /**
  * Class to build layout scenario that runs for a certain duration. Multiple
@@ -88,10 +90,12 @@ public class AutoLayout {
     private float innerRatio;
     private LayoutScenario currentLayout;
     private boolean cancel;
+    private ProjectManager pc;
 
     public AutoLayout(long duration, TimeUnit timeUnit) {
         this.duration = TimeUnit.MILLISECONDS.convert(duration, timeUnit);
         this.layouts = new ArrayList<>();
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
     }
 
     public void addLayout(AbstractLayout layout, float ratio) {
@@ -174,7 +178,7 @@ public class AutoLayout {
         if (currentLayout != layout) {
             innerStart = currentRatio;
             innerIteration = 0;
-            layout.layout.initAlgo();
+            layout.layout.initAlgo(pc.getCurrentWorkspace());
         } else {
             innerIteration++;
         }

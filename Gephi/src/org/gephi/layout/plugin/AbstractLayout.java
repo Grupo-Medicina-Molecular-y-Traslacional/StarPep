@@ -41,6 +41,7 @@
  */
 package org.gephi.layout.plugin;
 
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -104,8 +105,8 @@ public abstract class AbstractLayout implements Algorithm {
     public abstract void endLayout();
 
     @Override
-    public final void initAlgo() {
-        graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();        
+    public final void initAlgo(Workspace workspace) {
+        graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel(workspace);        
         graph = graphModel.getGraphVisible();
         graph.readLock();
         try {

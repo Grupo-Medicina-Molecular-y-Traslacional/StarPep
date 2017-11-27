@@ -12,6 +12,7 @@ import java.util.concurrent.ForkJoinPool;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -65,12 +66,12 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
     }
 
     @Override
-    public void initAlgo() {
+    public void initAlgo(Workspace workspace) {
         histogram.clear();
-        attrModel = pc.getAttributesModel();
+        attrModel = pc.getAttributesModel(workspace);
         stopRun = false;
         if (attrModel != null) {
-            GraphModel graphModel = pc.getGraphModel();
+            GraphModel graphModel = pc.getGraphModel(workspace);
             SimilarityGraphEdgeBuilder.attrModel = attrModel;
             SimilarityGraphEdgeBuilder.peptides = attrModel.getPeptides().toArray(new Peptide[0]);
             SimilarityGraphEdgeBuilder.graphModel = graphModel;

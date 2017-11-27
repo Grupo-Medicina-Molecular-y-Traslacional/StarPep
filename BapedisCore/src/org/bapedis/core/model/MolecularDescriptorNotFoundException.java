@@ -15,14 +15,26 @@ import org.openide.util.NbBundle;
 public class MolecularDescriptorNotFoundException extends Exception {
 
     private final NotifyDescriptor errorND;
+    private final Peptide pept;
+    private final MolecularDescriptor attr;
 
     public MolecularDescriptorNotFoundException(Peptide pept, MolecularDescriptor attr) {
         super(NbBundle.getMessage(MolecularDescriptorNotFoundException.class, "MolecularDescriptorNotFoundException.msg", pept.getId(), attr.getCategory(), attr.getDisplayName()));
         errorND = new NotifyDescriptor.Message(getMessage(), NotifyDescriptor.ERROR_MESSAGE);
+        this.pept = pept;
+        this.attr = attr;
     }
 
     public NotifyDescriptor getErrorND() {
         return errorND;
     }
+
+    public Peptide getPept() {
+        return pept;
+    }
+
+    public MolecularDescriptor getAttr() {
+        return attr;
+    }        
 
 }

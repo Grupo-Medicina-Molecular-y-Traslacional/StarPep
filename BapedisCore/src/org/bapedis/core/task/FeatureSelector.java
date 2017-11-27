@@ -40,7 +40,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
     private final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private final String taskName = "Feature Selection";
     private final Workspace workspace;
-    private final int rankView = 3;
+    protected final NotifyDescriptor emptyMDs;
 
     public FeatureSelector(FeatureSelectionModel model, AttributesModel attrModel) {
         this.attrModel = attrModel;
@@ -54,6 +54,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                 return true;
             }
         });
+        emptyMDs = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureSelector.class, "FeatureSelector.emptyMDs.info"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
     @Override
@@ -67,9 +68,17 @@ public class FeatureSelector extends SwingWorker<Void, String> {
 
         List<MolecularDescriptor> allFeatures = new LinkedList<>();
         for (String key : attrModel.getMolecularDescriptorKeys()) {
-            for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
-                allFeatures.add(attr);
+            if (!key.equals(MolecularDescriptor.DEFAULT_CATEGORY)) {
+                for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
+                    allFeatures.add(attr);
+                }
             }
+        }
+        
+        if (allFeatures.isEmpty()){
+            DialogDisplayer.getDefault().notify(emptyMDs);
+            pc.reportError("There is not calculated molecular descriptors", workspace);
+            return null;
         }
 
         //---------------Remove Useless--------------
@@ -160,8 +169,8 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                             rank2 = rank(column2);
                             score = calculatePearsonCorrelation(rank1, rank2);
                             if (score >= threshold) {
-                                pc.reportMsg("Removed: " + rankedFeatures[j].getDisplayName() + " - " + String.format("rho(%s) = %f", rankedFeatures[i].getDisplayName(), score), workspace);
                                 attrModel.deleteAttribute(rankedFeatures[j]);
+                                pc.reportMsg("Removed: " + rankedFeatures[j].getDisplayName() + " - " + String.format("rho(%s) = %f", rankedFeatures[i].getDisplayName(), score), workspace);
                                 toRemove.add(rankedFeatures[j]);
                                 rankedFeatures[j] = null;
                             }
@@ -172,10 +181,9 @@ public class FeatureSelector extends SwingWorker<Void, String> {
             }
 
             redundantRemoveSize = toRemove.size();
-            pc.reportMsg("Redundant features removed: " + redundantRemoveSize + "\n", workspace);            
+            pc.reportMsg("Redundant features removed: " + redundantRemoveSize, workspace);
         }
-        pc.reportMsg("\n", workspace);
-        pc.reportMsg("Total of removed features: " + (uselessRemovedSize + redundantRemoveSize), workspace);
+        pc.reportMsg("\nTotal of removed features: " + (uselessRemovedSize + redundantRemoveSize), workspace);
         return null;
     }
 
@@ -192,10 +200,12 @@ public class FeatureSelector extends SwingWorker<Void, String> {
             if (ex.getCause() instanceof MolecularDescriptorNotFoundException) {
                 NotifyDescriptor errorND = ((MolecularDescriptorNotFoundException) ex.getCause()).getErrorND();
                 DialogDisplayer.getDefault().notify(errorND);
+                pc.reportError(ex.getCause().getMessage(), workspace);
             } else {
                 Exceptions.printStackTrace(ex);
+                pc.reportError(ex.getCause().toString(), workspace);
             }
-            pc.reportError(ex.getCause().toString(), workspace);
+            
         } finally {
             model.setRunning(false);
             ticket.finish();

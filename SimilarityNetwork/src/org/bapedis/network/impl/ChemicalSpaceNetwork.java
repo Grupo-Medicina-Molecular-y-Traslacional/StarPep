@@ -12,6 +12,7 @@ import java.util.Set;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -75,8 +76,8 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
     }
 
     @Override
-    public void initAlgo() {
-        super.initAlgo();
+    public void initAlgo(Workspace workspace) {
+        super.initAlgo(workspace);
         featureList.clear();
         // Fill the feature list
         if (optionIndex == AllOption) {
@@ -88,12 +89,14 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
         } else if (optionIndex == CustomizeOption) {
             if (descriptorKeys.isEmpty()) {
                 DialogDisplayer.getDefault().notify(emptyKeys);
+                pc.reportError("There is no molecular descriptor selected", workspace);
                 cancel();
             } else {
                 for (String key : descriptorKeys) {
                     if (!attrModel.hasMolecularDescriptors(key)) {
                         NotifyDescriptor notFound = new NotifyDescriptor.Message(NbBundle.getMessage(ChemicalSpaceNetwork.class, "ChemicalSpaceNetwork.key.notFound", key), NotifyDescriptor.ERROR_MESSAGE);
                         DialogDisplayer.getDefault().notify(notFound);
+                        pc.reportError("Value not found for molecular descriptor: " + key, workspace);
                         cancel();
                         break;
                     }
@@ -113,7 +116,7 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
                 for (MolecularDescriptor attr : featureList) {
                     attr.resetSummaryStats(peptides);
                 }
-                // Remove useless
+                // Remove constant attributes
                 List<MolecularDescriptor> toRemove = new LinkedList<>();
                 for (MolecularDescriptor attr : featureList) {
                     if (attr.getMax() == attr.getMin()) {
@@ -122,19 +125,31 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
                 }
                 if (toRemove.size() > 0) {
                     DialogDisplayer.getDefault().notify(uselessFeatureWarning);
+                    pc.reportMsg("Some molecular features (useless) remain constant for all peptides and they will be ignored.", workspace);
                 }
                 featureList.removeAll(toRemove);
+                for(MolecularDescriptor descriptor: toRemove){
+                    pc.reportMsg("Ignored: " + descriptor.getDisplayName(), workspace);
+                }
 
                 //Check feature list size
                 if (featureList.size() < MIN_AVAILABLE_FEATURES) {
                     DialogDisplayer.getDefault().notify(notEnoughFeatures);
+                    pc.reportError("There is not enough number of available molecular features", workspace);
                     cancel();
                 }
             } catch (MolecularDescriptorNotFoundException ex) {
                 DialogDisplayer.getDefault().notify(ex.getErrorND());
+                pc.reportError(ex.getMessage(), workspace);
                 cancel();
             }
         }
+        
+        //Print feature list size
+        if (!stopRun){
+            pc.reportMsg("\nTotal of available molecular features: "  + featureList.size(), workspace);
+        }
+        
     }
 
     @Override

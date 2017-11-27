@@ -81,10 +81,10 @@ public abstract class AbstractMD implements Algorithm {
     }
 
     @Override
-    public void initAlgo() {
+    public void initAlgo(Workspace workspace) {
         map.clear();
-        attrModel = pc.getAttributesModel();
-        workspace = pc.getCurrentWorkspace();
+        attrModel = pc.getAttributesModel(workspace);
+        this.workspace = workspace;
         stopRun = false;
     }
 
@@ -123,8 +123,10 @@ public abstract class AbstractMD implements Algorithm {
 
             try {
                 peptides.parallelStream().forEach(peptide -> {
-                    compute(peptide);
-                    progressTicket.progress();
+                    if (!stopRun) {
+                        compute(peptide);
+                        progressTicket.progress();
+                    }
                 });
             } finally {
                 //Add molecular descriptors to attributes model
@@ -158,7 +160,7 @@ public abstract class AbstractMD implements Algorithm {
                     for (int i = key.length() + 1; i <= maxKeyLength; i++) {
                         msg.append(' ');
                     }
-                    msg.append(" :");
+                    msg.append(" : ");
                     msg.append(size);
                     msg.append(size > 1 ? " features" : " feature");
                     pc.reportMsg(msg.toString(), workspace);

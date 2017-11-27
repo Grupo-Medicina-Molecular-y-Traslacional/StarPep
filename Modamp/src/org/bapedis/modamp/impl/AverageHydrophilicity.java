@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.scales.HydrophilicityScale;
@@ -62,8 +63,8 @@ public class AverageHydrophilicity extends AbstractMD {
     }
 
     @Override
-    public void initAlgo() {
-        super.initAlgo(); 
+    public void initAlgo(Workspace workspace) {
+        super.initAlgo(workspace); 
         if (HOPT810101) {
             addAttribute(HOPT810101_NAME, HOPT810101_NAME, Double.class);
         }

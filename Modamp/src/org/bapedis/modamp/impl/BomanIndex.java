@@ -7,6 +7,7 @@ package org.bapedis.modamp.impl;
 
 import org.bapedis.core.spi.algo.impl.AbstractMD;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.modamp.MD;
 
 /**
@@ -22,8 +23,8 @@ public class BomanIndex extends AbstractMD {
     }
 
     @Override
-    public void initAlgo() {
-        super.initAlgo(); 
+    public void initAlgo(Workspace workspace) {
+        super.initAlgo(workspace); 
         addAttribute(BM, BM, Double.class);
     }
     
@@ -32,7 +33,6 @@ public class BomanIndex extends AbstractMD {
     protected void compute(Peptide peptide) {
         double val = MD.boman(peptide.getSequence());
         peptide.setAttributeValue(getAttribute(BM), val);
-
     }
 
 

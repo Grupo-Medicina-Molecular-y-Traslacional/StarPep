@@ -48,6 +48,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Stack;
 import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -441,9 +442,9 @@ public class GraphDistance implements Algorithm {
     }
 
     @Override
-    public void initAlgo() {
+    public void initAlgo(Workspace workspace) {
         isCanceled = false;
-        graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();
+        graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel(workspace);
         initializeAttributeColunms(graphModel);
     }
 

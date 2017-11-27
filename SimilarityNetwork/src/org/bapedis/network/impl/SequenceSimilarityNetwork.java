@@ -6,6 +6,7 @@
 package org.bapedis.network.impl;
 
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.biojava.nbio.alignment.Alignments;
 import org.biojava.nbio.alignment.SimpleGapPenalty;
@@ -167,6 +168,19 @@ public class SequenceSimilarityNetwork extends SimilarityNetworkAlgo{
         }       
         return 0;
     }
+
+    @Override
+    public void initAlgo() {
+        super.initAlgo(); 
+        Workspace workspace = pc.getCurrentWorkspace();
+        pc.reportMsg("Alignment type: " + Alignment_Type[alignmentTypeIndex], workspace);
+        pc.reportMsg("Substitution matrix: " + Substitution_Matrix[substitutionMatrixIndex], workspace);
+        pc.reportMsg("Similarity: " + Similarity_Type[similarityTypeIndex], workspace);
+        pc.reportMsg("Score: " + Similarity_Score[similarityTypeIndex][similarityScoreIndex], workspace);
+        pc.reportMsg("Threshold: " + threshold, workspace);        
+    }
+    
+    
     
 
     @Override

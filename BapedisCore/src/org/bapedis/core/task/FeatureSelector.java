@@ -75,7 +75,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
         //---------------Remove Useless--------------
         List<Peptide> peptides = attrModel.getPeptides();
         String state1 = NbBundle.getMessage(FeatureSelector.class, "FeatureSelector.task.removeUseless");
-        pc.reportMsg(state1 + System.getProperty("line.separator"), workspace);
+        pc.reportMsg(state1 + "\n", workspace);
         ticket.progress(state1);
         ticket.switchToDeterminate(allFeatures.size());
 
@@ -85,7 +85,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
         double score;
 
         pc.reportMsg("Entropy max score: " + maxScore, workspace);
-        pc.reportMsg("Entropy cutoff value: " + threshold + System.getProperty("line.separator"), workspace);
+        pc.reportMsg("Entropy cutoff value: " + threshold + "\n", workspace);
         LinkedList<MolecularDescriptor> toRemove = new LinkedList<>();
         for (MolecularDescriptor descriptor : allFeatures) {
             if (!stopRun) {
@@ -103,7 +103,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
         }
         allFeatures.removeAll(toRemove);
         int uselessRemovedSize = toRemove.size();
-        pc.reportMsg("Useless features removed: " + uselessRemovedSize + System.getProperty("line.separator"), workspace);
+        pc.reportMsg("Useless features removed: " + uselessRemovedSize + "\n", workspace);
 
         pc.reportMsg("Top 5", workspace);
         MolecularDescriptor[] rankedFeatures = allFeatures.toArray(new MolecularDescriptor[0]);
@@ -129,14 +129,15 @@ public class FeatureSelector extends SwingWorker<Void, String> {
         }
 
         //---------------Remove Redundant--------------
+        int redundantRemoveSize = 0;
         if (model.isRemoveRedundant()) {
             toRemove.clear();
             String state2 = NbBundle.getMessage(FeatureSelector.class, "FeatureSelector.task.removeRedundant");
-            pc.reportMsg(System.getProperty("line.separator"), workspace);
-            pc.reportMsg(state2 + System.getProperty("line.separator"), workspace);
+            pc.reportMsg("\n", workspace);
+            pc.reportMsg(state2 + "\n", workspace);
 
             threshold = model.getCorrelationCutoff() / 100.;
-            pc.reportMsg("Correlation cutoff value: " + threshold + System.getProperty("line.separator"), workspace);
+            pc.reportMsg("Correlation cutoff value: " + threshold + "\n", workspace);
             ticket.progress(state2);
             ticket.switchToDeterminate(rankedFeatures.length * rankedFeatures.length);
             double[] column1 = new double[peptides.size()];
@@ -163,19 +164,18 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                                 attrModel.deleteAttribute(rankedFeatures[j]);
                                 toRemove.add(rankedFeatures[j]);
                                 rankedFeatures[j] = null;
-                            } 
+                            }
                         }
                         ticket.progress();
                     }
                 }
             }
 
-            int redundantRemoveSize = toRemove.size();
-            pc.reportMsg("Redundant features removed: " + redundantRemoveSize + System.getProperty("line.separator"), workspace);
-
-            pc.reportMsg(System.getProperty("line.separator"), workspace);
-            pc.reportMsg("Total of removed features: " + (uselessRemovedSize + redundantRemoveSize), workspace);
+            redundantRemoveSize = toRemove.size();
+            pc.reportMsg("Redundant features removed: " + redundantRemoveSize + "\n", workspace);            
         }
+        pc.reportMsg("\n", workspace);
+        pc.reportMsg("Total of removed features: " + (uselessRemovedSize + redundantRemoveSize), workspace);
         return null;
     }
 

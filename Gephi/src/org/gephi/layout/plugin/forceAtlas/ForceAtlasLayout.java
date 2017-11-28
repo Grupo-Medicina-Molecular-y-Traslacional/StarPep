@@ -50,6 +50,7 @@ import org.gephi.graph.api.Node;
 import org.gephi.layout.plugin.AbstractLayout;
 import org.gephi.layout.plugin.ForceVectorNodeLayoutData;
 import org.gephi.layout.plugin.ForceVectorUtils;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -179,7 +180,7 @@ public class ForceAtlasLayout extends AbstractLayout {
                     NbBundle.getMessage(ForceAtlasLayout.class, "forceAtlas.speed.desc"),
                     "getSpeed", "setSpeed"));
         } catch (Exception e) {
-            e.printStackTrace();
+            Exceptions.printStackTrace(e);
         }
     }
 

@@ -45,9 +45,9 @@ import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import org.gephi.appearance.api.Function;
-import org.gephi.appearance.api.RankingFunction;
-import org.gephi.appearance.plugin.RankingLabelSizeTransformer;
-import org.gephi.appearance.spi.RankingTransformer;
+import org.gephi.appearance.api.PartitionFunction;
+import org.gephi.appearance.plugin.PartitionLabelColorTransformer;
+import org.gephi.appearance.spi.PartitionTransformer;
 import org.gephi.appearance.spi.TransformerCategory;
 import org.gephi.appearance.spi.TransformerUI;
 import org.gephi.ui.appearance.plugin.category.DefaultCategory;
@@ -58,24 +58,24 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author mbastian
  */
-@ServiceProvider(service = TransformerUI.class, position = 800)
-public class RankingLabelSizeTransformerUI implements TransformerUI {
+@ServiceProvider(service = TransformerUI.class, position = 600)
+public class PartitionLabelColorTransformerUI implements TransformerUI {
 
-    private RankingSizeTransformerPanel panel;
+    private PartitionColorTransformerPanel panel;
 
     @Override
     public TransformerCategory getCategory() {
-        return DefaultCategory.LABEL_SIZE;
+        return DefaultCategory.LABEL_COLOR;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return NbBundle.getMessage(PartitionLabelColorTransformerUI.class, "Attribute.partition.name");
     }
 
     @Override
     public Icon getIcon() {
         return null;
-    }
-
-    @Override
-    public String getDisplayName() {
-        return NbBundle.getMessage(RankingLabelSizeTransformerUI.class, "Attribute.ranking.name");
     }
 
     @Override
@@ -86,19 +86,22 @@ public class RankingLabelSizeTransformerUI implements TransformerUI {
     @Override
     public synchronized JPanel getPanel(Function function) {
         if (panel == null) {
-            panel = new RankingSizeTransformerPanel();
+            panel = new PartitionColorTransformerPanel();
         }
-        panel.setup((RankingFunction) function);
+        panel.setup((PartitionFunction) function);
         return panel;
     }
 
     @Override
     public synchronized AbstractButton[] getControlButton() {
-        return null;
+        if (panel == null) {
+            panel = new PartitionColorTransformerPanel();
+        }
+        return new AbstractButton[]{panel.getPaletteButton()};
     }
 
     @Override
-    public Class<? extends RankingTransformer> getTransformerClass() {
-        return RankingLabelSizeTransformer.class;
+    public Class<? extends PartitionTransformer> getTransformerClass() {
+        return PartitionLabelColorTransformer.class;
     }
 }

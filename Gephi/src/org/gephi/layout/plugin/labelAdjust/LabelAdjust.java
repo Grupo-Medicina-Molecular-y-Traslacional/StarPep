@@ -49,6 +49,7 @@ import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.TextProperties;
 import org.gephi.layout.plugin.AbstractLayout;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -100,7 +101,7 @@ public class LabelAdjust extends AbstractLayout {
                     NbBundle.getMessage(getClass(), "LabelAdjust.adjustBySize.desc"),
                     "isAdjustBySize", "setAdjustBySize"));
         } catch (Exception e) {
-            e.printStackTrace();
+            Exceptions.printStackTrace(e);
         }
     }
 

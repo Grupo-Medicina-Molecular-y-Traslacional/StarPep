@@ -39,66 +39,43 @@
 
  Portions Copyrighted 2013 Gephi Consortium.
  */
-package org.gephi.ui.appearance.plugin;
+package org.gephi.appearance.plugin;
 
-import javax.swing.AbstractButton;
-import javax.swing.Icon;
-import javax.swing.JPanel;
-import org.gephi.appearance.api.Function;
-import org.gephi.appearance.api.RankingFunction;
-import org.gephi.appearance.plugin.RankingLabelSizeTransformer;
-import org.gephi.appearance.spi.RankingTransformer;
-import org.gephi.appearance.spi.TransformerCategory;
-import org.gephi.appearance.spi.TransformerUI;
-import org.gephi.ui.appearance.plugin.category.DefaultCategory;
-import org.openide.util.NbBundle;
+import java.awt.Color;
+import org.gephi.appearance.api.Partition;
+import org.gephi.appearance.plugin.palette.PaletteManager;
+import org.gephi.appearance.spi.PartitionTransformer;
+import org.gephi.appearance.spi.Transformer;
+import org.gephi.graph.api.Element;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author mbastian
  */
-@ServiceProvider(service = TransformerUI.class, position = 800)
-public class RankingLabelSizeTransformerUI implements TransformerUI {
-
-    private RankingSizeTransformerPanel panel;
+@ServiceProvider(service = Transformer.class)
+public class PartitionLabelColorTransformer implements PartitionTransformer<Element> {
 
     @Override
-    public TransformerCategory getCategory() {
-        return DefaultCategory.LABEL_SIZE;
-    }
-
-    @Override
-    public Icon getIcon() {
-        return null;
-    }
-
-    @Override
-    public String getDisplayName() {
-        return NbBundle.getMessage(RankingLabelSizeTransformerUI.class, "Attribute.ranking.name");
-    }
-
-    @Override
-    public String getDescription() {
-        return null;
-    }
-
-    @Override
-    public synchronized JPanel getPanel(Function function) {
-        if (panel == null) {
-            panel = new RankingSizeTransformerPanel();
+    public void transform(Element element, Partition partition, Object value) {
+        Color color = partition.getColor(value);
+        if (color == null) {
+            color = Color.BLACK;
         }
-        panel.setup((RankingFunction) function);
-        return panel;
+        element.getTextProperties().setColor(color);
     }
 
     @Override
-    public synchronized AbstractButton[] getControlButton() {
-        return null;
+    public boolean isNode() {
+        return true;
     }
 
     @Override
-    public Class<? extends RankingTransformer> getTransformerClass() {
-        return RankingLabelSizeTransformer.class;
+    public boolean isEdge() {
+        return true;
+    }
+
+    public PaletteManager getPaletteManager() {
+        return PaletteManager.getInstance();
     }
 }

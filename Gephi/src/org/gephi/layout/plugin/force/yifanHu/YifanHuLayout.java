@@ -56,6 +56,7 @@ import org.gephi.layout.plugin.force.Displacement;
 import org.gephi.layout.plugin.force.ForceVector;
 import org.gephi.layout.plugin.force.quadtree.BarnesHut;
 import org.gephi.layout.plugin.force.quadtree.QuadTree;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -166,7 +167,7 @@ public class YifanHuLayout extends AbstractLayout {
                     NbBundle.getMessage(getClass(), "YifanHu.theta.desc"),
                     "getBarnesHutTheta", "setBarnesHutTheta"));
         } catch (Exception e) {
-            e.printStackTrace();
+            Exceptions.printStackTrace(e);
         }
 
     }

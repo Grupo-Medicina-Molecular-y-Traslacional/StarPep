@@ -8,6 +8,7 @@ package org.bapedis.db;
 import org.bapedis.core.task.QueryExecutor;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.openide.modules.ModuleInstall;
+import org.openide.util.Exceptions;
 
 public class Installer extends ModuleInstall {
 
@@ -20,8 +21,7 @@ public class Installer extends ModuleInstall {
             QueryExecutor worker = new QueryExecutor();
             worker.execute();
         } catch (Exception ex) {
-            System.out.println(ex);
-            ex.printStackTrace();
+            Exceptions.printStackTrace(ex);
         }
     }
 

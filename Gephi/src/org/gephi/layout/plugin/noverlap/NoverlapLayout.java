@@ -50,6 +50,7 @@ import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.gephi.graph.api.Node;
 import org.gephi.layout.plugin.AbstractLayout;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -79,20 +80,12 @@ public class NoverlapLayout extends AbstractLayout {
         try {
             properties.add(AlgorithmProperty.createProperty(
                     this, Double.class, "speed", NOVERLAP_CATEGORY, "speed", "getSpeed", "setSpeed"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
             properties.add(AlgorithmProperty.createProperty(
                     this, Double.class, "ratio", NOVERLAP_CATEGORY, "ratio", "getRatio", "setRatio"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
             properties.add(AlgorithmProperty.createProperty(
                     this, Double.class, "margin", NOVERLAP_CATEGORY, "margin", "getMargin", "setMargin"));
         } catch (Exception e) {
-            e.printStackTrace();
+            Exceptions.printStackTrace(e);
         }
     }
 
@@ -232,7 +225,7 @@ public class NoverlapLayout extends AbstractLayout {
         for (Node n : nodes) {
             if (!canLayout()) {
                 return;
-            }            
+            }
             NoverlapLayoutData layoutData = n.getLayoutData();
             if (!n.isFixed()) {
                 layoutData.dx *= 0.1 * speed;
@@ -336,7 +329,7 @@ public class NoverlapLayout extends AbstractLayout {
                     try {
                         data.get(new Cell(row, col)).add(node);
                     } catch (Exception e) {
-                        //e.printStackTrace();
+                        //Exceptions.printStackTrace(e);
                         if (nxmin < xmin || nxmax > xmax) {
                         }
                         if (nymin < ymin || nymax > ymax) {

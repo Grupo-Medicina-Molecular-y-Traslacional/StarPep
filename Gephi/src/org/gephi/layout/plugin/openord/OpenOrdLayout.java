@@ -53,6 +53,7 @@ import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.gephi.graph.api.Edge;
 import org.gephi.layout.plugin.AbstractLayout;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -161,7 +162,7 @@ public class OpenOrdLayout extends AbstractLayout{
                     "getSimmerStage", "setSimmerStage"));
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Exceptions.printStackTrace(e);
         }    
     }
     

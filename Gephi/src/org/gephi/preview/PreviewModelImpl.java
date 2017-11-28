@@ -416,7 +416,7 @@ public class PreviewModelImpl implements PreviewModel {
             Object value = simpleValueEntry.getValue();
             if (value != null) {
                 Class clazz = value.getClass();
-                String text = Serialization.getValueAsText(value, value.getClass());
+                String text = Serialization.getValueAsText(value, clazz);
                 if (text != null) {
                     writer.writeStartElement("previewsimplevalue");
                     writer.writeAttribute("name", simpleValueEntry.getKey());

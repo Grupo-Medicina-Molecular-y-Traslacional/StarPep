@@ -9,6 +9,7 @@ import org.bapedis.core.project.ProjectManager;
 import org.gephi.graph.api.Node;
 import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -89,7 +90,7 @@ public class GraphNodeWrapper extends GraphElementNode {
             property = createLabelVisiblePropertyField();
             set.put(property);
         } catch (NoSuchMethodException exception) {
-            exception.printStackTrace();
+            Exceptions.printStackTrace(exception);
         }        
 
         return sheet;

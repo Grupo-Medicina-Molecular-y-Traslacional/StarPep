@@ -129,7 +129,7 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
                 }
                 if (toRemove.size() > 0) {
                     DialogDisplayer.getDefault().notify(uselessFeatureWarning);
-                    pc.reportMsg("Some molecular features (useless) remain constant for all peptides and they will be ignored.", workspace);
+                    pc.reportMsg("Some molecular features remain constant for all peptides and they will be ignored.", workspace);
                 }
                 featureList.removeAll(toRemove);
                 for (MolecularDescriptor descriptor : toRemove) {

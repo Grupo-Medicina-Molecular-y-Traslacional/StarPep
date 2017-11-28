@@ -49,6 +49,7 @@ import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.gephi.graph.api.Node;
 import org.gephi.layout.plugin.AbstractLayout;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -78,7 +79,7 @@ public class RandomLayout extends AbstractLayout {
                     NbBundle.getMessage(getClass(), "Random.spaceSize.desc"),
                     "getSize", "setSize"));
         } catch (Exception e) {
-            e.printStackTrace();
+            Exceptions.printStackTrace(e);
         }
     }
 

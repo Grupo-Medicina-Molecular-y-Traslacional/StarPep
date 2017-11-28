@@ -40,6 +40,7 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.GraphElementNavigatorLookupHint;
 import org.bapedis.core.ui.MetadataNavigatorLookupHint;
 import org.gephi.graph.api.Node;
+import org.gephi.ui.components.JColorBlackWhiteSwitcher;
 import org.gephi.ui.components.JColorButton;
 import org.gephi.visualization.VizController;
 import org.gephi.visualization.VizModel;
@@ -49,6 +50,7 @@ import org.gephi.ui.components.JPopupButton;
 import org.gephi.visualization.api.selection.SelectionManager;
 import org.gephi.visualization.apiimpl.VizEvent;
 import org.gephi.visualization.apiimpl.VizEventListener;
+import org.gephi.visualization.text.ColorMode;
 import org.gephi.visualization.text.SizeMode;
 import org.gephi.visualization.text.TextManager;
 import org.gephi.visualization.text.TextModelImpl;
@@ -67,7 +69,6 @@ import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
 import org.openide.windows.WindowManager;
 
-
 public class NeoGraphScene extends JPanel implements MultiViewElement, WorkspaceEventListener, PropertyChangeListener, VizEventListener {
 
     protected final ProjectManager pc;
@@ -80,18 +81,19 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(20, 20));
     private final JPanel graphPanel = new JPanel();
     // Global
-    final JColorButton backgroundButton = new JColorButton(Color.BLACK);
-    final JXHyperlink configureLink = new JXHyperlink();
+    private final JColorBlackWhiteSwitcher backgroundColorButton = new JColorBlackWhiteSwitcher(Color.BLACK);
+    private final JXHyperlink configureLink = new JXHyperlink();
     //Node
     final JToggleButton showNodeLabelsButton = new JToggleButton();
     final JButton nodeFontButton = new JButton();
 //    final JColorButton nodeColorButton = new JColorButton(Color.BLACK);
     final JPopupButton labelSizeModeButton = new JPopupButton();
+    final JPopupButton labelColorModeButton = new JPopupButton();
     final JSlider nodeSizeSlider = new JSlider();
     //Edge
     final JToggleButton showEdgeButton = new JToggleButton();
     final JToggleButton edgeHasNodeColorButton = new JToggleButton();
-//    final JColorButton edgeColorButton = new JColorButton(Color.BLACK);
+    final JColorButton edgeColorButton = new JColorButton(Color.BLACK);
     final JSlider edgeScaleSlider = new JSlider();
     final JToggleButton showEdgeLabelsButton = new JToggleButton();
     final JButton edgeFontButton = new JButton();
@@ -131,22 +133,20 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         topToolbar.addSeparator();
 
         // Background
-        backgroundButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.backgroundButton.toolTipText"));
-        backgroundButton.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
+        backgroundColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.backgroundButton.toolTipText"));
+        backgroundColorButton.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                Color backgroundColor = (Color) evt.getNewValue();
                 VizModel vizModel = VizController.getInstance().getVizModel();
-                if (!vizModel.getBackgroundColor().equals(backgroundColor)) {
-                    vizModel.setBackgroundColor(backgroundColor);
+                Color backgroundColor = ((JColorBlackWhiteSwitcher) backgroundColorButton).getColor();
+                vizModel.setBackgroundColor(backgroundColor);
 
-                    TextModelImpl textModel = VizController.getInstance().getVizModel().getTextModel();
-                    boolean isDarkBackground = (backgroundColor.getRed() + backgroundColor.getGreen() + backgroundColor.getBlue()) / 3 < 128;
-                    textModel.setNodeColor(isDarkBackground ? Color.WHITE : Color.BLACK);
-                }
+                TextModelImpl textModel = VizController.getInstance().getVizModel().getTextModel();
+                boolean isDarkBackground = (backgroundColor.getRed() + backgroundColor.getGreen() + backgroundColor.getBlue()) / 3 < 128;
+                textModel.setNodeColor(isDarkBackground ? Color.WHITE : Color.BLACK);
             }
         });
-        topToolbar.add(backgroundButton);
+        topToolbar.add(backgroundColorButton);
 
         //Zoom
         topToolbar.addSeparator();
@@ -310,6 +310,19 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         });
         bottomToolbar.add(labelSizeModeButton);
 
+        //Color mode
+        labelColorModeButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/labelColorMode.png", false));
+        labelColorModeButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.labelColorModeButton.toolTipText"));
+        labelColorModeButton.setChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                ColorMode cm = (ColorMode) e.getSource();
+                TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
+                model.setColorMode(cm);
+            }
+        });
+        bottomToolbar.add(labelColorModeButton);
+
         // Node Font
         nodeFontButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/font.png", false));
         nodeFontButton.addActionListener(new ActionListener() {
@@ -338,6 +351,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 //            }
 //        });
 //        toolbar.add(nodeColorButton);
+
         //Font Size
         nodeSizeSlider.setPreferredSize(new Dimension(100, 20));
         nodeSizeSlider.setMaximumSize(nodeSizeSlider.getPreferredSize());
@@ -388,7 +402,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         bottomToolbar.add(edgeHasNodeColorButton);
 
         //Edge color
-//        edgeColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeColorButton.ToolTipText"));
+        edgeColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeColorButton.ToolTipText"));
 //        edgeColorButton.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
 //            @Override
 //            public void propertyChange(PropertyChangeEvent evt) {
@@ -404,6 +418,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 //            }
 //        });
 //        toolbar.add(edgeColorButton);
+
         //EdgeScale slider
         edgeScaleSlider.setMinimum(0);
         edgeScaleSlider.setMaximum(100);
@@ -512,7 +527,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         TextModelImpl textModel = vizModel.getTextModel();
 
         // Background color
-        backgroundButton.setColor(vizModel.getBackgroundColor());
+        backgroundColorButton.setColor(vizModel.getBackgroundColor());
 
         //Show node labels
         showNodeLabelsButton.setSelected(vizModel.getTextModel().isShowNodeLabels());
@@ -523,6 +538,12 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             labelSizeModeButton.addItem(sm, sm.getIcon());
         }
         labelSizeModeButton.setSelectedItem(textModel.getSizeMode());
+
+        // Color mode
+        for (final ColorMode cm : textManager.getColorModes()) {
+            labelColorModeButton.addItem(cm, cm.getIcon());
+        }
+        labelColorModeButton.setSelectedItem(textManager.getModel().getColorMode());
 
         //Font
         Font nodeFont = textModel.getNodeFont();

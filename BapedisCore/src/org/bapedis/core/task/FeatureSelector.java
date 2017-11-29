@@ -74,8 +74,8 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                 }
             }
         }
-        
-        if (allFeatures.isEmpty()){
+
+        if (allFeatures.isEmpty()) {
             DialogDisplayer.getDefault().notify(emptyMDs);
             pc.reportError("There is not calculated molecular descriptors", workspace);
             return null;
@@ -141,14 +141,18 @@ public class FeatureSelector extends SwingWorker<Void, String> {
         int redundantRemoveSize = 0;
         if (model.isRemoveRedundant()) {
             toRemove.clear();
+            int totalUnits = allFeatures.size() + (rankedFeatures.length * (rankedFeatures.length - 1)) / 2;
+            System.out.println(totalUnits);
+            ticket.switchToDeterminate(totalUnits);            
+            
             String state2 = NbBundle.getMessage(FeatureSelector.class, "FeatureSelector.task.removeRedundant");
+            ticket.progress(state2);
             pc.reportMsg("\n", workspace);
-            pc.reportMsg(state2 + "\n", workspace);
+            pc.reportMsg(state2 + "\n", workspace);            
 
             threshold = model.getCorrelationCutoff() / 100.;
             pc.reportMsg("Correlation cutoff value: " + threshold + "\n", workspace);
-            ticket.progress(state2);
-            ticket.switchToDeterminate(rankedFeatures.length * rankedFeatures.length);
+            
             double[] column1 = new double[peptides.size()];
             double[] column2 = new double[peptides.size()];
             double[] rank1, rank2;
@@ -168,17 +172,21 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                             }
                             rank2 = rank(column2);
                             score = calculatePearsonCorrelation(rank1, rank2);
-                            if (score >= threshold) {
+                            if (Math.abs(score) >= threshold) {
                                 attrModel.deleteAttribute(rankedFeatures[j]);
                                 pc.reportMsg("Removed: " + rankedFeatures[j].getDisplayName() + " - " + String.format("rho(%s) = %f", rankedFeatures[i].getDisplayName(), score), workspace);
                                 toRemove.add(rankedFeatures[j]);
                                 rankedFeatures[j] = null;
                             }
-                        }
+                        }          
                         ticket.progress();
                     }
+                } else{
+                    //Report progress of units
+                    ticket.progress(ticket.getCurrentUnit() + (rankedFeatures.length - (i+1))); 
                 }
             }
+            System.out.println(ticket.getCurrentUnit());
 
             redundantRemoveSize = toRemove.size();
             pc.reportMsg("Redundant features removed: " + redundantRemoveSize, workspace);
@@ -205,7 +213,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                 Exceptions.printStackTrace(ex);
                 pc.reportError(ex.getCause().toString(), workspace);
             }
-            
+
         } finally {
             model.setRunning(false);
             ticket.finish();

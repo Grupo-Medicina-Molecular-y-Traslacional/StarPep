@@ -33,6 +33,8 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
     protected int optionIndex;
     protected static int AllOption = 0;
     protected static int CustomizeOption = 1;
+    protected static final String[] similarityMetrics = new String[]{"Tanimoto Coefficient"};
+    protected static final String[] normalization = new String[]{"Z-score", "Min-max"};
     protected int metricIndex;
     protected int normalizationIndex;
     protected final List<MolecularDescriptor> featureList;
@@ -149,7 +151,7 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
             }
         }
 
-        //Print feature list
+        //Output details
         if (!stopRun) {
             Map<String, List<MolecularDescriptor>> byCategory = featureList.parallelStream()
                     .collect(Collectors.groupingBy(MolecularDescriptor::getCategory));
@@ -171,6 +173,9 @@ public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
                 pc.reportMsg(msg.toString(), workspace);
             }
             pc.reportMsg("\nTotal of available molecular features: " + featureList.size(), workspace);
+            
+            pc.reportMsg("\nSimilarity Metric: " + similarityMetrics[metricIndex], workspace);
+            pc.reportMsg("Normalization: " + normalization[normalizationIndex], workspace);
         }
 
     }

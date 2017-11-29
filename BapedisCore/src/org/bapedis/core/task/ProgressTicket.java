@@ -161,11 +161,20 @@ public final class ProgressTicket {
     }
 
     /**
+     * Returns the number of current unit.
+     * @return the number of current unit
+     */    
+    public synchronized int getCurrentUnit() {
+        return currentUnit;
+    }        
+
+    /**
      * Start the progress indication for indeterminate task.
      */
     public synchronized void start() {
         if (handle != null) {
             started = true;
+            currentUnit = 0;
             handle.start();
         }
     }
@@ -177,6 +186,7 @@ public final class ProgressTicket {
     public synchronized void start(int workunits) {
         if (handle != null) {
             started = true;
+            currentUnit = 0;
             this.progressTotal = workunits;
             handle.start(100);
         }

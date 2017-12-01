@@ -141,8 +141,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
         int redundantRemoveSize = 0;
         if (model.isRemoveRedundant()) {
             toRemove.clear();
-            int totalUnits = allFeatures.size() + (rankedFeatures.length * (rankedFeatures.length - 1)) / 2;
-            System.out.println(totalUnits);
+            int totalUnits = ticket.getCurrentUnit() + (rankedFeatures.length * (rankedFeatures.length - 1)) / 2;
             ticket.switchToDeterminate(totalUnits);            
             
             String state2 = NbBundle.getMessage(FeatureSelector.class, "FeatureSelector.task.removeRedundant");
@@ -186,7 +185,6 @@ public class FeatureSelector extends SwingWorker<Void, String> {
                     ticket.progress(ticket.getCurrentUnit() + (rankedFeatures.length - (i+1))); 
                 }
             }
-            System.out.println(ticket.getCurrentUnit());
 
             redundantRemoveSize = toRemove.size();
             pc.reportMsg("Redundant features removed: " + redundantRemoveSize, workspace);

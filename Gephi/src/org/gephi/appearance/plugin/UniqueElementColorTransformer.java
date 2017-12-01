@@ -41,6 +41,8 @@
  */
 package org.gephi.appearance.plugin;
 
+import java.awt.Color;
+import org.bapedis.core.project.ProjectManager;
 import org.gephi.appearance.spi.SimpleTransformer;
 import org.gephi.appearance.spi.Transformer;
 import org.gephi.graph.api.Element;
@@ -52,6 +54,21 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service = Transformer.class)
 public class UniqueElementColorTransformer extends AbstractUniqueColorTransformer implements SimpleTransformer<Element> {
+
+    public UniqueElementColorTransformer() {
+        super(new Color(0));
+        float r = ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f;
+        float g = ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f;
+        float b = ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f;
+
+        int rgba = 255 << 24; // Alpha set to 1
+        rgba = (rgba & 0xFF00FFFF) | (((int) (r * 255f)) << 16); // set R
+        rgba = (rgba & 0xFFFF00FF) | ((int) (g * 255f)) << 8; // set G
+        rgba = (rgba & 0xFFFFFF00) | ((int) (b * 255f)); // set B   
+
+        color = new Color(rgba, true);        
+    }
+    
 
     @Override
     public void transform(Element element) {

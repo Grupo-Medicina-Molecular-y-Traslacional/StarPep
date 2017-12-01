@@ -45,6 +45,7 @@ import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import net.java.dev.colorchooser.ColorChooser;
+import org.bapedis.core.project.ProjectManager;
 import org.gephi.appearance.api.SimpleFunction;
 import org.gephi.appearance.plugin.AbstractUniqueColorTransformer;
 
@@ -55,7 +56,7 @@ import org.gephi.appearance.plugin.AbstractUniqueColorTransformer;
 public class UniqueColorTransformerPanel extends javax.swing.JPanel {
 
     private AbstractUniqueColorTransformer transformer;
-    private final Color defaultColor = new Color(0f, 0f, 0f, 1f);
+    private final Color defaultColor;
 
     public UniqueColorTransformerPanel() {
         initComponents();
@@ -72,6 +73,18 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
             }
         });
 
+        float r = ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f;
+        float g = ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f;
+        float b = ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f;
+
+        int rgba = 255 << 24; // Alpha set to 1
+        rgba = (rgba & 0xFF00FFFF) | (((int) (r * 255f)) << 16); // set R
+        rgba = (rgba & 0xFFFF00FF) | ((int) (g * 255f)) << 8; // set G
+        rgba = (rgba & 0xFFFFFF00) | ((int) (b * 255f)); // set B        
+        
+//        rgba = (rgba & 0xFFFFFF) | ((int) (a * 255f)) << 24; // set Alpha
+        
+        defaultColor = new Color(rgba, true);
     }
 
     public void setup(SimpleFunction function) {

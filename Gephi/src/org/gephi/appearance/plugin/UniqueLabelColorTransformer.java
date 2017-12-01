@@ -41,6 +41,7 @@
  */
 package org.gephi.appearance.plugin;
 
+import java.awt.Color;
 import org.gephi.appearance.spi.SimpleTransformer;
 import org.gephi.appearance.spi.Transformer;
 import org.gephi.graph.api.Element;
@@ -52,6 +53,10 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service = Transformer.class)
 public class UniqueLabelColorTransformer extends AbstractUniqueColorTransformer implements SimpleTransformer<Element> {
+
+    public UniqueLabelColorTransformer() {
+        super(new Color(0f, 0f, 0f, 1f));
+    }
 
     @Override
     public void transform(Element element) {

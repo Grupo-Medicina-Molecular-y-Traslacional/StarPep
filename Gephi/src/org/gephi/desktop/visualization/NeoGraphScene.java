@@ -144,6 +144,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 TextModelImpl textModel = VizController.getInstance().getVizModel().getTextModel();
                 boolean isDarkBackground = (backgroundColor.getRed() + backgroundColor.getGreen() + backgroundColor.getBlue()) / 3 < 128;
                 textModel.setNodeColor(isDarkBackground ? Color.WHITE : Color.BLACK);
+                textModel.setEdgeColor(isDarkBackground ? Color.WHITE : Color.BLACK);
             }
         });
         topToolbar.add(backgroundColorButton);

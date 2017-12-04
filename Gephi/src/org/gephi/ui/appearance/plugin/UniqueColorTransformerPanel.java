@@ -56,7 +56,7 @@ import org.gephi.appearance.plugin.AbstractUniqueColorTransformer;
 public class UniqueColorTransformerPanel extends javax.swing.JPanel {
 
     private AbstractUniqueColorTransformer transformer;
-    private final Color defaultColor;
+    private Color defaultColor;
 
     public UniqueColorTransformerPanel() {
         initComponents();
@@ -72,25 +72,17 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
                 }
             }
         });
-
-        float r = ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f;
-        float g = ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f;
-        float b = ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f;
-
-        int rgba = 255 << 24; // Alpha set to 1
-        rgba = (rgba & 0xFF00FFFF) | (((int) (r * 255f)) << 16); // set R
-        rgba = (rgba & 0xFFFF00FF) | ((int) (g * 255f)) << 8; // set G
-        rgba = (rgba & 0xFFFFFF00) | ((int) (b * 255f)); // set B        
-        
-//        rgba = (rgba & 0xFFFFFF) | ((int) (a * 255f)) << 24; // set Alpha
-        
-        defaultColor = new Color(rgba, true);
     }
 
     public void setup(SimpleFunction function) {
         transformer = (AbstractUniqueColorTransformer) function.getTransformer();
+        
         colorChooser.setColor(transformer.getColor());
         colorLabel.setText(getHex(transformer.getColor()));
+        
+        if (defaultColor == null){
+            defaultColor = transformer.getColor();
+        }
     }
 
     private String getHex(Color color) {

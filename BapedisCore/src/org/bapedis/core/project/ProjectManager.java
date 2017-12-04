@@ -36,6 +36,8 @@ import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
+import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -63,9 +65,16 @@ public class ProjectManager implements Lookup.Provider {
     public static final String EDGE_TABLE_PRO_SIMILARITY = "similarity";
     public static final String EDGE_TABLE_PRO_SIMILARITY_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.similarity.title");
 
-    ;
+    final String OUTPUT_ID = "output";
+    TopComponent outputWindow;
 
     public ProjectManager() {
+        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
+            @Override
+            public void run() {
+               outputWindow  = WindowManager.getDefault().findTopComponent(OUTPUT_ID);
+            }
+        });
     }
 
     public void newProject() {
@@ -101,6 +110,10 @@ public class ProjectManager implements Lookup.Provider {
             Workspace oldWs = currentWS;
             currentWS = workspace;
             fireWorkspaceEvent(oldWs, currentWS);
+            if (outputWindow != null && outputWindow.isOpened()) {
+                InputOutput io = IOProvider.getDefault().getIO(currentWS.getName(), false);
+                io.select();
+            }
         }
     }
 

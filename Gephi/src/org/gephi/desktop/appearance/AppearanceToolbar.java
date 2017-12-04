@@ -85,13 +85,11 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
     //Toolbars
     private final CategoryToolbar categoryToolbar;
     private final TransformerToolbar transformerToolbar;
-    private final ControlToolbar controlToolbar;
 
     public AppearanceToolbar(AppearanceUIController controller) {
         this.controller = controller;
         categoryToolbar = new CategoryToolbar();
         transformerToolbar = new TransformerToolbar();
-        controlToolbar = new ControlToolbar();
 
         controller.addPropertyChangeListener(this);
 
@@ -109,18 +107,6 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
         return transformerToolbar;
     }
 
-    public ControlToolbar getControlToolbar() {
-        return controlToolbar;
-    }
-
-    public void addRankingControl(AbstractButton btn) {
-        controlToolbar.addRankingButton(btn);
-    }
-
-    public void addPartitionControl(AbstractButton btn) {
-        controlToolbar.addPartitionButton(btn);
-    }
-
     @Override
     public void propertyChange(PropertyChangeEvent pce) {
         if (pce.getPropertyName().equals(AppearanceUIModelEvent.MODEL)) {
@@ -129,22 +115,7 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
             refreshSelectedElementClass((String) pce.getNewValue());
         } else if (pce.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_CATEGORY)) {
             refreshSelectedCategory((TransformerCategory) pce.getNewValue());
-        } else if (pce.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_FUNCTION)) {
-            refreshSelectedFunction((Function) pce.getNewValue());
-        } else if (pce.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_TRANSFORMER_UI)) {
-            refreshSelectedTransformerUI();
-        }
-//        if (pce.getPropertyName().equals(AppearanceUIModelEvent.CURRENT_ELEMENT_TYPE)) {
-//            refreshSelectedElmntGroup((String) pce.getNewValue());
-//        }
-//        if (pce.getPropertyName().equals(RankingUIModel.CURRENT_TRANSFORMER)
-//                || pce.getPropertyName().equals(RankingUIModel.CURRENT_ELEMENT_TYPE)) {
-//            refreshTransformers();
-//        }
-//        if (pce.getPropertyName().equalsIgnoreCase(RankingUIModel.START_AUTO_TRANSFORMER)
-//                || pce.getPropertyName().equalsIgnoreCase(RankingUIModel.STOP_AUTO_TRANSFORMER)) {
-//            refreshDecoratedIcons();
-//        }
+        } 
     }
 
     private void setup(final AppearanceUIModel model) {
@@ -162,9 +133,6 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
                 transformerToolbar.setup();
                 transformerToolbar.refreshTransformers();
 
-                controlToolbar.setEnabled(model != null);
-                controlToolbar.setup();
-                controlToolbar.refreshControls();
             }
         });
     }
@@ -173,11 +141,9 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                categoryToolbar.refreshSelectedElmntGroup();
                 categoryToolbar.refreshTransformers();
 
                 transformerToolbar.refreshTransformers();
-                controlToolbar.refreshControls();
             }
         });
     }
@@ -186,33 +152,11 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                categoryToolbar.refreshTransformers();
-
                 transformerToolbar.refreshTransformers();
-
-                controlToolbar.refreshControls();
             }
         });
     }
 
-    private void refreshSelectedFunction(final Function ui) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                transformerToolbar.refreshTransformers();
-                controlToolbar.refreshControls();
-            }
-        });
-    }
-
-    private void refreshSelectedTransformerUI() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                controlToolbar.refreshControls();
-            }
-        });
-    }
 
     private class AbstractToolbar extends JToolBar {
 
@@ -237,14 +181,14 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
     }
 
     public class CategoryToolbar extends AbstractToolbar {
-
+        private final JLabel elementClassLabel;
         private final List<ButtonGroup> buttonGroups = new ArrayList<>();
         private final List<ActionListener> actionListener = new LinkedList<>();
         private final ButtonGroup popupGroup;
         
         public CategoryToolbar() {
             //Init components
-            final JLabel elementClassLabel = new JLabel(NbBundle.getMessage(AppearanceToolbar.class, "AppearanceToolbar." + AppearanceUIController.ELEMENT_CLASSES[0] + ".label") + ": ");
+            elementClassLabel = new JLabel(NbBundle.getMessage(AppearanceToolbar.class, "AppearanceToolbar." + AppearanceUIController.ELEMENT_CLASSES[0] + ".label") + ": ");
             popupGroup = new ButtonGroup();
             final JPopupMenu popup = new JPopupMenu();
             JCheckBoxMenuItem item;
@@ -334,7 +278,6 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
                         buttonGroup.add(btn);
                         add(btn);
                     }
-
                     buttonGroups.add(buttonGroup);
                 }
             } else {
@@ -367,6 +310,7 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
                 if (selected == null || elmtType.equals(selected)) {
                     item = (JCheckBoxMenuItem) items.nextElement();
                     item.setSelected(true);
+                    elementClassLabel.setText(NbBundle.getMessage(AppearanceToolbar.class, "AppearanceToolbar." + elmtType + ".label") + ": ");
                     break;
                 }
                 items.nextElement();
@@ -466,128 +410,5 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
         }
     }
 
-    public class ControlToolbar extends AbstractToolbar {
-
-        private transient final Set<AbstractButton> rankingSouthControls;
-        private transient final Set<AbstractButton> partitionSouthControls;
-        private transient final Set<AbstractButton> controlButtons;
-
-        public ControlToolbar() {
-            rankingSouthControls = new HashSet<>();
-            partitionSouthControls = new HashSet<>();
-            controlButtons = new HashSet<>();
-        }
-
-        public void addRankingButton(AbstractButton btn) {
-            removeAll();
-            rankingSouthControls.add(btn);
-        }
-
-        public void addPartitionButton(AbstractButton btn) {
-            removeAll();
-            partitionSouthControls.add(btn);
-        }
-
-        private void clear() {
-            //Clear precent buttons
-            for (AbstractButton btn : rankingSouthControls) {
-                remove(btn);
-            }
-            for (AbstractButton btn : partitionSouthControls) {
-                remove(btn);
-            }
-        }
-
-        private void clearControlButtons() {
-            for (AbstractButton btn : controlButtons) {
-                remove(btn);
-            }
-            controlButtons.clear();
-        }
-
-        protected void setup() {
-            clear();
-            if (model != null) {
-                removeAll();
-                for (AbstractButton btn : partitionSouthControls) {
-                    add(btn);
-                }
-                for (AbstractButton btn : rankingSouthControls) {
-                    if (!partitionSouthControls.contains(btn)) {
-                        add(btn);
-                    }
-                }
-                JLabel box = new javax.swing.JLabel();
-                box.setMaximumSize(new java.awt.Dimension(32767, 32767));
-                addSeparator();
-                add(box);
-            }
-        }
-
-        protected void refreshControls() {
-            if (model != null) {
-                for (AbstractButton btn : partitionSouthControls) {
-                    btn.setVisible(false);
-                }
-                for (AbstractButton btn : rankingSouthControls) {
-                    btn.setVisible(false);
-                }
-                TransformerUI u = model.getSelectedTransformerUI();
-                if (u != null && model.isAttributeTransformerUI(u)) {
-                    //Ranking
-                    Function selectedColumn = model.getSelectedFunction();
-                    if (selectedColumn != null) {
-                        if (selectedColumn.isRanking()) {
-                            for (AbstractButton btn : rankingSouthControls) {
-                                btn.setVisible(true);
-                            }
-                        } else if (selectedColumn.isPartition()) {
-                            for (AbstractButton btn : partitionSouthControls) {
-                                btn.setVisible(true);
-                            }
-                        }
-                    }
-                }
-                clearControlButtons();
-                if (u != null) {
-                    Function selectedColumn = model.getSelectedFunction();
-                    if (selectedColumn != null) {
-                        AbstractButton[] bb = selectedColumn.getUI().getControlButton();
-                        if (bb != null) {
-                            for (AbstractButton b : bb) {
-                                add(b);
-                                controlButtons.add(b);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-//    private void refreshDecoratedIcons() {
-//        SwingUtilities.invokeLater(new Runnable() {
-//            @Override
-//            public void run() {
-//                int index = 0;
-//                for (String elmtType : AppearanceUIController.ELEMENT_CLASSES) {
-//                    ButtonGroup g = buttonGroups.get(index++);
-//                    boolean active = model == null ? false : model.getCurrentElementType().equals(elmtType);
-//                    if (active) {
-//                        for (Enumeration<AbstractButton> btns = g.getElements(); btns.hasMoreElements();) {
-//                            btns.nextElement().repaint();
-//                        }
-//                    }
-//                }
-//            }
-//        });
-//    }
-//    private DecoratedIcon getDecoratedIcon(Icon icon, final Transformer transformer) {
-//        Icon decoration = ImageUtilities.image2Icon(ImageUtilities.loadImage("org/gephi/desktop/ranking/resources/chain.png", false));
-//        return new DecoratedIcon(icon, decoration, new DecoratedIcon.DecorationController() {
-//            @Override
-//            public boolean isDecorated() {
-//                return model != null && model.isAutoTransformer(transformer);
-//            }
-//        });
-//    }
-    }
+   
 }

@@ -1,4 +1,4 @@
- /*
+/*
  Copyright 2008-2013 Gephi
  Authors : Mathieu Bastian <mathieu.bastian@gephi.org>
  Website : http://www.gephi.org
@@ -51,6 +51,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.gephi.appearance.api.AppearanceController;
@@ -72,8 +73,9 @@ import org.openide.util.lookup.ServiceProvider;
  * @author mbastian
  */
 @ServiceProvider(service = AppearanceUIController.class)
-public class AppearanceUIController {
+public class AppearanceUIController implements WorkspaceEventListener {
 
+    private final ProjectManager pc;
     //Classes
     public static final String NODE_ELEMENT = "nodes";
     public static final String EDGE_ELEMENT = "edges";
@@ -90,72 +92,17 @@ public class AppearanceUIController {
 //    private GraphChangeObserver graphObserver;
 
     public AppearanceUIController() {
-        final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
         appearanceController = Lookup.getDefault().lookup(AppearanceController.class);
-//        pc.addWorkspaceListener(new WorkspaceListener() {
-//            @Override
-//            public void initialize(Workspace workspace) {
-//            }
-//
-//            @Override
-//            public void select(Workspace workspace) {
-//                AppearanceUIModel oldModel = model;
-//                model = workspace.getLookup().lookup(AppearanceUIModel.class);
-//                if (model == null) {
-//                    AppearanceModel appearanceModel = appearanceController.getModel(workspace);
-//                    model = new AppearanceUIModel(AppearanceUIController.this, appearanceModel);
-//                    workspace.add(model);
-//                }
-//                model.select();
-//                if (tableObserver != null) {
-//                    tableObserver.destroy();
-//                }
-//                if (graphObserver != null) {
-//                    graphObserver.destroy();
-//                    graphObserver = null;
-//                }
-//                tableObserver = new TableChangeObserver(workspace);
-//                tableObserver.start();
-//
-//                firePropertyChangeEvent(AppearanceUIModelEvent.MODEL, oldModel, model);
-//            }
-//
-//            @Override
-//            public void unselect(Workspace workspace) {
-//                if (model != null) {
-//                    model.unselect();
-//                }
-//            }
-//
-//            @Override
-//            public void close(Workspace workspace) {
-//            }
-//
-//            @Override
-//            public void disable() {
-//                AppearanceUIModel oldModel = model;
-//                model = null;
-//                firePropertyChangeEvent(AppearanceUIModelEvent.MODEL, oldModel, model);
-//                if (tableObserver != null) {
-//                    tableObserver.destroy();
-//                }
-//                if (graphObserver != null) {
-//                    graphObserver.destroy();
-//                    graphObserver = null;
-//                }
-//            }
-//        });
-
-        if (pc.getCurrentWorkspace() != null) {
-            model = pc.getCurrentWorkspace().getLookup().lookup(AppearanceUIModel.class);
-            if (model == null) {
-                AppearanceModel appearanceModel = appearanceController.getModel(pc.getCurrentWorkspace());
-                model = new AppearanceUIModel(this, appearanceModel);
-                pc.getCurrentWorkspace().add(model);
-                model.select();
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
+        pc.addWorkspaceEventListener(this);
+        
+        model = pc.getCurrentWorkspace().getLookup().lookup(AppearanceUIModel.class);
+        if (model == null) {
+            AppearanceModel appearanceModel = appearanceController.getModel(pc.getCurrentWorkspace());
+            model = new AppearanceUIModel(this, appearanceModel);
+            pc.getCurrentWorkspace().add(model);
 //                tableObserver = new TableChangeObserver(pc.getCurrentWorkspace());
 //                tableObserver.start();
-            }
         }
 
         listeners = Collections.synchronizedSet(new HashSet<AppearanceUIModelListener>());
@@ -194,6 +141,24 @@ public class AppearanceUIController {
         }
     }
 
+    @Override
+    public void workspaceChanged(Workspace oldWs, Workspace newWs) {
+        AppearanceUIModel oldModel = oldWs != null ? oldWs.getLookup().lookup(AppearanceUIModel.class) : null;
+        model = getModel(newWs);
+
+//        if (tableObserver != null) {
+//            tableObserver.destroy();
+//        }
+//        if (graphObserver != null) {
+//            graphObserver.destroy();
+//            graphObserver = null;
+//        }
+//        tableObserver = new TableChangeObserver(workspace);
+//        tableObserver.start();
+        firePropertyChangeEvent(AppearanceUIModelEvent.MODEL, oldModel, model);
+
+    }
+
     public Collection<TransformerCategory> getCategories(String elementClass) {
         return transformers.get(elementClass).keySet();
     }
@@ -207,21 +172,16 @@ public class AppearanceUIController {
     }
 
     public AppearanceUIModel getModel(Workspace workspace) {
-        AppearanceUIModel m = workspace.getLookup().lookup(AppearanceUIModel.class);
-        if (m == null) {
-            AppearanceController ac = Lookup.getDefault().lookup(AppearanceController.class);
-            AppearanceModel appearanceModel = ac.getModel(workspace);
-            m = new AppearanceUIModel(this, appearanceModel);
-            workspace.add(m);
+        AppearanceUIModel model = workspace.getLookup().lookup(AppearanceUIModel.class);
+        if (model == null) {
+            AppearanceModel appearanceModel = appearanceController.getModel(workspace);
+            model = new AppearanceUIModel(this, appearanceModel);
+            workspace.add(model);
         }
-        return m;
+        return model;
     }
 
     public void setSelectedElementClass(String elementClass) {
-//        if (graphObserver != null) {
-//            graphObserver.destroy();
-//            graphObserver = null;
-//        }
         if (!elementClass.equals(NODE_ELEMENT) && !elementClass.equals(EDGE_ELEMENT)) {
             throw new RuntimeException("Element class has to be " + NODE_ELEMENT + " or " + EDGE_ELEMENT);
         }
@@ -230,38 +190,16 @@ public class AppearanceUIController {
             if (!oldValue.equals(elementClass)) {
                 model.setSelectedElementClass(elementClass);
 
-//                Function function = model.getSelectedFunction();
-//                if (function != null) {
-//                    model.refreshSelectedFunction();
-//                    if (!function.isSimple()) {
-//                        graphObserver = new GraphChangeObserver(function.getGraph(), function instanceof AttributeFunction ? ((AttributeFunction) function).getColumn() : null);
-//                        graphObserver.start();
-//                    }
-//                }
-
                 firePropertyChangeEvent(AppearanceUIModelEvent.SELECTED_ELEMENT_CLASS, oldValue, elementClass);
             }
         }
     }
 
     public void setSelectedCategory(TransformerCategory category) {
-//        if (graphObserver != null) {
-//            graphObserver.destroy();
-//            graphObserver = null;
-//        }
         if (model != null) {
             TransformerCategory oldValue = model.getSelectedCategory();
             if (!oldValue.equals(category)) {
                 model.setSelectedCategory(category);
-
-//                Function function = model.getSelectedFunction();
-//                if (function != null) {
-//                    model.refreshSelectedFunction();
-//                    if (!function.isSimple()) {
-//                        graphObserver = new GraphChangeObserver(function.getGraph(), function instanceof AttributeFunction ? ((AttributeFunction) function).getColumn() : null);
-//                        graphObserver.start();
-//                    }
-//                }
 
                 firePropertyChangeEvent(AppearanceUIModelEvent.SELECTED_CATEGORY, oldValue, category);
             }
@@ -269,24 +207,11 @@ public class AppearanceUIController {
     }
 
     public void setSelectedTransformerUI(TransformerUI ui) {
-//        if (graphObserver != null) {
-//            graphObserver.destroy();
-//            graphObserver = null;
-//        }
         if (model != null) {
             TransformerUI oldValue = model.getSelectedTransformerUI();
             if (!oldValue.equals(ui)) {
                 model.setAutoApply(false);
                 model.setSelectedTransformerUI(ui);
-
-//                Function function = model.getSelectedFunction();
-//                if (function != null) {
-//                    model.refreshSelectedFunction();
-//                    if (!function.isSimple()) {
-//                        graphObserver = new GraphChangeObserver(function.getGraph(), function instanceof AttributeFunction ? ((AttributeFunction) function).getColumn() : null);
-//                        graphObserver.start();
-//                    }
-//                }
 
                 firePropertyChangeEvent(AppearanceUIModelEvent.SELECTED_TRANSFORMER_UI, oldValue, ui);
             }
@@ -294,63 +219,19 @@ public class AppearanceUIController {
     }
 
     public void setSelectedFunction(Function function) {
-//        if (graphObserver != null) {
-//            graphObserver.destroy();
-//            graphObserver = null;
-//        }
         if (model != null) {
             Function oldValue = model.getSelectedFunction();
             if ((oldValue == null && function != null) || (oldValue != null && function == null) || (function != null && oldValue != null && !oldValue.equals(function))) {
                 model.setAutoApply(false);
                 model.setSelectedFunction(function);
+
                 firePropertyChangeEvent(AppearanceUIModelEvent.SELECTED_FUNCTION, oldValue, function);
-
-//                if (function != null && !function.isSimple()) {
-//                    graphObserver = new GraphChangeObserver(function.getGraph(), function instanceof AttributeFunction ? ((AttributeFunction) function).getColumn() : null);
-//                    graphObserver.start();
-//                }
-            }
-        }
-    }
-
-    public void setAutoApply(boolean autoApply) {
-        if (model != null) {
-            model.setAutoApply(autoApply);
-            firePropertyChangeEvent(AppearanceUIModelEvent.SET_AUTO_APPLY, !autoApply, autoApply);
-        }
-    }
-
-    public void startAutoApply() {
-        if (model != null) {
-            AutoAppyTransformer aat = model.getAutoAppyTransformer();
-            if (aat != null) {
-                aat.start();
-                firePropertyChangeEvent(AppearanceUIModelEvent.START_STOP_AUTO_APPLY, false, true);
-            }
-        }
-    }
-
-    public void stopAutoApply() {
-        if (model != null) {
-            AutoAppyTransformer aat = model.getAutoAppyTransformer();
-            if (aat != null) {
-                aat.stop();
-                firePropertyChangeEvent(AppearanceUIModelEvent.START_STOP_AUTO_APPLY, true, false);
             }
         }
     }
 
     public AppearanceController getAppearanceController() {
         return appearanceController;
-    }
-
-    protected TransformerCategory getFirstCategory(String elementClass) {
-        return transformers.get(elementClass).keySet().toArray(new TransformerCategory[0])[0];
-    }
-
-    protected TransformerUI getFirstTransformerUI(String elementClass, TransformerCategory category) {
-        Map<TransformerCategory, Set<TransformerUI>> e = transformers.get(elementClass);
-        return e.get(category).toArray(new TransformerUI[0])[0];
     }
 
     public void addPropertyChangeListener(AppearanceUIModelListener listener) {

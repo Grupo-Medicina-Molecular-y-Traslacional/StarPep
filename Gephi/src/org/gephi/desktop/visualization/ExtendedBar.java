@@ -23,9 +23,8 @@ import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
+public class ExtendedBar extends javax.swing.JPanel implements AppearanceUIModelListener {
 
-public class ExtendedBar extends javax.swing.JPanel implements ActionListener, AppearanceUIModelListener {
-    
     private final AppearanceToolbar toolbar;
     private final AppearanceUIController controller;
     private final ExtendedPanel extendedPanel;
@@ -39,18 +38,26 @@ public class ExtendedBar extends javax.swing.JPanel implements ActionListener, A
     public ExtendedBar() {
         controller = Lookup.getDefault().lookup(AppearanceUIController.class);
         model = controller.getModel();
+
         toolbar = new AppearanceToolbar(controller);
         initComponents();
         if (UIUtils.isAquaLookAndFeel()) {
             setBackground(UIManager.getColor("NbExplorerView.background"));
         }
         controller.addPropertyChangeListener(this);
+
         AppearanceToolbar.CategoryToolbar ctb = toolbar.getCategoryToolbar();
-        ctb.addActionListener(this);
+        ctb.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                categoryActionPerformed(e);
+            }
+        });
         leftPanel.add(ctb, BorderLayout.CENTER);
+
         extendedPanel = new ExtendedPanel(controller, toolbar);
         dd = new DialogDescriptor(extendedPanel, "");
-        
+
         toolController = new DesktopToolController();
         centerPanel.add(toolController.getToolbar(), BorderLayout.CENTER);
         rightPanel.add(toolController.getPropertiesBar(), BorderLayout.CENTER);
@@ -95,8 +102,7 @@ public class ExtendedBar extends javax.swing.JPanel implements ActionListener, A
         add(rightPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
+    private void categoryActionPerformed(ActionEvent e) {
         TransformerCategory c = model.getSelectedCategory();
         String elementLabel = NbBundle.getMessage(ExtendedBar.class, "ExtendedBar." + model.getSelectedElementClass() + ".label");
         dd.setTitle(elementLabel + ": " + c.getDisplayName());
@@ -104,20 +110,20 @@ public class ExtendedBar extends javax.swing.JPanel implements ActionListener, A
             controller.getAppearanceController().transform(model.getSelectedFunction());
         }
     }
-    
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_CATEGORY)
+        if (evt.getPropertyName().equals(AppearanceUIModelEvent.MODEL)) {
+            model = (AppearanceUIModel) evt.getNewValue();
+            toolController.unselect();
+            centerPanel.setVisible(model.getSelectedElementClass().equals(AppearanceUIController.NODE_ELEMENT));            
+        } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_CATEGORY)
                 || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_TRANSFORMER_UI)
                 || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_FUNCTION)) {
             dd.setValid(model.getSelectedFunction() != null);
         } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_ELEMENT_CLASS)) {
-            if (model.getSelectedElementClass().equals(AppearanceUIController.NODE_ELEMENT)) {
-                centerPanel.setVisible(true);
-            } else {
-                toolController.unselect();
-                centerPanel.setVisible(false);
-            }            
+            toolController.unselect();
+            centerPanel.setVisible(model.getSelectedElementClass().equals(AppearanceUIController.NODE_ELEMENT));
         }
     }
 

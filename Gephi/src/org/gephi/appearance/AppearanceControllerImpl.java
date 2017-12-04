@@ -41,6 +41,7 @@
  */
 package org.gephi.appearance;
 
+import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.gephi.appearance.api.AppearanceController;
@@ -60,44 +61,14 @@ import org.openide.util.lookup.ServiceProvider;
  * @author mbastian
  */
 @ServiceProvider(service = AppearanceController.class)
-public class AppearanceControllerImpl implements AppearanceController {
+public class AppearanceControllerImpl implements AppearanceController, WorkspaceEventListener {
 
     private AppearanceModelImpl model;
 
     public AppearanceControllerImpl() {
-        //Workspace events
-//        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-//        pc.addWorkspaceListener(new WorkspaceListener() {
-//            @Override
-//            public void initialize(Workspace workspace) {
-//            }
-//
-//            @Override
-//            public void select(Workspace workspace) {
-//                model = workspace.getLookup().lookup(AppearanceModelImpl.class);
-//                if (model == null) {
-//                    model = new AppearanceModelImpl(workspace);
-//                    workspace.add(model);
-//                }
-////                model.select();
-//            }
-//
-//            @Override
-//            public void unselect(Workspace workspace) {
-////                model.unselect();
-//                model = null;
-//            }
-//
-//            @Override
-//            public void close(Workspace workspace) {
-//            }
-//
-//            @Override
-//            public void disable() {
-//                model = null;
-//            }
-//        });
         ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+        pc.addWorkspaceEventListener(this);
+        
         if (pc.getCurrentWorkspace() != null) {
             model = pc.getCurrentWorkspace().getLookup().lookup(AppearanceModelImpl.class);
             if (model == null) {
@@ -106,6 +77,11 @@ public class AppearanceControllerImpl implements AppearanceController {
             }
         }
     }
+    
+    @Override
+    public void workspaceChanged(Workspace oldWs, Workspace newWs) {
+        model = getModel(newWs);
+    }    
 
     @Override
     public void transform(Function function) {
@@ -164,4 +140,5 @@ public class AppearanceControllerImpl implements AppearanceController {
             model.setLocalScale(useLocalScale);
         }
     }
+
 }

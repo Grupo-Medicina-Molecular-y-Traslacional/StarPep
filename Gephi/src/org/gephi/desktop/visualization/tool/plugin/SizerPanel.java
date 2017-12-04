@@ -83,42 +83,24 @@ public class SizerPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         jLabel1 = new javax.swing.JLabel();
         labelSize = new javax.swing.JLabel();
         sizeLabel = new javax.swing.JLabel();
 
-        setLayout(new java.awt.GridBagLayout());
+        setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jLabel1.setFont(jLabel1.getFont().deriveFont((float)10));
         jLabel1.setText(org.openide.util.NbBundle.getMessage(SizerPanel.class, "SizerPanel.jLabel1.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 0);
-        add(jLabel1, gridBagConstraints);
+        add(jLabel1);
 
         labelSize.setFont(labelSize.getFont().deriveFont((float)10));
         labelSize.setText(org.openide.util.NbBundle.getMessage(SizerPanel.class, "SizerPanel.labelSize.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 4);
-        add(labelSize, gridBagConstraints);
+        add(labelSize);
 
         sizeLabel.setFont(sizeLabel.getFont().deriveFont((float)10));
         sizeLabel.setText(org.openide.util.NbBundle.getMessage(SizerPanel.class, "SizerPanel.sizeLabel.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
-        add(sizeLabel, gridBagConstraints);
+        add(sizeLabel);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;

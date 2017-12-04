@@ -179,15 +179,19 @@ public class HeatMapPanel extends javax.swing.JPanel {
         labelPalette = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(654, 28));
+        setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         statusLabel.setFont(statusLabel.getFont().deriveFont((float)10));
         statusLabel.setText(org.openide.util.NbBundle.getMessage(HeatMapPanel.class, "HeatMapPanel.statusLabel.text")); // NOI18N
+        add(statusLabel);
 
         labelMode.setFont(labelMode.getFont().deriveFont((float)10));
         labelMode.setText(org.openide.util.NbBundle.getMessage(HeatMapPanel.class, "HeatMapPanel.labelMode.text")); // NOI18N
+        add(labelMode);
 
         modeComboBox.setFont(modeComboBox.getFont().deriveFont((float)10));
         modeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Gradient", "Palette" }));
+        add(modeComboBox);
 
         gradientPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -196,6 +200,8 @@ public class HeatMapPanel extends javax.swing.JPanel {
         labelGradient.setPreferredSize(new java.awt.Dimension(45, 28));
         gradientPanel.add(labelGradient);
 
+        add(gradientPanel);
+
         palettePanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         labelPalette.setFont(labelPalette.getFont().deriveFont((float)10));
@@ -203,32 +209,7 @@ public class HeatMapPanel extends javax.swing.JPanel {
         labelPalette.setPreferredSize(new java.awt.Dimension(45, 28));
         palettePanel.add(labelPalette);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(labelMode)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(modeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(gradientPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 399, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(palettePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 363, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(labelMode, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(modeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addComponent(gradientPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(palettePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-        );
+        add(palettePanel);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel gradientPanel;

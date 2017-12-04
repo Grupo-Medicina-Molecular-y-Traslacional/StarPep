@@ -100,61 +100,37 @@ public class BrushPanel extends javax.swing.JPanel {
         intensitySpinner = new javax.swing.JSpinner();
         jLabel1 = new javax.swing.JLabel();
 
+        setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
         labelDiffusion.setFont(labelDiffusion.getFont().deriveFont((float)10));
         labelDiffusion.setText(org.openide.util.NbBundle.getMessage(BrushPanel.class, "BrushPanel.labelDiffusion.text")); // NOI18N
+        add(labelDiffusion);
 
         labelColor.setFont(labelColor.getFont().deriveFont((float)10));
         labelColor.setText(org.openide.util.NbBundle.getMessage(BrushPanel.class, "BrushPanel.labelColor.text")); // NOI18N
+        add(labelColor);
 
         diffusionCombobox.setFont(diffusionCombobox.getFont().deriveFont((float)10));
         diffusionCombobox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        add(diffusionCombobox);
 
+        colorButton.setFont(new java.awt.Font("Ubuntu", 0, 10)); // NOI18N
         colorButton.setText(org.openide.util.NbBundle.getMessage(BrushPanel.class, "BrushPanel.colorButton.text")); // NOI18N
         colorButton.setContentAreaFilled(false);
         colorButton.setFocusPainted(false);
+        add(colorButton);
 
         labelIntensity.setFont(labelIntensity.getFont().deriveFont((float)10));
         labelIntensity.setText(org.openide.util.NbBundle.getMessage(BrushPanel.class, "BrushPanel.labelIntensity.text")); // NOI18N
+        add(labelIntensity);
 
         intensitySpinner.setFont(intensitySpinner.getFont().deriveFont((float)10));
         intensitySpinner.setModel(new javax.swing.SpinnerNumberModel(0, 0, 100, 1));
+        add(intensitySpinner);
 
         jLabel1.setFont(jLabel1.getFont().deriveFont((float)10));
         jLabel1.setText(org.openide.util.NbBundle.getMessage(BrushPanel.class, "BrushPanel.jLabel1.text")); // NOI18N
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(labelColor)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(colorButton, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(labelIntensity)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(intensitySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 239, Short.MAX_VALUE)
-                .addComponent(labelDiffusion)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(diffusionCombobox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(labelColor, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(colorButton, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(labelIntensity, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(intensitySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(jLabel1))
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(diffusionCombobox, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(labelDiffusion, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
+        add(jLabel1);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton colorButton;

@@ -74,30 +74,16 @@ public class PainterPanel extends javax.swing.JPanel {
         colorButton = new JColorButton(Color.BLACK);
         labelColor = new javax.swing.JLabel();
 
+        setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
         colorButton.setText(org.openide.util.NbBundle.getMessage(PainterPanel.class, "PainterPanel.colorButton.text")); // NOI18N
         colorButton.setContentAreaFilled(false);
         colorButton.setFocusPainted(false);
+        add(colorButton);
 
         labelColor.setFont(labelColor.getFont().deriveFont((float)10));
         labelColor.setText(org.openide.util.NbBundle.getMessage(PainterPanel.class, "PainterPanel.labelColor.text")); // NOI18N
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(labelColor)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(colorButton, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(465, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(labelColor, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(colorButton, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
+        add(labelColor);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton colorButton;

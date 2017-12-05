@@ -272,7 +272,7 @@ public class PeptideDAOImpl implements PeptideDAO {
             graphEdge.setR(ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f);
             graphEdge.setG(ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f);
             graphEdge.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
-            graphEdge.setAlpha(0f);
+            graphEdge.setAlpha(0.5f);
 
             mainGraph.addEdge(graphEdge);
         }

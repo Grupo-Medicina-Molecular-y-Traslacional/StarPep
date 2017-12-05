@@ -159,25 +159,28 @@ public class SelfLoopModel extends EdgeModel {
             float r;
             float g;
             float b;
-            float a = edge.alpha();
+            float a;
             if (vizModel.isEdgeHasUniColor()) {
-                float[] uni = vizModel.getEdgeUniColor();
-                r = uni[0];
-                g = uni[1];
-                b = uni[2];
-                a = uni[3];
-            } else if (a == 0f) {
+                a = edge.alpha();
+                if (a == 0.f) {
+                    float[] uni = vizModel.getEdgeUniColor();
+                    r = uni[0];
+                    g = uni[1];
+                    b = uni[2];
+                    a = uni[3];
+                } else {
+                    r = edge.r();
+                    g = edge.g();
+                    b = edge.b();
+                }
+            } else {
                 Node source = edge.getSource();
                 r = source.r();
                 g = source.g();
                 b = source.b();
                 a = source.alpha();
-            } else {
-                g = edge.g();
-                b = edge.b();
-                r = edge.r();
-                a = edge.alpha();
-            }
+            } 
+            
             if (vizModel.getConfig().isLightenNonSelected()) {
                 float lightColorFactor = vizModel.getConfig().getLightenNonSelectedFactor();
                 a = a - (a - 0.01f) * lightColorFactor;

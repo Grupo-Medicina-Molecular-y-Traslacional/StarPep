@@ -56,7 +56,11 @@ import org.openide.util.lookup.ServiceProvider;
 public class UniqueElementColorTransformer extends AbstractUniqueColorTransformer implements SimpleTransformer<Element> {
 
     public UniqueElementColorTransformer() {
-        super(new Color(0));
+        super(defaultColor());
+
+    }
+
+    private static Color defaultColor() {
         float r = ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f;
         float g = ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f;
         float b = ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f;
@@ -66,9 +70,8 @@ public class UniqueElementColorTransformer extends AbstractUniqueColorTransforme
         rgba = (rgba & 0xFFFF00FF) | ((int) (g * 255f)) << 8; // set G
         rgba = (rgba & 0xFFFFFF00) | ((int) (b * 255f)); // set B   
 
-        color = new Color(rgba, true);        
+        return new Color(rgba, true);
     }
-    
 
     @Override
     public void transform(Element element) {

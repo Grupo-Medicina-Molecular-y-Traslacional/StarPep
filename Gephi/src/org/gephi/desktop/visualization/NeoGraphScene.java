@@ -70,7 +70,7 @@ import org.openide.util.lookup.ProxyLookup;
 import org.openide.windows.WindowManager;
 
 public class NeoGraphScene extends JPanel implements MultiViewElement, WorkspaceEventListener, PropertyChangeListener, VizEventListener {
-
+    
     protected final ProjectManager pc;
     protected final InstanceContent content;
     protected final Lookup lookup;
@@ -98,11 +98,11 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     final JToggleButton showEdgeLabelsButton = new JToggleButton();
     final JButton edgeFontButton = new JButton();
     final JSlider edgeSizeSlider = new JSlider();
-
+    
     static {
         UIManager.put("Slider.paintValue", false);
     }
-
+    
     public NeoGraphScene() {
         initComponents();
         pc = Lookup.getDefault().lookup(ProjectManager.class);
@@ -112,14 +112,14 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         content = new InstanceContent();
         lookup = new ProxyLookup(new AbstractLookup(content), Lookups.singleton(new GraphElementNavigatorLookupHint()), Lookups.singleton(new MetadataNavigatorLookupHint()));
     }
-
+    
     private void initComponents() {
         setLayout(new CardLayout());
-
+        
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         busyLabel.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.busyLabel.text"));
         add(busyLabel, "busyCard");
-
+        
         graphPanel.setLayout(new BorderLayout());
         add(graphPanel, "graphCard");
 
@@ -127,7 +127,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         initTopToolbar(); // Global settings
         initBottomToolbar(); // Node and edge settings
     }
-
+    
     private void initTopToolbar() {
         topToolbar.setFloatable(false);
         topToolbar.addSeparator();
@@ -140,7 +140,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 VizModel vizModel = VizController.getInstance().getVizModel();
                 Color backgroundColor = ((JColorBlackWhiteSwitcher) backgroundColorButton).getColor();
                 vizModel.setBackgroundColor(backgroundColor);
-
+                
                 TextModelImpl textModel = VizController.getInstance().getVizModel().getTextModel();
                 boolean isDarkBackground = (backgroundColor.getRed() + backgroundColor.getGreen() + backgroundColor.getBlue()) / 3 < 128;
                 textModel.setNodeColor(isDarkBackground ? Color.WHITE : Color.BLACK);
@@ -200,7 +200,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         mouseButton.setFocusable(false);
         mouseButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.selection.mouse.tooltip"));
         mouseButton.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (mouseButton.isSelected()) {
@@ -224,7 +224,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         configureLink.setFocusable(false);
         configureLink.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N   
         configureLink.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 JPopupMenu menu = createPopup();
@@ -235,7 +235,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
         //Init events
         VizController.getInstance().getSelectionManager().addChangeListener(new ChangeListener() {
-
+            
             @Override
             public void stateChanged(ChangeEvent e) {
                 SelectionManager selectionManager = VizController.getInstance().getSelectionManager();
@@ -250,17 +250,17 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 }
             }
         });
-
+        
         topToolbar.addSeparator();
     }
-
+    
     private JPopupMenu createPopup() {
         SelectionManager manager = VizController.getInstance().getSelectionManager();
         final MouseSelectionPopupPanel popupPanel = new MouseSelectionPopupPanel();
         popupPanel.setDiameter(manager.getMouseSelectionDiameter());
         popupPanel.setProportionnalToZoom(manager.isMouseSelectionZoomProportionnal());
         popupPanel.setChangeListener(new ChangeListener() {
-
+            
             @Override
             public void stateChanged(ChangeEvent e) {
                 SelectionManager manager = VizController.getInstance().getSelectionManager();
@@ -268,12 +268,12 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 manager.setMouseSelectionZoomProportionnal(popupPanel.isProportionnalToZoom());
             }
         });
-
+        
         JPopupMenu menu = new JPopupMenu();
         menu.add(popupPanel);
         return menu;
     }
-
+    
     private void initBottomToolbar() {
         bottomToolbar.setFloatable(false);
         bottomToolbar.addSeparator();
@@ -327,7 +327,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         // Node Font
         nodeFontButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.nodeFontButton.ToolTipText"));
         nodeFontButton.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
@@ -389,6 +389,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         bottomToolbar.add(showEdgeButton);
 
 //        Edge color mode
+        edgeHasNodeColorButton.setFocusable(false);
         edgeHasNodeColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeHasNodeColorButton.ToolTipText"));
         edgeHasNodeColorButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/edgeNodeColor.png", false));
         edgeHasNodeColorButton.addChangeListener(new ChangeListener() {
@@ -457,7 +458,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         //Edge Font
         edgeFontButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.edgeFontButton.ToolTipText"));
         edgeFontButton.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 TextModelImpl model = VizController.getInstance().getVizModel().getTextModel();
@@ -498,7 +499,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             extendButton.setRolloverIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowUp_rollover.png", false)); // NOI18N
         }
         extendButton.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (extendButton.isSelected()) {
@@ -514,14 +515,14 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         extendedBar.setVisible(extendButton.isSelected());
         bottomToolbar.add(extendButton);
     }
-
+    
     public void setBusy(boolean busy) {
         CardLayout cl = (CardLayout) getLayout();
         cl.show(NeoGraphScene.this, busy ? "busyCard" : "graphCard");
         busyLabel.setBusy(busy);
         callback.getTopComponent().makeBusy(busy);
     }
-
+    
     private void initToolBarComponents() {
         VizModel vizModel = VizController.getInstance().getVizModel();
         TextManager textManager = VizController.getInstance().getTextManager();
@@ -549,11 +550,10 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
         //Font
         Font nodeFont = textModel.getNodeFont();
-        nodeFontButton.setText(nodeFont.getFontName() + ", " + nodeFont.getSize()); 
-        
+        nodeFontButton.setText(nodeFont.getFontName() + ", " + nodeFont.getSize());
+
         //Node color
 //        nodeColorButton.setColor(textModel.getNodeColor());
-
         //Font Size
         if (nodeSizeSlider.getValue() / 100f != textModel.getNodeSizeFactor()) {
             nodeSizeSlider.setValue((int) (textModel.getNodeSizeFactor() * 100f));
@@ -585,35 +585,35 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             edgeSizeSlider.setValue((int) (textModel.getEdgeSizeFactor() * 100f));
         }
     }
-
+    
     private void setNodeLabelButton(boolean enabled) {
         labelSizeModeButton.setEnabled(enabled);
         nodeFontButton.setEnabled(enabled);
         nodeSizeSlider.setEnabled(enabled);
     }
-
+    
     private void setEdgeButton(boolean enabled) {
 //        edgeHasNodeColorButton.setEnabled(enabled);
         edgeScaleSlider.setEnabled(enabled);
         showEdgeLabelsButton.setEnabled(enabled);
         edgeSizeSlider.setEnabled(showEdgeLabelsButton.isSelected() && enabled);
     }
-
+    
     private void setEdgeLabelButton(boolean enabled) {
         edgeFontButton.setEnabled(showEdgeButton.isSelected() && enabled);
         edgeSizeSlider.setEnabled(showEdgeButton.isSelected() && enabled);
     }
-
+    
     @Override
     public JComponent getVisualRepresentation() {
         return this;
     }
-
+    
     @Override
     public JComponent getToolbarRepresentation() {
         return topToolbar;
     }
-
+    
     @Override
     public Action[] getActions() {
         if (callback != null) {
@@ -621,12 +621,12 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         }
         return new Action[]{};
     }
-
+    
     @Override
     public Lookup getLookup() {
         return lookup;
     }
-
+    
     @Override
     public void componentOpened() {
         VizController.getInstance().getVizModel().addPropertyChangeListener(this);
@@ -635,64 +635,64 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         Workspace currentWorkspace = pc.getCurrentWorkspace();
         workspaceChanged(null, currentWorkspace);
     }
-
+    
     @Override
     public void componentClosed() {
         VizController.getInstance().getVizModel().removePropertyChangeListener(this);
         VizController.getInstance().getVizEventManager().removeListener(this);
         pc.removeWorkspaceEventListener(this);
     }
-
+    
     @Override
     public void componentShowing() {
     }
-
+    
     @Override
     public void componentHidden() {
     }
-
+    
     @Override
     public void componentActivated() {
     }
-
+    
     @Override
     public void componentDeactivated() {
     }
-
+    
     @Override
     public UndoRedo getUndoRedo() {
         return UndoRedo.NONE;
     }
-
+    
     @Override
     public void setMultiViewCallback(MultiViewElementCallback mvec) {
         this.callback = mvec;
     }
-
+    
     @Override
     public CloseOperationState canCloseElement() {
         return CloseOperationState.STATE_OK;
     }
-
+    
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
         if (oldWs != null) {
             QueryModel oldQueryModel = pc.getQueryModel(oldWs);
             oldQueryModel.removePropertyChangeListener(this);
-
+            
             FilterModel oldFilterModel = pc.getFilterModel(oldWs);
             oldFilterModel.removePropertyChangeListener(this);
         }
-
+        
         QueryModel queryModel = pc.getQueryModel(newWs);
         queryModel.addPropertyChangeListener(this);
-
+        
         FilterModel filterModel = pc.getFilterModel(newWs);
         filterModel.addPropertyChangeListener(this);
-
+        
         setBusy(queryModel.isRunning() || filterModel.isRunning());
     }
-
+    
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof QueryModel) {
@@ -709,7 +709,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             }
         }
     }
-
+    
     @Override
     public void handleEvent(VizEvent event) {
         Collection<? extends GraphNodeWrapper> oldNodes = lookup.lookupAll(GraphNodeWrapper.class);
@@ -721,26 +721,26 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             content.add(new GraphNodeWrapper(node));
         }
     }
-
+    
     @Override
     public VizEvent.Type getType() {
         return VizEvent.Type.NODE_LEFT_CLICK;
     }
-
+    
     private class BottomPanel extends JPanel {
-
+        
         public BottomPanel() {
             setLayout(new BorderLayout());
             add(extendedBar, BorderLayout.CENTER);
             add(bottomToolbar, BorderLayout.SOUTH);
         }
-
+        
     }
-
+    
 }
 
 class MouseSelectionPopupPanel extends javax.swing.JPanel {
-
+    
     private javax.swing.JSlider diameterSlider;
     private javax.swing.JLabel labelDiameter;
     private javax.swing.JLabel labelValue;
@@ -752,9 +752,9 @@ class MouseSelectionPopupPanel extends javax.swing.JPanel {
      */
     public MouseSelectionPopupPanel() {
         initComponents();
-
+        
         diameterSlider.addChangeListener(new ChangeListener() {
-
+            
             @Override
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
@@ -763,53 +763,53 @@ class MouseSelectionPopupPanel extends javax.swing.JPanel {
                 }
             }
         });
-
+        
         proportionnalZoomCheckbox.addItemListener(new ItemListener() {
-
+            
             @Override
             public void itemStateChanged(ItemEvent e) {
                 fireChangeEvent(proportionnalZoomCheckbox);
             }
         });
     }
-
+    
     public boolean isProportionnalToZoom() {
         return proportionnalZoomCheckbox.isSelected();
     }
-
+    
     public void setProportionnalToZoom(boolean proportionnalToZoom) {
         proportionnalZoomCheckbox.setSelected(proportionnalToZoom);
     }
-
+    
     public int getDiameter() {
         return diameterSlider.getValue();
     }
-
+    
     public void setDiameter(int diameter) {
         diameterSlider.setValue(diameter);
     }
-
+    
     public void setChangeListener(ChangeListener changeListener) {
         this.changeListener = changeListener;
     }
-
+    
     private void fireChangeEvent(Object source) {
         if (changeListener != null) {
             ChangeEvent changeEvent = new ChangeEvent(source);
             changeListener.stateChanged(changeEvent);
         }
     }
-
+    
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
-
+        
         labelDiameter = new javax.swing.JLabel();
         diameterSlider = new javax.swing.JSlider();
         labelValue = new javax.swing.JLabel();
         proportionnalZoomCheckbox = new javax.swing.JCheckBox();
-
+        
         setLayout(new java.awt.GridBagLayout());
-
+        
         labelDiameter.setText(NbBundle.getMessage(MouseSelectionPopupPanel.class, "NeoGraphScene.labelDiameter.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -818,7 +818,7 @@ class MouseSelectionPopupPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(6, 5, 8, 0);
         add(labelDiameter, gridBagConstraints);
-
+        
         diameterSlider.setMaximum(1000);
         diameterSlider.setMinimum(1);
         diameterSlider.setFocusable(false);
@@ -839,14 +839,14 @@ class MouseSelectionPopupPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         add(diameterSlider, gridBagConstraints);
-
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(6, 0, 8, 5);
         add(labelValue, gridBagConstraints);
-
+        
         proportionnalZoomCheckbox.setText(NbBundle.getMessage(MouseSelectionPopupPanel.class, "NeoGraphScene.proportionnalZoomCheckbox.text")); // NOI18N
         proportionnalZoomCheckbox.setFocusable(false);
         proportionnalZoomCheckbox.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
@@ -857,6 +857,6 @@ class MouseSelectionPopupPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(10, 5, 5, 0);
         add(proportionnalZoomCheckbox, gridBagConstraints);
-
+        
     }
 }

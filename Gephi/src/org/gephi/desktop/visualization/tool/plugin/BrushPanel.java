@@ -91,6 +91,7 @@ public class BrushPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         labelDiffusion = new javax.swing.JLabel();
         labelColor = new javax.swing.JLabel();
@@ -99,40 +100,82 @@ public class BrushPanel extends javax.swing.JPanel {
         labelIntensity = new javax.swing.JLabel();
         intensitySpinner = new javax.swing.JSpinner();
         jLabel1 = new javax.swing.JLabel();
+        brushInfoLabel = new javax.swing.JLabel();
 
-        setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        setLayout(new java.awt.GridBagLayout());
 
         labelDiffusion.setFont(labelDiffusion.getFont().deriveFont((float)10));
         labelDiffusion.setText(org.openide.util.NbBundle.getMessage(BrushPanel.class, "BrushPanel.labelDiffusion.text")); // NOI18N
-        add(labelDiffusion);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        add(labelDiffusion, gridBagConstraints);
 
         labelColor.setFont(labelColor.getFont().deriveFont((float)10));
         labelColor.setText(org.openide.util.NbBundle.getMessage(BrushPanel.class, "BrushPanel.labelColor.text")); // NOI18N
-        add(labelColor);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        add(labelColor, gridBagConstraints);
 
         diffusionCombobox.setFont(diffusionCombobox.getFont().deriveFont((float)10));
         diffusionCombobox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        add(diffusionCombobox);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
+        add(diffusionCombobox, gridBagConstraints);
 
         colorButton.setFont(new java.awt.Font("Ubuntu", 0, 10)); // NOI18N
         colorButton.setText(org.openide.util.NbBundle.getMessage(BrushPanel.class, "BrushPanel.colorButton.text")); // NOI18N
         colorButton.setContentAreaFilled(false);
         colorButton.setFocusPainted(false);
-        add(colorButton);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
+        add(colorButton, gridBagConstraints);
 
         labelIntensity.setFont(labelIntensity.getFont().deriveFont((float)10));
         labelIntensity.setText(org.openide.util.NbBundle.getMessage(BrushPanel.class, "BrushPanel.labelIntensity.text")); // NOI18N
-        add(labelIntensity);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        add(labelIntensity, gridBagConstraints);
 
         intensitySpinner.setFont(intensitySpinner.getFont().deriveFont((float)10));
         intensitySpinner.setModel(new javax.swing.SpinnerNumberModel(0, 0, 100, 1));
-        add(intensitySpinner);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
+        add(intensitySpinner, gridBagConstraints);
 
         jLabel1.setFont(jLabel1.getFont().deriveFont((float)10));
         jLabel1.setText(org.openide.util.NbBundle.getMessage(BrushPanel.class, "BrushPanel.jLabel1.text")); // NOI18N
-        add(jLabel1);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        add(jLabel1, gridBagConstraints);
+
+        brushInfoLabel.setFont(new java.awt.Font("Ubuntu", 0, 10)); // NOI18N
+        brushInfoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/gephi/desktop/visualization/resources/info.png"))); // NOI18N
+        brushInfoLabel.setText(org.openide.util.NbBundle.getMessage(BrushPanel.class, "BrushPanel.brushInfoLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        add(brushInfoLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel brushInfoLabel;
     private javax.swing.JButton colorButton;
     private javax.swing.JComboBox diffusionCombobox;
     private javax.swing.JSpinner intensitySpinner;

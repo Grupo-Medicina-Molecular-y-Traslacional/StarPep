@@ -70,7 +70,7 @@ public class HeatMapPanel extends javax.swing.JPanel {
     private GradientSlider slider;
     private JCheckBox dontPaintUnreachableCheckbox;
     private JCheckBox invertPaletteCheckbox;
-    private boolean usePalette = false;
+    private boolean usePalette = true;
 
     /** Creates new form HeatMapPanel */
     public HeatMapPanel(Color[] gradientColors, float[] gradientPositions, boolean dontPaintUnreachable) {
@@ -78,6 +78,7 @@ public class HeatMapPanel extends javax.swing.JPanel {
 
         //Slider
         slider = new GradientSlider(GradientSlider.HORIZONTAL, gradientPositions, gradientColors);
+        slider.setPreferredSize(new Dimension(70, 18));
         slider.putClientProperty("GradientSlider.includeOpacity", "false");
         gradientPanel.add(slider);
 
@@ -87,7 +88,7 @@ public class HeatMapPanel extends javax.swing.JPanel {
         dontPaintUnreachableCheckbox.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         dontPaintUnreachableCheckbox.setText(org.openide.util.NbBundle.getMessage(HeatMapPanel.class, "HeatMapPanel.dontPaintUnreachableCheckbox.text")); // NOI18N
         dontPaintUnreachableCheckbox.setToolTipText(org.openide.util.NbBundle.getMessage(HeatMapPanel.class, "HeatMapPanel.dontPaintUnreachableCheckbox.text")); // NOI18N
-        dontPaintUnreachableCheckbox.setPreferredSize(new java.awt.Dimension(160, 28));
+        dontPaintUnreachableCheckbox.setPreferredSize(new java.awt.Dimension(140, 28));
         gradientPanel.add(dontPaintUnreachableCheckbox);
 
         //Invert
@@ -95,7 +96,7 @@ public class HeatMapPanel extends javax.swing.JPanel {
         invertPaletteCheckbox.setSelected(dontPaintUnreachable);
         invertPaletteCheckbox.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         invertPaletteCheckbox.setText(org.openide.util.NbBundle.getMessage(HeatMapPanel.class, "HeatMapPanel.invertPalette.text")); // NOI18N
-        invertPaletteCheckbox.setPreferredSize(new java.awt.Dimension(139, 28));
+        invertPaletteCheckbox.setPreferredSize(new java.awt.Dimension(140, 28));
         invertPaletteCheckbox.addItemListener(new ItemListener() {
 
             @Override
@@ -110,19 +111,20 @@ public class HeatMapPanel extends javax.swing.JPanel {
         palettePanel.add(invertPaletteCheckbox);
 
         //Init events
+        modeComboBox.setSelectedIndex(usePalette? 0 : 1);
         modeComboBox.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (modeComboBox.getSelectedIndex() == 0) {
-                    usePalette = false;
-                    initMode();
+                    usePalette = true;                    
                 } else {
-                    usePalette = true;
-                    initMode();
+                    usePalette = false;
                 }
+                initMode();
             }
         });
+        
         initMode();
     }
 
@@ -141,8 +143,8 @@ public class HeatMapPanel extends javax.swing.JPanel {
     }
 
     public void setStatus(String status) {
-        statusLabel.setText(status);
-        statusLabel.setToolTipText(status);
+        heatMapInfoLabel.setText(status);
+        heatMapInfoLabel.setToolTipText(status);
     }
 
     public Color[] getGradientColors() {
@@ -169,56 +171,63 @@ public class HeatMapPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        statusLabel = new javax.swing.JLabel();
+        heatMapInfoLabel = new javax.swing.JLabel();
         labelMode = new javax.swing.JLabel();
         modeComboBox = new javax.swing.JComboBox();
         gradientPanel = new javax.swing.JPanel();
-        labelGradient = new javax.swing.JLabel();
         palettePanel = new javax.swing.JPanel();
-        labelPalette = new javax.swing.JLabel();
 
-        setPreferredSize(new java.awt.Dimension(654, 28));
-        setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        setLayout(new java.awt.GridBagLayout());
 
-        statusLabel.setFont(statusLabel.getFont().deriveFont((float)10));
-        statusLabel.setText(org.openide.util.NbBundle.getMessage(HeatMapPanel.class, "HeatMapPanel.statusLabel.text")); // NOI18N
-        add(statusLabel);
+        heatMapInfoLabel.setFont(heatMapInfoLabel.getFont().deriveFont((float)10));
+        heatMapInfoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/gephi/desktop/visualization/resources/info.png"))); // NOI18N
+        heatMapInfoLabel.setText(org.openide.util.NbBundle.getMessage(HeatMapPanel.class, "HeatMapPanel.heatMapInfoLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        add(heatMapInfoLabel, gridBagConstraints);
 
         labelMode.setFont(labelMode.getFont().deriveFont((float)10));
         labelMode.setText(org.openide.util.NbBundle.getMessage(HeatMapPanel.class, "HeatMapPanel.labelMode.text")); // NOI18N
-        add(labelMode);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        add(labelMode, gridBagConstraints);
 
         modeComboBox.setFont(modeComboBox.getFont().deriveFont((float)10));
-        modeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Gradient", "Palette" }));
-        add(modeComboBox);
+        modeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Palette", "Gradient" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
+        add(modeComboBox, gridBagConstraints);
 
         gradientPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        labelGradient.setFont(labelGradient.getFont().deriveFont((float)10));
-        labelGradient.setText(org.openide.util.NbBundle.getMessage(HeatMapPanel.class, "HeatMapPanel.labelGradient.text")); // NOI18N
-        labelGradient.setPreferredSize(new java.awt.Dimension(45, 28));
-        gradientPanel.add(labelGradient);
-
-        add(gradientPanel);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        add(gradientPanel, gridBagConstraints);
 
         palettePanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        labelPalette.setFont(labelPalette.getFont().deriveFont((float)10));
-        labelPalette.setText(org.openide.util.NbBundle.getMessage(HeatMapPanel.class, "HeatMapPanel.labelPalette.text")); // NOI18N
-        labelPalette.setPreferredSize(new java.awt.Dimension(45, 28));
-        palettePanel.add(labelPalette);
-
-        add(palettePanel);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        add(palettePanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel gradientPanel;
-    private javax.swing.JLabel labelGradient;
+    private javax.swing.JLabel heatMapInfoLabel;
     private javax.swing.JLabel labelMode;
-    private javax.swing.JLabel labelPalette;
     private javax.swing.JComboBox modeComboBox;
     private javax.swing.JPanel palettePanel;
-    private javax.swing.JLabel statusLabel;
     // End of variables declaration//GEN-END:variables
 
     private class PaletteComboBox extends JComboBox {

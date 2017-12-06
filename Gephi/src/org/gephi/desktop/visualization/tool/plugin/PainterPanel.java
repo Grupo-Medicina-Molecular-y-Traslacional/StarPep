@@ -70,23 +70,45 @@ public class PainterPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         colorButton = new JColorButton(Color.BLACK);
         labelColor = new javax.swing.JLabel();
+        painterInfoLabel = new javax.swing.JLabel();
 
-        setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        setLayout(new java.awt.GridBagLayout());
 
         colorButton.setText(org.openide.util.NbBundle.getMessage(PainterPanel.class, "PainterPanel.colorButton.text")); // NOI18N
         colorButton.setContentAreaFilled(false);
         colorButton.setFocusPainted(false);
-        add(colorButton);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
+        add(colorButton, gridBagConstraints);
 
         labelColor.setFont(labelColor.getFont().deriveFont((float)10));
         labelColor.setText(org.openide.util.NbBundle.getMessage(PainterPanel.class, "PainterPanel.labelColor.text")); // NOI18N
-        add(labelColor);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        add(labelColor, gridBagConstraints);
+
+        painterInfoLabel.setFont(new java.awt.Font("Ubuntu", 0, 10)); // NOI18N
+        painterInfoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/gephi/desktop/visualization/resources/info.png"))); // NOI18N
+        painterInfoLabel.setText(org.openide.util.NbBundle.getMessage(PainterPanel.class, "PainterPanel.painterInfoLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        add(painterInfoLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton colorButton;
     private javax.swing.JLabel labelColor;
+    private javax.swing.JLabel painterInfoLabel;
     // End of variables declaration//GEN-END:variables
 }

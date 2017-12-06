@@ -83,28 +83,45 @@ public class SizerPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        jLabel1 = new javax.swing.JLabel();
+        sizerInfoLabel = new javax.swing.JLabel();
         labelSize = new javax.swing.JLabel();
         sizeLabel = new javax.swing.JLabel();
 
-        setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        setLayout(new java.awt.GridBagLayout());
 
-        jLabel1.setFont(jLabel1.getFont().deriveFont((float)10));
-        jLabel1.setText(org.openide.util.NbBundle.getMessage(SizerPanel.class, "SizerPanel.jLabel1.text")); // NOI18N
-        add(jLabel1);
+        sizerInfoLabel.setFont(sizerInfoLabel.getFont().deriveFont((float)10));
+        sizerInfoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/gephi/desktop/visualization/resources/info.png"))); // NOI18N
+        sizerInfoLabel.setText(org.openide.util.NbBundle.getMessage(SizerPanel.class, "SizerPanel.sizerInfoLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        add(sizerInfoLabel, gridBagConstraints);
 
         labelSize.setFont(labelSize.getFont().deriveFont((float)10));
         labelSize.setText(org.openide.util.NbBundle.getMessage(SizerPanel.class, "SizerPanel.labelSize.text")); // NOI18N
-        add(labelSize);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        add(labelSize, gridBagConstraints);
 
         sizeLabel.setFont(sizeLabel.getFont().deriveFont((float)10));
         sizeLabel.setText(org.openide.util.NbBundle.getMessage(SizerPanel.class, "SizerPanel.sizeLabel.text")); // NOI18N
-        add(sizeLabel);
+        sizeLabel.setPreferredSize(new java.awt.Dimension(50, 12));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
+        add(sizeLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel labelSize;
     private javax.swing.JLabel sizeLabel;
+    private javax.swing.JLabel sizerInfoLabel;
     // End of variables declaration//GEN-END:variables
 }

@@ -66,11 +66,11 @@ public class Brush implements Tool {
 
     //Architecture
     private ToolEventListener[] listeners;
-    private BrushPanel brushPanel;
+    private BrushPanel brushPanel = new BrushPanel();
     //Settings
     private float[] color = {1f, 0f, 0f};
     private float intensity = 0.3f;
-    private DiffusionMethods.DiffusionMethod diffusionMethod = DiffusionMethods.DiffusionMethod.NEIGHBORS;
+    private DiffusionMethods.DiffusionMethod diffusionMethod = DiffusionMethods.DiffusionMethod.NONE;
 
     @Override
     public void select() {
@@ -156,7 +156,7 @@ public class Brush implements Tool {
         return new ToolUI() {
             @Override
             public JPanel getPropertiesBar(Tool tool) {
-                brushPanel = new BrushPanel();
+                
                 brushPanel.setDiffusionMethod(diffusionMethod);
                 brushPanel.setColor(new Color(color[0], color[1], color[2]));
                 brushPanel.setIntensity(intensity);

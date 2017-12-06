@@ -114,7 +114,7 @@ public class VizConfig {
     public static final boolean DEFAULT_NEIGHBOUR_SELECT = true;
     public static final boolean DEFAULT_HIDE_NONSELECTED_EDGES = false;
     public static final boolean DEFAULT_SELECTEDNODE_UNIQUE_COLOR = false;
-    public static final boolean DEFAULT_EDGE_HAS_UNIQUE_COLOR = false;
+    public static final boolean DEFAULT_EDGE_HAS_UNIQUE_COLOR = true;
     public static final Color DEFAULT_EDGE_UNIQUE_COLOR = new Color(0.5f, 0.5f, 0.5f, 0.5f);
     public static final Color DEFAULT_NODE_LABEL_COLOR = new Color(0f, 0f, 0f, 1f);
     public static final Color DEFAULT_EDGE_LABEL_COLOR = new Color(0.5f, 0.5f, 0.5f, 1f);

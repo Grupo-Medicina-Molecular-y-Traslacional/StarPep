@@ -22,6 +22,7 @@ import java.util.Collection;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -83,8 +84,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     // Global
     private final JColorBlackWhiteSwitcher backgroundColorSwitcher = new JColorBlackWhiteSwitcher(Color.BLACK);
     private final JColorButton backgroundColorButton = new JColorButton(Color.BLACK);
-    private final JSlider zoomSlider = new JSlider();
     private final JXHyperlink configureLink = new JXHyperlink();
+    private final JCheckBox autoSelectNeighborCheckbox = new JCheckBox();
     //Node
     final JToggleButton showNodeLabelsButton = new JToggleButton();
     final JButton nodeFontButton = new JButton();
@@ -178,48 +179,29 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             public void actionPerformed(ActionEvent e) {
                 GraphIO io = VizController.getInstance().getGraphIO();
                 io.centerOnGraph();
-                
             }
         });
         topToolbar.add(resetZoomButton);
 
         // Plus Zoom
         JButton plusButton = new JButton();
-        plusButton.setText("+");
+//        plusButton.setText("+");
+        plusButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/magnifier--plus.png", false));
         plusButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.plusButton.toolTipText"));
         plusButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int cameraDistance = Math.max((int) VizController.getInstance().getVizModel().getCameraDistance() - 1000, 100);                
+                int cameraDistance = Math.max((int) VizController.getInstance().getVizModel().getCameraDistance() - 1000, 100);
                 GraphIO io = VizController.getInstance().getGraphIO();
                 io.setCameraDistance(cameraDistance);
-                zoomSlider.setValue(cameraDistance);
             }
         });
         topToolbar.add(plusButton);
 
-        // Slider
-        zoomSlider.setMaximum(10000);
-        zoomSlider.setMinimum(100);
-        zoomSlider.setValue(5000);
-        zoomSlider.setPreferredSize(new Dimension(120, 23));
-        zoomSlider.setMaximumSize(zoomSlider.getPreferredSize());
-        zoomSlider.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                int cam = (int) VizController.getInstance().getVizModel().getCameraDistance();
-                if (zoomSlider.getValue() != cam ) {
-                    GraphIO io = VizController.getInstance().getGraphIO();
-                    io.setCameraDistance(zoomSlider.getValue());
-                }
-            }
-        });     
-        topToolbar.add(zoomSlider);
-
         // Minus Zoom
         JButton minusButton = new JButton();
-        minusButton.setText("-");
+//        minusButton.setText("-");
+        minusButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/magnifier--minus.png", false));
         minusButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.minusButton.toolTipText"));
         minusButton.addActionListener(new ActionListener() {
             @Override
@@ -227,7 +209,6 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 int cameraDistance = Math.min((int) VizController.getInstance().getVizModel().getCameraDistance() + 1000, 10000);
                 GraphIO io = VizController.getInstance().getGraphIO();
                 io.setCameraDistance(cameraDistance);
-                zoomSlider.setValue(cameraDistance);
             }
         });
         topToolbar.add(minusButton);
@@ -291,6 +272,19 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         });
 
         topToolbar.addSeparator();
+
+        //Auto select neighbor
+        autoSelectNeighborCheckbox.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.autoSelectNeigborCheckbox.text"));
+        autoSelectNeighborCheckbox.setHorizontalTextPosition(SwingConstants.LEFT);
+        autoSelectNeighborCheckbox.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                VizModel vizModel = VizController.getInstance().getVizModel();
+                vizModel.setAutoSelectNeighbor(autoSelectNeighborCheckbox.isSelected());
+            }
+        });        
+        topToolbar.add(autoSelectNeighborCheckbox);
     }
 
     private JPopupMenu createPopup() {
@@ -570,11 +564,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         backgroundColorSwitcher.setColor(vizModel.getBackgroundColor());
         backgroundColorButton.setColor(vizModel.getBackgroundColor());
         
-        // Zoom slider
-        int zoomValue = Math.min((int)VizController.getInstance().getVizModel().getCameraDistance(), zoomSlider.getMaximum()) ;
-        if (zoomSlider.getValue() != zoomValue) {
-            zoomSlider.setValue(zoomValue);
-        }   
+        //Auto select neighbor
+        autoSelectNeighborCheckbox.setSelected(vizModel.isAutoSelectNeighbor());
 
         //Show node labels
         showNodeLabelsButton.setSelected(vizModel.getTextModel().isShowNodeLabels());

@@ -185,7 +185,6 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
         // Plus Zoom
         JButton plusButton = new JButton();
-//        plusButton.setText("+");
         plusButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/magnifier--plus.png", false));
         plusButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.plusButton.toolTipText"));
         plusButton.addActionListener(new ActionListener() {
@@ -200,7 +199,6 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
         // Minus Zoom
         JButton minusButton = new JButton();
-//        minusButton.setText("-");
         minusButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/magnifier--minus.png", false));
         minusButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.minusButton.toolTipText"));
         minusButton.addActionListener(new ActionListener() {

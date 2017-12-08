@@ -42,6 +42,8 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.GraphElementNavigatorLookupHint;
 import org.bapedis.core.ui.MetadataNavigatorLookupHint;
 import org.gephi.graph.api.Node;
+import org.gephi.preview.api.PreviewController;
+import org.gephi.preview.api.PreviewProperty;
 import org.gephi.ui.components.JColorBlackWhiteSwitcher;
 import org.gephi.ui.components.JColorButton;
 import org.gephi.visualization.VizController;
@@ -89,23 +91,23 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     private final JXHyperlink configureLink = new JXHyperlink();
     private final JCheckBox autoSelectNeighborCheckbox = new JCheckBox();
     private final JPopupMenu screenshotPopup = new JPopupMenu();
-    final JButton screenshotButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/screenshot.png", false), screenshotPopup);
+    private final JButton screenshotButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/screenshot.png", false), screenshotPopup);
     //Node
-    final JToggleButton showNodeLabelsButton = new JToggleButton();
-    final JButton nodeFontButton = new JButton();
+    private final JToggleButton showNodeLabelsButton = new JToggleButton();
+    private final JButton nodeFontButton = new JButton();
 //    final JColorButton nodeColorButton = new JColorButton(Color.BLACK);
-    final JPopupButton labelSizeModeButton = new JPopupButton();
-    final JPopupButton labelColorModeButton = new JPopupButton();
-    final JSlider nodeSizeSlider = new JSlider();
+    private final JPopupButton labelSizeModeButton = new JPopupButton();
+    private final JPopupButton labelColorModeButton = new JPopupButton();
+    private final JSlider nodeSizeSlider = new JSlider();
     //Edge
-    final JToggleButton showEdgeButton = new JToggleButton();
-    final JToggleButton edgeHasNodeColorButton = new JToggleButton();
+    private final JToggleButton showEdgeButton = new JToggleButton();
+    private final JToggleButton edgeHasNodeColorButton = new JToggleButton();
 //    final JColorButton edgeColorButton = new JColorButton(Color.BLACK);
-    final JSlider edgeScaleSlider = new JSlider();
-    final JToggleButton showEdgeLabelsButton = new JToggleButton();
-    final JButton edgeFontButton = new JButton();
-    final JSlider edgeSizeSlider = new JSlider();
-
+    private final JSlider edgeScaleSlider = new JSlider();
+    private final JToggleButton showEdgeLabelsButton = new JToggleButton();
+    private final JButton edgeFontButton = new JButton();
+    private final JSlider edgeSizeSlider = new JSlider();
+    
     static {
         UIManager.put("Slider.paintValue", false);
     }
@@ -146,7 +148,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             public void propertyChange(PropertyChangeEvent evt) {
                 VizModel vizModel = VizController.getInstance().getVizModel();
                 Color backgroundColor = ((JColorBlackWhiteSwitcher) backgroundColorSwitcher).getColor();
-                vizModel.setBackgroundColor(backgroundColor);
+                vizModel.setBackgroundColor(backgroundColor);                
                 backgroundColorButton.setColor(backgroundColor);
 
                 TextModelImpl textModel = VizController.getInstance().getVizModel().getTextModel();

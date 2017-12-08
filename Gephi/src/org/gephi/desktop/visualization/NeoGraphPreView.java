@@ -35,6 +35,8 @@ import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.RenderTarget;
 import org.gephi.ui.components.JColorButton;
+import org.gephi.visualization.VizController;
+import org.gephi.visualization.VizModel;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
@@ -43,7 +45,8 @@ import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.Lookups;
-
+import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 public class NeoGraphPreView extends JPanel implements MultiViewElement {
 
@@ -67,51 +70,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
         info.setText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.infoLabel.text"));
         add(info, "infoCard");
 
-        // Tool bar
         toolbar.addSeparator();
-
-        // Background button
-        JColorButton backgroundButton = new JColorButton((Color) previewController.getModel().getProperties().getValue(PreviewProperty.BACKGROUND_COLOR));
-        backgroundButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreView.backgroundButton.toolTipText"));
-        backgroundButton.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                previewController.getModel().getProperties().putValue(PreviewProperty.BACKGROUND_COLOR, (Color) evt.getNewValue());
-                sketch.refresh();
-            }
-        });
-        toolbar.add(backgroundButton);
-
-        toolbar.addSeparator();
-        // Visibility Ratio
-        float val = previewController.getModel().getProperties().getValue(PreviewProperty.VISIBILITY_RATIO);
-        final NumberFormat formatter = NumberFormat.getPercentInstance();
-
-        final JLabel ratioLabel = new JLabel();
-        ratioLabel.setFont(new Font("Serif", Font.PLAIN, 11));
-        ratioLabel.setPreferredSize(new Dimension(35, 20));
-        ratioLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        ratioLabel.setMaximumSize(ratioLabel.getPreferredSize());
-
-        final JSlider ratioSlider = new JSlider();
-        ratioSlider.setMaximum(100);
-        ratioSlider.setMinimum(1);
-        ratioSlider.setPreferredSize(new Dimension(120, 23));
-        ratioSlider.setMaximumSize(ratioSlider.getPreferredSize());
-
-        ratioSlider.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                float val = ratioSlider.getValue() / 100f;
-                ratioSlider.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.visibilityRatio.text", formatter.format(val)));
-                ratioLabel.setText(formatter.format(val));
-                ratioLabel.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.visibilityRatio.text", formatter.format(val)));
-                previewController.getModel().getProperties().putValue(PreviewProperty.VISIBILITY_RATIO, val);
-            }
-        });
-        ratioSlider.setValue(Math.round(val) * 100);
-        toolbar.add(ratioSlider);
-        toolbar.add(ratioLabel);
 
         // Refresh button
         JButton refreshButton = new JButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/refresh.png", false));
@@ -124,6 +83,8 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
+                        VizModel vizModel = VizController.getInstance().getVizModel();
+                        previewController.getModel().getProperties().putValue(PreviewProperty.BACKGROUND_COLOR, vizModel.getBackgroundColor());
                         previewController.refreshPreview();
                         sketch.refresh();
                     }
@@ -153,9 +114,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
 
         // Plus Zoom
         JButton plusButton = new JButton();
-
-        plusButton.setText(
-                "+");
+        plusButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/magnifier--plus.png", false));
         plusButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class,
                 "NeoGraphPreview.plusButton.toolTipText"));
         plusButton.addActionListener(
@@ -171,9 +130,7 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
 
         // Minus Zoom
         JButton minusButton = new JButton();
-
-        minusButton.setText(
-                "-");
+        minusButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/magnifier--minus.png", false));
         minusButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class,
                 "NeoGraphPreview.minusButton.toolTipText"));
         minusButton.addActionListener(
@@ -186,6 +143,27 @@ public class NeoGraphPreView extends JPanel implements MultiViewElement {
         }
         );
         toolbar.add(minusButton);
+
+        toolbar.addSeparator();
+        // Settings
+        JButton settingsButton = new JButton();
+        settingsButton.setText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.settings.text"));
+        settingsButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/settings.png", false));
+        settingsButton.setToolTipText(NbBundle.getMessage(NeoGraphPreView.class, "NeoGraphPreview.settings.toolTipText"));
+        settingsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TopComponent tc = WindowManager.getDefault().findTopComponent("properties"); // NOI18N
+                if (tc != null) {
+                    tc.open();
+                    tc.requestActive();
+                }
+            }
+        });
+        
+        toolbar.add(settingsButton);
+        
+        toolbar.addSeparator();
     }
 
     @Override

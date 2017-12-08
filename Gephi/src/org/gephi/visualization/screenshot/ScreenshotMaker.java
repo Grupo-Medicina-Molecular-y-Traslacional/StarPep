@@ -52,6 +52,7 @@ import com.jogamp.opengl.util.TileRenderer;
 import com.jogamp.opengl.util.texture.TextureData;
 import com.jogamp.opengl.util.texture.TextureIO;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -345,6 +346,7 @@ public class ScreenshotMaker implements VizArchitecture {
 
     public void configure() {
         ScreenshotSettingsPanel panel = new ScreenshotSettingsPanel();
+        panel.setPreferredSize(new Dimension(320, 112));
         panel.setup(this);
 
         DialogDescriptor dd = new DialogDescriptor(panel, NbBundle.getMessage(ScreenshotMaker.class, "ScreenshotMaker.configure.title"));

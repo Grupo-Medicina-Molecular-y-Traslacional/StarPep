@@ -9,7 +9,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 import javax.swing.JFileChooser;
-import javax.swing.JPanel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.components.ValidationSupportUI;

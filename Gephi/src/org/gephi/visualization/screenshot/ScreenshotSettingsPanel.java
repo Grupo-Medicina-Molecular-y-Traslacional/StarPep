@@ -43,6 +43,7 @@ package org.gephi.visualization.screenshot;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Locale;
 import javax.swing.JFileChooser;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -73,8 +74,8 @@ public class ScreenshotSettingsPanel extends javax.swing.JPanel {
     public void setup(final ScreenshotMaker screenshotMaker) {
         autoSaveCheckBox.setSelected(screenshotMaker.isAutoSave());
         selectDirectoryButton.setEnabled(autoSaveCheckBox.isSelected());
-        widthTextField.setText(String.valueOf(screenshotMaker.getWidth()));
-        heightTextField.setText(String.valueOf(screenshotMaker.getHeight()));
+        widthTextField.setText(String.format("%d", screenshotMaker.getWidth()));
+        heightTextField.setText(String.format("%d",screenshotMaker.getHeight()));
         switch (screenshotMaker.getAntiAliasing()) {
             case 0:
                 antiAliasingCombo.setSelectedIndex(0);
@@ -146,111 +147,125 @@ public class ScreenshotSettingsPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        imagePanel = new javax.swing.JPanel();
+        topPanel = new javax.swing.JPanel();
         labelHeight = new javax.swing.JLabel();
         labelWidth = new javax.swing.JLabel();
-        java.text.NumberFormat widthFormat = java.text.NumberFormat.getIntegerInstance();
+        java.text.NumberFormat widthFormat = java.text.NumberFormat.getIntegerInstance(Locale.ENGLISH);
+        widthFormat.setGroupingUsed(false);
         javax.swing.text.NumberFormatter widthFormatter = new javax.swing.text.NumberFormatter(widthFormat);
+        widthFormatter.setValueClass(Integer.class);
         widthFormatter.setMinimum(1);
         widthFormatter.setAllowsInvalid(false);
         widthTextField = new javax.swing.JFormattedTextField(widthFormatter);
-        labelAntiAliasing = new javax.swing.JLabel();
-        antiAliasingCombo = new javax.swing.JComboBox();
-        java.text.NumberFormat heightFormat = java.text.NumberFormat.getIntegerInstance();
+        java.text.NumberFormat heightFormat = java.text.NumberFormat.getIntegerInstance(Locale.ENGLISH);
+        heightFormat.setGroupingUsed(false);
         javax.swing.text.NumberFormatter heightFormatter = new javax.swing.text.NumberFormatter(heightFormat);
         heightFormatter.setMinimum(1);
         heightFormatter.setAllowsInvalid(false);
         heightTextField = new javax.swing.JFormattedTextField(heightFormatter);
+        bottomPanel = new javax.swing.JPanel();
+        labelAntiAliasing = new javax.swing.JLabel();
+        antiAliasingCombo = new javax.swing.JComboBox();
         autoSaveCheckBox = new javax.swing.JCheckBox();
         selectDirectoryButton = new javax.swing.JButton();
 
-        imagePanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        setLayout(new java.awt.GridBagLayout());
+
+        topPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        topPanel.setLayout(new java.awt.GridBagLayout());
 
         labelHeight.setText(org.openide.util.NbBundle.getMessage(ScreenshotSettingsPanel.class, "ScreenshotSettingsPanel.labelHeight.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
+        topPanel.add(labelHeight, gridBagConstraints);
 
         labelWidth.setText(org.openide.util.NbBundle.getMessage(ScreenshotSettingsPanel.class, "ScreenshotSettingsPanel.labelWidth.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        topPanel.add(labelWidth, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 5);
+        topPanel.add(widthTextField, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 5);
+        topPanel.add(heightTextField, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 5;
+        gridBagConstraints.ipady = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(topPanel, gridBagConstraints);
+
+        bottomPanel.setLayout(new java.awt.GridBagLayout());
 
         labelAntiAliasing.setText(org.openide.util.NbBundle.getMessage(ScreenshotSettingsPanel.class, "ScreenshotSettingsPanel.labelAntiAliasing.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        bottomPanel.add(labelAntiAliasing, gridBagConstraints);
 
         antiAliasingCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0x", "2x", "4x", "8x", "16x" }));
-
-        javax.swing.GroupLayout imagePanelLayout = new javax.swing.GroupLayout(imagePanel);
-        imagePanel.setLayout(imagePanelLayout);
-        imagePanelLayout.setHorizontalGroup(
-            imagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(imagePanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(imagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(imagePanelLayout.createSequentialGroup()
-                        .addComponent(labelWidth)
-                        .addGap(3, 3, 3)
-                        .addComponent(widthTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(labelHeight)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(heightTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(imagePanelLayout.createSequentialGroup()
-                        .addComponent(labelAntiAliasing)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(antiAliasingCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        imagePanelLayout.setVerticalGroup(
-            imagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(imagePanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(imagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelWidth)
-                    .addComponent(widthTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(labelHeight)
-                    .addComponent(heightTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(imagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelAntiAliasing)
-                    .addComponent(antiAliasingCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
+        bottomPanel.add(antiAliasingCombo, gridBagConstraints);
 
         autoSaveCheckBox.setText(org.openide.util.NbBundle.getMessage(ScreenshotSettingsPanel.class, "ScreenshotSettingsPanel.autoSaveCheckBox.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
+        bottomPanel.add(autoSaveCheckBox, gridBagConstraints);
 
         selectDirectoryButton.setText(org.openide.util.NbBundle.getMessage(ScreenshotSettingsPanel.class, "ScreenshotSettingsPanel.selectDirectoryButton.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 2, 0, 0);
+        bottomPanel.add(selectDirectoryButton, gridBagConstraints);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(imagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(autoSaveCheckBox)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(selectDirectoryButton)))
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(imagePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(autoSaveCheckBox)
-                    .addComponent(selectDirectoryButton, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(21, Short.MAX_VALUE))
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
+        add(bottomPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox antiAliasingCombo;
     private javax.swing.JCheckBox autoSaveCheckBox;
+    private javax.swing.JPanel bottomPanel;
     private javax.swing.JTextField heightTextField;
-    private javax.swing.JPanel imagePanel;
     private javax.swing.JLabel labelAntiAliasing;
     private javax.swing.JLabel labelHeight;
     private javax.swing.JLabel labelWidth;
     private javax.swing.JButton selectDirectoryButton;
+    private javax.swing.JPanel topPanel;
     private javax.swing.JTextField widthTextField;
     // End of variables declaration//GEN-END:variables
 }

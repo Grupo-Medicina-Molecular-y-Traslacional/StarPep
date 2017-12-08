@@ -44,13 +44,9 @@ package org.gephi.visualization.screenshot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JFileChooser;
-import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-//import org.gephi.lib.validation.Multiple4NumberValidator;
-//import org.netbeans.validation.api.builtin.Validators;
-//import org.netbeans.validation.api.ui.ValidationGroup;
-//import org.netbeans.validation.api.ui.ValidationPanel;
+
 import org.openide.windows.WindowManager;
 
 /**
@@ -137,30 +133,10 @@ public class ScreenshotSettingsPanel extends javax.swing.JPanel {
             default:
                 screenshotMaker.setAntiAliasing(0);
                 break;
-        }
+        } 
         //screenshotMaker.setTransparentBackground(transparentBackgroundCheckBox.isSelected());
     }
 
-    public static JPanel createValidationPanel(ScreenshotSettingsPanel innerPanel) {
-//        ValidationPanel validationPanel = new ValidationPanel();
-//        if (innerPanel == null) {
-//            innerPanel = new ScreenshotSettingsPanel();
-//        }
-//        validationPanel.setInnerComponent(innerPanel);
-//
-//        ValidationGroup group = validationPanel.getValidationGroup();
-//
-//        //Node field
-//        group.add(innerPanel.widthTextField, Validators.REQUIRE_NON_EMPTY_STRING,
-//                new Multiple4NumberValidator());
-//
-//        //Edge field
-//        group.add(innerPanel.heightTextField, Validators.REQUIRE_NON_EMPTY_STRING,
-//                new Multiple4NumberValidator());
-//
-//        return validationPanel;
-        return null;
-    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -174,10 +150,18 @@ public class ScreenshotSettingsPanel extends javax.swing.JPanel {
         imagePanel = new javax.swing.JPanel();
         labelHeight = new javax.swing.JLabel();
         labelWidth = new javax.swing.JLabel();
-        widthTextField = new javax.swing.JTextField();
+        java.text.NumberFormat widthFormat = java.text.NumberFormat.getIntegerInstance();
+        javax.swing.text.NumberFormatter widthFormatter = new javax.swing.text.NumberFormatter(widthFormat);
+        widthFormatter.setMinimum(1);
+        widthFormatter.setAllowsInvalid(false);
+        widthTextField = new javax.swing.JFormattedTextField(widthFormatter);
         labelAntiAliasing = new javax.swing.JLabel();
         antiAliasingCombo = new javax.swing.JComboBox();
-        heightTextField = new javax.swing.JTextField();
+        java.text.NumberFormat heightFormat = java.text.NumberFormat.getIntegerInstance();
+        javax.swing.text.NumberFormatter heightFormatter = new javax.swing.text.NumberFormatter(heightFormat);
+        heightFormatter.setMinimum(1);
+        heightFormatter.setAllowsInvalid(false);
+        heightTextField = new javax.swing.JFormattedTextField(heightFormatter);
         autoSaveCheckBox = new javax.swing.JCheckBox();
         selectDirectoryButton = new javax.swing.JButton();
 
@@ -187,13 +171,9 @@ public class ScreenshotSettingsPanel extends javax.swing.JPanel {
 
         labelWidth.setText(org.openide.util.NbBundle.getMessage(ScreenshotSettingsPanel.class, "ScreenshotSettingsPanel.labelWidth.text")); // NOI18N
 
-        widthTextField.setText(org.openide.util.NbBundle.getMessage(ScreenshotSettingsPanel.class, "ScreenshotSettingsPanel.widthTextField.text")); // NOI18N
-
         labelAntiAliasing.setText(org.openide.util.NbBundle.getMessage(ScreenshotSettingsPanel.class, "ScreenshotSettingsPanel.labelAntiAliasing.text")); // NOI18N
 
         antiAliasingCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0x", "2x", "4x", "8x", "16x" }));
-
-        heightTextField.setText(org.openide.util.NbBundle.getMessage(ScreenshotSettingsPanel.class, "ScreenshotSettingsPanel.heightTextField.text")); // NOI18N
 
         javax.swing.GroupLayout imagePanelLayout = new javax.swing.GroupLayout(imagePanel);
         imagePanel.setLayout(imagePanelLayout);

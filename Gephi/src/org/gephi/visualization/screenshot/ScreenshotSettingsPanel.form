@@ -116,11 +116,10 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="widthTextField">
-          <Properties>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/gephi/visualization/screenshot/Bundle.properties" key="ScreenshotSettingsPanel.widthTextField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-            </Property>
-          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JFormattedTextField(widthFormatter)"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodePre" type="java.lang.String" value="java.text.NumberFormat widthFormat = java.text.NumberFormat.getIntegerInstance();&#xa;javax.swing.text.NumberFormatter widthFormatter = new javax.swing.text.NumberFormatter(widthFormat);&#xa;widthFormatter.setMinimum(1);&#xa;widthFormatter.setAllowsInvalid(false);"/>
+          </AuxValues>
         </Component>
         <Component class="javax.swing.JLabel" name="labelAntiAliasing">
           <Properties>
@@ -143,11 +142,10 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="heightTextField">
-          <Properties>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/gephi/visualization/screenshot/Bundle.properties" key="ScreenshotSettingsPanel.heightTextField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-            </Property>
-          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JFormattedTextField(heightFormatter)"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodePre" type="java.lang.String" value="java.text.NumberFormat heightFormat = java.text.NumberFormat.getIntegerInstance();&#xa;javax.swing.text.NumberFormatter heightFormatter = new javax.swing.text.NumberFormatter(heightFormat);&#xa;heightFormatter.setMinimum(1);&#xa;heightFormatter.setAllowsInvalid(false);"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

@@ -24,6 +24,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSlider;
@@ -60,6 +61,7 @@ import org.jdesktop.swingx.JXHyperlink;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
+import org.openide.awt.DropDownButtonFactory;
 import org.openide.awt.UndoRedo;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
@@ -86,6 +88,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     private final JColorButton backgroundColorButton = new JColorButton(Color.BLACK);
     private final JXHyperlink configureLink = new JXHyperlink();
     private final JCheckBox autoSelectNeighborCheckbox = new JCheckBox();
+    private final JPopupMenu screenshotPopup = new JPopupMenu();
+    final JButton screenshotButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/screenshot.png", false), screenshotPopup);
     //Node
     final JToggleButton showNodeLabelsButton = new JToggleButton();
     final JButton nodeFontButton = new JButton();
@@ -281,8 +285,32 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 VizModel vizModel = VizController.getInstance().getVizModel();
                 vizModel.setAutoSelectNeighbor(autoSelectNeighborCheckbox.isSelected());
             }
-        });        
+        });
         topToolbar.add(autoSelectNeighborCheckbox);
+
+        topToolbar.addSeparator();
+        
+        //Screenshots
+        JMenuItem configureScreenshotItem = new JMenuItem(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.screenshot.configure"));
+        configureScreenshotItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                VizController.getInstance().getScreenshotMaker().configure();
+            }
+        });
+        screenshotPopup.add(configureScreenshotItem);
+
+        screenshotButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.screenshot.toolTipText"));
+        screenshotButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                VizController.getInstance().getScreenshotMaker().takeScreenshot();
+            }
+        });
+        
+        topToolbar.add(screenshotButton);
+        
+        topToolbar.addSeparator();
     }
 
     private JPopupMenu createPopup() {
@@ -561,7 +589,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         // Background color
         backgroundColorSwitcher.setColor(vizModel.getBackgroundColor());
         backgroundColorButton.setColor(vizModel.getBackgroundColor());
-        
+
         //Auto select neighbor
         autoSelectNeighborCheckbox.setSelected(vizModel.isAutoSelectNeighbor());
 

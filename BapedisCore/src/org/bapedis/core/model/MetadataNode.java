@@ -5,17 +5,12 @@
  */
 package org.bapedis.core.model;
 
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;
 import org.openide.util.NbBundle;
-import org.openide.util.lookup.Lookups;
 
 /**
  *
@@ -40,7 +35,8 @@ public class MetadataNode extends AbstractNode {
         // Label property
         PropertySupport.ReadOnly labelProperty;
         labelProperty = createPropertyField("label", NbBundle.getMessage(MetadataNode.class, "PropertySet.label"),
-                NbBundle.getMessage(MetadataNode.class, "PropertySet.label.desc"), String.class, metadata.getName());
+                NbBundle.getMessage(MetadataNode.class, "PropertySet.label.desc"), String.class, metadata.getAnnotationType().getDisplayName());
+        set.put(labelProperty);
 
         // Name property
         PropertySupport.ReadOnly nameProperty = createPropertyField("name", NbBundle.getMessage(GraphElementNode.class, "PropertySet.name"),

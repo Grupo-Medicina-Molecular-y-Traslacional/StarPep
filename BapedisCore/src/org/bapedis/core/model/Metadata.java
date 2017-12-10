@@ -5,10 +5,6 @@
  */
 package org.bapedis.core.model;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -31,7 +27,7 @@ public class Metadata{
         this.underlyingNodeID = underlyingNodeID;
         this.name = name;
         this.annotationType = annotationType;
-        childs = isLeaf ? null: new LinkedList<Metadata>();
+        childs = isLeaf ? null: new LinkedList<>();
     }
 
     public Metadata(String underlyingNodeID, String name, AnnotationType annotationType) {

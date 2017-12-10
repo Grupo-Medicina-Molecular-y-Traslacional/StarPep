@@ -5,12 +5,15 @@
  */
 package org.bapedis.core.model;
 
+import java.lang.reflect.InvocationTargetException;
 import javax.swing.Action;
 import org.bapedis.core.ui.actions.RemoveAllFromQueryModel;
 import org.bapedis.core.ui.actions.RemoveFromQueryModel;
 import org.bapedis.core.ui.actions.RemoveOthersFromQueryModel;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
+import org.openide.nodes.PropertySupport;
+import org.openide.nodes.Sheet;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.Lookups;
 
@@ -48,7 +51,7 @@ public class QueryNode extends AbstractNode {
         actions[2].setEnabled(queryModel.countElements() > 0);
         return actions;
     }
-    
+
     @Override
     public String getHtmlDisplayName() {
         if (metadata != null) {
@@ -56,7 +59,45 @@ public class QueryNode extends AbstractNode {
                     + "<i> " + metadata.getName() + "</i>";
         }
         return NbBundle.getMessage(QueryNode.class, "QueryNode.rootContext.name");
-    }    
+    }
+
+    @Override
+    protected Sheet createSheet() {
+        Sheet sheet = Sheet.createDefault();
+        Sheet.Set set = Sheet.createPropertiesSet();
+
+        if (metadata != null) {
+            // Label property
+            PropertySupport.ReadOnly labelProperty;
+            labelProperty = createPropertyField("label", NbBundle.getMessage(MetadataNode.class, "PropertySet.label"),
+                    NbBundle.getMessage(MetadataNode.class, "PropertySet.label.desc"), String.class, metadata.getAnnotationType().getDisplayName());
+            set.put(labelProperty);
+        }
+
+        // Name property
+        PropertySupport.ReadOnly nameProperty = createPropertyField("name", NbBundle.getMessage(GraphElementNode.class, "PropertySet.name"),
+                NbBundle.getMessage(MetadataNode.class, "PropertySet.name.desc"), String.class, metadata==null? NbBundle.getMessage(QueryNode.class, "QueryNode.rootContext.name"): metadata.getName());
+        set.put(nameProperty);
+
+        sheet.put(set);
+        return sheet;
+    }
+
+    private PropertySupport.ReadOnly createPropertyField(String name, String displayName, String description, Class type, final Object value) {
+        PropertySupport.ReadOnly property = new PropertySupport.ReadOnly(name, type, displayName, description) {
+
+            @Override
+            public Object getValue() throws IllegalAccessException, InvocationTargetException {
+                return value;
+            }
+        };
+        String strValue = value.toString();
+
+        // Set the font color for read only property. Default is a gray color.
+        property.setValue("htmlDisplayValue", "<font color='000000'>" + strValue + "</font>");
+//      property.setValue("suppressCustomEditor", true);
+        return property;
+    }
 
 //    @Override
 //    public PasteType getDropType(Transferable t, int action, int index) {
@@ -80,6 +121,4 @@ public class QueryNode extends AbstractNode {
 //        }
 //        return null;
 //    }
-        
-
 }

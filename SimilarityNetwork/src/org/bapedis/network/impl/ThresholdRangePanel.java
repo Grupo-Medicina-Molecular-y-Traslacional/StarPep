@@ -44,20 +44,17 @@ package org.bapedis.network.impl;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
@@ -79,21 +76,18 @@ import org.openide.util.NbBundle;
 public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyChangeListener {
 
     private ChartPanel chartPanel;
-    private final SpinnerNumberModel thresholdSpinnerModel;
     protected final JXBusyLabel busyLabel;
     protected SimilarityMeasure simMeasure;
     protected final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private RichTooltip richTooltip;
     private final DecimalFormat formatter;
 
+    static {
+        UIManager.put("Slider.paintValue", false);
+    }
+
     public ThresholdRangePanel() {
         initComponents();
-        Float value = 0f;
-        Float min = 0f;
-        Float max = 1f;
-        Float step = 0.01f;
-        thresholdSpinnerModel = new SpinnerNumberModel(value, min, max, step);
-        jThresholdSpinner.setModel(thresholdSpinnerModel);
 
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -101,14 +95,6 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
         symbols.setDecimalSeparator('.');
         formatter = new DecimalFormat("0.00", symbols);
-
-        jApplyButton.setVisible(false);
-        ((JSpinner.DefaultEditor) jThresholdSpinner.getEditor()).getTextField().addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                jApplyButton.setVisible(true);
-            }
-        });
     }
 
     public void setup(SimilarityMeasure measure) {
@@ -118,7 +104,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         this.simMeasure = measure;
         this.simMeasure.addPropertyChangeListener(this);
         currentValueLabel.setText(formatter.format(measure.getThreshold()));
-        thresholdSpinnerModel.setValue(measure.getThreshold());
+        newValueTextField.setText(currentValueLabel.getText());
 
         JQuickHistogram histogram = measure.getHistogram();
         histogram.setConstraintHeight(histogramPanel.getHeight());
@@ -230,7 +216,6 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
                 try {
                     get();
                     currentValueLabel.setText(formatter.format(newValue));
-                    jApplyButton.setVisible(false);
                     attrModel.fireChangedGraphView();
                 } catch (InterruptedException ex) {
                     Exceptions.printStackTrace(ex);
@@ -244,7 +229,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         };
         setCursor(new Cursor(Cursor.WAIT_CURSOR));
         jApplyButton.setEnabled(false);
-        sw.execute();
+        sw.execute(); 
     }
 
     /**
@@ -260,13 +245,19 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         histogramPanel = new javax.swing.JPanel();
         infoLabel = new javax.swing.JLabel();
         currentValuePanel = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
         currentValueLabel = new javax.swing.JLabel();
-        newValueToolBar = new javax.swing.JToolBar();
-        jSeparator1 = new javax.swing.JToolBar.Separator();
-        jLabel2 = new javax.swing.JLabel();
-        jThresholdSpinner = new javax.swing.JSpinner();
+        thresholdSlider = new javax.swing.JSlider();
         jApplyButton = new javax.swing.JButton();
+        java.text.NumberFormat format = java.text.DecimalFormat.getInstance(Locale.ENGLISH);
+        format.setMinimumFractionDigits(2);
+        format.setMaximumFractionDigits(2);
+        format.setRoundingMode(java.math.RoundingMode.HALF_UP);
+        javax.swing.text.NumberFormatter textFormatter = new javax.swing.text.NumberFormatter(format);
+        textFormatter.setValueClass(Float.class);
+        textFormatter.setMinimum(0f);
+        textFormatter.setMaximum(1f);
+        textFormatter.setAllowsInvalid(false);
+        newValueTextField = new javax.swing.JFormattedTextField(textFormatter);
 
         setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.border.title"))); // NOI18N
         setOpaque(false);
@@ -279,7 +270,6 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -295,38 +285,36 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(infoLabel, gridBagConstraints);
 
-        jLabel1.setText(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.jLabel1.text")); // NOI18N
-        currentValuePanel.add(jLabel1);
+        currentValuePanel.setLayout(new java.awt.GridBagLayout());
 
         currentValueLabel.setText(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.currentValueLabel.text")); // NOI18N
-        currentValuePanel.add(currentValueLabel);
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        add(currentValuePanel, gridBagConstraints);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
+        currentValuePanel.add(currentValueLabel, gridBagConstraints);
 
-        newValueToolBar.setFloatable(false);
-        newValueToolBar.setRollover(true);
-        newValueToolBar.add(jSeparator1);
-
-        jLabel2.setText(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.jLabel2.text")); // NOI18N
-        newValueToolBar.add(jLabel2);
-
-        jThresholdSpinner.setMinimumSize(new java.awt.Dimension(60, 28));
-        jThresholdSpinner.setPreferredSize(new java.awt.Dimension(64, 28));
-        jThresholdSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+        thresholdSlider.setToolTipText(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.thresholdSlider.toolTipText")); // NOI18N
+        thresholdSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jThresholdSpinnerStateChanged(evt);
+                thresholdSliderStateChanged(evt);
             }
         });
-        newValueToolBar.add(jThresholdSpinner);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        currentValuePanel.add(thresholdSlider, gridBagConstraints);
 
         jApplyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/network/resources/refresh.png"))); // NOI18N
         jApplyButton.setText(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.jApplyButton.text")); // NOI18N
@@ -339,21 +327,46 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
                 jApplyButtonActionPerformed(evt);
             }
         });
-        newValueToolBar.add(jApplyButton);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        currentValuePanel.add(jApplyButton, gridBagConstraints);
 
+        newValueTextField.setText(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.newValueTextField.text")); // NOI18N
+        newValueTextField.setMinimumSize(new java.awt.Dimension(86, 27));
+        newValueTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                newValueTextFieldActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
+        currentValuePanel.add(newValueTextField, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        add(newValueToolBar, gridBagConstraints);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        add(currentValuePanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jApplyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jApplyButtonActionPerformed
         if (simMeasure != null) {
             try {
-                jThresholdSpinner.commitEdit();
-                simMeasure.setThreshold((float) thresholdSpinnerModel.getValue());
-                jApplyButton.setVisible(false);
-            } catch (ParseException ex) {
+                float newValue = Float.parseFloat(newValueTextField.getText());
+                simMeasure.setThreshold(newValue);
+
+                int newVal = Math.round(newValue * 100);
+                if (thresholdSlider.getValue() != newVal) {
+                    thresholdSlider.setValue(newVal);
+                }
+            } catch (NumberFormatException ex) {
                 NotifyDescriptor d
                         = new NotifyDescriptor.Message(NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.threshold.invalid"), NotifyDescriptor.ERROR_MESSAGE);
                 DialogDisplayer.getDefault().notify(d);
@@ -373,10 +386,19 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         }
     }//GEN-LAST:event_infoLabelMouseExited
 
-    private void jThresholdSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jThresholdSpinnerStateChanged
-        float newValue = (float) thresholdSpinnerModel.getValue();
-        jApplyButton.setVisible(simMeasure != null && simMeasure.getThreshold() != newValue);
-    }//GEN-LAST:event_jThresholdSpinnerStateChanged
+    private void thresholdSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_thresholdSliderStateChanged
+        String newTextValue = formatter.format(thresholdSlider.getValue() / 100.);
+        if (!newValueTextField.getText().equals(newTextValue)) {
+            newValueTextField.setText(newTextValue);
+        }
+    }//GEN-LAST:event_thresholdSliderStateChanged
+
+    private void newValueTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newValueTextFieldActionPerformed
+        int newVal = Math.round(Float.parseFloat(newValueTextField.getText()) * 100);
+        if (thresholdSlider.getValue() != newVal) {
+            thresholdSlider.setValue(newVal);
+        }
+    }//GEN-LAST:event_newValueTextFieldActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel currentValueLabel;
@@ -384,11 +406,8 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
     private javax.swing.JPanel histogramPanel;
     private javax.swing.JLabel infoLabel;
     private javax.swing.JButton jApplyButton;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JToolBar.Separator jSeparator1;
-    private javax.swing.JSpinner jThresholdSpinner;
-    private javax.swing.JToolBar newValueToolBar;
+    private javax.swing.JTextField newValueTextField;
+    private javax.swing.JSlider thresholdSlider;
     // End of variables declaration//GEN-END:variables
 
     @Override

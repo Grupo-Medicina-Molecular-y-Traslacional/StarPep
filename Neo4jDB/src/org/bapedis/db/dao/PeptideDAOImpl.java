@@ -115,7 +115,6 @@ public class PeptideDAOImpl implements PeptideDAO {
             Peptide peptide;
             org.gephi.graph.api.Node graphNode, graphNeighborNode;
             org.gephi.graph.api.Edge graphEdge;
-            PeptideAttribute attr;
             String id, seq;
             try {
                 graphDBView = graphModel.createView();

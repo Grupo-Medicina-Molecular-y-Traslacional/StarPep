@@ -22,9 +22,8 @@ import org.openide.util.Lookup;
  * @author loge
  */
 public class Neo4jDB {
-
+    
     public static final String DB_NAME = "neo4jDB";
-    public static final File DB_DIR = new File(System.getProperty("netbeans.user"), "db");
     public static final String ZIP_DB = "org/bapedis/db/resources/neo4jDB.zip";
     private static final int BUFFER_SIZE = 4096;
     private static GraphDatabaseService graphDb;
@@ -32,16 +31,13 @@ public class Neo4jDB {
 //    private static AttributeModelDAO modelDAO;
 
     @SuppressWarnings("empty-statement")
-    public synchronized static void extractDatabase() throws IOException {
+    public synchronized static void extractDatabase(File dbDir) throws IOException {
         ClassLoader cl = Lookup.getDefault().lookup(ClassLoader.class);
         try (ZipInputStream zipIn = new ZipInputStream(cl.getResourceAsStream(ZIP_DB))) {
-            if (!DB_DIR.exists()) {
-                DB_DIR.mkdir();
-            }
             ZipEntry zipEntry;
             File newFile;
             while ((zipEntry = zipIn.getNextEntry()) != null) {
-                newFile = new File(DB_DIR, zipEntry.getName());
+                newFile = new File(dbDir, zipEntry.getName());
                 if (zipEntry.isDirectory()) {
                     newFile.mkdir();
                 } else {
@@ -61,8 +57,8 @@ public class Neo4jDB {
         }
     }
 
-    public synchronized static GraphDatabaseService loadDatabase() throws IOException {
-        graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(new File(DB_DIR, DB_NAME))
+    public synchronized static GraphDatabaseService loadDatabase(File dbDir) throws IOException {
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(new File(dbDir, DB_NAME))
                 .setConfig(GraphDatabaseSettings.read_only, "true")
                 .newGraphDatabase();
         registerShutdownHook(graphDb);

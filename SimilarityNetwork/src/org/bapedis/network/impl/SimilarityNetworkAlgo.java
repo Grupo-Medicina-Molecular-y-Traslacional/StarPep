@@ -17,8 +17,10 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
+import static org.bapedis.network.impl.SimilarityGraphEdgeBuilder.graphModel;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.Node;
 import org.openide.util.Lookup;
 
 /**
@@ -81,6 +83,15 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
             SimilarityGraphEdgeBuilder.csnGraph = graphModel.getGraph(attrModel.getCsnView());
             SimilarityGraphEdgeBuilder.similarityMeasure = getSimilarityMeasure();
             SimilarityGraphEdgeBuilder.edgeList = new LinkedList<>();
+            
+            // Remove all edges..
+            int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+            for (Node node : graphModel.getGraph().getNodes()){
+                for(Edge edge: graphModel.getGraph().getEdges(node, relType)){
+                    edge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, -1f);
+                }
+            }
+            SimilarityGraphEdgeBuilder.csnGraph.removeAllEdges(SimilarityGraphEdgeBuilder.csnGraph.getEdges().toCollection());            
         }
     }
 

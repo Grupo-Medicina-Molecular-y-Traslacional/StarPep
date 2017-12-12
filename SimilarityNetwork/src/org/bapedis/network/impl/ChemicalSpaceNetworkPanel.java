@@ -57,7 +57,7 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 2, 0, 0);
-        optionPanel.add(select, gridBagConstraints);
+        optionPanel.add(select, gridBagConstraints);      
 
         thresholdPanel = new ThresholdRangePanel();
         southPanel.add(thresholdPanel, BorderLayout.CENTER);

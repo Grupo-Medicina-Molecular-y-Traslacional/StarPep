@@ -244,10 +244,9 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
 
         histogramPanel = new javax.swing.JPanel();
         infoLabel = new javax.swing.JLabel();
-        currentValuePanel = new javax.swing.JPanel();
         currentValueLabel = new javax.swing.JLabel();
+        currentValuePanel = new javax.swing.JPanel();
         thresholdSlider = new javax.swing.JSlider();
-        jApplyButton = new javax.swing.JButton();
         java.text.NumberFormat format = java.text.DecimalFormat.getInstance(Locale.ENGLISH);
         format.setMinimumFractionDigits(2);
         format.setMaximumFractionDigits(2);
@@ -258,6 +257,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         textFormatter.setMaximum(1f);
         textFormatter.setAllowsInvalid(false);
         newValueTextField = new javax.swing.JFormattedTextField(textFormatter);
+        jApplyButton = new javax.swing.JButton();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.border.title"))); // NOI18N
         setOpaque(false);
@@ -269,7 +269,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         histogramPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -286,12 +286,10 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(infoLabel, gridBagConstraints);
-
-        currentValuePanel.setLayout(new java.awt.GridBagLayout());
 
         currentValueLabel.setText(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.currentValueLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -300,7 +298,9 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
-        currentValuePanel.add(currentValueLabel, gridBagConstraints);
+        add(currentValueLabel, gridBagConstraints);
+
+        currentValuePanel.setLayout(new java.awt.GridBagLayout());
 
         thresholdSlider.setToolTipText(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.thresholdSlider.toolTipText")); // NOI18N
         thresholdSlider.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -310,11 +310,27 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         currentValuePanel.add(thresholdSlider, gridBagConstraints);
+
+        newValueTextField.setText(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.newValueTextField.text")); // NOI18N
+        newValueTextField.setMinimumSize(new java.awt.Dimension(86, 20));
+        newValueTextField.setPreferredSize(new java.awt.Dimension(86, 20));
+        newValueTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                newValueTextFieldActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
+        currentValuePanel.add(newValueTextField, gridBagConstraints);
 
         jApplyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/network/resources/refresh.png"))); // NOI18N
         jApplyButton.setText(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.jApplyButton.text")); // NOI18N
@@ -329,28 +345,13 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         currentValuePanel.add(jApplyButton, gridBagConstraints);
 
-        newValueTextField.setText(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.newValueTextField.text")); // NOI18N
-        newValueTextField.setMinimumSize(new java.awt.Dimension(86, 27));
-        newValueTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                newValueTextFieldActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
-        currentValuePanel.add(newValueTextField, gridBagConstraints);
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         add(currentValuePanel, gridBagConstraints);

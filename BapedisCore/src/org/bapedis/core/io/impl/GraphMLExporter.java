@@ -43,10 +43,10 @@
 package org.bapedis.core.io.impl;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -632,13 +632,16 @@ public class GraphMLExporter implements Exporter {
             protected Object doInBackground() throws Exception {
                 GraphModel graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();
                 Graph graph = graphModel.getGraphVisible();
-
-                graph.readLock();
+                
                 progressTicket.start();
+                writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+                graph.readLock();
                 try {
                     exportData(createDocument(), graph);
-                } finally {
+                } finally {                    
                     graph.readUnlock();
+                    writer.flush();
+                    writer.close();                    
                 }
                 return null;
             }

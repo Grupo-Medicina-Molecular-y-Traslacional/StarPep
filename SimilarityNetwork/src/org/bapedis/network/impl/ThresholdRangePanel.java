@@ -297,7 +297,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(3, 2, 0, 0);
         add(currentValueLabel, gridBagConstraints);
 
         currentValuePanel.setLayout(new java.awt.GridBagLayout());
@@ -314,11 +314,12 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
         currentValuePanel.add(thresholdSlider, gridBagConstraints);
 
         newValueTextField.setText(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.newValueTextField.text")); // NOI18N
-        newValueTextField.setMinimumSize(new java.awt.Dimension(86, 20));
-        newValueTextField.setPreferredSize(new java.awt.Dimension(86, 20));
+        newValueTextField.setMinimumSize(new java.awt.Dimension(50, 26));
+        newValueTextField.setPreferredSize(new java.awt.Dimension(50, 26));
         newValueTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 newValueTextFieldActionPerformed(evt);
@@ -337,6 +338,9 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         jApplyButton.setToolTipText(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.jApplyButton.toolTipText")); // NOI18N
         jApplyButton.setFocusable(false);
         jApplyButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jApplyButton.setMaximumSize(new java.awt.Dimension(50, 26));
+        jApplyButton.setMinimumSize(new java.awt.Dimension(50, 26));
+        jApplyButton.setPreferredSize(new java.awt.Dimension(50, 26));
         jApplyButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jApplyButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

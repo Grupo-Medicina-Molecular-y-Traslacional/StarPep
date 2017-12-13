@@ -41,9 +41,8 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.GraphElementNavigatorLookupHint;
 import org.bapedis.core.ui.MetadataNavigatorLookupHint;
+import org.bapedis.core.ui.actions.ExportGraph;
 import org.gephi.graph.api.Node;
-import org.gephi.preview.api.PreviewController;
-import org.gephi.preview.api.PreviewProperty;
 import org.gephi.ui.components.JColorBlackWhiteSwitcher;
 import org.gephi.ui.components.JColorButton;
 import org.gephi.visualization.VizController;
@@ -86,12 +85,16 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(20, 20));
     private final JPanel graphPanel = new JPanel();
     // Global
+    private final JButton resetZoomButton = new JButton();
+    private final JButton plusButton = new JButton();
+    private final JButton minusButton = new JButton();
     private final JColorBlackWhiteSwitcher backgroundColorSwitcher = new JColorBlackWhiteSwitcher(Color.BLACK);
     private final JColorButton backgroundColorButton = new JColorButton(Color.BLACK);
     private final JXHyperlink configureLink = new JXHyperlink();
     private final JCheckBox autoSelectNeighborCheckbox = new JCheckBox();
     private final JPopupMenu screenshotPopup = new JPopupMenu();
     private final JButton screenshotButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/screenshot.png", false), screenshotPopup);
+    private final JButton expotToXML = new JButton();
     //Node
     private final JToggleButton showNodeLabelsButton = new JToggleButton();
     private final JButton nodeFontButton = new JButton();
@@ -176,8 +179,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         //Zoom
         topToolbar.addSeparator();
 
-        // Reset Zoom 
-        JButton resetZoomButton = new JButton();
+        // Reset Zoom         
         resetZoomButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/centerOnGraph.png", false));
         resetZoomButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.resetZoomButton.toolTipText"));
         resetZoomButton.addActionListener(new ActionListener() {
@@ -189,8 +191,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         });
         topToolbar.add(resetZoomButton);
 
-        // Plus Zoom
-        JButton plusButton = new JButton();
+        // Plus Zoom        
         plusButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/magnifier--plus.png", false));
         plusButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.plusButton.toolTipText"));
         plusButton.addActionListener(new ActionListener() {
@@ -203,8 +204,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         });
         topToolbar.add(plusButton);
 
-        // Minus Zoom
-        JButton minusButton = new JButton();
+        // Minus Zoom        
         minusButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/magnifier--minus.png", false));
         minusButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.minusButton.toolTipText"));
         minusButton.addActionListener(new ActionListener() {
@@ -311,6 +311,11 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         });
         
         topToolbar.add(screenshotButton);
+        
+        expotToXML.setAction(new ExportGraph());
+        expotToXML.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/xml.png", false));
+        expotToXML.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.expotToXML.toolTipText"));
+        topToolbar.add(expotToXML);
         
         topToolbar.addSeparator();
     }

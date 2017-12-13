@@ -53,7 +53,6 @@ public final class ExportMD extends WorkspaceContextSensitiveAction<AttributesMo
                 MDExporter exporter = new MDExporter(attrModel);
                 exporter.exportTo(ui.getSelectedFile());
             } catch (Exception ex) {
-                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Error: " + ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE));
                 Exceptions.printStackTrace(ex);
             }
         }

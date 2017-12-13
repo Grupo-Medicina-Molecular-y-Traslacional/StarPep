@@ -11,8 +11,6 @@ import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.io.impl.FileExporterUI;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.components.SetupDialog;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -53,7 +51,6 @@ public final class ExportFasta extends WorkspaceContextSensitiveAction<Attribute
                 FastaExporter exporter = new FastaExporter(attrModel);
                 exporter.exportTo(ui.getSelectedFile());
             } catch (Exception ex) {
-                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Error: " + ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE));
                 Exceptions.printStackTrace(ex);
             }
         }

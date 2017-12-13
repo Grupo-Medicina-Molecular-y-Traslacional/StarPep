@@ -41,18 +41,36 @@
  */
 package org.bapedis.core.io.impl;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.io.File;
+import javax.swing.JFileChooser;
+import org.bapedis.core.model.Workspace;
+import org.bapedis.core.project.ProjectManager;
+import org.bapedis.core.ui.components.ValidationSupportUI;
+import org.openide.util.Lookup;
+
 
 /**
  *
  * @author Mathieu Bastian
  */
-public class GraphMLExportPanel extends javax.swing.JPanel {
+public class GraphMLExportPanel extends javax.swing.JPanel implements ValidationSupportUI {
 
-    /**
-     * Creates new form UIExporterGEXFPanel
-     */
+    protected JFileChooser chooser;
+    protected static File parentDirectory;
+    protected File selectedFile;
+    protected boolean validState;
+    protected final PropertyChangeSupport changeSupport;
+    
+    
     public GraphMLExportPanel() {
         initComponents();
+        chooser = new JFileChooser();
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        validState = false;
+        changeSupport = new PropertyChangeSupport(this);
+        
     }
 
     public void setup(GraphMLExporter exporter) {
@@ -88,13 +106,16 @@ public class GraphMLExportPanel extends javax.swing.JPanel {
         sizeExportCheckbox = new javax.swing.JCheckBox();
         labelNormalize = new javax.swing.JLabel();
         normalizeCheckbox = new javax.swing.JCheckBox();
+        fileLabel = new javax.swing.JLabel();
+        fileTextField = new javax.swing.JTextField();
+        browseButton = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
         labelExport.setText(org.openide.util.NbBundle.getMessage(GraphMLExportPanel.class, "GraphMLExportPanel.labelExport.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
         gridBagConstraints.insets = new java.awt.Insets(3, 5, 0, 5);
         add(labelExport, gridBagConstraints);
@@ -102,14 +123,14 @@ public class GraphMLExportPanel extends javax.swing.JPanel {
         positionExportCheckbox.setText(org.openide.util.NbBundle.getMessage(GraphMLExportPanel.class, "GraphMLExportPanel.positionExportCheckbox.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         add(positionExportCheckbox, gridBagConstraints);
 
         colorsExportCheckbox.setText(org.openide.util.NbBundle.getMessage(GraphMLExportPanel.class, "GraphMLExportPanel.colorsExportCheckbox.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 0);
         add(colorsExportCheckbox, gridBagConstraints);
@@ -117,7 +138,7 @@ public class GraphMLExportPanel extends javax.swing.JPanel {
         attributesExportCheckbox.setText(org.openide.util.NbBundle.getMessage(GraphMLExportPanel.class, "GraphMLExportPanel.attributesExportCheckbox.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 0);
         add(attributesExportCheckbox, gridBagConstraints);
@@ -125,7 +146,7 @@ public class GraphMLExportPanel extends javax.swing.JPanel {
         sizeExportCheckbox.setText(org.openide.util.NbBundle.getMessage(GraphMLExportPanel.class, "GraphMLExportPanel.sizeExportCheckbox.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 0);
         add(sizeExportCheckbox, gridBagConstraints);
@@ -136,7 +157,7 @@ public class GraphMLExportPanel extends javax.swing.JPanel {
         labelNormalize.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
@@ -147,17 +168,98 @@ public class GraphMLExportPanel extends javax.swing.JPanel {
         normalizeCheckbox.setText(org.openide.util.NbBundle.getMessage(GraphMLExportPanel.class, "GraphMLExportPanel.normalizeCheckbox.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(normalizeCheckbox, gridBagConstraints);
+
+        fileLabel.setText(org.openide.util.NbBundle.getMessage(GraphMLExportPanel.class, "GraphMLExportPanel.fileLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
+        add(fileLabel, gridBagConstraints);
+
+        fileTextField.setText(org.openide.util.NbBundle.getMessage(GraphMLExportPanel.class, "GraphMLExportPanel.fileTextField.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        add(fileTextField, gridBagConstraints);
+
+        browseButton.setText(org.openide.util.NbBundle.getMessage(GraphMLExportPanel.class, "GraphMLExportPanel.browseButton.text")); // NOI18N
+        browseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                browseButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 2);
+        add(browseButton, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
+        if (parentDirectory != null) {
+            chooser.setCurrentDirectory(parentDirectory);
+        }
+        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
+        Workspace workspace = pm.getCurrentWorkspace();
+        chooser.setSelectedFile(new File(parentDirectory, workspace.getName() + "_graph.graphml"));
+        int returnVal = chooser.showSaveDialog(GraphMLExportPanel.this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            fileTextField.setText(chooser.getSelectedFile().getAbsolutePath());
+            boolean oldValidState = validState;
+            validState = true;
+            changeSupport.firePropertyChange(VALID_STATE, oldValidState, validState);
+        }
+    }//GEN-LAST:event_browseButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox attributesExportCheckbox;
+    private javax.swing.JButton browseButton;
     private javax.swing.JCheckBox colorsExportCheckbox;
+    private javax.swing.JLabel fileLabel;
+    private javax.swing.JTextField fileTextField;
     private javax.swing.JLabel labelExport;
     private javax.swing.JLabel labelNormalize;
     private javax.swing.JCheckBox normalizeCheckbox;
     private javax.swing.JCheckBox positionExportCheckbox;
     private javax.swing.JCheckBox sizeExportCheckbox;
     // End of variables declaration//GEN-END:variables
+
+    public File getSelectedFile() {
+        return selectedFile;
+    }
+    
+    @Override
+    public boolean isValidState() {
+        return validState;
+    }
+
+    @Override
+    public void finishSettings() {
+        selectedFile = new File(fileTextField.getText());
+        parentDirectory = selectedFile.getParentFile();
+    }
+
+    @Override
+    public void cancelSettings() {
+        selectedFile = null;
+    }
+
+    @Override
+    public void addValidStateListener(PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(listener);
+    }
+
+    @Override
+    public void removeValidStateListener(PropertyChangeListener listener) {
+        changeSupport.removePropertyChangeListener(listener);
+    }
 }

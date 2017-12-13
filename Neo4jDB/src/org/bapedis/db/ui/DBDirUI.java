@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.db;
+package org.bapedis.db.ui;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -19,12 +19,11 @@ import org.openide.util.NbPreferences;
 public class DBDirUI extends javax.swing.JPanel implements ValidationSupportUI {
 
     protected JFileChooser chooser;
-    protected File selectedDir;
+    protected static File lastDirectory;
+    protected File selectedFile;
     protected boolean validState;
     protected final PropertyChangeSupport changeSupport;
-    final String LAST_PATH = "DBDirUI_Last_Path";
-    public static final File DEFAULT_DIR = new File(System.getProperty("netbeans.user"));
-
+    
     /**
      * Creates new form DBDirUI
      */
@@ -34,10 +33,6 @@ public class DBDirUI extends javax.swing.JPanel implements ValidationSupportUI {
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         validState = false;
         changeSupport = new PropertyChangeSupport(this);
-    }
-
-    public File getSelectedDir() {
-        return selectedDir;
     }
 
     /**
@@ -53,7 +48,6 @@ public class DBDirUI extends javax.swing.JPanel implements ValidationSupportUI {
         dirLabel = new javax.swing.JLabel();
         dirTextField = new javax.swing.JTextField();
         browseButton = new javax.swing.JButton();
-        resetButton = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(489, 50));
         setPreferredSize(new java.awt.Dimension(489, 50));
@@ -88,66 +82,46 @@ public class DBDirUI extends javax.swing.JPanel implements ValidationSupportUI {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 2);
         add(browseButton, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(resetButton, org.openide.util.NbBundle.getMessage(DBDirUI.class, "DBDirUI.resetButton.text")); // NOI18N
-        resetButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                resetButtonActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(resetButton, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
-        String dbDir = NbPreferences.forModule(DBDirUI.class).get(LAST_PATH, DEFAULT_DIR.getAbsolutePath());
-        chooser.setCurrentDirectory(new File(dbDir));
         int returnVal = chooser.showSaveDialog(DBDirUI.this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            setFile(chooser.getSelectedFile());
+            dirTextField.setText(chooser.getSelectedFile().getAbsolutePath());
+            boolean oldValidState = validState;
+            validState = true;
+            changeSupport.firePropertyChange(VALID_STATE, oldValidState, validState);            
         }
     }//GEN-LAST:event_browseButtonActionPerformed
-
-    private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
-        setFile(DEFAULT_DIR);
-        chooser.setCurrentDirectory(DEFAULT_DIR);
-    }//GEN-LAST:event_resetButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseButton;
     private javax.swing.JLabel dirLabel;
     private javax.swing.JTextField dirTextField;
-    private javax.swing.JButton resetButton;
     // End of variables declaration//GEN-END:variables
 
-    private void setFile(File file) {
-        dirTextField.setText(file.getAbsolutePath());
-        boolean oldValidState = validState;
-        validState = true;
-        changeSupport.firePropertyChange(VALID_STATE, oldValidState, validState);
+    @Override
+    public void finishSettings() {
+        selectedFile = new File(dirTextField.getText());
+        if (!selectedFile.exists()){
+            selectedFile.mkdir();
+        }
+        lastDirectory = selectedFile;
+    }
+
+    public File getSelectedFile() {
+        return selectedFile;
+    }
+
+    @Override
+    public void cancelSettings() {
+        selectedFile = null;
     }
 
     @Override
     public boolean isValidState() {
         return validState;
-    }
-
-    @Override
-    public void finishSettings() {
-        selectedDir = new File(dirTextField.getText());
-        if (selectedDir.exists() || selectedDir.mkdir()) {
-            NbPreferences.forModule(DBDirUI.class).put(LAST_PATH, dirTextField.getText());
-        }
-    }
-
-    @Override
-    public void cancelSettings() {
-        selectedDir = null;
     }
 
     @Override
@@ -159,4 +133,5 @@ public class DBDirUI extends javax.swing.JPanel implements ValidationSupportUI {
     public void removeValidStateListener(PropertyChangeListener listener) {
         changeSupport.removePropertyChangeListener(listener);
     }
+
 }

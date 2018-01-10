@@ -37,6 +37,7 @@ import org.bapedis.core.model.GraphElementNode;
 import org.bapedis.core.model.GraphElementType;
 import org.bapedis.core.model.GraphElementsDataTable;
 import org.bapedis.core.model.GraphNodeWrapper;
+import org.bapedis.core.model.GraphViz;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.actions.CenterNodeOnGraph;
@@ -73,14 +74,12 @@ import org.openide.util.lookup.InstanceContent;
  */
 @NavigatorPanel.Registration(mimeType = "graph/table", displayName = "#GraphElementNavigator.name")
 public class GraphElementNavigator extends JComponent implements
-        WorkspaceEventListener, PropertyChangeListener, LookupListener, NavigatorPanelWithToolbar {
+        WorkspaceEventListener, PropertyChangeListener, NavigatorPanelWithToolbar {
 
     protected final JToolBar toolBar;
     protected final ProjectManager pc;
     protected final Lookup lookup;
     protected final InstanceContent content;
-    protected Lookup.Result<AttributesModel> peptideLkpResult;
-    protected AttributesModel currentModel;
 
     protected final JToggleButton nodesBtn, edgesBtn;
     protected final JButton availableColumnsButton;
@@ -254,23 +253,17 @@ public class GraphElementNavigator extends JComponent implements
 
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
-        removeLookupListener();
         if (oldWs != null) {
-            AttributesModel oldAttrModel = pc.getAttributesModel(oldWs);
-            if (oldAttrModel != null) {
-                oldAttrModel.removeQuickFilterChangeListener(this);
-                oldAttrModel.removeGraphViewChangeListener(this);
+            GraphViz oldModel = pc.getGraphViz(oldWs);
+            if (oldModel != null) {
+                oldModel.removeGraphViewChangeListener(this);
             }
         }
-        peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class
-        );
-        peptideLkpResult.addLookupListener(this);
 
-        AttributesModel peptidesModel = pc.getAttributesModel(newWs);
-        if (peptidesModel != null) {
-            peptidesModel.addGraphViewChangeListener(this);
+        GraphViz vizModel = pc.getGraphViz(newWs);
+        if (vizModel != null) {
+            vizModel.addGraphViewChangeListener(this);
         }
-        this.currentModel = peptidesModel;
 
         navigatorModel = newWs.getLookup().lookup(GraphElementNavigatorModel.class);
         if (navigatorModel == null) {
@@ -346,12 +339,12 @@ public class GraphElementNavigator extends JComponent implements
     }
 
     private GraphElementDataColumn[] getEdgeColumns(Table table) {
-        edgeColumns[0] = sourceColumn;        
-        if (currentModel != null && currentModel.getMainGView() == AttributesModel.CSN_VIEW) {
-            edgeColumns[1] = new GraphElementAttributeColumn(table.getColumn(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
-        } else {
-            edgeColumns[1] = new GraphElementAttributeColumn(table.getColumn("label"));
-        } 
+        edgeColumns[0] = sourceColumn;
+//        if (currentModel != null && currentModel.getMainGView() == AttributesModel.CSN_VIEW) {
+//            edgeColumns[1] = new GraphElementAttributeColumn(table.getColumn(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
+//        } else {
+        edgeColumns[1] = new GraphElementAttributeColumn(table.getColumn("label"));
+//        } 
         edgeColumns[2] = targetColumn;
         return edgeColumns;
     }
@@ -364,24 +357,8 @@ public class GraphElementNavigator extends JComponent implements
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource().equals(currentModel)) {
-            if (evt.getPropertyName().equals(AttributesModel.CHANGED_GVIEW)){
-                reload();
-            }
-        }
-    }
-
-    @Override
-    public void resultChanged(LookupEvent le) {
-        if (le.getSource().equals(peptideLkpResult)) {
-            if (currentModel != null) {
-                currentModel.removeGraphViewChangeListener(this);
-            }
-            Collection<? extends AttributesModel> attrModels = peptideLkpResult.allInstances();
-            if (!attrModels.isEmpty()) {
-                currentModel = attrModels.iterator().next();
-                currentModel.addGraphViewChangeListener(this);
-            }
+        if (evt.getPropertyName().equals(GraphViz.CHANGED_GRAPH_VIEW)) {
+            reload();
         }
     }
 
@@ -408,13 +385,6 @@ public class GraphElementNavigator extends JComponent implements
         return this;
     }
 
-    private void removeLookupListener() {
-        if (peptideLkpResult != null) {
-            peptideLkpResult.removeLookupListener(this);
-            peptideLkpResult = null;
-        }
-    }
-
     @Override
     public void panelActivated(Lookup lkp) {
         pc.addWorkspaceEventListener(this);
@@ -424,10 +394,10 @@ public class GraphElementNavigator extends JComponent implements
 
     @Override
     public void panelDeactivated() {
-        removeLookupListener();
         pc.removeWorkspaceEventListener(this);
-        if (currentModel != null) {
-            currentModel.removeGraphViewChangeListener(this);
+        GraphViz vizModel = pc.getGraphViz();
+        if (vizModel != null) {
+            vizModel.removeGraphViewChangeListener(this);
         }
     }
 

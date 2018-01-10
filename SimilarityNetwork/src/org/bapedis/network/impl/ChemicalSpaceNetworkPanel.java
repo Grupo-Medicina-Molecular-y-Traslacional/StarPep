@@ -271,7 +271,7 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
         metricComboBox.setSelectedIndex(csnAlgo.getMetricIndex());
         normComboBox.setSelectedIndex(csnAlgo.getNormalizationIndex());
 
-        thresholdPanel.setup(csnAlgo.getSimilarityMeasure());
+        thresholdPanel.setup(csnAlgo);
         return this;
     }
 

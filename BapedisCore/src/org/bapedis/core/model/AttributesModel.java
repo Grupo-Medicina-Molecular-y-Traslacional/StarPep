@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.gephi.graph.api.GraphView;
 import org.netbeans.swing.etable.QuickFilter;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Index;
@@ -40,14 +39,9 @@ public class AttributesModel {
     public static final String DISPLAY_ATTR_REMOVED = "display_attribute_remove";
     public static final String MD_ATTR_ADDED = "md_attribute_add";
     public static final String MD_ATTR_REMOVED = "md_attribute_remove";
-    public static final String CHANGED_GVIEW = "changed_graphview";    
+        
     protected transient final PropertyChangeSupport propertyChangeSupport;
-    protected Node rootNode;
-    public static final int GRAPH_DB_VIEW = 1;
-    public static final int CSN_VIEW = 2;
-    protected int mainGView;
-    protected GraphView graphDBView, csnView;
-    protected double similarityThreshold;
+    protected Node rootNode;    
 
     public AttributesModel() {
         mdMap = new LinkedHashMap<>();
@@ -63,47 +57,8 @@ public class AttributesModel {
 
         List<MolecularDescriptor> list = new LinkedList<>();
         list.add(Peptide.LENGHT);
-        mdMap.put(Peptide.LENGHT.getCategory(), list);
-
-        mainGView = CSN_VIEW;
-    }
-
-    public int getMainGView() {
-        return mainGView;
-    }
-
-    public void setMainGView(int mainGView) {
-        int oldvalue = this.mainGView;
-        if (mainGView != GRAPH_DB_VIEW && mainGView != CSN_VIEW) {
-            throw new IllegalArgumentException("Unknown value for main graph view");
-        }
-        this.mainGView = mainGView;
-        propertyChangeSupport.firePropertyChange(CHANGED_GVIEW, oldvalue, mainGView);
-    }
-
-    public double getSimilarityThreshold() {
-        return similarityThreshold;
-    }
-
-    public void setSimilarityThreshold(double similarityThreshold) {
-        this.similarityThreshold = similarityThreshold;
-    }
-
-    public GraphView getGraphDBView() {
-        return graphDBView;
-    }
-
-    public void setGraphDBView(GraphView graphDBView) {
-        this.graphDBView = graphDBView;
-    }
-
-    public GraphView getCsnView() {
-        return csnView;
-    }
-
-    public void setCsnView(GraphView csnView) {
-        this.csnView = csnView;
-    }
+        mdMap.put(Peptide.LENGHT.getCategory(), list);        
+    }       
 
     public PeptideAttribute[] getDisplayedColumns() {
         return displayedColumnsModel.toArray(new PeptideAttribute[0]);
@@ -249,18 +204,6 @@ public class AttributesModel {
     public void removeMolecularDescriptorChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(MD_ATTR_ADDED, listener);
         propertyChangeSupport.removePropertyChangeListener(MD_ATTR_REMOVED, listener);
-    }
-
-    public void addGraphViewChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(CHANGED_GVIEW, listener);
-    }
-
-    public void removeGraphViewChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(CHANGED_GVIEW, listener);
-    }
-
-    public void fireChangedGraphView() {
-        propertyChangeSupport.firePropertyChange(CHANGED_GVIEW, null, mainGView);
     }
 
     private class PeptideNodeContainer extends Index.ArrayChildren {

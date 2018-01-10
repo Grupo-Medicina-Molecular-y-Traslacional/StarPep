@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.spi.data.PeptideDAO;
@@ -23,8 +22,6 @@ import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphFactory;
 import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.GraphView;
-import org.gephi.graph.api.Subgraph;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -109,33 +106,21 @@ public class PeptideDAOImpl implements PeptideDAO {
 
             // Write lock
             graphModel.getGraph().writeLock();
-            GraphView graphDBView = null;
-            GraphView csnView = null;
 
             Peptide peptide;
             org.gephi.graph.api.Node graphNode, graphNeighborNode;
             org.gephi.graph.api.Edge graphEdge;
             String id, seq;
             try {
-                graphDBView = graphModel.createView();
-                Subgraph subGraphDB = graphModel.getGraph(graphDBView);
-
-                csnView = graphModel.createView();
-                Subgraph subGraphCSN = graphModel.getGraph(csnView);
-
                 while (peptideNodes.hasNext()) {
                     Node neoNode = peptideNodes.next();
                     id = neoNode.getProperty(PRO_ID).toString();
                     seq = neoNode.getProperty(PRO_SEQ).toString();
                     // Fill graph
-                    graphNode = getGraphNodeFromNeoNode(neoNode, graphModel);
-                    subGraphDB.addNode(graphNode);
-                    subGraphCSN.addNode(graphNode);
+                    graphNode = getOrAddGraphNodeFromNeoNode(neoNode, graphModel);
                     for (Relationship relation : neoNode.getRelationships(Direction.OUTGOING)) {
-                        graphNeighborNode = getGraphNodeFromNeoNode(relation.getEndNode(), graphModel);
-                        graphEdge = getGraphEdgeFromNeoRelationship(graphNode, graphNeighborNode, relation, graphModel);
-                        subGraphDB.addNode(graphNeighborNode);
-                        subGraphDB.addEdge(graphEdge);
+                        graphNeighborNode = getOrAddGraphNodeFromNeoNode(relation.getEndNode(), graphModel);
+                        graphEdge = getOrAddGraphEdgeFromNeoRelationship(graphNode, graphNeighborNode, relation, graphModel);
                     }
 
                     //Fill Attribute Model
@@ -149,8 +134,6 @@ public class PeptideDAOImpl implements PeptideDAO {
             } finally {
                 //Write unlock
                 graphModel.getGraph().writeUnlock();
-                attrModel.setCsnView(csnView);
-                attrModel.setGraphDBView(graphDBView);
                 peptideNodes.close();
                 tx.success();
             }
@@ -222,7 +205,7 @@ public class PeptideDAOImpl implements PeptideDAO {
         return edges;
     }
 
-    protected org.gephi.graph.api.Node getGraphNodeFromNeoNode(Node neoNode, GraphModel graphModel) {
+    protected org.gephi.graph.api.Node getOrAddGraphNodeFromNeoNode(Node neoNode, GraphModel graphModel) {
         Graph mainGraph = graphModel.getGraph();
         String id = String.valueOf(neoNode.getId());
         org.gephi.graph.api.Node graphNode = mainGraph.getNode(id);
@@ -254,7 +237,7 @@ public class PeptideDAOImpl implements PeptideDAO {
         return graphNode;
     }
 
-    protected Edge getGraphEdgeFromNeoRelationship(org.gephi.graph.api.Node startNode, org.gephi.graph.api.Node endNode, Relationship relation, GraphModel graphModel) {
+    protected Edge getOrAddGraphEdgeFromNeoRelationship(org.gephi.graph.api.Node startNode, org.gephi.graph.api.Node endNode, Relationship relation, GraphModel graphModel) {
         Graph mainGraph = graphModel.getGraph();
         String id = String.valueOf(relation.getId());
         Edge graphEdge = mainGraph.getEdge(id);

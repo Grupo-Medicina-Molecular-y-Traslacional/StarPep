@@ -11,14 +11,15 @@ import java.util.LinkedList;
 import java.util.concurrent.ForkJoinPool;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.GraphViz;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
-import static org.bapedis.network.impl.SimilarityGraphEdgeBuilder.graphModel;
 import org.gephi.graph.api.Edge;
+import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.openide.util.Lookup;
@@ -28,7 +29,8 @@ import org.openide.util.Lookup;
  * @author loge
  */
 public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeasure {
-
+    
+    public static final String CHANGED_SIMILARITY_VALUES = "similarity_values";
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
     protected final JQuickHistogram histogram;
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
@@ -37,32 +39,17 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
     protected boolean stopRun;
     protected final AlgorithmFactory factory;
     protected final PropertyChangeSupport propertyChangeSupport;
-    protected float threshold;
 
     public SimilarityNetworkAlgo(AlgorithmFactory factory) {
         this.factory = factory;
         propertyChangeSupport = new PropertyChangeSupport(this);
         histogram = new JQuickHistogram();
-        threshold = 0.7f;
     }
 
-    @Override
-    public float getThreshold() {
-        return threshold;
-    }
-
-    @Override
-    public void setThreshold(float value) {
-        float oldValue = this.threshold;
-        this.threshold = value;
-        propertyChangeSupport.firePropertyChange(CHANGED_THRESHOLD_VALUE, oldValue, threshold);
-    }
-    
-    public SimilarityMeasure getSimilarityMeasure(){
+    public SimilarityMeasure getSimilarityMeasure() {
         return this;
     }
 
-    @Override
     public JQuickHistogram getHistogram() {
         return histogram;
     }
@@ -74,24 +61,35 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
         stopRun = false;
         if (attrModel != null) {
             GraphModel graphModel = pc.getGraphModel(workspace);
+            GraphViz graphViz = pc.getGraphViz(workspace);
             SimilarityGraphEdgeBuilder.attrModel = attrModel;
             SimilarityGraphEdgeBuilder.peptides = attrModel.getPeptides().toArray(new Peptide[0]);
             SimilarityGraphEdgeBuilder.graphModel = graphModel;
             SimilarityGraphEdgeBuilder.setStopRun(stopRun);
             SimilarityGraphEdgeBuilder.progressTicket = progressTicket;
             SimilarityGraphEdgeBuilder.mainGraph = graphModel.getGraph();
-            SimilarityGraphEdgeBuilder.csnGraph = graphModel.getGraph(attrModel.getCsnView());
+            SimilarityGraphEdgeBuilder.csnGraph = graphModel.getGraphVisible();
+            SimilarityGraphEdgeBuilder.threshold = graphViz.getSimilarityThreshold();
             SimilarityGraphEdgeBuilder.similarityMeasure = getSimilarityMeasure();
             SimilarityGraphEdgeBuilder.edgeList = new LinkedList<>();
-            
-            // Remove all edges..
+
+            // Remove all similarity edges..
             int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-            for (Node node : graphModel.getGraph().getNodes()){
-                for(Edge edge: graphModel.getGraph().getEdges(node, relType)){
-                    edge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, -1f);
-                }
+            removeAllSimilarityEdges(graphModel.getGraph(), relType);
+            if (!graphModel.getVisibleView().isMainView()) {
+                removeAllSimilarityEdges(graphModel.getGraphVisible(), relType);
             }
-            SimilarityGraphEdgeBuilder.csnGraph.removeAllEdges(SimilarityGraphEdgeBuilder.csnGraph.getEdges().toCollection());            
+        }
+    }
+
+    private void removeAllSimilarityEdges(Graph graph, int relType) {
+        graph.writeLock();
+        try {
+            for (Node node : graph.getNodes()) {
+                graph.clearEdges(node, relType);
+            }
+        } finally {
+            graph.writeUnlock();
         }
     }
 
@@ -104,6 +102,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
         SimilarityGraphEdgeBuilder.graphModel = null;
         SimilarityGraphEdgeBuilder.mainGraph = null;
         SimilarityGraphEdgeBuilder.csnGraph = null;
+        SimilarityGraphEdgeBuilder.threshold = null;
         SimilarityGraphEdgeBuilder.similarityMeasure = null;
         SimilarityGraphEdgeBuilder.progressTicket = null;
         SimilarityGraphEdgeBuilder.edgeList = null;
@@ -135,7 +134,6 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
     @Override
     public void run() {
         if (attrModel != null) {
-            attrModel.setSimilarityThreshold(threshold);
             propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY_VALUES, null, null);
             Peptide[] peptides = SimilarityGraphEdgeBuilder.peptides;
             // Workunits for pairwise sim matrix builder
@@ -148,17 +146,14 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
                 histogram.addData((float) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
             }
             propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY_VALUES, null, histogram);
-            attrModel.fireChangedGraphView();
         }
     }
 
-    @Override
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
+    public void addSimilarityChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
-    @Override
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
+    public void removeSimilarityChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 

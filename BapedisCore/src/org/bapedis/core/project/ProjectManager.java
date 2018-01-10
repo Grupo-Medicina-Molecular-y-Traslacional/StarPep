@@ -19,6 +19,7 @@ import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AlgorithmModel;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FilterModel;
+import org.bapedis.core.model.GraphViz;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
@@ -72,7 +73,7 @@ public class ProjectManager implements Lookup.Provider {
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             @Override
             public void run() {
-               outputWindow  = WindowManager.getDefault().findTopComponent(OUTPUT_ID);
+                outputWindow = WindowManager.getDefault().findTopComponent(OUTPUT_ID);
             }
         });
     }
@@ -237,6 +238,19 @@ public class ProjectManager implements Lookup.Provider {
             Configuration config = new Configuration();
             model = GraphModel.Factory.newInstance();
             createColumns(model);
+            workspace.add(model);
+        }
+        return model;
+    }
+    
+    public GraphViz getGraphViz(){
+        return getGraphViz(currentWS);
+    }
+
+    public GraphViz getGraphViz(Workspace workspace) {
+        GraphViz model = workspace.getLookup().lookup(GraphViz.class);
+        if (model == null) {
+            model = new GraphViz();
             workspace.add(model);
         }
         return model;

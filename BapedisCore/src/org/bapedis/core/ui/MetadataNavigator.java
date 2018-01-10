@@ -31,7 +31,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AnnotationType;
-import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.GraphViz;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.MetadataNavigatorModel;
 import org.bapedis.core.model.MetadataNode;
@@ -45,12 +45,9 @@ import org.bapedis.core.ui.actions.RemoveFromQueryModel;
 import org.bapedis.core.ui.actions.SelectNodeOnGraph;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.GraphView;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTree;
 import org.openide.util.Lookup;
-import org.openide.util.LookupEvent;
-import org.openide.util.LookupListener;
 import org.openide.util.NbBundle;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
@@ -66,14 +63,12 @@ import org.openide.util.lookup.InstanceContent;
  */
 @NavigatorPanel.Registration(mimeType = "peptide/metadata", displayName = "#MetadataNavigator.name")
 public class MetadataNavigator extends JComponent implements
-        WorkspaceEventListener, PropertyChangeListener, LookupListener, NavigatorPanelWithToolbar {
+        WorkspaceEventListener, PropertyChangeListener, NavigatorPanelWithToolbar {
 
     protected final InstanceContent content;
     private final DefaultComboBoxModel comboBoxModel;
     protected final ProjectManager pc;
     protected final Lookup lookup;
-    protected Lookup.Result<AttributesModel> peptideLkpResult;
-    protected AttributesModel currentModel;
     protected final JToolBar toolBar;
     protected final JCheckBox showAllCheckBox;
     protected final JButton findButton;
@@ -215,32 +210,19 @@ public class MetadataNavigator extends JComponent implements
     private javax.swing.JScrollPane scrollPane;
     // End of variables declaration//GEN-END:variables
 
-    private void removeLookupListener() {
-        if (peptideLkpResult != null) {
-            peptideLkpResult.removeLookupListener(this);
-            peptideLkpResult = null;
-        }
-    }
-
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
-        removeLookupListener();
         if (oldWs != null) {
-            AttributesModel oldAttrModel = pc.getAttributesModel(oldWs);
-            if (oldAttrModel != null) {
-                oldAttrModel.removeQuickFilterChangeListener(this);
-
+            GraphViz oldModel = pc.getGraphViz(oldWs);
+            if (oldModel != null) {
+                oldModel.removeGraphViewChangeListener(this);
             }
         }
-        peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class
-        );
-        peptideLkpResult.addLookupListener(this);
 
-        AttributesModel peptidesModel = pc.getAttributesModel(newWs);
-        if (peptidesModel != null) {
-            peptidesModel.addQuickFilterChangeListener(this);
+        GraphViz vizModel = pc.getGraphViz(newWs);
+        if (vizModel != null) {
+            vizModel.addGraphViewChangeListener(this);
         }
-        this.currentModel = peptidesModel;
 
         navigatorModel = newWs.getLookup().lookup(MetadataNavigatorModel.class);
         if (navigatorModel == null) {
@@ -262,33 +244,11 @@ public class MetadataNavigator extends JComponent implements
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource().equals(currentModel)
-                && evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
-            if (comboBox.getSelectedItem() instanceof AnnotationItem) {
-                AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
-                if (!item.isShowAll()) {
-                    item.reload();
-                }
-            }
-        }
-    }
-
-    @Override
-    public void resultChanged(LookupEvent ev) {
-        if (ev.getSource().equals(peptideLkpResult)) {
-            if (currentModel != null) {
-                currentModel.removeQuickFilterChangeListener(this);
-            }
-            Collection<? extends AttributesModel> attrModels = peptideLkpResult.allInstances();
-            if (!attrModels.isEmpty()) {
-                currentModel = attrModels.iterator().next();
-                currentModel.addQuickFilterChangeListener(this);
-                if (comboBox.getSelectedItem() instanceof AnnotationItem) {
-                    AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
-                    if (!item.isShowAll()) {
-                        item.reload();
-                    }
-                }
+        if (evt.getPropertyName().equals(GraphViz.CHANGED_GRAPH_VIEW)
+                && comboBox.getSelectedItem() instanceof AnnotationItem) {
+            AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
+            if (!item.isShowAll()) {
+                item.reload();
             }
         }
     }
@@ -320,10 +280,10 @@ public class MetadataNavigator extends JComponent implements
 
     @Override
     public void panelDeactivated() {
-        removeLookupListener();
         pc.removeWorkspaceEventListener(this);
-        if (currentModel != null) {
-            currentModel.removeQuickFilterChangeListener(this);
+        GraphViz vizModel = pc.getGraphViz();
+        if (vizModel != null) {
+            vizModel.removeGraphViewChangeListener(this);
         }
         pc.getQueryModel().setMetadataActivated(false);
     }
@@ -376,24 +336,20 @@ public class MetadataNavigator extends JComponent implements
                             rootNode.add(createNode(m));
                         }
                     } else {
-                        AttributesModel attrModel = pc.getAttributesModel();
-                        if (attrModel != null) {
-                            GraphModel graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();
-                            GraphView view = attrModel.getGraphDBView();
-                            Graph graph = graphModel.getGraph(view);
-                            org.gephi.graph.api.Node node;
-                            graph.readLock();
-                            try {
-                                for (Metadata m : metadatas) {
-                                    node = graph.getNode(m.getUnderlyingNodeID());
-                                    if (node != null) {
-                                        m.setGraphNode(node);
-                                        rootNode.add(createNode(m));
-                                    }
+                        GraphModel graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();
+                        Graph graph = graphModel.getGraphVisible();
+                        org.gephi.graph.api.Node node;
+                        graph.readLock();
+                        try {
+                            for (Metadata m : metadatas) {
+                                node = graph.getNode(m.getUnderlyingNodeID());
+                                if (node != null) {
+                                    m.setGraphNode(node);
+                                    rootNode.add(createNode(m));
                                 }
-                            } finally {
-                                graph.readUnlock();
                             }
+                        } finally {
+                            graph.readUnlock();
                         }
                     }
                     return null;

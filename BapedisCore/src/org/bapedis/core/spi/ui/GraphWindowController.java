@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.spi.ui;
 
+import java.util.List;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
 import org.openide.windows.TopComponent;
@@ -26,4 +27,6 @@ public interface GraphWindowController {
     void centerOnNode(Node node);
 
     void closeGraphWindow();
+    
+    void refreshGraphView(List<Node> toAddNodes, List<Node> toRemoveNodes);
 }

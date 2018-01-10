@@ -5,7 +5,6 @@
  */
 package org.bapedis.network.impl;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.bapedis.core.model.Peptide;
@@ -180,7 +179,6 @@ public class SequenceSimilarityNetwork extends SimilarityNetworkAlgo {
         outMap.put("Substitution matrix", Substitution_Matrix[substitutionMatrixIndex]);
         outMap.put("Similarity", Similarity_Type[similarityTypeIndex]);
         outMap.put("Score", Similarity_Score[similarityTypeIndex][similarityScoreIndex]);
-        outMap.put("Threshold", String.valueOf(threshold));
 
         int maxKeyLength = 0;
         for (String key : outMap.keySet()) {

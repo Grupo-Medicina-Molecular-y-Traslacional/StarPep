@@ -7,17 +7,22 @@ package org.bapedis.core.task;
 
 import java.awt.Cursor;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Metadata;
+import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.data.PeptideDAO;
+import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.GraphView;
+import org.gephi.graph.api.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -30,6 +35,7 @@ import org.openide.windows.WindowManager;
 public class QueryExecutor extends SwingWorker<AttributesModel, String> {
 
     protected static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+    protected static GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
     protected final Workspace workspace;
     protected final QueryModel queryModel;
     protected final GraphModel graphModel;
@@ -51,14 +57,38 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
     protected AttributesModel doInBackground() throws Exception {
         publish("start");
         pc.reportRunningTask(taskName, workspace);
-        
+
         PeptideDAO dao = Lookup.getDefault().lookup(PeptideDAO.class);
         AttributesModel model = dao.getPeptides(queryModel, graphModel);
-        Graph graph = graphModel.getGraph(model.getGraphDBView());
-        for (Iterator<Metadata> it = queryModel.getMetadataIterator(); it.hasNext();) {
-            Metadata metadata = it.next();
-            metadata.setGraphNode(graph.getNode(metadata.getUnderlyingNodeID()));
+
+        //Set graph node for metadata
+        Graph graph = graphModel.getGraph();
+        graph.readLock();
+        try {
+            for (Iterator<Metadata> it = queryModel.getMetadataIterator(); it.hasNext();) {
+                Metadata metadata = it.next();
+                metadata.setGraphNode(graph.getNode(metadata.getUnderlyingNodeID()));
+            }
+        } finally {
+            graph.readUnlock();
         }
+
+        //Create graph node list
+        List<Node> toAddNodes = new LinkedList<>();
+        for (Peptide peptide : model.getPeptides()) {
+            toAddNodes.add(peptide.getGraphNode());
+        }
+
+        // Reset graph view
+        GraphView oldView = graphModel.getVisibleView();
+        GraphView newView = graphModel.createView();
+        graphModel.setVisibleView(newView);
+        if (!oldView.isMainView()) {
+            graphModel.destroyView(oldView);
+        }
+
+        // To refresh graph view     
+        graphWC.refreshGraphView(toAddNodes, null);
 
         return model;
     }
@@ -66,7 +96,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
     @Override
     protected void process(List<String> chunks) {
         queryModel.setRunning(true);
-        WindowManager.getDefault().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));        
+        WindowManager.getDefault().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     }
 
     @Override
@@ -76,27 +106,10 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
             // Set new Model
             if (oldModel != null) {
                 workspace.remove(oldModel);
-                newModel.setMainGView(oldModel.getMainGView());
             }
             workspace.add(newModel);
 
-            // Set new view            
-            switch (newModel.getMainGView()) {
-                case AttributesModel.GRAPH_DB_VIEW:
-                    graphModel.setVisibleView(newModel.getGraphDBView());
-                    break;
-                case AttributesModel.CSN_VIEW:
-                    graphModel.setVisibleView(newModel.getCsnView());
-                    break;
-            }
-            newModel.fireChangedGraphView();
-
-            // Destroy old graph model       
-            if (oldModel != null) {
-                graphModel.destroyView(oldModel.getCsnView());
-                graphModel.destroyView(oldModel.getGraphDBView());
-            }
-            
+//            newModel.fireChangedGraphView();
             pc.reportMsg(NbBundle.getMessage(QueryExecutor.class, "QueryExecutor.output.text", newModel.getNodeList().size()), workspace);
         } catch (InterruptedException | ExecutionException ex) {
             Exceptions.printStackTrace(ex);

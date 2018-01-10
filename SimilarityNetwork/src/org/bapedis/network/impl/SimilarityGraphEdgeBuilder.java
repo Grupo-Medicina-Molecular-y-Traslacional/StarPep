@@ -26,6 +26,7 @@ class SimilarityGraphEdgeBuilder extends RecursiveAction {
     protected static AttributesModel attrModel;
     protected static GraphModel graphModel;
     protected static Graph mainGraph, csnGraph;
+    protected static Float threshold;
     protected static Peptide[] peptides;
     protected static ProgressTicket progressTicket;
     protected static SimilarityMeasure similarityMeasure;
@@ -77,7 +78,7 @@ class SimilarityGraphEdgeBuilder extends RecursiveAction {
 
     private void computeDirectly() {
         Peptide peptide1, peptide2;
-        float score;
+        float score, threshold;
         for (int y = ylow; y < yhigh; y++) {
             peptide1 = peptides[y];
             for (int x = xlow; x < Math.min(xhigh, y); x++) {
@@ -120,7 +121,7 @@ class SimilarityGraphEdgeBuilder extends RecursiveAction {
         // Add edge to csn graph
         csnGraph.writeLock();
         try {
-            if (!csnGraph.hasEdge(id) && score >= similarityMeasure.getThreshold()) {
+            if (!csnGraph.hasEdge(id) && score >= threshold) {
                 csnGraph.addEdge(graphEdge);
             }
         } finally {

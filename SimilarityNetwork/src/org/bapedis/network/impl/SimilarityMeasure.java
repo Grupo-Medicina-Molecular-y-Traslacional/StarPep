@@ -5,7 +5,6 @@
  */
 package org.bapedis.network.impl;
 
-import java.beans.PropertyChangeListener;
 import org.bapedis.core.model.Peptide;
 
 /**
@@ -14,18 +13,6 @@ import org.bapedis.core.model.Peptide;
  */
 public interface SimilarityMeasure {
 
-    String CHANGED_THRESHOLD_VALUE = "threshold_value";
-    String CHANGED_SIMILARITY_VALUES = "similarity_values";
-
-    JQuickHistogram getHistogram();
-    
-    float getThreshold();
-
-    void setThreshold(float value);
-
     float computeSimilarity(Peptide peptide1, Peptide peptide2);
     
-    void addPropertyChangeListener(PropertyChangeListener listener);
-    
-    void removePropertyChangeListener(PropertyChangeListener listener);
 }

@@ -42,42 +42,30 @@
 package org.bapedis.network.impl;
 
 import java.awt.BorderLayout;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 import javax.swing.SwingConstants;
-import javax.swing.SwingWorker;
 import javax.swing.UIManager;
-import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
-import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.Node;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jfree.chart.ChartPanel;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
  *
- * @author Mathieu Bastian
+ * @author Loge
  */
 public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyChangeListener {
 
     private ChartPanel chartPanel;
     protected final JXBusyLabel busyLabel;
-    protected SimilarityMeasure simMeasure;
+    protected SimilarityNetworkAlgo simNetAlgo;
     protected final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private RichTooltip richTooltip;
     private final DecimalFormat formatter;
@@ -97,16 +85,14 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         formatter = new DecimalFormat("0.00", symbols);
     }
 
-    public void setup(SimilarityMeasure measure) {
-        if (this.simMeasure != null) {
-            this.simMeasure.removePropertyChangeListener(this);
+    public void setup(SimilarityNetworkAlgo simNetAlgo) {
+        if (this.simNetAlgo != null) {
+            this.simNetAlgo.removeSimilarityChangeListener(this);
         }
-        this.simMeasure = measure;
-        this.simMeasure.addPropertyChangeListener(this);
-        currentValueLabel.setText(formatter.format(measure.getThreshold()));
-        newValueTextField.setText(currentValueLabel.getText());
+        this.simNetAlgo = simNetAlgo;
+        this.simNetAlgo.addSimilarityChangeListener(this);
 
-        JQuickHistogram histogram = measure.getHistogram();
+        JQuickHistogram histogram = simNetAlgo.getHistogram();
         histogram.setConstraintHeight(histogramPanel.getHeight());
         if (chartPanel != null) {
             histogramPanel.remove(chartPanel);
@@ -155,83 +141,6 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         richTooltip.addDescriptionSection("Min: " + (histogram.countValues() > 0 ? formatter.format(histogram.getMinValue()) : "NaN"));
         richTooltip.addDescriptionSection("Max: " + (histogram.countValues() > 0 ? formatter.format(histogram.getMaxValue()) : "NaN"));
     }
-
-    private void resetSimilarityThreshold(final float oldValue, final float newValue) {
-        final AttributesModel attrModel = pc.getAttributesModel();
-        SwingWorker sw = new SwingWorker() {
-            @Override
-            protected Object doInBackground() throws Exception {
-                if (attrModel != null) {
-                    attrModel.setSimilarityThreshold(newValue);
-                    Graph csnGraph = pc.getGraphModel().getGraph(attrModel.getCsnView());
-                    float score;
-                    if (newValue < oldValue) { // to add edges
-                        List<Edge> toAdd = new LinkedList<>();
-                        Graph mainGraph = pc.getGraphModel().getGraph();
-                        int relType = pc.getGraphModel().getEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-                        if (relType != -1) {
-                            csnGraph.writeLock();
-                            try {
-                                for (Node node : csnGraph.getNodes()) {
-                                    mainGraph.readLock();
-                                    try {
-                                        for (Edge edge : mainGraph.getEdges(node, relType)) {
-                                            if (csnGraph.hasNode(edge.getSource().getId()) && csnGraph.hasNode(edge.getTarget().getId())) {
-                                                score = (float) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
-                                                if (score >= newValue) {
-                                                    toAdd.add(edge);
-                                                }
-                                            }
-                                        }
-                                    } finally {
-                                        mainGraph.readUnlock();
-                                    }
-                                }
-                                csnGraph.addAllEdges(toAdd);
-                            } finally {
-                                csnGraph.writeUnlock();
-                            }
-                        }
-                    } else if (newValue > oldValue) { // to romove edges
-                        List<Edge> toRemove = new LinkedList<>();
-                        csnGraph.writeLock();
-                        try {
-                            for (Edge edge : csnGraph.getEdges()) {
-                                score = (float) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
-                                if (score < newValue) {
-                                    toRemove.add(edge);
-                                }
-                            }
-                            csnGraph.removeAllEdges(toRemove);
-                        } finally {
-                            csnGraph.writeUnlock();
-                        }
-                    }
-                }
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    get();
-                    currentValueLabel.setText(formatter.format(newValue));
-                    attrModel.fireChangedGraphView();
-                } catch (InterruptedException ex) {
-                    Exceptions.printStackTrace(ex);
-                } catch (ExecutionException ex) {
-                    Exceptions.printStackTrace(ex);
-                } finally {
-                    setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                    jApplyButton.setEnabled(true);
-                }
-            }
-        };
-        setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        jApplyButton.setEnabled(false);
-        sw.execute(); 
-    }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -244,7 +153,6 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
 
         histogramPanel = new javax.swing.JPanel();
         infoLabel = new javax.swing.JLabel();
-        currentValueLabel = new javax.swing.JLabel();
         currentValuePanel = new javax.swing.JPanel();
         thresholdSlider = new javax.swing.JSlider();
         java.text.NumberFormat format = java.text.DecimalFormat.getInstance(Locale.ENGLISH);
@@ -290,15 +198,6 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(infoLabel, gridBagConstraints);
-
-        currentValueLabel.setText(org.openide.util.NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.currentValueLabel.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 2, 0, 0);
-        add(currentValueLabel, gridBagConstraints);
 
         currentValuePanel.setLayout(new java.awt.GridBagLayout());
 
@@ -362,21 +261,21 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
     }// </editor-fold>//GEN-END:initComponents
 
     private void jApplyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jApplyButtonActionPerformed
-        if (simMeasure != null) {
-            try {
-                float newValue = Float.parseFloat(newValueTextField.getText());
-                simMeasure.setThreshold(newValue);
-
-                int newVal = Math.round(newValue * 100);
-                if (thresholdSlider.getValue() != newVal) {
-                    thresholdSlider.setValue(newVal);
-                }
-            } catch (NumberFormatException ex) {
-                NotifyDescriptor d
-                        = new NotifyDescriptor.Message(NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.threshold.invalid"), NotifyDescriptor.ERROR_MESSAGE);
-                DialogDisplayer.getDefault().notify(d);
-            }
-        }
+//        if (simMeasure != null) {
+//            try {
+//                float newValue = Float.parseFloat(newValueTextField.getText());
+//                simMeasure.setThreshold(newValue);
+//
+//                int newVal = Math.round(newValue * 100);
+//                if (thresholdSlider.getValue() != newVal) {
+//                    thresholdSlider.setValue(newVal);
+//                }
+//            } catch (NumberFormatException ex) {
+//                NotifyDescriptor d
+//                        = new NotifyDescriptor.Message(NbBundle.getMessage(ThresholdRangePanel.class, "ThresholdRangePanel.threshold.invalid"), NotifyDescriptor.ERROR_MESSAGE);
+//                DialogDisplayer.getDefault().notify(d);
+//            }
+//        }
     }//GEN-LAST:event_jApplyButtonActionPerformed
 
     private void infoLabelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_infoLabelMouseEntered
@@ -406,7 +305,6 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
     }//GEN-LAST:event_newValueTextFieldActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel currentValueLabel;
     private javax.swing.JPanel currentValuePanel;
     private javax.swing.JPanel histogramPanel;
     private javax.swing.JLabel infoLabel;
@@ -417,12 +315,9 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource().equals(simMeasure)) {
-            if (evt.getPropertyName().equals(SimilarityMeasure.CHANGED_SIMILARITY_VALUES)) {
-                setupHistogram((evt.getNewValue() != null ? (JQuickHistogram) evt.getNewValue() : null));
-            } else if (evt.getPropertyName().equals(SimilarityMeasure.CHANGED_THRESHOLD_VALUE)) {
-                resetSimilarityThreshold((float) evt.getOldValue(), (float) evt.getNewValue());
-            }
+        if (evt.getSource().equals(simNetAlgo) &&
+               evt.getPropertyName().equals(SimilarityNetworkAlgo.CHANGED_SIMILARITY_VALUES)) {
+            setupHistogram((evt.getNewValue() != null ? (JQuickHistogram) evt.getNewValue() : null)); 
         }
     }
 }

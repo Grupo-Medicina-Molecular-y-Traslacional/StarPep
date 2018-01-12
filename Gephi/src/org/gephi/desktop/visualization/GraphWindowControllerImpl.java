@@ -14,7 +14,9 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.GraphViz;
+import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
@@ -127,45 +129,50 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
     }
 
     private void addMetadataNodes(AnnotationType aType) {
+        GraphViz graphViz = pc.getGraphViz();
+        AttributesModel attrModel = pc.getAttributesModel();
         GraphModel graphModel = pc.getGraphModel();
         Graph graph = graphModel.getGraphVisible();
         int relType = graphModel.getEdgeType(aType.getRelationType());
         if (relType != -1) {
-            graph.writeLock();
-            try {
-                for (Node node : graph.getNodes()) {
-                    for (Node neighbor : graphModel.getGraph().getNeighbors(node, relType)) {
-                        if (!graph.hasNode(neighbor.getId())) {
-                            graph.addNode(neighbor);
-                        }
-                        Edge edge = graphModel.getGraph().getEdge(node, neighbor, relType);
-                        if (!graph.hasEdge(edge.getId())) {
-                            graph.addEdge(edge);
-                        }
-                    }
+            Set<Node> nodes = new HashSet<>();
+            List<Edge> edges = new LinkedList<>();
+            Node node;
+            Edge edge;
+            for (Peptide peptide : attrModel.getPeptides()) {
+                node = peptide.getGraphNode();
+                for (Node neighbor : graphModel.getGraph().getNeighbors(node, relType)) {
+                    nodes.add(neighbor);
+                    edge = graphModel.getGraph().getEdge(node, neighbor, relType);
+                    edges.add(edge);
                 }
-            } finally {
-                graph.writeUnlock();
+            }
+            graph.addAllNodes(nodes);
+            graph.addAllEdges(edges);
+            if (nodes.size() > 0 || edges.size() > 0) {
+                graphViz.fireChangedGraphView();
             }
         }
     }
 
     private void removeMetadataNodes(AnnotationType aType) {
+        GraphViz graphViz = pc.getGraphViz();
+        AttributesModel attrModel = pc.getAttributesModel();
         GraphModel graphModel = pc.getGraphModel();
         Graph graph = graphModel.getGraphVisible();
         int relType = graphModel.getEdgeType(aType.getRelationType());
         if (relType != -1) {
-            graph.writeLock();
-            try {
-                for (Node node : graph.getNodes()) {
-                    for (Node neighbor : graphModel.getGraph().getNeighbors(node, relType)) {
-                        if (graph.hasNode(neighbor.getId())) {
-                            graph.removeNode(neighbor);
-                        }
-                    }
+            Set<Node> nodes = new HashSet<>();
+            Node node;
+            for (Peptide peptide : attrModel.getPeptides()) {
+                node = peptide.getGraphNode();
+                for (Node neighbor : graph.getNeighbors(node, relType)) {
+                    nodes.add(neighbor);
                 }
-            } finally {
-                graph.writeUnlock();
+            }
+            graph.removeAllNodes(nodes);
+            if (nodes.size() > 0) {
+                graphViz.fireChangedGraphView();
             }
         }
     }

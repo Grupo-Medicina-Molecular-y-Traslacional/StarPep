@@ -109,7 +109,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     private final JPopupButton labelSizeModeButton = new JPopupButton();
     private final JPopupButton labelColorModeButton = new JPopupButton();
     private final JSlider nodeSizeSlider = new JSlider();
-    private final JButton metadataButton = new JButton();
+    private final JButton relationshipsButton = new JButton();
     //Edge
     private final JToggleButton showEdgeButton = new JToggleButton();
     private final JToggleButton edgeHasNodeColorButton = new JToggleButton();
@@ -153,6 +153,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         topToolbar.addSeparator();
 
         // Background
+        backgroundColorSwitcher.setFocusable(false);
         backgroundColorSwitcher.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.backgroundSwitcher.toolTipText"));
         backgroundColorSwitcher.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
             @Override
@@ -170,6 +171,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         });
         topToolbar.add(backgroundColorSwitcher);
 
+        backgroundColorButton.setFocusable(false);
         backgroundColorButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.backgroundButton.toolTipText"));
         backgroundColorButton.addPropertyChangeListener(JColorButton.EVENT_COLOR, new PropertyChangeListener() {
 
@@ -187,7 +189,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         //Zoom
         topToolbar.addSeparator();
 
-        // Reset Zoom         
+        // Reset Zoom
+        resetZoomButton.setFocusable(false);
         resetZoomButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/centerOnGraph.png", false));
         resetZoomButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.resetZoomButton.toolTipText"));
         resetZoomButton.addActionListener(new ActionListener() {
@@ -199,7 +202,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         });
         topToolbar.add(resetZoomButton);
 
-        // Plus Zoom        
+        // Plus Zoom  
+        plusButton.setFocusable(false);
         plusButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/magnifier--plus.png", false));
         plusButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.plusButton.toolTipText"));
         plusButton.addActionListener(new ActionListener() {
@@ -212,7 +216,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         });
         topToolbar.add(plusButton);
 
-        // Minus Zoom        
+        // Minus Zoom   
+        minusButton.setFocusable(false);
         minusButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/magnifier--minus.png", false));
         minusButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.minusButton.toolTipText"));
         minusButton.addActionListener(new ActionListener() {
@@ -225,8 +230,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         });
         topToolbar.add(minusButton);
 
-        // Mouse Selection
         topToolbar.addSeparator();
+        // Mouse Selection        
         final ButtonGroup buttonGroup = new ButtonGroup();
         final JToggleButton mouseButton = new JToggleButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/mouse.png", false));
         mouseButton.setFocusable(false);
@@ -249,11 +254,11 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         topToolbar.add(mouseButton);
 
         //Configure
+        configureLink.setFocusable(false);
         configureLink.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.selection.configureLink.text")); // NOI18N
         configureLink.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.selection.configureLink.tooltip"));
         configureLink.setClickedColor(new java.awt.Color(0, 51, 255));
         configureLink.setDefaultCapable(false);
-        configureLink.setFocusable(false);
         configureLink.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N   
         configureLink.addActionListener(new ActionListener() {
 
@@ -285,12 +290,12 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
         topToolbar.addSeparator();
 
-        // Metadata nodes
-        metadataButton.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.metadataButton.text"));
-        metadataButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.metadataButton.toolTipText"));
-        metadataButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/metadata.png", false));
-        metadataButton.setFocusable(false);
-        metadataButton.addActionListener(new ActionListener() {
+        // Relationships
+        relationshipsButton.setFocusable(false);
+        relationshipsButton.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.relationshipsButton.text"));
+        relationshipsButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.relationshipsButton.toolTipText"));
+        relationshipsButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/relationships.png", false));
+        relationshipsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 GraphViz graphViz = pc.getGraphViz();
@@ -298,24 +303,23 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 DialogDescriptor dd = new DialogDescriptor(metadataPanel, NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.metadataPanel.title"));
                 dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION});
                 if (DialogDisplayer.getDefault().notify(dd) == DialogDescriptor.OK_OPTION) {
-                    for(MetadataCheckBox mcb: metadataPanel.getMetadataCheckBoxs()){
-                        if (mcb.getCheckBox().isSelected()){
+                    for (MetadataCheckBox mcb : metadataPanel.getMetadataCheckBoxs()) {
+                        if (mcb.getCheckBox().isSelected()) {
                             graphViz.addDisplayedMetadata(mcb.getAnnotationType());
-                        }else{
+                        } else {
                             graphViz.removeDisplayedMetadata(mcb.getAnnotationType());
                         }
                     }
                 }
             }
         });
-        topToolbar.add(metadataButton);
+        topToolbar.add(relationshipsButton);
 
         topToolbar.addSeparator();
 
         //Auto select neighbor
-        autoSelectNeighborCheckbox.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.autoSelectNeigborCheckbox.text"));
         autoSelectNeighborCheckbox.setFocusable(false);
-        autoSelectNeighborCheckbox.setHorizontalTextPosition(SwingConstants.LEFT);
+        autoSelectNeighborCheckbox.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.autoSelectNeigborCheckbox.text"));
         autoSelectNeighborCheckbox.addItemListener(new ItemListener() {
 
             @Override
@@ -328,8 +332,9 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
         topToolbar.addSeparator();
 
-        //Screenshots
+        //Screenshots        
         JMenuItem configureScreenshotItem = new JMenuItem(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.screenshot.configure"));
+        configureScreenshotItem.setFocusable(false);
         configureScreenshotItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -338,6 +343,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         });
         screenshotPopup.add(configureScreenshotItem);
 
+        screenshotButton.setFocusable(false);
         screenshotButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.screenshot.toolTipText"));
         screenshotButton.addActionListener(new ActionListener() {
             @Override
@@ -348,6 +354,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
         topToolbar.add(screenshotButton);
 
+        expotToXML.setFocusable(false);
         expotToXML.setAction(new ExportGraph());
         expotToXML.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/xml.png", false));
         expotToXML.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.expotToXML.toolTipText"));
@@ -969,30 +976,45 @@ class MouseSelectionPopupPanel extends javax.swing.JPanel {
 }
 
 class MetadataNodesPanel extends JPanel {
-    
+
     MetadataCheckBox[] metadataCheckBoxs;
+    JPanel contentPanel;
 
     public MetadataNodesPanel(GraphViz graphViz) {
-        super(new GridBagLayout());  
+        super(new GridBagLayout());
         setMinimumSize(new Dimension(440, 220));
         setPreferredSize(new Dimension(440, 220));
+        GridBagConstraints gridBagConstraints;
         
+        //
+        
+        // Content Panel
+        contentPanel = new JPanel(new GridBagLayout());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        add(contentPanel, gridBagConstraints);
+        initComponents(graphViz);
+    }
+
+    private void initComponents(GraphViz graphViz) {
         GridBagConstraints gridBagConstraints;
         AnnotationType[] arr = AnnotationType.values();
         metadataCheckBoxs = new MetadataCheckBox[arr.length];
         MetadataCheckBox mcb;
         JCheckBox cb;
-        for (int i=0; i<arr.length; i++) {
+        for (int i = 0; i < arr.length; i++) {
             mcb = new MetadataCheckBox(arr[i]);
             metadataCheckBoxs[i] = mcb;
             cb = mcb.getCheckBox();
             cb.setSelected(graphViz.isDisplayedMetadata(arr[i]));
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx=0;
-            gridBagConstraints.gridy=i;
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = i;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(2, 5, 0, 0);
-            add(cb, gridBagConstraints);
+            contentPanel.add(cb, gridBagConstraints);
         }
     }
 
@@ -1019,5 +1041,5 @@ class MetadataCheckBox {
     public AnnotationType getAnnotationType() {
         return aType;
     }
-           
+
 }

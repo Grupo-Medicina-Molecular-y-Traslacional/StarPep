@@ -103,12 +103,12 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
         if (oldWs != null) {
             GraphViz oldModel = pc.getGraphViz(oldWs);
             if (oldModel != null) {
-                oldModel.removeGraphViewChangeListener(this);
+                oldModel.removeDisplayedMetadataChangeListener(this);
             }
         }
 
         GraphViz graphViz = pc.getGraphViz(newWs);
-        graphViz.addGraphViewChangeListener(this);
+        graphViz.addDisplayedMetadataChangeListener(this);
     }
 
     @Override

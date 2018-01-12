@@ -12,6 +12,9 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -35,7 +38,9 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.bapedis.core.events.WorkspaceEventListener;
+import org.bapedis.core.model.AnnotationType;
 import org.bapedis.core.model.FilterModel;
+import org.bapedis.core.model.GraphViz;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
@@ -62,6 +67,8 @@ import org.jdesktop.swingx.JXHyperlink;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 import org.openide.awt.DropDownButtonFactory;
 import org.openide.awt.UndoRedo;
 import org.openide.util.ImageUtilities;
@@ -102,6 +109,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     private final JPopupButton labelSizeModeButton = new JPopupButton();
     private final JPopupButton labelColorModeButton = new JPopupButton();
     private final JSlider nodeSizeSlider = new JSlider();
+    private final JButton metadataButton = new JButton();
     //Edge
     private final JToggleButton showEdgeButton = new JToggleButton();
     private final JToggleButton edgeHasNodeColorButton = new JToggleButton();
@@ -110,7 +118,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     private final JToggleButton showEdgeLabelsButton = new JToggleButton();
     private final JButton edgeFontButton = new JButton();
     private final JSlider edgeSizeSlider = new JSlider();
-    
+
     static {
         UIManager.put("Slider.paintValue", false);
     }
@@ -151,7 +159,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             public void propertyChange(PropertyChangeEvent evt) {
                 VizModel vizModel = VizController.getInstance().getVizModel();
                 Color backgroundColor = ((JColorBlackWhiteSwitcher) backgroundColorSwitcher).getColor();
-                vizModel.setBackgroundColor(backgroundColor);                
+                vizModel.setBackgroundColor(backgroundColor);
                 backgroundColorButton.setColor(backgroundColor);
 
                 TextModelImpl textModel = VizController.getInstance().getVizModel().getTextModel();
@@ -277,8 +285,36 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
         topToolbar.addSeparator();
 
+        // Metadata nodes
+        metadataButton.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.metadataButton.text"));
+        metadataButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.metadataButton.toolTipText"));
+        metadataButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/metadata.png", false));
+        metadataButton.setFocusable(false);
+        metadataButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GraphViz graphViz = pc.getGraphViz();
+                MetadataNodesPanel metadataPanel = new MetadataNodesPanel(graphViz);
+                DialogDescriptor dd = new DialogDescriptor(metadataPanel, NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.metadataPanel.title"));
+                dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION});
+                if (DialogDisplayer.getDefault().notify(dd) == DialogDescriptor.OK_OPTION) {
+                    for(MetadataCheckBox mcb: metadataPanel.getMetadataCheckBoxs()){
+                        if (mcb.getCheckBox().isSelected()){
+                            graphViz.addDisplayedMetadata(mcb.getAnnotationType());
+                        }else{
+                            graphViz.removeDisplayedMetadata(mcb.getAnnotationType());
+                        }
+                    }
+                }
+            }
+        });
+        topToolbar.add(metadataButton);
+
+        topToolbar.addSeparator();
+
         //Auto select neighbor
         autoSelectNeighborCheckbox.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.autoSelectNeigborCheckbox.text"));
+        autoSelectNeighborCheckbox.setFocusable(false);
         autoSelectNeighborCheckbox.setHorizontalTextPosition(SwingConstants.LEFT);
         autoSelectNeighborCheckbox.addItemListener(new ItemListener() {
 
@@ -291,7 +327,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         topToolbar.add(autoSelectNeighborCheckbox);
 
         topToolbar.addSeparator();
-        
+
         //Screenshots
         JMenuItem configureScreenshotItem = new JMenuItem(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.screenshot.configure"));
         configureScreenshotItem.addActionListener(new ActionListener() {
@@ -309,14 +345,14 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 VizController.getInstance().getScreenshotMaker().takeScreenshot();
             }
         });
-        
+
         topToolbar.add(screenshotButton);
-        
+
         expotToXML.setAction(new ExportGraph());
         expotToXML.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/xml.png", false));
         expotToXML.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.expotToXML.toolTipText"));
         topToolbar.add(expotToXML);
-        
+
         topToolbar.addSeparator();
     }
 
@@ -930,4 +966,58 @@ class MouseSelectionPopupPanel extends javax.swing.JPanel {
         add(proportionnalZoomCheckbox, gridBagConstraints);
 
     }
+}
+
+class MetadataNodesPanel extends JPanel {
+    
+    MetadataCheckBox[] metadataCheckBoxs;
+
+    public MetadataNodesPanel(GraphViz graphViz) {
+        super(new GridBagLayout());  
+        setMinimumSize(new Dimension(440, 220));
+        setPreferredSize(new Dimension(440, 220));
+        
+        GridBagConstraints gridBagConstraints;
+        AnnotationType[] arr = AnnotationType.values();
+        metadataCheckBoxs = new MetadataCheckBox[arr.length];
+        MetadataCheckBox mcb;
+        JCheckBox cb;
+        for (int i=0; i<arr.length; i++) {
+            mcb = new MetadataCheckBox(arr[i]);
+            metadataCheckBoxs[i] = mcb;
+            cb = mcb.getCheckBox();
+            cb.setSelected(graphViz.isDisplayedMetadata(arr[i]));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx=0;
+            gridBagConstraints.gridy=i;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(2, 5, 0, 0);
+            add(cb, gridBagConstraints);
+        }
+    }
+
+    public MetadataCheckBox[] getMetadataCheckBoxs() {
+        return metadataCheckBoxs;
+    }
+
+}
+
+class MetadataCheckBox {
+
+    private final JCheckBox cb;
+    private final AnnotationType aType;
+
+    public MetadataCheckBox(AnnotationType aType) {
+        this.aType = aType;
+        cb = new JCheckBox(aType.getDisplayName());
+    }
+
+    public JCheckBox getCheckBox() {
+        return cb;
+    }
+
+    public AnnotationType getAnnotationType() {
+        return aType;
+    }
+           
 }

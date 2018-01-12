@@ -50,10 +50,7 @@
       <SubComponents>
         <Container class="javax.swing.JPanel" name="contentPanel">
 
-          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
-            <Property name="columns" type="int" value="0"/>
-            <Property name="rows" type="int" value="1"/>
-          </Layout>
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout"/>
         </Container>
       </SubComponents>
     </Container>

@@ -41,10 +41,10 @@ Portions Copyrighted 2011 Gephi Consortium.
  */
 package org.bapedis.core.ui.components;
 
+import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
-import net.miginfocom.swing.MigLayout;
 import org.bapedis.core.model.GraphElementAttributeColumn;
 import org.bapedis.core.model.GraphElementAvailableColumnsModel;
 import org.bapedis.core.model.GraphElementDataColumn;
@@ -74,11 +74,14 @@ public class GraphElementAvailableColumnsPanel extends javax.swing.JPanel {
     private void refreshColumns() {        
         columnsCheckBoxes = new JCheckBox[columns.length];
         contentPanel.removeAll();
-        contentPanel.setLayout(new MigLayout("", "[pref!]"));
+        GridBagConstraints gbc = new GridBagConstraints();
         for (int i = 0; i < columns.length; i++) {
             columnsCheckBoxes[i] = new JCheckBox(columns[i].getColumnName(), availableColumnsModel.isColumnAvailable(columns[i]));
             columnsCheckBoxes[i].addActionListener(new ColumnCheckBoxListener(i));
-            contentPanel.add(columnsCheckBoxes[i], "wrap");
+            gbc.gridx=0;
+            gbc.gridy=i;
+            gbc.anchor = GridBagConstraints.WEST;
+            contentPanel.add(columnsCheckBoxes[i], gbc);
             if (columns[i] instanceof GraphElementAttributeColumn && columns[i].getColumn().getId().equals(GraphElementAvailableColumnsModel.DefaultColumnID)){
                 columnsCheckBoxes[i].setEnabled(false);
             }
@@ -146,7 +149,7 @@ public class GraphElementAvailableColumnsPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(infoLabel, gridBagConstraints);
 
-        contentPanel.setLayout(new java.awt.GridLayout(1, 0));
+        contentPanel.setLayout(new java.awt.GridBagLayout());
         scroll.setViewportView(contentPanel);
 
         gridBagConstraints = new java.awt.GridBagConstraints();

@@ -69,6 +69,14 @@ public class GraphViz {
         propertyChangeSupport.firePropertyChange(CHANGED_THRESHOLD, oldValue, threshold);
     }    
     
+    public void addDisplayedMetadataChangeListener(PropertyChangeListener listener){
+        propertyChangeSupport.addPropertyChangeListener(CHANGED_DISPLAYED_METADATA, listener);
+    }
+
+    public void removeDisplayedMetadataChangeListener(PropertyChangeListener listener){
+         propertyChangeSupport.removePropertyChangeListener(CHANGED_DISPLAYED_METADATA, listener);
+    }
+    
     public void addGraphViewChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(CHANGED_GRAPH_VIEW, listener);
     }

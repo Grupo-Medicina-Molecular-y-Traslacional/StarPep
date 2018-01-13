@@ -27,6 +27,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -299,11 +300,12 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             @Override
             public void actionPerformed(ActionEvent e) {
                 GraphViz graphViz = pc.getGraphViz();
-                MetadataNodesPanel metadataPanel = new MetadataNodesPanel(graphViz);
-                DialogDescriptor dd = new DialogDescriptor(metadataPanel, NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.metadataPanel.title"));
+                NodeRelationshipsPanel relationshipsPanel = new NodeRelationshipsPanel(graphViz);
+                DialogDescriptor dd = new DialogDescriptor(relationshipsPanel, NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.relationshipsPanel.title"));
                 dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION});
                 if (DialogDisplayer.getDefault().notify(dd) == DialogDescriptor.OK_OPTION) {
-                    for (MetadataCheckBox mcb : metadataPanel.getMetadataCheckBoxs()) {
+                    graphViz.setCsnVisible(relationshipsPanel.getCSNCheckBox().isSelected());
+                    for (MetadataCheckBox mcb : relationshipsPanel.getMetadataCheckBoxs()) {
                         if (mcb.getCheckBox().isSelected()) {
                             graphViz.addDisplayedMetadata(mcb.getAnnotationType());
                         } else {
@@ -975,30 +977,54 @@ class MouseSelectionPopupPanel extends javax.swing.JPanel {
     }
 }
 
-class MetadataNodesPanel extends JPanel {
+class NodeRelationshipsPanel extends JPanel {
 
+    JCheckBox csnCheckBox;
+    JLabel label;
     MetadataCheckBox[] metadataCheckBoxs;
     JPanel contentPanel;
 
-    public MetadataNodesPanel(GraphViz graphViz) {
+    public NodeRelationshipsPanel(GraphViz graphViz) {
         super(new GridBagLayout());
         setMinimumSize(new Dimension(440, 220));
         setPreferredSize(new Dimension(440, 220));
         GridBagConstraints gridBagConstraints;
-        
-        //
-        
+
+        //Similarity Check Box
+        csnCheckBox = new JCheckBox(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.relationshipsPanel.csn"));
+        csnCheckBox.setSelected(graphViz.isCsnVisible());
+        csnCheckBox.setFocusable(false);
+        csnCheckBox.setHorizontalTextPosition(SwingConstants.LEFT);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(5, 0, 0, 5);
+        add(csnCheckBox, gridBagConstraints);
+
+        // Label
+        label = new JLabel(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.relationshipsPanel.label"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        add(label, gridBagConstraints);
+
         // Content Panel
         contentPanel = new JPanel(new GridBagLayout());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new Insets(2, 5, 0, 5);
         add(contentPanel, gridBagConstraints);
-        initComponents(graphViz);
+        initMetadataCheckBoxs(graphViz);
     }
 
-    private void initComponents(GraphViz graphViz) {
+    private void initMetadataCheckBoxs(GraphViz graphViz) {
         GridBagConstraints gridBagConstraints;
         AnnotationType[] arr = AnnotationType.values();
         metadataCheckBoxs = new MetadataCheckBox[arr.length];
@@ -1008,19 +1034,26 @@ class MetadataNodesPanel extends JPanel {
             mcb = new MetadataCheckBox(arr[i]);
             metadataCheckBoxs[i] = mcb;
             cb = mcb.getCheckBox();
+            cb.setFocusable(false);
             cb.setSelected(graphViz.isDisplayedMetadata(arr[i]));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.weightx = 1.0;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(2, 5, 0, 0);
             contentPanel.add(cb, gridBagConstraints);
         }
     }
 
+    public JCheckBox getCSNCheckBox() {
+        return csnCheckBox;
+    }        
+
     public MetadataCheckBox[] getMetadataCheckBoxs() {
         return metadataCheckBoxs;
-    }
+    }        
 
 }
 

@@ -45,7 +45,6 @@ import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import net.java.dev.colorchooser.ColorChooser;
-import org.bapedis.core.project.ProjectManager;
 import org.gephi.appearance.api.SimpleFunction;
 import org.gephi.appearance.plugin.AbstractUniqueColorTransformer;
 

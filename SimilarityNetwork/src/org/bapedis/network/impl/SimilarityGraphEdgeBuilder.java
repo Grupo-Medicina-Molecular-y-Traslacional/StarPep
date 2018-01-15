@@ -4,7 +4,6 @@
  */
 package org.bapedis.network.impl;
 
-import java.util.List;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
@@ -30,8 +29,7 @@ class SimilarityGraphEdgeBuilder extends RecursiveAction {
     protected static Peptide[] peptides;
     protected static ProgressTicket progressTicket;
     protected static SimilarityMeasure similarityMeasure;
-    protected static List<Edge> edgeList;
-
+    protected static JQuickHistogram histogram;
     protected int xlow, xhigh, ylow, yhigh;
 
     protected final static Logger log = Logger.getLogger(SimilarityGraphEdgeBuilder.class.getName());
@@ -50,7 +48,7 @@ class SimilarityGraphEdgeBuilder extends RecursiveAction {
 
     static void setStopRun(boolean stop) {
         stopRun.set(stop);
-    }        
+    }
 
     @Override
     protected void compute() {
@@ -78,21 +76,33 @@ class SimilarityGraphEdgeBuilder extends RecursiveAction {
 
     private void computeDirectly() {
         Peptide peptide1, peptide2;
-        float score, threshold;
+        float score;
         for (int y = ylow; y < yhigh; y++) {
             peptide1 = peptides[y];
             for (int x = xlow; x < Math.min(xhigh, y); x++) {
                 peptide2 = peptides[x];
                 if (!stopRun.get()) {
                     score = similarityMeasure.computeSimilarity(peptide1, peptide2);
-                    createGraphEdge(peptide1, peptide2, score);
+                    if (score >= 0.3) {
+                        Edge graphEdge = createGraphEdge(peptide1, peptide2, score);
+                        // Add edge to csn graph
+                        if (score >= threshold) {
+                            csnGraph.writeLock();
+                            try {
+                                csnGraph.addEdge(graphEdge);
+                            } finally {
+                                csnGraph.writeUnlock();
+                            }
+                        }
+                        histogram.addData(score);
+                    }
                     progressTicket.progress();
                 }
             }
         }
     }
 
-    private void createGraphEdge(Peptide peptide1, Peptide peptide2, float score) {
+    private Edge createGraphEdge(Peptide peptide1, Peptide peptide2, float score) {
         Edge graphEdge;
         int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
         String id = String.format("%s-%s", peptide1.getGraphNode().getId(), peptide2.getGraphNode().getId());
@@ -113,20 +123,10 @@ class SimilarityGraphEdgeBuilder extends RecursiveAction {
                 mainGraph.addEdge(graphEdge);
             }
             graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, score);
-            edgeList.add(graphEdge);
         } finally {
             mainGraph.writeUnlock();
         }
-
-        // Add edge to csn graph
-        csnGraph.writeLock();
-        try {
-            if (!csnGraph.hasEdge(id) && score >= threshold) {
-                csnGraph.addEdge(graphEdge);
-            }
-        } finally {
-            csnGraph.writeUnlock();
-        }
-    }    
+        return graphEdge;
+    }
 
 }

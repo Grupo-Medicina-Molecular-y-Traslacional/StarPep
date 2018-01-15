@@ -986,8 +986,8 @@ class NodeRelationshipsPanel extends JPanel {
 
     public NodeRelationshipsPanel(GraphViz graphViz) {
         super(new GridBagLayout());
-        setMinimumSize(new Dimension(440, 220));
-        setPreferredSize(new Dimension(440, 220));
+        setMinimumSize(new Dimension(440, 240));
+        setPreferredSize(new Dimension(440, 240));
         GridBagConstraints gridBagConstraints;
 
         //Similarity Check Box

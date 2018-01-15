@@ -71,7 +71,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
             SimilarityGraphEdgeBuilder.csnGraph = graphModel.getGraphVisible();
             SimilarityGraphEdgeBuilder.threshold = graphViz.getSimilarityThreshold();
             SimilarityGraphEdgeBuilder.similarityMeasure = getSimilarityMeasure();
-            SimilarityGraphEdgeBuilder.edgeList = new LinkedList<>();
+            SimilarityGraphEdgeBuilder.histogram = histogram;                    
 
             // Remove all similarity edges..
             int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
@@ -105,8 +105,8 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
         SimilarityGraphEdgeBuilder.threshold = null;
         SimilarityGraphEdgeBuilder.similarityMeasure = null;
         SimilarityGraphEdgeBuilder.progressTicket = null;
-        SimilarityGraphEdgeBuilder.edgeList = null;
         SimilarityGraphEdgeBuilder.progressTicket = null;
+        SimilarityGraphEdgeBuilder.histogram = null;
     }
 
     @Override
@@ -142,9 +142,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
             SimilarityGraphEdgeBuilder task = new SimilarityGraphEdgeBuilder();
             fjPool.invoke(task);
             task.join();
-            for (Edge edge : SimilarityGraphEdgeBuilder.edgeList) {
-                histogram.addData((float) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
-            }
+            
             propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY_VALUES, null, histogram);
         }
     }

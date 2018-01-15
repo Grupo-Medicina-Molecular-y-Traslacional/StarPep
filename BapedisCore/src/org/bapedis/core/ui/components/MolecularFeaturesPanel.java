@@ -8,6 +8,7 @@ package org.bapedis.core.ui.components;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -18,6 +19,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableModel;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.PeptideAttribute;
@@ -25,6 +29,7 @@ import org.jdesktop.swingx.JXList;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 
 /**
  *
@@ -38,7 +43,8 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
     protected final JButton findButton;
     protected final String ALL_SELECTION;
     protected final HashMap<MolecularDescriptor, StatsPanel> map;
-    protected final DescriptorSelectionPanel descriptorTable;
+    protected final DescriptorSelectionPanel leftTable;
+    protected static final String LAST_LEFT_VIEW = "last_left_view";
 
     /**
      * Creates new form MolecularFeaturesPanel
@@ -68,15 +74,25 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         leftPanel.add(new JScrollPane(leftList), "list");
 
         // Table view
-        descriptorTable = new DescriptorSelectionPanel(attrModel);
-        descriptorTable.setMinimumSize(leftPanel.getMinimumSize());
-        descriptorTable.setPreferredSize(leftPanel.getPreferredSize());
-        
-        leftPanel.add(new JScrollPane(descriptorTable), "table");
+        leftTable = new DescriptorSelectionPanel(attrModel);
+        leftTable.setMinimumSize(leftPanel.getMinimumSize());
+        leftTable.setPreferredSize(leftPanel.getPreferredSize());
+        leftTable.addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                TableModel model = (TableModel) e.getSource();
+                boolean flag = false;
+                for (int row = 0; row < model.getRowCount(); row++) {
+                    if ((boolean) model.getValueAt(row, 0)) {
+                        flag = true;
+                        break;
+                    }
+                }
+                addToDisplayButton.setEnabled(flag);
+            }
+        });
 
-        // Default view 
-        CardLayout cl = (CardLayout) leftPanel.getLayout();
-        cl.show(leftPanel, "list");
+        leftPanel.add(new JScrollPane(leftTable), "table");
 
         // Add tool bar buttons
         findButton = new JButton(leftList.getActionMap().get("find"));
@@ -127,11 +143,36 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
             }
         });
 
-        addToDisplayButton.setEnabled(false);
         removeFromDisplayButton.setEnabled(false);
         loadButton.setEnabled(false);
         featureTextField.setEnabled(false);
         map = new HashMap<>();
+        
+        // Default view 
+        String leftView = NbPreferences.forModule(MolecularFeaturesPanel.class).get(LAST_LEFT_VIEW, "list");
+        setLeftView(leftView);        
+    }
+
+    private void setLeftView(String leftView) {
+        CardLayout cl = (CardLayout) leftPanel.getLayout();
+        switch (leftView) {
+            case "list":
+                switcherComboBox.setSelectedIndex(0);
+                categoryComboBox.setEnabled(true);
+                findButton.setEnabled(true);
+                cl.show(leftPanel, "list");
+                addToDisplayButton.setEnabled(!leftList.getSelectionModel().isSelectionEmpty());
+                sizeLabel.setText(NbBundle.getMessage(MolecularFeaturesPanel.class, "MolecularFeaturesPanel.sizeLabel.text", leftList.getModel().getSize()));
+                break;
+            case "table":
+                switcherComboBox.setSelectedIndex(1);
+                categoryComboBox.setEnabled(false);
+                findButton.setEnabled(false);
+                cl.show(leftPanel, "table");
+                sizeLabel.setText(NbBundle.getMessage(MolecularFeaturesPanel.class, "MolecularFeaturesPanel.sizeLabel.text", leftTable.totalOfFeatures()));
+                addToDisplayButton.setEnabled(leftTable.getSelectedDescriptorKeys().size() > 0);
+                break;
+        }
     }
 
     private void setStats(MolecularDescriptor attribute) {
@@ -149,6 +190,18 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
     }
 
     private void addToDisplayedColumns() {
+        switch (switcherComboBox.getSelectedIndex()) {
+            case 0:
+                addToDisplayFromList();
+                break;
+            case 1:
+                addToDisplayFromTable();
+                break;
+        }
+        infoLabel.setVisible(!attrModel.canAddDisplayColumn());
+    }
+
+    private void addToDisplayFromList() {
         int[] indices = leftList.getSelectedIndices();
         DefaultListModel<MolecularDescriptor> leftListModel = (DefaultListModel<MolecularDescriptor>) leftList.getModel();
         for (int i = 0; i < indices.length && attrModel.canAddDisplayColumn(); i++) {
@@ -158,7 +211,18 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
             }
 
         }
-        infoLabel.setVisible(!attrModel.canAddDisplayColumn());
+    }
+
+    private void addToDisplayFromTable() {
+        Set<String> selected = leftTable.getSelectedDescriptorKeys();
+        for (String key : selected) {
+            for (MolecularDescriptor md : attrModel.getMolecularDescriptors(key)) {
+                if (!attrModel.addDisplayedColumn(md)) {
+                    return;
+                }
+                rightListModel.addElement(md);
+            }
+        }
     }
 
     private void removeFromDisplayedColumns() {
@@ -467,15 +531,14 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_loadButtonActionPerformed
 
     private void switcherComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_switcherComboBoxActionPerformed
-        CardLayout cl = (CardLayout) leftPanel.getLayout();
         switch (switcherComboBox.getSelectedIndex()) {
             case 0:
-                categoryComboBox.setEnabled(true);
-                cl.show(leftPanel, "list");
+                setLeftView("list");
+                NbPreferences.forModule(MolecularFeaturesPanel.class).put(LAST_LEFT_VIEW, "list");
                 break;
             case 1:
-                categoryComboBox.setEnabled(false);
-                cl.show(leftPanel, "table");
+                setLeftView("table");
+                NbPreferences.forModule(MolecularFeaturesPanel.class).put(LAST_LEFT_VIEW, "table");
                 break;
         }
     }//GEN-LAST:event_switcherComboBoxActionPerformed

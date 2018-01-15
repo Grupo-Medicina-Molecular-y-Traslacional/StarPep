@@ -152,6 +152,14 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
         }
     }
 
+    public int totalOfFeatures() {
+        int sum = 0;
+        for (int row = 0; row < tableModel.getRowCount(); row++) {
+            sum += (int) tableModel.getValueAt(row, 2);
+        }
+        return sum;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

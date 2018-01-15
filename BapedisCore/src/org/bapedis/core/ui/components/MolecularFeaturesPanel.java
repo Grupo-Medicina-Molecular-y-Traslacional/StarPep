@@ -6,12 +6,14 @@
 package org.bapedis.core.ui.components;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
+import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
@@ -36,6 +38,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
     protected final JButton findButton;
     protected final String ALL_SELECTION;
     protected final HashMap<MolecularDescriptor, StatsPanel> map;
+    protected final DescriptorSelectionPanel descriptorTable;
 
     /**
      * Creates new form MolecularFeaturesPanel
@@ -45,9 +48,9 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
     public MolecularFeaturesPanel(final AttributesModel attrModel) {
         initComponents();
         this.attrModel = attrModel;
-        
+
+        // List View
         leftList = new JXList();
-        leftScrollPane.setViewportView(leftList);
 
         rightListModel = new DefaultListModel<>();
         rightList = new JList<>(rightListModel);
@@ -55,12 +58,26 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
 
         // Fill combobox
         ALL_SELECTION = NbBundle.getMessage(MolecularFeaturesPanel.class, "MolecularFeaturesPanel.chooseAll.text");
-        DefaultComboBoxModel comboModel = (DefaultComboBoxModel) descriptorComboBox.getModel();
+        DefaultComboBoxModel comboModel = (DefaultComboBoxModel) categoryComboBox.getModel();
         comboModel.addElement(ALL_SELECTION);
         comboModel.setSelectedItem(ALL_SELECTION);
         for (String key : attrModel.getMolecularDescriptorKeys()) {
             comboModel.addElement(key);
         }
+
+        leftPanel.add(new JScrollPane(leftList), "list");
+
+        // Table view
+        descriptorTable = new DescriptorSelectionPanel(attrModel);
+        descriptorTable.setMinimumSize(leftPanel.getMinimumSize());
+        descriptorTable.setPreferredSize(leftPanel.getPreferredSize());
+        
+        leftPanel.add(new JScrollPane(descriptorTable), "table");
+
+        // Default view 
+        CardLayout cl = (CardLayout) leftPanel.getLayout();
+        cl.show(leftPanel, "list");
+
         // Add tool bar buttons
         findButton = new JButton(leftList.getActionMap().get("find"));
         findButton.setText("");
@@ -87,7 +104,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
                     ListSelectionModel lsm = (ListSelectionModel) e.getSource();
                     if (!lsm.isSelectionEmpty()) {
                         rightList.clearSelection();
-                        setStats(((DefaultListModel<MolecularDescriptor>)leftList.getModel()).get(leftList.getSelectedIndex()));
+                        setStats(((DefaultListModel<MolecularDescriptor>) leftList.getModel()).get(leftList.getSelectedIndex()));
                         loadButton.setEnabled(true);
                     }
                     addToDisplayButton.setEnabled(!lsm.isSelectionEmpty() && attrModel.canAddDisplayColumn());
@@ -133,7 +150,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
 
     private void addToDisplayedColumns() {
         int[] indices = leftList.getSelectedIndices();
-        DefaultListModel<MolecularDescriptor> leftListModel = (DefaultListModel<MolecularDescriptor>)leftList.getModel();
+        DefaultListModel<MolecularDescriptor> leftListModel = (DefaultListModel<MolecularDescriptor>) leftList.getModel();
         for (int i = 0; i < indices.length && attrModel.canAddDisplayColumn(); i++) {
             if (rightListModel.indexOf(leftListModel.get(indices[i])) < 0) {
                 attrModel.addDisplayedColumn(leftListModel.get(indices[i]));
@@ -163,8 +180,6 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        descriptorComboBox = new javax.swing.JComboBox<>();
-        leftScrollPane = new javax.swing.JScrollPane();
         infoLabel = new javax.swing.JLabel();
         rightUpperPanel = new javax.swing.JPanel();
         rightScrollPane = new javax.swing.JScrollPane();
@@ -173,7 +188,10 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         addToDisplayButton = new javax.swing.JButton();
         removeFromDisplayButton = new javax.swing.JButton();
         sizeLabel = new javax.swing.JLabel();
+        leftPanel = new javax.swing.JPanel();
         leftToolBar = new javax.swing.JToolBar();
+        switcherComboBox = new javax.swing.JComboBox<>();
+        categoryComboBox = new javax.swing.JComboBox<>();
         rightBottomPanel = new javax.swing.JPanel();
         rightControlPanel = new javax.swing.JPanel();
         loadButton = new javax.swing.JButton();
@@ -185,38 +203,11 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(690, 480));
         setLayout(new java.awt.GridBagLayout());
 
-        descriptorComboBox.setMinimumSize(new java.awt.Dimension(200, 27));
-        descriptorComboBox.setPreferredSize(new java.awt.Dimension(215, 27));
-        descriptorComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                descriptorComboBoxActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
-        add(descriptorComboBox, gridBagConstraints);
-
-        leftScrollPane.setMaximumSize(new java.awt.Dimension(275, 32767));
-        leftScrollPane.setMinimumSize(new java.awt.Dimension(275, 23));
-        leftScrollPane.setPreferredSize(new java.awt.Dimension(275, 23));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.gridheight = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-        add(leftScrollPane, gridBagConstraints);
-
         infoLabel.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
         infoLabel.setForeground(java.awt.Color.red);
         org.openide.awt.Mnemonics.setLocalizedText(infoLabel, org.openide.util.NbBundle.getMessage(MolecularFeaturesPanel.class, "MolecularFeaturesPanel.infoLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
@@ -241,7 +232,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         rightUpperPanel.add(rightScrollPane, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -291,7 +282,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         upperToolBar.add(removeFromDisplayButton);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
         add(upperToolBar, gridBagConstraints);
@@ -306,10 +297,40 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         add(sizeLabel, gridBagConstraints);
 
+        leftPanel.setMinimumSize(new java.awt.Dimension(275, 23));
+        leftPanel.setPreferredSize(new java.awt.Dimension(275, 23));
+        leftPanel.setLayout(new java.awt.CardLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridheight = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(leftPanel, gridBagConstraints);
+
         leftToolBar.setFloatable(false);
         leftToolBar.setRollover(true);
+
+        switcherComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "List view", "Table view" }));
+        switcherComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                switcherComboBoxActionPerformed(evt);
+            }
+        });
+        leftToolBar.add(switcherComboBox);
+
+        categoryComboBox.setMinimumSize(new java.awt.Dimension(200, 27));
+        categoryComboBox.setPreferredSize(new java.awt.Dimension(215, 27));
+        categoryComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                categoryComboBoxActionPerformed(evt);
+            }
+        });
+        leftToolBar.add(categoryComboBox);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
@@ -320,7 +341,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         rightBottomPanel.setPreferredSize(new java.awt.Dimension(275, 23));
         rightBottomPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
@@ -355,7 +376,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         rightControlPanel.add(featureTextField, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
@@ -367,7 +388,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         centerToolBar.add(jSeparator2);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
@@ -382,14 +403,14 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         removeFromDisplayedColumns();
     }//GEN-LAST:event_removeFromDisplayButtonActionPerformed
 
-    private void descriptorComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_descriptorComboBoxActionPerformed
+    private void categoryComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_categoryComboBoxActionPerformed
         final DefaultListModel<MolecularDescriptor> leftListModel = new DefaultListModel<>();
-        final String selectedKey = (String) descriptorComboBox.getSelectedItem();
+        final String selectedKey = (String) categoryComboBox.getSelectedItem();
         SwingWorker<Void, Void> sw = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
                 if (selectedKey.equals(ALL_SELECTION)) {
-                    for (String key: attrModel.getMolecularDescriptorKeys()) {
+                    for (String key : attrModel.getMolecularDescriptorKeys()) {
                         for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
                             leftListModel.addElement(attr);
                         }
@@ -416,14 +437,14 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
 
         };
         sw.execute();
-    }//GEN-LAST:event_descriptorComboBoxActionPerformed
+    }//GEN-LAST:event_categoryComboBoxActionPerformed
 
     private void loadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadButtonActionPerformed
         int[] indices = null;
         DefaultListModel<MolecularDescriptor> listModel = null;
         if (!leftList.getSelectionModel().isSelectionEmpty()) {
             indices = leftList.getSelectedIndices();
-            listModel = (DefaultListModel<MolecularDescriptor>)leftList.getModel();
+            listModel = (DefaultListModel<MolecularDescriptor>) leftList.getModel();
         } else if (!rightList.getSelectionModel().isSelectionEmpty()) {
             indices = rightList.getSelectedIndices();
             listModel = rightListModel;
@@ -445,16 +466,30 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
 
     }//GEN-LAST:event_loadButtonActionPerformed
 
+    private void switcherComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_switcherComboBoxActionPerformed
+        CardLayout cl = (CardLayout) leftPanel.getLayout();
+        switch (switcherComboBox.getSelectedIndex()) {
+            case 0:
+                categoryComboBox.setEnabled(true);
+                cl.show(leftPanel, "list");
+                break;
+            case 1:
+                categoryComboBox.setEnabled(false);
+                cl.show(leftPanel, "table");
+                break;
+        }
+    }//GEN-LAST:event_switcherComboBoxActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addToDisplayButton;
+    private javax.swing.JComboBox<String> categoryComboBox;
     private javax.swing.JToolBar centerToolBar;
-    private javax.swing.JComboBox<String> descriptorComboBox;
     private javax.swing.JTextField featureTextField;
     private javax.swing.JLabel infoLabel;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
-    private javax.swing.JScrollPane leftScrollPane;
+    private javax.swing.JPanel leftPanel;
     private javax.swing.JToolBar leftToolBar;
     private javax.swing.JButton loadButton;
     private javax.swing.JButton removeFromDisplayButton;
@@ -463,6 +498,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane rightScrollPane;
     private javax.swing.JPanel rightUpperPanel;
     private javax.swing.JLabel sizeLabel;
+    private javax.swing.JComboBox<String> switcherComboBox;
     private javax.swing.JToolBar upperToolBar;
     // End of variables declaration//GEN-END:variables
 }

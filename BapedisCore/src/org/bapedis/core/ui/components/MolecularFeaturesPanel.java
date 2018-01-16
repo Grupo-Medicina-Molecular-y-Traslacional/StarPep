@@ -7,6 +7,7 @@ package org.bapedis.core.ui.components;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -145,32 +146,17 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
 
         removeFromDisplayButton.setEnabled(false);
         loadButton.setEnabled(false);
-        featureTextField.setEnabled(false);
+        featureLabel.setText("");
         map = new HashMap<>();
-        
+
         // Default view 
         String leftView = NbPreferences.forModule(MolecularFeaturesPanel.class).get(LAST_LEFT_VIEW, "list");
-        setLeftView(leftView);        
-    }
-
-    private void setLeftView(String leftView) {
-        CardLayout cl = (CardLayout) leftPanel.getLayout();
         switch (leftView) {
             case "list":
                 switcherComboBox.setSelectedIndex(0);
-                categoryComboBox.setEnabled(true);
-                findButton.setEnabled(true);
-                cl.show(leftPanel, "list");
-                addToDisplayButton.setEnabled(!leftList.getSelectionModel().isSelectionEmpty());
-                sizeLabel.setText(NbBundle.getMessage(MolecularFeaturesPanel.class, "MolecularFeaturesPanel.sizeLabel.text", leftList.getModel().getSize()));
                 break;
             case "table":
                 switcherComboBox.setSelectedIndex(1);
-                categoryComboBox.setEnabled(false);
-                findButton.setEnabled(false);
-                cl.show(leftPanel, "table");
-                sizeLabel.setText(NbBundle.getMessage(MolecularFeaturesPanel.class, "MolecularFeaturesPanel.sizeLabel.text", leftTable.totalOfFeatures()));
-                addToDisplayButton.setEnabled(leftTable.getSelectedDescriptorKeys().size() > 0);
                 break;
         }
     }
@@ -178,12 +164,12 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
     private void setStats(MolecularDescriptor attribute) {
         rightBottomPanel.removeAll();
         if (map.containsKey(attribute)) {
-            featureTextField.setText(attribute.getDisplayName());
-            featureTextField.setEnabled(true);
+            featureLabel.setForeground(Color.black);
+            featureLabel.setText(attribute.getDisplayName());
             rightBottomPanel.add(map.get(attribute), BorderLayout.CENTER);
         } else {
-            featureTextField.setText("");
-            featureTextField.setEnabled(false);
+            featureLabel.setText("");
+            rightBottomPanel.removeAll();
         }
         rightBottomPanel.revalidate();
         rightBottomPanel.repaint();
@@ -217,10 +203,9 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         Set<String> selected = leftTable.getSelectedDescriptorKeys();
         for (String key : selected) {
             for (MolecularDescriptor md : attrModel.getMolecularDescriptors(key)) {
-                if (!attrModel.addDisplayedColumn(md)) {
-                    return;
+                if (attrModel.addDisplayedColumn(md)) {
+                    rightListModel.addElement(md);
                 }
-                rightListModel.addElement(md);
             }
         }
     }
@@ -259,12 +244,12 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         rightBottomPanel = new javax.swing.JPanel();
         rightControlPanel = new javax.swing.JPanel();
         loadButton = new javax.swing.JButton();
-        featureTextField = new javax.swing.JTextField();
+        featureLabel = new javax.swing.JLabel();
         centerToolBar = new javax.swing.JToolBar();
         jSeparator2 = new javax.swing.JToolBar.Separator();
 
-        setMinimumSize(new java.awt.Dimension(700, 480));
-        setPreferredSize(new java.awt.Dimension(690, 480));
+        setMinimumSize(new java.awt.Dimension(760, 480));
+        setPreferredSize(new java.awt.Dimension(760, 480));
         setLayout(new java.awt.GridBagLayout());
 
         infoLabel.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
@@ -274,7 +259,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 0, 2);
         add(infoLabel, gridBagConstraints);
 
         rightUpperPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(MolecularFeaturesPanel.class, "MolecularFeaturesPanel.rightUpperPanel.border.title"))); // NOI18N
@@ -318,7 +303,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         addToDisplayButton.setFocusable(false);
         addToDisplayButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         addToDisplayButton.setMaximumSize(new java.awt.Dimension(50, 21));
-        addToDisplayButton.setMinimumSize(new java.awt.Dimension(23, 21));
+        addToDisplayButton.setMinimumSize(new java.awt.Dimension(50, 21));
         addToDisplayButton.setPreferredSize(new java.awt.Dimension(50, 21));
         addToDisplayButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         addToDisplayButton.addActionListener(new java.awt.event.ActionListener() {
@@ -335,7 +320,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         removeFromDisplayButton.setFocusable(false);
         removeFromDisplayButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         removeFromDisplayButton.setMaximumSize(new java.awt.Dimension(50, 21));
-        removeFromDisplayButton.setMinimumSize(new java.awt.Dimension(23, 21));
+        removeFromDisplayButton.setMinimumSize(new java.awt.Dimension(50, 21));
         removeFromDisplayButton.setPreferredSize(new java.awt.Dimension(50, 21));
         removeFromDisplayButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         removeFromDisplayButton.addActionListener(new java.awt.event.ActionListener() {
@@ -352,6 +337,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         add(upperToolBar, gridBagConstraints);
 
         sizeLabel.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
+        sizeLabel.setForeground(java.awt.Color.black);
         org.openide.awt.Mnemonics.setLocalizedText(sizeLabel, org.openide.util.NbBundle.getMessage(MolecularFeaturesPanel.class, "MolecularFeaturesPanel.sizeLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -361,8 +347,8 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         add(sizeLabel, gridBagConstraints);
 
-        leftPanel.setMinimumSize(new java.awt.Dimension(275, 23));
-        leftPanel.setPreferredSize(new java.awt.Dimension(275, 23));
+        leftPanel.setMinimumSize(new java.awt.Dimension(335, 23));
+        leftPanel.setPreferredSize(new java.awt.Dimension(335, 23));
         leftPanel.setLayout(new java.awt.CardLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -377,6 +363,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         leftToolBar.setRollover(true);
 
         switcherComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "List view", "Table view" }));
+        switcherComboBox.setSelectedIndex(-1);
         switcherComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 switcherComboBoxActionPerformed(evt);
@@ -384,8 +371,6 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         });
         leftToolBar.add(switcherComboBox);
 
-        categoryComboBox.setMinimumSize(new java.awt.Dimension(200, 27));
-        categoryComboBox.setPreferredSize(new java.awt.Dimension(215, 27));
         categoryComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 categoryComboBoxActionPerformed(evt);
@@ -396,9 +381,10 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 0, 0);
         add(leftToolBar, gridBagConstraints);
 
         rightBottomPanel.setMinimumSize(new java.awt.Dimension(275, 23));
@@ -429,15 +415,16 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
         rightControlPanel.add(loadButton, gridBagConstraints);
 
-        featureTextField.setEditable(false);
-        featureTextField.setText(org.openide.util.NbBundle.getMessage(MolecularFeaturesPanel.class, "MolecularFeaturesPanel.featureTextField.text")); // NOI18N
+        featureLabel.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
+        featureLabel.setForeground(java.awt.Color.red);
+        org.openide.awt.Mnemonics.setLocalizedText(featureLabel, org.openide.util.NbBundle.getMessage(MolecularFeaturesPanel.class, "MolecularFeaturesPanel.featureLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
-        rightControlPanel.add(featureTextField, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 2);
+        rightControlPanel.add(featureLabel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -526,18 +513,33 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
             if (indices.length > 0) {
                 setStats(listModel.get(indices[0]));
             }
+        } else {
+            featureLabel.setForeground(Color.red);
+            featureLabel.setText(NbBundle.getMessage(MolecularFeaturesPanel.class, "MolecularFeaturesPanel.featureLabel.text"));
+            rightBottomPanel.removeAll();
+            rightBottomPanel.revalidate();
+            rightBottomPanel.repaint();
         }
 
     }//GEN-LAST:event_loadButtonActionPerformed
 
     private void switcherComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_switcherComboBoxActionPerformed
+        CardLayout cl = (CardLayout) leftPanel.getLayout();
         switch (switcherComboBox.getSelectedIndex()) {
             case 0:
-                setLeftView("list");
+                categoryComboBox.setEnabled(true);
+                findButton.setEnabled(true);
+                cl.show(leftPanel, "list");
+                addToDisplayButton.setEnabled(!leftList.getSelectionModel().isSelectionEmpty());
+                sizeLabel.setText(NbBundle.getMessage(MolecularFeaturesPanel.class, "MolecularFeaturesPanel.sizeLabel.text", leftList.getModel().getSize()));
                 NbPreferences.forModule(MolecularFeaturesPanel.class).put(LAST_LEFT_VIEW, "list");
                 break;
             case 1:
-                setLeftView("table");
+                categoryComboBox.setEnabled(false);
+                findButton.setEnabled(false);
+                cl.show(leftPanel, "table");
+                addToDisplayButton.setEnabled(leftTable.getSelectedDescriptorKeys().size() > 0);
+                sizeLabel.setText(NbBundle.getMessage(MolecularFeaturesPanel.class, "MolecularFeaturesPanel.sizeLabel.text", leftTable.totalOfFeatures()));
                 NbPreferences.forModule(MolecularFeaturesPanel.class).put(LAST_LEFT_VIEW, "table");
                 break;
         }
@@ -548,7 +550,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
     private javax.swing.JButton addToDisplayButton;
     private javax.swing.JComboBox<String> categoryComboBox;
     private javax.swing.JToolBar centerToolBar;
-    private javax.swing.JTextField featureTextField;
+    private javax.swing.JLabel featureLabel;
     private javax.swing.JLabel infoLabel;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;

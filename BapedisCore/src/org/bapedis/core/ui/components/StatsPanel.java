@@ -158,6 +158,8 @@ public class StatsPanel extends javax.swing.JPanel {
         summaryPanel.setPreferredSize(new java.awt.Dimension(275, 51));
         summaryPanel.setLayout(new java.awt.GridBagLayout());
 
+        maxLabel.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
+        maxLabel.setForeground(java.awt.Color.black);
         org.openide.awt.Mnemonics.setLocalizedText(maxLabel, org.openide.util.NbBundle.getMessage(StatsPanel.class, "StatsPanel.maxLabel.text")); // NOI18N
         maxLabel.setMaximumSize(new java.awt.Dimension(90, 14));
         maxLabel.setMinimumSize(new java.awt.Dimension(50, 14));
@@ -168,8 +170,11 @@ public class StatsPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 0, 2);
         summaryPanel.add(maxLabel, gridBagConstraints);
 
+        minLabel.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
+        minLabel.setForeground(java.awt.Color.black);
         org.openide.awt.Mnemonics.setLocalizedText(minLabel, org.openide.util.NbBundle.getMessage(StatsPanel.class, "StatsPanel.minLabel.text")); // NOI18N
         minLabel.setMaximumSize(new java.awt.Dimension(90, 14));
         minLabel.setMinimumSize(new java.awt.Dimension(50, 14));
@@ -180,36 +185,47 @@ public class StatsPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         summaryPanel.add(minLabel, gridBagConstraints);
 
+        jLabel1.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(StatsPanel.class, "StatsPanel.jLabel1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 0, 0);
         summaryPanel.add(jLabel1, gridBagConstraints);
 
+        jLabel2.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(StatsPanel.class, "StatsPanel.jLabel2.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 0);
         summaryPanel.add(jLabel2, gridBagConstraints);
 
+        jLabel3.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(StatsPanel.class, "StatsPanel.jLabel3.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 0, 0);
         summaryPanel.add(jLabel3, gridBagConstraints);
 
+        jLabel4.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(StatsPanel.class, "StatsPanel.jLabel4.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 0);
         summaryPanel.add(jLabel4, gridBagConstraints);
 
+        meanLabel.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
+        meanLabel.setForeground(java.awt.Color.black);
         org.openide.awt.Mnemonics.setLocalizedText(meanLabel, org.openide.util.NbBundle.getMessage(StatsPanel.class, "StatsPanel.meanLabel.text")); // NOI18N
         meanLabel.setMaximumSize(new java.awt.Dimension(90, 14));
         meanLabel.setMinimumSize(new java.awt.Dimension(50, 14));
@@ -220,8 +236,11 @@ public class StatsPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 0, 2);
         summaryPanel.add(meanLabel, gridBagConstraints);
 
+        stdLabel.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
+        stdLabel.setForeground(java.awt.Color.black);
         org.openide.awt.Mnemonics.setLocalizedText(stdLabel, org.openide.util.NbBundle.getMessage(StatsPanel.class, "StatsPanel.stdLabel.text")); // NOI18N
         stdLabel.setMaximumSize(new java.awt.Dimension(90, 14));
         stdLabel.setMinimumSize(new java.awt.Dimension(50, 14));
@@ -232,6 +251,7 @@ public class StatsPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         summaryPanel.add(stdLabel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();

@@ -980,7 +980,7 @@ class MouseSelectionPopupPanel extends javax.swing.JPanel {
 class NodeRelationshipsPanel extends JPanel {
 
     JCheckBox csnCheckBox;
-    JLabel label;
+    JLabel metadataInfoLabel;
     MetadataCheckBox[] metadataCheckBoxs;
     JPanel contentPanel;
 
@@ -988,6 +988,7 @@ class NodeRelationshipsPanel extends JPanel {
         super(new GridBagLayout());
         setMinimumSize(new Dimension(440, 240));
         setPreferredSize(new Dimension(440, 240));
+        
         GridBagConstraints gridBagConstraints;
 
         //Similarity Check Box
@@ -1003,13 +1004,13 @@ class NodeRelationshipsPanel extends JPanel {
         add(csnCheckBox, gridBagConstraints);
 
         // Label
-        label = new JLabel(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.relationshipsPanel.label"));
+        metadataInfoLabel = new JLabel(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.relationshipsPanel.label"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        add(label, gridBagConstraints);
+        add(metadataInfoLabel, gridBagConstraints);
 
         // Content Panel
         contentPanel = new JPanel(new GridBagLayout());
@@ -1057,22 +1058,4 @@ class NodeRelationshipsPanel extends JPanel {
 
 }
 
-class MetadataCheckBox {
 
-    private final JCheckBox cb;
-    private final AnnotationType aType;
-
-    public MetadataCheckBox(AnnotationType aType) {
-        this.aType = aType;
-        cb = new JCheckBox(aType.getDisplayName());
-    }
-
-    public JCheckBox getCheckBox() {
-        return cb;
-    }
-
-    public AnnotationType getAnnotationType() {
-        return aType;
-    }
-
-}

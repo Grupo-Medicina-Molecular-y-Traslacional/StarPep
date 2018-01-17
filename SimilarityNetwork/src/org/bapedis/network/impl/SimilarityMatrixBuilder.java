@@ -88,16 +88,6 @@ class SimilarityMatrixBuilder extends RecursiveAction {
                     score = similarityMeasure.computeSimilarity(peptide1, peptide2);
                     if (score >= 0.3) {
                         matrix.setValue(peptide1, peptide2, score);
-//                        Edge graphEdge = createGraphEdge(peptide1, peptide2, score);
-//                        // Add edge to csn graph
-//                        if (score >= threshold) {
-//                            csnGraph.writeLock();
-//                            try {
-//                                csnGraph.addEdge(graphEdge);
-//                            } finally {
-//                                csnGraph.writeUnlock();
-//                            }
-//                        }
                         histogram.addData(score);
                     }
                     progressTicket.progress();
@@ -106,31 +96,6 @@ class SimilarityMatrixBuilder extends RecursiveAction {
         }
     }
 
-//    private Edge createGraphEdge(Peptide peptide1, Peptide peptide2, float score) {
-//        Edge graphEdge;
-//        int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-//        String id = String.format("%s-%s", peptide1.getGraphNode().getId(), peptide2.getGraphNode().getId());
-//        // Add edge to main graph
-//        mainGraph.writeLock();
-//        try {
-//            graphEdge = mainGraph.getEdge(id);
-//            if (graphEdge == null) {
-//                graphEdge = graphModel.factory().newEdge(id, peptide1.getGraphNode(), peptide2.getGraphNode(), relType, ProjectManager.GRAPH_EDGE_WEIGHT, false);
-//                graphEdge.setLabel(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-//
-//                //Set color
-//                graphEdge.setR(ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f);
-//                graphEdge.setG(ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f);
-//                graphEdge.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
-//                graphEdge.setAlpha(0f);
-//
-//                mainGraph.addEdge(graphEdge);
-//            }
-//            graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, score);
-//        } finally {
-//            mainGraph.writeUnlock();
-//        }
-//        return graphEdge;
-//    }
+
 
 }

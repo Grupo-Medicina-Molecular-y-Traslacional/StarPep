@@ -30,12 +30,14 @@ public class SimilarityMatrix implements Serializable {
     public void setValue(Peptide peptide1, Peptide peptide2, Float value) {
         int x = (int)peptide1.getAttributeValue(INDEX_ATTR);
         int y = (int)peptide2.getAttributeValue(INDEX_ATTR);
+        assert x != y;
         data[ pos(x, y)] = value;
     }
 
     public Float getValue(Peptide peptide1, Peptide peptide2) {
         int x = (int)peptide1.getAttributeValue(INDEX_ATTR);
         int y = (int)peptide2.getAttributeValue(INDEX_ATTR);
+        assert x != y;
         return data[ pos(x, y)];
     }
 

@@ -9,7 +9,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.SimilarityMatrix;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.task.ProgressTicket;
+import org.gephi.graph.api.Edge;
+import org.gephi.graph.api.Graph;
+import org.gephi.graph.api.GraphModel;
 
 /**
  *
@@ -17,12 +21,14 @@ import org.bapedis.core.task.ProgressTicket;
  */
 class SimilarityMatrixBuilder extends RecursiveAction {
 
-    protected static final int SEQUENTIAL_THRESHOLD = 10;    
+    protected static final int SEQUENTIAL_THRESHOLD = 10;
     protected static Peptide[] peptides;
+    protected static Graph graph;
+    protected static float threshold;
     protected static ProgressTicket progressTicket;
     protected static SimilarityMeasure similarityMeasure;
     protected static JQuickHistogram histogram;
-    
+
     protected final SimilarityMatrix matrix;
     protected int xlow, xhigh, ylow, yhigh;
 
@@ -47,9 +53,9 @@ class SimilarityMatrixBuilder extends RecursiveAction {
 
     public SimilarityMatrix getSimilarityMatrix() {
         return matrix;
-    }    
-    
-    public int getSize(){
+    }
+
+    public int getSize() {
         return matrix.getSize();
     }
 
@@ -78,24 +84,65 @@ class SimilarityMatrixBuilder extends RecursiveAction {
     }
 
     private void computeDirectly() {
-        Peptide peptide1, peptide2;
         float score;
         for (int y = ylow; y < yhigh; y++) {
-            peptide1 = peptides[y];
             for (int x = xlow; x < Math.min(xhigh, y); x++) {
-                peptide2 = peptides[x];
                 if (!stopRun.get()) {
-                    score = similarityMeasure.computeSimilarity(peptide1, peptide2);
+                    score = similarityMeasure.computeSimilarity(peptides[y], peptides[x]);
                     if (score >= 0.3) {
-                        matrix.setValue(peptide1, peptide2, score);
+                        matrix.setValue(peptides[y], peptides[x], score);
                         histogram.addData(score);
                     }
                     progressTicket.progress();
                 }
             }
         }
+
+        new Thread(new Runnable() {
+            private final Graph graph = SimilarityMatrixBuilder.graph;
+
+            @Override
+            public void run() {
+                // Add similarity edge to graph
+                Edge graphEdge;
+                Float score;
+                graph.writeLock();
+                try {
+                    for (int y = ylow; y < yhigh; y++) {
+                        for (int x = xlow; x < Math.min(xhigh, y); x++) {
+                            score = matrix.getValue(peptides[y], peptides[x]);
+                            if (score != null && score >= threshold) {
+                                graphEdge = createGraphEdge(peptides[y], peptides[x], score);
+                                graph.addEdge(graphEdge);
+                            }
+                        }
+                    }
+                } finally {
+                    graph.writeUnlock();
+                }
+            }
+
+            private Edge createGraphEdge(Peptide peptide1, Peptide peptide2, Float score) {
+                GraphModel graphModel = graph.getModel();
+                int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+                String id = String.format("%s-%s", peptide1.getId(), peptide2.getId());
+
+                // Create Edge
+                Edge graphEdge = graphModel.factory().newEdge(id, peptide1.getGraphNode(), peptide2.getGraphNode(), relType, ProjectManager.GRAPH_EDGE_WEIGHT, false);
+                graphEdge.setLabel(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+
+                //Set color
+                graphEdge.setR(ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f);
+                graphEdge.setG(ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f);
+                graphEdge.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
+                graphEdge.setAlpha(0f);
+
+                // Add edge to main graph
+                graphModel.getGraph().addEdge(graphEdge);
+                graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, score);
+
+                return graphEdge;
+            }
+        }).start();
     }
-
-
-
 }

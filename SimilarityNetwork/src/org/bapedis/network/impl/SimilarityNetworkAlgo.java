@@ -10,6 +10,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.concurrent.ForkJoinPool;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.GraphViz;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.SimilarityMatrix;
 import org.bapedis.core.model.Workspace;
@@ -65,38 +66,32 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
         attrModel = pc.getAttributesModel(workspace);
         if (attrModel != null) {
             peptides = attrModel.getPeptides().toArray(new Peptide[0]);
+            graphModel = pc.getGraphModel(workspace);
+            graph = graphModel.getGraphVisible();
+            GraphViz graphViz = pc.getGraphViz(workspace);
+
             // Setup Similarity Matrix Builder
             SimilarityMatrixBuilder.setStopRun(stopRun);
             SimilarityMatrixBuilder.peptides = peptides;
+            SimilarityMatrixBuilder.graph = graph;
+            SimilarityMatrixBuilder.threshold = graphViz.getSimilarityThreshold();
             SimilarityMatrixBuilder.progressTicket = progressTicket;
             SimilarityMatrixBuilder.similarityMeasure = getSimilarityMeasure();
             SimilarityMatrixBuilder.histogram = histogram;
 
             // Remove all similarity edges..
-            graphModel = pc.getGraphModel(workspace);
-            graph = graphModel.getGraphVisible();
             int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-            
-            // Remove from main graph
-            removeAllSimilarityEdges(graphModel.getGraph(), relType);
-            
-            
-//            if (!graphModel.getVisibleView().isMainView()) {
-//                removeAllSimilarityEdges(graphModel.getGraphVisible(), relType);
-//            }
+            Graph mainGraph = graphModel.getGraph();
+            mainGraph.writeLock();
+            try {
+                for (Node node : mainGraph.getNodes()) {
+                    mainGraph.clearEdges(node, relType);
+                }
+            } finally {
+                mainGraph.writeUnlock();
+            }
         }
     }
-    
-    private void removeAllSimilarityEdges(Graph graph, int relType) {
-        graph.writeLock();
-        try {
-            for (Node node : graph.getNodes()) {
-                graph.clearEdges(node, relType);
-            }
-        } finally {
-            graph.writeUnlock();
-        }
-    }    
 
     @Override
     public void endAlgo() {
@@ -107,6 +102,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
         graph = null;
         progressTicket = null;
         SimilarityMatrixBuilder.peptides = null;
+        SimilarityMatrixBuilder.graph = null;
         SimilarityMatrixBuilder.similarityMeasure = null;
         SimilarityMatrixBuilder.progressTicket = null;
         SimilarityMatrixBuilder.histogram = null;
@@ -155,49 +151,9 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
             // Add the new similarity matrix to workspace
             matrix = task.getSimilarityMatrix();
             workspace.add(matrix);
-
-            // Add edge to csn graph
-            Edge graphEdge;
-            Float score;
-            graph.writeLock();
-            try {
-                for (int i = 0; i < peptides.length - 1; i++) {
-                    for (int j = i + 1; j < peptides.length; j++) {
-                        score = matrix.getValue(peptides[i], peptides[j]);
-                        if (score != null) {
-                            graphEdge = createOrGetGraphEdge(peptides[i], peptides[j], score);
-                            graph.addEdge(graphEdge);
-                        }
-                    }
-                }
-            } finally {
-                graph.writeUnlock();
-            }
+            
             propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY_VALUES, null, histogram);
         }
-    }
-
-    private Edge createOrGetGraphEdge(Peptide peptide1, Peptide peptide2, float score) {
-        Edge graphEdge;
-        int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-        String id = String.format("%s-%s", peptide1.getGraphNode().getId(), peptide2.getGraphNode().getId());
-        // Add edge to main graph
-        graphEdge = graph.getEdge(id);
-        if (graphEdge == null) {
-            graphEdge = graphModel.factory().newEdge(id, peptide1.getGraphNode(), peptide2.getGraphNode(), relType, ProjectManager.GRAPH_EDGE_WEIGHT, false);
-            graphEdge.setLabel(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-
-            //Set color
-            graphEdge.setR(ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f);
-            graphEdge.setG(ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f);
-            graphEdge.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
-            graphEdge.setAlpha(0f);
-            
-            graphModel.getGraph().addEdge(graphEdge);
-        }
-        graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, score);
-
-        return graphEdge;
     }
 
     public void addSimilarityChangeListener(PropertyChangeListener listener) {

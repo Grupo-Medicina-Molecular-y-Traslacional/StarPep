@@ -76,16 +76,27 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
             graphModel = pc.getGraphModel(workspace);
             graph = graphModel.getGraphVisible();
             int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-            graph.writeLock();
-            try {
-                for (Node node : graph.getNodes()) {
-                    graph.clearEdges(node, relType);
-                }
-            } finally {
-                graph.writeUnlock();
-            }
+            
+            // Remove from main graph
+            removeAllSimilarityEdges(graphModel.getGraph(), relType);
+            
+            
+//            if (!graphModel.getVisibleView().isMainView()) {
+//                removeAllSimilarityEdges(graphModel.getGraphVisible(), relType);
+//            }
         }
     }
+    
+    private void removeAllSimilarityEdges(Graph graph, int relType) {
+        graph.writeLock();
+        try {
+            for (Node node : graph.getNodes()) {
+                graph.clearEdges(node, relType);
+            }
+        } finally {
+            graph.writeUnlock();
+        }
+    }    
 
     @Override
     public void endAlgo() {
@@ -181,8 +192,8 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
             graphEdge.setG(ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f);
             graphEdge.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
             graphEdge.setAlpha(0f);
-
-            graph.addEdge(graphEdge);
+            
+            graphModel.getGraph().addEdge(graphEdge);
         }
         graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, score);
 

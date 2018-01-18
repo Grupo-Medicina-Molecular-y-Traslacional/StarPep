@@ -110,7 +110,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     private final JPopupButton labelSizeModeButton = new JPopupButton();
     private final JPopupButton labelColorModeButton = new JPopupButton();
     private final JSlider nodeSizeSlider = new JSlider();
-    private final JButton relationshipsButton = new JButton();
+    private final JButton metadataButton = new JButton();
     //Edge
     private final JToggleButton showEdgeButton = new JToggleButton();
     private final JToggleButton edgeHasNodeColorButton = new JToggleButton();
@@ -292,20 +292,19 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         topToolbar.addSeparator();
 
         // Relationships
-        relationshipsButton.setFocusable(false);
-        relationshipsButton.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.relationshipsButton.text"));
-        relationshipsButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.relationshipsButton.toolTipText"));
-        relationshipsButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/relationships.png", false));
-        relationshipsButton.addActionListener(new ActionListener() {
+        metadataButton.setFocusable(false);
+        metadataButton.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.metadataButton.text"));
+        metadataButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.metadataButton.toolTipText"));
+        metadataButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/relationships.png", false));
+        metadataButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 GraphViz graphViz = pc.getGraphViz();
-                NodeRelationshipsPanel relationshipsPanel = new NodeRelationshipsPanel(graphViz);
-                DialogDescriptor dd = new DialogDescriptor(relationshipsPanel, NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.relationshipsPanel.title"));
+                MetadataPanel metadataPanel = new MetadataPanel(graphViz);
+                DialogDescriptor dd = new DialogDescriptor(metadataPanel, NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.metadataPanel.title"));
                 dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION});
                 if (DialogDisplayer.getDefault().notify(dd) == DialogDescriptor.OK_OPTION) {
-                    graphViz.setCsnVisible(relationshipsPanel.getCSNCheckBox().isSelected());
-                    for (MetadataCheckBox mcb : relationshipsPanel.getMetadataCheckBoxs()) {
+                    for (MetadataCheckBox mcb : metadataPanel.getMetadataCheckBoxs()) {
                         if (mcb.getCheckBox().isSelected()) {
                             graphViz.addDisplayedMetadata(mcb.getAnnotationType());
                         } else {
@@ -315,7 +314,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 }
             }
         });
-        topToolbar.add(relationshipsButton);
+        topToolbar.add(metadataButton);
 
         topToolbar.addSeparator();
 
@@ -977,51 +976,38 @@ class MouseSelectionPopupPanel extends javax.swing.JPanel {
     }
 }
 
-class NodeRelationshipsPanel extends JPanel {
+class MetadataPanel extends JPanel {
 
-    JCheckBox csnCheckBox;
-    JLabel metadataInfoLabel;
     MetadataCheckBox[] metadataCheckBoxs;
-    JPanel contentPanel;
+    JLabel metadataInfoLabel;
+    JPanel centerPanel;
 
-    public NodeRelationshipsPanel(GraphViz graphViz) {
+    public MetadataPanel(GraphViz graphViz) {
         super(new GridBagLayout());
-        setMinimumSize(new Dimension(440, 240));
-        setPreferredSize(new Dimension(440, 240));
-        
-        GridBagConstraints gridBagConstraints;
+        setMinimumSize(new Dimension(440, 220));
+        setPreferredSize(new Dimension(440, 220));
 
-        //Similarity Check Box
-        csnCheckBox = new JCheckBox(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.relationshipsPanel.csn"));
-        csnCheckBox.setSelected(graphViz.isCsnVisible());
-        csnCheckBox.setFocusable(false);
-        csnCheckBox.setHorizontalTextPosition(SwingConstants.LEFT);
+        GridBagConstraints gridBagConstraints;
+        
+       // Label
+        metadataInfoLabel = new JLabel(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.metadataPanel.label"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(5, 0, 0, 5);
-        add(csnCheckBox, gridBagConstraints);
-
-        // Label
-        metadataInfoLabel = new JLabel(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.relationshipsPanel.label"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(metadataInfoLabel, gridBagConstraints);
 
-        // Content Panel
-        contentPanel = new JPanel(new GridBagLayout());
+        // Center Panel
+        centerPanel = new JPanel(new GridBagLayout());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(2, 5, 0, 5);
-        add(contentPanel, gridBagConstraints);
+        gridBagConstraints.insets = new Insets(5, 5, 0, 5);
+        add(centerPanel, gridBagConstraints);
         initMetadataCheckBoxs(graphViz);
     }
 
@@ -1044,18 +1030,32 @@ class NodeRelationshipsPanel extends JPanel {
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(2, 5, 0, 0);
-            contentPanel.add(cb, gridBagConstraints);
+            centerPanel.add(cb, gridBagConstraints);
         }
     }
 
-    public JCheckBox getCSNCheckBox() {
-        return csnCheckBox;
-    }        
-
     public MetadataCheckBox[] getMetadataCheckBoxs() {
         return metadataCheckBoxs;
-    }        
+    }
 
 }
 
+class MetadataCheckBox {
 
+    private final JCheckBox cb;
+    private final AnnotationType aType;
+
+    public MetadataCheckBox(AnnotationType aType) {
+        this.aType = aType;
+        cb = new JCheckBox(aType.getDisplayName());
+    }
+
+    public JCheckBox getCheckBox() {
+        return cb;
+    }
+
+    public AnnotationType getAnnotationType() {
+        return aType;
+    }
+
+}

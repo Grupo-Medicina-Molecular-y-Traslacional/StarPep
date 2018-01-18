@@ -28,7 +28,7 @@ import org.openide.util.Lookup;
  *
  * @author loge
  */
-public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeasure {
+public abstract class SimilarityNetworkBaseAlgo implements Algorithm, SimilarityMeasure {
 
     public static final String CHANGED_SIMILARITY_VALUES = "similarity_values";
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
@@ -44,7 +44,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
     protected final PropertyChangeSupport propertyChangeSupport;
     protected Workspace workspace;
 
-    public SimilarityNetworkAlgo(AlgorithmFactory factory) {
+    public SimilarityNetworkBaseAlgo(AlgorithmFactory factory) {
         this.factory = factory;
         propertyChangeSupport = new PropertyChangeSupport(this);
         histogram = new JQuickHistogram();
@@ -71,13 +71,13 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
             GraphViz graphViz = pc.getGraphViz(workspace);
 
             // Setup Similarity Matrix Builder
-            SimilarityMatrixBuilder.setStopRun(stopRun);
-            SimilarityMatrixBuilder.peptides = peptides;
-            SimilarityMatrixBuilder.graph = graph;
-            SimilarityMatrixBuilder.threshold = graphViz.getSimilarityThreshold();
-            SimilarityMatrixBuilder.progressTicket = progressTicket;
-            SimilarityMatrixBuilder.similarityMeasure = getSimilarityMeasure();
-            SimilarityMatrixBuilder.histogram = histogram;
+            SimilarityNetworkBuilder.setStopRun(stopRun);
+            SimilarityNetworkBuilder.peptides = peptides;
+            SimilarityNetworkBuilder.graph = graph;
+            SimilarityNetworkBuilder.threshold = graphViz.getSimilarityThreshold();
+            SimilarityNetworkBuilder.progressTicket = progressTicket;
+            SimilarityNetworkBuilder.similarityMeasure = getSimilarityMeasure();
+            SimilarityNetworkBuilder.histogram = histogram;
 
             // Remove all similarity edges..
             int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
@@ -101,17 +101,17 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
         graphModel = null;
         graph = null;
         progressTicket = null;
-        SimilarityMatrixBuilder.peptides = null;
-        SimilarityMatrixBuilder.graph = null;
-        SimilarityMatrixBuilder.similarityMeasure = null;
-        SimilarityMatrixBuilder.progressTicket = null;
-        SimilarityMatrixBuilder.histogram = null;
+        SimilarityNetworkBuilder.peptides = null;
+        SimilarityNetworkBuilder.graph = null;
+        SimilarityNetworkBuilder.similarityMeasure = null;
+        SimilarityNetworkBuilder.progressTicket = null;
+        SimilarityNetworkBuilder.histogram = null;
     }
 
     @Override
     public boolean cancel() {
         stopRun = true;
-        SimilarityMatrixBuilder.setStopRun(stopRun);
+        SimilarityNetworkBuilder.setStopRun(stopRun);
         return true;
     }
 
@@ -142,7 +142,7 @@ public abstract class SimilarityNetworkAlgo implements Algorithm, SimilarityMeas
             }
 
             // Build new similarity matrix
-            SimilarityMatrixBuilder task = new SimilarityMatrixBuilder();
+            SimilarityNetworkBuilder task = new SimilarityNetworkBuilder();
             int workunits = task.getSize();
             progressTicket.switchToDeterminate(workunits);
             fjPool.invoke(task);

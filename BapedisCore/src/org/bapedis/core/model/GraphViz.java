@@ -30,7 +30,7 @@ public class GraphViz {
         displayedMetadata = new HashSet<>(AnnotationType.values().length);
 //        displayedMetadata.add(AnnotationType.DATABASE);
         csnVisible = true;
-        similarityThreshold = 0.7f;
+        similarityThreshold = 0.3f;
     }
     
     public boolean isDisplayedMetadata(AnnotationType aType){

@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.ui.actions;
 
+import java.awt.event.ActionEvent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.bapedis.core.model.AlgorithmCategory;
@@ -28,8 +29,22 @@ import org.openide.util.NbBundle;
 @NbBundle.Messages({"CTL_SimilarityNetworkAction=Similarity Network"})
 public class SimilarityNetworkAction extends ToolAction {
     
+    
     public SimilarityNetworkAction() {
         super(AlgorithmCategory.SimilarityNetwork);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        
+    }
+
+    @Override
+    public JMenuItem getMenuPresenter() {
+        JMenu menu = (JMenu) super.getMenuPresenter();
+        JMenuItem newItem = new JMenuItem(new SimilarityNetworkWizardAction());
+        menu.insert(newItem, 0);
+        return menu;
     }
 
 }

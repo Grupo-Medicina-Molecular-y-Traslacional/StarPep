@@ -24,7 +24,7 @@ import org.openide.util.Exceptions;
  *
  * @author loge
  */
-public class SequenceSimilarityNetwork extends SimilarityNetworkAlgo {
+public class SequenceSimilarityNetwork extends SimilarityNetworkBaseAlgo {
 
     public static final String[] Alignment_Type = new String[]{"Needleman-Wunsch", "Smith-Waterman"};
     public static final String[] Substitution_Matrix = new String[]{

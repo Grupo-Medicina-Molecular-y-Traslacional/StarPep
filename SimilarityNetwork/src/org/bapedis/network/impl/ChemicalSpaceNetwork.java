@@ -24,7 +24,7 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class ChemicalSpaceNetwork extends SimilarityNetworkAlgo {
+public class ChemicalSpaceNetwork extends SimilarityNetworkBaseAlgo {
 
     public static final int MIN_AVAILABLE_FEATURES = 2;
     protected final Set<String> descriptorKeys;

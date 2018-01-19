@@ -5,6 +5,8 @@
  */
 package org.bapedis.core.spi.network;
 
+import org.bapedis.core.spi.algo.AlgorithmFactory;
+
 /**
  *
  * @author loge
@@ -22,6 +24,9 @@ public interface SimilarityNetworkFactory {
      * @return  a description snippet for the algorithm
      */
     public String getDescription();
+    
+    
+    public AlgorithmFactory[] getNetworkSettings();
     
     
 }

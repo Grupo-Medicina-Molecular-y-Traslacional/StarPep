@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.spi.algo;
 
-import javax.swing.Icon;
 import javax.swing.JPanel;
 
 /**

@@ -57,6 +57,10 @@ public class SimilarityNetworkWizardAction extends AbstractAction {
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wiz.setTitleFormat(new MessageFormat("{0}"));
         wiz.setTitle(NbBundle.getMessage(SimilarityNetworkWizardAction.class, "SimilarityNetworkWizard.title"));
+        
+        //The image in the left sidebar of the wizard is set like this:
+//        wiz.putProperty(WizardDescriptor.PROP_IMAGE, ImageUtilities.loadImage("org/demo/wizard/banner.PNG", true));
+        
         if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
 //            ProjectInfo pInfo = (ProjectInfo)wiz.getProperty(NewProjectVisualPanel1.PROJECT_TYPE);
 //            String name = (String)wiz.getProperty(NewProjectVisualPanel2.PRO_NAME);

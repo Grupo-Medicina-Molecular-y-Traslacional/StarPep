@@ -23,8 +23,6 @@ class SimilarityNetworkBuilder extends RecursiveAction {
 
     protected static final int SEQUENTIAL_THRESHOLD = 10;
     protected static Peptide[] peptides;
-    protected static Graph graph;
-    protected static float threshold;
     protected static ProgressTicket progressTicket;
     protected static SimilarityMeasure similarityMeasure;
     protected static JQuickHistogram histogram;
@@ -97,54 +95,8 @@ class SimilarityNetworkBuilder extends RecursiveAction {
                 }
             }
         }
-
-        // Add similarity edge to graph
-        new Thread(new Runnable() {
-            private final Graph graph = SimilarityNetworkBuilder.graph;
-
-            @Override
-            public void run() {
-                Edge graphEdge;
-                Float value;
-                graph.writeLock();
-                try {
-                    for (int y = ylow; y < yhigh; y++) {
-                        for (int x = xlow; x < Math.min(xhigh, y); x++) {
-                            value = matrix.getValue(peptides[y], peptides[x]);
-                            if (value != null && value >= threshold) {
-                                graphEdge = createGraphEdge(peptides[y], peptides[x], value);
-                                graph.addEdge(graphEdge);
-                            }
-                        }
-                    }
-                } finally {
-                    graph.writeUnlock();
-                }
-            }
-
-        }).start();
     }
 
-    private Edge createGraphEdge(Peptide peptide1, Peptide peptide2, Float score) {
-        GraphModel graphModel = graph.getModel();
-        int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-        String id = String.format("%s-%s", peptide1.getId(), peptide2.getId());
 
-        // Create Edge
-        Edge graphEdge = graphModel.factory().newEdge(id, peptide1.getGraphNode(), peptide2.getGraphNode(), relType, ProjectManager.GRAPH_EDGE_WEIGHT, false);
-        graphEdge.setLabel(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-
-        //Set color
-        graphEdge.setR(ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f);
-        graphEdge.setG(ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f);
-        graphEdge.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
-        graphEdge.setAlpha(0f);
-
-        // Add edge to main graph
-        graphModel.getGraph().addEdge(graphEdge);
-        graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, score);
-
-        return graphEdge;
-    }
 
 }

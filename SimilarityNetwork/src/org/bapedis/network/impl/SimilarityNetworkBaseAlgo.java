@@ -73,8 +73,6 @@ public abstract class SimilarityNetworkBaseAlgo implements Algorithm, Similarity
             // Setup Similarity Matrix Builder
             SimilarityNetworkBuilder.setStopRun(stopRun);
             SimilarityNetworkBuilder.peptides = peptides;
-            SimilarityNetworkBuilder.graph = graph;
-            SimilarityNetworkBuilder.threshold = graphViz.getSimilarityThreshold();
             SimilarityNetworkBuilder.progressTicket = progressTicket;
             SimilarityNetworkBuilder.similarityMeasure = getSimilarityMeasure();
             SimilarityNetworkBuilder.histogram = histogram;
@@ -102,7 +100,6 @@ public abstract class SimilarityNetworkBaseAlgo implements Algorithm, Similarity
         graph = null;
         progressTicket = null;
         SimilarityNetworkBuilder.peptides = null;
-        SimilarityNetworkBuilder.graph = null;
         SimilarityNetworkBuilder.similarityMeasure = null;
         SimilarityNetworkBuilder.progressTicket = null;
         SimilarityNetworkBuilder.histogram = null;
@@ -151,9 +148,48 @@ public abstract class SimilarityNetworkBaseAlgo implements Algorithm, Similarity
             // Add the new similarity matrix to workspace
             matrix = task.getSimilarityMatrix();
             workspace.add(matrix);
-            
+
+            // Add similarity edge to graph
+            Edge graphEdge;
+            Float score;
+            graph.writeLock();
+            try {
+                for (int i=0; i < peptides.length -1; i++) {
+                    for (int j = i + 1; j < peptides.length; j++) {
+                        score = matrix.getValue(peptides[i], peptides[j]);
+                        if (score != null && score >= 0.3) {
+                            graphEdge = createGraphEdge(peptides[i], peptides[j], score);
+                            graph.addEdge(graphEdge);
+                        }
+                    }
+                }
+            } finally {
+                graph.writeUnlock();
+            }
+
             propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY_VALUES, null, histogram);
         }
+    }
+
+    private Edge createGraphEdge(Peptide peptide1, Peptide peptide2, Float score) {
+        int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+        String id = String.format("%s-%s", peptide1.getId(), peptide2.getId());
+
+        // Create Edge
+        Edge graphEdge = graphModel.factory().newEdge(id, peptide1.getGraphNode(), peptide2.getGraphNode(), relType, ProjectManager.GRAPH_EDGE_WEIGHT, false);
+        graphEdge.setLabel(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+
+        //Set color
+        graphEdge.setR(ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f);
+        graphEdge.setG(ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f);
+        graphEdge.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
+        graphEdge.setAlpha(0f);
+
+        // Add edge to main graph
+        graphModel.getGraph().addEdge(graphEdge);
+        graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, score);
+
+        return graphEdge;
     }
 
     public void addSimilarityChangeListener(PropertyChangeListener listener) {

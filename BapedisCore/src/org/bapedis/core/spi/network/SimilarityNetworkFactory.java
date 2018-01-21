@@ -5,7 +5,8 @@
  */
 package org.bapedis.core.spi.network;
 
-import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmSetupUI;
 
 /**
  *
@@ -23,10 +24,18 @@ public interface SimilarityNetworkFactory {
      * The description of the algorithm purpose.
      * @return  a description snippet for the algorithm
      */
-    public String getDescription();
+    public String getDescription();    
     
-    
-    public AlgorithmFactory[] getNetworkSettings();
-    
-    
+    /**
+     * User interface attributes (name, description, icon...) for all algorithms
+     * built by this factory.
+     * @return a <code>LayoutUI</code> instance
+     */
+    public SimilarityNetworkSetupUI getSetupUI();
+
+    /**
+     * Builds an instance of the algorithm.
+     * @return  a new <code>Layout</code> instance
+     */
+    public Algorithm createAlgorithm();
 }

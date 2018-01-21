@@ -39,7 +39,7 @@ public interface AlgorithmFactory {
     public AlgorithmSetupUI getSetupUI();
 
     /**
-     * Builds an instance of the Layout.
+     * Builds an instance of the algorithm.
      * @return  a new <code>Layout</code> instance
      */
     public Algorithm createAlgorithm();

@@ -14,7 +14,15 @@ import org.openide.WizardDescriptor;
  */
 public interface SimilarityNetworkSetupUI {
     
-    WizardDescriptor.Panel<WizardDescriptor> getWizardPanels(Algorithm algorithm);
+    /**
+     * Collection of wizard panels. For each step in the wizard, a panel has to be provided
+     * @return a <code>array</code> of wizard panels
+     */    
+    WizardDescriptor.Panel<WizardDescriptor>[] getWizardPanels(Algorithm algorithm);
     
-    void finishWizard(Algorithm algorithm);
+    /**
+     * The finish button of the wizard has been clicked
+     * Save properties from wizard to algorithm
+     */     
+    void finishedWizard(WizardDescriptor wiz, Algorithm algorithm);
 }

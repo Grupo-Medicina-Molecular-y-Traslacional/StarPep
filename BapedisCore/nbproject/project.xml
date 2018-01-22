@@ -199,6 +199,7 @@
                 <package>org.bapedis.core.spi.data</package>
                 <package>org.bapedis.core.spi.filters</package>
                 <package>org.bapedis.core.spi.filters.impl</package>
+                <package>org.bapedis.core.spi.network</package>
                 <package>org.bapedis.core.spi.ui</package>
                 <package>org.bapedis.core.task</package>
                 <package>org.bapedis.core.ui</package>

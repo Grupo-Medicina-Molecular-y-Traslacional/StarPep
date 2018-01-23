@@ -26,11 +26,16 @@ import org.openide.util.NbBundle;
  */
 public class CheckBoxHeader extends JCheckBox implements TableCellRenderer {
 
+    private JTableHeader header;
+    private int index;
     public CheckBoxHeader(final JTableHeader header, final int index) {
+        this.header = header;
+        this.index = index;
+        
         setOpaque(false);
         setFont(header.getFont());
         setHorizontalAlignment(SwingConstants.CENTER);
-        setToolTipText(NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.checkAll.text"));
+        setToolTipText(NbBundle.getMessage(CheckBoxHeader.class, "CheckBoxHeader.checkAll.text"));
 
         header.addMouseListener(new MouseAdapter() {
             @Override
@@ -55,16 +60,23 @@ public class CheckBoxHeader extends JCheckBox implements TableCellRenderer {
             @Override
             public void tableChanged(TableModelEvent e) {
                 TableModel model = (TableModel) e.getSource();
-                if (model.getRowCount() > 0) {
-                    boolean flag = (boolean) model.getValueAt(0, index);
-                    for (int row = 1; row < model.getRowCount() && flag; row++) {
-                        flag = flag && (boolean) model.getValueAt(row, index);
-                    }
-                    setSelected(flag);
-                    header.repaint();
-                }
+                refreshSelection(model);
             }
         });
+        
+        refreshSelection(header.getTable().getModel());
+    }
+
+    private void refreshSelection(TableModel model) {
+        if (model.getRowCount() > 0) {
+            boolean flag = (boolean) model.getValueAt(0, index);
+            for (int row = 1; row < model.getRowCount() && flag; row++) {
+                flag = flag && (boolean) model.getValueAt(row, index);
+            }
+            setSelected(flag);
+            header.invalidate();
+            header.repaint();
+        }
     }
 
     @Override

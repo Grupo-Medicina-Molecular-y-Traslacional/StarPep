@@ -197,7 +197,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
 
     }
 
-   static class MyTableModel extends AbstractTableModel {
+   private static class MyTableModel extends AbstractTableModel {
 
         private final String[] columnNames;
         private final ArrayList<Object[]> data;

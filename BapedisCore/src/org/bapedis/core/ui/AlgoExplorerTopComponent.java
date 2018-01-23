@@ -470,10 +470,10 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             Algorithm selectedAlgorithm = algoModel.getSelectedAlgorithm();
 
             if (selectedAlgorithm.getFactory().getSetupUI() != null) {
-                JPanel editPanel = selectedAlgorithm.getFactory().getSetupUI().getSettingPanel(selectedAlgorithm);
-                editPanel.setBorder(BorderFactory.createTitledBorder(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.editPanel.border.title"))); // NOI18N
+                JPanel settingPanel = selectedAlgorithm.getFactory().getSetupUI().getSettingPanel(selectedAlgorithm);
+                settingPanel.setBorder(BorderFactory.createTitledBorder(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.settingPanel.bordertitle"))); // NOI18N
                 propSheetPanel.setVisible(false);
-                scrollPane.setViewportView(editPanel);
+                scrollPane.setViewportView(settingPanel);
                 scrollPane.setVisible(true);
             } else {
                 scrollPane.setViewportView(null);

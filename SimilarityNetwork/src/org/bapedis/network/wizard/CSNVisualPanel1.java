@@ -89,13 +89,15 @@ public final class CSNVisualPanel1 extends JPanel {
         jLessButton = new javax.swing.JButton();
         jPIDSlider = new javax.swing.JSlider();
         jMoreButton = new javax.swing.JButton();
+        jextLabel = new javax.swing.JLabel();
         jQuestionLabel = new javax.swing.JLabel();
         jOption1 = new javax.swing.JRadioButton();
         jOption2 = new javax.swing.JRadioButton();
+        jwarningLabel = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
-        bottomPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.bottomPanel.border.title"))); // NOI18N
+        bottomPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         bottomPanel.setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.jLabel1.text")); // NOI18N
@@ -214,10 +216,18 @@ public final class CSNVisualPanel1 extends JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         bottomPanel.add(jToolBar1, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jextLabel, org.openide.util.NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.jextLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 1.0;
+        bottomPanel.add(jextLabel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -225,7 +235,7 @@ public final class CSNVisualPanel1 extends JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new java.awt.Insets(10, 5, 5, 5);
         add(bottomPanel, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.jQuestionLabel.text")); // NOI18N
@@ -264,6 +274,14 @@ public final class CSNVisualPanel1 extends JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jOption2, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jwarningLabel, org.openide.util.NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.jwarningLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(jwarningLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jATComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jATComboBoxActionPerformed
@@ -334,5 +352,7 @@ public final class CSNVisualPanel1 extends JPanel {
     private javax.swing.JLabel jQuestionLabel;
     private javax.swing.JComboBox jSMComboBox;
     private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JLabel jextLabel;
+    private javax.swing.JLabel jwarningLabel;
     // End of variables declaration//GEN-END:variables
 }

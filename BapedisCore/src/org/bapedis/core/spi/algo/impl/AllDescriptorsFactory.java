@@ -21,7 +21,7 @@ import org.openide.util.lookup.ServiceProvider;
 public class AllDescriptorsFactory implements AlgorithmFactory, ToolMenuItem {
 
     private AllDescriptorsPanel panel;
-    
+
     @Override
     public AlgorithmCategory getCategory() {
         return AlgorithmCategory.MolecularDescriptor;
@@ -39,8 +39,8 @@ public class AllDescriptorsFactory implements AlgorithmFactory, ToolMenuItem {
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        if (panel == null){
-             panel = new AllDescriptorsPanel();
+        if (panel == null) {
+            panel = new AllDescriptorsPanel();
         }
         return panel;
     }
@@ -70,5 +70,13 @@ public class AllDescriptorsFactory implements AlgorithmFactory, ToolMenuItem {
     public boolean addSeparatorAfter() {
         return true;
     }
-    
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof AllDescriptorsFactory) {
+            return getName().equals(((AllDescriptorsFactory) obj).getName());
+        }
+        return false;
+    }
+
 }

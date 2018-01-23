@@ -10,6 +10,7 @@ import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -30,7 +31,7 @@ import org.openide.util.NbBundle;
 public class AllDescriptors extends AbstractMD implements PropertyChangeListener {
 
     private final List<AbstractMD> algorithms;
-    private final Set<String> descriptorKeys, allDescriptorKey;
+    private final Set<String> descriptorKeys;
     private int buttonGroupIndex;
     protected final NotifyDescriptor emptyKeys;
 
@@ -39,23 +40,17 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
         algorithms = new LinkedList<>();
         buttonGroupIndex = 0;
         emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(AllDescriptors.class, "AllDescriptors.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
-        allDescriptorKey = new HashSet<>();
-        descriptorKeys = new HashSet<>();
+        descriptorKeys = new LinkedHashSet<>();
         String key;
         for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
             final AlgorithmFactory f = it.next();
             if (!f.equals(factory) && f.getCategory() == AlgorithmCategory.MolecularDescriptor) {
                 key = f.getName();
                 descriptorKeys.add(key);
-                allDescriptorKey.add(key);
             }
         }
     }
 
-    public Set<String> getAllDescriptorKey() {
-        return allDescriptorKey;
-    }
-    
     public Set<String> getDescriptorKeys() {
         return descriptorKeys;
     }

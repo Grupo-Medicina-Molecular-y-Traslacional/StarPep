@@ -58,5 +58,6 @@ public interface AlgorithmFactory {
      * algorithm. Return -1 if you don't want to display a rank.
      * @return an integer between 1 and 5 or -1 if you don't want to show a rank
      */
-    public int getSpeedRank();      
+    public int getSpeedRank();   
+    
 }

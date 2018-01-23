@@ -256,7 +256,7 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
     }//GEN-LAST:event_option1RadioButtonActionPerformed
 
     @Override
-    public JPanel getEditPanel(Algorithm algo) {
+    public JPanel getSettingPanel(Algorithm algo) {
         this.csnAlgo = (ChemicalSpaceNetwork) algo;
         switch (csnAlgo.getOptionIndex()) {
             case 0:

@@ -119,7 +119,7 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public JPanel getEditPanel(Algorithm algo) {
+    public JPanel getSettingPanel(Algorithm algo) {
         this.algo = (AllDescriptors) algo;
         ((MyTableModel) table.getModel()).refresh();
         return this;

@@ -9,6 +9,8 @@ import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.algo.impl.AllDescriptors;
+import org.bapedis.core.spi.algo.impl.AllDescriptorsFactory;
 import org.bapedis.core.task.ProgressTicket;
 
 /**
@@ -17,14 +19,20 @@ import org.bapedis.core.task.ProgressTicket;
  */
 public class CSNAlgorithm implements Algorithm {
     private final SequenceClustering seqClustering;
+    private final AllDescriptors descriptorAlgo;
 
     public CSNAlgorithm() {
         seqClustering = new SequenceClustering();
+        descriptorAlgo = (AllDescriptors)new AllDescriptorsFactory().createAlgorithm();         
     }
 
     public SequenceClustering getSeqClustering() {
         return seqClustering;
-    }            
+    }   
+
+    public AllDescriptors getDescriptorAlgo() {
+        return descriptorAlgo;
+    }        
 
     @Override
     public void initAlgo(Workspace workspace) {

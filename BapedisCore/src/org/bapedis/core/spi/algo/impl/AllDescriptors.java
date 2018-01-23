@@ -30,7 +30,7 @@ import org.openide.util.NbBundle;
 public class AllDescriptors extends AbstractMD implements PropertyChangeListener {
 
     private final List<AbstractMD> algorithms;
-    private final Set<String> descriptorKeys;
+    private final Set<String> descriptorKeys, allDescriptorKey;
     private int buttonGroupIndex;
     protected final NotifyDescriptor emptyKeys;
 
@@ -39,13 +39,25 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
         algorithms = new LinkedList<>();
         buttonGroupIndex = 0;
         emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(AllDescriptors.class, "AllDescriptors.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
+        allDescriptorKey = new HashSet<>();
         descriptorKeys = new HashSet<>();
+        String key;
         for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
             final AlgorithmFactory f = it.next();
             if (!f.equals(factory) && f.getCategory() == AlgorithmCategory.MolecularDescriptor) {
-                descriptorKeys.add(f.getName());
+                key = f.getName();
+                descriptorKeys.add(key);
+                allDescriptorKey.add(key);
             }
         }
+    }
+
+    public Set<String> getAllDescriptorKey() {
+        return allDescriptorKey;
+    }
+    
+    public Set<String> getDescriptorKeys() {
+        return descriptorKeys;
     }
 
     public void includeAlgorithm(String algoName) {

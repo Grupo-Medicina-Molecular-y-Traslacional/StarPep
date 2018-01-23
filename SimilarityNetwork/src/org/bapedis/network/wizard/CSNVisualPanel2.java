@@ -5,12 +5,25 @@
  */
 package org.bapedis.network.wizard;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.util.ArrayList;
+import java.util.Set;
 import javax.swing.JPanel;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+import org.bapedis.core.spi.algo.impl.AllDescriptors;
 import org.bapedis.network.impl.CSNAlgorithm;
+import org.jdesktop.swingx.JXTable;
+import org.openide.util.NbBundle;
 
 public final class CSNVisualPanel2 extends JPanel {
 
     private final CSNAlgorithm csnAlgo;
+    private final JXTable table;
+    protected final TableModel tableModel;
 
     /**
      * Creates new form CSNVisualPanel2
@@ -18,11 +31,42 @@ public final class CSNVisualPanel2 extends JPanel {
     public CSNVisualPanel2(CSNAlgorithm csnAlgo) {
         this.csnAlgo = csnAlgo;
         initComponents();
+        AllDescriptors allDescritporAlgo = csnAlgo.getDescriptorAlgo();
+
+        // Descriptor Table        
+        tableModel = new MyTableModel(allDescritporAlgo);
+        table = new JXTable(tableModel){
+            @Override
+            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+                Component c = super.prepareRenderer(renderer, row, column);
+                TableModel tableModel = table.getModel();
+                if ((boolean) tableModel.getValueAt(table.convertRowIndexToModel(row), 2)) {
+                    c.setForeground(Color.BLUE);
+                }
+                return c;
+            }
+
+        };
+        
+        table.setGridColor(Color.LIGHT_GRAY);
+        table.setColumnControlVisible(false);
+        table.setSortable(true);
+        table.setAutoCreateRowSorter(true);
+        table.setRowSelectionAllowed(false);
+
+        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel()) {
+            @Override
+            public boolean isSortable(int column) {
+                return column < 2;
+            }
+        };
+        table.setRowSorter(sorter);        
+        jScrollPane.setViewportView(table);
     }
 
     @Override
     public String getName() {
-        return "Step #2";
+        return NbBundle.getMessage(CSNVisualPanel2.class, "CSNVisualPanel2.name");
     }
 
     /**
@@ -32,19 +76,95 @@ public final class CSNVisualPanel2 extends JPanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        jToolBar = new javax.swing.JToolBar();
+        jScrollPane = new javax.swing.JScrollPane();
+
+        setLayout(new java.awt.GridBagLayout());
+
+        jToolBar.setRollover(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(jToolBar, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(jScrollPane, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane jScrollPane;
+    private javax.swing.JToolBar jToolBar;
     // End of variables declaration//GEN-END:variables
+
+    static class MyTableModel extends AbstractTableModel {
+
+        private final String[] columnNames;
+        private final ArrayList<Object[]> data;
+
+        public MyTableModel(AllDescriptors allDescritporAlgo) {
+            this.columnNames = new String[]{NbBundle.getMessage(CSNVisualPanel2.class, "CSNVisualPanel2.descriptorTable.column1"),
+                                            NbBundle.getMessage(CSNVisualPanel2.class, "CSNVisualPanel2.descriptorTable.column2")};
+            
+            Set<String> allDescriptorKeys = allDescritporAlgo.getAllDescriptorKey();            
+            this.data = new ArrayList<>(allDescriptorKeys.size());
+            int no = 1;
+            for(String key: allDescriptorKeys){
+                data.add(new Object[]{no++, key, allDescritporAlgo.isIncluded(key)});
+            }
+        }
+
+        @Override
+        public int getColumnCount() {
+            return columnNames.length;
+        }
+
+        @Override
+        public int getRowCount() {
+            return data.size();
+        }
+
+        @Override
+        public String getColumnName(int col) {
+            return columnNames[col];
+        }
+
+        @Override
+        public Object getValueAt(int row, int col) {
+            return data.get(row)[col];
+        }
+
+        @Override
+        public Class getColumnClass(int c) {
+            switch (c) {
+                case 0:
+                    return Integer.class;
+                case 1:
+                    return String.class;
+                case 2:
+                    return Boolean.class;
+            }
+            return null;
+        }
+
+        @Override
+        public boolean isCellEditable(int row, int col) {
+            return col == 0;
+        }
+
+        @Override
+        public void setValueAt(Object value, int row, int col) {
+            data.get(row)[col] = value;
+            fireTableCellUpdated(row, col);
+        }
+
+    }
 }

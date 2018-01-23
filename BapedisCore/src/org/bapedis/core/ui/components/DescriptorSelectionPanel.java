@@ -32,7 +32,7 @@ import org.openide.util.NbBundle;
 public class DescriptorSelectionPanel extends javax.swing.JPanel implements PropertyChangeListener {
 
     protected final AttributesModel attrModel;
-    protected final MyTableModel tableModel;
+    private final MyTableModel tableModel;
     protected JXTable table;
 
     public DescriptorSelectionPanel(final AttributesModel attrModel) {
@@ -197,7 +197,7 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
 
     }
 
-    class MyTableModel extends AbstractTableModel {
+   static class MyTableModel extends AbstractTableModel {
 
         private final String[] columnNames;
         private final ArrayList<Object[]> data;

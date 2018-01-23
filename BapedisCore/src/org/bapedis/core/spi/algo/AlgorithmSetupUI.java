@@ -20,6 +20,6 @@ public interface AlgorithmSetupUI {
      * @return A simple settings panel for <code>algorithm</code> or
      * <code>null</code>
      */
-    public JPanel getEditPanel(Algorithm algo);  
+    public JPanel getSettingPanel(Algorithm algo);  
     
 }

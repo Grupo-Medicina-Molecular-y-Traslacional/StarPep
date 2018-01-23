@@ -95,6 +95,7 @@ public final class CSNVisualPanel1 extends JPanel {
 
         setLayout(new java.awt.GridBagLayout());
 
+        bottomPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.bottomPanel.border.title"))); // NOI18N
         bottomPanel.setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.jLabel1.text")); // NOI18N
@@ -223,6 +224,7 @@ public final class CSNVisualPanel1 extends JPanel {
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(bottomPanel, gridBagConstraints);
 

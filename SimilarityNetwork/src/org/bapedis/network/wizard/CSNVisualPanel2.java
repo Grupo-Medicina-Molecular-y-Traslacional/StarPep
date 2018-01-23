@@ -3,26 +3,26 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.network.impl.wizard;
+package org.bapedis.network.wizard;
 
 import javax.swing.JPanel;
 import org.bapedis.network.impl.CSNAlgorithm;
 
-public final class CSNVisualPanel4 extends JPanel {
+public final class CSNVisualPanel2 extends JPanel {
 
     private final CSNAlgorithm csnAlgo;
 
     /**
-     * Creates new form CSNVisualPanel4
+     * Creates new form CSNVisualPanel2
      */
-    public CSNVisualPanel4(CSNAlgorithm csnAlgo) {
+    public CSNVisualPanel2(CSNAlgorithm csnAlgo) {
         this.csnAlgo = csnAlgo;
         initComponents();
     }
 
     @Override
     public String getName() {
-        return "Step #4";
+        return "Step #2";
     }
 
     /**

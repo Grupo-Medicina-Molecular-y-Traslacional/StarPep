@@ -47,6 +47,7 @@ public class SequenceClustering {
     protected AlgorithmProperty[] properties;
     protected int alignmentTypeIndex, substitutionMatrixIndex;
     protected int percentIdentity;
+    protected boolean clustering;
 
     public SequenceClustering() {
         properties = new AlgorithmProperty[4];
@@ -55,6 +56,7 @@ public class SequenceClustering {
         substitutionMatrixIndex = 7; // Blosum 62 by Henikoff & Henikoff
         substitutionMatrix = getSubstitutionMatrix();
         percentIdentity = 70;
+        clustering = true;
     }
 
     public int getPercentIdentity() {
@@ -66,7 +68,15 @@ public class SequenceClustering {
             throw new IllegalArgumentException("Invalid value for percent identity. It should be between " + PID_MIN + " and " + PID_MAX);
         }
         this.percentIdentity = percentIdentity;
-    }        
+    }    
+
+    public boolean isClustering() {
+        return clustering;
+    }
+
+    public void setClustering(boolean clustering) {
+        this.clustering = clustering;
+    }    
 
     public int getAlignmentTypeIndex() {
         return alignmentTypeIndex;

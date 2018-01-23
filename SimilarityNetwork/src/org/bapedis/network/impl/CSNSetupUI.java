@@ -5,9 +5,12 @@
  */
 package org.bapedis.network.impl;
 
+import org.bapedis.network.wizard.CSNWizardPanel2;
+import org.bapedis.network.wizard.CSNWizardPanel3;
+import org.bapedis.network.wizard.CSNWizardPanel1;
+import org.bapedis.network.wizard.CSNWizardPanel4;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.network.SimilarityNetworkSetupUI;
-import org.bapedis.network.impl.wizard.*;
 import org.openide.WizardDescriptor;
 
 /**

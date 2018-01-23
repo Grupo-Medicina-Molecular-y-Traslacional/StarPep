@@ -3,36 +3,34 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.network.impl.wizard;
+package org.bapedis.network.wizard;
 
 import javax.swing.event.ChangeListener;
 import org.bapedis.network.impl.CSNAlgorithm;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
-public class CSNWizardPanel4 implements WizardDescriptor.Panel<WizardDescriptor> {
-
+public class CSNWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor> {   
     private final CSNAlgorithm csnAlgo;
 
-    public CSNWizardPanel4(CSNAlgorithm csnAlgo) {
+    public CSNWizardPanel1(CSNAlgorithm csnAlgo) {
         this.csnAlgo = csnAlgo;
-    }
-    
+    }        
     
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private CSNVisualPanel4 component;
+    private CSNVisualPanel1 component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public CSNVisualPanel4 getComponent() {
+    public CSNVisualPanel1 getComponent() {
         if (component == null) {
-            component = new CSNVisualPanel4(csnAlgo);
+            component = new CSNVisualPanel1(csnAlgo);
         }
         return component;
     }

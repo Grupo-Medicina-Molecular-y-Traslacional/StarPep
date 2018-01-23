@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.network.impl.wizard;
+package org.bapedis.network.wizard;
 
 import javax.swing.JPanel;
 import org.bapedis.network.impl.CSNAlgorithm;

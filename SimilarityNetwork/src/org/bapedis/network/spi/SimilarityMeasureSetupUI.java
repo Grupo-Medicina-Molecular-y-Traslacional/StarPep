@@ -3,16 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.network.impl;
-
-import org.bapedis.core.model.Peptide;
+package org.bapedis.network.spi;
 
 /**
  *
  * @author loge
  */
-public interface SimilarityMeasure {
-
-    float computeSimilarity(Peptide peptide1, Peptide peptide2);
+public interface SimilarityMeasureSetupUI {
     
 }

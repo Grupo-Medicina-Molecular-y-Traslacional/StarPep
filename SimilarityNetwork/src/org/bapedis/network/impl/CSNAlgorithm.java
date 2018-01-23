@@ -6,12 +6,14 @@
 package org.bapedis.network.impl;
 
 import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.model.FeatureSelectionModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.spi.algo.impl.AllDescriptors;
 import org.bapedis.core.spi.algo.impl.AllDescriptorsFactory;
 import org.bapedis.core.task.ProgressTicket;
+import org.bapedis.network.spi.SimilarityMeasure;
 
 /**
  *
@@ -20,10 +22,13 @@ import org.bapedis.core.task.ProgressTicket;
 public class CSNAlgorithm implements Algorithm {
     private final SequenceClustering seqClustering;
     private final AllDescriptors descriptorAlgo;
+    private final FeatureSelectionModel featureModel;
+    private SimilarityMeasure simMeasure;
 
     public CSNAlgorithm() {
         seqClustering = new SequenceClustering();
-        descriptorAlgo = (AllDescriptors)new AllDescriptorsFactory().createAlgorithm();         
+        descriptorAlgo = (AllDescriptors)new AllDescriptorsFactory().createAlgorithm(); 
+        featureModel = new FeatureSelectionModel(null);
     }
 
     public SequenceClustering getSeqClustering() {
@@ -32,6 +37,18 @@ public class CSNAlgorithm implements Algorithm {
 
     public AllDescriptors getDescriptorAlgo() {
         return descriptorAlgo;
+    }        
+
+    public FeatureSelectionModel getFeatureModel() {
+        return featureModel;
+    } 
+
+    public SimilarityMeasure getSimMeasure() {
+        return simMeasure;
+    }
+
+    public void setSimMeasure(SimilarityMeasure simMeasure) {
+        this.simMeasure = simMeasure;
     }        
 
     @Override

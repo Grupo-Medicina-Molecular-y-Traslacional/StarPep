@@ -275,6 +275,9 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jwarningLabel">
       <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/org/bapedis/network/resources/info.png"/>
+        </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="org/bapedis/network/wizard/Bundle.properties" key="CSNVisualPanel1.jwarningLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>

@@ -5,8 +5,11 @@
  */
 package org.bapedis.network.wizard;
 
+import java.awt.BorderLayout;
 import javax.swing.JPanel;
+import org.bapedis.core.ui.components.FeatureSelectionPanel;
 import org.bapedis.network.impl.CSNAlgorithm;
+import org.openide.util.NbBundle;
 
 public final class CSNVisualPanel3 extends JPanel {
 
@@ -18,11 +21,12 @@ public final class CSNVisualPanel3 extends JPanel {
     public CSNVisualPanel3(CSNAlgorithm csnAlgo) {
         this.csnAlgo = csnAlgo;
         initComponents();
+        centerPanel.add(new FeatureSelectionPanel(csnAlgo.getFeatureModel()), BorderLayout.CENTER);
     }
 
     @Override
     public String getName() {
-        return "Step #3";
+        return NbBundle.getMessage(CSNVisualPanel3.class, "CSNVisualPanel3.name");
     }
 
     /**
@@ -32,19 +36,34 @@ public final class CSNVisualPanel3 extends JPanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        centerPanel = new javax.swing.JPanel();
+        jQuestionLabel = new javax.swing.JLabel();
+
+        setLayout(new java.awt.GridBagLayout());
+
+        centerPanel.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(centerPanel, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(CSNVisualPanel3.class, "CSNVisualPanel3.jQuestionLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(jQuestionLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel centerPanel;
+    private javax.swing.JLabel jQuestionLabel;
     // End of variables declaration//GEN-END:variables
 }

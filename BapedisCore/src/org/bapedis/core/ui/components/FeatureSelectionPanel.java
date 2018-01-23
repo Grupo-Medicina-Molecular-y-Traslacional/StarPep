@@ -5,38 +5,23 @@
  */
 package org.bapedis.core.ui.components;
 
-import java.awt.Dimension;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Hashtable;
 import javax.swing.JLabel;
-import javax.swing.JSlider;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FeatureSelectionModel;
-import org.bapedis.core.task.FeatureSelector;
-import org.jdesktop.swingx.JXBusyLabel;
-import org.openide.DialogDisplayer;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author loge
  */
-public class FeatureSelectionPanel extends javax.swing.JPanel implements PropertyChangeListener {
+public class FeatureSelectionPanel extends javax.swing.JPanel {
 
-    protected final AttributesModel attrModel;
     protected final FeatureSelectionModel model;
-    protected final JXBusyLabel busyLabel;
 
-    public FeatureSelectionPanel(FeatureSelectionModel model, AttributesModel attrModel) {
+    public FeatureSelectionPanel(FeatureSelectionModel model) {
         initComponents();
-        this.attrModel = attrModel;
         this.model = model;
 
         // Configure sliders        
@@ -50,9 +35,11 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         uselessSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                JSlider source = (JSlider) e.getSource();
-                int val = (int) source.getValue();
-                uselessLabel.setText(val + "%");
+                if (!uselessSlider.getValueIsAdjusting()) {
+                    int val = uselessSlider.getValue();
+                    uselessLabel.setText(val + "%");
+                    model.setEntropyCutoff(val);
+                }
             }
         });
 
@@ -73,9 +60,11 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         redundantSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                JSlider source = (JSlider) e.getSource();
-                int val = (int) source.getValue();
-                redundantLabel.setText(val + "%");
+                if (!redundantSlider.getValueIsAdjusting()) {
+                    int val = redundantSlider.getValue();
+                    redundantLabel.setText(val + "%");
+                    model.setCorrelationCutoff(val);
+                }
             }
         });
 
@@ -86,15 +75,6 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
 
         redundantSlider.setLabelTable(redundantLabelTable);
 
-        busyLabel = new JXBusyLabel(new Dimension(20, 20));
-        busyLabel.setText(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.removing.text"));
-        busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        boolean running = model.isRunning();
-        busyLabel.setBusy(running);
-        busyLabel.setVisible(running);
-        rightPanel.add(busyLabel);
-        
-        
         if (model.isRemoveUseless()) {
             if (model.isRemoveRedundant()) {
                 option2Button.setSelected(true);
@@ -102,30 +82,14 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
                 option1Button.setSelected(true);
             }
         }
-        
-        addAncestorListener(new AncestorListener() {
-            @Override
-            public void ancestorAdded(AncestorEvent event) {
-                model.addPropertyChangeListener(FeatureSelectionPanel.this);
-            }
-
-            @Override
-            public void ancestorRemoved(AncestorEvent event) {
-                model.removePropertyChangeListener(FeatureSelectionPanel.this);
-            }
-
-            @Override
-            public void ancestorMoved(AncestorEvent event) {
-            }
-        });         
 
     }
 
-    static {
-        UIManager.put("Slider.paintValue", false);
-    }
-
-    private void refreshInternalPanels() {
+//    static {
+//        UIManager.put("Slider.paintValue", false);
+//    }
+    
+    public void refreshState() {
         boolean enabled = (option2Button.isSelected() || option1Button.isSelected()) && !model.isRunning();
         entropyPanel.setEnabled(enabled);
         uselessSlider.setEnabled(enabled);
@@ -150,7 +114,6 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         java.awt.GridBagConstraints gridBagConstraints;
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        centerPanel = new javax.swing.JPanel();
         option1Button = new javax.swing.JRadioButton();
         option2Button = new javax.swing.JRadioButton();
         entropyPanel = new javax.swing.JPanel();
@@ -163,15 +126,10 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         redundantLabel = new javax.swing.JLabel();
         tanimotoInfoLabel = new javax.swing.JLabel();
         extLabel2 = new javax.swing.JLabel();
-        rightPanel = new javax.swing.JPanel();
-        removeButton = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(440, 290));
         setPreferredSize(new java.awt.Dimension(540, 320));
         setLayout(new java.awt.GridBagLayout());
-
-        centerPanel.setPreferredSize(new java.awt.Dimension(259, 130));
-        centerPanel.setLayout(new java.awt.GridBagLayout());
 
         buttonGroup1.add(option1Button);
         org.openide.awt.Mnemonics.setLocalizedText(option1Button, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.removeUselessRButton.text")); // NOI18N
@@ -190,8 +148,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 0);
-        centerPanel.add(option1Button, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(option1Button, gridBagConstraints);
 
         buttonGroup1.add(option2Button);
         org.openide.awt.Mnemonics.setLocalizedText(option2Button, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.selectRankedRButton.text")); // NOI18N
@@ -210,8 +168,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        centerPanel.add(option2Button, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(option2Button, gridBagConstraints);
 
         entropyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.entropyPanel.border.title"))); // NOI18N
         entropyPanel.setLayout(new java.awt.GridBagLayout());
@@ -268,8 +226,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 2, 0, 0);
-        centerPanel.add(entropyPanel, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(10, 5, 0, 5);
+        add(entropyPanel, gridBagConstraints);
 
         correlationPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.correlationPanel.border.title"))); // NOI18N
         correlationPanel.setLayout(new java.awt.GridBagLayout());
@@ -325,43 +283,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        centerPanel.add(correlationPanel, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(centerPanel, gridBagConstraints);
-
-        rightPanel.setMaximumSize(new java.awt.Dimension(110, 58));
-        rightPanel.setMinimumSize(new java.awt.Dimension(110, 58));
-        rightPanel.setPreferredSize(new java.awt.Dimension(110, 58));
-        rightPanel.setLayout(new javax.swing.BoxLayout(rightPanel, javax.swing.BoxLayout.Y_AXIS));
-
-        removeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/delete.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(removeButton, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.removeButton.text")); // NOI18N
-        removeButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        removeButton.setMaximumSize(new java.awt.Dimension(99, 29));
-        removeButton.setMinimumSize(new java.awt.Dimension(99, 29));
-        removeButton.setPreferredSize(new java.awt.Dimension(99, 29));
-        removeButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                removeButtonActionPerformed(evt);
-            }
-        });
-        rightPanel.add(removeButton);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(10, 5, 0, 0);
-        add(rightPanel, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(correlationPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void option2ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_option2ButtonActionPerformed
@@ -379,27 +302,15 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
     }//GEN-LAST:event_option1ButtonActionPerformed
 
     private void option2ButtonItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_option2ButtonItemStateChanged
-        refreshInternalPanels();
+        refreshState();
     }//GEN-LAST:event_option2ButtonItemStateChanged
 
     private void option1ButtonItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_option1ButtonItemStateChanged
-        refreshInternalPanels();
+        refreshState();
     }//GEN-LAST:event_option1ButtonItemStateChanged
-
-    private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
-        if (model.getOwnerWS().isBusy()) {
-            DialogDisplayer.getDefault().notify(model.getOwnerWS().getBusyNotifyDescriptor());
-        } else {
-            model.setEntropyCutoff(uselessSlider.getValue());
-            model.setCorrelationCutoff(redundantSlider.getValue());
-            FeatureSelector selector = new FeatureSelector(model, attrModel);
-            selector.execute();
-        }
-    }//GEN-LAST:event_removeButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JPanel centerPanel;
     private javax.swing.JPanel correlationPanel;
     private javax.swing.JLabel entropyInfoLabel;
     private javax.swing.JPanel entropyPanel;
@@ -409,21 +320,9 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Propert
     private javax.swing.JRadioButton option2Button;
     private javax.swing.JLabel redundantLabel;
     private javax.swing.JSlider redundantSlider;
-    private javax.swing.JButton removeButton;
-    private javax.swing.JPanel rightPanel;
     private javax.swing.JLabel tanimotoInfoLabel;
     private javax.swing.JLabel uselessLabel;
     private javax.swing.JSlider uselessSlider;
     // End of variables declaration//GEN-END:variables
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource().equals(model) && evt.getPropertyName().equals(FeatureSelectionModel.RUNNING)){
-            boolean running = model.isRunning();
-            busyLabel.setBusy(running);
-            busyLabel.setVisible(running);  
-            refreshInternalPanels();
-        }        
-    }
 
 }

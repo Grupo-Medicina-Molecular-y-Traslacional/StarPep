@@ -5,6 +5,7 @@
  */
 package org.bapedis.network.impl;
 
+import org.bapedis.network.spi.SimilarityMeasure;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.concurrent.ForkJoinPool;

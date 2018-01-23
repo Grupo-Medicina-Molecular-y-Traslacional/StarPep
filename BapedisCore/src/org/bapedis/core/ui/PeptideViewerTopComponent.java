@@ -38,6 +38,7 @@ import org.bapedis.core.spi.filters.impl.FilterHelper;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
 import org.bapedis.core.ui.actions.MolecularDescriptorAction;
 import org.bapedis.core.ui.components.DeleteDescriptorPanel;
+import org.bapedis.core.ui.components.FeatureFilterPanel;
 import org.bapedis.core.ui.components.FeatureSelectionPanel;
 import org.bapedis.core.ui.components.MolecularFeaturesPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -452,7 +453,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             featureModel = new FeatureSelectionModel(currentWS);
             currentWS.add(featureModel);
         }        
-        DialogDescriptor dd = new DialogDescriptor(new FeatureSelectionPanel(featureModel, currentModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.FeatureSelectionPanel.title"));
+        DialogDescriptor dd = new DialogDescriptor(new FeatureFilterPanel(featureModel, currentModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.FeatureFilterPanel.title"));
         dd.setOptions(new Object[]{DialogDescriptor.CLOSED_OPTION});
         DialogDisplayer.getDefault().notify(dd);
     }//GEN-LAST:event_selectButtonActionPerformed

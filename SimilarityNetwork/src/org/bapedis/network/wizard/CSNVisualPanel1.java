@@ -66,6 +66,7 @@ public final class CSNVisualPanel1 extends JPanel {
         jLessButton.setEnabled(enable);
         jPIDSlider.setEnabled(enable);
         jMoreButton.setEnabled(enable);
+        jwarningLabel.setVisible(!enable);
     }
 
     /**
@@ -275,6 +276,7 @@ public final class CSNVisualPanel1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jOption2, gridBagConstraints);
 
+        jwarningLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/network/resources/info.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jwarningLabel, org.openide.util.NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.jwarningLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

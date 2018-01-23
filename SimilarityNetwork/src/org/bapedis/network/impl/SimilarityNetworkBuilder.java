@@ -4,6 +4,7 @@
  */
 package org.bapedis.network.impl;
 
+import org.bapedis.network.spi.SimilarityMeasure;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;

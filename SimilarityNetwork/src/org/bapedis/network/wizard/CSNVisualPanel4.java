@@ -5,12 +5,26 @@
  */
 package org.bapedis.network.wizard;
 
+import java.awt.Component;
+import java.util.Collection;
+import javax.swing.Icon;
 import javax.swing.JPanel;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import org.bapedis.network.impl.CSNAlgorithm;
+import org.bapedis.network.spi.SimilarityMeasureFactory;
+import org.openide.util.ImageUtilities;
+import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 public final class CSNVisualPanel4 extends JPanel {
 
     private final CSNAlgorithm csnAlgo;
+    public static final String NETWORK_FACTORY = "network_factory";
+    DefaultMutableTreeNode treeNode;
 
     /**
      * Creates new form CSNVisualPanel4
@@ -18,11 +32,24 @@ public final class CSNVisualPanel4 extends JPanel {
     public CSNVisualPanel4(CSNAlgorithm csnAlgo) {
         this.csnAlgo = csnAlgo;
         initComponents();
+        treeNode = new DefaultMutableTreeNode("Network type", true);
+        populateJTree();
+        jTree1.setModel(new DefaultTreeModel(treeNode));
+        jTree1.setRootVisible(true);
+        jTree1.setCellRenderer(new SimilarityFactoryNodeRenderer());
+
+    }
+
+    private void populateJTree() {
+        Collection<? extends SimilarityMeasureFactory> factories = Lookup.getDefault().lookupAll(SimilarityMeasureFactory.class);
+        for (SimilarityMeasureFactory factory : factories) {
+            treeNode.add(new SimilarityFactoryTreeNode(factory));
+        }
     }
 
     @Override
     public String getName() {
-        return "Step #4";
+        return NbBundle.getMessage(CSNVisualPanel4.class, "CSNVisualPanel4.name");
     }
 
     /**
@@ -32,19 +59,136 @@ public final class CSNVisualPanel4 extends JPanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTree1 = new javax.swing.JTree();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
+
+        setLayout(new java.awt.GridBagLayout());
+
+        jTree1.setRootVisible(false);
+        jTree1.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+                jTree1ValueChanged(evt);
+            }
+        });
+        jScrollPane1.setViewportView(jTree1);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(jScrollPane1, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(CSNVisualPanel4.class, "CSNVisualPanel4.jLabel1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
+        add(jLabel1, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(CSNVisualPanel4.class, "CSNVisualPanel4.jLabel2.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
+        add(jLabel2, gridBagConstraints);
+
+        jTextArea1.setEditable(false);
+        jTextArea1.setColumns(20);
+        jTextArea1.setLineWrap(true);
+        jTextArea1.setRows(5);
+        jTextArea1.setWrapStyleWord(true);
+        jScrollPane2.setViewportView(jTextArea1);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(jScrollPane2, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
+        TreePath newPath = evt.getNewLeadSelectionPath();
+
+        if (newPath != null && newPath.getLastPathComponent() instanceof SimilarityFactoryTreeNode) {
+            SimilarityFactoryTreeNode newNode = (SimilarityFactoryTreeNode) newPath.getLastPathComponent();
+            SimilarityMeasureFactory factory = newNode.getFactory();
+            jTextArea1.setText(factory.getDescription());
+            firePropertyChange(NETWORK_FACTORY, null, factory);
+        } else {
+            jTextArea1.setText("");
+            firePropertyChange(NETWORK_FACTORY, null, null);
+        }
+    }//GEN-LAST:event_jTree1ValueChanged
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
+
+    private static class SimilarityFactoryTreeNode extends DefaultMutableTreeNode {
+
+        public SimilarityFactoryTreeNode(SimilarityMeasureFactory factory) {
+            super(factory, false);
+        }
+
+        public SimilarityMeasureFactory getFactory() {
+            return (SimilarityMeasureFactory) userObject;
+        }
+
+        @Override
+        public String toString() {
+            return getFactory().getName();
+        }
+
+    }
+
+    private static class SimilarityFactoryNodeRenderer extends DefaultTreeCellRenderer {
+
+        Icon icon;
+
+        public SimilarityFactoryNodeRenderer() {
+            icon = ImageUtilities.loadImageIcon("org/bapedis/core/resources/network.png", false);
+        }
+
+        @Override
+        public Component getTreeCellRendererComponent(
+                JTree tree,
+                Object value,
+                boolean sel,
+                boolean expanded,
+                boolean leaf,
+                int row,
+                boolean hasFocus) {
+
+            super.getTreeCellRendererComponent(
+                    tree, value, sel,
+                    expanded, leaf, row,
+                    hasFocus);
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+            if (!(node instanceof SimilarityFactoryTreeNode)) {
+                // Root node
+                setIcon(icon);
+            }
+            return this;
+        }
+    }
+
 }

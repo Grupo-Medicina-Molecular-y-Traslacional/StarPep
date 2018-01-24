@@ -68,6 +68,7 @@ public final class CSNVisualPanel4 extends JPanel {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
 
+        setPreferredSize(new java.awt.Dimension(640, 480));
         setLayout(new java.awt.GridBagLayout());
 
         jTree1.setRootVisible(false);

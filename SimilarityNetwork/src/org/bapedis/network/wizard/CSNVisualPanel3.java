@@ -41,6 +41,7 @@ public final class CSNVisualPanel3 extends JPanel {
         centerPanel = new javax.swing.JPanel();
         jQuestionLabel = new javax.swing.JLabel();
 
+        setPreferredSize(new java.awt.Dimension(640, 480));
         setLayout(new java.awt.GridBagLayout());
 
         centerPanel.setLayout(new java.awt.BorderLayout());

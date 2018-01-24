@@ -96,6 +96,7 @@ public final class CSNVisualPanel1 extends JPanel {
         jOption2 = new javax.swing.JRadioButton();
         jwarningLabel = new javax.swing.JLabel();
 
+        setPreferredSize(new java.awt.Dimension(640, 480));
         setLayout(new java.awt.GridBagLayout());
 
         bottomPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -218,7 +219,6 @@ public final class CSNVisualPanel1 extends JPanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         bottomPanel.add(jToolBar1, gridBagConstraints);
 

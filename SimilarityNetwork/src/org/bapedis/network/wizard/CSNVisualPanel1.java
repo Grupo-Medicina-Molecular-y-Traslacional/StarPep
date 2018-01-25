@@ -97,8 +97,8 @@ public final class CSNVisualPanel1 extends JPanel {
         jOption2 = new javax.swing.JRadioButton();
         jwarningLabel = new javax.swing.JLabel();
 
-        setMinimumSize(new java.awt.Dimension(440, 380));
-        setPreferredSize(new java.awt.Dimension(440, 380));
+        setMinimumSize(new java.awt.Dimension(460, 400));
+        setPreferredSize(new java.awt.Dimension(460, 400));
         setLayout(new java.awt.GridBagLayout());
 
         bottomPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());

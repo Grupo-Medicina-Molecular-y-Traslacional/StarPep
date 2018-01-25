@@ -44,8 +44,8 @@ public final class CSNVisualPanel2 extends JPanel {
         jScrollPane = new javax.swing.JScrollPane();
         jInfoLabel = new javax.swing.JLabel();
 
-        setMinimumSize(new java.awt.Dimension(440, 380));
-        setPreferredSize(new java.awt.Dimension(440, 380));
+        setMinimumSize(new java.awt.Dimension(460, 400));
+        setPreferredSize(new java.awt.Dimension(460, 400));
         setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

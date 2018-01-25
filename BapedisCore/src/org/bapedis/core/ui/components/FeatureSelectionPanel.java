@@ -95,12 +95,16 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         uselessSlider.setEnabled(enabled);
         uselessLabel.setEnabled(enabled);
         entropyInfoLabel.setEnabled(enabled);
+        jLessUselessButton.setEnabled(enabled);
+        jMoreUselessButton.setEnabled(enabled);
 
         enabled = option2Button.isSelected() && !model.isRunning();
         correlationPanel.setEnabled(enabled);
         redundantSlider.setEnabled(enabled);
         redundantLabel.setEnabled(enabled);
-        tanimotoInfoLabel.setEnabled(enabled);
+        redundantInfoLabel.setEnabled(enabled);
+        jLessRedundantButton.setEnabled(enabled);
+        jMoreRedundantButton.setEnabled(enabled);
     }
 
     /**
@@ -121,17 +125,17 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         uselessLabel = new javax.swing.JLabel();
         entropyInfoLabel = new javax.swing.JLabel();
         jEntropyToolBar = new javax.swing.JToolBar();
-        jLessEntropyButton = new javax.swing.JButton();
+        jLessUselessButton = new javax.swing.JButton();
         uselessSlider = new javax.swing.JSlider();
-        jMoreEntropyButton = new javax.swing.JButton();
+        jMoreUselessButton = new javax.swing.JButton();
         correlationPanel = new javax.swing.JPanel();
         redundantLabel = new javax.swing.JLabel();
-        tanimotoInfoLabel = new javax.swing.JLabel();
+        redundantInfoLabel = new javax.swing.JLabel();
         jRedundantToolBar = new javax.swing.JToolBar();
         jLessRedundantButton = new javax.swing.JButton();
         redundantSlider = new javax.swing.JSlider();
         jMoreRedundantButton = new javax.swing.JButton();
-        extLabel1 = new javax.swing.JLabel();
+        jResetButton = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(440, 360));
         setPreferredSize(new java.awt.Dimension(440, 360));
@@ -183,6 +187,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         jSettingPanel.setLayout(new java.awt.GridBagLayout());
 
         entropyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.entropyPanel.border.title"))); // NOI18N
+        entropyPanel.setPreferredSize(new java.awt.Dimension(493, 140));
         entropyPanel.setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(uselessLabel, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessLabel.text")); // NOI18N
@@ -209,45 +214,57 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
 
         jEntropyToolBar.setFloatable(false);
         jEntropyToolBar.setRollover(true);
+        jEntropyToolBar.setPreferredSize(new java.awt.Dimension(338, 90));
 
-        jLessEntropyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/less.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLessEntropyButton, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.jLessEntropyButton.text")); // NOI18N
-        jLessEntropyButton.setFocusable(false);
-        jLessEntropyButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jLessEntropyButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jEntropyToolBar.add(jLessEntropyButton);
+        jLessUselessButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/less.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLessUselessButton, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.jLessUselessButton.text")); // NOI18N
+        jLessUselessButton.setFocusable(false);
+        jLessUselessButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jLessUselessButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jEntropyToolBar.add(jLessUselessButton);
 
+        uselessSlider.setMajorTickSpacing(10);
+        uselessSlider.setMaximum(30);
+        uselessSlider.setMinimum(10);
+        uselessSlider.setMinorTickSpacing(5);
         uselessSlider.setPaintLabels(true);
         uselessSlider.setPaintTicks(true);
         uselessSlider.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.toolTipText")); // NOI18N
-        uselessSlider.setValue(0);
         uselessSlider.setEnabled(false);
+        uselessSlider.setMinimumSize(new java.awt.Dimension(280, 80));
+        uselessSlider.setPreferredSize(new java.awt.Dimension(280, 80));
         jEntropyToolBar.add(uselessSlider);
 
-        jMoreEntropyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/more.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jMoreEntropyButton, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.jMoreEntropyButton.text")); // NOI18N
-        jMoreEntropyButton.setFocusable(false);
-        jMoreEntropyButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jMoreEntropyButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jEntropyToolBar.add(jMoreEntropyButton);
+        jMoreUselessButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/more.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jMoreUselessButton, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.jMoreUselessButton.text")); // NOI18N
+        jMoreUselessButton.setFocusable(false);
+        jMoreUselessButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jMoreUselessButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jEntropyToolBar.add(jMoreUselessButton);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         entropyPanel.add(jEntropyToolBar, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(10, 5, 0, 5);
         jSettingPanel.add(entropyPanel, gridBagConstraints);
 
         correlationPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.correlationPanel.border.title"))); // NOI18N
+        correlationPanel.setPreferredSize(new java.awt.Dimension(493, 140));
         correlationPanel.setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(redundantLabel, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantLabel.text")); // NOI18N
@@ -263,18 +280,19 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(10, 5, 0, 0);
         correlationPanel.add(redundantLabel, gridBagConstraints);
 
-        tanimotoInfoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(tanimotoInfoLabel, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.tanimotoInfoLabel.text")); // NOI18N
-        tanimotoInfoLabel.setMaximumSize(new java.awt.Dimension(23, 14));
+        redundantInfoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(redundantInfoLabel, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantInfoLabel.text")); // NOI18N
+        redundantInfoLabel.setMaximumSize(new java.awt.Dimension(23, 14));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(10, 5, 0, 0);
-        correlationPanel.add(tanimotoInfoLabel, gridBagConstraints);
+        correlationPanel.add(redundantInfoLabel, gridBagConstraints);
 
         jRedundantToolBar.setFloatable(false);
         jRedundantToolBar.setRollover(true);
+        jRedundantToolBar.setPreferredSize(new java.awt.Dimension(338, 90));
 
         jLessRedundantButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/less.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLessRedundantButton, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.jLessRedundantButton.text")); // NOI18N
@@ -283,11 +301,16 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         jLessRedundantButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jRedundantToolBar.add(jLessRedundantButton);
 
+        redundantSlider.setMajorTickSpacing(20);
+        redundantSlider.setMaximum(80);
+        redundantSlider.setMinimum(40);
+        redundantSlider.setMinorTickSpacing(10);
         redundantSlider.setPaintLabels(true);
         redundantSlider.setPaintTicks(true);
         redundantSlider.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.toolTipText")); // NOI18N
-        redundantSlider.setValue(0);
         redundantSlider.setEnabled(false);
+        redundantSlider.setMinimumSize(new java.awt.Dimension(280, 80));
+        redundantSlider.setPreferredSize(new java.awt.Dimension(280, 80));
         jRedundantToolBar.add(redundantSlider);
 
         jMoreRedundantButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/more.png"))); // NOI18N
@@ -298,28 +321,32 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         jRedundantToolBar.add(jMoreRedundantButton);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         correlationPanel.add(jRedundantToolBar, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         jSettingPanel.add(correlationPanel, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(extLabel1, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.extLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jResetButton, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.jResetButton.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.weighty = 1.0;
-        jSettingPanel.add(extLabel1, gridBagConstraints);
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 5);
+        jSettingPanel.add(jResetButton, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -358,19 +385,19 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
     private javax.swing.JPanel correlationPanel;
     private javax.swing.JLabel entropyInfoLabel;
     private javax.swing.JPanel entropyPanel;
-    private javax.swing.JLabel extLabel1;
     private javax.swing.JToolBar jEntropyToolBar;
-    private javax.swing.JButton jLessEntropyButton;
     private javax.swing.JButton jLessRedundantButton;
-    private javax.swing.JButton jMoreEntropyButton;
+    private javax.swing.JButton jLessUselessButton;
     private javax.swing.JButton jMoreRedundantButton;
+    private javax.swing.JButton jMoreUselessButton;
     private javax.swing.JToolBar jRedundantToolBar;
+    private javax.swing.JButton jResetButton;
     private javax.swing.JPanel jSettingPanel;
     private javax.swing.JRadioButton option1Button;
     private javax.swing.JRadioButton option2Button;
+    private javax.swing.JLabel redundantInfoLabel;
     private javax.swing.JLabel redundantLabel;
     private javax.swing.JSlider redundantSlider;
-    private javax.swing.JLabel tanimotoInfoLabel;
     private javax.swing.JLabel uselessLabel;
     private javax.swing.JSlider uselessSlider;
     // End of variables declaration//GEN-END:variables

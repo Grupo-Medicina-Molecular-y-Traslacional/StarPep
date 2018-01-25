@@ -96,7 +96,8 @@ public final class CSNVisualPanel1 extends JPanel {
         jOption2 = new javax.swing.JRadioButton();
         jwarningLabel = new javax.swing.JLabel();
 
-        setPreferredSize(new java.awt.Dimension(640, 480));
+        setMinimumSize(new java.awt.Dimension(440, 380));
+        setPreferredSize(new java.awt.Dimension(440, 380));
         setLayout(new java.awt.GridBagLayout());
 
         bottomPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -170,6 +171,7 @@ public final class CSNVisualPanel1 extends JPanel {
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         bottomPanel.add(jPIDLabel, gridBagConstraints);
 
@@ -218,7 +220,7 @@ public final class CSNVisualPanel1 extends JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         bottomPanel.add(jToolBar1, gridBagConstraints);
 

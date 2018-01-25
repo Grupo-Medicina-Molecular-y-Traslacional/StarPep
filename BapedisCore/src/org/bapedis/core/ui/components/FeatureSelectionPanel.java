@@ -133,8 +133,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         jMoreRedundantButton = new javax.swing.JButton();
         extLabel1 = new javax.swing.JLabel();
 
-        setMinimumSize(new java.awt.Dimension(540, 360));
-        setPreferredSize(new java.awt.Dimension(580, 360));
+        setMinimumSize(new java.awt.Dimension(440, 360));
+        setPreferredSize(new java.awt.Dimension(440, 360));
         setLayout(new java.awt.GridBagLayout());
 
         buttonGroup1.add(option1Button);
@@ -234,7 +234,6 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         entropyPanel.add(jEntropyToolBar, gridBagConstraints);
@@ -301,7 +300,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         correlationPanel.add(jRedundantToolBar, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();

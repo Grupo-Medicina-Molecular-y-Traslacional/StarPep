@@ -137,8 +137,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         jMoreRedundantButton = new javax.swing.JButton();
         jResetButton = new javax.swing.JButton();
 
-        setMinimumSize(new java.awt.Dimension(440, 360));
-        setPreferredSize(new java.awt.Dimension(440, 360));
+        setMinimumSize(new java.awt.Dimension(440, 380));
+        setPreferredSize(new java.awt.Dimension(440, 380));
         setLayout(new java.awt.GridBagLayout());
 
         buttonGroup1.add(option1Button);
@@ -260,7 +260,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 5, 0, 5);
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
         jSettingPanel.add(entropyPanel, gridBagConstraints);
 
         correlationPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.correlationPanel.border.title"))); // NOI18N
@@ -341,6 +341,9 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         jSettingPanel.add(correlationPanel, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jResetButton, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.jResetButton.text")); // NOI18N
+        jResetButton.setMaximumSize(new java.awt.Dimension(145, 23));
+        jResetButton.setMinimumSize(new java.awt.Dimension(145, 23));
+        jResetButton.setPreferredSize(new java.awt.Dimension(145, 23));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -354,7 +357,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 2, 5);
         add(jSettingPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 

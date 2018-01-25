@@ -81,8 +81,8 @@ public class FeatureFilterPanel extends javax.swing.JPanel implements PropertyCh
         rightPanel = new javax.swing.JPanel();
         removeButton = new javax.swing.JButton();
 
-        setMinimumSize(new java.awt.Dimension(480, 360));
-        setPreferredSize(new java.awt.Dimension(500, 360));
+        setMinimumSize(new java.awt.Dimension(440, 380));
+        setPreferredSize(new java.awt.Dimension(540, 380));
         setLayout(new java.awt.GridBagLayout());
 
         centerPanel.setPreferredSize(new java.awt.Dimension(259, 130));

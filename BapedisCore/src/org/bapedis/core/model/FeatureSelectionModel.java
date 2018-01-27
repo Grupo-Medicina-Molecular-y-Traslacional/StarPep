@@ -18,6 +18,7 @@ public class FeatureSelectionModel {
     public static final int[] ENTROPY_CUTOFF_REFS = new int[]{10, 20, 30};
     public static final int ENTROPY_CUTOFF_MIN=10;
     public static final int ENTROPY_CUTOFF_MAX=30;
+    public static final int ENTROPY_DEFAULT_VALUE=30;
     public static final int ENTROPY_MAJORTICKSPACING=10;
     public static final int ENTROPY_MINORTICKSPACING=5;
     
@@ -25,6 +26,7 @@ public class FeatureSelectionModel {
     public static final int[] CORRELATION_CUTOFF_REFS = new int[]{40, 60, 80};
     public static final int CORRELATION_CUTOFF_MIN=40;
     public static final int CORRELATION_CUTOFF_MAX=80;
+    public static final int CORRELATION_DEFAULT_VALUE=40;
     public static final int CORRELATION_MAJORTICKSPACING=20;
     public static final int CORRELATION_MINORTICKSPACING=10;    
     
@@ -38,7 +40,7 @@ public class FeatureSelectionModel {
 
     public FeatureSelectionModel(Workspace owner) {
         this.owner = owner;
-        entropyCutoff = ENTROPY_CUTOFF_REFS[0];
+        entropyCutoff = ENTROPY_DEFAULT_VALUE;
         correlationCutoff = CORRELATION_CUTOFF_REFS[1];
         removeUseless = true;
         removeRedundant = false;

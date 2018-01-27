@@ -344,6 +344,11 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         jResetButton.setMaximumSize(new java.awt.Dimension(145, 23));
         jResetButton.setMinimumSize(new java.awt.Dimension(145, 23));
         jResetButton.setPreferredSize(new java.awt.Dimension(145, 23));
+        jResetButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jResetButtonActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -382,6 +387,11 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
     private void option1ButtonItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_option1ButtonItemStateChanged
         refreshState();
     }//GEN-LAST:event_option1ButtonItemStateChanged
+
+    private void jResetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jResetButtonActionPerformed
+        uselessSlider.setValue(FeatureSelectionModel.ENTROPY_DEFAULT_VALUE);
+        redundantSlider.setValue(FeatureSelectionModel.CORRELATION_DEFAULT_VALUE);
+    }//GEN-LAST:event_jResetButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;

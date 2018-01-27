@@ -30,6 +30,10 @@ public class SequenceClustering {
     public static final int PID_MIN=50;
     public static final int[] PID_REFS= new int[]{50, 70, 90};
     
+    public static final int DEFAULT_ALIGNMENT_TYPE_INDEX=0; // Needleman-Wunsch
+    public static final int DEFAULT_SUBSTITUTION_MATRIX_INDEX=7; // Blosum 62 by Henikoff & Henikoff
+    public static final int DEFAULT_PID=70;
+    
     public static final String[] Alignment_Type = new String[]{"Needleman-Wunsch", "Smith-Waterman"};
     public static final String[] Substitution_Matrix = new String[]{
         "Blosum 30 by Henikoff & Henikoff", "Blosum 35 by Henikoff & Henikoff", "Blosum 40 by Henikoff & Henikoff",
@@ -38,9 +42,7 @@ public class SequenceClustering {
         "Blosum 70 by Henikoff & Henikoff", "Blosum 75 by Henikoff & Henikoff", "Blosum 80 by Henikoff & Henikoff",
         "Blosum 85 by Henikoff & Henikoff", "Blosum 90 by Henikoff & Henikoff", "Blosum 100 by Henikoff & Henikoff",
         "PAM 250 by Gonnet, Cohen & Benner", "PAM 250 by Dayhoff"};
-//    public static final String[] Similarity_Type = new String[]{"Percent sequence identity", "Percent positive substitutions"};
-//    public static final String[][] Similarity_Score = new String[][]{{"Identities / (Length of shorter sequence)", "Identities / Columns"},
-//    {"Positives / (Length of shorter sequence)", "Positives / Columns"}};
+
     protected SubstitutionMatrix<AminoAcidCompound> substitutionMatrix;
     protected Alignments.PairwiseSequenceAlignerType alignerType;    
     
@@ -51,11 +53,11 @@ public class SequenceClustering {
 
     public SequenceClustering() {
         properties = new AlgorithmProperty[4];
-        alignmentTypeIndex = 0;
+        alignmentTypeIndex = DEFAULT_ALIGNMENT_TYPE_INDEX;
         alignerType = getAlignerType();
-        substitutionMatrixIndex = 7; // Blosum 62 by Henikoff & Henikoff
+        substitutionMatrixIndex = DEFAULT_SUBSTITUTION_MATRIX_INDEX; 
         substitutionMatrix = getSubstitutionMatrix();
-        percentIdentity = 70;
+        percentIdentity = DEFAULT_PID;
         clustering = true;
     }
 

@@ -238,6 +238,11 @@ public final class CSNVisualPanel1 extends JPanel {
         jResetButton.setMaximumSize(new java.awt.Dimension(145, 23));
         jResetButton.setMinimumSize(new java.awt.Dimension(145, 23));
         jResetButton.setPreferredSize(new java.awt.Dimension(145, 23));
+        jResetButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jResetButtonActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -291,7 +296,7 @@ public final class CSNVisualPanel1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jOption2, gridBagConstraints);
 
-        jwarningLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/network/resources/info.png"))); // NOI18N
+        jwarningLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/network/resources/warning.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jwarningLabel, org.openide.util.NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.jwarningLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -352,6 +357,12 @@ public final class CSNVisualPanel1 extends JPanel {
     private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
         setClustering(false);
     }//GEN-LAST:event_jOption2ActionPerformed
+
+    private void jResetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jResetButtonActionPerformed
+        jATComboBox.setSelectedIndex(SequenceClustering.DEFAULT_ALIGNMENT_TYPE_INDEX);
+        jSMComboBox.setSelectedIndex(SequenceClustering.DEFAULT_SUBSTITUTION_MATRIX_INDEX);
+        jPIDSlider.setValue(SequenceClustering.DEFAULT_PID);
+    }//GEN-LAST:event_jResetButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bottomPanel;

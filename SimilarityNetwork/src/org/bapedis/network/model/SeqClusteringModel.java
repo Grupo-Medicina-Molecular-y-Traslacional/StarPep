@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.network.impl;
+package org.bapedis.network.model;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -24,7 +24,7 @@ import org.openide.util.Exceptions;
  *
  * @author loge
  */
-public class SequenceClustering {
+public class SeqClusteringModel {
 
     public static final int PID_MAX=90;
     public static final int PID_MIN=50;
@@ -51,7 +51,7 @@ public class SequenceClustering {
     protected int percentIdentity;
     protected boolean clustering;
 
-    public SequenceClustering() {
+    public SeqClusteringModel() {
         properties = new AlgorithmProperty[4];
         alignmentTypeIndex = DEFAULT_ALIGNMENT_TYPE_INDEX;
         alignerType = getAlignerType();

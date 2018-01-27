@@ -13,7 +13,7 @@ import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.GraphViz;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.SimilarityMatrix;
+import org.bapedis.network.model.SimilarityMatrixModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
@@ -72,11 +72,11 @@ public abstract class SimilarityNetworkBaseAlgo implements Algorithm, Similarity
             GraphViz graphViz = pc.getGraphViz(workspace);
 
             // Setup Similarity Matrix Builder
-            SimilarityNetworkBuilder.setStopRun(stopRun);
-            SimilarityNetworkBuilder.peptides = peptides;
-            SimilarityNetworkBuilder.progressTicket = progressTicket;
-            SimilarityNetworkBuilder.similarityMeasure = getSimilarityMeasure();
-            SimilarityNetworkBuilder.histogram = histogram;
+            SimilarityMatrixkBuilder.setStopRun(stopRun);
+            SimilarityMatrixkBuilder.peptides = peptides;
+            SimilarityMatrixkBuilder.progressTicket = progressTicket;
+            SimilarityMatrixkBuilder.similarityMeasure = getSimilarityMeasure();
+            SimilarityMatrixkBuilder.histogram = histogram;
 
             // Remove all similarity edges..
             int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
@@ -100,16 +100,16 @@ public abstract class SimilarityNetworkBaseAlgo implements Algorithm, Similarity
         graphModel = null;
         graph = null;
         progressTicket = null;
-        SimilarityNetworkBuilder.peptides = null;
-        SimilarityNetworkBuilder.similarityMeasure = null;
-        SimilarityNetworkBuilder.progressTicket = null;
-        SimilarityNetworkBuilder.histogram = null;
+        SimilarityMatrixkBuilder.peptides = null;
+        SimilarityMatrixkBuilder.similarityMeasure = null;
+        SimilarityMatrixkBuilder.progressTicket = null;
+        SimilarityMatrixkBuilder.histogram = null;
     }
 
     @Override
     public boolean cancel() {
         stopRun = true;
-        SimilarityNetworkBuilder.setStopRun(stopRun);
+        SimilarityMatrixkBuilder.setStopRun(stopRun);
         return true;
     }
 
@@ -134,13 +134,13 @@ public abstract class SimilarityNetworkBaseAlgo implements Algorithm, Similarity
             propertyChangeSupport.firePropertyChange(CHANGED_SIMILARITY_VALUES, null, null);
 
             // Delete old similarity matrix
-            SimilarityMatrix matrix = workspace.getLookup().lookup(SimilarityMatrix.class);
+            SimilarityMatrixModel matrix = workspace.getLookup().lookup(SimilarityMatrixModel.class);
             if (matrix != null) {
                 workspace.remove(matrix);
             }
 
             // Build new similarity matrix
-            SimilarityNetworkBuilder task = new SimilarityNetworkBuilder();
+            SimilarityMatrixkBuilder task = new SimilarityMatrixkBuilder();
             int workunits = task.getSize();
             progressTicket.switchToDeterminate(workunits);
             fjPool.invoke(task);

@@ -5,6 +5,7 @@
  */
 package org.bapedis.network.impl;
 
+import org.bapedis.network.model.SeqClusteringModel;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.FeatureSelectionModel;
 import org.bapedis.core.model.Workspace;
@@ -20,18 +21,18 @@ import org.bapedis.network.spi.SimilarityMeasure;
  * @author loge
  */
 public class CSNAlgorithm implements Algorithm {
-    private final SequenceClustering seqClustering;
+    private final SeqClusteringModel seqClustering;
     private final AllDescriptors descriptorAlgo;
     private final FeatureSelectionModel featureModel;
     private SimilarityMeasure simMeasure;
 
     public CSNAlgorithm() {
-        seqClustering = new SequenceClustering();
+        seqClustering = new SeqClusteringModel();
         descriptorAlgo = (AllDescriptors)new AllDescriptorsFactory().createAlgorithm(); 
         featureModel = new FeatureSelectionModel(null);
     }
 
-    public SequenceClustering getSeqClustering() {
+    public SeqClusteringModel getSeqClustering() {
         return seqClustering;
     }   
 

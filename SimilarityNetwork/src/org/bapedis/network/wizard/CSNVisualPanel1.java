@@ -10,12 +10,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.bapedis.network.impl.CSNAlgorithm;
-import org.bapedis.network.impl.SequenceClustering;
+import org.bapedis.network.model.SeqClusteringModel;
 import org.openide.util.NbBundle;
 
 public final class CSNVisualPanel1 extends JPanel {
     
-    private final SequenceClustering seqClustering;
+    private final SeqClusteringModel seqClustering;
     private final RichTooltip pidRichTooltip;
 
     /**
@@ -28,14 +28,14 @@ public final class CSNVisualPanel1 extends JPanel {
         jATComboBox.setSelectedIndex(seqClustering.getAlignmentTypeIndex());
         jSMComboBox.setSelectedIndex(seqClustering.getSubstitutionMatrixIndex());
         
-        jPIDSlider.setMinimum(SequenceClustering.PID_MIN);
-        jPIDSlider.setMaximum(SequenceClustering.PID_MAX);
+        jPIDSlider.setMinimum(SeqClusteringModel.PID_MIN);
+        jPIDSlider.setMaximum(SeqClusteringModel.PID_MAX);
 
         //Label table
         Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
-        labelTable.put(SequenceClustering.PID_REFS[0], new JLabel(NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.pidSlider.low")));
-        labelTable.put(SequenceClustering.PID_REFS[1], new JLabel(NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.pidSlider.middle")));
-        labelTable.put(SequenceClustering.PID_REFS[2], new JLabel(NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.pidSlider.high")));
+        labelTable.put(SeqClusteringModel.PID_REFS[0], new JLabel(NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.pidSlider.low")));
+        labelTable.put(SeqClusteringModel.PID_REFS[1], new JLabel(NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.pidSlider.middle")));
+        labelTable.put(SeqClusteringModel.PID_REFS[2], new JLabel(NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.pidSlider.high")));
         
         jPIDSlider.setLabelTable(labelTable);
         jPIDLabel.setText(seqClustering.getPercentIdentity() + "%");
@@ -359,9 +359,9 @@ public final class CSNVisualPanel1 extends JPanel {
     }//GEN-LAST:event_jOption2ActionPerformed
 
     private void jResetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jResetButtonActionPerformed
-        jATComboBox.setSelectedIndex(SequenceClustering.DEFAULT_ALIGNMENT_TYPE_INDEX);
-        jSMComboBox.setSelectedIndex(SequenceClustering.DEFAULT_SUBSTITUTION_MATRIX_INDEX);
-        jPIDSlider.setValue(SequenceClustering.DEFAULT_PID);
+        jATComboBox.setSelectedIndex(SeqClusteringModel.DEFAULT_ALIGNMENT_TYPE_INDEX);
+        jSMComboBox.setSelectedIndex(SeqClusteringModel.DEFAULT_SUBSTITUTION_MATRIX_INDEX);
+        jPIDSlider.setValue(SeqClusteringModel.DEFAULT_PID);
     }//GEN-LAST:event_jResetButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

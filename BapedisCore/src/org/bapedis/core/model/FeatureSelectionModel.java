@@ -41,7 +41,7 @@ public class FeatureSelectionModel {
     public FeatureSelectionModel(Workspace owner) {
         this.owner = owner;
         entropyCutoff = ENTROPY_DEFAULT_VALUE;
-        correlationCutoff = CORRELATION_CUTOFF_REFS[1];
+        correlationCutoff = CORRELATION_DEFAULT_VALUE;
         removeUseless = true;
         removeRedundant = false;
         this.running = new AtomicBoolean(false);

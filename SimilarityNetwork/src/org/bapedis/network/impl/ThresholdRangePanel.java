@@ -65,7 +65,7 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
 
     private ChartPanel chartPanel;
     protected final JXBusyLabel busyLabel;
-    protected SimilarityNetworkBaseAlgo simNetAlgo;
+//    protected SimilarityNetworkBaseAlgo simNetAlgo;
     protected final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private RichTooltip richTooltip;
     private final DecimalFormat formatter;
@@ -85,23 +85,23 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
         formatter = new DecimalFormat("0.00", symbols);
     }
 
-    public void setup(SimilarityNetworkBaseAlgo simNetAlgo) {
-        if (this.simNetAlgo != null) {
-            this.simNetAlgo.removeSimilarityChangeListener(this);
-        }
-        this.simNetAlgo = simNetAlgo;
-        this.simNetAlgo.addSimilarityChangeListener(this);
-
-        JQuickHistogram histogram = simNetAlgo.getHistogram();
-        histogram.setConstraintHeight(histogramPanel.getHeight());
-        if (chartPanel != null) {
-            histogramPanel.remove(chartPanel);
-        }
-        chartPanel = histogram.createChartPanel();
-
-        setBusy(false);
-        resetTooltip(histogram);
-    }
+//    public void setup(SimilarityNetworkBaseAlgo simNetAlgo) {
+//        if (this.simNetAlgo != null) {
+//            this.simNetAlgo.removeSimilarityChangeListener(this);
+//        }
+//        this.simNetAlgo = simNetAlgo;
+//        this.simNetAlgo.addSimilarityChangeListener(this);
+//
+//        JQuickHistogram histogram = simNetAlgo.getHistogram();
+//        histogram.setConstraintHeight(histogramPanel.getHeight());
+//        if (chartPanel != null) {
+//            histogramPanel.remove(chartPanel);
+//        }
+//        chartPanel = histogram.createChartPanel();
+//
+//        setBusy(false);
+//        resetTooltip(histogram);
+//    }
 
     private void setBusy(boolean busy) {
         busyLabel.setBusy(busy);
@@ -315,9 +315,9 @@ public class ThresholdRangePanel extends javax.swing.JPanel implements PropertyC
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource().equals(simNetAlgo) &&
-               evt.getPropertyName().equals(SimilarityNetworkBaseAlgo.CHANGED_SIMILARITY_VALUES)) {
-            setupHistogram((evt.getNewValue() != null ? (JQuickHistogram) evt.getNewValue() : null)); 
-        }
+//        if (evt.getSource().equals(simNetAlgo) &&
+//               evt.getPropertyName().equals(SimilarityNetworkBaseAlgo.CHANGED_SIMILARITY_VALUES)) {
+//            setupHistogram((evt.getNewValue() != null ? (JQuickHistogram) evt.getNewValue() : null)); 
+//        }
     }
 }

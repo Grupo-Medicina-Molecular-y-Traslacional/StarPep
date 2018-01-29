@@ -5,6 +5,9 @@
  */
 package org.bapedis.network.spi;
 
+import java.util.List;
+import org.bapedis.core.model.MolecularDescriptor;
+import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 
 /**
@@ -13,6 +16,8 @@ import org.bapedis.core.model.Peptide;
  */
 public interface SimilarityMeasure {
 
-    float computeSimilarity(Peptide peptide1, Peptide peptide2);
+    void setMolecularDescriptors(List<MolecularDescriptor> featureList);
+    
+    float computeSimilarity(Peptide peptide1, Peptide peptide2) throws MolecularDescriptorNotFoundException;
     
 }

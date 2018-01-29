@@ -8,17 +8,11 @@ package org.bapedis.network.model;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.bapedis.core.model.AlgorithmProperty;
-import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.biojava.nbio.alignment.Alignments;
-import org.biojava.nbio.alignment.SimpleGapPenalty;
 import org.biojava.nbio.core.alignment.matrices.SubstitutionMatrixHelper;
-import org.biojava.nbio.core.alignment.template.SequencePair;
 import org.biojava.nbio.core.alignment.template.SubstitutionMatrix;
-import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
-import org.biojava.nbio.core.sequence.ProteinSequence;
 import org.biojava.nbio.core.sequence.compound.AminoAcidCompound;
-import org.openide.util.Exceptions;
 
 /**
  *
@@ -71,6 +65,10 @@ public class SeqClusteringModel {
         }
         this.percentIdentity = percentIdentity;
     }    
+    
+    public float getIndentityScore(){
+        return percentIdentity / 100.f;
+    }
 
     public boolean isClustering() {
         return clustering;
@@ -104,7 +102,7 @@ public class SeqClusteringModel {
         substitutionMatrix = getSubstitutionMatrix();
     }
 
-    private SubstitutionMatrix<AminoAcidCompound> getSubstitutionMatrix() {
+    public SubstitutionMatrix<AminoAcidCompound> getSubstitutionMatrix() {
         switch (Substitution_Matrix[substitutionMatrixIndex]) {
             case "Blosum 30 by Henikoff & Henikoff":
                 return SubstitutionMatrixHelper.getBlosum30();
@@ -181,34 +179,4 @@ public class SeqClusteringModel {
         }
     }
     
-    private int getDenominatorValue(SequencePair<ProteinSequence, AminoAcidCompound> pair, Peptide peptide1, Peptide peptide2) {
-        switch (getAlignerType()) {
-            case LOCAL:
-                return Math.min(peptide1.getSequence().length(), peptide2.getSequence().length());
-            case GLOBAL:
-                return pair.getLength();
-        }
-        return 0;
-    }    
-
-    private float computeSequenceIdentity(Peptide peptide1, Peptide peptide2) {
-        SimpleGapPenalty gapPenalty = new SimpleGapPenalty();
-        SequencePair<ProteinSequence, AminoAcidCompound> pair;
-        float score;
-        if (peptide1.getSequence().equals(peptide2.getSequence())) {
-            score = 1;
-        } else {
-            try {
-                pair = Alignments.getPairwiseAlignment(peptide1.getBiojavaSeq(), peptide2.getBiojavaSeq(),
-                        alignerType, gapPenalty, substitutionMatrix);
-                score = ((float) pair.getNumIdenticals()) / getDenominatorValue(pair, peptide1, peptide2);
-            } catch (CompoundNotFoundException ex) {
-//                log.log(Level.SEVERE, "Compound Not Found Exception: {0}", ex.getMessage());
-                Exceptions.printStackTrace(ex);
-                score = -1;
-            }
-        }
-        return score;
-    }
-
 }

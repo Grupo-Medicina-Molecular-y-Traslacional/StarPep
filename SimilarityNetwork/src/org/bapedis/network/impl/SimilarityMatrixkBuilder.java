@@ -8,9 +8,12 @@ import org.bapedis.network.spi.SimilarityMeasure;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
+import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.network.model.SimilarityMatrixModel;
 import org.bapedis.core.task.ProgressTicket;
+import org.openide.DialogDisplayer;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -18,20 +21,25 @@ import org.bapedis.core.task.ProgressTicket;
  */
 class SimilarityMatrixkBuilder extends RecursiveAction {
 
-    protected static final int SEQUENTIAL_THRESHOLD = 10;
-    protected static Peptide[] peptides;
-    protected static ProgressTicket progressTicket;
-    protected static SimilarityMeasure similarityMeasure;
-    protected static JQuickHistogram histogram;
+    private static final int SEQUENTIAL_THRESHOLD = 10;
+    private static Peptide[] peptides;
+    private static ProgressTicket progressTicket;
+    private static SimilarityMeasure similarityMeasure;
 
-    protected final SimilarityMatrixModel matrix;
-    protected int xlow, xhigh, ylow, yhigh;
+    private final SimilarityMatrixModel matrix;
+    private int xlow, xhigh, ylow, yhigh;
 
-    protected final static Logger log = Logger.getLogger(SimilarityMatrixkBuilder.class.getName());
-    protected static AtomicBoolean stopRun = new AtomicBoolean(false);
+    private final static Logger log = Logger.getLogger(SimilarityMatrixkBuilder.class.getName());
+    private static AtomicBoolean stopRun = new AtomicBoolean(false);
 
     SimilarityMatrixkBuilder() {
         this(new SimilarityMatrixModel(peptides), 0, peptides.length, 0, peptides.length);
+    }
+
+    static void setContext(Peptide[] peptides, ProgressTicket progressTicket, SimilarityMeasure similarityMeasure) {
+        SimilarityMatrixkBuilder.peptides = peptides;
+        SimilarityMatrixkBuilder.progressTicket = progressTicket;
+        SimilarityMatrixkBuilder.similarityMeasure = similarityMeasure;
     }
 
     private SimilarityMatrixkBuilder(SimilarityMatrixModel matrix, int xlow, int xhigh, int ylow, int yhigh) {
@@ -50,7 +58,7 @@ class SimilarityMatrixkBuilder extends RecursiveAction {
         return matrix;
     }
 
-    public int getSize() {
+    public int getWorkUnits() {
         return matrix.getSize();
     }
 
@@ -83,17 +91,20 @@ class SimilarityMatrixkBuilder extends RecursiveAction {
         for (int y = ylow; y < yhigh; y++) {
             for (int x = xlow; x < Math.min(xhigh, y); x++) {
                 if (!stopRun.get()) {
-                    score = similarityMeasure.computeSimilarity(peptides[y], peptides[x]);
+                    try {
+                        score = similarityMeasure.computeSimilarity(peptides[y], peptides[x]);
+                    } catch (MolecularDescriptorNotFoundException ex) {
+                        DialogDisplayer.getDefault().notify(ex.getErrorND());
+                        stopRun.set(true);
+                        score = -1;
+                    }
                     if (score >= 0.3) {
                         matrix.setValue(peptides[y], peptides[x], score);
-                        histogram.addData(score);
                     }
                     progressTicket.progress();
                 }
             }
         }
     }
-
-
 
 }

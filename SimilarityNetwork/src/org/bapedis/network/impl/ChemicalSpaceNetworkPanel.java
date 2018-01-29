@@ -29,7 +29,7 @@ import org.openide.util.NbBundle;
 public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
 
     protected final ProjectManager pc;
-    protected ChemicalSpaceNetwork csnAlgo;
+//    protected ChemicalSpaceNetwork csnAlgo;
     protected final JXHyperlink select;
     protected final ThresholdRangePanel thresholdPanel;
 
@@ -64,20 +64,20 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
     }
 
     private void setMolecularDescriptors() {
-        AttributesModel attrModel = pc.getAttributesModel();
-        if (attrModel != null && csnAlgo != null) {
-            DescriptorSelectionPanel selectionPanel = new DescriptorSelectionPanel(attrModel);
-            Set<String> descriptorKeys = csnAlgo.getDescriptorKeys();
-            selectionPanel.setSelectedDescriptorKeys(descriptorKeys);
-
-            DialogDescriptor dd = new DialogDescriptor(selectionPanel, NbBundle.getMessage(ChemicalSpaceNetworkPanel.class, "ChemicalSpaceNetworkPanel.DescriptorSelectionPanel.title"));
-            dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION});
-            if (DialogDisplayer.getDefault().notify(dd) == DialogDescriptor.OK_OPTION) {
-                Set<String> selected = selectionPanel.getSelectedDescriptorKeys();
-                descriptorKeys.clear();
-                descriptorKeys.addAll(selected);
-            }
-        }
+//        AttributesModel attrModel = pc.getAttributesModel();
+//        if (attrModel != null && csnAlgo != null) {
+//            DescriptorSelectionPanel selectionPanel = new DescriptorSelectionPanel(attrModel);
+//            Set<String> descriptorKeys = csnAlgo.getDescriptorKeys();
+//            selectionPanel.setSelectedDescriptorKeys(descriptorKeys);
+//
+//            DialogDescriptor dd = new DialogDescriptor(selectionPanel, NbBundle.getMessage(ChemicalSpaceNetworkPanel.class, "ChemicalSpaceNetworkPanel.DescriptorSelectionPanel.title"));
+//            dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION});
+//            if (DialogDisplayer.getDefault().notify(dd) == DialogDescriptor.OK_OPTION) {
+//                Set<String> selected = selectionPanel.getSelectedDescriptorKeys();
+//                descriptorKeys.clear();
+//                descriptorKeys.addAll(selected);
+//            }
+//        }
     }
 
     /**
@@ -231,47 +231,47 @@ public class ChemicalSpaceNetworkPanel extends javax.swing.JPanel implements Alg
     }//GEN-LAST:event_option2RadioButtonItemStateChanged
 
     private void metricComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_metricComboBoxActionPerformed
-        if (csnAlgo != null) {
-            csnAlgo.setMetricIndex(metricComboBox.getSelectedIndex());
-        }
+//        if (csnAlgo != null) {
+//            csnAlgo.setMetricIndex(metricComboBox.getSelectedIndex());
+//        }
     }//GEN-LAST:event_metricComboBoxActionPerformed
 
     private void normComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_normComboBoxActionPerformed
-        if (csnAlgo != null) {
-            csnAlgo.setNormalizationIndex(normComboBox.getSelectedIndex());
-        }
+//        if (csnAlgo != null) {
+//            csnAlgo.setNormalizationIndex(normComboBox.getSelectedIndex());
+//        }
 
     }//GEN-LAST:event_normComboBoxActionPerformed
 
     private void option2RadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_option2RadioButtonActionPerformed
-        if (csnAlgo != null) {
-            csnAlgo.setOptionIndex(1);
-        }
+//        if (csnAlgo != null) {
+//            csnAlgo.setOptionIndex(1);
+//        }
     }//GEN-LAST:event_option2RadioButtonActionPerformed
 
     private void option1RadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_option1RadioButtonActionPerformed
-        if (csnAlgo != null) {
-            csnAlgo.setOptionIndex(0);
-        }
+//        if (csnAlgo != null) {
+//            csnAlgo.setOptionIndex(0);
+//        }
     }//GEN-LAST:event_option1RadioButtonActionPerformed
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
-        this.csnAlgo = (ChemicalSpaceNetwork) algo;
-        switch (csnAlgo.getOptionIndex()) {
-            case 0:
-                option1RadioButton.setSelected(true);
-                select.setVisible(false);
-                break;
-            case 1:
-                option2RadioButton.setSelected(true);
-                select.setVisible(true);
-                break;
-        }
-        metricComboBox.setSelectedIndex(csnAlgo.getMetricIndex());
-        normComboBox.setSelectedIndex(csnAlgo.getNormalizationIndex());
-
-        thresholdPanel.setup(csnAlgo);
+//        this.csnAlgo = (ChemicalSpaceNetwork) algo;
+//        switch (csnAlgo.getOptionIndex()) {
+//            case 0:
+//                option1RadioButton.setSelected(true);
+//                select.setVisible(false);
+//                break;
+//            case 1:
+//                option2RadioButton.setSelected(true);
+//                select.setVisible(true);
+//                break;
+//        }
+//        metricComboBox.setSelectedIndex(csnAlgo.getMetricIndex());
+//        normComboBox.setSelectedIndex(csnAlgo.getNormalizationIndex());
+//
+//        thresholdPanel.setup(csnAlgo);
         return this;
     }
 

@@ -38,21 +38,34 @@ public class Peptide {
     protected final Node graphNode;
     protected final Graph graph;
     protected Map<PeptideAttribute, Object> attrsValue;
-    protected ProteinSequence biojavaSeq;
+
+    protected String id, seq;
+    protected ProteinSequence biojavaSeq;    
+    protected int length;
 
     public Peptide(Node graphNode, Graph graph) {
         this.graphNode = graphNode;
         this.graph = graph;
         attrsValue = Collections.synchronizedMap(new LinkedHashMap<>());
         propertyChangeSupport = new PropertyChangeSupport(this);
+        
+        id = null;
+        seq = null;
+        length = 0;
     }
 
     public String getId() {
-        return (String) attrsValue.get(ID);
+        if (id == null){
+            id = (String) attrsValue.get(ID);
+        }
+        return id;
     }
 
     public String getSequence() {
-        return (String) attrsValue.get(SEQ);
+        if (seq == null){
+            seq = (String) attrsValue.get(SEQ);
+        }
+        return seq;
     }
 
     public ProteinSequence getBiojavaSeq() throws CompoundNotFoundException {
@@ -63,7 +76,10 @@ public class Peptide {
     }
 
     public int getLength() {
-        return (int) attrsValue.get(LENGHT);
+        if (length == 0){
+            length = (int) attrsValue.get(LENGHT); 
+        }
+        return length;
     }
 
     public void setAttributeValue(PeptideAttribute attr, Object value) {

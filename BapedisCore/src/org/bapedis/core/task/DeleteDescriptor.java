@@ -12,7 +12,6 @@ import javax.swing.SwingWorker;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.DeleteDescriptorModel;
 import org.bapedis.core.project.ProjectManager;
-import static org.bapedis.core.task.QueryExecutor.pc;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;

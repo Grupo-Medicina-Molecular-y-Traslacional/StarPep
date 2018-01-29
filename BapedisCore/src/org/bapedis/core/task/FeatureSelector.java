@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
@@ -35,6 +36,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
 
     private boolean stopRun;
     private final ProgressTicket ticket;
+    private final Set<String> descriptorKeys;
     private final AttributesModel attrModel;
     private final FeatureSelectionModel model;
     private final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
@@ -42,9 +44,14 @@ public class FeatureSelector extends SwingWorker<Void, String> {
     private final Workspace workspace;
     protected final NotifyDescriptor emptyMDs;
 
-    public FeatureSelector(FeatureSelectionModel model, AttributesModel attrModel) {
+    public FeatureSelector(FeatureSelectionModel model, AttributesModel attrModel){
+        this(model, attrModel,attrModel.getMolecularDescriptorKeys());
+    }
+        
+    public FeatureSelector(FeatureSelectionModel model, AttributesModel attrModel, Set<String> descriptorKeys) {
         this.attrModel = attrModel;
         this.model = model;
+        this.descriptorKeys = descriptorKeys;
         workspace = model.getOwnerWS();
         stopRun = false;
         ticket = new ProgressTicket(NbBundle.getMessage(FeatureSelector.class, "FeatureSelector.task.name", workspace.getName()), new Cancellable() {
@@ -67,7 +74,7 @@ public class FeatureSelector extends SwingWorker<Void, String> {
         pc.reportRunningTask(taskName, workspace);
 
         List<MolecularDescriptor> allFeatures = new LinkedList<>();
-        for (String key : attrModel.getMolecularDescriptorKeys()) {
+        for (String key : descriptorKeys) {
             if (!key.equals(MolecularDescriptor.DEFAULT_CATEGORY)) {
                 for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
                     allFeatures.add(attr);

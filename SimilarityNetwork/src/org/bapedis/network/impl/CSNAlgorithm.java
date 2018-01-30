@@ -179,7 +179,6 @@ public class CSNAlgorithm implements Algorithm {
     public void run() {
         if (peptides != null) {
             Peptide[] representatives;
-
             
             //Get representative peptides
             if (clusteringModel.isClustering()) {

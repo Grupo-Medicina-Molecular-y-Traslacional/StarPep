@@ -52,7 +52,6 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.task.AlgorithmExecutor;
-import org.bapedis.core.task.AlgorithmListener;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.DialogDisplayer;

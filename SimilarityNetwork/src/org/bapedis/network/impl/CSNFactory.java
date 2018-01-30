@@ -19,6 +19,7 @@ import org.openide.util.lookup.ServiceProvider;
 public class CSNFactory implements SimilarityNetworkFactory{
 
     private final CSNSetupUI setupUI = new CSNSetupUI();
+    private final CSNAlgorithmFactory factory = new CSNAlgorithmFactory();
             
     @Override
     public String getName() {
@@ -33,7 +34,7 @@ public class CSNFactory implements SimilarityNetworkFactory{
 
     @Override
     public Algorithm createAlgorithm() {
-        return new CSNAlgorithm();
+        return factory.createAlgorithm();
     }
     
 }

@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import org.bapedis.network.model.SeqClusteringModel;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.FeatureSelectionModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
@@ -25,7 +24,8 @@ import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.spi.algo.impl.AllDescriptors;
 import org.bapedis.core.spi.algo.impl.AllDescriptorsFactory;
-import org.bapedis.core.task.FeatureSelector;
+import org.bapedis.core.spi.algo.impl.FeatureSelectionAlgo;
+import org.bapedis.core.spi.algo.impl.FeatureSelectionFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.network.model.Cluster;
 import org.bapedis.network.model.MDOptionModel;
@@ -46,10 +46,11 @@ import org.openide.util.NbBundle;
  */
 public class CSNAlgorithm implements Algorithm {
 
+    private CSNAlgorithmFactory factory;
     private final SeqClusteringModel clusteringModel;
     private final MDOptionModel mdOptionModel;
     private final AllDescriptors descriptorAlgo;
-    private final FeatureSelectionModel featureModel;
+    private final FeatureSelectionAlgo featureSelectionAlgo;
     private SimilarityMeasure simMeasure;
     private int thresholdPercent;
 
@@ -64,14 +65,15 @@ public class CSNAlgorithm implements Algorithm {
     protected Peptide[] peptides;
     protected GraphModel graphModel;
     protected Graph graph;
-    protected ProgressTicket progressTicket;
+    protected ProgressTicket ticket;
     protected boolean stopRun;
 
-    public CSNAlgorithm() {
+    public CSNAlgorithm(CSNAlgorithmFactory factory) {
+        this.factory = factory;
         clusteringModel = new SeqClusteringModel();
         mdOptionModel = new MDOptionModel(pc.getAttributesModel().getMolecularDescriptorKeys());
         descriptorAlgo = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
-        featureModel = new FeatureSelectionModel(null);
+        featureSelectionAlgo = (FeatureSelectionAlgo) new FeatureSelectionFactory().createAlgorithm();
         thresholdPercent = 70;
 
         emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithm.class, "ChemicalSpaceNetwork.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
@@ -92,8 +94,8 @@ public class CSNAlgorithm implements Algorithm {
         return descriptorAlgo;
     }
 
-    public FeatureSelectionModel getFeatureModel() {
-        return featureModel;
+    public FeatureSelectionAlgo getFeatureSelectionAlgo() {
+        return featureSelectionAlgo;
     }
 
     public SimilarityMeasure getSimMeasure() {
@@ -147,7 +149,7 @@ public class CSNAlgorithm implements Algorithm {
         attrModel = null;
         graphModel = null;
         graph = null;
-        progressTicket = null;
+        ticket = null;
         SimilarityMatrixkBuilder.setContext(null, null, null);
     }
 
@@ -165,12 +167,12 @@ public class CSNAlgorithm implements Algorithm {
 
     @Override
     public AlgorithmFactory getFactory() {
-        return null;
+        return factory;
     }
 
     @Override
     public void setProgressTicket(ProgressTicket progressTicket) {
-        this.progressTicket = progressTicket;
+        this.ticket = progressTicket;
     }
 
     @Override
@@ -178,9 +180,12 @@ public class CSNAlgorithm implements Algorithm {
         if (peptides != null) {
             Peptide[] representatives;
 
+            
             //Get representative peptides
             if (clusteringModel.isClustering()) {
+                ticket.progress(NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.clusterize"));
                 SeqClusterBuilder clusterBuilder = new SeqClusterBuilder(clusteringModel);
+                clusterBuilder.setProgressTicket(ticket);
                 List<Cluster> clusters = clusterBuilder.clusterize(peptides);
                 representatives = new Peptide[clusters.size()];
                 int pos = 0;
@@ -197,7 +202,7 @@ public class CSNAlgorithm implements Algorithm {
                 descriptorKeys = mdOptionModel.getDescriptorKeys();
             } else if (mdOptionModel.getOptionIndex() == MDOptionModel.NEW_MD) {
                 descriptorAlgo.initAlgo(workspace);
-                descriptorAlgo.setProgressTicket(progressTicket);
+                descriptorAlgo.setProgressTicket(ticket);
                 descriptorAlgo.run();
                 descriptorKeys = descriptorAlgo.getDescriptorKeys();
                 descriptorAlgo.endAlgo();
@@ -221,8 +226,9 @@ public class CSNAlgorithm implements Algorithm {
             }
 
             //Feature selection
-            FeatureSelector selector = new FeatureSelector(featureModel, attrModel, descriptorKeys);
-            selector.execute();
+            featureSelectionAlgo.initAlgo(workspace);
+            featureSelectionAlgo.run();
+            featureSelectionAlgo.endAlgo();
 
             //Populate feature list
             List<MolecularDescriptor> featureList = new LinkedList<>();
@@ -303,10 +309,10 @@ public class CSNAlgorithm implements Algorithm {
             }
 
             // Build new similarity matrix
-            SimilarityMatrixkBuilder.setContext(representatives, progressTicket, simMeasure);
+            SimilarityMatrixkBuilder.setContext(representatives, ticket, simMeasure);
             SimilarityMatrixkBuilder task = new SimilarityMatrixkBuilder();
             int workunits = task.getWorkUnits();
-            progressTicket.switchToDeterminate(workunits);
+            ticket.switchToDeterminate(workunits);
             fjPool.invoke(task);
             task.join();
 

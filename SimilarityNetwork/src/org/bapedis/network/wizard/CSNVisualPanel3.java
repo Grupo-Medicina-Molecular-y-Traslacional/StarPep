@@ -7,7 +7,8 @@ package org.bapedis.network.wizard;
 
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
-import org.bapedis.core.ui.components.FeatureSelectionPanel;
+import org.bapedis.core.spi.algo.impl.FeatureSelectionAlgo;
+import org.bapedis.core.spi.algo.impl.FeatureSelectionPanel;
 import org.bapedis.network.impl.CSNAlgorithm;
 import org.openide.util.NbBundle;
 
@@ -21,7 +22,9 @@ public final class CSNVisualPanel3 extends JPanel {
     public CSNVisualPanel3(CSNAlgorithm csnAlgo) {
         this.csnAlgo = csnAlgo;
         initComponents();
-        centerPanel.add(new FeatureSelectionPanel(csnAlgo.getFeatureModel()), BorderLayout.CENTER);
+        FeatureSelectionAlgo algo = csnAlgo.getFeatureSelectionAlgo();
+        JPanel settingPanel = (FeatureSelectionPanel)algo.getFactory().getSetupUI().getSettingPanel(algo);
+        centerPanel.add(settingPanel, BorderLayout.CENTER);
     }
 
     @Override

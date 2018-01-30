@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.ui.components;
 
+import org.bapedis.core.spi.algo.impl.FeatureSelectionPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
@@ -12,11 +13,13 @@ import java.beans.PropertyChangeListener;
 import javax.swing.SwingConstants;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
-import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.FeatureSelectionModel;
-import org.bapedis.core.task.FeatureSelector;
+import org.bapedis.core.model.Workspace;
+import org.bapedis.core.spi.algo.impl.FeatureSelectionAlgo;
+import org.bapedis.core.spi.algo.impl.FeatureSelectionFactory;
+import org.bapedis.core.task.AlgorithmExecutor;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.openide.DialogDisplayer;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
@@ -25,24 +28,31 @@ import org.openide.util.NbBundle;
  */
 public class FeatureFilterPanel extends javax.swing.JPanel implements PropertyChangeListener {
 
-    protected final AttributesModel attrModel;
-    protected final FeatureSelectionModel model;
+    protected static final AlgorithmExecutor executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
+    protected Workspace workspace;
+    protected FeatureSelectionAlgo algo;
     protected final JXBusyLabel busyLabel;
     protected final FeatureSelectionPanel settingPanel;
 
     /**
      * Creates new form FeatureFilterPanel
+     * @param workspace
      */
-    public FeatureFilterPanel(FeatureSelectionModel model, AttributesModel attrModel) {
+    public FeatureFilterPanel(Workspace workspace) {
         initComponents();
-
-        this.attrModel = attrModel;
-        this.model = model;
+        
+        this.workspace = workspace;
+        
+        algo = workspace.getLookup().lookup(FeatureSelectionAlgo.class);
+        if (algo == null) {
+            algo = (FeatureSelectionAlgo) new FeatureSelectionFactory().createAlgorithm();
+            workspace.add(algo);
+        }            
 
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setText(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.removing.text"));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        boolean running = model.isRunning();
+        boolean running = algo.isRunning();
         busyLabel.setBusy(running);
         busyLabel.setVisible(running);
         rightPanel.add(busyLabel);
@@ -50,12 +60,12 @@ public class FeatureFilterPanel extends javax.swing.JPanel implements PropertyCh
         addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
-                model.addPropertyChangeListener(FeatureFilterPanel.this);
+                algo.addPropertyChangeListener(FeatureFilterPanel.this);
             }
 
             @Override
             public void ancestorRemoved(AncestorEvent event) {
-                model.removePropertyChangeListener(FeatureFilterPanel.this);
+                algo.removePropertyChangeListener(FeatureFilterPanel.this);
             }
 
             @Override
@@ -63,7 +73,7 @@ public class FeatureFilterPanel extends javax.swing.JPanel implements PropertyCh
             }
         });   
         
-        settingPanel = new FeatureSelectionPanel(model);
+        settingPanel = (FeatureSelectionPanel)algo.getFactory().getSetupUI().getSettingPanel(algo);
         centerPanel.add(settingPanel, BorderLayout.CENTER);
     }
 
@@ -124,18 +134,17 @@ public class FeatureFilterPanel extends javax.swing.JPanel implements PropertyCh
     }// </editor-fold>//GEN-END:initComponents
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
-        if (model.getOwnerWS().isBusy()) {
-            DialogDisplayer.getDefault().notify(model.getOwnerWS().getBusyNotifyDescriptor());
+        if (workspace.isBusy()) {
+            DialogDisplayer.getDefault().notify(workspace.getBusyNotifyDescriptor());
         } else {                        
-            FeatureSelector selector = new FeatureSelector(model, attrModel);
-            selector.execute();
+            executor.execute(algo);
         }
     }//GEN-LAST:event_removeButtonActionPerformed
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource().equals(model) && evt.getPropertyName().equals(FeatureSelectionModel.RUNNING)){
-            boolean running = model.isRunning();
+        if (evt.getSource().equals(algo) && evt.getPropertyName().equals(FeatureSelectionAlgo.RUNNING)){
+            boolean running = algo.isRunning();
             busyLabel.setBusy(running);
             busyLabel.setVisible(running);  
             settingPanel.refreshState();

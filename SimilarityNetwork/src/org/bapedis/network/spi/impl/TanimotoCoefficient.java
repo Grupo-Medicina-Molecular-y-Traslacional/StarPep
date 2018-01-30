@@ -47,7 +47,7 @@ public class TanimotoCoefficient implements SimilarityMeasure {
             case 1:
                 return attr.getNormalizedMinMaxValue(peptide);
         }
-        throw new IllegalStateException("Unknown value for normalization index: " + normalizationIndex);
+        throw new IllegalArgumentException("Unknown value for normalization index: " + normalizationIndex);
     }    
     
 }

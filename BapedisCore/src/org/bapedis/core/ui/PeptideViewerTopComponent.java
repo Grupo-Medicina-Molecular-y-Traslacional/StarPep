@@ -27,8 +27,6 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.DeleteDescriptorModel;
-import org.bapedis.core.model.FeatureSelectionModel;
 import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.QueryModel;
@@ -37,9 +35,8 @@ import org.bapedis.core.spi.filters.impl.AttributeFilter;
 import org.bapedis.core.spi.filters.impl.FilterHelper;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
 import org.bapedis.core.ui.actions.MolecularDescriptorAction;
-import org.bapedis.core.ui.components.DeleteDescriptorPanel;
+import org.bapedis.core.ui.components.DeleteMDPanel;
 import org.bapedis.core.ui.components.FeatureFilterPanel;
-import org.bapedis.core.ui.components.FeatureSelectionPanel;
 import org.bapedis.core.ui.components.MolecularFeaturesPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.netbeans.swing.etable.ETableColumn;
@@ -435,25 +432,15 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
     private void delMDButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delMDButtonActionPerformed
         Workspace currentWS = pc.getCurrentWorkspace();
-        DeleteDescriptorModel deleteModel = currentWS.getLookup().lookup(DeleteDescriptorModel.class);
-        if (deleteModel == null){
-            deleteModel = new DeleteDescriptorModel(currentWS);
-            currentWS.add(deleteModel);
-        }
-        DialogDescriptor dd = new DialogDescriptor(new DeleteDescriptorPanel(currentModel, deleteModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.DeleteDescriptorPanel.title"));
+        DialogDescriptor dd = new DialogDescriptor(new DeleteMDPanel(currentWS), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.DeleteDescriptorPanel.title"));
         dd.setOptions(new Object[]{DialogDescriptor.CLOSED_OPTION});
         DialogDisplayer.getDefault().notify(dd);
         populateVisibleColumns(currentModel);
     }//GEN-LAST:event_delMDButtonActionPerformed
 
     private void selectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectButtonActionPerformed
-        Workspace currentWS = pc.getCurrentWorkspace();
-        FeatureSelectionModel featureModel = currentWS.getLookup().lookup(FeatureSelectionModel.class);
-        if (featureModel == null) {
-            featureModel = new FeatureSelectionModel(currentWS);
-            currentWS.add(featureModel);
-        }        
-        DialogDescriptor dd = new DialogDescriptor(new FeatureFilterPanel(featureModel, currentModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.FeatureFilterPanel.title"));
+        Workspace currentWS = pc.getCurrentWorkspace();    
+        DialogDescriptor dd = new DialogDescriptor(new FeatureFilterPanel(currentWS), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.FeatureFilterPanel.title"));
         dd.setOptions(new Object[]{DialogDescriptor.CLOSED_OPTION});
         DialogDisplayer.getDefault().notify(dd);
     }//GEN-LAST:event_selectButtonActionPerformed

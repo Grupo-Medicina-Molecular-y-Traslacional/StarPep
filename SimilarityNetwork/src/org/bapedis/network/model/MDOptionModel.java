@@ -35,7 +35,7 @@ public class MDOptionModel {
 
     public void setOptionIndex(int optionIndex) {
         if (optionIndex != AVAILABLE_MD && optionIndex != NEW_MD)
-            throw new IllegalStateException("Unknown value for option index: " + optionIndex);
+            throw new IllegalArgumentException("Unknown value for option index: " + optionIndex);
         this.optionIndex = optionIndex;
     }    
 

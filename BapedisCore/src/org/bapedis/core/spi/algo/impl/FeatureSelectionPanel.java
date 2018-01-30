@@ -3,85 +3,74 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.ui.components;
+package org.bapedis.core.spi.algo.impl;
 
 import java.util.Hashtable;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.bapedis.core.model.FeatureSelectionModel;
+import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmSetupUI;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author loge
  */
-public class FeatureSelectionPanel extends javax.swing.JPanel {
+public class FeatureSelectionPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
 
-    protected final FeatureSelectionModel model;
+    private FeatureSelectionAlgo algo;
 
-    public FeatureSelectionPanel(FeatureSelectionModel model) {
+    public FeatureSelectionPanel() {
         initComponents();
-        this.model = model;
 
         // Configure sliders        
-        uselessSlider.setMinimum(FeatureSelectionModel.ENTROPY_CUTOFF_MIN);
-        uselessSlider.setMaximum(FeatureSelectionModel.ENTROPY_CUTOFF_MAX);
-        uselessSlider.setMajorTickSpacing(FeatureSelectionModel.ENTROPY_MAJORTICKSPACING);
-        uselessSlider.setMinorTickSpacing(FeatureSelectionModel.ENTROPY_MINORTICKSPACING);
-        int val = model.getEntropyCutoff();
-        uselessSlider.setValue(val);
-        uselessLabel.setText(val + "%");
+        uselessSlider.setMinimum(FeatureSelectionAlgo.ENTROPY_CUTOFF_MIN);
+        uselessSlider.setMaximum(FeatureSelectionAlgo.ENTROPY_CUTOFF_MAX);
+        uselessSlider.setMajorTickSpacing(FeatureSelectionAlgo.ENTROPY_MAJORTICKSPACING);
+        uselessSlider.setMinorTickSpacing(FeatureSelectionAlgo.ENTROPY_MINORTICKSPACING);
         uselessSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 if (!uselessSlider.getValueIsAdjusting()) {
                     int val = uselessSlider.getValue();
                     uselessLabel.setText(val + "%");
-                    model.setEntropyCutoff(val);
+                    if (algo != null) {
+                        algo.setEntropyCutoff(val);
+                    }
                 }
             }
         });
 
         Hashtable<Integer, JLabel> uselessLabelTable = new Hashtable<>();
-        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.low")));
-        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.middle")));
-        uselessLabelTable.put(FeatureSelectionModel.ENTROPY_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.high")));
-
+        uselessLabelTable.put(FeatureSelectionAlgo.ENTROPY_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.low")));
+        uselessLabelTable.put(FeatureSelectionAlgo.ENTROPY_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.middle")));
+        uselessLabelTable.put(FeatureSelectionAlgo.ENTROPY_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.high")));
         uselessSlider.setLabelTable(uselessLabelTable);
 
-        redundantSlider.setMinimum(FeatureSelectionModel.CORRELATION_CUTOFF_MIN);
-        redundantSlider.setMaximum(FeatureSelectionModel.CORRELATION_CUTOFF_MAX);
-        redundantSlider.setMajorTickSpacing(FeatureSelectionModel.CORRELATION_MAJORTICKSPACING);
-        redundantSlider.setMinorTickSpacing(FeatureSelectionModel.CORRELATION_MINORTICKSPACING);
-        val = model.getCorrelationCutoff();
-        redundantSlider.setValue(val);
-        redundantLabel.setText(val + "%");
+        redundantSlider.setMinimum(FeatureSelectionAlgo.CORRELATION_CUTOFF_MIN);
+        redundantSlider.setMaximum(FeatureSelectionAlgo.CORRELATION_CUTOFF_MAX);
+        redundantSlider.setMajorTickSpacing(FeatureSelectionAlgo.CORRELATION_MAJORTICKSPACING);
+        redundantSlider.setMinorTickSpacing(FeatureSelectionAlgo.CORRELATION_MINORTICKSPACING);
         redundantSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 if (!redundantSlider.getValueIsAdjusting()) {
                     int val = redundantSlider.getValue();
                     redundantLabel.setText(val + "%");
-                    model.setCorrelationCutoff(val);
+                    if (algo != null) {
+                        algo.setCorrelationCutoff(val);
+                    }
                 }
             }
         });
 
         Hashtable<Integer, JLabel> redundantLabelTable = new Hashtable<>();
-        redundantLabelTable.put(FeatureSelectionModel.CORRELATION_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.low")));
-        redundantLabelTable.put(FeatureSelectionModel.CORRELATION_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.middle")));
-        redundantLabelTable.put(FeatureSelectionModel.CORRELATION_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.high")));
-
+        redundantLabelTable.put(FeatureSelectionAlgo.CORRELATION_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.low")));
+        redundantLabelTable.put(FeatureSelectionAlgo.CORRELATION_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.middle")));
+        redundantLabelTable.put(FeatureSelectionAlgo.CORRELATION_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.high")));
         redundantSlider.setLabelTable(redundantLabelTable);
-
-        if (model.isRemoveUseless()) {
-            if (model.isRemoveRedundant()) {
-                option2Button.setSelected(true);
-            } else {
-                option1Button.setSelected(true);
-            }
-        }
 
     }
 
@@ -90,7 +79,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
 //    }
     
     public void refreshState() {
-        boolean enabled = (option2Button.isSelected() || option1Button.isSelected()) && !model.isRunning();
+        boolean running = algo != null && algo.isRunning();
+        boolean enabled = (option2Button.isSelected() || option1Button.isSelected()) && !running;
         entropyPanel.setEnabled(enabled);
         uselessSlider.setEnabled(enabled);
         uselessLabel.setEnabled(enabled);
@@ -98,7 +88,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
         jLessUselessButton.setEnabled(enabled);
         jMoreUselessButton.setEnabled(enabled);
 
-        enabled = option2Button.isSelected() && !model.isRunning();
+        enabled = option2Button.isSelected() && !running;
         correlationPanel.setEnabled(enabled);
         redundantSlider.setEnabled(enabled);
         redundantLabel.setEnabled(enabled);
@@ -367,16 +357,16 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void option2ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_option2ButtonActionPerformed
-        if (model != null) {
-            model.setRemoveUseless(true);
-            model.setRemoveRedundant(true);
+        if (algo != null) {
+            algo.setRemoveUseless(true);
+            algo.setRemoveRedundant(true);
         }
     }//GEN-LAST:event_option2ButtonActionPerformed
 
     private void option1ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_option1ButtonActionPerformed
-        if (model != null) {
-            model.setRemoveUseless(true);
-            model.setRemoveRedundant(false);
+        if (algo != null) {
+            algo.setRemoveUseless(true);
+            algo.setRemoveRedundant(false);
         }
     }//GEN-LAST:event_option1ButtonActionPerformed
 
@@ -389,8 +379,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_option1ButtonItemStateChanged
 
     private void jResetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jResetButtonActionPerformed
-        uselessSlider.setValue(FeatureSelectionModel.ENTROPY_DEFAULT_VALUE);
-        redundantSlider.setValue(FeatureSelectionModel.CORRELATION_DEFAULT_VALUE);
+        uselessSlider.setValue(FeatureSelectionAlgo.ENTROPY_DEFAULT_VALUE);
+        redundantSlider.setValue(FeatureSelectionAlgo.CORRELATION_DEFAULT_VALUE);
     }//GEN-LAST:event_jResetButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -414,5 +404,27 @@ public class FeatureSelectionPanel extends javax.swing.JPanel {
     private javax.swing.JLabel uselessLabel;
     private javax.swing.JSlider uselessSlider;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public JPanel getSettingPanel(Algorithm algo) {
+        this.algo = (FeatureSelectionAlgo) algo;
+        int val = this.algo.getEntropyCutoff();
+        uselessSlider.setValue(val);
+        uselessLabel.setText(val + "%");
+
+        val = this.algo.getCorrelationCutoff();
+        redundantSlider.setValue(val);
+        redundantLabel.setText(val + "%");
+
+        if (this.algo.isRemoveUseless()) {
+            if (this.algo.isRemoveRedundant()) {
+                option2Button.setSelected(true);
+            } else {
+                option1Button.setSelected(true);
+            }
+        }
+
+        return this;
+    }
 
 }

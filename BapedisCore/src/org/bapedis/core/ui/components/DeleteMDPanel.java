@@ -17,42 +17,55 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.DeleteDescriptorModel;
 import org.bapedis.core.model.MolecularDescriptor;
-import org.bapedis.core.task.DeleteDescriptor;
+import org.bapedis.core.model.Workspace;
+import org.bapedis.core.spi.algo.impl.DeleteDescriptorAlgo;
+import org.bapedis.core.spi.algo.impl.DeleteDescriptorFactory;
+import org.bapedis.core.task.AlgorithmExecutor;
+import static org.bapedis.core.ui.components.FeatureFilterPanel.executor;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.openide.DialogDisplayer;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
  * @author loge
  */
-public class DeleteDescriptorPanel extends javax.swing.JPanel implements PropertyChangeListener {
+public class DeleteMDPanel extends javax.swing.JPanel implements PropertyChangeListener {
 
+    protected static final AlgorithmExecutor executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
+    protected final Workspace workspace;
+    protected DeleteDescriptorAlgo algo;
     protected final DescriptorSelectionPanel selectionPanel;
     protected final JXBusyLabel busyLabel;
-    protected final AttributesModel attrModel;
-    protected final DeleteDescriptorModel deleteModel;
 
-    public DeleteDescriptorPanel(AttributesModel attrModel, final DeleteDescriptorModel deleteModel) {
+    public DeleteMDPanel(Workspace workspace) {
         initComponents();
-        this.attrModel = attrModel;
-        this.deleteModel = deleteModel;
-
+        
+        this.workspace = workspace;
+        
+        algo = workspace.getLookup().lookup(DeleteDescriptorAlgo.class);
+        if (algo == null){
+            algo = (DeleteDescriptorAlgo) new DeleteDescriptorFactory().createAlgorithm();
+            workspace.add(algo);
+        }
+        
+        AttributesModel attrModel = workspace.getLookup().lookup(AttributesModel.class);        
         selectionPanel = new DescriptorSelectionPanel(attrModel, Color.RED);
         selectionPanel.removeDescriptorRow(MolecularDescriptor.DEFAULT_CATEGORY);
+        selectionPanel.setSelectedDescriptorKeys(algo.getDescriptorKeys());
 
         centerPanel.add(selectionPanel, BorderLayout.CENTER);
 
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
-        busyLabel.setText(NbBundle.getMessage(DeleteDescriptorPanel.class, "DeleteDescriptorPanel.deleting.text"));
+        busyLabel.setText(NbBundle.getMessage(DeleteMDPanel.class, "DeleteMDPanel.deleting.text"));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        boolean running = deleteModel.isRunning();
+        boolean running = algo.isRunning();
         busyLabel.setBusy(running);
         busyLabel.setVisible(running);
         rightPanel.add(busyLabel);
 
-        deleteButton.setEnabled(false);
+        deleteButton.setEnabled(selectionPanel.getSelectedDescriptorKeys().size()>0);
 
         selectionPanel.addTableModelListener(new TableModelListener() {
             @Override
@@ -62,7 +75,9 @@ public class DeleteDescriptorPanel extends javax.swing.JPanel implements Propert
                 for (int row = 0; row < model.getRowCount(); row++) {
                     if ((boolean) model.getValueAt(row, 0)) {
                         flag = true;
-                        break;
+                        algo.includeAlgorithm((String)model.getValueAt(row, 1));
+                    } else{
+                        algo.excludeAlgorithm((String)model.getValueAt(row, 1));
                     }
                 }
                 deleteButton.setEnabled(flag);
@@ -72,12 +87,12 @@ public class DeleteDescriptorPanel extends javax.swing.JPanel implements Propert
         addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
-                deleteModel.addPropertyChangeListener(DeleteDescriptorPanel.this);
+                algo.addPropertyChangeListener(DeleteMDPanel.this);
             }
 
             @Override
             public void ancestorRemoved(AncestorEvent event) {
-                deleteModel.removePropertyChangeListener(DeleteDescriptorPanel.this);
+                algo.removePropertyChangeListener(DeleteMDPanel.this);
             }
 
             @Override
@@ -110,7 +125,7 @@ public class DeleteDescriptorPanel extends javax.swing.JPanel implements Propert
         rightPanel.setLayout(new javax.swing.BoxLayout(rightPanel, javax.swing.BoxLayout.Y_AXIS));
 
         deleteButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/delete.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(deleteButton, org.openide.util.NbBundle.getMessage(DeleteDescriptorPanel.class, "DeleteDescriptorPanel.deleteButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(deleteButton, org.openide.util.NbBundle.getMessage(DeleteMDPanel.class, "DeleteMDPanel.deleteButton.text")); // NOI18N
         deleteButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         deleteButton.setMaximumSize(new java.awt.Dimension(99, 29));
         deleteButton.setMinimumSize(new java.awt.Dimension(99, 29));
@@ -144,12 +159,10 @@ public class DeleteDescriptorPanel extends javax.swing.JPanel implements Propert
     }// </editor-fold>//GEN-END:initComponents
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
-        if (deleteModel.getOwnerWS().isBusy()) {
-            DialogDisplayer.getDefault().notify(deleteModel.getOwnerWS().getBusyNotifyDescriptor());
+        if (workspace.isBusy()) {
+            DialogDisplayer.getDefault().notify(workspace.getBusyNotifyDescriptor());
         } else {
-            DeleteDescriptor deleteTask = new DeleteDescriptor(deleteModel, attrModel, selectionPanel.getSelectedDescriptorKeys());
-            deleteTask.execute();
-            deleteButton.setEnabled(false);            
+            executor.execute(algo);          
         }
     }//GEN-LAST:event_deleteButtonActionPerformed
 
@@ -162,8 +175,8 @@ public class DeleteDescriptorPanel extends javax.swing.JPanel implements Propert
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource().equals(deleteModel) && evt.getPropertyName().equals(DeleteDescriptorModel.RUNNING)){
-            boolean running = deleteModel.isRunning();
+        if (evt.getSource().equals(algo) && evt.getPropertyName().equals(DeleteDescriptorAlgo.RUNNING)){
+            boolean running = algo.isRunning();
             busyLabel.setBusy(running);
             busyLabel.setVisible(running);            
         }

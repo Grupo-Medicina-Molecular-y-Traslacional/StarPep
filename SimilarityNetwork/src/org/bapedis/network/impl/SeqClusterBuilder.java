@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.network.model.Cluster;
 import org.bapedis.network.model.SeqClusteringModel;
 import org.biojava.nbio.alignment.Alignments;
@@ -31,6 +32,7 @@ import org.openide.util.Exceptions;
  */
 public class SeqClusterBuilder {
 
+    protected ProgressTicket ticket;
     protected final Alignments.PairwiseSequenceAlignerType alignerType;
     protected final SubstitutionMatrix<AminoAcidCompound> substitutionMatrix;
     protected final float identityScore;
@@ -43,33 +45,45 @@ public class SeqClusterBuilder {
         identityScore = model.getIndentityScore();
     }
 
-    public List<Cluster> clusterize(Peptide[] peptides) {
-        List<Cluster> clusters = new LinkedList<>();
+    public ProgressTicket getProgressTicket() {
+        return ticket;
+    }
+
+    public void setProgressTicket(ProgressTicket progressTicket) {
+        this.ticket = progressTicket;
+    }
+
+    public List<Cluster> clusterize(Peptide[] peptides) {        
+        List<Cluster> clusterList = new LinkedList<>();
 
         // Sort by decreasing sequence length
-        Arrays.sort(peptides, new SeqLengthComparator());
+        Arrays.parallelSort(peptides, new SeqLengthComparator());
 
         // Create clusters
-        clusters.add(new Cluster(peptides[0]));
+        clusterList.add(new Cluster(peptides[0]));
 
+        ticket.switchToDeterminate(ticket.getCurrentUnit() + peptides.length);
         boolean isRepresentative;
         Peptide query;
         Peptide centroid;
         int rejections;
-        Iterator<Cluster> iterator;
+        Cluster[] clusters;
         Cluster c;
+        int pos;
         for (int i = 1; i < peptides.length; i++) {
             isRepresentative = true;
             query = peptides[i];
             rejections = 0;
+            
             // Sort by decreasing common words
-            Collections.sort(clusters, new ClusterComparator(query));
+            clusters = clusterList.toArray(new Cluster[0]);
+            Arrays.parallelSort(clusters, new ClusterComparator(query));
 
             // Assign query to cluster
             // Stop if max rejects ocurred
-            iterator = clusters.iterator();
+            pos = 0;
             do {
-                c = iterator.next();
+                c = clusters[pos++];
                 centroid = c.getCentroid();
                 if (computeSequenceIdentity(query, centroid) >= identityScore) {
                     c.addMember(query);
@@ -77,14 +91,16 @@ public class SeqClusterBuilder {
                 } else {
                     rejections++;
                 }
-            } while (isRepresentative && iterator.hasNext() && rejections < MAX_REJECTS);
-            
-            if (isRepresentative){
-                clusters.add(new Cluster(query));
+            } while (isRepresentative && pos < clusters.length && rejections < MAX_REJECTS);
+
+            if (isRepresentative) {
+                clusterList.add(new Cluster(query));
             }
+            
+            ticket.progress();
         }
 
-        return clusters;
+        return clusterList;
     }
 
     private float computeSequenceIdentity(Peptide peptide1, Peptide peptide2) {

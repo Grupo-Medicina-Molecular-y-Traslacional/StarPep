@@ -37,7 +37,7 @@ public class SeqClusterBuilder {
     protected final SubstitutionMatrix<AminoAcidCompound> substitutionMatrix;
     protected final float identityScore;
 
-    protected static final int MAX_REJECTS = 32;
+    protected static final int MAX_REJECTS = 8;
 
     public SeqClusterBuilder(SeqClusteringModel model) {
         alignerType = model.getAlignerType();

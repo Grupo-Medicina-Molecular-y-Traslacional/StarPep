@@ -24,7 +24,8 @@ public final class CSNVisualPanel4 extends JPanel {
 
     private final CSNAlgorithm csnAlgo;
     public static final String NETWORK_FACTORY = "network_factory";
-    DefaultMutableTreeNode treeNode;
+    private final DefaultMutableTreeNode treeNode;
+    private SimilarityMeasureFactory factory;
 
     /**
      * Creates new form CSNVisualPanel4
@@ -39,6 +40,10 @@ public final class CSNVisualPanel4 extends JPanel {
         jTree1.setCellRenderer(new SimilarityFactoryNodeRenderer());
 
     }
+
+    public SimilarityMeasureFactory getSimilarityMeasureFactory() {
+        return factory;
+    }        
 
     private void populateJTree() {
         Collection<? extends SimilarityMeasureFactory> factories = Lookup.getDefault().lookupAll(SimilarityMeasureFactory.class);
@@ -124,16 +129,16 @@ public final class CSNVisualPanel4 extends JPanel {
 
     private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
         TreePath newPath = evt.getNewLeadSelectionPath();
-
+        
         if (newPath != null && newPath.getLastPathComponent() instanceof SimilarityFactoryTreeNode) {
             SimilarityFactoryTreeNode newNode = (SimilarityFactoryTreeNode) newPath.getLastPathComponent();
-            SimilarityMeasureFactory factory = newNode.getFactory();
-            jTextArea1.setText(factory.getDescription());
-            firePropertyChange(NETWORK_FACTORY, null, factory);
+            factory = newNode.getFactory();
+            jTextArea1.setText(factory.getDescription());            
         } else {
+            factory = null;
             jTextArea1.setText("");
-            firePropertyChange(NETWORK_FACTORY, null, null);
         }
+        firePropertyChange(NETWORK_FACTORY, null, factory);
     }//GEN-LAST:event_jTree1ValueChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

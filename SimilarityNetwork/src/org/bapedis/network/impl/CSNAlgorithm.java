@@ -200,6 +200,7 @@ public class CSNAlgorithm implements Algorithm {
             if (mdOptionModel.getOptionIndex() == MDOptionModel.AVAILABLE_MD) {
                 descriptorKeys = mdOptionModel.getDescriptorKeys();
             } else if (mdOptionModel.getOptionIndex() == MDOptionModel.NEW_MD) {
+                ticket.progress(NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.md"));
                 descriptorAlgo.initAlgo(workspace);
                 descriptorAlgo.setProgressTicket(ticket);
                 descriptorAlgo.run();
@@ -225,7 +226,9 @@ public class CSNAlgorithm implements Algorithm {
             }
 
             //Feature selection
+            ticket.progress(NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.fs"));
             featureSelectionAlgo.initAlgo(workspace);
+            featureSelectionAlgo.setProgressTicket(ticket);
             featureSelectionAlgo.run();
             featureSelectionAlgo.endAlgo();
 
@@ -308,6 +311,7 @@ public class CSNAlgorithm implements Algorithm {
             }
 
             // Build new similarity matrix
+            ticket.progress(NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.simMatrix"));
             SimilarityMatrixkBuilder.setContext(representatives, ticket, simMeasure);
             SimilarityMatrixkBuilder task = new SimilarityMatrixkBuilder();
             int workunits = task.getWorkUnits();

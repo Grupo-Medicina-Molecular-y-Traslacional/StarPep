@@ -53,7 +53,7 @@ public class SeqClusterBuilder {
         this.ticket = progressTicket;
     }
 
-    public List<Cluster> clusterize(Peptide[] peptides) {        
+    public List<Cluster> clusterize(Peptide[] peptides) {
         List<Cluster> clusterList = new LinkedList<>();
 
         // Sort by decreasing sequence length
@@ -67,16 +67,15 @@ public class SeqClusterBuilder {
         Peptide query;
         Peptide centroid;
         int rejections;
-        Cluster[] clusters;
+        Cluster[] clusters = clusterList.toArray(new Cluster[0]);
         Cluster c;
         int pos;
         for (int i = 1; i < peptides.length; i++) {
             isRepresentative = true;
             query = peptides[i];
             rejections = 0;
-            
-            // Sort by decreasing common words
-            clusters = clusterList.toArray(new Cluster[0]);
+
+            // Sort by decreasing common words            
             Arrays.parallelSort(clusters, new ClusterComparator(query));
 
             // Assign query to cluster
@@ -95,8 +94,9 @@ public class SeqClusterBuilder {
 
             if (isRepresentative) {
                 clusterList.add(new Cluster(query));
+                clusters = clusterList.toArray(new Cluster[0]);
             }
-            
+
             ticket.progress();
         }
 

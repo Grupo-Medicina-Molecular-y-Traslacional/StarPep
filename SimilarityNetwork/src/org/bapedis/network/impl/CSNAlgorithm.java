@@ -183,6 +183,8 @@ public class CSNAlgorithm implements Algorithm {
             //Get representative peptides
             if (clusteringModel.isClustering()) {
                 ticket.progress(NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.clusterize"));
+                ticket.switchToDeterminate(ticket.getCurrentUnit() + peptides.length);
+                
                 SeqClusterBuilder clusterBuilder = new SeqClusterBuilder(clusteringModel);
                 clusterBuilder.setProgressTicket(ticket);
                 List<Cluster> clusters = clusterBuilder.clusterize(peptides);
@@ -201,6 +203,8 @@ public class CSNAlgorithm implements Algorithm {
                 descriptorKeys = mdOptionModel.getDescriptorKeys();
             } else if (mdOptionModel.getOptionIndex() == MDOptionModel.NEW_MD) {
                 ticket.progress(NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.md"));
+//                ticket.switchToDeterminate(ticket.getCurrentUnit() + peptides.length);
+                
                 descriptorAlgo.initAlgo(workspace);
                 descriptorAlgo.setProgressTicket(ticket);
                 descriptorAlgo.run();
@@ -324,6 +328,7 @@ public class CSNAlgorithm implements Algorithm {
             workspace.add(matrix);
 
             // Add similarity edge to graph
+            ticket.progress(NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.csn"));
             Edge graphEdge;
             Float score;
             graph.writeLock();

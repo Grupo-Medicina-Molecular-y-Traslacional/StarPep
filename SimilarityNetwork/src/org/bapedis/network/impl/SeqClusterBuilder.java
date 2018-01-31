@@ -61,8 +61,7 @@ public class SeqClusterBuilder {
 
         // Create clusters
         clusterList.add(new Cluster(peptides[0]));
-
-        ticket.switchToDeterminate(ticket.getCurrentUnit() + peptides.length);
+        
         boolean isRepresentative;
         Peptide query;
         Peptide centroid;
@@ -149,7 +148,7 @@ class ClusterComparator implements Comparator<Cluster> {
     private final int k;
 
     public ClusterComparator(Peptide query) {
-        k = 3;
+        k = 6;
         set = new HashSet<>();
         String seq = query.getSequence();
         for (int i = 0; i <= seq.length() - k; i++) {

@@ -112,7 +112,7 @@ public final class CSNVisualPanel1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         bottomPanel.add(jLabel1, gridBagConstraints);
 
-        jATComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Needleman-Wunsch", "Smith-Waterman" }));
+        jATComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Global (Needleman-Wunsch)", "Local (Smith-Waterman)" }));
         jATComboBox.setSelectedIndex(-1);
         jATComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -277,7 +277,7 @@ public final class CSNVisualPanel1 extends JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jOption1, gridBagConstraints);
@@ -291,7 +291,7 @@ public final class CSNVisualPanel1 extends JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jOption2, gridBagConstraints);

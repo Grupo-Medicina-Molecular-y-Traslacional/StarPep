@@ -23,13 +23,11 @@ public class CSNWizardPanel4 implements WizardDescriptor.Panel<WizardDescriptor>
     private final CSNAlgorithm csnAlgo;
     private final EventListenerList listeners = new EventListenerList();
     private boolean isValid = false;
-    
 
     public CSNWizardPanel4(CSNAlgorithm csnAlgo) {
         this.csnAlgo = csnAlgo;
     }
-    
-    
+
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
@@ -86,7 +84,9 @@ public class CSNWizardPanel4 implements WizardDescriptor.Panel<WizardDescriptor>
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
         SimilarityMeasureFactory factory = component.getSimilarityMeasureFactory();
-        csnAlgo.setSimMeasure(factory.createAlgorithm());
+        if (factory != null) {
+            csnAlgo.setSimMeasure(factory.createAlgorithm());
+        }
     }
 
     @Override
@@ -102,9 +102,9 @@ public class CSNWizardPanel4 implements WizardDescriptor.Panel<WizardDescriptor>
         if (evt.getPropertyName().equals(CSNVisualPanel4.NETWORK_FACTORY)) {
             isValid = evt.getNewValue() != null;
         }
-        if (oldState != isValid){
+        if (oldState != isValid) {
             ChangeEvent srcEvt = new ChangeEvent(evt);
-            for(ChangeListener listener: listeners.getListeners(ChangeListener.class)){
+            for (ChangeListener listener : listeners.getListeners(ChangeListener.class)) {
                 listener.stateChanged(srcEvt);
             }
         }

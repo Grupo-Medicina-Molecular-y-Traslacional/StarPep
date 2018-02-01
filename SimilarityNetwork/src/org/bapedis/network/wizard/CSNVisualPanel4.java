@@ -33,7 +33,7 @@ public final class CSNVisualPanel4 extends JPanel {
     public CSNVisualPanel4(CSNAlgorithm csnAlgo) {
         this.csnAlgo = csnAlgo;
         initComponents();
-        treeNode = new DefaultMutableTreeNode("Network type", true);
+        treeNode = new DefaultMutableTreeNode(NbBundle.getMessage(CSNVisualPanel4.class, "CSNWizardPanel4.root.name"), true);
         populateJTree();
         jTree1.setModel(new DefaultTreeModel(treeNode));
         jTree1.setRootVisible(true);
@@ -68,10 +68,9 @@ public final class CSNVisualPanel4 extends JPanel {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
+        jInfoLabel = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
         setPreferredSize(new java.awt.Dimension(460, 400));
@@ -94,22 +93,6 @@ public final class CSNVisualPanel4 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jScrollPane1, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(CSNVisualPanel4.class, "CSNVisualPanel4.jLabel1.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
-        add(jLabel1, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(CSNVisualPanel4.class, "CSNVisualPanel4.jLabel2.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
-        add(jLabel2, gridBagConstraints);
-
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
         jTextArea1.setLineWrap(true);
@@ -125,6 +108,15 @@ public final class CSNVisualPanel4 extends JPanel {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jScrollPane2, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(CSNVisualPanel4.class, "CSNVisualPanel4.jInfoLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(jInfoLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
@@ -142,8 +134,7 @@ public final class CSNVisualPanel4 extends JPanel {
     }//GEN-LAST:event_jTree1ValueChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jInfoLabel;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;

@@ -57,7 +57,7 @@ public class CSNAlgorithm implements Algorithm {
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
 
-    protected final NotifyDescriptor emptyKeys, uselessFeatureWarning, notEnoughFeatures;
+    protected final NotifyDescriptor emptyKeys, notEnoughFeatures;
     public static final int MIN_AVAILABLE_FEATURES = 2;
 
     protected Workspace workspace;
@@ -78,7 +78,6 @@ public class CSNAlgorithm implements Algorithm {
 
         emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithm.class, "ChemicalSpaceNetwork.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
         notEnoughFeatures = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithm.class, "ChemicalSpaceNetwork.features.notEnough", MIN_AVAILABLE_FEATURES), NotifyDescriptor.ERROR_MESSAGE);
-        uselessFeatureWarning = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithm.class, "ChemicalSpaceNetwork.uselessFeature.warning"), NotifyDescriptor.WARNING_MESSAGE);
 
     }
 

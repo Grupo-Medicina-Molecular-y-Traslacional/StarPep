@@ -13,8 +13,8 @@ import java.util.Set;
  */
 public class MDOptionModel {
 
-    public static final int AVAILABLE_MD = 0;
-    public static final int NEW_MD = 1;
+    public static final int AVAILABLE_MD = 1;
+    public static final int NEW_MD = 0;
 
     protected static final String[] normalization = new String[]{"Z-score", "Min-max"};
     protected final Set<String> descriptorKeys;
@@ -22,7 +22,7 @@ public class MDOptionModel {
 
     public MDOptionModel(Set<String> descriptorKeys) {
         this.descriptorKeys = descriptorKeys;
-        optionIndex = 1;        
+        optionIndex = NEW_MD;        
     }
 
     public Set<String> getDescriptorKeys() {

@@ -28,7 +28,7 @@ import org.openide.util.NbBundle;
  * @author loge
  */
 public class AllDescriptorTable extends JXTable {
-
+    
     public AllDescriptorTable() {
         //Set Model
         setModel(new MyTableModel());
@@ -42,7 +42,7 @@ public class AllDescriptorTable extends JXTable {
                 renderedLabel.setHorizontalAlignment(SwingConstants.LEFT);
                 return renderedLabel;
             }
-
+            
         });
         tc.setPreferredWidth(20);
 
@@ -50,13 +50,13 @@ public class AllDescriptorTable extends JXTable {
         tc = getColumn(2);
         tc.setHeaderRenderer(new CheckBoxHeader(getTableHeader(), 2));
         tc.setPreferredWidth(30);
-
+        
         setGridColor(Color.LIGHT_GRAY);
         setColumnControlVisible(false);
         setSortable(true);
         setAutoCreateRowSorter(true);
         setRowSelectionAllowed(false);
-
+        
         TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(getModel()) {
             @Override
             public boolean isSortable(int column) {
@@ -65,7 +65,7 @@ public class AllDescriptorTable extends JXTable {
         };
         setRowSorter(sorter);
     }
-
+    
     @Override
     public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
         Component c = super.prepareRenderer(renderer, row, column);
@@ -76,16 +76,15 @@ public class AllDescriptorTable extends JXTable {
         return c;
     }
     
-    
-    public void setup(AllDescriptors algo){
-        ((MyTableModel)getModel()).setup(algo);
+    public void setup(AllDescriptors algo) {
+        ((MyTableModel) getModel()).setup(algo);
     }
-
+    
     private class MyTableModel extends AbstractTableModel {
-
+        
         private AllDescriptors algo;
         private final ArrayList<Object[]> data;
-
+        
         public MyTableModel() {
             AllDescriptors allDescriptors = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
             Set<String> allDescriptorKeys = allDescriptors.getDescriptorKeys();
@@ -95,7 +94,7 @@ public class AllDescriptorTable extends JXTable {
                 data.add(new Object[]{no++, key, true});
             }
         }
-
+        
         public void setup(AllDescriptors algo) {
             this.algo = algo;
             if (algo != null) {
@@ -116,12 +115,12 @@ public class AllDescriptorTable extends JXTable {
                 }
             }
         }
-
+        
         @Override
         public int getColumnCount() {
             return 3;
         }
-
+        
         @Override
         public String getColumnName(int col) {
             switch (col) {
@@ -132,7 +131,7 @@ public class AllDescriptorTable extends JXTable {
             }
             return "";
         }
-
+        
         @Override
         public Class getColumnClass(int c) {
             switch (c) {
@@ -145,22 +144,22 @@ public class AllDescriptorTable extends JXTable {
             }
             return null;
         }
-
+        
         @Override
         public int getRowCount() {
             return data.size();
         }
-
+        
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             return data.get(rowIndex)[columnIndex];
         }
-
+        
         @Override
         public boolean isCellEditable(int row, int col) {
             return col == 2;
         }
-
+        
         @Override
         public void setValueAt(Object value, int row, int col) {
             data.get(row)[col] = value;
@@ -173,7 +172,16 @@ public class AllDescriptorTable extends JXTable {
             }
             fireTableCellUpdated(row, col);
         }
-
+        
     }
-
+    
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);        
+        if (getColumnCount() > 2 && getColumn(2).getHeaderRenderer() instanceof CheckBoxHeader) {
+            CheckBoxHeader header = (CheckBoxHeader) getColumn(2).getHeaderRenderer();
+            header.setEnabled(enabled);
+        }        
+    }
+    
 }

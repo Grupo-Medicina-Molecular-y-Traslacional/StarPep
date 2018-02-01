@@ -28,7 +28,10 @@ public class SeqClusteringModel {
     public static final int DEFAULT_SUBSTITUTION_MATRIX_INDEX=7; // Blosum 62 by Henikoff & Henikoff
     public static final int DEFAULT_PID=70;
     
-    public static final String[] Alignment_Type = new String[]{"Needleman-Wunsch", "Smith-Waterman"};
+    public static final String GLOBAL_ALIGNMENT_TEXT="Global (Needleman-Wunsch)";
+    public static final String LOCAL_ALIGNMENT_TEXT="Local (Smith-Waterman)";
+    
+    public static final String[] Alignment_Type = new String[]{GLOBAL_ALIGNMENT_TEXT, LOCAL_ALIGNMENT_TEXT};
     public static final String[] Substitution_Matrix = new String[]{
         "Blosum 30 by Henikoff & Henikoff", "Blosum 35 by Henikoff & Henikoff", "Blosum 40 by Henikoff & Henikoff",
         "Blosum 45 by Henikoff & Henikoff", "Blosum 50 by Henikoff & Henikoff", "Blosum 55 by Henikoff & Henikoff",
@@ -143,9 +146,9 @@ public class SeqClusteringModel {
     }
 
     public Alignments.PairwiseSequenceAlignerType getAlignerType() {
-        if (Alignment_Type[alignmentTypeIndex].equals("Needleman-Wunsch")) {
+        if (Alignment_Type[alignmentTypeIndex].equals(GLOBAL_ALIGNMENT_TEXT)) {
             return Alignments.PairwiseSequenceAlignerType.GLOBAL;
-        } else if (Alignment_Type[alignmentTypeIndex].equals("Smith-Waterman")) {
+        } else if (Alignment_Type[alignmentTypeIndex].equals(LOCAL_ALIGNMENT_TEXT)) {
             return Alignments.PairwiseSequenceAlignerType.LOCAL;
         }
         return null;

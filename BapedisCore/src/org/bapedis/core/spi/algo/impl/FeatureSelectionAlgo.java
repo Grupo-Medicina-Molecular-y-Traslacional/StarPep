@@ -254,8 +254,8 @@ public class FeatureSelectionAlgo implements Algorithm {
             int redundantRemoveSize = 0;
             if (isRemoveRedundant()) {
                 toRemove.clear();
-                int totalUnits = ticket.getCurrentUnit() + rankedFeatures.length + (rankedFeatures.length * (rankedFeatures.length - 1)) / 2;
-                ticket.switchToDeterminate(totalUnits);
+                int workUnits = rankedFeatures.length + (rankedFeatures.length * (rankedFeatures.length - 1)) / 2;
+                ticket.switchToDeterminate(workUnits);
 
                 String state2 = NbBundle.getMessage(FeatureSelectionAlgo.class, "FeatureSelectionAlgo.task.removeRedundant");
                 ticket.progress(state2);
@@ -299,7 +299,7 @@ public class FeatureSelectionAlgo implements Algorithm {
                         }
                     } else {
                         //Report progress of units
-                        ticket.progress(ticket.getCurrentUnit() + (rankedFeatures.length - (i + 1)));
+                        ticket.progress(rankedFeatures.length - (i + 1));
                     }
                 }
 

@@ -42,13 +42,13 @@ Portions Copyrighted 2011 Gephi Consortium.
 package org.bapedis.core.task;
 
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.StatusDisplayer;
 import org.openide.util.Cancellable;
 
 /**
  *
  * @author Mathieu Bastian
+ * Modified by Loge
  */
 public final class ProgressTicket {
 
@@ -61,7 +61,7 @@ public final class ProgressTicket {
     private boolean finished = false;
 
     public ProgressTicket(String displayName, Cancellable cancellable) {
-        handle = ProgressHandleFactory.createHandle(displayName, cancellable);
+        handle = ProgressHandle.createHandle(displayName, cancellable);
         this.displayName = displayName;
     }
 
@@ -97,7 +97,7 @@ public final class ProgressTicket {
      * Notify the user about a new completed unit. Equivalent to incrementing workunits by one.
      */
     public synchronized void progress() {
-        progress(currentUnit + 1);
+        progress(1);
     }
 
     /**
@@ -105,9 +105,9 @@ public final class ProgressTicket {
      * @param workunit a cumulative number of workunits completed so far
      */
     public synchronized void progress(int workunit) {
-        this.currentUnit = workunit;
+        this.currentUnit += workunit;
         if (handle != null) {
-            int ratioProgress = (int) (100.0 * workunit / progressTotal);
+            int ratioProgress = (int) (100.0 * currentUnit / progressTotal);
             if (ratioProgress != progress100) {
                 progress100 = ratioProgress;
                 handle.progress(progress100 <= 100 ? progress100 : 100);
@@ -131,9 +131,9 @@ public final class ProgressTicket {
      * @param workunit a cumulative number of workunits completed so far
      */
     public synchronized void progress(String message, int workunit) {
-        currentUnit = workunit;
+        currentUnit += workunit;
         if (handle != null) {
-            int ratioProgress = (int) (100.0 * workunit / progressTotal);
+            int ratioProgress = (int) (100.0 * currentUnit / progressTotal);
             if (ratioProgress != progress100) {
                 progress100 = ratioProgress;
                 handle.progress(message, progress100 <= 100 ? progress100 : 100);
@@ -199,7 +199,7 @@ public final class ProgressTicket {
     public synchronized void switchToDeterminate(int workunits) {
         if (handle != null) {
             if (started) {
-                this.progressTotal = workunits;
+                this.progressTotal = currentUnit + workunits;
                 handle.switchToDeterminate(100);
             } else {
                 start(workunits);

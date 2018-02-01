@@ -54,6 +54,8 @@ public class SeqClusterBuilder {
     }
 
     public List<Cluster> clusterize(Peptide[] peptides) {
+        ticket.switchToDeterminate(peptides.length);
+        
         List<Cluster> clusterList = new LinkedList<>();
 
         // Sort by decreasing sequence length

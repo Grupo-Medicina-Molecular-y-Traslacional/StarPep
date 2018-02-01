@@ -178,175 +178,179 @@ public class CSNAlgorithm implements Algorithm {
     @Override
     public void run() {
         if (peptides != null) {
-            Peptide[] representatives;
-            
-            //Get representative peptides
-            if (clusteringModel.isClustering()) {
-                ticket.progress(NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.clusterize"));
-                ticket.switchToDeterminate(ticket.getCurrentUnit() + peptides.length);
-                
-                SeqClusterBuilder clusterBuilder = new SeqClusterBuilder(clusteringModel);
-                clusterBuilder.setProgressTicket(ticket);
-                List<Cluster> clusters = clusterBuilder.clusterize(peptides);
-                representatives = new Peptide[clusters.size()];
-                int pos = 0;
-                for (Cluster c : clusters) {
-                    representatives[pos++] = c.getCentroid();
-                }
-            } else {
-                representatives = peptides;
-            }
+            //Step 1. Get representative peptides            
+            Peptide[] representatives = clusteringModel.isClustering() ? clusterize() : peptides;
 
-            // Compute molecular descriptors if needed            
+            //Setp 2. Compute molecular descriptors if needed            
             Set<String> descriptorKeys = null;
             if (mdOptionModel.getOptionIndex() == MDOptionModel.AVAILABLE_MD) {
                 descriptorKeys = mdOptionModel.getDescriptorKeys();
-            } else if (mdOptionModel.getOptionIndex() == MDOptionModel.NEW_MD) {
-                ticket.progress(NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.md"));
-//                ticket.switchToDeterminate(ticket.getCurrentUnit() + peptides.length);
-                
-                descriptorAlgo.initAlgo(workspace);
-                descriptorAlgo.setProgressTicket(ticket);
-                descriptorAlgo.run();
-                descriptorKeys = descriptorAlgo.getDescriptorKeys();
-                descriptorAlgo.endAlgo();
+            } else if (mdOptionModel.getOptionIndex() == MDOptionModel.NEW_MD && !stopRun) {
+                descriptorKeys = computeMD();
             }
 
-            // Validate descriptor keys
-            if (descriptorKeys.isEmpty()) {
-                DialogDisplayer.getDefault().notify(emptyKeys);
-                pc.reportError("There is no molecular descriptor selected", workspace);
-                cancel();
-            } else {
-                for (String key : descriptorKeys) {
-                    if (!attrModel.hasMolecularDescriptors(key)) {
-                        NotifyDescriptor notFound = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithm.class, "ChemicalSpaceNetwork.key.notFound", key), NotifyDescriptor.ERROR_MESSAGE);
-                        DialogDisplayer.getDefault().notify(notFound);
-                        pc.reportError("Value not found for molecular descriptor: " + key, workspace);
-                        cancel();
-                        break;
-                    }
-                }
-            }
-
-            //Feature selection
-            ticket.progress(NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.fs"));
-            featureSelectionAlgo.initAlgo(workspace);
-            featureSelectionAlgo.setProgressTicket(ticket);
-            featureSelectionAlgo.run();
-            featureSelectionAlgo.endAlgo();
-
-            //Populate feature list
-            List<MolecularDescriptor> featureList = new LinkedList<>();
-            for (String key : descriptorKeys) {
-                for (MolecularDescriptor desc : attrModel.getMolecularDescriptors(key)) {
-                    featureList.add(desc);
-                }
-            }
-
-            try {
-                //Preprocess feature list
-                // Compute max, min, mean and std
-                for (MolecularDescriptor attr : featureList) {
-                    attr.resetSummaryStats(Arrays.asList(representatives));
-                }
-                // Remove constant attributes
-                List<MolecularDescriptor> toRemove = new LinkedList<>();
-                for (MolecularDescriptor attr : featureList) {
-                    if (attr.getMax() == attr.getMin()) {
-                        toRemove.add(attr);
-                    }
-                }
-                if (toRemove.size() > 0) {
-                    DialogDisplayer.getDefault().notify(uselessFeatureWarning);
-                    pc.reportMsg("Some molecular features remain constant for all peptides and they will be ignored.", workspace);
-                }
-                featureList.removeAll(toRemove);
-                for (MolecularDescriptor descriptor : toRemove) {
-                    pc.reportMsg("Ignored: " + descriptor.getDisplayName(), workspace);
-                }
-
-                //Check feature list size
-                if (featureList.size() < MIN_AVAILABLE_FEATURES) {
-                    DialogDisplayer.getDefault().notify(notEnoughFeatures);
-                    pc.reportError("There is not enough number of available molecular features", workspace);
-                    cancel();
-                }
-            } catch (MolecularDescriptorNotFoundException ex) {
-                DialogDisplayer.getDefault().notify(ex.getErrorND());
-                pc.reportError(ex.getMessage(), workspace);
-                cancel();
-            }
-
-            //Output details
             if (!stopRun) {
-                Map<String, List<MolecularDescriptor>> byCategory = featureList.parallelStream()
-                        .collect(Collectors.groupingBy(MolecularDescriptor::getCategory));
-
-                int maxKeyLength = 0;
-                for (String key : attrModel.getMolecularDescriptorKeys()) {
-                    if (key.length() > maxKeyLength) {
-                        maxKeyLength = key.length();
-                    }
-                }
-                StringBuilder msg;
-                for (String key : attrModel.getMolecularDescriptorKeys()) {
-                    msg = new StringBuilder(key);
-                    for (int i = key.length() + 1; i <= maxKeyLength; i++) {
-                        msg.append(' ');
-                    }
-                    msg.append(" : ");
-                    msg.append(byCategory.containsKey(key) ? byCategory.get(key).size() : 0);
-                    pc.reportMsg(msg.toString(), workspace);
-                }
-                pc.reportMsg("\nTotal of available molecular features: " + featureList.size(), workspace);
-
-//            pc.reportMsg("\nSimilarity Metric: " + similarityMetrics[metricIndex], workspace);
-//            pc.reportMsg("Normalization: " + normalization[normalizationIndex], workspace);
+                // Validate descriptor keys
+                validateMD(descriptorKeys);
             }
 
-            //Set feature list
-            simMeasure.setMolecularDescriptors(featureList);
+            // Step 3. Feature selection and preprocessing 
+            List<MolecularDescriptor> featureList = new LinkedList<>();
+            if (!stopRun) {
+                filterFeatures();
 
-            // Delete old similarity matrix
-            SimilarityMatrixModel matrix = workspace.getLookup().lookup(SimilarityMatrixModel.class);
-            if (matrix != null) {
-                workspace.remove(matrix);
+                // Populate feature list                
+                for (String key : descriptorKeys) {
+                    for (MolecularDescriptor desc : attrModel.getMolecularDescriptors(key)) {
+                        featureList.add(desc);
+                    }
+                }
+
+                // Preprocessing and validate molecular features
+                preprocessing(featureList, representatives);
             }
 
-            // Build new similarity matrix
-            ticket.progress(NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.simMatrix"));
-            SimilarityMatrixkBuilder.setContext(representatives, ticket, simMeasure);
-            SimilarityMatrixkBuilder task = new SimilarityMatrixkBuilder();
-            int workunits = task.getWorkUnits();
-            ticket.switchToDeterminate(workunits);
-            fjPool.invoke(task);
-            task.join();
+            //Step 4. Compute similarity matrix
+            if (!stopRun) {
+                //Set feature list to similarity measure
+                simMeasure.setMolecularDescriptors(featureList);
 
-            // Add the new similarity matrix to workspace
-            matrix = task.getSimilarityMatrix();
-            workspace.add(matrix);
+                // Delete old similarity matrix
+                SimilarityMatrixModel oldMatrix = workspace.getLookup().lookup(SimilarityMatrixModel.class);
+                if (oldMatrix != null) {
+                    workspace.remove(oldMatrix);
+                }
 
-            // Add similarity edge to graph
-            ticket.progress(NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.csn"));
-            Edge graphEdge;
-            Float score;
-            graph.writeLock();
-            try {
-                for (int i = 0; i < representatives.length - 1; i++) {
-                    for (int j = i + 1; j < representatives.length; j++) {
-                        score = matrix.getValue(representatives[i], representatives[j]);
-                        if (score != null && score >= 0.3) {
-                            graphEdge = createGraphEdge(representatives[i], representatives[j], score);
-                            graph.addEdge(graphEdge);
+                // Compute new similarity matrix
+                SimilarityMatrixModel newMatrix = computeSimilarityMatrix(representatives);
+
+                // Add the new similarity matrix to workspace
+                workspace.add(newMatrix);
+
+                // Add similarity edge to graph
+                ticket.progress(NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.csn"));
+                Edge graphEdge;
+                Float score;
+                graph.writeLock();
+                try {
+                    for (int i = 0; i < representatives.length - 1; i++) {
+                        for (int j = i + 1; j < representatives.length; j++) {
+                            score = newMatrix.getValue(representatives[i], representatives[j]);
+                            if (score != null && score >= 0.3) {
+                                graphEdge = createGraphEdge(representatives[i], representatives[j], score);
+                                graph.addEdge(graphEdge);
+                            }
                         }
                     }
+                } finally {
+                    graph.writeUnlock();
                 }
-            } finally {
-                graph.writeUnlock();
             }
         }
 
+    }
+
+    private Peptide[] clusterize() {
+        String msg = NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.clusterize");
+        pc.reportMsg(msg, workspace);
+        ticket.progress(msg);
+
+        SeqClusterBuilder clusterBuilder = new SeqClusterBuilder(clusteringModel);
+        clusterBuilder.setProgressTicket(ticket);
+
+        List<Cluster> clusters = clusterBuilder.clusterize(peptides);
+        Peptide[] representatives = new Peptide[clusters.size()];
+        int pos = 0;
+        for (Cluster c : clusters) {
+            representatives[pos++] = c.getCentroid();
+        }
+        return representatives;
+    }
+
+    private Set<String> computeMD() {
+        String msg = NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.calculatingMD");
+        pc.reportMsg(msg, workspace);
+        ticket.progress(msg);
+
+        descriptorAlgo.initAlgo(workspace);
+        descriptorAlgo.setProgressTicket(ticket);
+        descriptorAlgo.run();
+        Set<String> descriptorKeys = descriptorAlgo.getDescriptorKeys();
+        descriptorAlgo.endAlgo();
+        return descriptorKeys;
+    }
+
+    private void validateMD(Set<String> descriptorKeys) {        
+        if (descriptorKeys == null || descriptorKeys.isEmpty()) {
+            DialogDisplayer.getDefault().notify(emptyKeys);
+            pc.reportError("There is no molecular descriptors", workspace);
+            cancel();
+        } else {
+            for (String key : descriptorKeys) {
+                if (!attrModel.hasMolecularDescriptors(key)) {
+                    NotifyDescriptor notFound = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithm.class, "ChemicalSpaceNetwork.key.notFound", key), NotifyDescriptor.ERROR_MESSAGE);
+                    DialogDisplayer.getDefault().notify(notFound);
+                    pc.reportError("Value not found for molecular descriptor: " + key, workspace);
+                    cancel();
+                    break;
+                }
+            }
+        }
+    }
+
+    private void filterFeatures() {
+        String msg = NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.fs");
+        pc.reportMsg(msg, workspace);
+        ticket.progress(msg);
+
+        featureSelectionAlgo.initAlgo(workspace);
+        featureSelectionAlgo.setProgressTicket(ticket);
+        featureSelectionAlgo.run();
+        featureSelectionAlgo.endAlgo();
+    }
+
+    private void preprocessing(List<MolecularDescriptor> featureList, Peptide[] peptides) {
+        // Check feature list size
+        if (featureList.size() < MIN_AVAILABLE_FEATURES) {
+            DialogDisplayer.getDefault().notify(notEnoughFeatures);
+            pc.reportError("There is not enough number of available molecular features", workspace);
+            cancel();
+        }
+
+        // try/catch for molecular not found exception handling
+        try {
+            String msg = NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.fs");
+
+            // Preprocessing of feature list. Compute max, min, mean and std
+            for (MolecularDescriptor attr : featureList) {
+                attr.resetSummaryStats(Arrays.asList(peptides));
+            }
+
+            // Validate molecular features
+            for (MolecularDescriptor attr : featureList) {
+                assert attr.getMax() != attr.getMin() : "Some molecular features remain constant for all peptides.";
+            }
+
+        } catch (MolecularDescriptorNotFoundException ex) {
+            DialogDisplayer.getDefault().notify(ex.getErrorND());
+            pc.reportError(ex.getMessage(), workspace);
+            cancel();
+        }
+
+    }
+
+    private SimilarityMatrixModel computeSimilarityMatrix(Peptide[] peptides) {
+        String msg = NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.simMatrix");
+        pc.reportMsg(msg, workspace);
+        ticket.progress(msg);
+
+        SimilarityMatrixkBuilder.setContext(peptides, ticket, simMeasure);
+        SimilarityMatrixkBuilder task = new SimilarityMatrixkBuilder();
+        int workunits = task.getWorkUnits();
+        ticket.switchToDeterminate(workunits);
+        fjPool.invoke(task);
+        task.join();
+        return task.getSimilarityMatrix();
     }
 
     private Edge createGraphEdge(Peptide peptide1, Peptide peptide2, Float score) {

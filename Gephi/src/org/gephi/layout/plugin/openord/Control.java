@@ -143,7 +143,7 @@ public class Control {
             realFixed = false;
         }
 
-        Progress.progress(progressTicket, totIterations);
+        Progress.progress(progressTicket);
         //System.out.println("Progress "+progress+"%");
 
         if (STAGE == 0) {

@@ -58,7 +58,7 @@ import org.openide.windows.WindowManager;
         preferredID = "QueryExplorerTopComponent"
 )
 @Messages({
-    "CTL_QueryExplorerAction= Query",
+    "CTL_QueryExplorerAction=Query",
     "CTL_QueryExplorerTopComponent=Query",
     "HINT_QueryExplorerTopComponent=This is the Query window"
 })

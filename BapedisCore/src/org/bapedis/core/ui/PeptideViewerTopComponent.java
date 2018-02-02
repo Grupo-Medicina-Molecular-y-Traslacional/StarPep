@@ -316,6 +316,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         topPanel.add(leftToolBar, gridBagConstraints);
 
+        jLabelFilter.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabelFilter, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jLabelFilter.text")); // NOI18N
         rightPanel.add(jLabelFilter);
 

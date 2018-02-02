@@ -84,7 +84,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
         GraphView newView = graphModel.createView();
         graphModel.setVisibleView(newView);
         if (!oldView.isMainView()) {
-            graphModel.destroyView(oldView);
+            graphModel.destroyView(oldView); //TODO: java.lang.IllegalArgumentException: The view doesn't exist
         }
 
         // To refresh graph view     

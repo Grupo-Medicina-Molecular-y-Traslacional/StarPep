@@ -5,9 +5,13 @@
  */
 package org.bapedis.core.spi.algo.impl;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Hashtable;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.bapedis.core.spi.algo.Algorithm;
@@ -18,9 +22,9 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class FeatureSelectionPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
+public class FeatureSelectionPanel extends javax.swing.JPanel implements AlgorithmSetupUI, PropertyChangeListener {
 
-    private FeatureSelectionAlgo algo;
+    private FeatureSelectionAlgo algorithm;
 
     public FeatureSelectionPanel() {
         initComponents();
@@ -36,8 +40,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
                 if (!uselessSlider.getValueIsAdjusting()) {
                     int val = uselessSlider.getValue();
                     uselessLabel.setText(val + "%");
-                    if (algo != null) {
-                        algo.setEntropyCutoff(val);
+                    if (algorithm != null) {
+                        algorithm.setEntropyCutoff(val);
                     }
                 }
             }
@@ -59,8 +63,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
                 if (!redundantSlider.getValueIsAdjusting()) {
                     int val = redundantSlider.getValue();
                     redundantLabel.setText(val + "%");
-                    if (algo != null) {
-                        algo.setCorrelationCutoff(val);
+                    if (algorithm != null) {
+                        algorithm.setCorrelationCutoff(val);
                     }
                 }
             }
@@ -70,7 +74,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         redundantLabelTable.put(FeatureSelectionAlgo.CORRELATION_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.low")));
         redundantLabelTable.put(FeatureSelectionAlgo.CORRELATION_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.middle")));
         redundantLabelTable.put(FeatureSelectionAlgo.CORRELATION_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.high")));
-        redundantSlider.setLabelTable(redundantLabelTable);
+        redundantSlider.setLabelTable(redundantLabelTable);                
 
     }
 
@@ -78,8 +82,12 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
 //        UIManager.put("Slider.paintValue", false);
 //    }
     
-    public void refreshState() {
-        boolean running = algo != null && algo.isRunning();
+    private void refreshState() {
+        boolean running = algorithm != null && algorithm.isRunning();
+        option1Button.setEnabled(!running);
+        option2Button.setEnabled(!running);
+        jResetButton.setEnabled(!running);
+
         boolean enabled = (option2Button.isSelected() || option1Button.isSelected()) && !running;
         entropyPanel.setEnabled(enabled);
         uselessSlider.setEnabled(enabled);
@@ -357,16 +365,16 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
     }// </editor-fold>//GEN-END:initComponents
 
     private void option2ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_option2ButtonActionPerformed
-        if (algo != null) {
-            algo.setRemoveUseless(true);
-            algo.setRemoveRedundant(true);
+        if (algorithm != null) {
+            algorithm.setRemoveUseless(true);
+            algorithm.setRemoveRedundant(true);
         }
     }//GEN-LAST:event_option2ButtonActionPerformed
 
     private void option1ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_option1ButtonActionPerformed
-        if (algo != null) {
-            algo.setRemoveUseless(true);
-            algo.setRemoveRedundant(false);
+        if (algorithm != null) {
+            algorithm.setRemoveUseless(true);
+            algorithm.setRemoveRedundant(false);
         }
     }//GEN-LAST:event_option1ButtonActionPerformed
 
@@ -407,24 +415,49 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
-        this.algo = (FeatureSelectionAlgo) algo;
-        int val = this.algo.getEntropyCutoff();
+        this.algorithm = (FeatureSelectionAlgo) algo;
+        int val = this.algorithm.getEntropyCutoff();
         uselessSlider.setValue(val);
         uselessLabel.setText(val + "%");
 
-        val = this.algo.getCorrelationCutoff();
+        val = this.algorithm.getCorrelationCutoff();
         redundantSlider.setValue(val);
         redundantLabel.setText(val + "%");
 
-        if (this.algo.isRemoveUseless()) {
-            if (this.algo.isRemoveRedundant()) {
+        if (this.algorithm.isRemoveUseless()) {
+            if (this.algorithm.isRemoveRedundant()) {
                 option2Button.setSelected(true);
             } else {
                 option1Button.setSelected(true);
             }
         }
+        
+        addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent event) {
+                algorithm.addPropertyChangeListener(FeatureSelectionPanel.this);
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+                algorithm.removePropertyChangeListener(FeatureSelectionPanel.this);
+            }
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) {
+            }
+        });      
+        
+        refreshState();
 
         return this;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getSource().equals(algorithm) && evt.getPropertyName().equals(FeatureSelectionAlgo.RUNNING)) {
+            refreshState();
+        }
     }
 
 }

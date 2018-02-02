@@ -19,10 +19,9 @@ import javax.swing.table.TableModel;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.spi.algo.impl.DeleteDescriptorAlgo;
-import org.bapedis.core.spi.algo.impl.DeleteDescriptorFactory;
+import org.bapedis.core.spi.algo.impl.RemoveDescriptorAlgo;
+import org.bapedis.core.spi.algo.impl.RemoveDescriptorFactory;
 import org.bapedis.core.task.AlgorithmExecutor;
-import static org.bapedis.core.ui.components.FeatureFilterPanel.executor;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
@@ -31,26 +30,26 @@ import org.openide.util.NbBundle;
 /**
  * @author loge
  */
-public class DeleteMDPanel extends javax.swing.JPanel implements PropertyChangeListener {
+public class RemoveDescriptorPanel extends javax.swing.JPanel implements PropertyChangeListener {
 
     protected static final AlgorithmExecutor executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
     protected final Workspace workspace;
-    protected DeleteDescriptorAlgo algo;
+    protected RemoveDescriptorAlgo algo;
     protected final DescriptorSelectionPanel selectionPanel;
     protected final JXBusyLabel busyLabel;
 
-    public DeleteMDPanel(Workspace workspace) {
+    public RemoveDescriptorPanel(Workspace workspace) {
         initComponents();
-        
+
         this.workspace = workspace;
-        
-        algo = workspace.getLookup().lookup(DeleteDescriptorAlgo.class);
-        if (algo == null){
-            algo = (DeleteDescriptorAlgo) new DeleteDescriptorFactory().createAlgorithm();
+
+        algo = workspace.getLookup().lookup(RemoveDescriptorAlgo.class);
+        if (algo == null) {
+            algo = (RemoveDescriptorAlgo) new RemoveDescriptorFactory().createAlgorithm();
             workspace.add(algo);
         }
-        
-        AttributesModel attrModel = workspace.getLookup().lookup(AttributesModel.class);        
+
+        AttributesModel attrModel = workspace.getLookup().lookup(AttributesModel.class);
         selectionPanel = new DescriptorSelectionPanel(attrModel, Color.RED);
         selectionPanel.removeDescriptorRow(MolecularDescriptor.DEFAULT_CATEGORY);
         selectionPanel.setSelectedDescriptorKeys(algo.getDescriptorKeys());
@@ -58,14 +57,14 @@ public class DeleteMDPanel extends javax.swing.JPanel implements PropertyChangeL
         centerPanel.add(selectionPanel, BorderLayout.CENTER);
 
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
-        busyLabel.setText(NbBundle.getMessage(DeleteMDPanel.class, "DeleteMDPanel.deleting.text"));
+        busyLabel.setText(NbBundle.getMessage(RemoveDescriptorPanel.class, "RemoveDescriptorPanel.removing.text"));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         boolean running = algo.isRunning();
         busyLabel.setBusy(running);
         busyLabel.setVisible(running);
         rightPanel.add(busyLabel);
 
-        deleteButton.setEnabled(selectionPanel.getSelectedDescriptorKeys().size()>0);
+        removeButton.setEnabled(selectionPanel.getSelectedDescriptorKeys().size() > 0);
 
         selectionPanel.addTableModelListener(new TableModelListener() {
             @Override
@@ -75,30 +74,32 @@ public class DeleteMDPanel extends javax.swing.JPanel implements PropertyChangeL
                 for (int row = 0; row < model.getRowCount(); row++) {
                     if ((boolean) model.getValueAt(row, 0)) {
                         flag = true;
-                        algo.includeAlgorithm((String)model.getValueAt(row, 1));
-                    } else{
-                        algo.excludeAlgorithm((String)model.getValueAt(row, 1));
+                        algo.includeAlgorithm((String) model.getValueAt(row, 1));
+                    } else {
+                        algo.excludeAlgorithm((String) model.getValueAt(row, 1));
                     }
                 }
-                deleteButton.setEnabled(flag);
+                removeButton.setEnabled(flag);
             }
         });
-        
+
         addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
-                algo.addPropertyChangeListener(DeleteMDPanel.this);
+                algo.addPropertyChangeListener(RemoveDescriptorPanel.this);
             }
 
             @Override
             public void ancestorRemoved(AncestorEvent event) {
-                algo.removePropertyChangeListener(DeleteMDPanel.this);
+                algo.removePropertyChangeListener(RemoveDescriptorPanel.this);
             }
 
             @Override
             public void ancestorMoved(AncestorEvent event) {
             }
-        });        
+        });
+        
+        sizeLabel.setText(NbBundle.getMessage(RemoveDescriptorPanel.class, "RemoveDescriptorPanel.sizeLabel.text", selectionPanel.totalOfFeatures()));
     }
 
     /**
@@ -112,8 +113,9 @@ public class DeleteMDPanel extends javax.swing.JPanel implements PropertyChangeL
         java.awt.GridBagConstraints gridBagConstraints;
 
         rightPanel = new javax.swing.JPanel();
-        deleteButton = new javax.swing.JButton();
+        removeButton = new javax.swing.JButton();
         centerPanel = new javax.swing.JPanel();
+        sizeLabel = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(440, 380));
         setPreferredSize(new java.awt.Dimension(540, 380));
@@ -124,18 +126,19 @@ public class DeleteMDPanel extends javax.swing.JPanel implements PropertyChangeL
         rightPanel.setPreferredSize(new java.awt.Dimension(110, 58));
         rightPanel.setLayout(new javax.swing.BoxLayout(rightPanel, javax.swing.BoxLayout.Y_AXIS));
 
-        deleteButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/delete.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(deleteButton, org.openide.util.NbBundle.getMessage(DeleteMDPanel.class, "DeleteMDPanel.deleteButton.text")); // NOI18N
-        deleteButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        deleteButton.setMaximumSize(new java.awt.Dimension(99, 29));
-        deleteButton.setMinimumSize(new java.awt.Dimension(99, 29));
-        deleteButton.setPreferredSize(new java.awt.Dimension(99, 29));
-        deleteButton.addActionListener(new java.awt.event.ActionListener() {
+        removeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/delete.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(removeButton, org.openide.util.NbBundle.getMessage(RemoveDescriptorPanel.class, "RemoveDescriptorPanel.removeButton.text")); // NOI18N
+        removeButton.setToolTipText(org.openide.util.NbBundle.getMessage(RemoveDescriptorPanel.class, "RemoveDescriptorPanel.removeButton.toolTipText")); // NOI18N
+        removeButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        removeButton.setMaximumSize(new java.awt.Dimension(99, 29));
+        removeButton.setMinimumSize(new java.awt.Dimension(99, 29));
+        removeButton.setPreferredSize(new java.awt.Dimension(99, 29));
+        removeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deleteButtonActionPerformed(evt);
+                removeButtonActionPerformed(evt);
             }
         });
-        rightPanel.add(deleteButton);
+        rightPanel.add(removeButton);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -156,29 +159,44 @@ public class DeleteMDPanel extends javax.swing.JPanel implements PropertyChangeL
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(centerPanel, gridBagConstraints);
+
+        sizeLabel.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
+        sizeLabel.setForeground(java.awt.Color.black);
+        org.openide.awt.Mnemonics.setLocalizedText(sizeLabel, org.openide.util.NbBundle.getMessage(RemoveDescriptorPanel.class, "RemoveDescriptorPanel.sizeLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 5, 0);
+        add(sizeLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
+    private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
         if (workspace.isBusy()) {
             DialogDisplayer.getDefault().notify(workspace.getBusyNotifyDescriptor());
         } else {
-            executor.execute(algo);          
+            executor.execute(algo);
         }
-    }//GEN-LAST:event_deleteButtonActionPerformed
+    }//GEN-LAST:event_removeButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
-    private javax.swing.JButton deleteButton;
+    private javax.swing.JButton removeButton;
     private javax.swing.JPanel rightPanel;
+    private javax.swing.JLabel sizeLabel;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource().equals(algo) && evt.getPropertyName().equals(DeleteDescriptorAlgo.RUNNING)){
+        if (evt.getSource().equals(algo) && evt.getPropertyName().equals(RemoveDescriptorAlgo.RUNNING)) {
             boolean running = algo.isRunning();
             busyLabel.setBusy(running);
-            busyLabel.setVisible(running);            
+            busyLabel.setVisible(running);
+            if (!running) {
+                sizeLabel.setText(NbBundle.getMessage(RemoveDescriptorPanel.class, "RemoveDescriptorPanel.sizeLabel.text", selectionPanel.totalOfFeatures()));
+            }
         }
     }
 }

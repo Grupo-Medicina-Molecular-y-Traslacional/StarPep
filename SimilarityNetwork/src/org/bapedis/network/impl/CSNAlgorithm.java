@@ -8,10 +8,8 @@ package org.bapedis.network.impl;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
-import java.util.stream.Collectors;
 import org.bapedis.network.model.SeqClusteringModel;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
@@ -227,23 +225,23 @@ public class CSNAlgorithm implements Algorithm {
                 workspace.add(newMatrix);
 
                 // Add similarity edge to graph
-                ticket.progress(NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.csn"));
-                Edge graphEdge;
-                Float score;
-                graph.writeLock();
-                try {
-                    for (int i = 0; i < representatives.length - 1; i++) {
-                        for (int j = i + 1; j < representatives.length; j++) {
-                            score = newMatrix.getValue(representatives[i], representatives[j]);
-                            if (score != null && score >= 0.3) {
-                                graphEdge = createGraphEdge(representatives[i], representatives[j], score);
-                                graph.addEdge(graphEdge);
-                            }
-                        }
-                    }
-                } finally {
-                    graph.writeUnlock();
-                }
+//                ticket.progress(NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.csn"));
+//                Edge graphEdge;
+//                Float score;
+//                graph.writeLock();
+//                try {
+//                    for (int i = 0; i < representatives.length - 1; i++) {
+//                        for (int j = i + 1; j < representatives.length; j++) {
+//                            score = newMatrix.getValue(representatives[i], representatives[j]);
+//                            if (score != null && score >= 0.3) {
+//                                graphEdge = createGraphEdge(representatives[i], representatives[j], score);
+//                                graph.addEdge(graphEdge);
+//                            }
+//                        }
+//                    }
+//                } finally {
+//                    graph.writeUnlock();
+//                }
             }
         }
 
@@ -298,7 +296,7 @@ public class CSNAlgorithm implements Algorithm {
     }
 
     private void filterFeatures() {
-        String msg = NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.fs");
+        String msg = NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.filtering");
         pc.reportMsg(msg, workspace);
         ticket.progress(msg);
 
@@ -308,7 +306,7 @@ public class CSNAlgorithm implements Algorithm {
         featureSelectionAlgo.endAlgo();
     }
 
-    private void preprocessing(List<MolecularDescriptor> featureList, Peptide[] peptides) {
+    private void preprocessing(List<MolecularDescriptor> featureList, Peptide[] peptides) {        
         // Check feature list size
         if (featureList.size() < MIN_AVAILABLE_FEATURES) {
             DialogDisplayer.getDefault().notify(notEnoughFeatures);
@@ -318,7 +316,9 @@ public class CSNAlgorithm implements Algorithm {
 
         // try/catch for molecular not found exception handling
         try {
-            String msg = NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.fs");
+            String msg = NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.filtering");
+            pc.reportMsg(msg, workspace);
+            ticket.progress(msg);
 
             // Preprocessing of feature list. Compute max, min, mean and std
             for (MolecularDescriptor attr : featureList) {

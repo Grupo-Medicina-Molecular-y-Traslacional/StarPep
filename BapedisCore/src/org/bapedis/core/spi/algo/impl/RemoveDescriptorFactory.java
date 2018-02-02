@@ -15,7 +15,7 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class DeleteDescriptorFactory implements AlgorithmFactory{
+public class RemoveDescriptorFactory implements AlgorithmFactory{
 
     @Override
     public AlgorithmCategory getCategory() {
@@ -24,12 +24,12 @@ public class DeleteDescriptorFactory implements AlgorithmFactory{
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(DeleteDescriptorAlgo.class, "DeleteDescriptor.name");
+        return NbBundle.getMessage(RemoveDescriptorAlgo.class, "RemoveDescriptor.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(DeleteDescriptorAlgo.class, "DeleteDescriptor.desc");
+        return NbBundle.getMessage(RemoveDescriptorAlgo.class, "RemoveDescriptor.desc");
     }
 
     @Override
@@ -39,7 +39,7 @@ public class DeleteDescriptorFactory implements AlgorithmFactory{
 
     @Override
     public Algorithm createAlgorithm() {
-        return new DeleteDescriptorAlgo(this);
+        return new RemoveDescriptorAlgo(this);
     }
 
     @Override

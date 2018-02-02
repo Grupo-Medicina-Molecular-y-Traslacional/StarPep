@@ -22,10 +22,10 @@ import org.openide.util.Lookup;
  *
  * @author loge
  */
-public class DeleteDescriptorAlgo implements Algorithm {
+public class RemoveDescriptorAlgo implements Algorithm {
 
     private final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-    private final DeleteDescriptorFactory factory;
+    private final RemoveDescriptorFactory factory;
     
     private final Set<String> descriptorKeys;
     protected Workspace workspace;
@@ -37,7 +37,7 @@ public class DeleteDescriptorAlgo implements Algorithm {
     protected boolean running;
     protected transient final PropertyChangeSupport propertyChangeSupport;
 
-    public DeleteDescriptorAlgo(DeleteDescriptorFactory factory) {
+    public RemoveDescriptorAlgo(RemoveDescriptorFactory factory) {
         descriptorKeys = new LinkedHashSet<>();
         running = false;
         propertyChangeSupport = new PropertyChangeSupport(this);

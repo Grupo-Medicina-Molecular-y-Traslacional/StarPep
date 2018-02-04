@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
-import org.bapedis.network.model.SeqClusteringModel;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
@@ -24,8 +23,9 @@ import org.bapedis.core.spi.algo.impl.AllDescriptors;
 import org.bapedis.core.spi.algo.impl.AllDescriptorsFactory;
 import org.bapedis.core.spi.algo.impl.FeatureSelectionAlgo;
 import org.bapedis.core.spi.algo.impl.FeatureSelectionFactory;
+import org.bapedis.core.spi.algo.impl.SequenceClustering;
+import org.bapedis.core.spi.algo.impl.SequenceClusteringFactory;
 import org.bapedis.core.task.ProgressTicket;
-import org.bapedis.network.model.Cluster;
 import org.bapedis.network.model.MDOptionModel;
 import org.bapedis.network.model.SimilarityMatrixModel;
 import org.bapedis.network.spi.SimilarityMeasure;
@@ -45,7 +45,7 @@ import org.openide.util.NbBundle;
 public class CSNAlgorithm implements Algorithm {
 
     private CSNAlgorithmFactory factory;
-    private final SeqClusteringModel clusteringModel;
+    private final SequenceClustering clusteringAlgo;
     private final MDOptionModel mdOptionModel;
     private final AllDescriptors descriptorAlgo;
     private final FeatureSelectionAlgo featureSelectionAlgo;
@@ -68,7 +68,7 @@ public class CSNAlgorithm implements Algorithm {
 
     public CSNAlgorithm(CSNAlgorithmFactory factory) {
         this.factory = factory;
-        clusteringModel = new SeqClusteringModel();
+        clusteringAlgo = (SequenceClustering)new SequenceClusteringFactory().createAlgorithm();
         mdOptionModel = new MDOptionModel(pc.getAttributesModel().getMolecularDescriptorKeys());
         descriptorAlgo = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
         featureSelectionAlgo = (FeatureSelectionAlgo) new FeatureSelectionFactory().createAlgorithm();
@@ -79,8 +79,8 @@ public class CSNAlgorithm implements Algorithm {
 
     }
 
-    public SeqClusteringModel getSeqClustering() {
-        return clusteringModel;
+    public SequenceClustering getSequenceClustering() {
+        return clusteringAlgo;
     }
 
     public MDOptionModel getMdOptionModel() {
@@ -175,8 +175,9 @@ public class CSNAlgorithm implements Algorithm {
     @Override
     public void run() {
         if (peptides != null) {
-            //Step 1. Get representative peptides            
-            Peptide[] representatives = clusteringModel.isClustering() ? clusterize() : peptides;
+            //Step 1. Get representative peptides 
+            clusterize();
+//            Peptide[] representatives = clusteringModel.isClustering() ? clusterize() : peptides;
 
             //Setp 2. Compute molecular descriptors if needed            
             Set<String> descriptorKeys = null;
@@ -204,7 +205,7 @@ public class CSNAlgorithm implements Algorithm {
                 }
 
                 // Preprocessing and validate molecular features
-                preprocessing(featureList, representatives);
+                preprocessing(featureList, peptides);
             }
 
             //Step 4. Compute similarity matrix
@@ -219,7 +220,7 @@ public class CSNAlgorithm implements Algorithm {
                 }
 
                 // Compute new similarity matrix
-                SimilarityMatrixModel newMatrix = computeSimilarityMatrix(representatives);
+                SimilarityMatrixModel newMatrix = computeSimilarityMatrix(peptides);
 
                 // Add the new similarity matrix to workspace
                 workspace.add(newMatrix);
@@ -247,21 +248,15 @@ public class CSNAlgorithm implements Algorithm {
 
     }
 
-    private Peptide[] clusterize() {
+    private void clusterize() {
         String msg = NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.clusterize");
         pc.reportMsg(msg, workspace);
         ticket.progress(msg);
 
-        SeqClusterBuilder clusterBuilder = new SeqClusterBuilder(clusteringModel);
-        clusterBuilder.setProgressTicket(ticket);
-
-        List<Cluster> clusters = clusterBuilder.clusterize(peptides);
-        Peptide[] representatives = new Peptide[clusters.size()];
-        int pos = 0;
-        for (Cluster c : clusters) {
-            representatives[pos++] = c.getCentroid();
-        }
-        return representatives;
+        clusteringAlgo.initAlgo(workspace);
+        clusteringAlgo.setProgressTicket(ticket);
+        clusteringAlgo.run();
+        clusteringAlgo.endAlgo();        
     }
 
     private Set<String> computeMD() {

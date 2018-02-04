@@ -12,11 +12,11 @@ import org.openide.util.NbBundle;
  * @author loge
  */
 public enum AlgorithmCategory {
-    
-    GraphLayout("graphLayout"),
-    GraphMeasure("graphMeasure"),
+    Sequence("seq"),
     MolecularDescriptor("md"),
-    SimilarityNetwork("csn");
+    SimilarityNetwork("csn"),
+    GraphLayout("graphLayout"),
+    GraphMeasure("graphMeasure");
     
     private final String displayName;
 

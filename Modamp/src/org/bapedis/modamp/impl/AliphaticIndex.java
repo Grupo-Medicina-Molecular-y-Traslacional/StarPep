@@ -9,6 +9,7 @@ import org.bapedis.core.spi.algo.impl.AbstractMD;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.modamp.MD;
 
 /**
@@ -24,8 +25,8 @@ public class AliphaticIndex extends AbstractMD {
     }
 
     @Override
-    public void initAlgo(Workspace workspace) {
-        super.initAlgo(workspace); 
+    public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
+        super.initAlgo(workspace, progressTicket); 
          addAttribute(AI, AI, Double.class);
     }
     

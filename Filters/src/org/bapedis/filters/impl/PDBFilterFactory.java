@@ -25,7 +25,7 @@ public class PDBFilterFactory implements FilterFactory {
     
     @Override
     public String getName() {
-        return NbBundle.getMessage(PDBFilterFactory.class, "PDBFilterFactory.name");
+        return NbBundle.getMessage(PDBFilterFactory.class, "PDBFilter.name");
     }
 
     @Override

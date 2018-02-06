@@ -115,10 +115,9 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
         algoPresetPersistence = new AlgoPresetPersistence();
         ((PropertySheet) propSheetPanel).setDescriptionAreaVisible(false);
-        NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text");
+        NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text");        
         DefaultComboBoxModel comboBoxModel =  new DefaultComboBoxModel();
-        comboBoxModel.addElement(NO_SELECTION);
-        comboBoxModel.setSelectedItem(NO_SELECTION);
+        comboBoxModel.addElement(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.defaultText"));
         algoComboBox.setModel(comboBoxModel);
     }
 

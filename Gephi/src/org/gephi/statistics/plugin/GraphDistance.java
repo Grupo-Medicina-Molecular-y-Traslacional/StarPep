@@ -432,17 +432,9 @@ public class GraphDistance implements Algorithm {
         return true;
     }
 
-    /**
-     *
-     * @param progressTicket
-     */
     @Override
-    public void setProgressTicket(ProgressTicket progressTicket) {
+    public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.progress = progressTicket;
-    }
-
-    @Override
-    public void initAlgo(Workspace workspace) {
         isCanceled = false;
         graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel(workspace);
         initializeAttributeColunms(graphModel);

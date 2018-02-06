@@ -115,8 +115,8 @@ public final class AlgorithmExecutor {
         }
 
         AlgoExecutor runnable = new AlgoExecutor(workspace, algorithm, listener, errorHandler);
-        runnable.progress.start();
-        runnable.progress.progress(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.submitted"));
+        runnable.ticket.start();
+        runnable.ticket.progress(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.submitted"));
         runnable.future = executor.submit(runnable);
         taskList.add(runnable);
     }
@@ -173,7 +173,7 @@ public final class AlgorithmExecutor {
 
         private final Algorithm algorithm;
         private Future<?> future;
-        private final ProgressTicket progress;
+        private final ProgressTicket ticket;
         private final AlgorithmListener listener;
         private final AlgorithmErrorHandler errorHandler;
         private final AtomicBoolean running;
@@ -186,23 +186,22 @@ public final class AlgorithmExecutor {
             this.errorHandler = errorHandler;
             this.running = new AtomicBoolean(false);
             String taskName = NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.name", workspace.getName(), algorithm.getFactory().getName());
-            this.progress = new ProgressTicket(taskName, new Cancellable() {
+            this.ticket = new ProgressTicket(taskName, new Cancellable() {
                 @Override
                 public boolean cancel() {
                     return AlgoExecutor.this.cancel();
                 }
 
             });
-            algorithm.setProgressTicket(progress);
         }
 
         @Override
         public void run() {
             running.set(true);
-            progress.progress(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.running"));
+            ticket.progress(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.running"));
             pc.reportRunningTask(algorithm.getFactory().getName(), workspace);
             try {
-                algorithm.initAlgo(workspace);
+                algorithm.initAlgo(workspace, ticket);
                 algorithm.run();
             } catch (Throwable e) {
                 if (errorHandler != null) {
@@ -219,7 +218,7 @@ public final class AlgorithmExecutor {
         }
 
         public boolean cancel() {
-            progress.progress(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.canceling"));
+            ticket.progress(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.canceling"));
             boolean isCancelled = algorithm.cancel();
             if (!running.get()) {
                 isCancelled = future.cancel(true);
@@ -233,7 +232,7 @@ public final class AlgorithmExecutor {
         private void finish() {
             if (taskList.remove(this)) {
                 algorithm.endAlgo();
-                progress.finish();
+                ticket.finish();
                 if (listener != null) {
                     listener.algorithmFinished(algorithm);
                 }

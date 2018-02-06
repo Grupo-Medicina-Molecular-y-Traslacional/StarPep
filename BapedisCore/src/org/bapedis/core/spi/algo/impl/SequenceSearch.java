@@ -5,47 +5,78 @@
  */
 package org.bapedis.core.spi.algo.impl;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.model.Workspace;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
-import org.biojava.nbio.alignment.Alignments;
-import org.biojava.nbio.alignment.SimpleGapPenalty;
-import org.biojava.nbio.core.alignment.template.SequencePair;
-import org.biojava.nbio.core.alignment.template.SubstitutionMatrix;
 import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
 import org.biojava.nbio.core.sequence.ProteinSequence;
-import org.biojava.nbio.core.sequence.compound.AminoAcidCompound;
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 
 /**
  *
  * @author loge
  */
-public class SequenceSearch implements Algorithm{
+public class SequenceSearch implements Algorithm {
 
+    private final ProjectManager pc;
     private ProteinSequence query;
-    private Peptide[] targets;    
+    private Peptide[] targets;
+    private List<Peptide> resultList;
     private ProgressTicket ticket;
     private boolean stopRun;
-    private SequenceAlignmentModel alignmentModel;
+    private final SequenceAlignmentModel alignmentModel;
     private final SequenceSearchFactory factory;
+    protected static final int MAX_REJECTS = 16;
 
     public SequenceSearch(SequenceSearchFactory factory) {
         this.factory = factory;
+        alignmentModel = new SequenceAlignmentModel();
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
+    }
+
+    public SequenceAlignmentModel getAlignmentModel() {
+        return alignmentModel;
+    }
+
+    public Peptide[] getTargets() {
+        return targets;
+    }
+
+    public void setTargets(Peptide[] targets) {
+        this.targets = targets;
+    }
+
+    public List<Peptide> getResultList() {
+        return resultList;
     }        
-    
+
     @Override
-    public void initAlgo(Workspace workspace) {
-        
+    public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
+        if (targets == null) {
+            AttributesModel attrModel = pc.getAttributesModel(workspace);
+            targets = attrModel.getPeptides().toArray(new Peptide[0]);
+        }
+        ticket = progressTicket;
+        resultList = new LinkedList<>();
     }
 
     @Override
     public void endAlgo() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        targets = null;
+        ticket = null;
     }
 
     @Override
@@ -65,45 +96,70 @@ public class SequenceSearch implements Algorithm{
     }
 
     @Override
-    public void setProgressTicket(ProgressTicket progressTicket) {
-        ticket = progressTicket;
+    public void run() {
+        if (targets != null && query != null) {            
+            
+            // Sort by decreasing common words
+            Arrays.sort(targets, new CommonKMersComparator(query.getSequenceAsString()));
+
+            // Assign peptide from targets to result list
+            // Stop if max rejects ocurred
+            float identityScore = alignmentModel.getIndentityScore();
+            int rejections = 0;
+            for (int i = 0; i < targets.length && rejections < MAX_REJECTS; i++) {
+                try {
+                    if (PairwiseSequenceAlignment.computeSequenceIdentity(query, targets[i].getBiojavaSeq(), alignmentModel) >= identityScore) {
+                        resultList.add(targets[i]);
+                    } else {
+                        rejections++;
+                    }
+                } catch (CompoundNotFoundException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            }
+
+        }
+    }
+
+}
+
+class SeqLengthComparator implements Comparator<Peptide> {
+
+    @Override
+    public int compare(Peptide o1, Peptide o2) {
+        return o2.getLength() - o1.getLength();
+    }
+}
+
+class CommonKMersComparator implements Comparator<Peptide> {
+
+    private final Set<String> set;
+    private final int k;
+
+    public CommonKMersComparator(String query) {
+        k = 6;
+        set = new HashSet<>();
+        for (int i = 0; i <= query.length() - k; i++) {
+            set.add(query.substring(i, i + k - 1));
+        }
     }
 
     @Override
-    public void run() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public int compare(Peptide o1, Peptide o2) {
+        int c1 = countCommonWords(o1);
+        int c2 = countCommonWords(o2);
+        return c2 - c1;
     }
-    
 
-    public static float computeSequenceIdentity(Peptide peptide1, Peptide peptide2, SequenceAlignmentModel model) {
-        Alignments.PairwiseSequenceAlignerType alignerType = model.getAlignerType();
-        SubstitutionMatrix<AminoAcidCompound> substitutionMatrix = model.getSubstitutionMatrix();        
-        SimpleGapPenalty gapPenalty = new SimpleGapPenalty();
-        SequencePair<ProteinSequence, AminoAcidCompound> pair;
-        float score;
-        if (peptide1.getSequence().equals(peptide2.getSequence())) {
-            score = 1;
-        } else {
-            try {
-                pair = Alignments.getPairwiseAlignment(peptide1.getBiojavaSeq(), peptide2.getBiojavaSeq(),
-                        alignerType, gapPenalty, substitutionMatrix);
-                score = ((float) pair.getNumIdenticals()) / getDenominatorValue(pair, peptide1, peptide2, alignerType);
-            } catch (CompoundNotFoundException ex) {
-//                log.log(Level.SEVERE, "Compound Not Found Exception: {0}", ex.getMessage());
-                Exceptions.printStackTrace(ex);
-                score = -1;
+    private int countCommonWords(Peptide peptide) {
+        String seq = peptide.getSequence();
+        int count = 0;
+        for (int i = 0; i <= seq.length() - k; i++) {
+            if (set.contains(seq.substring(i, i + k - 1))) {
+                count++;
             }
         }
-        return score;
-    }    
-    
-    private static int getDenominatorValue(SequencePair<ProteinSequence, AminoAcidCompound> pair, Peptide peptide1, Peptide peptide2, Alignments.PairwiseSequenceAlignerType alignerType) {
-        switch (alignerType) {
-            case LOCAL:
-                return Math.min(peptide1.getSequence().length(), peptide2.getSequence().length());
-            case GLOBAL:
-                return pair.getLength();
-        }
-        return 0;
-    }    
+        return count;
+    }
+
 }

@@ -12,6 +12,7 @@ import java.util.Map;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
+import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.scales.HydrophobicityScale;
 import org.openide.util.Exceptions;
@@ -123,8 +124,8 @@ public class HydrophobicMoment extends AbstractMD {
     }
 
     @Override
-    public void initAlgo(Workspace workspace) {
-        super.initAlgo(workspace);
+    public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
+        super.initAlgo(workspace, progressTicket);
         for (int i = 0; i < scale.length; i++) {
             if (scale[i]) {
                 for (int j = 0; j < angle.length; j++) {

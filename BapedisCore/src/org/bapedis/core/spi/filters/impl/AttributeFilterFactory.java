@@ -21,7 +21,7 @@ public class AttributeFilterFactory implements FilterFactory {
     protected final FilterSetupUI setupUI;
     
     public AttributeFilterFactory() {
-        name = NbBundle.getMessage(AttributeFilterFactory.class, "AttributeFilterFactory.name");
+        name = NbBundle.getMessage(AttributeFilterFactory.class, "AttributeFilter.name");
         setupUI = new AttributeFilterSetupUI();
     }
     

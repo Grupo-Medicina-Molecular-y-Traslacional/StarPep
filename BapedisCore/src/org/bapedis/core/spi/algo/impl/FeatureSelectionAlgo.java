@@ -135,8 +135,9 @@ public class FeatureSelectionAlgo implements Algorithm {
     }
 
     @Override
-    public void initAlgo(Workspace workspace) {
+    public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
+        ticket = progressTicket;
         attrModel = pc.getAttributesModel(workspace);
         stopRun = false;
         setRunning(true);
@@ -164,11 +165,6 @@ public class FeatureSelectionAlgo implements Algorithm {
     @Override
     public AlgorithmFactory getFactory() {
         return factory;
-    }
-
-    @Override
-    public void setProgressTicket(ProgressTicket progressTicket) {
-        ticket = progressTicket;
     }
 
     @Override

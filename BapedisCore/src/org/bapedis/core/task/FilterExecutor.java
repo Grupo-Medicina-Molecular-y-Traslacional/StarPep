@@ -42,7 +42,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
     protected final Graph graph;
     protected final ProgressTicket ticket;
     protected final AtomicBoolean stopRun;
-    protected final String taskName = "Filter";
+    protected final String taskName;
 
     public FilterExecutor() {
         this(pc.getCurrentWorkspace());
@@ -54,13 +54,14 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
         this.graph = pc.getGraphModel(workspace).getGraphVisible();
         this.filterModel = pc.getFilterModel(workspace);
         stopRun = new AtomicBoolean(false);
-        ticket = new ProgressTicket(NbBundle.getMessage(FilterExecutor.class, "FilterWorker.name", workspace.getName()), new Cancellable() {
+        ticket = new ProgressTicket(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.task.name", workspace.getName()), new Cancellable() {
             @Override
             public boolean cancel() {
                 stopRun.set(true);
                 return true;
             }
         });
+        taskName = NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.name");
     }
 
     @Override
@@ -68,8 +69,8 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
         publish("start");
         pc.reportRunningTask(taskName, workspace);
 
-        ticket.start(attrModel.getNodeList().size() + 1); // + refresh graph view
-        ticket.progress(NbBundle.getMessage(FilterExecutor.class, "FilterWorker.running"));
+        ticket.start(attrModel.getNodeList().size() + 1);
+        ticket.progress(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.running"));
 
         TreeSet<String> set = filterModel.isEmpty() ? null : new TreeSet<String>();
 
@@ -105,7 +106,8 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
             graph.readUnlock();
         }
 
-        // To refresh graph view   
+        // To refresh graph view  
+        ticket.progress(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.refreshingGView"));
         graphWC.refreshGraphView(toAddNodes, toRemoveNodes);
         ticket.progress();
 
@@ -177,21 +179,21 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
         this.stopRun.set(stopRun);
     }
 
-}
+    private static class QuickFilterImpl implements QuickFilter {
 
-class QuickFilterImpl implements QuickFilter {
+        private final TreeSet<String> set;
 
-    private final TreeSet<String> set;
+        public QuickFilterImpl(TreeSet<String> set) {
+            this.set = set;
+        }
 
-    public QuickFilterImpl(TreeSet<String> set) {
-        this.set = set;
-    }
+        @Override
+        public boolean accept(Object obj) {
+            PeptideNode node = ((PeptideNode) obj);
+            Peptide peptide = node.getPeptide();
+            return set.contains(peptide.getId());
+        }
 
-    @Override
-    public boolean accept(Object obj) {
-        PeptideNode node = ((PeptideNode) obj);
-        Peptide peptide = node.getPeptide();
-        return set.contains(peptide.getId());
     }
 
 }

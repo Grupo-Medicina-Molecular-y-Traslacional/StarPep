@@ -13,39 +13,21 @@ import org.bapedis.core.spi.filters.FilterFactory;
  *
  * @author loge
  */
-public class SimilarityFilter implements Filter {
-    protected final SimilarityFilterFactory factory;
-    private String seq;
-    private int k;
+public class SeqAlignmentFilter implements Filter{
+    private final SeqAlignmentFilterFactory factory;
 
-    public SimilarityFilter(SimilarityFilterFactory factory) {
+    public SeqAlignmentFilter(SeqAlignmentFilterFactory factory) {
         this.factory = factory;
-    }
-        
+    }        
+    
     @Override
     public String getDisplayName() {
-        return "SimilarityFilter";
+        return "";
     }
 
     @Override
     public boolean accept(Peptide peptide) {
-        return false;
-    }
-
-    public String getSeq() {
-        return seq;
-    }
-
-    public void setSeq(String seq) {
-        this.seq = seq;
-    }
-
-    public int getK() {
-        return k;
-    }
-
-    public void setK(int k) {
-        this.k = k;
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

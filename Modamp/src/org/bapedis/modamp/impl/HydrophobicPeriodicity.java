@@ -12,6 +12,7 @@ import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.modamp.MD;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
@@ -51,8 +52,8 @@ public class HydrophobicPeriodicity extends AbstractMD {
     }
 
     @Override
-    public void initAlgo(Workspace workspace) {
-        super.initAlgo(workspace); 
+    public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
+        super.initAlgo(workspace, progressTicket); 
         String name = getProName();
         addAttribute(name, name, Double.class);        
     }

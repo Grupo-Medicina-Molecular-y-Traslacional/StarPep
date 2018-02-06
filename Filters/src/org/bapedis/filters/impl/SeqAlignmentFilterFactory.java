@@ -8,35 +8,36 @@ package org.bapedis.filters.impl;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.spi.filters.FilterSetupUI;
+import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author loge
  */
-public class SimilarityFilterFactory implements FilterFactory  {
+@ServiceProvider(service = FilterFactory.class)
+public class SeqAlignmentFilterFactory implements FilterFactory {
 
-    SimilarityFilterSetupUI setupUI;
-    
-    public SimilarityFilterFactory(){
-//        setupUI = new SimilarityFilterSetupUI();
+    protected final SeqAlignmentFilterSetupUI setupUI;
+
+    public SeqAlignmentFilterFactory() {
+        setupUI = new SeqAlignmentFilterSetupUI();
     }
-            
-
+    
+    
     @Override
     public String getName() {
-        return "Similarity filter";
+        return NbBundle.getMessage(SeqAlignmentFilter.class, "SeqAlignmentFilter.name");
     }
 
     @Override
     public Filter createFilter() {
-        return new SimilarityFilter(this);
+        return new SeqAlignmentFilter(this);
     }
-
 
     @Override
     public FilterSetupUI getSetupUI() {
         return setupUI;
     }
-
-
+    
 }

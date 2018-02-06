@@ -178,7 +178,7 @@ public class AutoLayout {
         if (currentLayout != layout) {
             innerStart = currentRatio;
             innerIteration = 0;
-            layout.layout.initAlgo(pc.getCurrentWorkspace());
+            layout.layout.initAlgo(pc.getCurrentWorkspace(), null);
         } else {
             innerIteration++;
         }

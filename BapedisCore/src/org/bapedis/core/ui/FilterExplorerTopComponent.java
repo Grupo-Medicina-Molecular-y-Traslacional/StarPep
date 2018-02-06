@@ -63,9 +63,9 @@ import org.openide.util.lookup.ProxyLookup;
         preferredID = "FilterExplorerTopComponent"
 )
 @Messages({
-    "CTL_FilterExplorerAction=Filter",
-    "CTL_FilterExplorerTopComponent=Filter",
-    "HINT_FilterExplorerTopComponent=This is the Filter window"
+    "CTL_FilterExplorerAction=Quick Filter",
+    "CTL_FilterExplorerTopComponent=Quick Filter",
+    "HINT_FilterExplorerTopComponent=This is the Quick Filter window"
 })
 public final class FilterExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener, ExplorerManager.Provider {
 

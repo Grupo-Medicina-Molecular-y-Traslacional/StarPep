@@ -26,12 +26,12 @@ public class RemoveDescriptorAlgo implements Algorithm {
 
     private final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private final RemoveDescriptorFactory factory;
-    
+
     private final Set<String> descriptorKeys;
     protected Workspace workspace;
     private AttributesModel attrModel;
     private boolean stopRun = false;
-    private ProgressTicket ticket;    
+    private ProgressTicket ticket;
 
     public static final String RUNNING = "RUNNING";
     protected boolean running;
@@ -43,7 +43,7 @@ public class RemoveDescriptorAlgo implements Algorithm {
         propertyChangeSupport = new PropertyChangeSupport(this);
         this.factory = factory;
     }
-    
+
     public Set<String> getDescriptorKeys() {
         return descriptorKeys;
     }
@@ -58,7 +58,7 @@ public class RemoveDescriptorAlgo implements Algorithm {
 
     public boolean isIncluded(String algoName) {
         return descriptorKeys.contains(algoName);
-    }    
+    }
 
     public boolean isRunning() {
         return running;
@@ -82,8 +82,9 @@ public class RemoveDescriptorAlgo implements Algorithm {
     }
 
     @Override
-    public void initAlgo(Workspace workspace) {
+    public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
+        ticket = progressTicket;
         attrModel = pc.getAttributesModel(workspace);
         stopRun = false;
         setRunning(true);
@@ -114,22 +115,16 @@ public class RemoveDescriptorAlgo implements Algorithm {
     }
 
     @Override
-    public void setProgressTicket(ProgressTicket progressTicket) {
-        ticket = progressTicket;
-    }
-
-    @Override
     public void run() {
-        ticket.switchToDeterminate(descriptorKeys.size());
         for (String key : descriptorKeys) {
             if (!stopRun) {
                 if (attrModel.hasMolecularDescriptors(key)) {
                     attrModel.deleteAllMolecularDescriptors(key);
                     pc.reportMsg("Deleted: " + key, workspace);
                 }
-                ticket.progress();
             }
         }
+        descriptorKeys.clear();
     }
 
 }

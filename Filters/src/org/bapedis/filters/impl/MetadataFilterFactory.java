@@ -21,7 +21,7 @@ public class MetadataFilterFactory implements FilterFactory {
     protected final FilterSetupUI setupUI;
 
     public MetadataFilterFactory() {
-        name = NbBundle.getMessage(MetadataFilterFactory.class, "MetadataFilterFactory.name");
+        name = NbBundle.getMessage(MetadataFilterFactory.class, "MetadataFilter.name");
         setupUI = new MetadataFilterSetupUI();
     }    
     

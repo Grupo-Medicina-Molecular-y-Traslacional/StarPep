@@ -112,9 +112,10 @@ public class CSNAlgorithm implements Algorithm {
     }
 
     @Override
-    public void initAlgo(Workspace workspace) {
+    public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         stopRun = false;
         this.workspace = workspace;
+        this.ticket = progressTicket;
         attrModel = pc.getAttributesModel(workspace);
         if (attrModel != null) {
             peptides = attrModel.getPeptides().toArray(new Peptide[0]);
@@ -165,11 +166,6 @@ public class CSNAlgorithm implements Algorithm {
     @Override
     public AlgorithmFactory getFactory() {
         return factory;
-    }
-
-    @Override
-    public void setProgressTicket(ProgressTicket progressTicket) {
-        this.ticket = progressTicket;
     }
 
     @Override
@@ -253,8 +249,7 @@ public class CSNAlgorithm implements Algorithm {
         pc.reportMsg(msg, workspace);
         ticket.progress(msg);
 
-        clusteringAlgo.initAlgo(workspace);
-        clusteringAlgo.setProgressTicket(ticket);
+        clusteringAlgo.initAlgo(workspace, ticket);
         clusteringAlgo.run();
         clusteringAlgo.endAlgo();        
     }
@@ -264,8 +259,7 @@ public class CSNAlgorithm implements Algorithm {
         pc.reportMsg(msg, workspace);
         ticket.progress(msg);
 
-        descriptorAlgo.initAlgo(workspace);
-        descriptorAlgo.setProgressTicket(ticket);
+        descriptorAlgo.initAlgo(workspace, ticket);
         descriptorAlgo.run();
         Set<String> descriptorKeys = descriptorAlgo.getDescriptorKeys();
         descriptorAlgo.endAlgo();
@@ -295,8 +289,7 @@ public class CSNAlgorithm implements Algorithm {
         pc.reportMsg(msg, workspace);
         ticket.progress(msg);
 
-        featureSelectionAlgo.initAlgo(workspace);
-        featureSelectionAlgo.setProgressTicket(ticket);
+        featureSelectionAlgo.initAlgo(workspace, ticket);
         featureSelectionAlgo.run();
         featureSelectionAlgo.endAlgo();
     }

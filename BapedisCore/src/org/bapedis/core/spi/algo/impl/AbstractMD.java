@@ -81,7 +81,8 @@ public abstract class AbstractMD implements Algorithm {
     }
 
     @Override
-    public void initAlgo(Workspace workspace) {
+    public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
+        this.progressTicket = progressTicket;
         map.clear();
         attrModel = pc.getAttributesModel(workspace);
         this.workspace = workspace;
@@ -108,11 +109,6 @@ public abstract class AbstractMD implements Algorithm {
     @Override
     public AlgorithmFactory getFactory() {
         return factory;
-    }
-
-    @Override
-    public void setProgressTicket(ProgressTicket progressTicket) {
-        this.progressTicket = progressTicket;
     }
 
     @Override

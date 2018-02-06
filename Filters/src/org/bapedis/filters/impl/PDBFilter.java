@@ -10,7 +10,6 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.model.AnnotationType;
-import org.openide.util.NbBundle;
 
 /**
  *
@@ -18,12 +17,13 @@ import org.openide.util.NbBundle;
  */
 public class PDBFilter implements Filter {
     protected final PDBFilterFactory factory;
-
+    protected final String text;
     protected boolean negative;
 
     public PDBFilter(PDBFilterFactory factory) {
         this.factory = factory;
         negative = false;
+        text = "PDB structure";
     }
 
     public boolean isNegative() {
@@ -35,8 +35,7 @@ public class PDBFilter implements Filter {
     }
 
     @Override
-    public String getDisplayName() {
-        String text = NbBundle.getMessage(PDBFilter.class, "PDBFilter.name");
+    public String getDisplayName() {        
         return negative ? "Not (" + text + ")" : text;
     }
 

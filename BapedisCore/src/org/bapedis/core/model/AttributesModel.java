@@ -160,7 +160,7 @@ public class AttributesModel {
     }
 
     public List<PeptideNode> getNodeList() {
-        return nodeList;
+        return Collections.unmodifiableList(nodeList);
     }
 
     public void addPeptide(Peptide peptide) {

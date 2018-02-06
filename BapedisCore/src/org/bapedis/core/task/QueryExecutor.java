@@ -40,7 +40,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
     protected final QueryModel queryModel;
     protected final GraphModel graphModel;
     protected final AttributesModel oldModel;
-    protected final String taskName = "Query";
+    protected final String taskName;
 
     public QueryExecutor() {
         this(pc.getCurrentWorkspace());
@@ -51,6 +51,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
         queryModel = pc.getQueryModel(workspace);
         graphModel = pc.getGraphModel(workspace);
         oldModel = pc.getAttributesModel(workspace);
+        taskName = NbBundle.getMessage(QueryExecutor.class, "QueryExecutor.name");
     }
 
     @Override

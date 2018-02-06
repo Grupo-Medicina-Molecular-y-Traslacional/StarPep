@@ -105,7 +105,8 @@ public abstract class AbstractLayout implements Algorithm {
     public abstract void endLayout();
 
     @Override
-    public final void initAlgo(Workspace workspace) {
+    public final void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
+        this.progressTicket = progressTicket;
         graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel(workspace);        
         graph = graphModel.getGraphVisible();
         graph.readLock();
@@ -154,11 +155,6 @@ public abstract class AbstractLayout implements Algorithm {
     public synchronized boolean cancel() {
         stopRun = true;
         return true;
-    }
-
-    @Override
-    public void setProgressTicket(ProgressTicket progressTicket) {
-        this.progressTicket = progressTicket;
     }
 
     /**

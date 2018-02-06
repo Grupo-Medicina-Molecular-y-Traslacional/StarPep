@@ -37,6 +37,8 @@ public class PDBFilterSetupUI extends javax.swing.JPanel implements FilterSetupU
         jLabel1 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox();
 
+        setMinimumSize(new java.awt.Dimension(240, 120));
+        setPreferredSize(new java.awt.Dimension(240, 120));
         setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(PDBFilterSetupUI.class, "PDBFilterSetupUI.jLabel1.text")); // NOI18N

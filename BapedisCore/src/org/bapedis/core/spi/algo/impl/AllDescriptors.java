@@ -20,6 +20,7 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.task.ProgressTicket;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
@@ -76,8 +77,8 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
     }
 
     @Override
-    public void initAlgo(Workspace workspace) {
-        super.initAlgo(workspace); 
+    public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
+        super.initAlgo(workspace, progressTicket); 
         algorithms.clear();
         if (descriptorKeys.isEmpty()) {
             DialogDisplayer.getDefault().notify(emptyKeys);
@@ -107,7 +108,7 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
             // Init all algoritms
             for (AbstractMD algo : algorithms) {
                 algo.addMolecularDescriptorChangeListener(this);
-                algo.initAlgo(workspace);
+                algo.initAlgo(workspace, null);
             }
         }        
     }

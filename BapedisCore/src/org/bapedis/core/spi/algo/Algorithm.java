@@ -17,8 +17,12 @@ public interface Algorithm extends Runnable {
 
     /**
      * initAlgo() is called to initialize the algorithm (prepare to run).
-     */
-    public abstract void initAlgo(Workspace workspace);
+     * 
+     *
+     * @param workspace the current workspace
+     * @param progressTicket the progress ticket for this algorithm
+     */     
+    public abstract void initAlgo(Workspace workspace, ProgressTicket progressTicket);
 
     /**
      * Called when the algorithm is finished.
@@ -49,11 +53,5 @@ public interface Algorithm extends Runnable {
      */
     public AlgorithmFactory getFactory();
 
-    /**
-     * Set the progress ticket for the algorithm. Can't be null.
-     *
-     * @param progressTicket the progress ticket for this algorithm
-     */
-    public void setProgressTicket(ProgressTicket progressTicket);
 
 }

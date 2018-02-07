@@ -17,7 +17,7 @@ public interface ValidationSupportUI {
 
     boolean isValidState();
 
-    void finishSettings();
+    void saveSettings();
 
     void cancelSettings();
 

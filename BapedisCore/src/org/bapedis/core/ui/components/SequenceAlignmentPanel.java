@@ -18,17 +18,16 @@ import org.openide.util.NbBundle;
  */
 public class SequenceAlignmentPanel extends javax.swing.JPanel {
 
-
-    private final RichTooltip pidRichTooltip;
     private final SequenceAlignmentModel model;
 
     /**
      * Creates new form SequenceAlignmentPanel
+     *
      * @param model
      */
     public SequenceAlignmentPanel(SequenceAlignmentModel model) {
         initComponents();
-        
+
         this.model = model;
 
         DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel();
@@ -37,14 +36,15 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         }
         jATComboBox.setModel(comboBoxModel);
         jATComboBox.setSelectedIndex(model.getAlignmentTypeIndex());
+        setInfoLabel();
 
         comboBoxModel = new DefaultComboBoxModel<>();
         for (String s : SequenceAlignmentModel.SUBSTITUTION_MATRIX) {
             comboBoxModel.addElement(s);
-        }        
+        }
         jSMComboBox.setModel(comboBoxModel);
         jSMComboBox.setSelectedIndex(model.getSubstitutionMatrixIndex());
-        
+
         jPIDSlider.setMinimum(SequenceAlignmentModel.PID_MIN);
         jPIDSlider.setMaximum(SequenceAlignmentModel.PID_MAX);
 
@@ -53,29 +53,39 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         labelTable.put(SequenceAlignmentModel.PID_REFS[0], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.low")));
         labelTable.put(SequenceAlignmentModel.PID_REFS[1], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.middle")));
         labelTable.put(SequenceAlignmentModel.PID_REFS[2], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.high")));
-        
+
         jPIDSlider.setLabelTable(labelTable);
         jPIDLabel.setText(model.getPercentIdentity() + "%");
-        jPIDSlider.setValue(model.getPercentIdentity());        
+        jPIDSlider.setValue(model.getPercentIdentity());
 
-        pidRichTooltip = new RichTooltip();
-        pidRichTooltip.setTitle(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidInfo.title"));
-        pidRichTooltip.addDescriptionSection(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidInfo1.text"));
-        pidRichTooltip.addDescriptionSection(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidInfo2.text"));
-
-    }  
+//        pidRichTooltip = new RichTooltip();
+//        pidRichTooltip.setTitle(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidInfo.title"));
+//        pidRichTooltip.addDescriptionSection(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidInfo1.text"));
+//        pidRichTooltip.addDescriptionSection(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidInfo2.text"));
+    }
 
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled); //To change body of generated methods, choose Tools | Templates.
-        
+
         jATComboBox.setEnabled(enabled);
         jSMComboBox.setEnabled(enabled);
         jPIDLabel.setEnabled(enabled);
         jLessButton.setEnabled(enabled);
         jPIDSlider.setEnabled(enabled);
-        jMoreButton.setEnabled(enabled);        
-    }            
+        jMoreButton.setEnabled(enabled);
+    }
+
+    private void setInfoLabel() {
+        switch (model.getAlignerType()) {
+            case LOCAL:
+                jPIDInfoLabel.setToolTipText("Identities * 100 / Length of shorter sequence");
+                break;
+            case GLOBAL:
+                jPIDInfoLabel.setToolTipText("Identities * 100 / Columns");
+                break;
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -144,14 +154,6 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
 
         jPIDInfoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jPIDInfoLabel, org.openide.util.NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.jPIDInfoLabel.text")); // NOI18N
-        jPIDInfoLabel.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jPIDInfoLabelMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                jPIDInfoLabelMouseExited(evt);
-            }
-        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -248,14 +250,7 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
     private void jATComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jATComboBoxActionPerformed
         if (model.getAlignmentTypeIndex() != jATComboBox.getSelectedIndex()) {
             model.setAlignmentTypeIndex(jATComboBox.getSelectedIndex());
-            switch (model.getAlignerType()) {
-                case LOCAL:
-                    jPIDLabel.setToolTipText("Identities * 100 / Length of shorter sequence");
-                    break;
-                case GLOBAL:
-                    jPIDLabel.setToolTipText("Identities * 100 / Columns");
-                    break;
-            }
+            setInfoLabel();
         }
     }//GEN-LAST:event_jATComboBoxActionPerformed
 
@@ -264,14 +259,6 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
             model.setSubstitutionMatrixIndex(jSMComboBox.getSelectedIndex());
         }
     }//GEN-LAST:event_jSMComboBoxActionPerformed
-
-    private void jPIDInfoLabelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPIDInfoLabelMouseEntered
-        pidRichTooltip.showTooltip(jPIDInfoLabel, evt.getLocationOnScreen());
-    }//GEN-LAST:event_jPIDInfoLabelMouseEntered
-
-    private void jPIDInfoLabelMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPIDInfoLabelMouseExited
-        pidRichTooltip.hideTooltip();
-    }//GEN-LAST:event_jPIDInfoLabelMouseExited
 
     private void jLessButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLessButtonActionPerformed
         int pid = jPIDSlider.getValue();

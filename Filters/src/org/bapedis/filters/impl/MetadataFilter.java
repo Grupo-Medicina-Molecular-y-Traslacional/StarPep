@@ -71,6 +71,11 @@ public class MetadataFilter implements Filter {
     }
 
     @Override
+    public String getHTMLDisplayName() {
+        return null;
+    }
+        
+    @Override
     public String getDisplayName() {
         String text = annotationType.getDisplayName() + " " + operator + " " + value;
         return negative ? "Not (" + text + ")" : text;

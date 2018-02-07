@@ -28,19 +28,19 @@ public class SetupDialog implements PropertyChangeListener {
         }
         boolean flag;
         if (DialogDisplayer.getDefault().notify(dd).equals(NotifyDescriptor.OK_OPTION)) {
-            setupUI.finishSettings();
+            setupUI.saveSettings();
             flag = true;
         } else {
-            setupUI.cancelSettings();
             flag = false;
-        }
+            setupUI.cancelSettings();
+        }        
         setupUI.removeValidStateListener(this);
         return flag;
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName() == ValidationSupportUI.VALID_STATE && dd != null) {
+        if (evt.getPropertyName().equals(ValidationSupportUI.VALID_STATE) && dd != null) {
             boolean validState = (boolean) evt.getNewValue();
             dd.setValid(validState);
         }

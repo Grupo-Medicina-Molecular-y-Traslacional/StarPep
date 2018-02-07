@@ -115,7 +115,7 @@ public class FileExporterUI extends javax.swing.JPanel implements ValidationSupp
 
 
     @Override
-    public void finishSettings() {
+    public void saveSettings() {
         selectedFile = new File(fileTextField.getText());
         parentDirectory = selectedFile.getParentFile();
     }

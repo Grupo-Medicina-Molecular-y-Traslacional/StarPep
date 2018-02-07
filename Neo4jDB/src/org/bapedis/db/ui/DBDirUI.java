@@ -10,7 +10,6 @@ import java.beans.PropertyChangeSupport;
 import java.io.File;
 import javax.swing.JFileChooser;
 import org.bapedis.core.ui.components.ValidationSupportUI;
-import org.openide.util.NbPreferences;
 
 /**
  *
@@ -102,7 +101,7 @@ public class DBDirUI extends javax.swing.JPanel implements ValidationSupportUI {
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public void finishSettings() {
+    public void saveSettings() {
         selectedFile = new File(dirTextField.getText());
         if (!selectedFile.exists()){
             selectedFile.mkdir();

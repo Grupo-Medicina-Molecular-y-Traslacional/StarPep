@@ -6,10 +6,12 @@
 package org.bapedis.filters.impl;
 
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.spi.algo.impl.SequenceSearch;
 import org.bapedis.core.spi.algo.impl.SequenceSearchFactory;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
+import org.biojava.nbio.core.sequence.ProteinSequence;
 
 /**
  *
@@ -27,15 +29,36 @@ public class SeqAlignmentFilter implements Filter{
     public SequenceSearch getSearchAlgorithm() {
         return searchAlgo;
     }
+    
+    public SequenceAlignmentModel getAlignmentModel(){
+        return searchAlgo.getAlignmentModel();
+    }
+    
+    public void setAlignmentModel(SequenceAlignmentModel model){
+        searchAlgo.setAlignmentModel(model);
+    }
+    
+    public ProteinSequence getQuery() {
+        return searchAlgo.getQuery();
+    }
+
+    public void setQuery(ProteinSequence query) {
+        searchAlgo.setQuery(query); 
+    }   
+
+    @Override
+    public String getHTMLDisplayName() {
+       return "<html><u>query</u>: " + searchAlgo.getQuery().getSequenceAsString() + "</p></html>";
+    }        
             
     @Override
     public String getDisplayName() {
-        return "";
+        return factory.getName();
     }
 
     @Override
     public boolean accept(Peptide peptide) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return true;
     }
 
     @Override

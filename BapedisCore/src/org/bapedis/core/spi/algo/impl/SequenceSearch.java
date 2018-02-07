@@ -37,19 +37,31 @@ public class SequenceSearch implements Algorithm {
     private List<Peptide> resultList;
     private ProgressTicket ticket;
     private boolean stopRun;
-    private final SequenceAlignmentModel alignmentModel;
+    private SequenceAlignmentModel alignmentModel;
     private final SequenceSearchFactory factory;
     protected static final int MAX_REJECTS = 16;
 
     public SequenceSearch(SequenceSearchFactory factory) {
         this.factory = factory;
         alignmentModel = new SequenceAlignmentModel();
-        pc = Lookup.getDefault().lookup(ProjectManager.class);
+        pc = Lookup.getDefault().lookup(ProjectManager.class);        
     }
 
     public SequenceAlignmentModel getAlignmentModel() {
         return alignmentModel;
     }
+
+    public void setAlignmentModel(SequenceAlignmentModel alignmentModel) {
+        this.alignmentModel = alignmentModel;
+    }    
+
+    public ProteinSequence getQuery() {
+        return query;
+    }
+
+    public void setQuery(ProteinSequence query) {
+        this.query = query;
+    }    
 
     public Peptide[] getTargets() {
         return targets;

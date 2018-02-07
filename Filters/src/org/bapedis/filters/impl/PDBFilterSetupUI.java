@@ -72,7 +72,7 @@ public class PDBFilterSetupUI extends javax.swing.JPanel implements FilterSetupU
     }
 
     @Override
-    public void finishSettings() {
+    public void saveSettings() {
         boolean negative = jComboBox1.getSelectedIndex() == 1;
         filter.setNegative(negative);
     }
@@ -83,12 +83,10 @@ public class PDBFilterSetupUI extends javax.swing.JPanel implements FilterSetupU
     }
 
     @Override
-    public void addValidStateListener(PropertyChangeListener listener) {
-        
+    public void addValidStateListener(PropertyChangeListener listener) {        
     }
 
     @Override
-    public void removeValidStateListener(PropertyChangeListener listener) {
-        
+    public void removeValidStateListener(PropertyChangeListener listener) {        
     }
 }

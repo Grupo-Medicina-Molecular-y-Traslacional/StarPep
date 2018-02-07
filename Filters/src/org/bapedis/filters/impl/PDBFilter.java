@@ -35,6 +35,11 @@ public class PDBFilter implements Filter {
     }
 
     @Override
+    public String getHTMLDisplayName() {
+        return null;
+    }        
+
+    @Override
     public String getDisplayName() {        
         return negative ? "Not (" + text + ")" : text;
     }

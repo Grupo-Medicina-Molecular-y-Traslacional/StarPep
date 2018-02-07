@@ -221,7 +221,7 @@ public class MetadataFilterSetupUI extends javax.swing.JPanel implements FilterS
     }   
     
     @Override
-    public void finishSettings() {
+    public void saveSettings() {
         filter.setNegative(notCheckBox.isSelected());
         filter.setAnnotationType((AnnotationType) annotationComboBox.getSelectedItem());
         filter.setOperator((FilterOperator) opComboBox.getSelectedItem());

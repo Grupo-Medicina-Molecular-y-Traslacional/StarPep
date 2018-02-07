@@ -12,7 +12,14 @@ import org.bapedis.core.model.Peptide;
  * @author loge
  */
 public interface Filter {
+    /*Return a variant of the display name containing HTML
+    * or null; it should not return the non-HTML display name.
+    */
+    String getHTMLDisplayName();
+    
+    //Gets the localized display name of this filter
     String getDisplayName();
+    
     boolean accept(Peptide peptide);
     public FilterFactory getFactory(); 
 }

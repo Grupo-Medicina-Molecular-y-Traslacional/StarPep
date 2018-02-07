@@ -89,6 +89,11 @@ public class AttributeFilter implements Filter {
     }
 
     @Override
+    public String getHTMLDisplayName() {
+        return null;
+    }
+        
+    @Override
     public String getDisplayName() {
         String text = attr + " " + operator + " " + value;
         return negative ? "Not (" + text + ")" : text;

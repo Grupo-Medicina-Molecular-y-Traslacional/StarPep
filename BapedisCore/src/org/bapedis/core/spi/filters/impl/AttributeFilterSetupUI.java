@@ -245,7 +245,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
     }
 
     @Override
-    public void finishSettings() {
+    public void saveSettings() {
         filter.setNegative(notCheckBox.isSelected());
         filter.setAttribute((PeptideAttribute) attrComboBox.getSelectedItem());
         filter.setOperator((FilterOperator) opComboBox.getSelectedItem());

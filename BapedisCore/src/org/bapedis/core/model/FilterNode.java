@@ -22,10 +22,12 @@ import org.openide.util.lookup.Lookups;
  */
 public class FilterNode extends AbstractNode {
 
+    protected final Filter filter;
     protected Action[] actions;
 
     public FilterNode(Filter filter) {
         super(Children.LEAF, Lookups.singleton(filter));
+        this.filter = filter;
         List<? extends Action> nodeActions
                 = Utilities.actionsForPath("Actions/EditFilter");
 
@@ -33,17 +35,24 @@ public class FilterNode extends AbstractNode {
     }
 
     @Override
-    public String getDisplayName() {
-        Filter filter = getLookup().lookup(Filter.class);
+    public String getHtmlDisplayName() {
+        String name = filter.getHTMLDisplayName();
+        if (name.startsWith("<html>") && name.endsWith("</html>")){
+            return name;
+        }
+        return null;
+    }        
+
+    @Override
+    public String getDisplayName() {        
         return filter.getDisplayName();
     }
 
     public Filter getFilter() {
-        return getLookup().lookup(Filter.class);
+        return filter;
     }
 
     public void refresh() {
-        Filter filter = getLookup().lookup(Filter.class);
         fireDisplayNameChange("", filter.getDisplayName());
     }
 

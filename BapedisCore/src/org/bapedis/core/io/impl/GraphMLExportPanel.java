@@ -243,7 +243,7 @@ public class GraphMLExportPanel extends javax.swing.JPanel implements Validation
     }
 
     @Override
-    public void finishSettings() {
+    public void saveSettings() {
         selectedFile = new File(fileTextField.getText());
         parentDirectory = selectedFile.getParentFile();
     }

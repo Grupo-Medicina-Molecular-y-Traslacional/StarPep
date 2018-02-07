@@ -18,6 +18,7 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideNode;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
+import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Graph;
@@ -74,19 +75,30 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
 
         TreeSet<String> set = filterModel.isEmpty() ? null : new TreeSet<String>();
 
+        List<PeptideNode> peptideNodes = attrModel.getNodeList();
+        Peptide[] targets = new Peptide[peptideNodes.size()];
+        int pos = 0;
+        for (PeptideNode node : peptideNodes) {
+            targets[pos++] = node.getPeptide();
+        }
+        
+        
+        for(Iterator<Filter> it = filterModel.getFilterIterator(); it.hasNext();){
+            Filter filter = it.next();
+            Algorithm preAlgo = filter.getPreprocessing(targets);
+        }        
+
         List<Node> toAddNodes = new LinkedList<>();
         List<Node> toRemoveNodes = new LinkedList<>();
 
-        Peptide peptide;
         Node graphNode;
         graph.readLock();
         try {
-            for (PeptideNode node : attrModel.getNodeList()) {
+            for (Peptide peptide : targets) {
                 if (stopRun.get()) {
                     break;
                 }
 
-                peptide = node.getPeptide();
                 graphNode = peptide.getGraphNode();
 
                 if (isAccepted(peptide)) {

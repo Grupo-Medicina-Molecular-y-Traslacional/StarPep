@@ -5,11 +5,13 @@
  */
 package org.bapedis.filters.impl;
 
+import java.util.List;
 import java.util.StringTokenizer;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.spi.algo.Algorithm;
 
 /**
  *
@@ -64,6 +66,11 @@ public class PDBFilter implements Filter {
     @Override
     public FilterFactory getFactory() {
         return factory;
+    }
+
+    @Override
+    public Algorithm getPreprocessing(Peptide[] targets) {
+        return null;
     }
 
 }

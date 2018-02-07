@@ -6,9 +6,11 @@
 package org.bapedis.core.spi.filters.impl;
 
 import java.util.Iterator;
+import java.util.List;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.project.ProjectManager;
+import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.openide.util.Lookup;
@@ -120,6 +122,11 @@ public class AttributeFilter implements Filter {
     @Override
     public FilterFactory getFactory() {
         return factory;
+    }
+
+    @Override
+    public Algorithm getPreprocessing(Peptide[] targets) {
+        return null;
     }
 
 }

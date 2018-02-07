@@ -23,9 +23,8 @@ public class SetupDialog implements PropertyChangeListener {
     public boolean setup(JPanel panel, ValidationSupportUI setupUI, String title) {
         dd = new DialogDescriptor(panel, title);
         dd.setValid(setupUI.isValidState());
-        if (!setupUI.isValidState()) {
-            setupUI.addValidStateListener(this);
-        }
+        
+        setupUI.addValidStateListener(this);
         boolean flag;
         if (DialogDisplayer.getDefault().notify(dd).equals(NotifyDescriptor.OK_OPTION)) {
             setupUI.saveSettings();

@@ -238,6 +238,7 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
         try {
             this.filter.setAlignmentModel(alignmentModel);
             this.filter.setQuery(new ProteinSequence(jSeqTextArea.getText()));
+            this.filter.resetSearch();
         } catch (CompoundNotFoundException ex) {
             Exceptions.printStackTrace(ex);
         }

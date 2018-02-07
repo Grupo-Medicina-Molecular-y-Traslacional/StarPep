@@ -5,7 +5,9 @@
  */
 package org.bapedis.core.spi.filters;
 
+import java.util.List;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.spi.algo.Algorithm;
 
 /**
  *
@@ -20,6 +22,11 @@ public interface Filter {
     //Gets the localized display name of this filter
     String getDisplayName();
     
+    // The preprocessing algorithm to data. It can be null.
+    Algorithm getPreprocessing(Peptide[] targets);
+    
     boolean accept(Peptide peptide);
+    
+    
     public FilterFactory getFactory(); 
 }

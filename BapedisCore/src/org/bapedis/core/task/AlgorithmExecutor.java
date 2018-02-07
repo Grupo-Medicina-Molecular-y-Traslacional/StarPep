@@ -97,6 +97,14 @@ public final class AlgorithmExecutor {
         defaultErrorHandler = new AlgorithmErrorHandlerImpl();
     }
 
+    public AlgorithmListener getDefaultAlgoListener() {
+        return defaultAlgoListener;
+    }
+
+    public AlgorithmErrorHandler getDefaultErrorHandler() {
+        return defaultErrorHandler;
+    }        
+
     /**
      * Execute an algorithm with cancel and progress support.
      *
@@ -109,11 +117,6 @@ public final class AlgorithmExecutor {
      * @throws NullPointerException if <code>algorithm</code> is null
      */
     public synchronized void execute(Workspace workspace, final Algorithm algorithm, AlgorithmListener listener, AlgorithmErrorHandler errorHandler) {
-        Collection<? extends Algorithm> algorithms = workspace.getLookup().lookupAll(Algorithm.class);
-        if (!algorithms.contains(algorithm)) {
-            throw new IllegalArgumentException("The workspace does not contains the algorithm to be executed");
-        }
-
         AlgoExecutor runnable = new AlgoExecutor(workspace, algorithm, listener, errorHandler);
         runnable.ticket.start();
         runnable.ticket.progress(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.submitted"));

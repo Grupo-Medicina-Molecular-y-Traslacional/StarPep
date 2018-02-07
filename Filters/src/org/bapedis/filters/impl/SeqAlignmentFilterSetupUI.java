@@ -5,10 +5,15 @@
  */
 package org.bapedis.filters.impl;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import javax.swing.JPanel;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterSetupUI;
+import org.bapedis.core.ui.components.SequenceAlignmentPanel;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -16,11 +21,22 @@ import org.bapedis.core.spi.filters.FilterSetupUI;
  */
 public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements FilterSetupUI {
 
+    private enum Card {
+        SEQUENCE, ALIGNMENT
+    };
+    private Card card;
+    protected final PropertyChangeSupport changeSupport;
+    protected SeqAlignmentFilter filter;
+
     /**
      * Creates new form SeqAlignmentFilterSetupUI
      */
     public SeqAlignmentFilterSetupUI() {
         initComponents();
+        card = Card.SEQUENCE;
+        CardLayout cl = (CardLayout) centerPanel.getLayout();
+        cl.show(centerPanel, "sequence");
+        changeSupport = new PropertyChangeSupport(this);        
     }
 
     /**
@@ -31,50 +47,133 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        jSwitcherButton = new javax.swing.JButton();
+        centerPanel = new javax.swing.JPanel();
+        seqPanel = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jseqPane = new javax.swing.JScrollPane();
+        jSeqTextArea = new javax.swing.JTextArea();
+        alignmentPanel = new javax.swing.JPanel();
+
+        setMinimumSize(new java.awt.Dimension(400, 300));
+        setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(jSwitcherButton, org.openide.util.NbBundle.getMessage(SeqAlignmentFilterSetupUI.class, "SeqAlignmentFilterSetupUI.jSwitcherButton.text")); // NOI18N
+        jSwitcherButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jSwitcherButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(jSwitcherButton, gridBagConstraints);
+
+        centerPanel.setLayout(new java.awt.CardLayout());
+
+        seqPanel.setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(SeqAlignmentFilterSetupUI.class, "SeqAlignmentFilterSetupUI.jLabel1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
+        seqPanel.add(jLabel1, gridBagConstraints);
+
+        jSeqTextArea.setColumns(20);
+        jSeqTextArea.setLineWrap(true);
+        jSeqTextArea.setRows(5);
+        jSeqTextArea.setWrapStyleWord(true);
+        jseqPane.setViewportView(jSeqTextArea);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 0);
+        seqPanel.add(jseqPane, gridBagConstraints);
+
+        centerPanel.add(seqPanel, "sequence");
+
+        alignmentPanel.setLayout(new java.awt.BorderLayout());
+        centerPanel.add(alignmentPanel, "alignment");
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 5, 5);
+        add(centerPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jSwitcherButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSwitcherButtonActionPerformed
+        CardLayout cl = (CardLayout) centerPanel.getLayout();
+        switch (card) {
+            case ALIGNMENT:
+                cl.show(centerPanel, "sequence");
+                jSwitcherButton.setText(NbBundle.getMessage(SeqAlignmentFilterSetupUI.class, "SeqAlignmentFilterSetupUI.jSwitcherButton.text"));
+                card = Card.SEQUENCE;
+                break;
+            case SEQUENCE:
+                jSwitcherButton.setText(NbBundle.getMessage(SeqAlignmentFilterSetupUI.class, "SeqAlignmentFilterSetupUI.jSwitcherButton.alternativeText"));
+                cl.show(centerPanel, "alignment");
+                card = Card.ALIGNMENT;
+                break;
+        }
+    }//GEN-LAST:event_jSwitcherButtonActionPerformed
 
     @Override
     public JPanel getEditPanel(Filter filter) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        this.filter = (SeqAlignmentFilter) filter;
+        alignmentPanel.removeAll();
+        alignmentPanel.add(new SequenceAlignmentPanel(this.filter.getSearchAlgorithm().getAlignmentModel()), BorderLayout.CENTER);
+        alignmentPanel.revalidate();
+        alignmentPanel.repaint();
+        return this;
     }
 
     @Override
     public boolean isValidState() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return true;
     }
 
     @Override
     public void finishSettings() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
     }
 
     @Override
     public void cancelSettings() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
     }
 
     @Override
     public void addValidStateListener(PropertyChangeListener listener) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        changeSupport.addPropertyChangeListener(listener);
     }
 
     @Override
     public void removeValidStateListener(PropertyChangeListener listener) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        changeSupport.removePropertyChangeListener(listener);
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel alignmentPanel;
+    private javax.swing.JPanel centerPanel;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JTextArea jSeqTextArea;
+    private javax.swing.JButton jSwitcherButton;
+    private javax.swing.JScrollPane jseqPane;
+    private javax.swing.JPanel seqPanel;
     // End of variables declaration//GEN-END:variables
 }

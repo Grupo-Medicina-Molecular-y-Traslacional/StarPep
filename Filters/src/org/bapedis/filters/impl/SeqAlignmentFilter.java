@@ -6,6 +6,8 @@
 package org.bapedis.filters.impl;
 
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.spi.algo.impl.SequenceSearch;
+import org.bapedis.core.spi.algo.impl.SequenceSearchFactory;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
 
@@ -15,11 +17,17 @@ import org.bapedis.core.spi.filters.FilterFactory;
  */
 public class SeqAlignmentFilter implements Filter{
     private final SeqAlignmentFilterFactory factory;
+    private final SequenceSearch searchAlgo;
 
     public SeqAlignmentFilter(SeqAlignmentFilterFactory factory) {
         this.factory = factory;
-    }        
-    
+        searchAlgo = (SequenceSearch) new SequenceSearchFactory().createAlgorithm();        
+    }   
+
+    public SequenceSearch getSearchAlgorithm() {
+        return searchAlgo;
+    }
+            
     @Override
     public String getDisplayName() {
         return "";

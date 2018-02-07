@@ -10,10 +10,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
-import org.biojava.nbio.alignment.Alignments;
-import org.biojava.nbio.core.alignment.matrices.SubstitutionMatrixHelper;
-import org.biojava.nbio.core.alignment.template.SubstitutionMatrix;
-import org.biojava.nbio.core.sequence.compound.AminoAcidCompound;
 import org.openide.util.NbBundle;
 
 /**
@@ -22,43 +18,32 @@ import org.openide.util.NbBundle;
  */
 public class SequenceAlignmentPanel extends javax.swing.JPanel {
 
-    public static final String GLOBAL_ALIGNMENT_TEXT = "Global (Needleman-Wunsch)";
-    public static final String LOCAL_ALIGNMENT_TEXT = "Local (Smith-Waterman)";
-
-    public static final String[] Alignment_Type = new String[]{LOCAL_ALIGNMENT_TEXT, GLOBAL_ALIGNMENT_TEXT};
-    public static final String[] Substitution_Matrix = new String[]{
-        "Blosum 30 by Henikoff & Henikoff", "Blosum 35 by Henikoff & Henikoff", "Blosum 40 by Henikoff & Henikoff",
-        "Blosum 45 by Henikoff & Henikoff", "Blosum 50 by Henikoff & Henikoff", "Blosum 55 by Henikoff & Henikoff",
-        "Blosum 60 by Henikoff & Henikoff", "Blosum 62 by Henikoff & Henikoff", "Blosum 65 by Henikoff & Henikoff",
-        "Blosum 70 by Henikoff & Henikoff", "Blosum 75 by Henikoff & Henikoff", "Blosum 80 by Henikoff & Henikoff",
-        "Blosum 85 by Henikoff & Henikoff", "Blosum 90 by Henikoff & Henikoff", "Blosum 100 by Henikoff & Henikoff",
-        "PAM 250 by Gonnet, Cohen & Benner", "PAM 250 by Dayhoff"};
-
-    public static final int DEFAULT_ALIGNMENT_TYPE_INDEX = 0; // Needleman-Wunsch
-    public static final int DEFAULT_SUBSTITUTION_MATRIX_INDEX = 7; // Blosum 62 by Henikoff & Henikoff
 
     private final RichTooltip pidRichTooltip;
-    private SequenceAlignmentModel model;
+    private final SequenceAlignmentModel model;
 
     /**
      * Creates new form SequenceAlignmentPanel
+     * @param model
      */
-    public SequenceAlignmentPanel() {
+    public SequenceAlignmentPanel(SequenceAlignmentModel model) {
         initComponents();
+        
+        this.model = model;
 
         DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel();
-        for (String s : Alignment_Type) {
+        for (String s : SequenceAlignmentModel.ALIGNMENT_TYPE) {
             comboBoxModel.addElement(s);
         }
         jATComboBox.setModel(comboBoxModel);
-        jATComboBox.setSelectedIndex(DEFAULT_ALIGNMENT_TYPE_INDEX);
+        jATComboBox.setSelectedIndex(model.getAlignmentTypeIndex());
 
         comboBoxModel = new DefaultComboBoxModel<>();
-        for (String s : Substitution_Matrix) {
+        for (String s : SequenceAlignmentModel.SUBSTITUTION_MATRIX) {
             comboBoxModel.addElement(s);
-        }
+        }        
         jSMComboBox.setModel(comboBoxModel);
-        jSMComboBox.setSelectedIndex(DEFAULT_SUBSTITUTION_MATRIX_INDEX);
+        jSMComboBox.setSelectedIndex(model.getSubstitutionMatrixIndex());
         
         jPIDSlider.setMinimum(SequenceAlignmentModel.PID_MIN);
         jPIDSlider.setMaximum(SequenceAlignmentModel.PID_MAX);
@@ -70,65 +55,15 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         labelTable.put(SequenceAlignmentModel.PID_REFS[2], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.high")));
         
         jPIDSlider.setLabelTable(labelTable);
-        jPIDLabel.setText(SequenceAlignmentModel.DEFAULT_PID + "%");
-        jPIDSlider.setValue(SequenceAlignmentModel.DEFAULT_PID);        
+        jPIDLabel.setText(model.getPercentIdentity() + "%");
+        jPIDSlider.setValue(model.getPercentIdentity());        
 
         pidRichTooltip = new RichTooltip();
         pidRichTooltip.setTitle(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidInfo.title"));
         pidRichTooltip.addDescriptionSection(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidInfo1.text"));
         pidRichTooltip.addDescriptionSection(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidInfo2.text"));
 
-    }
-
-    private SubstitutionMatrix<AminoAcidCompound> getSubstitutionMatrix() {
-        switch (Substitution_Matrix[jSMComboBox.getSelectedIndex()]) {
-            case "Blosum 30 by Henikoff & Henikoff":
-                return SubstitutionMatrixHelper.getBlosum30();
-            case "Blosum 35 by Henikoff & Henikoff":
-                return SubstitutionMatrixHelper.getBlosum35();
-            case "Blosum 40 by Henikoff & Henikoff":
-                return SubstitutionMatrixHelper.getBlosum40();
-            case "Blosum 45 by Henikoff & Henikoff":
-                return SubstitutionMatrixHelper.getBlosum45();
-            case "Blosum 50 by Henikoff & Henikoff":
-                return SubstitutionMatrixHelper.getBlosum50();
-            case "Blosum 55 by Henikoff & Henikoff":
-                return SubstitutionMatrixHelper.getBlosum55();
-            case "Blosum 60 by Henikoff & Henikoff":
-                return SubstitutionMatrixHelper.getBlosum60();
-            case "Blosum 62 by Henikoff & Henikoff":
-                return SubstitutionMatrixHelper.getBlosum62();
-            case "Blosum 65 by Henikoff & Henikoff":
-                return SubstitutionMatrixHelper.getBlosum65();
-            case "Blosum 70 by Henikoff & Henikoff":
-                return SubstitutionMatrixHelper.getBlosum70();
-            case "Blosum 75 by Henikoff & Henikoff":
-                return SubstitutionMatrixHelper.getBlosum75();
-            case "Blosum 80 by Henikoff & Henikoff":
-                return SubstitutionMatrixHelper.getBlosum80();
-            case "Blosum 85 by Henikoff & Henikoff":
-                return SubstitutionMatrixHelper.getBlosum85();
-            case "Blosum 90 by Henikoff & Henikoff":
-                return SubstitutionMatrixHelper.getBlosum90();
-            case "Blosum 100 by Henikoff & Henikoff":
-                return SubstitutionMatrixHelper.getBlosum100();
-            case "PAM 250 by Gonnet, Cohen & Benner":
-                return SubstitutionMatrixHelper.getGonnet250();
-            case "PAM 250 by Dayhoff":
-                return SubstitutionMatrixHelper.getPAM250();
-        }
-        return null;
-    }
-    
-    private Alignments.PairwiseSequenceAlignerType getAlignerType() {
-        switch(Alignment_Type[jATComboBox.getSelectedIndex()]){
-            case LOCAL_ALIGNMENT_TEXT:
-                return Alignments.PairwiseSequenceAlignerType.LOCAL;
-            case GLOBAL_ALIGNMENT_TEXT:
-                return Alignments.PairwiseSequenceAlignerType.GLOBAL;                    
-        }
-        return null;
-    }    
+    }  
 
     @Override
     public void setEnabled(boolean enabled) {
@@ -140,10 +75,7 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         jLessButton.setEnabled(enabled);
         jPIDSlider.setEnabled(enabled);
         jMoreButton.setEnabled(enabled);        
-    }
-    
-    
-    
+    }            
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -314,8 +246,8 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jATComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jATComboBoxActionPerformed
-        if (model != null) {
-            model.setAlignerType(getAlignerType());
+        if (model.getAlignmentTypeIndex() != jATComboBox.getSelectedIndex()) {
+            model.setAlignmentTypeIndex(jATComboBox.getSelectedIndex());
             switch (model.getAlignerType()) {
                 case LOCAL:
                     jPIDLabel.setToolTipText("Identities * 100 / Length of shorter sequence");
@@ -328,8 +260,8 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jATComboBoxActionPerformed
 
     private void jSMComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSMComboBoxActionPerformed
-        if (model != null) {
-            model.setSubstitutionMatrix(getSubstitutionMatrix());
+        if (model.getSubstitutionMatrixIndex() != jSMComboBox.getSelectedIndex()) {
+            model.setSubstitutionMatrixIndex(jSMComboBox.getSelectedIndex());
         }
     }//GEN-LAST:event_jSMComboBoxActionPerformed
 
@@ -363,8 +295,8 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jMoreButtonActionPerformed
 
     private void jResetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jResetButtonActionPerformed
-        jATComboBox.setSelectedIndex(DEFAULT_ALIGNMENT_TYPE_INDEX);
-        jSMComboBox.setSelectedIndex(DEFAULT_SUBSTITUTION_MATRIX_INDEX);
+        jATComboBox.setSelectedIndex(SequenceAlignmentModel.DEFAULT_ALIGNMENT_TYPE_INDEX);
+        jSMComboBox.setSelectedIndex(SequenceAlignmentModel.DEFAULT_SUBSTITUTION_MATRIX_INDEX);
         jPIDSlider.setValue(SequenceAlignmentModel.DEFAULT_PID);
     }//GEN-LAST:event_jResetButtonActionPerformed
 

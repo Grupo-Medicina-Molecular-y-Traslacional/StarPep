@@ -60,7 +60,7 @@ import org.openide.windows.WindowManager;
 @Messages({
     "CTL_QueryExplorerAction=Database Query",
     "CTL_QueryExplorerTopComponent=Database Query",
-    "HINT_QueryExplorerTopComponent=This is the Database Query window"
+    "HINT_QueryExplorerTopComponent=This is the Query window"
 })
 public final class QueryExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener, ExplorerManager.Provider {
 

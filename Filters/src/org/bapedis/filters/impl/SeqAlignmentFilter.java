@@ -7,21 +7,21 @@ package org.bapedis.filters.impl;
 
 import java.util.List;
 import java.util.TreeSet;
-import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.AlgorithmCategory;
+import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideNode;
 import org.bapedis.core.model.SequenceAlignmentModel;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.algo.AlgorithmSetupUI;
 import org.bapedis.core.spi.algo.impl.SequenceSearch;
 import org.bapedis.core.spi.algo.impl.SequenceSearchFactory;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
-import org.bapedis.core.task.AlgorithmErrorHandler;
-import org.bapedis.core.task.AlgorithmExecutor;
-import org.bapedis.core.task.AlgorithmListener;
+import org.bapedis.core.task.ProgressTicket;
 import org.biojava.nbio.core.sequence.ProteinSequence;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 /**
@@ -33,13 +33,11 @@ public class SeqAlignmentFilter implements Filter {
     private final ProjectManager pc;
     private final SeqAlignmentFilterFactory factory;
     private final SequenceSearch searchAlgo;
-    protected final AlgorithmExecutor executor;
-    protected TreeSet<String> searchResult;
+    private MyPreprocessingAlgo preprocessingAlgo;        
 
     public SeqAlignmentFilter(SeqAlignmentFilterFactory factory) {
         this.factory = factory;
         searchAlgo = (SequenceSearch) new SequenceSearchFactory().createAlgorithm();
-        executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
         pc = Lookup.getDefault().lookup(ProjectManager.class);
     }
 
@@ -73,30 +71,12 @@ public class SeqAlignmentFilter implements Filter {
         return factory.getName();
     }
 
-    public void resetSearch() {
-        searchResult = null;
-    }
-
     @Override
     public boolean accept(Peptide peptide) {
-        if (searchResult == null) {
-            runSearchAlgorithm();
-            //wait...
-            try {
-                synchronized (this) {
-                    this.wait();
-                }
-            } catch (InterruptedException ex) {
-            }
-
-            searchResult = new TreeSet<>();
-            List<Peptide> resultList = searchAlgo.getResultList();
-            for (Peptide p : resultList) {
-                searchResult.add(p.getId());
-            }
-        }
-        
-        return searchResult.contains(peptide.getId());
+        if (preprocessingAlgo != null) {
+            return preprocessingAlgo.contains(peptide);
+        }        
+        return false;
     }
 
     @Override
@@ -104,34 +84,98 @@ public class SeqAlignmentFilter implements Filter {
         return factory;
     }
 
-    private void runSearchAlgorithm() {        
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                executor.execute(searchAlgo, new AlgorithmListener() {
-                    @Override
-                    public void algorithmFinished(Algorithm algo) {
-                        synchronized (SeqAlignmentFilter.this) {
-                            SeqAlignmentFilter.this.notify();
-                        }
-                    }
-                }, new AlgorithmErrorHandler() {
-                    @Override
-                    public void fatalError(Throwable t) {
-                        synchronized (SeqAlignmentFilter.this) {
-                            SeqAlignmentFilter.this.notify();
-                        }
-                        Exceptions.printStackTrace(t);
-                    }
-                });
-            }
-        }).start();
-    }
-
     @Override
     public Algorithm getPreprocessing(Peptide[] targets) {
         searchAlgo.setTargets(targets);
-        return searchAlgo;
+        preprocessingAlgo = (MyPreprocessingAlgo)new MyPreprocessingAlgoFactory().createAlgorithm();
+        return preprocessingAlgo;
     }
 
+    private class MyPreprocessingAlgo implements Algorithm{
+        private final TreeSet<String> searchResult;
+        private final AlgorithmFactory factory;
+
+        public MyPreprocessingAlgo(AlgorithmFactory factory) {
+            searchResult = new TreeSet<>();
+            this.factory = factory;
+        }        
+        
+        @Override
+        public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
+            searchAlgo.initAlgo(workspace, progressTicket);
+        }
+
+        @Override
+        public void endAlgo() {
+            searchAlgo.endAlgo();
+            List<Peptide> resultList = searchAlgo.getResultList();
+            for (Peptide p : resultList) {
+                searchResult.add(p.getId());
+            }            
+        }
+
+        @Override
+        public boolean cancel() {
+            return searchAlgo.cancel();            
+        }
+
+        @Override
+        public AlgorithmProperty[] getProperties() {
+            return null;
+        }
+
+        @Override
+        public AlgorithmFactory getFactory() {
+            return factory;
+        }
+
+        @Override
+        public void run() {
+            searchAlgo.run();
+        }
+        
+        public boolean contains(Peptide peptide){
+            return searchResult.contains(peptide.getId());
+        }
+    
+    }
+    
+    private class MyPreprocessingAlgoFactory implements AlgorithmFactory{
+        AlgorithmFactory factory = searchAlgo.getFactory();
+        @Override
+        public AlgorithmCategory getCategory() {
+            return factory.getCategory();
+        }
+
+        @Override
+        public String getName() {
+           return factory.getName();
+        }
+
+        @Override
+        public String getDescription() {
+            return factory.getDescription();
+        }
+
+        @Override
+        public AlgorithmSetupUI getSetupUI() {
+            return null;
+        }
+
+        @Override
+        public Algorithm createAlgorithm() {
+            return new MyPreprocessingAlgo(this);
+        }
+
+        @Override
+        public int getQualityRank() {
+            return -1;
+        }
+
+        @Override
+        public int getSpeedRank() {
+            return -1;
+        }
+    
+    }
 }

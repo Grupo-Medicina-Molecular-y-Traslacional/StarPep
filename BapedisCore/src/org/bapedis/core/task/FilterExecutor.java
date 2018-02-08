@@ -36,6 +36,7 @@ import org.openide.util.NbBundle;
 public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
 
     protected static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+    protected static final AlgorithmExecutor executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
     protected static GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
     protected final Workspace workspace;
     protected final FilterModel filterModel;
@@ -65,6 +66,30 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
         taskName = NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.name");
     }
 
+    private void runAlgorithm(Algorithm preprocessingAlgo) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                executor.execute(preprocessingAlgo, new AlgorithmListener() {
+                    @Override
+                    public void algorithmFinished(Algorithm algo) {
+                        synchronized (FilterExecutor.this) {
+                            FilterExecutor.this.notify();
+                        }
+                    }
+                }, new AlgorithmErrorHandler() {
+                    @Override
+                    public void fatalError(Throwable t) {
+                        synchronized (FilterExecutor.this) {
+                            FilterExecutor.this.notify();
+                        }
+                        Exceptions.printStackTrace(t);
+                    }
+                });
+            }
+        }).start();
+    }
+
     @Override
     protected TreeSet<String> doInBackground() throws Exception {
         publish("start");
@@ -81,12 +106,21 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
         for (PeptideNode node : peptideNodes) {
             targets[pos++] = node.getPeptide();
         }
-        
-        
-        for(Iterator<Filter> it = filterModel.getFilterIterator(); it.hasNext();){
+
+        for (Iterator<Filter> it = filterModel.getFilterIterator(); it.hasNext();) {
             Filter filter = it.next();
             Algorithm preAlgo = filter.getPreprocessing(targets);
-        }        
+            if (preAlgo != null) {
+                runAlgorithm(preAlgo);
+                //wait for preprocessing...
+                try {
+                    synchronized (this) {
+                        this.wait();
+                    }
+                } catch (InterruptedException ex) {
+                }
+            }
+        }
 
         List<Node> toAddNodes = new LinkedList<>();
         List<Node> toRemoveNodes = new LinkedList<>();

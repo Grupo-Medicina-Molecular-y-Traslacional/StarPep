@@ -3,11 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.network.model;
+package org.bapedis.core.model;
 
 import java.util.LinkedList;
 import java.util.List;
-import org.bapedis.core.model.Peptide;
 
 /**
  *

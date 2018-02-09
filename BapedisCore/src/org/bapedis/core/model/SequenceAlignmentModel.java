@@ -16,7 +16,7 @@ import org.biojava.nbio.core.sequence.compound.AminoAcidCompound;
  *
  * @author loge
  */
-public class SequenceAlignmentModel {
+public class SequenceAlignmentModel implements Cloneable{
     
     public static final String GLOBAL_ALIGNMENT_TEXT = "Global (Needleman-Wunsch)";
     public static final String LOCAL_ALIGNMENT_TEXT = "Local (Smith-Waterman)";
@@ -162,6 +162,17 @@ public class SequenceAlignmentModel {
         }        
         return msg.toString(); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        SequenceAlignmentModel copyModel = new SequenceAlignmentModel();
+        copyModel.setAlignmentTypeIndex(getAlignmentTypeIndex());
+        copyModel.setSubstitutionMatrixIndex(getSubstitutionMatrixIndex());
+        copyModel.setPercentIdentity(getPercentIdentity());
+        return copyModel;        
+    }
+    
+    
     
     
 }

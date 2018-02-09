@@ -7,8 +7,12 @@ package org.bapedis.core.spi.algo.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.model.Workspace;
@@ -30,8 +34,9 @@ public class SequenceClustering implements Algorithm {
     private final SequenceClusteringFactory factory;
     private boolean stopRun;
     private ProgressTicket ticket;
-    private AttributesModel attrModel;
     private Peptide[] peptides;
+    private final List<Cluster> clusterList;
+    private final HashMap<String, Cluster> clusterMap;
     private SequenceAlignmentModel alignmentModel;
 
     protected static final int MAX_REJECTS = 8;
@@ -39,6 +44,9 @@ public class SequenceClustering implements Algorithm {
     public SequenceClustering(SequenceClusteringFactory factory) {
         this.factory = factory;
         pc = Lookup.getDefault().lookup(ProjectManager.class);
+        alignmentModel = new SequenceAlignmentModel();
+        clusterList = new LinkedList<>();
+        clusterMap = new HashMap<>();
     }
 
     public SequenceAlignmentModel getAlignmentModel() {
@@ -49,21 +57,36 @@ public class SequenceClustering implements Algorithm {
         this.alignmentModel = alignmentModel;
     }
 
+    public Peptide[] getPeptides() {
+        return peptides;
+    }
+
+    public void setPeptides(Peptide[] peptides) {
+        this.peptides = peptides;
+    }
+
+    public List<Cluster> getClusterList() {
+        return clusterList;
+    }
+
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
-        attrModel = pc.getAttributesModel(workspace);
-        ticket = progressTicket;
-        if (attrModel != null) {
-            peptides = attrModel.getPeptides().toArray(new Peptide[0]);
+        if (peptides == null) {
+            AttributesModel attrModel = pc.getAttributesModel(workspace);
+            if (attrModel != null) {
+                peptides = attrModel.getPeptides().toArray(new Peptide[0]);
+            }
         }
-
+        ticket = progressTicket;
+        clusterList.clear();
+        clusterMap.clear();
     }
 
     @Override
     public void endAlgo() {
-        attrModel = null;
         peptides = null;
         ticket = null;
+        clusterMap.clear();
     }
 
     @Override
@@ -87,34 +110,36 @@ public class SequenceClustering implements Algorithm {
         if (peptides != null && alignmentModel != null) {
             ticket.switchToDeterminate(peptides.length);
 
-            ArrayList<Peptide> centroids = new ArrayList<>(peptides.length);
-
             // Sort by decreasing sequence length
             Arrays.parallelSort(peptides, new SeqLengthComparator());
 
-            //Add first centroid
-            centroids.add(peptides[0]);
+            //Add first cluster
+            Cluster cluster = new Cluster(peptides[0]);
+            clusterList.add(cluster);
+            clusterMap.put(peptides[0].getId(), cluster);
+            Peptide[] centroids = new Peptide[]{peptides[0]};
 
             boolean isRepresentative;
             Peptide query;
             Peptide centroid;
             int rejections;
             float identityScore = alignmentModel.getIndentityScore();
-            for (int i = 1; i < peptides.length; i++) {
+            for (int i = 1; i < peptides.length && !stopRun; i++) {
                 isRepresentative = true;
                 query = peptides[i];
                 rejections = 0;
 
                 // Sort by decreasing common words 
-                centroids.sort(new CommonKMersComparator(query.getSequence()));
+                Arrays.parallelSort(centroids, new CommonKMersComparator(query.getSequence()));
 
                 // Assign query to cluster
                 // Stop if max rejects ocurred
-                for (int j = 0; j < centroids.size() && isRepresentative && rejections < MAX_REJECTS; j++) {
+                for (int j = 0; j < centroids.length && isRepresentative && rejections < MAX_REJECTS; j++) {
                     try {
-                        centroid = centroids.get(j);
+                        centroid = centroids[j];
                         if (PairwiseSequenceAlignment.computeSequenceIdentity(query.getBiojavaSeq(), centroid.getBiojavaSeq(), alignmentModel) >= identityScore) {
-                            centroid.addClusterMember(query);
+                            cluster = clusterMap.get(centroid.getId());
+                            cluster.addMember(query);
                             isRepresentative = false;
                         } else {
                             rejections++;
@@ -125,7 +150,15 @@ public class SequenceClustering implements Algorithm {
                 }
 
                 if (isRepresentative) {
-                    centroids.add(query);
+                    cluster = new Cluster(query);
+                    clusterList.add(cluster);
+                    clusterMap.put(query.getId(), cluster);
+                    // Increase centroids array
+                    centroids = new Peptide[centroids.length + 1];
+                    int pos=0;
+                    for(Cluster c: clusterList){
+                        centroids[pos++] = c.getCentroid();
+                    }
                 }
 
                 ticket.progress();

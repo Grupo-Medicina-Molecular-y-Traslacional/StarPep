@@ -29,9 +29,9 @@ import org.openide.util.NbBundle;
  * @author loge
  */
 public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements FilterSetupUI {
-
+    
     protected final JXHyperlink switcherLink;
-
+    
     private enum Card {
         SEQUENCE, ALIGNMENT
     };
@@ -47,35 +47,35 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
      */
     public SeqAlignmentFilterSetupUI() {
         initComponents();
-
+        
         card = Card.SEQUENCE;
         switcherLink = new JXHyperlink();
         configureSwitcherLink();
-
+        
         CardLayout cl = (CardLayout) centerPanel.getLayout();
         cl.show(centerPanel, "sequence");
         changeSupport = new PropertyChangeSupport(this);
         validState = false;
-        jErrorLabel.setVisible(false);
+        jErrorLabel.setText(" ");
         compoundSet = AminoAcidCompoundSet.getAminoAcidCompoundSet();
         jSeqTextArea.getDocument().addDocumentListener(new DocumentListener() {
-
+            
             @Override
             public void insertUpdate(DocumentEvent e) {
                 updateValidState();
             }
-
+            
             @Override
             public void removeUpdate(DocumentEvent e) {
                 updateValidState();
             }
-
+            
             @Override
             public void changedUpdate(DocumentEvent e) {
             }
         });
     }
-
+    
     private void configureSwitcherLink() {
         switcherLink.setText(NbBundle.getMessage(SeqAlignmentFilter.class, "SeqAlignmentFilterSetupUI.switcherLink.text"));
         switcherLink.setClickedColor(new java.awt.Color(0, 51, 255));
@@ -89,7 +89,7 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
                 switchPanel();
             }
         });
-
+        
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -97,7 +97,7 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(switcherLink, gridBagConstraints);
     }
-
+    
     private void switchPanel() {
         CardLayout cl = (CardLayout) centerPanel.getLayout();
         switch (card) {
@@ -113,7 +113,7 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
                 break;
         }
     }
-
+    
     private void updateValidState() {
         boolean oldValue = validState;
         String seq = jSeqTextArea.getText();
@@ -126,7 +126,9 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
                 validState = false;
             }
         }
-        jErrorLabel.setVisible(seq.length() > 0 && !validState);
+        if (seq.length() == 0 || validState) {
+            jErrorLabel.setText(" ");
+        }
         changeSupport.firePropertyChange(VALID_STATE, oldValue, validState);
     }
 
@@ -148,7 +150,6 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
         jErrorLabel = new javax.swing.JLabel();
         jMRLabel = new javax.swing.JLabel();
         jMRComboBox = new javax.swing.JComboBox<>();
-        jextLabel = new javax.swing.JLabel();
         alignmentPanel = new javax.swing.JPanel();
 
         setMinimumSize(new java.awt.Dimension(460, 300));
@@ -190,13 +191,14 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         seqPanel.add(jErrorLabel, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jMRLabel, org.openide.util.NbBundle.getMessage(SeqAlignmentFilterSetupUI.class, "SeqAlignmentFilterSetupUI.jMRLabel.text")); // NOI18N
+        jMRLabel.setToolTipText(org.openide.util.NbBundle.getMessage(SeqAlignmentFilterSetupUI.class, "SeqAlignmentFilterSetupUI.jMRLabel.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -211,12 +213,6 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         seqPanel.add(jMRComboBox, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jextLabel, org.openide.util.NbBundle.getMessage(SeqAlignmentFilterSetupUI.class, "SeqAlignmentFilterSetupUI.jextLabel.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
-        seqPanel.add(jextLabel, gridBagConstraints);
 
         centerPanel.add(seqPanel, "sequence");
 
@@ -237,55 +233,52 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
     public JPanel getEditPanel(Filter filter) {
         this.filter = (SeqAlignmentFilter) filter;
         int maximumResults = this.filter.getMaximumResuls();
-        if (maximumResults > 0){
+        if (maximumResults > 0) {
             jMRComboBox.setSelectedItem(String.valueOf(maximumResults));
         }
         ProteinSequence seq = this.filter.getQuery();
-        jSeqTextArea.setText(seq != null? seq.getSequenceAsString(): "");
+        jSeqTextArea.setText(seq != null ? seq.getSequenceAsString() : "");
         
-        alignmentModel = copyAlignmentModel(this.filter.getAlignmentModel());
+        try {
+            alignmentModel = (SequenceAlignmentModel)this.filter.getAlignmentModel().clone();
+        } catch (CloneNotSupportedException ex) {
+            Exceptions.printStackTrace(ex);
+        }
         alignmentPanel.removeAll();
         alignmentPanel.add(new SequenceAlignmentPanel(alignmentModel), BorderLayout.CENTER);
         alignmentPanel.revalidate();
         alignmentPanel.repaint();
         return this;
     }
-
-    private SequenceAlignmentModel copyAlignmentModel(SequenceAlignmentModel model) {
-        SequenceAlignmentModel copyModel = new SequenceAlignmentModel();
-        copyModel.setAlignmentTypeIndex(model.getAlignmentTypeIndex());
-        copyModel.setSubstitutionMatrixIndex(model.getSubstitutionMatrixIndex());
-        copyModel.setPercentIdentity(model.getPercentIdentity());
-        return copyModel;
-    }
-
+    
+    
     @Override
     public boolean isValidState() {
         return validState;
     }
-
+    
     @Override
     public void saveSettings() {
         try {
             this.filter.setAlignmentModel(alignmentModel);
             this.filter.setQuery(new ProteinSequence(jSeqTextArea.getText()));
-            this.filter.setMaximumResuls(Integer.parseInt((String)jMRComboBox.getSelectedItem()));
+            this.filter.setMaximumResuls(Integer.parseInt((String) jMRComboBox.getSelectedItem()));
         } catch (CompoundNotFoundException ex) {
             Exceptions.printStackTrace(ex);
         }
     }
-
+    
     @Override
     public void cancelSettings() {
         filter = null;
         alignmentModel = null;        
     }
-
+    
     @Override
     public void addValidStateListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);
     }
-
+    
     @Override
     public void removeValidStateListener(PropertyChangeListener listener) {
         changeSupport.removePropertyChangeListener(listener);
@@ -300,7 +293,6 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
     private javax.swing.JComboBox<String> jMRComboBox;
     private javax.swing.JLabel jMRLabel;
     private javax.swing.JTextArea jSeqTextArea;
-    private javax.swing.JLabel jextLabel;
     private javax.swing.JScrollPane jseqPane;
     private javax.swing.JPanel seqPanel;
     // End of variables declaration//GEN-END:variables

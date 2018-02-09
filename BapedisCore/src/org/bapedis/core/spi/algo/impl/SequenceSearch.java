@@ -34,8 +34,7 @@ public class SequenceSearch implements Algorithm {
     private final ProjectManager pc;
     private ProteinSequence query;
     private Peptide[] targets;
-    private List<Peptide> resultList;
-    private ProgressTicket ticket;
+    private final List<Peptide> resultList;
     private boolean stopRun;
     private SequenceAlignmentModel alignmentModel;
     private final SequenceSearchFactory factory;
@@ -45,7 +44,8 @@ public class SequenceSearch implements Algorithm {
     public SequenceSearch(SequenceSearchFactory factory) {
         this.factory = factory;
         alignmentModel = new SequenceAlignmentModel();
-        pc = Lookup.getDefault().lookup(ProjectManager.class);  
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
+        resultList = new LinkedList<>();
         maximumResults = -1;
     }
 
@@ -55,7 +55,7 @@ public class SequenceSearch implements Algorithm {
 
     public void setAlignmentModel(SequenceAlignmentModel alignmentModel) {
         this.alignmentModel = alignmentModel;
-    }    
+    }
 
     public int getMaximumResults() {
         return maximumResults;
@@ -63,7 +63,7 @@ public class SequenceSearch implements Algorithm {
 
     public void setMaximumResults(int maximumResults) {
         this.maximumResults = maximumResults;
-    }        
+    }
 
     public ProteinSequence getQuery() {
         return query;
@@ -71,7 +71,7 @@ public class SequenceSearch implements Algorithm {
 
     public void setQuery(ProteinSequence query) {
         this.query = query;
-    }    
+    }
 
     public Peptide[] getTargets() {
         return targets;
@@ -83,22 +83,23 @@ public class SequenceSearch implements Algorithm {
 
     public List<Peptide> getResultList() {
         return resultList;
-    }        
+    }
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         if (targets == null) {
             AttributesModel attrModel = pc.getAttributesModel(workspace);
-            targets = attrModel.getPeptides().toArray(new Peptide[0]);
+            if (attrModel != null) {
+                targets = attrModel.getPeptides().toArray(new Peptide[0]);
+            }
         }
-        ticket = progressTicket;
-        resultList = new LinkedList<>();
+        stopRun = false;
+        resultList.clear();
     }
 
     @Override
     public void endAlgo() {
         targets = null;
-        ticket = null;
     }
 
     @Override
@@ -119,8 +120,8 @@ public class SequenceSearch implements Algorithm {
 
     @Override
     public void run() {
-        if (targets != null && query != null) {            
-            
+        if (targets != null && query != null) {
+
             // Sort by decreasing common words
             Arrays.sort(targets, new CommonKMersComparator(query.getSequenceAsString()));
 
@@ -128,7 +129,7 @@ public class SequenceSearch implements Algorithm {
             // Stop if max rejects ocurred
             float identityScore = alignmentModel.getIndentityScore();
             int rejections = 0;
-            for (int i = 0; i < targets.length && rejections < MAX_REJECTS; i++) {
+            for (int i = 0; i < targets.length && !stopRun && rejections < MAX_REJECTS; i++) {
                 try {
                     if (PairwiseSequenceAlignment.computeSequenceIdentity(query, targets[i].getBiojavaSeq(), alignmentModel) >= identityScore) {
                         resultList.add(targets[i]);
@@ -159,10 +160,14 @@ class CommonKMersComparator implements Comparator<Peptide> {
     private final int k;
 
     public CommonKMersComparator(String query) {
-        k = 6;
+        k = 5;
         set = new HashSet<>();
-        for (int i = 0; i <= query.length() - k; i++) {
-            set.add(query.substring(i, i + k - 1));
+        if (query.length() > k) {
+            for (int i = 0; i <= query.length() - k; i++) {
+                set.add(query.substring(i, i + k - 1));
+            }
+        }else{
+            set.add(query);
         }
     }
 

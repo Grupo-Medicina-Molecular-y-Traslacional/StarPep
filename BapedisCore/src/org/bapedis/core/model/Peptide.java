@@ -41,7 +41,6 @@ public class Peptide {
     protected String id, seq;
     protected ProteinSequence biojavaSeq;    
     protected int length;
-    protected List<Peptide> clusterMembers;
 
     public Peptide(Node graphNode, Graph graph) {
         this.graphNode = graphNode;
@@ -136,22 +135,7 @@ public class Peptide {
 
     public void removeMolecularFeatureChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(CHANGED_ATTRIBUTE, listener);
-    }    
-    
-    public void addClusterMember(Peptide peptide){
-        if (clusterMembers == null){
-            clusterMembers = new LinkedList<>();
-        }
-        clusterMembers.add(peptide);
-    }
-    
-    public boolean isRepresentative(){
-        return clusterMembers != null && clusterMembers.size() > 0;
-    }
-
-    public List<Peptide> getClusterMembers() {
-        return clusterMembers;
-    }    
+    }          
 
     @Override
     public String toString() {

@@ -44,14 +44,4 @@ public class AliphaticIndexFactory implements AlgorithmFactory {
         return new AliphaticIndex(this);
     }
 
-    @Override
-    public int getQualityRank() {
-        return -1;
-    }
-
-    @Override
-    public int getSpeedRank() {
-        return -1;
-    }
-
 }

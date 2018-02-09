@@ -43,15 +43,5 @@ public class IsoelectricPointFactory implements AlgorithmFactory {
     public Algorithm createAlgorithm() {
         return new IsoelectricPoint(this);
     }
-
-    @Override
-    public int getQualityRank() {
-        return -1;
-    }
-
-    @Override
-    public int getSpeedRank() {
-        return -1;
-    }
     
 }

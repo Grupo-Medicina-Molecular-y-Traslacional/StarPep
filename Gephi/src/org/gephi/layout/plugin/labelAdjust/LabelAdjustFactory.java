@@ -68,14 +68,4 @@ public class LabelAdjustFactory extends AbstractLayoutFactory {
     public String getDescription() {
         return NbBundle.getMessage(LabelAdjustFactory.class, "description");
     }
-
-    @Override
-    public int getQualityRank() {
-        return -1;
-    }
-
-    @Override
-    public int getSpeedRank() {
-        return -1;
-    }
 }

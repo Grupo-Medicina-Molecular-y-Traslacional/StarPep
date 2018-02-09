@@ -43,15 +43,5 @@ public class DipeptideCompositionFactory implements AlgorithmFactory {
     public Algorithm createAlgorithm() {
         return new DipeptideComposition(this);
     }
-
-    @Override
-    public int getQualityRank() {
-        return -1;
-    }
-
-    @Override
-    public int getSpeedRank() {
-        return -1;
-    }
     
 }

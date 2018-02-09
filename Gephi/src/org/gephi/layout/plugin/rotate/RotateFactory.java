@@ -68,14 +68,4 @@ public class RotateFactory extends AbstractLayoutFactory {
     public String getDescription() {
         return NbBundle.getMessage(RotateFactory.class, "rotate.description");
     }
-
-    @Override
-    public int getQualityRank() {
-        return -1;
-    }
-
-    @Override
-    public int getSpeedRank() {
-        return -1;
-    }
 }

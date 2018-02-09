@@ -41,15 +41,5 @@ public class CSNAlgorithmFactory implements AlgorithmFactory {
     public Algorithm createAlgorithm() {
         return new CSNAlgorithm(this);
     }
-
-    @Override
-    public int getQualityRank() {
-        return -1;
-    }
-
-    @Override
-    public int getSpeedRank() {
-        return -1;
-    }
     
 }

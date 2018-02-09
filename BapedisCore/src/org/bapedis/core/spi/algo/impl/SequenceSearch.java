@@ -40,11 +40,13 @@ public class SequenceSearch implements Algorithm {
     private SequenceAlignmentModel alignmentModel;
     private final SequenceSearchFactory factory;
     protected static final int MAX_REJECTS = 16;
+    protected int maximumResults;
 
     public SequenceSearch(SequenceSearchFactory factory) {
         this.factory = factory;
         alignmentModel = new SequenceAlignmentModel();
-        pc = Lookup.getDefault().lookup(ProjectManager.class);        
+        pc = Lookup.getDefault().lookup(ProjectManager.class);  
+        maximumResults = -1;
     }
 
     public SequenceAlignmentModel getAlignmentModel() {
@@ -54,6 +56,14 @@ public class SequenceSearch implements Algorithm {
     public void setAlignmentModel(SequenceAlignmentModel alignmentModel) {
         this.alignmentModel = alignmentModel;
     }    
+
+    public int getMaximumResults() {
+        return maximumResults;
+    }
+
+    public void setMaximumResults(int maximumResults) {
+        this.maximumResults = maximumResults;
+    }        
 
     public ProteinSequence getQuery() {
         return query;

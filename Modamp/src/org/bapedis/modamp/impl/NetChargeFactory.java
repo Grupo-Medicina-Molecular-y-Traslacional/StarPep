@@ -43,15 +43,5 @@ public class NetChargeFactory implements AlgorithmFactory{
     public Algorithm createAlgorithm() {
         return new NetCharge(this);
     }
-
-    @Override
-    public int getQualityRank() {
-        return -1;
-    }
-
-    @Override
-    public int getSpeedRank() {
-        return -1;
-    }
     
 }

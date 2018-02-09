@@ -69,14 +69,4 @@ public class ExpandFactory extends AbstractLayoutFactory {
     public String getDescription() {
         return NbBundle.getMessage(ExpandFactory.class, "expand.description");
     }
-
-    @Override
-    public int getQualityRank() {
-        return -1;
-    }
-
-    @Override
-    public int getSpeedRank() {
-        return -1;
-    }
 }

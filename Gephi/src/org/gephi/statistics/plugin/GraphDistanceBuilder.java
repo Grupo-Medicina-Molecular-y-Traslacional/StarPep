@@ -80,13 +80,4 @@ public class GraphDistanceBuilder implements AlgorithmFactory {
         return new GraphDistance(this);
     }
 
-    @Override
-    public int getQualityRank() {
-        return -1;
-    }
-
-    @Override
-    public int getSpeedRank() {
-        return -1;
-    }
 }

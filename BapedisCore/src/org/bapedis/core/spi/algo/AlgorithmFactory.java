@@ -50,7 +50,7 @@ public interface AlgorithmFactory {
      * algorithm. Return -1 if you don't want to display a rank.
      * @return an integer between 1 and 5 or -1 if you don't want to show a rank
      */
-    public int getQualityRank();
+    default public int getQualityRank(){ return -1;}
 
     /**
      * An appraisal of speed for this algorithm. The rank must be between 1 and
@@ -58,6 +58,6 @@ public interface AlgorithmFactory {
      * algorithm. Return -1 if you don't want to display a rank.
      * @return an integer between 1 and 5 or -1 if you don't want to show a rank
      */
-    public int getSpeedRank();   
+    default public int getSpeedRank() {return -1;}
     
 }

@@ -23,6 +23,7 @@ import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.biojava.nbio.core.sequence.ProteinSequence;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -43,6 +44,14 @@ public class SeqAlignmentFilter implements Filter {
 
     public SequenceSearch getSearchAlgorithm() {
         return searchAlgo;
+    }
+    
+    public int getMaximumResuls(){
+        return searchAlgo.getMaximumResults();
+    }
+    
+    public void setMaximumResuls(int maximumResults){
+        searchAlgo.setMaximumResults(maximumResults);
     }
 
     public SequenceAlignmentModel getAlignmentModel() {
@@ -141,20 +150,19 @@ public class SeqAlignmentFilter implements Filter {
     }
     
     private class MyPreprocessingAlgoFactory implements AlgorithmFactory{
-        AlgorithmFactory factory = searchAlgo.getFactory();
         @Override
         public AlgorithmCategory getCategory() {
-            return factory.getCategory();
+            return AlgorithmCategory.Sequence;
         }
 
         @Override
         public String getName() {
-           return factory.getName();
+           return NbBundle.getMessage(SeqAlignmentFilter.class, "SeqAlignmentFilter.proprocessing.name");
         }
 
         @Override
         public String getDescription() {
-            return factory.getDescription();
+            return NbBundle.getMessage(SeqAlignmentFilter.class, "SeqAlignmentFilter.proprocessing.desc");
         }
 
         @Override
@@ -165,16 +173,6 @@ public class SeqAlignmentFilter implements Filter {
         @Override
         public Algorithm createAlgorithm() {
             return new MyPreprocessingAlgo(this);
-        }
-
-        @Override
-        public int getQualityRank() {
-            return -1;
-        }
-
-        @Override
-        public int getSpeedRank() {
-            return -1;
         }
     
     }

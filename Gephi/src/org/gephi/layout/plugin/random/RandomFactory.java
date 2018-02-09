@@ -68,14 +68,4 @@ public class RandomFactory extends AbstractLayoutFactory {
     public String getDescription() {
         return NbBundle.getMessage(RandomFactory.class, "Random.description");
     }
-
-    @Override
-    public int getQualityRank() {
-        return -1;
-    }
-
-    @Override
-    public int getSpeedRank() {
-        return -1;
-    }
 }

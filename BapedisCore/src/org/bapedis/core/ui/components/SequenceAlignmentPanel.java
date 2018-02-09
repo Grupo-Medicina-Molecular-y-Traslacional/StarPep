@@ -9,7 +9,6 @@ import java.util.Hashtable;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import org.bapedis.core.model.SequenceAlignmentModel;
-import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.openide.util.NbBundle;
 
 /**

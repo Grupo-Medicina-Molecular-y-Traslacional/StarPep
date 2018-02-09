@@ -41,15 +41,5 @@ public class RemoveDescriptorFactory implements AlgorithmFactory{
     public Algorithm createAlgorithm() {
         return new RemoveDescriptorAlgo(this);
     }
-
-    @Override
-    public int getQualityRank() {
-        return -1;
-    }
-
-    @Override
-    public int getSpeedRank() {
-        return -1;
-    }
     
 }

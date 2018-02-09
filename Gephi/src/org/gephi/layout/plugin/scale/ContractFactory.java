@@ -72,13 +72,4 @@ public class ContractFactory extends AbstractLayoutFactory {
         return NbBundle.getMessage(ContractFactory.class, "contract.description");
     }
 
-    @Override
-    public int getQualityRank() {
-        return -1;
-    }
-
-    @Override
-    public int getSpeedRank() {
-        return -1;
-    }
 }

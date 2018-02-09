@@ -43,15 +43,5 @@ public class HydrophobicMomentFactory implements AlgorithmFactory{
     public Algorithm createAlgorithm() {
         return new HydrophobicMoment(this);
     }
-
-    @Override
-    public int getQualityRank() {
-        return -1;
-    }
-
-    @Override
-    public int getSpeedRank() {
-        return -1;
-    }
     
 }

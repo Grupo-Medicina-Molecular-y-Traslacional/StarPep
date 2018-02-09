@@ -68,14 +68,4 @@ public class NoverlapLayoutFactory extends AbstractLayoutFactory {
     public String getDescription() {
         return NbBundle.getMessage(NoverlapLayoutFactory.class, "description");
     }
-
-    @Override
-    public int getQualityRank() {
-        return -1;
-    }
-
-    @Override
-    public int getSpeedRank() {
-        return -1;
-    }
 }

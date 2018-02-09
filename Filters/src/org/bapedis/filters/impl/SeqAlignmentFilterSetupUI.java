@@ -11,7 +11,6 @@ import java.awt.GridBagConstraints;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.bapedis.core.model.SequenceAlignmentModel;
@@ -147,6 +146,9 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
         jseqPane = new javax.swing.JScrollPane();
         jSeqTextArea = new javax.swing.JTextArea();
         jErrorLabel = new javax.swing.JLabel();
+        jMRLabel = new javax.swing.JLabel();
+        jMRComboBox = new javax.swing.JComboBox<>();
+        jextLabel = new javax.swing.JLabel();
         alignmentPanel = new javax.swing.JPanel();
 
         setMinimumSize(new java.awt.Dimension(460, 300));
@@ -161,7 +163,9 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         seqPanel.add(jLabel1, gridBagConstraints);
 
@@ -174,7 +178,7 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -184,12 +188,35 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
         jErrorLabel.setForeground(new java.awt.Color(255, 0, 0));
         org.openide.awt.Mnemonics.setLocalizedText(jErrorLabel, org.openide.util.NbBundle.getMessage(SeqAlignmentFilterSetupUI.class, "SeqAlignmentFilterSetupUI.jErrorLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         seqPanel.add(jErrorLabel, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jMRLabel, org.openide.util.NbBundle.getMessage(SeqAlignmentFilterSetupUI.class, "SeqAlignmentFilterSetupUI.jMRLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 5);
+        seqPanel.add(jMRLabel, gridBagConstraints);
+
+        jMRComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "100", "200", "500", "1000" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        seqPanel.add(jMRComboBox, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jextLabel, org.openide.util.NbBundle.getMessage(SeqAlignmentFilterSetupUI.class, "SeqAlignmentFilterSetupUI.jextLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        seqPanel.add(jextLabel, gridBagConstraints);
 
         centerPanel.add(seqPanel, "sequence");
 
@@ -209,6 +236,10 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
     @Override
     public JPanel getEditPanel(Filter filter) {
         this.filter = (SeqAlignmentFilter) filter;
+        int maximumResults = this.filter.getMaximumResuls();
+        if (maximumResults > 0){
+            jMRComboBox.setSelectedItem(String.valueOf(maximumResults));
+        }
         ProteinSequence seq = this.filter.getQuery();
         jSeqTextArea.setText(seq != null? seq.getSequenceAsString(): "");
         
@@ -238,6 +269,7 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
         try {
             this.filter.setAlignmentModel(alignmentModel);
             this.filter.setQuery(new ProteinSequence(jSeqTextArea.getText()));
+            this.filter.setMaximumResuls(Integer.parseInt((String)jMRComboBox.getSelectedItem()));
         } catch (CompoundNotFoundException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -265,7 +297,10 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
     private javax.swing.JPanel centerPanel;
     private javax.swing.JLabel jErrorLabel;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JComboBox<String> jMRComboBox;
+    private javax.swing.JLabel jMRLabel;
     private javax.swing.JTextArea jSeqTextArea;
+    private javax.swing.JLabel jextLabel;
     private javax.swing.JScrollPane jseqPane;
     private javax.swing.JPanel seqPanel;
     // End of variables declaration//GEN-END:variables

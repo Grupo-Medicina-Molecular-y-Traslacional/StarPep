@@ -37,7 +37,7 @@ public class FilterNode extends AbstractNode {
     @Override
     public String getHtmlDisplayName() {
         String name = filter.getHTMLDisplayName();
-        if (name.startsWith("<html>") && name.endsWith("</html>")){
+        if (name != null && name.startsWith("<html>") && name.endsWith("</html>")){
             return name;
         }
         return null;

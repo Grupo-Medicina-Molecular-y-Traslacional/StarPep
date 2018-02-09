@@ -52,16 +52,6 @@ public class AllDescriptorsFactory implements AlgorithmFactory, ToolMenuItem {
     }
 
     @Override
-    public int getQualityRank() {
-        return -1;
-    }
-
-    @Override
-    public int getSpeedRank() {
-        return -1;
-    }
-
-    @Override
     public boolean addSeparatorBefore() {
         return false;
     }

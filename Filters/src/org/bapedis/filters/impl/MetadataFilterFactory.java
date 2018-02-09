@@ -15,7 +15,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author loge
  */
-@ServiceProvider(service=FilterFactory.class)
+@ServiceProvider(service=FilterFactory.class, position = 100)
 public class MetadataFilterFactory implements FilterFactory {
     protected final String name;
     protected final FilterSetupUI setupUI;

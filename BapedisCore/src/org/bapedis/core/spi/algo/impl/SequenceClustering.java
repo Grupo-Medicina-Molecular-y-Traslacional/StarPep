@@ -77,6 +77,7 @@ public class SequenceClustering implements Algorithm {
                 peptides = attrModel.getPeptides().toArray(new Peptide[0]);
             }
         }
+        stopRun = false;
         ticket = progressTicket;
         clusterList.clear();
         clusterMap.clear();

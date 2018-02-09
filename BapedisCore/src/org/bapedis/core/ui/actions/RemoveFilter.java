@@ -10,6 +10,8 @@ import java.util.Collection;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.model.FilterModel;
+import static org.bapedis.core.ui.actions.EditFilter.pc;
+import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -35,11 +37,11 @@ import org.openide.util.NbBundle;
 })
 @NbBundle.Messages("CTL_RemoveFilter=Remove filter")
 public class RemoveFilter extends GlobalContextSensitiveAction<Filter> {
-    protected final ProjectManager pc;
+
+    protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
 
     public RemoveFilter() {
         super(Filter.class);
-        pc = Lookup.getDefault().lookup(ProjectManager.class);
         String name = NbBundle.getMessage(RemoveFilter.class, "CTL_RemoveFilter");
         putValue(NAME, name);
         putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/core/resources/remove.png", false));
@@ -48,10 +50,14 @@ public class RemoveFilter extends GlobalContextSensitiveAction<Filter> {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Collection<? extends Filter> context = lkpResult.allInstances();
-        if (!context.isEmpty()){
-            FilterModel filterModel = pc.getFilterModel();
-            filterModel.remove(context.toArray(new Filter[0]));
+        if (pc.getFilterModel().isRunning()) {
+            DialogDisplayer.getDefault().notify(pc.getFilterModel().getOwnerWS().getBusyNotifyDescriptor());
+        } else {
+            Collection<? extends Filter> context = lkpResult.allInstances();
+            if (!context.isEmpty()) {
+                FilterModel filterModel = pc.getFilterModel();
+                filterModel.remove(context.toArray(new Filter[0]));
+            }
         }
     }
 

@@ -44,6 +44,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
     protected final Graph graph;
     protected final ProgressTicket ticket;
     protected final AtomicBoolean stopRun;
+    protected Algorithm preprocessing;
     protected final String taskName;
 
     public FilterExecutor() {
@@ -59,8 +60,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
         ticket = new ProgressTicket(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.task.name", workspace.getName()), new Cancellable() {
             @Override
             public boolean cancel() {
-                stopRun.set(true);
-                return true;
+                return FilterExecutor.this.cancel();
             }
         });
         taskName = NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.name");
@@ -95,7 +95,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
         publish("start");
         pc.reportRunningTask(taskName, workspace);
 
-        ticket.start(attrModel.getNodeList().size() + 1);
+        ticket.start();
         ticket.progress(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.running"));
 
         TreeSet<String> set = filterModel.isEmpty() ? null : new TreeSet<String>();
@@ -107,11 +107,12 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
             targets[pos++] = node.getPeptide();
         }
 
+        // Run preprocessing algorithms
         for (Iterator<Filter> it = filterModel.getFilterIterator(); it.hasNext();) {
             Filter filter = it.next();
-            Algorithm preAlgo = filter.getPreprocessing(targets);
-            if (preAlgo != null) {
-                runAlgorithm(preAlgo);
+            preprocessing = filter.getPreprocessing(targets);
+            if (preprocessing != null) {
+                runAlgorithm(preprocessing);
                 //wait for preprocessing...
                 try {
                     synchronized (this) {
@@ -120,8 +121,11 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
                 } catch (InterruptedException ex) {
                 }
             }
+            preprocessing = null;
         }
 
+        // Begin filtering process
+        ticket.switchToDeterminate(attrModel.getNodeList().size() + 1);
         List<Node> toAddNodes = new LinkedList<>();
         List<Node> toRemoveNodes = new LinkedList<>();
 
@@ -164,6 +168,24 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
     protected void process(List<String> chunks) {
         workspace.add(this);
         filterModel.setRunning(true);
+    }
+
+    public FilterExecutor(Workspace workspace, FilterModel filterModel, AttributesModel attrModel, Graph graph, ProgressTicket ticket, AtomicBoolean stopRun, String taskName) {
+        this.workspace = workspace;
+        this.filterModel = filterModel;
+        this.attrModel = attrModel;
+        this.graph = graph;
+        this.ticket = ticket;
+        this.stopRun = stopRun;
+        this.taskName = taskName;
+    }
+
+    public boolean cancel() {
+        if (preprocessing != null) {
+            preprocessing.cancel();
+        }
+        stopRun.set(true);
+        return true;
     }
 
     @Override
@@ -219,10 +241,6 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
 
     public ProgressTicket getTicket() {
         return ticket;
-    }
-
-    public void setStopRun(boolean stopRun) {
-        this.stopRun.set(stopRun);
     }
 
     private static class QuickFilterImpl implements QuickFilter {

@@ -11,7 +11,10 @@ import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.spi.filters.FilterSetupUI;
 import org.bapedis.core.model.FilterModel;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.components.SetupDialog;
+import org.openide.DialogDisplayer;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
@@ -33,14 +36,18 @@ public class AddFilter extends WorkspaceContextSensitiveAction<AttributesModel> 
     @Override
     public void actionPerformed(ActionEvent e) {
         FilterModel filterModel = pc.getFilterModel();
-        Filter filter = filterFactory.createFilter();
-        FilterSetupUI setupUI = filterFactory.getSetupUI();
-        if (setupUI == null) {
-            filterModel.add(filter);
+        if (filterModel.isRunning()) {
+            DialogDisplayer.getDefault().notify(filterModel.getOwnerWS().getBusyNotifyDescriptor());
         } else {
-            String title = NbBundle.getMessage(AddFilter.class, "FilterSetupDialog.title", filterFactory.getName());
-            if (dialog.setup(setupUI.getEditPanel(filter), setupUI, title)) {
+            Filter filter = filterFactory.createFilter();
+            FilterSetupUI setupUI = filterFactory.getSetupUI();
+            if (setupUI == null) {
                 filterModel.add(filter);
+            } else {
+                String title = NbBundle.getMessage(AddFilter.class, "FilterSetupDialog.title", filterFactory.getName());
+                if (dialog.setup(setupUI.getEditPanel(filter), setupUI, title)) {
+                    filterModel.add(filter);
+                }
             }
         }
     }

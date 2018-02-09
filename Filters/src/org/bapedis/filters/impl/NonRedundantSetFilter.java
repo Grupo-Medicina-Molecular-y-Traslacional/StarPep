@@ -5,6 +5,11 @@
  */
 package org.bapedis.filters.impl;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+import java.util.TreeSet;
+import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.spi.algo.Algorithm;
@@ -17,14 +22,16 @@ import org.bapedis.core.spi.filters.FilterFactory;
  *
  * @author loge
  */
-public class NonRedundantSetFilter implements Filter {
+public class NonRedundantSetFilter implements Filter, ActionListener {
 
     private final NonRedundantSetFilterFactory factory;
     protected final SequenceClustering clustering;
+    private final TreeSet<String> accepted;
 
     public NonRedundantSetFilter(NonRedundantSetFilterFactory factory) {
         this.factory = factory;
         this.clustering = (SequenceClustering) new SequenceClusteringFactory().createAlgorithm();
+        accepted = new TreeSet<>();
     }
     
     public SequenceAlignmentModel getAlignmentModel() {
@@ -47,17 +54,30 @@ public class NonRedundantSetFilter implements Filter {
 
     @Override
     public Algorithm getPreprocessing(Peptide[] targets) {
-        return null;
+        clustering.setPeptides(targets);
+        PreprocessingWrapper preprocessingAlgo = (PreprocessingWrapper) new PreprocessingWrapperFactory().createAlgorithm();
+        preprocessingAlgo.setAlgorithm(clustering);
+        preprocessingAlgo.setActionListener(this);
+        return preprocessingAlgo;
     }
 
     @Override
     public boolean accept(Peptide peptide) {
-        return true;
+        return accepted.contains(peptide.getId());
     }
 
     @Override
     public FilterFactory getFactory() {
         return factory;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        accepted.clear();
+        List<Cluster> clusterList = clustering.getClusterList();
+        for (Cluster cluster : clusterList) {
+            accepted.add(cluster.getCentroid().getId());
+        }
     }
     
     

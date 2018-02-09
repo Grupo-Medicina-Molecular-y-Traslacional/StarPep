@@ -15,7 +15,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author loge
  */
-@ServiceProvider(service = FilterFactory.class)
+@ServiceProvider(service = FilterFactory.class, position = 400)
 public class NonRedundantSetFilterFactory implements FilterFactory {
 
     private final NonRedundantSetFilterSetupUI setupUI = new NonRedundantSetFilterSetupUI();

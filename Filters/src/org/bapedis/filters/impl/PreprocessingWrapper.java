@@ -5,6 +5,8 @@
  */
 package org.bapedis.filters.impl;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.TreeSet;
 import org.bapedis.core.model.AlgorithmProperty;
@@ -20,46 +22,53 @@ import org.bapedis.core.task.ProgressTicket;
  */
 public class PreprocessingWrapper implements Algorithm {
 
-    private Algorithm preprocessing;
-    private final TreeSet<String> accepted;
+    private Algorithm algorithm;
+    private ActionListener actionListener;
     private final PreprocessingWrapperFactory factory;
 
     public PreprocessingWrapper(PreprocessingWrapperFactory factory) {
-        accepted = new TreeSet<>();
         this.factory = factory;
     }
 
-    public Algorithm getPreprocessing() {
-        return preprocessing;
+    public Algorithm getAlgorithm() {
+        return algorithm;
     }
 
-    public void setPreprocessing(Algorithm preprocessing) {
-        this.preprocessing = preprocessing;
-    }        
+    public void setAlgorithm(Algorithm algorithm) {
+        this.algorithm = algorithm;
+        this.factory.setName(algorithm.getFactory().getName());
+        this.factory.setDescription(algorithm.getFactory().getDescription());
+    }
+
+    public ActionListener getActionListener() {
+        return actionListener;
+    }
+
+    public void setActionListener(ActionListener actionListener) {
+        this.actionListener = actionListener;
+    }
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
-//            searchAlgo.initAlgo(workspace, progressTicket);
+        algorithm.initAlgo(workspace, progressTicket);
     }
 
     @Override
     public void endAlgo() {
-//            searchAlgo.endAlgo();
-//            List<Peptide> resultList = searchAlgo.getResultList();
-//            for (Peptide p : resultList) {
-//                searchResult.add(p.getId());
-//            }            
+        algorithm.endAlgo();
+        if (actionListener != null) {
+            actionListener.actionPerformed(new ActionEvent(this, 0, "preprocessing"));
+        }
     }
 
     @Override
     public boolean cancel() {
-//            return searchAlgo.cancel();
-        return true;
+        return algorithm.cancel();
     }
 
     @Override
     public AlgorithmProperty[] getProperties() {
-        return null;
+        return algorithm.getProperties();
     }
 
     @Override
@@ -69,11 +78,7 @@ public class PreprocessingWrapper implements Algorithm {
 
     @Override
     public void run() {
-//        searchAlgo.run();
-    }
-
-    public boolean contains(Peptide peptide) {
-        return accepted.contains(peptide.getId());
+        algorithm.run();
     }
 
 }

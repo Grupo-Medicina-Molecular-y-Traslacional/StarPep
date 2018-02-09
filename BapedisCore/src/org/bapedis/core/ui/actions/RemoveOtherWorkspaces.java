@@ -62,7 +62,12 @@ public class RemoveOtherWorkspaces extends AbstractAction implements LookupListe
             Collection<? extends Workspace> workspaces = pc.getLookup().lookupAll(Workspace.class);
             for (Workspace ws : workspaces) {
                 if (pc.getCurrentWorkspace() != ws) {
-                    pc.remove(ws);
+                    if (ws.isBusy()) {
+                        DialogDisplayer.getDefault().notify(ws.getBusyNotifyDescriptor());
+                        break;
+                    } else {
+                        pc.remove(ws);
+                    }
                 }
             }
         }

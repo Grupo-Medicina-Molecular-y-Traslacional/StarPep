@@ -9,7 +9,6 @@ import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
-import org.openide.util.NbBundle;
 
 /**
  *
@@ -17,29 +16,39 @@ import org.openide.util.NbBundle;
  */
 public class PreprocessingWrapperFactory implements AlgorithmFactory {
 
-    @Override
-        public AlgorithmCategory getCategory() {
-            return AlgorithmCategory.Sequence;
-        }
+    private String name, desc;
 
-        @Override
-        public String getName() {
-           return NbBundle.getMessage(SeqAlignmentFilter.class, "SeqAlignmentFilter.proprocessing.name");
-        }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-        @Override
-        public String getDescription() {
-            return NbBundle.getMessage(SeqAlignmentFilter.class, "SeqAlignmentFilter.proprocessing.desc");
-        }
-
-        @Override
-        public AlgorithmSetupUI getSetupUI() {
-            return null;
-        }
-
-        @Override
-        public Algorithm createAlgorithm() {
-            return new PreprocessingWrapper(this);
-        }
+    public void setDescription(String desc) {
+        this.desc = desc;
+    }
     
+    @Override
+    public AlgorithmCategory getCategory() {
+        return null;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getDescription() {
+        return desc;
+    }
+
+    @Override
+    public AlgorithmSetupUI getSetupUI() {
+        return null;
+    }
+
+    @Override
+    public Algorithm createAlgorithm() {
+        return new PreprocessingWrapper(this);
+    }
+
 }

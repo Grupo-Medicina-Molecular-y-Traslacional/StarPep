@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.ui;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -307,9 +308,6 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 
     private void refreshRunningState(boolean running) {
         restrictiveComboBox.setEnabled(!running);
-//        for (Component c : filterToolBar.getComponents()) {
-//            c.setEnabled(!running);
-//        }
         applyCheckBox.setEnabled(!running);
         viewerScrollPane.setEnabled(!running);
         if (running) {
@@ -319,7 +317,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         } else {
             runButton.setText(NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.runButton.text"));
             runButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/run.gif", false));
-            runButton.setToolTipText(NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.runButton.tooltip"));
+            runButton.setToolTipText(NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.runButton.toolTipText"));
         }
     }
 
@@ -335,13 +333,12 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 
     private void stop() {
         Workspace workspace = pc.getCurrentWorkspace();
-        Collection<? extends FilterExecutor> executor = workspace.getLookup().lookupAll(FilterExecutor.class);
-        if (!executor.isEmpty()) {
-            FilterExecutor worker = executor.iterator().next();
-            worker.setStopRun(true);
+        FilterExecutor executor = workspace.getLookup().lookup(FilterExecutor.class);
+        if (executor != null) {
+            executor.cancel();
         }
     }
-
+    
     @Override
     public ExplorerManager getExplorerManager() {
         return explorerMgr;

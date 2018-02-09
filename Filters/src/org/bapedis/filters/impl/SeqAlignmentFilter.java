@@ -5,6 +5,10 @@
  */
 package org.bapedis.filters.impl;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+import java.util.TreeSet;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.spi.algo.Algorithm;
@@ -18,26 +22,27 @@ import org.biojava.nbio.core.sequence.ProteinSequence;
  *
  * @author loge
  */
-public class SeqAlignmentFilter implements Filter {
+public class SeqAlignmentFilter implements Filter, ActionListener {
 
     private final SeqAlignmentFilterFactory factory;
     private final SequenceSearch searchAlgo;
-    private PreprocessingWrapper preprocessingAlgo;        
+    private final TreeSet<String> accepted;
 
     public SeqAlignmentFilter(SeqAlignmentFilterFactory factory) {
         this.factory = factory;
         searchAlgo = (SequenceSearch) new SequenceSearchFactory().createAlgorithm();
+        accepted = new TreeSet<>();
     }
 
     public SequenceSearch getSearchAlgorithm() {
         return searchAlgo;
     }
-    
-    public int getMaximumResuls(){
+
+    public int getMaximumResuls() {
         return searchAlgo.getMaximumResults();
     }
-    
-    public void setMaximumResuls(int maximumResults){
+
+    public void setMaximumResuls(int maximumResults) {
         searchAlgo.setMaximumResults(maximumResults);
     }
 
@@ -69,10 +74,7 @@ public class SeqAlignmentFilter implements Filter {
 
     @Override
     public boolean accept(Peptide peptide) {
-        if (preprocessingAlgo != null) {
-            return preprocessingAlgo.contains(peptide);
-        }        
-        return false;
+        return accepted.contains(peptide.getId());
     }
 
     @Override
@@ -83,8 +85,19 @@ public class SeqAlignmentFilter implements Filter {
     @Override
     public Algorithm getPreprocessing(Peptide[] targets) {
         searchAlgo.setTargets(targets);
-        preprocessingAlgo = (PreprocessingWrapper)new PreprocessingWrapperFactory().createAlgorithm();
+        PreprocessingWrapper preprocessingAlgo = (PreprocessingWrapper) new PreprocessingWrapperFactory().createAlgorithm();
+        preprocessingAlgo.setAlgorithm(searchAlgo);
+        preprocessingAlgo.setActionListener(this);
         return preprocessingAlgo;
     }
-           
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        accepted.clear();
+        List<Peptide> resultList = searchAlgo.getResultList();
+        for (Peptide p : resultList) {
+            accepted.add(p.getId());
+        }
+    }
+
 }

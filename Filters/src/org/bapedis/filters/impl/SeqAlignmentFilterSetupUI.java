@@ -206,7 +206,7 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 5);
         seqPanel.add(jMRLabel, gridBagConstraints);
 
-        jMRComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "100", "200", "500", "1000" }));
+        jMRComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "10", "50", "100", "250", "500", "1000" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -262,7 +262,11 @@ public class SeqAlignmentFilterSetupUI extends javax.swing.JPanel implements Fil
         try {
             this.filter.setAlignmentModel(alignmentModel);
             this.filter.setQuery(new ProteinSequence(jSeqTextArea.getText()));
-            this.filter.setMaximumResuls(Integer.parseInt((String) jMRComboBox.getSelectedItem()));
+            if (jMRComboBox.getSelectedItem().equals("All")){
+                this.filter.setMaximumResuls(-1);
+            }else{
+                this.filter.setMaximumResuls(Integer.parseInt((String) jMRComboBox.getSelectedItem()));
+            }                        
         } catch (CompoundNotFoundException ex) {
             Exceptions.printStackTrace(ex);
         }

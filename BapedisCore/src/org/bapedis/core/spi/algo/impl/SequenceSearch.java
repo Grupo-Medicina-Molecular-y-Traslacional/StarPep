@@ -8,9 +8,11 @@ package org.bapedis.core.spi.algo.impl;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
@@ -122,17 +124,21 @@ public class SequenceSearch implements Algorithm {
     public void run() {
         if (targets != null && query != null) {
 
+            TreeSet<SequenceHit> rankedSet = new TreeSet<>();
+
             // Sort by decreasing common words
             Arrays.sort(targets, new CommonKMersComparator(query.getSequenceAsString()));
 
             // Assign peptide from targets to result list
             // Stop if max rejects ocurred
             float identityScore = alignmentModel.getIndentityScore();
+            float score;
             int rejections = 0;
             for (int i = 0; i < targets.length && !stopRun && rejections < MAX_REJECTS; i++) {
                 try {
-                    if (PairwiseSequenceAlignment.computeSequenceIdentity(query, targets[i].getBiojavaSeq(), alignmentModel) >= identityScore) {
-                        resultList.add(targets[i]);
+                    score = PairwiseSequenceAlignment.computeSequenceIdentity(query, targets[i].getBiojavaSeq(), alignmentModel);
+                    if (score >= identityScore) {
+                        rankedSet.add(new SequenceHit(targets[i], score));
                     } else {
                         rejections++;
                     }
@@ -141,6 +147,44 @@ public class SequenceSearch implements Algorithm {
                 }
             }
 
+            SequenceHit hit;
+            for (Iterator<SequenceHit> it = rankedSet.descendingIterator(); it.hasNext()
+                    && (maximumResults == -1 || resultList.size() < maximumResults);) {
+                hit = it.next();
+                resultList.add(hit.getPeptide());
+            }
+
+        }
+    }
+
+    private static class SequenceHit implements Comparable<SequenceHit> {
+
+        private final Peptide peptide;
+        private final float score;
+
+        public SequenceHit(Peptide peptide, float score) {
+            this.peptide = peptide;
+            this.score = score;
+        }
+
+        public Peptide getPeptide() {
+            return peptide;
+        }
+
+        public float getScore() {
+            return score;
+        }
+
+        @Override
+        public int compareTo(SequenceHit other) {
+            float diff = getScore() - other.getScore();
+            if (diff < 0) {
+                return -1;
+            }
+            if (diff > 0) {
+                return 1;
+            }
+            return 0;            
         }
     }
 
@@ -166,7 +210,7 @@ class CommonKMersComparator implements Comparator<Peptide> {
             for (int i = 0; i <= query.length() - k; i++) {
                 set.add(query.substring(i, i + k - 1));
             }
-        }else{
+        } else {
             set.add(query);
         }
     }

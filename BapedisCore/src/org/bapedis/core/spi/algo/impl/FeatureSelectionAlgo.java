@@ -225,7 +225,7 @@ public class FeatureSelectionAlgo implements Algorithm {
 
             pc.reportMsg("Top 5", workspace);
             MolecularDescriptor[] rankedFeatures = allFeatures.toArray(new MolecularDescriptor[0]);
-            Arrays.sort(rankedFeatures, new Comparator<MolecularDescriptor>() {
+            Arrays.parallelSort(rankedFeatures, new Comparator<MolecularDescriptor>() {
                 @Override
                 public int compare(MolecularDescriptor o1, MolecularDescriptor o2) {
                     if (o1.getScore() > o2.getScore()) {
@@ -371,7 +371,7 @@ public class FeatureSelectionAlgo implements Algorithm {
         }
 
         // Sort the IntDoublePairs
-        Arrays.sort(ranks);
+        Arrays.parallelSort(ranks);
 
         // Walk the sorted array, filling output array using sorted positions,
         // resolving ties as we go

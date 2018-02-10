@@ -151,7 +151,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         centerPanel.add(errorLabel, "errorCard");
 
         leftToolBar.add(createAddMDButton(), 0);
-        leftToolBar.add(createExportButton());
+        leftToolBar.add(createExportButton(), 4);
 
         executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
     }
@@ -252,6 +252,11 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         filterMDButton = new javax.swing.JButton();
         removeMDButton = new javax.swing.JButton();
         columnsButton = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
+        detailsPanel = new javax.swing.JPanel();
+        jPeptideLabel = new javax.swing.JLabel();
+        jFetchedLabel = new javax.swing.JLabel();
+        jFilteredLabel = new javax.swing.JLabel();
         rightPanel = new javax.swing.JPanel();
         jLabelFilter = new javax.swing.JLabel();
         jFieldComboBox = new javax.swing.JComboBox();
@@ -307,6 +312,22 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             }
         });
         leftToolBar.add(columnsButton);
+        leftToolBar.add(jSeparator1);
+
+        detailsPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        org.openide.awt.Mnemonics.setLocalizedText(jPeptideLabel, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jPeptideLabel.text")); // NOI18N
+        detailsPanel.add(jPeptideLabel);
+
+        jFetchedLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/rightArrow.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jFetchedLabel, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jFetchedLabel.text")); // NOI18N
+        detailsPanel.add(jFetchedLabel);
+
+        jFilteredLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/rightArrow.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jFilteredLabel, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jFilteredLabel.text")); // NOI18N
+        detailsPanel.add(jFilteredLabel);
+
+        leftToolBar.add(detailsPanel);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -316,7 +337,6 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         topPanel.add(leftToolBar, gridBagConstraints);
 
-        jLabelFilter.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabelFilter, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jLabelFilter.text")); // NOI18N
         rightPanel.add(jLabelFilter);
 
@@ -447,7 +467,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         Workspace currentWS = pc.getCurrentWorkspace();
         FeatureFilterPanel panel = new FeatureFilterPanel(currentWS);
         DialogDescriptor dd = new DialogDescriptor(panel, NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.FeatureFilterPanel.title"));
-        dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION});        
+        dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION});
         panel.setDialogDescriptor(dd);
         if (DialogDisplayer.getDefault().notify(dd) == DialogDescriptor.OK_OPTION) {
             if (currentWS.isBusy()) {
@@ -461,11 +481,16 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
     private javax.swing.JButton columnsButton;
+    private javax.swing.JPanel detailsPanel;
     private javax.swing.JButton filterMDButton;
     private javax.swing.JButton jAddButton;
+    private javax.swing.JLabel jFetchedLabel;
     private javax.swing.JComboBox jFieldComboBox;
+    private javax.swing.JLabel jFilteredLabel;
     private javax.swing.JLabel jLabelFilter;
     private javax.swing.JComboBox jOperatorComboBox;
+    private javax.swing.JLabel jPeptideLabel;
+    private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JTextField jValueTextField;
     private javax.swing.JToolBar leftToolBar;
     private javax.swing.JButton removeMDButton;
@@ -583,6 +608,11 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         if (currentModel != null) {
             currentModel.addQuickFilterChangeListener(this);
             currentModel.addDisplayColumnChangeListener(this);
+            int fetchedData = currentModel.getNodeList().size();
+            jFetchedLabel.setText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jFetchedLabel.text", fetchedData));
+            int filteredData = currentModel.getPeptides().size();            
+            jFilteredLabel.setText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jFilteredLabel.text", filteredData));
+            jFilteredLabel.setVisible(fetchedData != filteredData);
         }
         leftToolBar.setVisible(attrModel != null);
     }
@@ -591,8 +621,12 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         QuickFilter quickFilter = currentModel == null ? null : currentModel.getQuickFilter();
         if (quickFilter != null) {
             view.getOutline().setQuickFilter(0, quickFilter);
+            int filteredData = currentModel.getPeptides().size();
+            jFilteredLabel.setText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jFilteredLabel.text", filteredData));
+            jFilteredLabel.setVisible(currentModel.getNodeList().size() != filteredData);
         } else {
             view.getOutline().unsetQuickFilter();
+            jFilteredLabel.setVisible(false);
         }
     }
 

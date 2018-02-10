@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.TreeSet;
 import org.bapedis.core.model.AlgorithmProperty;
@@ -123,22 +124,20 @@ public class SequenceSearch implements Algorithm {
     @Override
     public void run() {
         if (targets != null && query != null) {
-
-            TreeSet<SequenceHit> rankedSet = new TreeSet<>();
-
             // Sort by decreasing common words
-            Arrays.sort(targets, new CommonKMersComparator(query.getSequenceAsString()));
+            Arrays.parallelSort(targets, new CommonKMersComparator(query.getSequenceAsString()));
 
             // Assign peptide from targets to result list
             // Stop if max rejects ocurred
             float identityScore = alignmentModel.getIndentityScore();
             float score;
             int rejections = 0;
+            TreeSet<SequenceHit> hits = new TreeSet<>();
             for (int i = 0; i < targets.length && !stopRun && rejections < MAX_REJECTS; i++) {
                 try {
                     score = PairwiseSequenceAlignment.computeSequenceIdentity(query, targets[i].getBiojavaSeq(), alignmentModel);
                     if (score >= identityScore) {
-                        rankedSet.add(new SequenceHit(targets[i], score));
+                        hits.add(new SequenceHit(targets[i], score));
                     } else {
                         rejections++;
                     }
@@ -148,7 +147,7 @@ public class SequenceSearch implements Algorithm {
             }
 
             SequenceHit hit;
-            for (Iterator<SequenceHit> it = rankedSet.descendingIterator(); it.hasNext()
+            for (Iterator<SequenceHit> it = hits.descendingIterator(); it.hasNext()
                     && (maximumResults == -1 || resultList.size() < maximumResults);) {
                 hit = it.next();
                 resultList.add(hit.getPeptide());
@@ -178,13 +177,10 @@ public class SequenceSearch implements Algorithm {
         @Override
         public int compareTo(SequenceHit other) {
             float diff = getScore() - other.getScore();
-            if (diff < 0) {
-                return -1;
-            }
             if (diff > 0) {
                 return 1;
             }
-            return 0;            
+            return -1;
         }
     }
 
@@ -204,14 +200,10 @@ class CommonKMersComparator implements Comparator<Peptide> {
     private final int k;
 
     public CommonKMersComparator(String query) {
-        k = 5;
+        k = Math.min(5, query.length());
         set = new HashSet<>();
-        if (query.length() > k) {
-            for (int i = 0; i <= query.length() - k; i++) {
-                set.add(query.substring(i, i + k - 1));
-            }
-        } else {
-            set.add(query);
+        for (int i = 0; i <= query.length() - k; i++) {
+            set.add(query.substring(i, i + k));
         }
     }
 
@@ -226,7 +218,7 @@ class CommonKMersComparator implements Comparator<Peptide> {
         String seq = peptide.getSequence();
         int count = 0;
         for (int i = 0; i <= seq.length() - k; i++) {
-            if (set.contains(seq.substring(i, i + k - 1))) {
+            if (set.contains(seq.substring(i, i + k))) {
                 count++;
             }
         }

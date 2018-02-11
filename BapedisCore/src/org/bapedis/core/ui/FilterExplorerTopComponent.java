@@ -5,12 +5,10 @@
  */
 package org.bapedis.core.ui;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.Action;
@@ -303,7 +301,6 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 
         explorerMgr.setRootContext(filterModel.getRootContext());
         refreshRunningState(filterModel.isRunning());
-        runButton.setEnabled(!filterModel.isEmpty());
     }
 
     private void refreshRunningState(boolean running) {
@@ -354,7 +351,6 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
                 switch (evt.getPropertyName()) {
                     case FilterModel.ADDED_FILTER:
                     case FilterModel.REMOVED_FILTER:
-                        runButton.setEnabled(!filterModel.isEmpty());
                     case FilterModel.EDITED_FILTER:
                         runFilter();
                         break;

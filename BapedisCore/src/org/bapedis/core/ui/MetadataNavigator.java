@@ -5,6 +5,8 @@
  */
 package org.bapedis.core.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
@@ -19,6 +21,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
@@ -69,12 +72,13 @@ public class MetadataNavigator extends JComponent implements
     private final DefaultComboBoxModel comboBoxModel;
     protected final ProjectManager pc;
     protected final Lookup lookup;
-    protected final JToolBar toolBar;
+    protected final JToolBar toolBar, bottomToolbar;
     protected final JCheckBox showAllCheckBox;
     protected final JButton findButton;
     protected final JComboBox comboBox;
     protected final JXTree tree;
     protected final JXBusyLabel busyLabel;
+    protected final JLabel metadataSizeLabel;
     private final String NO_SELECTION;
     private MetadataNavigatorModel navigatorModel;
 
@@ -141,6 +145,13 @@ public class MetadataNavigator extends JComponent implements
         toolBar.add(findButton);
 
         pc = Lookup.getDefault().lookup(ProjectManager.class);
+        
+        // Botton toolbar
+        bottomToolbar = new JToolBar();
+        bottomToolbar.setFloatable(false);
+        metadataSizeLabel = new JLabel();
+        bottomToolbar.add(metadataSizeLabel);
+        add(bottomToolbar, BorderLayout.SOUTH);        
     }
 
     private void comboBoxItemStateChanged(java.awt.event.ItemEvent evt) {
@@ -161,6 +172,7 @@ public class MetadataNavigator extends JComponent implements
                 if (navigatorModel.getSelectedIndex() != -1) {
                     navigatorModel.setSelectedIndex(-1);
                 }
+                metadataSizeLabel.setText("");
             }
         }
     }
@@ -176,6 +188,10 @@ public class MetadataNavigator extends JComponent implements
 
     private void setBusyLabel(boolean busy) {
         scrollPane.setViewportView(busy ? busyLabel : tree);
+        for (Component c : toolBar.getComponents()) {
+            c.setEnabled(!busy);
+        }
+        bottomToolbar.setVisible(!busy);        
     }
 
     private void treeValueChanged(TreeSelectionEvent e) {
@@ -303,7 +319,7 @@ public class MetadataNavigator extends JComponent implements
 
         private final AnnotationType annotationType;
         private final MetadataDAO metadataDAO;
-        private List<Metadata> metadatas;
+        private List<Metadata> allMetadata;
         private boolean showAll;
 
         public AnnotationItem(AnnotationType annotationType) {
@@ -325,15 +341,16 @@ public class MetadataNavigator extends JComponent implements
             final DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode();
             final DefaultTreeModel treeModel = new DefaultTreeModel(rootNode);
             tree.setModel(treeModel);
-            SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+            SwingWorker<Integer, Void> worker = new SwingWorker<Integer, Void>() {
                 @Override
-                protected Void doInBackground() throws Exception {
-                    if (metadatas == null) {
-                        metadatas = metadataDAO.getMetadata(annotationType);
+                protected Integer doInBackground() throws Exception {
+                    int count=0;
+                    if (allMetadata == null) {
+                        allMetadata = metadataDAO.getMetadata(annotationType);
                     }
                     if (showAll) {
-                        for (Metadata m : metadatas) {
-                            rootNode.add(createNode(m));
+                        for (Metadata m : allMetadata) {
+                            count += createNode(m, rootNode);
                         }
                     } else {
                         GraphModel graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();
@@ -341,34 +358,37 @@ public class MetadataNavigator extends JComponent implements
                         org.gephi.graph.api.Node node;
                         graph.readLock();
                         try {
-                            for (Metadata m : metadatas) {
+                            for (Metadata m : allMetadata) {
                                 node = graph.getNode(m.getUnderlyingNodeID());
                                 if (node != null) {
                                     m.setGraphNode(node);
-                                    rootNode.add(createNode(m));
+                                    count += createNode(m, rootNode);
                                 }
                             }
                         } finally {
                             graph.readUnlock();
                         }
                     }
-                    return null;
+                    return count;
                 }
 
-                private DefaultMutableTreeNode createNode(Metadata metadata) {
+                private int createNode(Metadata metadata, DefaultMutableTreeNode parentNode) {
+                    int count = 1;
                     DefaultMutableTreeNode node = new DefaultMutableTreeNode(metadata);
+                    parentNode.add(node);
                     if (metadata.hasChilds()) {
                         for (Metadata m : metadata.getChilds()) {
-                            node.add(createNode(m));
+                            count += createNode(m, node);
                         }
-                    }
-                    return node;
+                    }                    
+                    return count;
                 }
 
                 @Override
                 protected void done() {
                     try {
-                        get();
+                        int count = get();
+                        metadataSizeLabel.setText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.metadataSizeLabel.text", count));
                         if (rootNode.getChildCount() > 0) {
                             treeModel.reload();
                         } else {

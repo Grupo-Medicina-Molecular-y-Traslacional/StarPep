@@ -10,6 +10,7 @@ import com.connectina.swing.fontchooser.JFontChooser;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -629,6 +630,9 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         CardLayout cl = (CardLayout) getLayout();
         cl.show(NeoGraphScene.this, busy ? "busyCard" : "graphCard");
         busyLabel.setBusy(busy);
+        for (Component c : topToolbar.getComponents()) {
+            c.setEnabled(!busy);
+        }
         callback.getTopComponent().makeBusy(busy);
     }
 
@@ -988,8 +992,8 @@ class MetadataPanel extends JPanel {
         setPreferredSize(new Dimension(440, 220));
 
         GridBagConstraints gridBagConstraints;
-        
-       // Label
+
+        // Label
         metadataInfoLabel = new JLabel(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.metadataPanel.label"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;

@@ -5,7 +5,9 @@
  */
 package org.bapedis.core.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -16,6 +18,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -26,7 +29,6 @@ import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.bapedis.core.events.WorkspaceEventListener;
-import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.GraphElementAttributeColumn;
 import org.bapedis.core.model.GraphElementDataColumn;
 import org.bapedis.core.model.GraphEdgeAttributeColumn;
@@ -62,8 +64,6 @@ import org.openide.awt.MouseUtils;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
-import org.openide.util.LookupEvent;
-import org.openide.util.LookupListener;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
@@ -76,7 +76,7 @@ import org.openide.util.lookup.InstanceContent;
 public class GraphElementNavigator extends JComponent implements
         WorkspaceEventListener, PropertyChangeListener, NavigatorPanelWithToolbar {
 
-    protected final JToolBar toolBar;
+    protected final JToolBar toolBar, bottomToolbar;
     protected final ProjectManager pc;
     protected final Lookup lookup;
     protected final InstanceContent content;
@@ -85,6 +85,7 @@ public class GraphElementNavigator extends JComponent implements
     protected final JButton availableColumnsButton;
     protected final JXBusyLabel busyLabel;
     protected final JXTable table;
+    protected final JLabel nodeSizeLabel, edgeSizeLabel;    
     protected GraphElementNavigatorModel navigatorModel;
     private final GraphElementDataColumn sourceColumn = new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Source);
     private final GraphElementDataColumn targetColumn = new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Targe);
@@ -169,6 +170,16 @@ public class GraphElementNavigator extends JComponent implements
         busyLabel.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.busyLabel.text"));
 
         pc = Lookup.getDefault().lookup(ProjectManager.class);
+
+        // Botton toolbar
+        bottomToolbar = new JToolBar();
+        bottomToolbar.setFloatable(false);
+        nodeSizeLabel = new JLabel();
+        edgeSizeLabel = new JLabel();
+        bottomToolbar.add(nodeSizeLabel);
+        bottomToolbar.addSeparator();
+        bottomToolbar.add(edgeSizeLabel);
+        add(bottomToolbar, BorderLayout.SOUTH);
     }
 
     private void initToogleButton(JToggleButton btn) {
@@ -179,6 +190,10 @@ public class GraphElementNavigator extends JComponent implements
 
     private void setBusyLabel(boolean busy) {
         scrollPane.setViewportView(busy ? busyLabel : table);
+        for (Component c : toolBar.getComponents()) {
+            c.setEnabled(!busy);
+        }
+        bottomToolbar.setVisible(!busy);
     }
 
     private void nodesButtonActionPerformed(java.awt.event.ActionEvent evt) {
@@ -293,7 +308,9 @@ public class GraphElementNavigator extends JComponent implements
         final GraphElementsDataTable dataModel = navigatorModel.getVisualElement() == GraphElementType.Node ? new GraphElementsDataTable(graph.getNodeCount(), getNodeColumns(columns))
                 : new GraphElementsDataTable(graph.getEdgeCount(), getEdgeColumns(columns));
         table.setModel(dataModel);
-
+        nodeSizeLabel.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.nodeSizeLabel.text", graph.getNodeCount()));
+        edgeSizeLabel.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edgeSizeLabel.text", graph.getEdgeCount()));
+        
         SwingWorker worker = new SwingWorker<Void, Element>() {
             @Override
             protected Void doInBackground() throws Exception {

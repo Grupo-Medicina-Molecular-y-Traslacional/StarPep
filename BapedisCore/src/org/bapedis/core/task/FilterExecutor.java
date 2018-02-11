@@ -125,7 +125,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
         }
 
         // Begin filtering process
-        ticket.switchToDeterminate(attrModel.getNodeList().size() + 1);
+        ticket.switchToDeterminate(targets.length);
         List<Node> toAddNodes = new LinkedList<>();
         List<Node> toRemoveNodes = new LinkedList<>();
 
@@ -158,8 +158,8 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
 
         // To refresh graph view  
         ticket.progress(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.refreshingGView"));
+        ticket.switchToIndeterminate();
         graphWC.refreshGraphView(toAddNodes, toRemoveNodes); // TODO: java.lang.IllegalArgumentException: The node is invalid
-        ticket.progress();
 
         return set;
     }

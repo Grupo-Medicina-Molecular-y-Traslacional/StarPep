@@ -3,23 +3,22 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.spi.algo.impl;
+package org.bapedis.network.impl;
 
-import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
-import org.bapedis.core.ui.components.SequenceAlignmentPanel;
 
 /**
  *
- * @author loge
+ * @author Home
  */
-public class SequenceClusteringPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
+public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
 
-    private SequenceAlignmentPanel alignmentPanel;
-
-    public SequenceClusteringPanel() {
+    /**
+     * Creates new form CSNAlgorithmPanel
+     */
+    public CSNAlgorithmPanel() {
         initComponents();
     }
 
@@ -32,26 +31,21 @@ public class SequenceClusteringPanel extends javax.swing.JPanel implements Algor
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setLayout(new java.awt.BorderLayout());
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
     }// </editor-fold>//GEN-END:initComponents
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
-        SequenceClustering clustering = (SequenceClustering) algo;
-        removeAll();
-        alignmentPanel = new SequenceAlignmentPanel(clustering.getAlignmentModel());
-        add(alignmentPanel, BorderLayout.CENTER);
-        revalidate();
-        repaint();
         return this;
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled); //To change body of generated methods, choose Tools | Templates.
-        if (alignmentPanel != null) {
-            alignmentPanel.setEnabled(enabled);
-        }
     }
 
 

@@ -39,12 +39,4 @@ public class SimilarityNetworkAction extends ToolAction {
         
     }
 
-    @Override
-    public JMenuItem getMenuPresenter() {
-        JMenu menu = (JMenu) super.getMenuPresenter();
-        JMenuItem newItem = new JMenuItem(new SimilarityNetworkWizardAction());
-        menu.insert(newItem, 0);
-        return menu;
-    }
-
 }

@@ -14,26 +14,20 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import org.bapedis.network.impl.CSNAlgorithm;
 import org.bapedis.network.spi.SimilarityMeasureFactory;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
-public final class CSNVisualPanel4 extends JPanel {
+public final class CSNVisualSimilarityMeasure extends JPanel {
 
-    private final CSNAlgorithm csnAlgo;
     public static final String NETWORK_FACTORY = "network_factory";
     private final DefaultMutableTreeNode treeNode;
     private SimilarityMeasureFactory factory;
 
-    /**
-     * Creates new form CSNVisualPanel4
-     */
-    public CSNVisualPanel4(CSNAlgorithm csnAlgo) {
-        this.csnAlgo = csnAlgo;
+    public CSNVisualSimilarityMeasure() {
         initComponents();
-        treeNode = new DefaultMutableTreeNode(NbBundle.getMessage(CSNVisualPanel4.class, "CSNWizardPanel4.root.name"), true);
+        treeNode = new DefaultMutableTreeNode(NbBundle.getMessage(CSNVisualSimilarityMeasure.class, "CSNVisualSimilarityMeasure.root.name"), true);
         populateJTree();
         jTree1.setModel(new DefaultTreeModel(treeNode));
         jTree1.setRootVisible(true);
@@ -54,7 +48,7 @@ public final class CSNVisualPanel4 extends JPanel {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(CSNVisualPanel4.class, "CSNVisualPanel4.name");
+        return NbBundle.getMessage(CSNVisualSimilarityMeasure.class, "CSNVisualSimilarityMeasure.name");
     }
 
     /**
@@ -109,7 +103,7 @@ public final class CSNVisualPanel4 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jScrollPane2, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(CSNVisualPanel4.class, "CSNVisualPanel4.jInfoLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(CSNVisualSimilarityMeasure.class, "CSNVisualSimilarityMeasure.jInfoLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;

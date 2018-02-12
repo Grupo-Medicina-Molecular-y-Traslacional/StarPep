@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
@@ -26,7 +27,7 @@ import org.bapedis.core.spi.algo.impl.FeatureSelectionFactory;
 import org.bapedis.core.spi.algo.impl.SequenceClustering;
 import org.bapedis.core.spi.algo.impl.SequenceClusteringFactory;
 import org.bapedis.core.task.ProgressTicket;
-import org.bapedis.network.model.MDOptionModel;
+import org.bapedis.network.model.WizardOptionModel;
 import org.bapedis.network.model.SimilarityMatrixModel;
 import org.bapedis.network.spi.SimilarityMeasure;
 import org.gephi.graph.api.Edge;
@@ -46,7 +47,7 @@ public class CSNAlgorithm implements Algorithm {
 
     private CSNAlgorithmFactory factory;
     private final SequenceClustering clusteringAlgo;
-    private final MDOptionModel mdOptionModel;
+    private final WizardOptionModel optionModel;
     private final AllDescriptors descriptorAlgo;
     private final FeatureSelectionAlgo featureSelectionAlgo;
     private SimilarityMeasure simMeasure;
@@ -60,7 +61,6 @@ public class CSNAlgorithm implements Algorithm {
 
     protected Workspace workspace;
     protected AttributesModel attrModel;
-    protected Peptide[] peptides;
     protected GraphModel graphModel;
     protected Graph graph;
     protected ProgressTicket ticket;
@@ -68,8 +68,8 @@ public class CSNAlgorithm implements Algorithm {
 
     public CSNAlgorithm(CSNAlgorithmFactory factory) {
         this.factory = factory;
-        clusteringAlgo = (SequenceClustering)new SequenceClusteringFactory().createAlgorithm();
-        mdOptionModel = new MDOptionModel(pc.getAttributesModel().getMolecularDescriptorKeys());
+        clusteringAlgo = (SequenceClustering) new SequenceClusteringFactory().createAlgorithm();
+        optionModel = new WizardOptionModel();
         descriptorAlgo = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
         featureSelectionAlgo = (FeatureSelectionAlgo) new FeatureSelectionFactory().createAlgorithm();
         thresholdPercent = 70;
@@ -83,8 +83,8 @@ public class CSNAlgorithm implements Algorithm {
         return clusteringAlgo;
     }
 
-    public MDOptionModel getMdOptionModel() {
-        return mdOptionModel;
+    public WizardOptionModel getMdOptionModel() {
+        return optionModel;
     }
 
     public AllDescriptors getDescriptorAlgo() {
@@ -118,7 +118,7 @@ public class CSNAlgorithm implements Algorithm {
         this.ticket = progressTicket;
         attrModel = pc.getAttributesModel(workspace);
         if (attrModel != null) {
-            peptides = attrModel.getPeptides().toArray(new Peptide[0]);
+
             graphModel = pc.getGraphModel(workspace);
             graph = graphModel.getGraphVisible();
 
@@ -143,7 +143,6 @@ public class CSNAlgorithm implements Algorithm {
     @Override
     public void endAlgo() {
         workspace = null;
-        peptides = null;
         attrModel = null;
         graphModel = null;
         graph = null;
@@ -170,25 +169,42 @@ public class CSNAlgorithm implements Algorithm {
 
     @Override
     public void run() {
-        if (peptides != null) {
-            //Step 1. Get representative peptides 
-            clusterize();
-//            Peptide[] representatives = clusteringModel.isClustering() ? clusterize() : peptides;
-
-            //Setp 2. Compute molecular descriptors if needed            
-            Set<String> descriptorKeys = null;
-            if (mdOptionModel.getOptionIndex() == MDOptionModel.AVAILABLE_MD) {
-                descriptorKeys = mdOptionModel.getDescriptorKeys();
-            } else if (mdOptionModel.getOptionIndex() == MDOptionModel.NEW_MD && !stopRun) {
-                descriptorKeys = computeMD();
+        if (attrModel != null) {
+            //Step 1.
+            Peptide[] peptides = null;
+            List<Cluster> clusterList = null;
+            if (!stopRun) {
+                switch (optionModel.getInputSequenceOption()) {
+                    case AVAILABLE:
+                        peptides = attrModel.getPeptides().toArray(new Peptide[0]);
+                        break;
+                    case NEW:
+                        clusterList = clusterize();
+                        peptides = new Peptide[clusterList.size()];
+                        int pos = 0;
+                        for (Cluster c : clusterList) {
+                            peptides[pos++] = c.getCentroid();
+                        }
+                        break;
+                }
             }
 
+            //Setp 2.
+            Set<String> descriptorKeys = null;
             if (!stopRun) {
+                switch (optionModel.getMolecularDescriptorOption()) {
+                    case AVAILABLE:
+                        descriptorKeys = attrModel.getMolecularDescriptorKeys();
+                        break;
+                    case NEW:
+                        descriptorKeys = computeMD();
+                        break;
+                }
                 // Validate descriptor keys
                 validateMD(descriptorKeys);
             }
 
-            // Step 3. Feature selection and preprocessing 
+            // Step 3.
             List<MolecularDescriptor> featureList = new LinkedList<>();
             if (!stopRun) {
                 filterFeatures();
@@ -244,14 +260,15 @@ public class CSNAlgorithm implements Algorithm {
 
     }
 
-    private void clusterize() {
+    private List<Cluster> clusterize() {
         String msg = NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.clusterize");
         pc.reportMsg(msg, workspace);
         ticket.progress(msg);
 
         clusteringAlgo.initAlgo(workspace, ticket);
         clusteringAlgo.run();
-        clusteringAlgo.endAlgo();        
+        clusteringAlgo.endAlgo();
+        return clusteringAlgo.getClusterList();
     }
 
     private Set<String> computeMD() {
@@ -266,7 +283,7 @@ public class CSNAlgorithm implements Algorithm {
         return descriptorKeys;
     }
 
-    private void validateMD(Set<String> descriptorKeys) {        
+    private void validateMD(Set<String> descriptorKeys) {
         if (descriptorKeys == null || descriptorKeys.isEmpty()) {
             DialogDisplayer.getDefault().notify(emptyKeys);
             pc.reportError("There is no molecular descriptors", workspace);
@@ -294,7 +311,7 @@ public class CSNAlgorithm implements Algorithm {
         featureSelectionAlgo.endAlgo();
     }
 
-    private void preprocessing(List<MolecularDescriptor> featureList, Peptide[] peptides) {        
+    private void preprocessing(List<MolecularDescriptor> featureList, Peptide[] peptides) {
         // Check feature list size
         if (featureList.size() < MIN_AVAILABLE_FEATURES) {
             DialogDisplayer.getDefault().notify(notEnoughFeatures);

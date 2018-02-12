@@ -5,33 +5,52 @@
  */
 package org.bapedis.network.wizard;
 
+import java.util.LinkedList;
+import java.util.List;
 import javax.swing.event.ChangeListener;
+import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.MolecularDescriptor;
+import org.bapedis.core.project.ProjectManager;
+import org.bapedis.core.ui.components.AllDescriptorTable;
 import org.bapedis.network.impl.CSNAlgorithm;
+import org.bapedis.network.model.WizardOptionModel;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
+import org.openide.util.Lookup;
 
-public class CSNWizardPanel3 implements WizardDescriptor.Panel<WizardDescriptor> {
+public class CSNWizardMolecularDescriptor implements WizardDescriptor.Panel<WizardDescriptor> {
 
     private final CSNAlgorithm csnAlgo;
+    private final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
 
-    public CSNWizardPanel3(CSNAlgorithm csnAlgo) {
+    public CSNWizardMolecularDescriptor(CSNAlgorithm csnAlgo) {
         this.csnAlgo = csnAlgo;
     }
-        
+
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private CSNVisualPanel3 component;
+    private CSNVisualMolecularDescriptor component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public CSNVisualPanel3 getComponent() {
+    public CSNVisualMolecularDescriptor getComponent() {
         if (component == null) {
-            component = new CSNVisualPanel3(csnAlgo);
+            AttributesModel attrModel = pc.getAttributesModel();
+            List<MolecularDescriptor> featureList = new LinkedList<>();
+            // Populate feature list                
+            for (String key : attrModel.getMolecularDescriptorKeys()) {
+                for (MolecularDescriptor desc : attrModel.getMolecularDescriptors(key)) {
+                    featureList.add(desc);
+                }
+            }
+            WizardOptionModel optionModel = csnAlgo.getMdOptionModel();
+
+            component = new CSNVisualMolecularDescriptor(optionModel, new AllDescriptorTable(), featureList.size());
         }
         return component;
     }

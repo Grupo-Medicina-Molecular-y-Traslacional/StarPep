@@ -61,11 +61,11 @@ public class ToolAction extends WorkspaceContextSensitiveAction<AttributesModel>
                 item.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        AlgorithmModel algoModel = pc.getAlgorithmModel();
-
-                        if (algoModel.isRunning()) {
-                            DialogDisplayer.getDefault().notify(algoModel.getOwnerWS().getBusyNotifyDescriptor());
+                        Workspace currentWS = pc.getCurrentWorkspace();
+                        if (currentWS.isBusy()) {
+                            DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
                         } else {
+                            AlgorithmModel algoModel = pc.getAlgorithmModel();
                             algoModel.setCategory(category);
 
                             Workspace currentWs = pc.getCurrentWorkspace();
@@ -79,24 +79,27 @@ public class ToolAction extends WorkspaceContextSensitiveAction<AttributesModel>
                             }
                             if (algorithm == null) {
                                 algorithm = factory.createAlgorithm();
-                                currentWs.add(algorithm);
                             }
-                            algoModel.setSelectedAlgorithm(algorithm);
 
-                            TopComponent tc = WindowManager.getDefault().findTopComponent("AlgoExplorerTopComponent");
-                            tc.open();
-                            tc.requestActive();
+                            if (algorithm != null) {
+                                currentWs.add(algorithm);
+                                algoModel.setSelectedAlgorithm(algorithm);
+
+                                TopComponent tc = WindowManager.getDefault().findTopComponent("AlgoExplorerTopComponent");
+                                tc.open();
+                                tc.requestActive();
+                            }
                         }
                     }
                 });
                 ToolMenuItem toolItem = factory instanceof ToolMenuItem ? (ToolMenuItem) factory : null;
-                if (toolItem != null && toolItem.addSeparatorBefore()){
+                if (toolItem != null && toolItem.addSeparatorBefore()) {
                     main.addSeparator();
                 }
                 main.add(item);
-                if (toolItem != null && toolItem.addSeparatorAfter()){
+                if (toolItem != null && toolItem.addSeparatorAfter()) {
                     main.addSeparator();
-                }                
+                }
             }
         }
         return main;

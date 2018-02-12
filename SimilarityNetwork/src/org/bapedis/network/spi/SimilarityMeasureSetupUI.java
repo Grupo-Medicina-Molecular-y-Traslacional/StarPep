@@ -5,10 +5,12 @@
  */
 package org.bapedis.network.spi;
 
+import javax.swing.JPanel;
+
 /**
  *
  * @author loge
  */
 public interface SimilarityMeasureSetupUI {
-    
+       public JPanel getSettingPanel(SimilarityMeasure simMeasure); 
 }

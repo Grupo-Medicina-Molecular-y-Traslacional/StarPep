@@ -5,34 +5,36 @@
  */
 package org.bapedis.network.wizard;
 
+import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
+import org.bapedis.core.spi.algo.impl.SequenceClustering;
 import org.bapedis.network.impl.CSNAlgorithm;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
-public class CSNWizardPanel2 implements WizardDescriptor.Panel<WizardDescriptor> {
-
+public class CSNWizardInputSequence implements WizardDescriptor.Panel<WizardDescriptor> {   
     private final CSNAlgorithm csnAlgo;
 
-    public CSNWizardPanel2(CSNAlgorithm csnAlgo) {
+    public CSNWizardInputSequence(CSNAlgorithm csnAlgo) {
         this.csnAlgo = csnAlgo;
-    }
-    
+    }        
     
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private CSNVisualPanel2 component;
+    private CSNVisualInputSequence component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public CSNVisualPanel2 getComponent() {
+    public CSNVisualInputSequence getComponent() {
         if (component == null) {
-            component = new CSNVisualPanel2(csnAlgo);
+            SequenceClustering clusteringAlgo = csnAlgo.getSequenceClustering();
+            JPanel settingPanel = clusteringAlgo.getFactory().getSetupUI().getSettingPanel(clusteringAlgo);
+            component = new CSNVisualInputSequence(csnAlgo.getMdOptionModel(), settingPanel);
         }
         return component;
     }

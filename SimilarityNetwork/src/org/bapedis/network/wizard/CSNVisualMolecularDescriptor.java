@@ -5,60 +5,43 @@
  */
 package org.bapedis.network.wizard;
 
-import java.util.LinkedList;
-import java.util.List;
 import javax.swing.JPanel;
-import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.MolecularDescriptor;
-import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.components.AllDescriptorTable;
 import org.bapedis.network.impl.CSNAlgorithm;
-import org.bapedis.network.model.MDOptionModel;
-import org.openide.util.Lookup;
+import org.bapedis.network.model.WizardOptionModel;
 import org.openide.util.NbBundle;
 
-public final class CSNVisualPanel2 extends JPanel {
-
-    private final MDOptionModel optionModel;
+public final class CSNVisualMolecularDescriptor extends JPanel {
+    
+    private final WizardOptionModel optionModel;
     private final AllDescriptorTable table;
-
-    /**
-     * Creates new form CSNVisualPanel2
-     */
-    public CSNVisualPanel2(CSNAlgorithm csnAlgo) {
-        this.optionModel = csnAlgo.getMdOptionModel();
+    
+    public CSNVisualMolecularDescriptor(WizardOptionModel optionModel, AllDescriptorTable table, int currentFeaureSize) {
+        this.optionModel = optionModel;
         initComponents();
 
         // Descriptor Table        
-        table = new AllDescriptorTable();
+        this.table = table;
         jScrollPane.setViewportView(table);
-
-        ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-        AttributesModel attrModel = pc.getAttributesModel();
-        List<MolecularDescriptor> featureList = new LinkedList<>();
-        // Populate feature list                
-        for (String key : attrModel.getMolecularDescriptorKeys()) {
-            for (MolecularDescriptor desc : attrModel.getMolecularDescriptors(key)) {
-                featureList.add(desc);
-            }
-        }
-        if (featureList.size() < CSNAlgorithm.MIN_AVAILABLE_FEATURES) {
+        
+        if (currentFeaureSize < CSNAlgorithm.MIN_AVAILABLE_FEATURES) {
+            optionModel.setMolecularDescriptorOption(WizardOptionModel.MolecularDescriptorOption.NEW);
             jOption2.setEnabled(false);
-            optionModel.setOptionIndex(MDOptionModel.NEW_MD);
-        }
-
-        switch (optionModel.getOptionIndex()) {
-            case MDOptionModel.AVAILABLE_MD:
+        }     
+        
+        switch (optionModel.getMolecularDescriptorOption()) {
+            case AVAILABLE:
                 jOption2.setSelected(true);
                 break;
-            case MDOptionModel.NEW_MD:
+            case NEW:
                 jOption1.setSelected(true);
+                break;
         }
     }
-
+    
     @Override
     public String getName() {
-        return NbBundle.getMessage(CSNVisualPanel2.class, "CSNVisualPanel2.name");
+        return NbBundle.getMessage(CSNVisualMolecularDescriptor.class, "CSNVisualMolecularDescriptor.name");
     }
 
     /**
@@ -88,7 +71,7 @@ public final class CSNVisualPanel2 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jScrollPane, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(CSNVisualPanel2.class, "CSNVisualPanel2.jQuestionLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(CSNVisualMolecularDescriptor.class, "CSNVisualMolecularDescriptor.jQuestionLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -97,7 +80,7 @@ public final class CSNVisualPanel2 extends JPanel {
         add(jQuestionLabel, gridBagConstraints);
 
         buttonGroup1.add(jOption1);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(CSNVisualPanel2.class, "CSNVisualPanel2.jOption1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(CSNVisualMolecularDescriptor.class, "CSNVisualMolecularDescriptor.jOption1.text")); // NOI18N
         jOption1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOption1ActionPerformed(evt);
@@ -111,7 +94,7 @@ public final class CSNVisualPanel2 extends JPanel {
         add(jOption1, gridBagConstraints);
 
         buttonGroup1.add(jOption2);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(CSNVisualPanel2.class, "CSNVisualPanel2.jOption2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(CSNVisualMolecularDescriptor.class, "CSNVisualMolecularDescriptor.jOption2.text")); // NOI18N
         jOption2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOption2ActionPerformed(evt);
@@ -126,15 +109,15 @@ public final class CSNVisualPanel2 extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
-        if (optionModel.getOptionIndex() != MDOptionModel.NEW_MD) {
-            optionModel.setOptionIndex(MDOptionModel.NEW_MD);
+        if (optionModel.getMolecularDescriptorOption() != WizardOptionModel.MolecularDescriptorOption.NEW) {
+            optionModel.setMolecularDescriptorOption(WizardOptionModel.MolecularDescriptorOption.NEW);
         }        
         table.setEnabled(true);
     }//GEN-LAST:event_jOption1ActionPerformed
 
     private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
-        if (optionModel.getOptionIndex() != MDOptionModel.AVAILABLE_MD) {
-            optionModel.setOptionIndex(MDOptionModel.AVAILABLE_MD);
+        if (optionModel.getMolecularDescriptorOption() != WizardOptionModel.MolecularDescriptorOption.AVAILABLE) {
+            optionModel.setMolecularDescriptorOption(WizardOptionModel.MolecularDescriptorOption.AVAILABLE);
         }
         table.setEnabled(false);
     }//GEN-LAST:event_jOption2ActionPerformed

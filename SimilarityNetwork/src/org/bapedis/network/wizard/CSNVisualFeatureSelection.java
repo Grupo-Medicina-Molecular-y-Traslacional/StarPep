@@ -7,29 +7,25 @@ package org.bapedis.network.wizard;
 
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
-import org.bapedis.core.spi.algo.impl.FeatureSelectionAlgo;
-import org.bapedis.core.spi.algo.impl.FeatureSelectionPanel;
-import org.bapedis.network.impl.CSNAlgorithm;
+import org.bapedis.network.model.WizardOptionModel;
 import org.openide.util.NbBundle;
 
-public final class CSNVisualPanel3 extends JPanel {
+public final class CSNVisualFeatureSelection extends JPanel {
 
-    private final CSNAlgorithm csnAlgo;
+    private final WizardOptionModel optionModel;
+    private final JPanel settingPanel;
 
-    /**
-     * Creates new form CSNVisualPanel3
-     */
-    public CSNVisualPanel3(CSNAlgorithm csnAlgo) {
-        this.csnAlgo = csnAlgo;
+    public CSNVisualFeatureSelection(WizardOptionModel optionModel, JPanel settingPanel) {        
         initComponents();
-        FeatureSelectionAlgo algo = csnAlgo.getFeatureSelectionAlgo();
-        JPanel settingPanel = (FeatureSelectionPanel)algo.getFactory().getSetupUI().getSettingPanel(algo);
+        this.optionModel = optionModel;
+        this.settingPanel = settingPanel;
         centerPanel.add(settingPanel, BorderLayout.CENTER);
+        jOption1.setSelected(optionModel.isFeatureFiltering());
     }
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(CSNVisualPanel3.class, "CSNVisualPanel3.name");
+        return NbBundle.getMessage(CSNVisualFeatureSelection.class, "CSNVisualFeatureSelection.name");
     }
 
     /**
@@ -41,6 +37,7 @@ public final class CSNVisualPanel3 extends JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        jOption1 = new javax.swing.JCheckBox();
         centerPanel = new javax.swing.JPanel();
         jQuestionLabel = new javax.swing.JLabel();
 
@@ -48,17 +45,30 @@ public final class CSNVisualPanel3 extends JPanel {
         setPreferredSize(new java.awt.Dimension(460, 400));
         setLayout(new java.awt.GridBagLayout());
 
-        centerPanel.setLayout(new java.awt.BorderLayout());
+        org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(CSNVisualFeatureSelection.class, "CSNVisualFeatureSelection.jOption1.text")); // NOI18N
+        jOption1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOption1ActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(jOption1, gridBagConstraints);
+
+        centerPanel.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(centerPanel, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(CSNVisualPanel3.class, "CSNVisualPanel3.jQuestionLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(CSNVisualFeatureSelection.class, "CSNVisualFeatureSelection.jQuestionLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -67,8 +77,14 @@ public final class CSNVisualPanel3 extends JPanel {
         add(jQuestionLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
+        optionModel.setFeatureFiltering(jOption1.isSelected());
+        settingPanel.setEnabled(optionModel.isFeatureFiltering());        
+    }//GEN-LAST:event_jOption1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
+    private javax.swing.JCheckBox jOption1;
     private javax.swing.JLabel jQuestionLabel;
     // End of variables declaration//GEN-END:variables
 }

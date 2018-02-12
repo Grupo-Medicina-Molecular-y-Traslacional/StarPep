@@ -115,8 +115,8 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
         algoPresetPersistence = new AlgoPresetPersistence();
         ((PropertySheet) propSheetPanel).setDescriptionAreaVisible(false);
-        NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text");        
-        DefaultComboBoxModel comboBoxModel =  new DefaultComboBoxModel();
+        NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text");
+        DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
         comboBoxModel.addElement(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.defaultText"));
         algoComboBox.setModel(comboBoxModel);
     }
@@ -274,9 +274,11 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         if (algoComboBox.getSelectedItem() instanceof AlgorithmFactoryItem) {
             factory = ((AlgorithmFactoryItem) algoComboBox.getSelectedItem()).getFactory();
             Algorithm newAlgo = factory.createAlgorithm();
-            currentWs.remove(oldAlgo);
-            currentWs.add(newAlgo);
-            algoModel.setSelectedAlgorithm(newAlgo);
+            if (newAlgo != null) {
+                currentWs.remove(oldAlgo);
+                currentWs.add(newAlgo);
+                algoModel.setSelectedAlgorithm(newAlgo);
+            }
         }
     }//GEN-LAST:event_resetButtonActionPerformed
 

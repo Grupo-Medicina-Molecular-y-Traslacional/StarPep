@@ -5,36 +5,42 @@
  */
 package org.bapedis.network.wizard;
 
+import java.awt.BorderLayout;
 import javax.swing.JPanel;
-import org.bapedis.network.impl.CSNAlgorithm;
+import org.bapedis.network.model.WizardOptionModel;
 import org.openide.util.NbBundle;
 
-public final class CSNVisualPanel1 extends JPanel {
-    
-    /**
-     * Creates new form CSNVisualPanel1
-     */
-    public CSNVisualPanel1(CSNAlgorithm csnAlgo) {
-        initComponents();
-        
-//        if (seqClustering.isClustering()) {
-//            jOption1.setSelected(true);
-//        } else {
-//            jOption2.setSelected(true);
-//        }
-//        setClustering(seqClustering.isClustering());
-        
+public final class CSNVisualInputSequence extends JPanel {
 
+    private final WizardOptionModel optionModel;
+    private final JPanel settingPanel;
+
+    public CSNVisualInputSequence(WizardOptionModel optionModel, JPanel settingPanel) {
+        initComponents();
+        this.optionModel = optionModel;
+        this.settingPanel = settingPanel;
+        
+        bottomPanel.add(settingPanel, BorderLayout.CENTER);
+        
+        switch (optionModel.getInputSequenceOption()) {
+            case AVAILABLE:
+                jOption2.setSelected(true);
+                break;
+            case NEW:
+                jOption1.setSelected(true);
+                break;
+        }
+        setClustering(optionModel.getInputSequenceOption() == WizardOptionModel.InputSequenceOption.NEW);
     }
-    
+
     @Override
     public String getName() {
-        return NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.name");
+        return NbBundle.getMessage(CSNVisualInputSequence.class, "CSNVisualInputSequence.name");
     }
-    
+
     private void setClustering(boolean enabled) {
         bottomPanel.setEnabled(enabled);
-        jwarningLabel.setVisible(!enabled);
+        settingPanel.setEnabled(enabled);
     }
 
     /**
@@ -51,7 +57,6 @@ public final class CSNVisualPanel1 extends JPanel {
         jQuestionLabel = new javax.swing.JLabel();
         jOption1 = new javax.swing.JRadioButton();
         jOption2 = new javax.swing.JRadioButton();
-        jwarningLabel = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
         setPreferredSize(new java.awt.Dimension(460, 400));
@@ -68,7 +73,7 @@ public final class CSNVisualPanel1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(10, 5, 5, 5);
         add(bottomPanel, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.jQuestionLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(CSNVisualInputSequence.class, "CSNVisualInputSequence.jQuestionLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -78,7 +83,7 @@ public final class CSNVisualPanel1 extends JPanel {
         add(jQuestionLabel, gridBagConstraints);
 
         buttonGroup1.add(jOption1);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.jOption1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(CSNVisualInputSequence.class, "CSNVisualInputSequence.jOption1.text")); // NOI18N
         jOption1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOption1ActionPerformed(evt);
@@ -92,7 +97,7 @@ public final class CSNVisualPanel1 extends JPanel {
         add(jOption1, gridBagConstraints);
 
         buttonGroup1.add(jOption2);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.jOption2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(CSNVisualInputSequence.class, "CSNVisualInputSequence.jOption2.text")); // NOI18N
         jOption2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOption2ActionPerformed(evt);
@@ -104,22 +109,19 @@ public final class CSNVisualPanel1 extends JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jOption2, gridBagConstraints);
-
-        jwarningLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/network/resources/warning.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jwarningLabel, org.openide.util.NbBundle.getMessage(CSNVisualPanel1.class, "CSNVisualPanel1.jwarningLabel.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(jwarningLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
+        if (optionModel.getInputSequenceOption() != WizardOptionModel.InputSequenceOption.NEW) {
+            optionModel.setInputSequenceOption(WizardOptionModel.InputSequenceOption.NEW);
+        }
         setClustering(true);
     }//GEN-LAST:event_jOption1ActionPerformed
 
     private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
+        if (optionModel.getInputSequenceOption() != WizardOptionModel.InputSequenceOption.AVAILABLE) {
+            optionModel.setInputSequenceOption(WizardOptionModel.InputSequenceOption.AVAILABLE);
+        }
         setClustering(false);
     }//GEN-LAST:event_jOption2ActionPerformed
 
@@ -129,6 +131,5 @@ public final class CSNVisualPanel1 extends JPanel {
     private javax.swing.JRadioButton jOption1;
     private javax.swing.JRadioButton jOption2;
     private javax.swing.JLabel jQuestionLabel;
-    private javax.swing.JLabel jwarningLabel;
     // End of variables declaration//GEN-END:variables
 }

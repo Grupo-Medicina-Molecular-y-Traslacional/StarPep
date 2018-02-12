@@ -17,14 +17,14 @@ import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
-public class CSNWizardPanel4 implements WizardDescriptor.Panel<WizardDescriptor>, WizardDescriptor.ValidatingPanel<WizardDescriptor>,
+public class CSNWizardSimilarityMeasure implements WizardDescriptor.Panel<WizardDescriptor>, WizardDescriptor.ValidatingPanel<WizardDescriptor>,
         PropertyChangeListener {
 
     private final CSNAlgorithm csnAlgo;
     private final EventListenerList listeners = new EventListenerList();
     private boolean isValid = false;
 
-    public CSNWizardPanel4(CSNAlgorithm csnAlgo) {
+    public CSNWizardSimilarityMeasure(CSNAlgorithm csnAlgo) {
         this.csnAlgo = csnAlgo;
     }
 
@@ -32,16 +32,16 @@ public class CSNWizardPanel4 implements WizardDescriptor.Panel<WizardDescriptor>
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private CSNVisualPanel4 component;
+    private CSNVisualSimilarityMeasure component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public CSNVisualPanel4 getComponent() {
+    public CSNVisualSimilarityMeasure getComponent() {
         if (component == null) {
-            component = new CSNVisualPanel4(csnAlgo);
+            component = new CSNVisualSimilarityMeasure();
         }
         return component;
     }
@@ -92,14 +92,14 @@ public class CSNWizardPanel4 implements WizardDescriptor.Panel<WizardDescriptor>
     @Override
     public void validate() throws WizardValidationException {
         if (getComponent().getSimilarityMeasureFactory() == null) {
-            throw new WizardValidationException(null, NbBundle.getMessage(CSNWizardPanel4.class, "CSNWizardPanel4.invalidNetworkType"), null);
+            throw new WizardValidationException(null, NbBundle.getMessage(CSNWizardSimilarityMeasure.class, "CSNVisualSimilarityMeasure.invalidNetworkType"), null);
         }
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         boolean oldState = isValid;
-        if (evt.getPropertyName().equals(CSNVisualPanel4.NETWORK_FACTORY)) {
+        if (evt.getPropertyName().equals(CSNVisualSimilarityMeasure.NETWORK_FACTORY)) {
             isValid = evt.getNewValue() != null;
         }
         if (oldState != isValid) {

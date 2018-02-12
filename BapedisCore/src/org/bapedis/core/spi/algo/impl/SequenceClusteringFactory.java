@@ -19,6 +19,8 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service = AlgorithmFactory.class, position = 20)
 public class SequenceClusteringFactory implements AlgorithmFactory {
 
+    private final SequenceClusteringPanel setupUI = new SequenceClusteringPanel();
+    
     @Override
     public AlgorithmCategory getCategory() {
         return AlgorithmCategory.Sequence;
@@ -36,7 +38,7 @@ public class SequenceClusteringFactory implements AlgorithmFactory {
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        return null;
+        return setupUI;
     }
 
     @Override

@@ -32,7 +32,6 @@ public final class CSNVisualSimilarityMeasure extends JPanel {
         jTree1.setModel(new DefaultTreeModel(treeNode));
         jTree1.setRootVisible(true);
         jTree1.setCellRenderer(new SimilarityFactoryNodeRenderer());
-
     }
 
     public SimilarityMeasureFactory getSimilarityMeasureFactory() {
@@ -67,7 +66,7 @@ public final class CSNVisualSimilarityMeasure extends JPanel {
         jInfoLabel = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
-        setPreferredSize(new java.awt.Dimension(460, 400));
+        setPreferredSize(new java.awt.Dimension(500, 460));
         setLayout(new java.awt.GridBagLayout());
 
         jTree1.setRootVisible(false);

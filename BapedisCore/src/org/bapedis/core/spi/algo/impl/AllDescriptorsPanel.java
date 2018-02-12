@@ -62,4 +62,12 @@ public class AllDescriptorsPanel extends javax.swing.JPanel implements Algorithm
         return this;
     }
 
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled); //To change body of generated methods, choose Tools | Templates.
+        table.setEnabled(enabled);
+    }
+    
+    
+
 }

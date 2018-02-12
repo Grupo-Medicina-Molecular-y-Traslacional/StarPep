@@ -26,6 +26,7 @@ public class WizardOptionModel {
         seqOption = InputSequenceOption.AVAILABLE;
         mdOption = MolecularDescriptorOption.NEW;
         normOption = NormalizationOption.MIN_MAX;
+        featureFiltering = true;
     }
 
     public boolean isFeatureFiltering() {

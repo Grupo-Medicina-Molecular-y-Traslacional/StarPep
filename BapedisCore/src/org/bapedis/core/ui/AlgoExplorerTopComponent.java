@@ -53,6 +53,7 @@ import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.task.AlgorithmExecutor;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
+import org.bapedis.core.ui.components.PropertySheetPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -61,7 +62,6 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.StatusDisplayer;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
-import org.openide.explorer.propertysheet.PropertySheet;
 import org.openide.filesystems.FileUtil;
 import org.openide.nodes.Node;
 import org.openide.util.ImageUtilities;
@@ -114,7 +114,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
         algoPresetPersistence = new AlgoPresetPersistence();
-        ((PropertySheet) propSheetPanel).setDescriptionAreaVisible(false);
+        ((PropertySheetPanel) propSheetPanel).getPropertySheet().setDescriptionAreaVisible(false);
         NO_SELECTION = NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.text");
         DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
         comboBoxModel.addElement(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.defaultText"));
@@ -141,7 +141,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         infoLabel = new javax.swing.JLabel();
         runButton = new javax.swing.JButton();
         scrollPane = new javax.swing.JScrollPane();
-        propSheetPanel = new PropertySheet();
+        propSheetPanel = new PropertySheetPanel();
         algoToolBar = new javax.swing.JToolBar();
         presetsButton = new javax.swing.JButton();
         resetButton = new javax.swing.JButton();
@@ -447,12 +447,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 it.remove();
             }
         }
-//        Collections.sort(factories, new Comparator() {
-//            @Override
-//            public int compare(Object o1, Object o2) {
-//                return ((AlgorithmFactory) o1).getName().compareTo(((AlgorithmFactory) o2).getName());
-//            }
-//        });
+
         for (AlgorithmFactory factory : factories) {
             AlgorithmFactoryItem item = new AlgorithmFactoryItem(factory);
             comboBoxModel.addElement(item);
@@ -463,7 +458,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
     private void refreshProperties(AlgorithmModel algoModel) {
         if (algoModel == null || algoModel.getSelectedAlgorithm() == null) {
-            ((PropertySheet) propSheetPanel).setNodes(new Node[0]);
+            ((PropertySheetPanel) propSheetPanel).getPropertySheet().setNodes(new Node[0]);            
             scrollPane.setViewportView(null);
             scrollPane.setVisible(false);
             propSheetPanel.setVisible(true);
@@ -479,7 +474,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             } else {
                 scrollPane.setViewportView(null);
                 scrollPane.setVisible(false);
-                ((PropertySheet) propSheetPanel).setNodes(new Node[]{new AlgorithmNode(selectedAlgorithm)});
+                ((PropertySheetPanel) propSheetPanel).getPropertySheet().setNodes(new Node[]{new AlgorithmNode(selectedAlgorithm)});
                 propSheetPanel.setVisible(true);
             }
 
@@ -507,7 +502,9 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
     private void refreshRunning(boolean running) {
         propSheetPanel.setEnabled(!running);
-        scrollPane.setEnabled(!running);
+        if (scrollPane.getViewport().getView() != null) {
+            scrollPane.getViewport().getView().setEnabled(!running);
+        }
         resetButton.setEnabled(!running);
         presetsButton.setEnabled(!running);
         algoComboBox.setEnabled(!running);
@@ -635,6 +632,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             }
         }
     }
+    
 }
 
 class AlgoPresetPersistence {

@@ -67,8 +67,12 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled); //To change body of generated methods, choose Tools | Templates.
 
+        jResetButton.setEnabled(enabled);
+        jATLabel.setEnabled(enabled);
         jATComboBox.setEnabled(enabled);
+        jSMLabel.setEnabled(enabled);
         jSMComboBox.setEnabled(enabled);
+        jPIDInfoLabel.setEnabled(enabled);
         jPIDLabel.setEnabled(enabled);
         jLessButton.setEnabled(enabled);
         jPIDSlider.setEnabled(enabled);
@@ -96,9 +100,9 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jLabel1 = new javax.swing.JLabel();
+        jATLabel = new javax.swing.JLabel();
         jATComboBox = new javax.swing.JComboBox();
-        jLabel2 = new javax.swing.JLabel();
+        jSMLabel = new javax.swing.JLabel();
         jSMComboBox = new javax.swing.JComboBox();
         jPIDInfoLabel = new javax.swing.JLabel();
         jPIDLabel = new javax.swing.JLabel();
@@ -111,13 +115,13 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
 
         setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jATLabel, org.openide.util.NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.jATLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(jLabel1, gridBagConstraints);
+        add(jATLabel, gridBagConstraints);
 
         jATComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -131,13 +135,13 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jATComboBox, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jSMLabel, org.openide.util.NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.jSMLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(jLabel2, gridBagConstraints);
+        add(jSMLabel, gridBagConstraints);
 
         jSMComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -214,11 +218,10 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         jToolBar1.add(jMoreButton);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jToolBar1, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jextLabel, org.openide.util.NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.jextLabel.text")); // NOI18N
@@ -289,8 +292,7 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jATComboBox;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jATLabel;
     private javax.swing.JButton jLessButton;
     private javax.swing.JButton jMoreButton;
     private javax.swing.JLabel jPIDInfoLabel;
@@ -298,6 +300,7 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
     private javax.swing.JSlider jPIDSlider;
     private javax.swing.JButton jResetButton;
     private javax.swing.JComboBox jSMComboBox;
+    private javax.swing.JLabel jSMLabel;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JLabel jextLabel;
     // End of variables declaration//GEN-END:variables

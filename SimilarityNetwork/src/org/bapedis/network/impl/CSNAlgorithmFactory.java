@@ -5,10 +5,12 @@
  */
 package org.bapedis.network.impl;
 
+import java.text.MessageFormat;
 import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+import org.bapedis.network.wizard.CSNWizardIterator;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
@@ -45,9 +47,8 @@ public class CSNAlgorithmFactory implements AlgorithmFactory {
 
     @Override
     public Algorithm createAlgorithm() {
-        CSNAlgorithm csnAlgo = new CSNAlgorithm(this);
-        CSNWizardSetupUI wizSetupUI = new CSNWizardSetupUI(csnAlgo);
-        WizardDescriptor wiz = wizSetupUI.getWizardDescriptor();
+        CSNAlgorithm csnAlgo = new CSNAlgorithm(this);        
+        WizardDescriptor wiz = createWizardDescriptor(csnAlgo);
         
         //The image in the left sidebar of the wizard is set like this:
         //wiz.putProperty(WizardDescriptor.PROP_IMAGE, ImageUtilities.loadImage("org/demo/wizard/banner.PNG", true));
@@ -55,6 +56,20 @@ public class CSNAlgorithmFactory implements AlgorithmFactory {
            return csnAlgo;            
         }
         return null;
+    }
+    
+    public static WizardDescriptor  createWizardDescriptor(CSNAlgorithm csnAlgo){
+        // Wizard iterator
+        WizardDescriptor.Iterator<WizardDescriptor> iterator = new CSNWizardIterator(csnAlgo);
+
+        // Open wizard
+        WizardDescriptor wiz = new WizardDescriptor(iterator);
+        
+        // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
+        wiz.setTitleFormat(new MessageFormat("{0}"));
+        wiz.setTitle(NbBundle.getMessage(CSNAlgorithmFactory.class, "CSNAlgorithm.wizard.title")); 
+        
+        return wiz;
     }
 
 }

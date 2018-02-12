@@ -30,17 +30,12 @@ public final class CSNVisualInputSequence extends JPanel {
                 jOption1.setSelected(true);
                 break;
         }
-        setClustering(optionModel.getInputSequenceOption() == WizardOptionModel.InputSequenceOption.NEW);
+        settingPanel.setEnabled(optionModel.getInputSequenceOption() == WizardOptionModel.InputSequenceOption.NEW);
     }
 
     @Override
     public String getName() {
         return NbBundle.getMessage(CSNVisualInputSequence.class, "CSNVisualInputSequence.name");
-    }
-
-    private void setClustering(boolean enabled) {
-        bottomPanel.setEnabled(enabled);
-        settingPanel.setEnabled(enabled);
     }
 
     /**
@@ -59,7 +54,7 @@ public final class CSNVisualInputSequence extends JPanel {
         jOption2 = new javax.swing.JRadioButton();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
-        setPreferredSize(new java.awt.Dimension(460, 400));
+        setPreferredSize(new java.awt.Dimension(500, 460));
         setLayout(new java.awt.GridBagLayout());
 
         bottomPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -70,7 +65,7 @@ public final class CSNVisualInputSequence extends JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 5, 5, 5);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(bottomPanel, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(CSNVisualInputSequence.class, "CSNVisualInputSequence.jQuestionLabel.text")); // NOI18N
@@ -114,15 +109,15 @@ public final class CSNVisualInputSequence extends JPanel {
     private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
         if (optionModel.getInputSequenceOption() != WizardOptionModel.InputSequenceOption.NEW) {
             optionModel.setInputSequenceOption(WizardOptionModel.InputSequenceOption.NEW);
-        }
-        setClustering(true);
+            settingPanel.setEnabled(true);
+        }        
     }//GEN-LAST:event_jOption1ActionPerformed
 
     private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
         if (optionModel.getInputSequenceOption() != WizardOptionModel.InputSequenceOption.AVAILABLE) {
             optionModel.setInputSequenceOption(WizardOptionModel.InputSequenceOption.AVAILABLE);
-        }
-        setClustering(false);
+            settingPanel.setEnabled(false);
+        }        
     }//GEN-LAST:event_jOption2ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

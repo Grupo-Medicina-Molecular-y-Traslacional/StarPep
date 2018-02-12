@@ -17,15 +17,16 @@ import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
-public class CSNWizardSimilarityMeasure implements WizardDescriptor.Panel<WizardDescriptor>, WizardDescriptor.ValidatingPanel<WizardDescriptor>,
+public class CSNWizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel<WizardDescriptor>,
         PropertyChangeListener {
 
     private final CSNAlgorithm csnAlgo;
     private final EventListenerList listeners = new EventListenerList();
-    private boolean isValid = false;
+    private boolean isValid;
 
     public CSNWizardSimilarityMeasure(CSNAlgorithm csnAlgo) {
         this.csnAlgo = csnAlgo;
+        isValid = true;
     }
 
     /**
@@ -42,6 +43,7 @@ public class CSNWizardSimilarityMeasure implements WizardDescriptor.Panel<Wizard
     public CSNVisualSimilarityMeasure getComponent() {
         if (component == null) {
             component = new CSNVisualSimilarityMeasure();
+            component.addPropertyChangeListener(this);
         }
         return component;
     }
@@ -76,8 +78,7 @@ public class CSNWizardSimilarityMeasure implements WizardDescriptor.Panel<Wizard
 
     @Override
     public void readSettings(WizardDescriptor wiz) {
-        // use wiz.getProperty to retrieve previous panel state
-        getComponent().addPropertyChangeListener(this);
+        // use wiz.getProperty to retrieve previous panel state        
     }
 
     @Override
@@ -92,7 +93,8 @@ public class CSNWizardSimilarityMeasure implements WizardDescriptor.Panel<Wizard
     @Override
     public void validate() throws WizardValidationException {
         if (getComponent().getSimilarityMeasureFactory() == null) {
-            throw new WizardValidationException(null, NbBundle.getMessage(CSNWizardSimilarityMeasure.class, "CSNVisualSimilarityMeasure.invalidNetworkType"), null);
+            isValid = false;
+            throw new WizardValidationException(null, NbBundle.getMessage(CSNWizardSimilarityMeasure.class, "CSNVisualSimilarityMeasure.invalid.text"), null);
         }
     }
 

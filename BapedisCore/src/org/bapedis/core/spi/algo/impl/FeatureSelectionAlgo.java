@@ -44,6 +44,9 @@ public class FeatureSelectionAlgo implements Algorithm {
     public static final int ENTROPY_MAJORTICKSPACING = 10;
     public static final int ENTROPY_MINORTICKSPACING = 5;
 
+    public static final String[] CORRELATION_METHODS = new String[]{"Pearson", "Spearman"};
+    public static final int CORRELATION_DEFAULT_INDEX = 0;
+
     //Correlation cutoff for references: Moderate, Strong and Very Strong    
     public static final int[] CORRELATION_CUTOFF_REFS = new int[]{40, 60, 80};
     public static final int CORRELATION_CUTOFF_MIN = 40;
@@ -63,7 +66,7 @@ public class FeatureSelectionAlgo implements Algorithm {
     protected transient final PropertyChangeSupport propertyChangeSupport;
 
     private boolean removeUseless, removeRedundant;
-    private int entropyCutoff, correlationCutoff;
+    private int entropyCutoff, correlationIndex, correlationCutoff;
     private NotifyDescriptor emptyMDs;
 
     public FeatureSelectionAlgo(FeatureSelectionFactory factory) {
@@ -71,6 +74,7 @@ public class FeatureSelectionAlgo implements Algorithm {
         this.factory = factory;
 
         entropyCutoff = ENTROPY_DEFAULT_VALUE;
+        correlationIndex = CORRELATION_DEFAULT_INDEX;
         correlationCutoff = CORRELATION_DEFAULT_VALUE;
         removeUseless = true;
         removeRedundant = false;
@@ -102,6 +106,9 @@ public class FeatureSelectionAlgo implements Algorithm {
     }
 
     public void setEntropyCutoff(int entropyCutoff) {
+        if (entropyCutoff < ENTROPY_CUTOFF_MIN || entropyCutoff > ENTROPY_CUTOFF_MAX) {
+            throw new IllegalArgumentException("Invalid value for entropy cutoff. It should be between " + ENTROPY_CUTOFF_MIN + " and " + ENTROPY_CUTOFF_MAX);
+        }        
         this.entropyCutoff = entropyCutoff;
     }
 
@@ -109,7 +116,21 @@ public class FeatureSelectionAlgo implements Algorithm {
         return correlationCutoff;
     }
 
+    public int getCorrelationIndex() {
+        return correlationIndex;
+    }
+
+    public void setCorrelationIndex(int correlationIndex) {
+        if (correlationIndex < 0 || correlationIndex >= CORRELATION_METHODS.length) {
+            throw new IllegalArgumentException("Invalid value for correlation index. It should be between " + 0 + " and " + (CORRELATION_METHODS.length - 1));
+        }
+        this.correlationIndex = correlationIndex;
+    }
+
     public void setCorrelationCutoff(int correlationCutoff) {
+        if (correlationCutoff < CORRELATION_CUTOFF_MIN || correlationCutoff > CORRELATION_CUTOFF_MAX) {
+            throw new IllegalArgumentException("Invalid value for correlation cutoff. It should be between " + CORRELATION_CUTOFF_MIN + " and " + CORRELATION_CUTOFF_MAX);
+        }
         this.correlationCutoff = correlationCutoff;
     }
 

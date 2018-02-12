@@ -5,30 +5,25 @@
  */
 package org.bapedis.network.wizard;
 
+import java.awt.BorderLayout;
 import javax.swing.JPanel;
-import org.bapedis.core.ui.components.AllDescriptorTable;
-import org.bapedis.network.impl.CSNAlgorithm;
 import org.bapedis.network.model.WizardOptionModel;
 import org.openide.util.NbBundle;
 
 public final class CSNVisualMolecularDescriptor extends JPanel {
-    
+
+    public static final String MD_OPTION = "md_option";
     private final WizardOptionModel optionModel;
-    private final AllDescriptorTable table;
-    
-    public CSNVisualMolecularDescriptor(WizardOptionModel optionModel, AllDescriptorTable table, int currentFeaureSize) {
-        this.optionModel = optionModel;
+    private final JPanel settingPanel;
+
+    public CSNVisualMolecularDescriptor(WizardOptionModel optionModel, JPanel settingPanel) {
         initComponents();
 
-        // Descriptor Table        
-        this.table = table;
-        jScrollPane.setViewportView(table);
-        
-        if (currentFeaureSize < CSNAlgorithm.MIN_AVAILABLE_FEATURES) {
-            optionModel.setMolecularDescriptorOption(WizardOptionModel.MolecularDescriptorOption.NEW);
-            jOption2.setEnabled(false);
-        }     
-        
+        this.optionModel = optionModel;
+        this.settingPanel = settingPanel;
+
+        bottomPanel.add(settingPanel, BorderLayout.CENTER);
+   
         switch (optionModel.getMolecularDescriptorOption()) {
             case AVAILABLE:
                 jOption2.setSelected(true);
@@ -37,12 +32,21 @@ public final class CSNVisualMolecularDescriptor extends JPanel {
                 jOption1.setSelected(true);
                 break;
         }
+        settingPanel.setEnabled(optionModel.getMolecularDescriptorOption() == WizardOptionModel.MolecularDescriptorOption.NEW);
     }
-    
+
     @Override
     public String getName() {
         return NbBundle.getMessage(CSNVisualMolecularDescriptor.class, "CSNVisualMolecularDescriptor.name");
     }
+    
+    public WizardOptionModel.MolecularDescriptorOption getSelectedOption(){
+        if (jOption1.isSelected())
+            return WizardOptionModel.MolecularDescriptorOption.NEW;
+        if (jOption2.isSelected())
+            return WizardOptionModel.MolecularDescriptorOption.AVAILABLE;
+        return null;
+    }    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -54,22 +58,14 @@ public final class CSNVisualMolecularDescriptor extends JPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        jScrollPane = new javax.swing.JScrollPane();
         jQuestionLabel = new javax.swing.JLabel();
         jOption1 = new javax.swing.JRadioButton();
         jOption2 = new javax.swing.JRadioButton();
+        bottomPanel = new javax.swing.JPanel();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
-        setPreferredSize(new java.awt.Dimension(460, 400));
+        setPreferredSize(new java.awt.Dimension(500, 460));
         setLayout(new java.awt.GridBagLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(jScrollPane, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(CSNVisualMolecularDescriptor.class, "CSNVisualMolecularDescriptor.jQuestionLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -106,28 +102,41 @@ public final class CSNVisualMolecularDescriptor extends JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(jOption2, gridBagConstraints);
+
+        bottomPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        bottomPanel.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(bottomPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
         if (optionModel.getMolecularDescriptorOption() != WizardOptionModel.MolecularDescriptorOption.NEW) {
             optionModel.setMolecularDescriptorOption(WizardOptionModel.MolecularDescriptorOption.NEW);
+            settingPanel.setEnabled(true);
+            firePropertyChange(MD_OPTION, WizardOptionModel.MolecularDescriptorOption.AVAILABLE, WizardOptionModel.MolecularDescriptorOption.NEW);
         }        
-        table.setEnabled(true);
     }//GEN-LAST:event_jOption1ActionPerformed
 
     private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
         if (optionModel.getMolecularDescriptorOption() != WizardOptionModel.MolecularDescriptorOption.AVAILABLE) {
             optionModel.setMolecularDescriptorOption(WizardOptionModel.MolecularDescriptorOption.AVAILABLE);
-        }
-        table.setEnabled(false);
+            settingPanel.setEnabled(false);
+            firePropertyChange(MD_OPTION, WizardOptionModel.MolecularDescriptorOption.NEW, WizardOptionModel.MolecularDescriptorOption.AVAILABLE);
+        }        
     }//GEN-LAST:event_jOption2ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel bottomPanel;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JRadioButton jOption1;
     private javax.swing.JRadioButton jOption2;
     private javax.swing.JLabel jQuestionLabel;
-    private javax.swing.JScrollPane jScrollPane;
     // End of variables declaration//GEN-END:variables
 
 }

@@ -19,8 +19,9 @@ public final class CSNVisualFeatureSelection extends JPanel {
         initComponents();
         this.optionModel = optionModel;
         this.settingPanel = settingPanel;
-        centerPanel.add(settingPanel, BorderLayout.CENTER);
+        bottomPanel.add(settingPanel, BorderLayout.CENTER);
         jOption1.setSelected(optionModel.isFeatureFiltering());
+        settingPanel.setEnabled(optionModel.isFeatureFiltering());
     }
 
     @Override
@@ -38,11 +39,11 @@ public final class CSNVisualFeatureSelection extends JPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jOption1 = new javax.swing.JCheckBox();
-        centerPanel = new javax.swing.JPanel();
+        bottomPanel = new javax.swing.JPanel();
         jQuestionLabel = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
-        setPreferredSize(new java.awt.Dimension(460, 400));
+        setPreferredSize(new java.awt.Dimension(500, 460));
         setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(CSNVisualFeatureSelection.class, "CSNVisualFeatureSelection.jOption1.text")); // NOI18N
@@ -58,7 +59,8 @@ public final class CSNVisualFeatureSelection extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jOption1, gridBagConstraints);
 
-        centerPanel.setLayout(new java.awt.BorderLayout());
+        bottomPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        bottomPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -66,7 +68,7 @@ public final class CSNVisualFeatureSelection extends JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(centerPanel, gridBagConstraints);
+        add(bottomPanel, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(CSNVisualFeatureSelection.class, "CSNVisualFeatureSelection.jQuestionLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -83,7 +85,7 @@ public final class CSNVisualFeatureSelection extends JPanel {
     }//GEN-LAST:event_jOption1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel centerPanel;
+    private javax.swing.JPanel bottomPanel;
     private javax.swing.JCheckBox jOption1;
     private javax.swing.JLabel jQuestionLabel;
     // End of variables declaration//GEN-END:variables

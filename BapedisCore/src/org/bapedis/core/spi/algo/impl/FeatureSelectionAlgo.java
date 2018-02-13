@@ -37,23 +37,25 @@ public class FeatureSelectionAlgo implements Algorithm {
     protected final FeatureSelectionFactory factory;
 
     //Entropy cutoff for reference: Very weak, Weak and Moderate
-    public static final int[] ENTROPY_CUTOFF_REFS = new int[]{10, 20, 30};
+    public static final int[] ENTROPY_CUTOFF_REFS = new int[]{10, 30, 50};
     public static final int ENTROPY_CUTOFF_MIN = 10;
-    public static final int ENTROPY_CUTOFF_MAX = 30;
+    public static final int ENTROPY_CUTOFF_MAX = 50;
     public static final int ENTROPY_DEFAULT_VALUE = 30;
     public static final int ENTROPY_MAJORTICKSPACING = 10;
     public static final int ENTROPY_MINORTICKSPACING = 5;
 
-    public static final String[] CORRELATION_METHODS = new String[]{"Pearson", "Spearman"};
+    private static final String PEARSON="Pearson";
+    private static final String SPEARMAN="Spearman";
+    public static final String[] CORRELATION_METHODS = new String[]{PEARSON, SPEARMAN};
     public static final int CORRELATION_DEFAULT_INDEX = 0;
 
     //Correlation cutoff for references: Moderate, Strong and Very Strong    
-    public static final int[] CORRELATION_CUTOFF_REFS = new int[]{40, 60, 80};
-    public static final int CORRELATION_CUTOFF_MIN = 40;
-    public static final int CORRELATION_CUTOFF_MAX = 80;
-    public static final int CORRELATION_DEFAULT_VALUE = 40;
-    public static final int CORRELATION_MAJORTICKSPACING = 20;
-    public static final int CORRELATION_MINORTICKSPACING = 10;
+    public static final int[] CORRELATION_CUTOFF_REFS = new int[]{50, 70, 90, 100};
+    public static final int CORRELATION_CUTOFF_MIN = 50;
+    public static final int CORRELATION_CUTOFF_MAX = 100;
+    public static final int CORRELATION_DEFAULT_VALUE = 70;
+    public static final int CORRELATION_MAJORTICKSPACING = 10;
+    public static final int CORRELATION_MINORTICKSPACING = 5;
 
     //To initialize
     protected Workspace workspace;
@@ -286,16 +288,18 @@ public class FeatureSelectionAlgo implements Algorithm {
                 double[][] transformedMatrix = new double[rankedFeatures.length][];
                 double[] column = new double[peptides.size()];
                 int pos;
+                boolean pearson = CORRELATION_METHODS[correlationIndex].equals(PEARSON);
+                boolean spearman = CORRELATION_METHODS[correlationIndex].equals(SPEARMAN);                
                 for (int i = 0; i < rankedFeatures.length && !stopRun; i++) {
                     pos = 0;
                     for (Peptide peptide : peptides) {
                         column[pos++] = MolecularDescriptor.getDoubleValue(peptide, rankedFeatures[i]);
                     }
-                    transformedMatrix[i] = rank(column);
+                    transformedMatrix[i] =  pearson? column: (spearman? rank(column): null);
                     ticket.progress();
                 }
 
-                pc.reportMsg("Calculating the Spearman's rank correlation", workspace);
+                pc.reportMsg("Calculating correlation: " + CORRELATION_METHODS[correlationIndex], workspace);
                 double[] rank1, rank2;
                 for (int i = 0; i < rankedFeatures.length - 1 && !stopRun; i++) {
                     if (rankedFeatures[i] != null) {
@@ -465,11 +469,11 @@ public class FeatureSelectionAlgo implements Algorithm {
 
         // Replace ranks with average 
         double value = (2 * c + length - 1) / 2d;
-        double sum = 0;
-        for (int pos : tiesTrace) {
-            sum += pos;
-        }
-        double avg = sum / length;
+//        double sum = 0;
+//        for (int pos : tiesTrace) {
+//            sum += pos;
+//        }
+//        double avg = sum / length;
 
         Iterator<Integer> iterator = tiesTrace.iterator();
         while (iterator.hasNext()) {

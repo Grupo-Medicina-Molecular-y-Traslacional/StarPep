@@ -13,7 +13,6 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.network.model.SimilarityMatrixModel;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.DialogDisplayer;
-import org.openide.util.Exceptions;
 
 /**
  *

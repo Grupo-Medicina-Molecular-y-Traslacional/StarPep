@@ -5,9 +5,15 @@
  */
 package org.bapedis.network.impl;
 
+import java.awt.GridBagConstraints;
 import javax.swing.JPanel;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+import org.jdesktop.swingx.JXHyperlink;
+import org.openide.DialogDisplayer;
+import org.openide.WizardDescriptor;
+import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -15,11 +21,40 @@ import org.bapedis.core.spi.algo.AlgorithmSetupUI;
  */
 public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
 
+    protected final JXHyperlink openWizardLink;
+    private CSNAlgorithm csnAlgo;
+
     /**
      * Creates new form CSNAlgorithmPanel
      */
     public CSNAlgorithmPanel() {
         initComponents();
+        openWizardLink = new JXHyperlink();
+        configureOpenWizardLink();
+    }
+
+    private void configureOpenWizardLink() {
+        openWizardLink.setIcon(ImageUtilities.loadImageIcon("org/bapedis/network/resources/wizard.png", false));
+        openWizardLink.setText(NbBundle.getMessage(CSNAlgorithmPanel.class, "CSNAlgorithmPanel.openWizardLink.text"));        
+        openWizardLink.setClickedColor(new java.awt.Color(0, 51, 255));
+        openWizardLink.setFocusPainted(false);
+        openWizardLink.setFocusable(false);
+        openWizardLink.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        openWizardLink.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        openWizardLink.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (csnAlgo != null) {
+                    WizardDescriptor wiz = CSNAlgorithmFactory.createWizardDescriptor(csnAlgo);
+                    if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
+                        
+                    }
+                }
+            }
+        });
+
+        
+        topPanel.add(openWizardLink);
     }
 
     /**
@@ -30,25 +65,40 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        topPanel = new javax.swing.JPanel();
+        centerPanel = new javax.swing.JPanel();
+
+        setLayout(new java.awt.GridBagLayout());
+
+        topPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(topPanel, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(centerPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
+        this.csnAlgo = (CSNAlgorithm) algo;
         return this;
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel centerPanel;
+    private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 }

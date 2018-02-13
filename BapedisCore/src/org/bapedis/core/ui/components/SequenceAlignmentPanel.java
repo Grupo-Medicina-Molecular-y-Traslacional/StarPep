@@ -46,12 +46,15 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
 
         jPIDSlider.setMinimum(SequenceAlignmentModel.PID_MIN);
         jPIDSlider.setMaximum(SequenceAlignmentModel.PID_MAX);
+        jPIDSlider.setMajorTickSpacing(SequenceAlignmentModel.PID_MAJORTICKSPACING);
+        jPIDSlider.setMinorTickSpacing(SequenceAlignmentModel.PID_MINORTICKSPACING);
 
         //Label table
         Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
         labelTable.put(SequenceAlignmentModel.PID_REFS[0], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.low")));
         labelTable.put(SequenceAlignmentModel.PID_REFS[1], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.middle")));
         labelTable.put(SequenceAlignmentModel.PID_REFS[2], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.high")));
+        labelTable.put(SequenceAlignmentModel.PID_REFS[3], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.max")));
 
         jPIDSlider.setLabelTable(labelTable);
         jPIDLabel.setText(model.getPercentIdentity() + "%");
@@ -140,7 +143,7 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(10, 5, 0, 0);
         add(jSMLabel, gridBagConstraints);
 
         jSMComboBox.addActionListener(new java.awt.event.ActionListener() {
@@ -152,7 +155,7 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(10, 5, 0, 0);
         add(jSMComboBox, gridBagConstraints);
 
         jPIDInfoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
@@ -161,7 +164,7 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(10, 5, 0, 0);
         add(jPIDInfoLabel, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jPIDLabel, org.openide.util.NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.jPIDLabel.text")); // NOI18N
@@ -172,7 +175,7 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(10, 5, 0, 0);
         add(jPIDLabel, gridBagConstraints);
 
         jToolBar1.setFloatable(false);
@@ -192,12 +195,12 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         jToolBar1.add(jLessButton);
 
         jPIDSlider.setMajorTickSpacing(10);
-        jPIDSlider.setMaximum(90);
         jPIDSlider.setMinimum(50);
         jPIDSlider.setMinorTickSpacing(5);
         jPIDSlider.setPaintLabels(true);
         jPIDSlider.setPaintTicks(true);
         jPIDSlider.setToolTipText(org.openide.util.NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.jPIDSlider.toolTipText")); // NOI18N
+        jPIDSlider.setPreferredSize(new java.awt.Dimension(280, 45));
         jPIDSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jPIDSliderStateChanged(evt);
@@ -221,6 +224,8 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jToolBar1, gridBagConstraints);
 

@@ -35,7 +35,7 @@ public class SequenceAlignmentModel implements Cloneable{
     
     public static final int PID_MAX=100;
     public static final int PID_MIN=50;
-    public static final int[] PID_REFS= new int[]{50, 70, 90, 100};  
+    public static final int[] PID_REFS= new int[]{50, 70, 100};  
     public static final int PID_MAJORTICKSPACING = 20;
     public static final int PID_MINORTICKSPACING = 10;    
     public static final int DEFAULT_PID=70;    

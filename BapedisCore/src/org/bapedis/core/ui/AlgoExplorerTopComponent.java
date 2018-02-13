@@ -227,9 +227,9 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         });
         algoToolBar.add(presetsButton);
 
+        resetButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/refresh.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(resetButton, org.openide.util.NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.resetButton.text")); // NOI18N
         resetButton.setFocusable(false);
-        resetButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         resetButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         resetButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -360,12 +360,22 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                     break;
                 }
             }
+            boolean addToWS = false;
             if (algorithm == null) {
                 algorithm = factory.createAlgorithm();
-                currentWs.add(algorithm);
+                addToWS = true;
             }
-            algoModel.setSelectedAlgorithm(algorithm);
-            setEnableState(true);
+
+            if (algorithm != null) {
+                if (addToWS) {
+                    currentWs.add(algorithm);
+                }
+                algoModel.setSelectedAlgorithm(algorithm);
+                setEnableState(true);
+            }else {
+                algoComboBox.setSelectedItem(NO_SELECTION);
+                setEnableState(false);
+            }
         } else {
             algoModel.setSelectedAlgorithm(null);
             setEnableState(false);
@@ -458,7 +468,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
     private void refreshProperties(AlgorithmModel algoModel) {
         if (algoModel == null || algoModel.getSelectedAlgorithm() == null) {
-            ((PropertySheetPanel) propSheetPanel).getPropertySheet().setNodes(new Node[0]);            
+            ((PropertySheetPanel) propSheetPanel).getPropertySheet().setNodes(new Node[0]);
             scrollPane.setViewportView(null);
             scrollPane.setVisible(false);
             propSheetPanel.setVisible(true);
@@ -632,7 +642,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             }
         }
     }
-    
+
 }
 
 class AlgoPresetPersistence {

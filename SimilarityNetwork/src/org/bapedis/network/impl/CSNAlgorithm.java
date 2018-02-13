@@ -5,6 +5,8 @@
  */
 package org.bapedis.network.impl;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,7 +30,7 @@ import org.bapedis.core.spi.algo.impl.SequenceClustering;
 import org.bapedis.core.spi.algo.impl.SequenceClusteringFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.network.model.WizardOptionModel;
-import org.bapedis.network.model.SimilarityMatrixModel;
+import org.bapedis.network.model.SimilarityMatrix;
 import org.bapedis.network.spi.SimilarityMeasure;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
@@ -45,16 +47,27 @@ import org.openide.util.NbBundle;
  */
 public class CSNAlgorithm implements Algorithm {
 
+    public static final int[] SIMILARITY_CUTOFF_REFS = new int[]{50, 70, 100};
+    public static final int SIMILARITY_CUTOFF_MIN = 50;
+    public static final int SIMILARITY_CUTOFF_MAX = 100;
+    public static final int SIMILARITY_DEFAULT_VALUE = 70;
+    public static final int SIMILARITY_MAJORTICKSPACING = 10;
+    public static final int SIMILARITY_MINORTICKSPACING = 5;
+    
+    public static final String RUNNING = "running";
+
     private CSNAlgorithmFactory factory;
     private final SequenceClustering clusteringAlgo;
     private final WizardOptionModel optionModel;
     private final AllDescriptors descriptorAlgo;
     private final FeatureSelectionAlgo featureSelectionAlgo;
     private SimilarityMeasure simMeasure;
-    private int thresholdPercent;
+    private int cutoffValue;
+    private SimilarityMatrix similarityMatrix;
 
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+    protected final PropertyChangeSupport propertyChangeSupport;
 
     protected final NotifyDescriptor emptyKeys, notEnoughFeatures;
     public static final int MIN_AVAILABLE_FEATURES = 2;
@@ -64,7 +77,7 @@ public class CSNAlgorithm implements Algorithm {
     protected GraphModel graphModel;
     protected Graph graph;
     protected ProgressTicket ticket;
-    protected boolean stopRun;
+    protected boolean stopRun, running;
 
     public CSNAlgorithm(CSNAlgorithmFactory factory) {
         this.factory = factory;
@@ -72,11 +85,12 @@ public class CSNAlgorithm implements Algorithm {
         optionModel = new WizardOptionModel();
         descriptorAlgo = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
         featureSelectionAlgo = (FeatureSelectionAlgo) new FeatureSelectionFactory().createAlgorithm();
-        thresholdPercent = 70;
+        cutoffValue = 70;
 
         emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithm.class, "ChemicalSpaceNetwork.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
         notEnoughFeatures = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithm.class, "ChemicalSpaceNetwork.features.notEnough", MIN_AVAILABLE_FEATURES), NotifyDescriptor.ERROR_MESSAGE);
-
+        propertyChangeSupport = new PropertyChangeSupport(this);
+        running = false;
     }
 
     public SequenceClustering getSequenceClustering() {
@@ -103,13 +117,24 @@ public class CSNAlgorithm implements Algorithm {
         this.simMeasure = simMeasure;
     }
 
-    public int getThresholdPercent() {
-        return thresholdPercent;
+    public int getCutoffValue() {
+        return cutoffValue;
     }
 
-    public void setThresholdPercent(int thresholdPercent) {
-        this.thresholdPercent = thresholdPercent;
+    public void setCutoffValue(int cutoffValue) {
+        if (cutoffValue < SIMILARITY_CUTOFF_MIN || cutoffValue > SIMILARITY_CUTOFF_MAX) {
+            throw new IllegalArgumentException("Invalid value for cutoff. It should be between " + SIMILARITY_CUTOFF_MIN + " and " + SIMILARITY_CUTOFF_MAX);
+        }
+        this.cutoffValue = cutoffValue;
     }
+
+    public SimilarityMatrix getSimilarityMatrix() {
+        return similarityMatrix;
+    }
+
+    public boolean isRunning() {
+        return running;
+    }        
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
@@ -135,9 +160,13 @@ public class CSNAlgorithm implements Algorithm {
                 }
             } finally {
                 mainGraph.writeUnlock();
-            }
+            }  
+            
+            similarityMatrix = null;
         }
-
+        
+        running = true;
+        propertyChangeSupport.firePropertyChange(RUNNING, false, true);
     }
 
     @Override
@@ -148,6 +177,13 @@ public class CSNAlgorithm implements Algorithm {
         graph = null;
         ticket = null;
         SimilarityMatrixkBuilder.setContext(null, null, null);
+        
+        if (stopRun){ // Cancelled
+            similarityMatrix = null;
+        }
+        
+        running = false;
+        propertyChangeSupport.firePropertyChange(RUNNING, true, false);
     }
 
     @Override
@@ -225,36 +261,8 @@ public class CSNAlgorithm implements Algorithm {
                 //Set feature list to similarity measure
                 simMeasure.setMolecularDescriptors(featureList);
 
-                // Delete old similarity matrix
-                SimilarityMatrixModel oldMatrix = workspace.getLookup().lookup(SimilarityMatrixModel.class);
-                if (oldMatrix != null) {
-                    workspace.remove(oldMatrix);
-                }
-
                 // Compute new similarity matrix
-                SimilarityMatrixModel newMatrix = computeSimilarityMatrix(peptides);
-
-                // Add the new similarity matrix to workspace
-                workspace.add(newMatrix);
-
-                // Add similarity edge to graph
-//                ticket.progress(NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.csn"));
-//                Edge graphEdge;
-//                Float score;
-//                graph.writeLock();
-//                try {
-//                    for (int i = 0; i < representatives.length - 1; i++) {
-//                        for (int j = i + 1; j < representatives.length; j++) {
-//                            score = newMatrix.getValue(representatives[i], representatives[j]);
-//                            if (score != null && score >= 0.3) {
-//                                graphEdge = createGraphEdge(representatives[i], representatives[j], score);
-//                                graph.addEdge(graphEdge);
-//                            }
-//                        }
-//                    }
-//                } finally {
-//                    graph.writeUnlock();
-//                }
+                similarityMatrix = computeSimilarityMatrix(peptides);                
             }
         }
 
@@ -343,7 +351,7 @@ public class CSNAlgorithm implements Algorithm {
 
     }
 
-    private SimilarityMatrixModel computeSimilarityMatrix(Peptide[] peptides) {
+    private SimilarityMatrix computeSimilarityMatrix(Peptide[] peptides) {
         String msg = NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.simMatrix");
         pc.reportMsg(msg, workspace);
         ticket.progress(msg);
@@ -356,26 +364,13 @@ public class CSNAlgorithm implements Algorithm {
         task.join();
         return task.getSimilarityMatrix();
     }
-
-    private Edge createGraphEdge(Peptide peptide1, Peptide peptide2, Float score) {
-        int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-        String id = String.format("%s-%s", peptide1.getId(), peptide2.getId());
-
-        // Create Edge
-        Edge graphEdge = graphModel.factory().newEdge(id, peptide1.getGraphNode(), peptide2.getGraphNode(), relType, ProjectManager.GRAPH_EDGE_WEIGHT, false);
-        graphEdge.setLabel(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-
-        //Set color
-        graphEdge.setR(ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f);
-        graphEdge.setG(ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f);
-        graphEdge.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
-        graphEdge.setAlpha(0f);
-
-        // Add edge to main graph
-        graphModel.getGraph().addEdge(graphEdge);
-        graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, score);
-
-        return graphEdge;
+    
+    public void addRunningListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
     }
+
+    public void removeRunningListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }    
 
 }

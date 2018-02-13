@@ -77,12 +77,16 @@ public class ToolAction extends WorkspaceContextSensitiveAction<AttributesModel>
                                     break;
                                 }
                             }
+                            boolean addToWS = false;
                             if (algorithm == null) {
                                 algorithm = factory.createAlgorithm();
+                                addToWS = true;
                             }
 
                             if (algorithm != null) {
-                                currentWs.add(algorithm);
+                                if (addToWS) {
+                                    currentWs.add(algorithm);
+                                }
                                 algoModel.setSelectedAlgorithm(algorithm);
 
                                 TopComponent tc = WindowManager.getDefault().findTopComponent("AlgoExplorerTopComponent");

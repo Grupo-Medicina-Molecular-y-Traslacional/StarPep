@@ -10,44 +10,56 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
+import org.bapedis.network.impl.JQuickHistogram;
 
 /**
  *
  * @author Longendri Aguilera Mendoza
  */
-public class SimilarityMatrixModel implements Serializable {
+public class SimilarityMatrix implements Serializable {
 
+    protected final JQuickHistogram histogram;
     protected static PeptideAttribute INDEX_ATTR = new PeptideAttribute("indexAttr", "indexAttr", Integer.class);
     protected Float[] data;
 
-    public SimilarityMatrixModel(Peptide[] peptides) { 
-        for(int index = 0; index < peptides.length; index++){
+    public SimilarityMatrix(Peptide[] peptides) {
+        for (int index = 0; index < peptides.length; index++) {
             peptides[index].setAttributeValue(INDEX_ATTR, index);
         }
         int size = peptides.length;
         data = new Float[size * (size - 1) / 2];
+        histogram = new JQuickHistogram();
     }
-    
 
     public void setValue(Peptide peptide1, Peptide peptide2, Float value) {
-        int x = (int)peptide1.getAttributeValue(INDEX_ATTR);
-        int y = (int)peptide2.getAttributeValue(INDEX_ATTR);
-        assert x != y;
-        data[ pos(x, y)] = value;
+        if (peptide1.hasAttribute(INDEX_ATTR) && peptide2.hasAttribute(INDEX_ATTR)) {
+            int x = (int) peptide1.getAttributeValue(INDEX_ATTR);
+            int y = (int) peptide2.getAttributeValue(INDEX_ATTR);
+            assert x != y;
+            data[pos(x, y)] = value;
+            histogram.addData(value);
+        }
+    }
+
+    public JQuickHistogram getHistogram() {
+        return histogram;
     }
 
     public Float getValue(Peptide peptide1, Peptide peptide2) {
-        int x = (int)peptide1.getAttributeValue(INDEX_ATTR);
-        int y = (int)peptide2.getAttributeValue(INDEX_ATTR);
-        assert x != y;
-        return data[ pos(x, y)];
+        if (peptide1.hasAttribute(INDEX_ATTR) && peptide2.hasAttribute(INDEX_ATTR)) {
+            int x = (int) peptide1.getAttributeValue(INDEX_ATTR);
+            int y = (int) peptide2.getAttributeValue(INDEX_ATTR);
+            assert x != y;
+            return data[pos(x, y)];
+        }
+        return -1.f;
     }
 
     public Float[] getValues() {
         return data;
     }
-    
-    public int getSize(){
+
+    public int getSize() {
         return data.length;
     }
 

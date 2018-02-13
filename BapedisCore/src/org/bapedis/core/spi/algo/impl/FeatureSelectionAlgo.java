@@ -36,21 +36,21 @@ public class FeatureSelectionAlgo implements Algorithm {
     protected final ProjectManager pc;
     protected final FeatureSelectionFactory factory;
 
-    //Entropy cutoff for reference: Very weak, Weak and Moderate
-    public static final int[] ENTROPY_CUTOFF_REFS = new int[]{10, 30, 50};
+    //Entropy cutoff for reference: 
+    public static final int[] ENTROPY_CUTOFF_REFS = new int[]{10, 25, 50};
     public static final int ENTROPY_CUTOFF_MIN = 10;
     public static final int ENTROPY_CUTOFF_MAX = 50;
-    public static final int ENTROPY_DEFAULT_VALUE = 30;
-    public static final int ENTROPY_MAJORTICKSPACING = 10;
+    public static final int ENTROPY_DEFAULT_VALUE = 25;
+    public static final int ENTROPY_MAJORTICKSPACING = 15;
     public static final int ENTROPY_MINORTICKSPACING = 5;
 
-    private static final String PEARSON="Pearson";
-    private static final String SPEARMAN="Spearman";
+    private static final String PEARSON = "Pearson";
+    private static final String SPEARMAN = "Spearman";
     public static final String[] CORRELATION_METHODS = new String[]{PEARSON, SPEARMAN};
     public static final int CORRELATION_DEFAULT_INDEX = 0;
 
-    //Correlation cutoff for references: Moderate, Strong and Very Strong    
-    public static final int[] CORRELATION_CUTOFF_REFS = new int[]{50, 70, 90, 100};
+    //Correlation cutoff for references: 
+    public static final int[] CORRELATION_CUTOFF_REFS = new int[]{50, 70, 100};
     public static final int CORRELATION_CUTOFF_MIN = 50;
     public static final int CORRELATION_CUTOFF_MAX = 100;
     public static final int CORRELATION_DEFAULT_VALUE = 70;
@@ -110,7 +110,7 @@ public class FeatureSelectionAlgo implements Algorithm {
     public void setEntropyCutoff(int entropyCutoff) {
         if (entropyCutoff < ENTROPY_CUTOFF_MIN || entropyCutoff > ENTROPY_CUTOFF_MAX) {
             throw new IllegalArgumentException("Invalid value for entropy cutoff. It should be between " + ENTROPY_CUTOFF_MIN + " and " + ENTROPY_CUTOFF_MAX);
-        }        
+        }
         this.entropyCutoff = entropyCutoff;
     }
 
@@ -284,36 +284,47 @@ public class FeatureSelectionAlgo implements Algorithm {
                 threshold = getCorrelationCutoff() / 100.;
                 pc.reportMsg("Correlation cutoff value: " + threshold + "\n", workspace);
 
-                pc.reportMsg("Calculating the transformed matrix of the input data", workspace);
-                double[][] transformedMatrix = new double[rankedFeatures.length][];
-                double[] column = new double[peptides.size()];
+                pc.reportMsg("Calculating descriptor matrix", workspace);
+                double[][] descriptorMatrix = new double[rankedFeatures.length][];
+                double[] column;
                 int pos;
-                boolean pearson = CORRELATION_METHODS[correlationIndex].equals(PEARSON);
-                boolean spearman = CORRELATION_METHODS[correlationIndex].equals(SPEARMAN);                
-                for (int i = 0; i < rankedFeatures.length && !stopRun; i++) {
-                    pos = 0;
-                    for (Peptide peptide : peptides) {
-                        column[pos++] = MolecularDescriptor.getDoubleValue(peptide, rankedFeatures[i]);
+                if (CORRELATION_METHODS[correlationIndex].equals(PEARSON)) {
+                    for (int i = 0; i < rankedFeatures.length && !stopRun; i++) {
+                        column = new double[peptides.size()];
+                        pos = 0;
+                        for (Peptide peptide : peptides) {
+                            column[pos++] = MolecularDescriptor.getDoubleValue(peptide, rankedFeatures[i]);
+                        }
+                        descriptorMatrix[i] = column;
+                        ticket.progress();
                     }
-                    transformedMatrix[i] =  pearson? column: (spearman? rank(column): null);
-                    ticket.progress();
+                } else if (CORRELATION_METHODS[correlationIndex].equals(SPEARMAN)) {
+                    column = new double[peptides.size()]; // Temporal column
+                    for (int i = 0; i < rankedFeatures.length && !stopRun; i++) {
+                        pos = 0;
+                        for (Peptide peptide : peptides) {
+                            column[pos++] = MolecularDescriptor.getDoubleValue(peptide, rankedFeatures[i]);
+                        }
+                        descriptorMatrix[i] = rank(column);
+                        ticket.progress();
+                    }
                 }
 
                 pc.reportMsg("Calculating correlation: " + CORRELATION_METHODS[correlationIndex], workspace);
                 double[] rank1, rank2;
                 for (int i = 0; i < rankedFeatures.length - 1 && !stopRun; i++) {
                     if (rankedFeatures[i] != null) {
-                        rank1 = transformedMatrix[i];
+                        rank1 = descriptorMatrix[i];
                         for (int j = i + 1; j < rankedFeatures.length && !stopRun; j++) {
                             if (rankedFeatures[j] != null) {
-                                rank2 = transformedMatrix[j];
+                                rank2 = descriptorMatrix[j];
                                 score = calculatePearsonCorrelation(rank1, rank2);
                                 if (Math.abs(score) >= threshold) {
                                     attrModel.deleteAttribute(rankedFeatures[j]);
-                                    pc.reportMsg("Removed: " + rankedFeatures[j].getDisplayName() + " - " + String.format("rho(%s) = %f", rankedFeatures[i].getDisplayName(), score), workspace);
+                                    pc.reportMsg("Removed: " + rankedFeatures[j].getDisplayName() + " - " + String.format("corr(%s) = %f", rankedFeatures[i].getDisplayName(), score), workspace);
                                     toRemove.add(rankedFeatures[j]);
                                     rankedFeatures[j] = null;
-                                    transformedMatrix[j] = null;
+                                    descriptorMatrix[j] = null;
                                 }
                             }
                             ticket.progress();

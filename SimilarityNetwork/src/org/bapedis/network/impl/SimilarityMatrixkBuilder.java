@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.network.model.SimilarityMatrixModel;
+import org.bapedis.network.model.SimilarityMatrix;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.DialogDisplayer;
 
@@ -24,24 +24,25 @@ class SimilarityMatrixkBuilder extends RecursiveAction {
     private static Peptide[] peptides;
     private static ProgressTicket progressTicket;
     private static SimilarityMeasure similarityMeasure;
+    private static float MIN_VALUE = CSNAlgorithm.SIMILARITY_CUTOFF_MIN / 100.f;
 
-    private final SimilarityMatrixModel matrix;
+    private final SimilarityMatrix matrix;
     private int xlow, xhigh, ylow, yhigh;
 
     private final static Logger log = Logger.getLogger(SimilarityMatrixkBuilder.class.getName());
     private static AtomicBoolean stopRun = new AtomicBoolean(false);
 
     SimilarityMatrixkBuilder() {
-        this(new SimilarityMatrixModel(peptides), 0, peptides.length, 0, peptides.length);
+        this(new SimilarityMatrix(peptides), 0, peptides.length, 0, peptides.length);
     }
 
     static void setContext(Peptide[] peptides, ProgressTicket progressTicket, SimilarityMeasure similarityMeasure) {
         SimilarityMatrixkBuilder.peptides = peptides;
         SimilarityMatrixkBuilder.progressTicket = progressTicket;
-        SimilarityMatrixkBuilder.similarityMeasure = similarityMeasure;
+        SimilarityMatrixkBuilder.similarityMeasure = similarityMeasure;        
     }
 
-    private SimilarityMatrixkBuilder(SimilarityMatrixModel matrix, int xlow, int xhigh, int ylow, int yhigh) {
+    private SimilarityMatrixkBuilder(SimilarityMatrix matrix, int xlow, int xhigh, int ylow, int yhigh) {
         this.matrix = matrix;
         this.xlow = xlow;
         this.xhigh = xhigh;
@@ -53,7 +54,7 @@ class SimilarityMatrixkBuilder extends RecursiveAction {
         stopRun.set(stop);
     }
 
-    public SimilarityMatrixModel getSimilarityMatrix() {
+    public SimilarityMatrix getSimilarityMatrix() {
         return matrix;
     }
 
@@ -97,7 +98,7 @@ class SimilarityMatrixkBuilder extends RecursiveAction {
                         stopRun.set(true);
                         score = -1;
                     }
-                    if (score >= 0.3) {
+                    if (score >= MIN_VALUE) {
                         matrix.setValue(peptides[y], peptides[x], score);
                     }
                     progressTicket.progress();

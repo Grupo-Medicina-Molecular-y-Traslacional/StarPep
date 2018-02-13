@@ -54,7 +54,6 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         labelTable.put(SequenceAlignmentModel.PID_REFS[0], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.low")));
         labelTable.put(SequenceAlignmentModel.PID_REFS[1], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.middle")));
         labelTable.put(SequenceAlignmentModel.PID_REFS[2], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.high")));
-        labelTable.put(SequenceAlignmentModel.PID_REFS[3], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.max")));
 
         jPIDSlider.setLabelTable(labelTable);
         jPIDLabel.setText(model.getPercentIdentity() + "%");
@@ -181,6 +180,7 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
         jToolBar1.setFocusable(false);
+        jToolBar1.setPreferredSize(new java.awt.Dimension(338, 90));
 
         jLessButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/less.png"))); // NOI18N
         jLessButton.setToolTipText(org.openide.util.NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.jLessButton.toolTipText")); // NOI18N
@@ -200,7 +200,8 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         jPIDSlider.setPaintLabels(true);
         jPIDSlider.setPaintTicks(true);
         jPIDSlider.setToolTipText(org.openide.util.NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.jPIDSlider.toolTipText")); // NOI18N
-        jPIDSlider.setPreferredSize(new java.awt.Dimension(280, 45));
+        jPIDSlider.setMinimumSize(new java.awt.Dimension(360, 80));
+        jPIDSlider.setPreferredSize(new java.awt.Dimension(360, 80));
         jPIDSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jPIDSliderStateChanged(evt);

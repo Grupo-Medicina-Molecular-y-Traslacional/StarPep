@@ -97,6 +97,10 @@ public class Peptide {
             propertyChangeSupport.firePropertyChange(CHANGED_ATTRIBUTE, attr, null);
         }
     }
+    
+    public boolean hasAttribute(PeptideAttribute attr){
+        return attrsValue.containsKey(attr);
+    }
 
     public PeptideAttribute[] getAttributes() {
         return attrsValue.keySet().toArray(new PeptideAttribute[0]);

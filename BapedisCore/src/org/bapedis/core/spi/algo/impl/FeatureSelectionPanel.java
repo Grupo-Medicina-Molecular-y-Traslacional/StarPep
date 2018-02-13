@@ -82,7 +82,6 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         redundantLabelTable.put(FeatureSelectionAlgo.CORRELATION_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.low")));
         redundantLabelTable.put(FeatureSelectionAlgo.CORRELATION_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.middle")));
         redundantLabelTable.put(FeatureSelectionAlgo.CORRELATION_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.high")));
-        redundantLabelTable.put(FeatureSelectionAlgo.CORRELATION_CUTOFF_REFS[3], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.max")));
         redundantSlider.setLabelTable(redundantLabelTable);                
 
     }
@@ -259,7 +258,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         uselessSlider.setPaintTicks(true);
         uselessSlider.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.toolTipText")); // NOI18N
         uselessSlider.setEnabled(false);
-        uselessSlider.setMinimumSize(new java.awt.Dimension(280, 80));
+        uselessSlider.setMinimumSize(new java.awt.Dimension(360, 80));
         uselessSlider.setPreferredSize(new java.awt.Dimension(360, 80));
         jEntropyToolBar.add(uselessSlider);
 
@@ -284,6 +283,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
         jSettingPanel.add(jSeparator1, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(correlationLabel, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.correlationLabel.text")); // NOI18N
@@ -327,7 +328,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         redundantSlider.setPaintTicks(true);
         redundantSlider.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.toolTipText")); // NOI18N
         redundantSlider.setEnabled(false);
-        redundantSlider.setMinimumSize(new java.awt.Dimension(280, 80));
+        redundantSlider.setMinimumSize(new java.awt.Dimension(360, 80));
         redundantSlider.setPreferredSize(new java.awt.Dimension(360, 80));
         jRedundantToolBar.add(redundantSlider);
 

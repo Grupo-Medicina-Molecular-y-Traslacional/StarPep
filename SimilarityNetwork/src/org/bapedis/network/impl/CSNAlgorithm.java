@@ -60,7 +60,7 @@ public class CSNAlgorithm implements Algorithm {
     private final AllDescriptors descriptorAlgo;
     private final FeatureSelectionAlgo featureSelectionAlgo;
     private SimilarityMeasure simMeasure;
-    private int cutoffValue;
+    private float cutoffValue;
     private SimilarityMatrix similarityMatrix;
 
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
@@ -83,7 +83,7 @@ public class CSNAlgorithm implements Algorithm {
         optionModel = new WizardOptionModel();
         descriptorAlgo = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
         featureSelectionAlgo = (FeatureSelectionAlgo) new FeatureSelectionFactory().createAlgorithm();
-        cutoffValue = 70;
+        cutoffValue = -1;
 
         emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithm.class, "ChemicalSpaceNetwork.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
         notEnoughFeatures = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithm.class, "ChemicalSpaceNetwork.features.notEnough", MIN_AVAILABLE_FEATURES), NotifyDescriptor.ERROR_MESSAGE);
@@ -115,13 +115,13 @@ public class CSNAlgorithm implements Algorithm {
         this.simMeasure = simMeasure;
     }
 
-    public int getCutoffValue() {
+    public float getCutoffValue() {
         return cutoffValue;
     }
 
-    public void setCutoffValue(int cutoffValue) {
-        if (cutoffValue < SIMILARITY_CUTOFF_MIN || cutoffValue > SIMILARITY_CUTOFF_MAX) {
-            throw new IllegalArgumentException("Invalid value for cutoff. It should be between " + SIMILARITY_CUTOFF_MIN + " and " + SIMILARITY_CUTOFF_MAX);
+    public void setCutoffValue(float cutoffValue) {
+        if (cutoffValue < 0 || cutoffValue > 1) {
+            throw new IllegalArgumentException("Invalid value for cutoff. It should be between 0 and 1");
         }
         this.cutoffValue = cutoffValue;
     }

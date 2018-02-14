@@ -39,7 +39,7 @@ public class ApplyCutoffValue extends SwingWorker<Void, Void> {
         this.matrix = csnAlgo.getSimilarityMatrix();
         stopRun = new AtomicBoolean(false);
         graphModel = pc.getGraphModel();
-        cutoff = csnAlgo.getCutoffValue() / 100.f;
+        this.cutoff = csnAlgo.getCutoffValue();
         ticket = new ProgressTicket("Applying similarity cutoff", new Cancellable() {
             @Override
             public boolean cancel() {
@@ -66,11 +66,12 @@ public class ApplyCutoffValue extends SwingWorker<Void, Void> {
     @Override
     protected Void doInBackground() throws Exception {
         ticket.start();
+        
         Edge graphEdge;
         Float score;
         Graph graph = graphModel.getGraphVisible();
         Peptide[] peptides = matrix.getPeptides();
-        clearGraph();
+        clearGraph();        
         for (int i = 0; i < peptides.length - 1 && !stopRun.get(); i++) {
             for (int j = i + 1; j < peptides.length && !stopRun.get(); j++) {
                 score = matrix.getValue(peptides[i], peptides[j]);

@@ -13,32 +13,20 @@ import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Hashtable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.SwingWorker;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
-import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.Peptide;
-import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmSetupUI;
-import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.bapedis.network.model.SimilarityMatrix;
-import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphModel;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXHyperlink;
 import org.jfree.chart.ChartPanel;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
-import org.openide.util.Cancellable;
-import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
@@ -47,7 +35,7 @@ import org.openide.util.NbBundle;
  * @author Home
  */
 public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSetupUI, PropertyChangeListener {
-    
+
     protected final JXHyperlink openWizardLink;
     private CSNAlgorithm csnAlgo;
     private RichTooltip richTooltip;
@@ -342,10 +330,7 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
     }// </editor-fold>//GEN-END:initComponents
 
     private void cutoffSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_cutoffSliderStateChanged
-        if (!cutoffSlider.getValueIsAdjusting() && csnAlgo != null) {
-            csnAlgo.setCutoffValue(cutoffSlider.getValue());
-            jCutoffValueLabel.setText(csnAlgo.getCutoffValue() + "%");
-        }
+        jCutoffValueLabel.setText(cutoffSlider.getValue() + "%");
     }//GEN-LAST:event_cutoffSliderStateChanged
 
     private void infoLabelMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_infoLabelMouseExited
@@ -376,18 +361,23 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
 
     private void jApplyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jApplyButtonActionPerformed
         if (csnAlgo != null && csnAlgo.getSimilarityMatrix() != null) {
+            csnAlgo.setCutoffValue(cutoffSlider.getValue() / 100.f);
             ApplyCutoffValue worker = new ApplyCutoffValue(csnAlgo);
             worker.execute();
         }
     }//GEN-LAST:event_jApplyButtonActionPerformed
 
     @Override
-    public JPanel getSettingPanel(Algorithm algo
-    ) {
+    public JPanel getSettingPanel(Algorithm algo) {
         this.csnAlgo = (CSNAlgorithm) algo;
-        int cutoff = csnAlgo.getCutoffValue();
-        jCutoffValueLabel.setText(cutoff + "%");
-        cutoffSlider.setValue(cutoff);
+        if (csnAlgo.getCutoffValue() != -1) {
+            int cutoff = (int) (csnAlgo.getCutoffValue() * 100);
+            cutoffSlider.setValue(cutoff);
+            jCutoffValueLabel.setText(cutoff + "%");
+        } else {
+            cutoffSlider.setValue(CSNAlgorithm.SIMILARITY_DEFAULT_VALUE);
+            jCutoffValueLabel.setText(CSNAlgorithm.SIMILARITY_DEFAULT_VALUE + "%");
+        }
         setBusy(csnAlgo.isRunning());
         return this;
     }

@@ -15,13 +15,10 @@ import java.util.Set;
  * @author loge
  */
 public class GraphViz {
-    public static final String CHANGED_THRESHOLD = "changed_threshold";
     public static final String CHANGED_GRAPH_VIEW = "changed_graph_view";
     public static final String CHANGED_DISPLAYED_METADATA = "changed_metadata";
-    public static final String CHANGED_DISPLAYED_CSN = "changed_csn";
 
     protected transient final PropertyChangeSupport propertyChangeSupport;
-    protected float similarityThreshold;
     protected final Set<AnnotationType> displayedMetadata;
     protected boolean csnVisible;
 
@@ -30,7 +27,6 @@ public class GraphViz {
         displayedMetadata = new HashSet<>(AnnotationType.values().length);
 //        displayedMetadata.add(AnnotationType.DATABASE);
         csnVisible = true;
-        similarityThreshold = 0.3f;
     }
     
     public boolean isDisplayedMetadata(AnnotationType aType){
@@ -49,26 +45,6 @@ public class GraphViz {
         }
     }    
 
-    public boolean isCsnVisible() {
-        return csnVisible;
-    }
-
-    public void setCsnVisible(boolean csnVisible) {
-        boolean oldValue = this.csnVisible;
-        this.csnVisible = csnVisible;
-        propertyChangeSupport.firePropertyChange(CHANGED_DISPLAYED_CSN, oldValue, csnVisible);
-    }
-
-    public float getSimilarityThreshold() {
-        return similarityThreshold;
-    }
-
-    public void setSimilarityThreshold(float threshold) {
-        float oldValue = this.similarityThreshold;
-        this.similarityThreshold = threshold;
-        propertyChangeSupport.firePropertyChange(CHANGED_THRESHOLD, oldValue, threshold);
-    }    
-    
     public void addDisplayedMetadataChangeListener(PropertyChangeListener listener){
         propertyChangeSupport.addPropertyChangeListener(CHANGED_DISPLAYED_METADATA, listener);
     }

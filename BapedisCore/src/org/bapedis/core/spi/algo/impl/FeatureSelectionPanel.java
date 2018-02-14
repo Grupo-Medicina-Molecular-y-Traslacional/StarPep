@@ -241,7 +241,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
 
         jEntropyToolBar.setFloatable(false);
         jEntropyToolBar.setRollover(true);
-        jEntropyToolBar.setPreferredSize(new java.awt.Dimension(338, 90));
+        jEntropyToolBar.setPreferredSize(new java.awt.Dimension(420, 90));
 
         jLessUselessButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/less.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLessUselessButton, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.jLessUselessButton.text")); // NOI18N
@@ -273,9 +273,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         jSettingPanel.add(jEntropyToolBar, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -312,7 +310,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
 
         jRedundantToolBar.setFloatable(false);
         jRedundantToolBar.setRollover(true);
-        jRedundantToolBar.setPreferredSize(new java.awt.Dimension(338, 90));
+        jRedundantToolBar.setPreferredSize(new java.awt.Dimension(420, 90));
 
         jLessRedundantButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/less.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLessRedundantButton, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.jLessRedundantButton.text")); // NOI18N
@@ -343,9 +341,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         jSettingPanel.add(jRedundantToolBar, gridBagConstraints);

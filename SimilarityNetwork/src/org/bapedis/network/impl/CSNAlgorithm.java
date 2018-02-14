@@ -32,10 +32,8 @@ import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.network.model.WizardOptionModel;
 import org.bapedis.network.model.SimilarityMatrix;
 import org.bapedis.network.spi.SimilarityMeasure;
-import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.Node;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
@@ -148,19 +146,7 @@ public class CSNAlgorithm implements Algorithm {
             graph = graphModel.getGraphVisible();
 
             // Setup Similarity Matrix Builder
-            SimilarityMatrixkBuilder.setStopRun(stopRun);
-
-            // Remove all similarity edges..
-            int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-            Graph mainGraph = graphModel.getGraph();
-            mainGraph.writeLock();
-            try {
-                for (Node node : mainGraph.getNodes()) {
-                    mainGraph.clearEdges(node, relType);
-                }
-            } finally {
-                mainGraph.writeUnlock();
-            }  
+            SimilarityMatrixkBuilder.setStopRun(stopRun); 
             
             similarityMatrix = null;
         }

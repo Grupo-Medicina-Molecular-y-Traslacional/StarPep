@@ -115,6 +115,7 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         jextLabel = new javax.swing.JLabel();
         jResetButton = new javax.swing.JButton();
 
+        setPreferredSize(new java.awt.Dimension(440, 224));
         setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jATLabel, org.openide.util.NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.jATLabel.text")); // NOI18N
@@ -180,7 +181,7 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
         jToolBar1.setFocusable(false);
-        jToolBar1.setPreferredSize(new java.awt.Dimension(338, 90));
+        jToolBar1.setPreferredSize(new java.awt.Dimension(420, 90));
 
         jLessButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/less.png"))); // NOI18N
         jLessButton.setToolTipText(org.openide.util.NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.jLessButton.toolTipText")); // NOI18N
@@ -225,8 +226,6 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jToolBar1, gridBagConstraints);
 

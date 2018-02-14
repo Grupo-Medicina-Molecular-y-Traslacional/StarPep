@@ -121,10 +121,6 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
             } else if (evt.getOldValue() != null) {
                 removeMetadataNodes((AnnotationType) evt.getOldValue());
             }
-        } else if (evt.getPropertyName().equals(GraphViz.CHANGED_DISPLAYED_CSN)) {
-
-        } else if (evt.getPropertyName().equals(GraphViz.CHANGED_THRESHOLD)) {
-            changedThreshold((float) evt.getOldValue(), (float) evt.getNewValue());
         }
     }
 
@@ -177,78 +173,6 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
         }
     }
 
-    private void changedThreshold(float oldValue, float newValue) {
-        GraphModel graphModel = pc.getGraphModel();
-        Graph graph = graphModel.getGraphVisible();
-        float score;
-        int relType = graphModel.getEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-        if (relType != -1) {
-            if (newValue < oldValue) { // to add edges      
-                graph.writeLock();
-                try {
-                    for (Node node : graph.getNodes()) {
-                        for (Edge edge : graphModel.getGraph().getEdges(node, relType)) {
-                            if (graph.hasNode(edge.getSource().getId()) && graph.hasNode(edge.getTarget().getId())) {
-                                score = (float) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
-                                if (score >= newValue) {
-                                    graph.addEdge(edge);
-                                }
-                            }
-                        }
-                    }
-                } finally {
-                    graph.writeUnlock();
-                }
-            } else if (newValue > oldValue) { // to remove edges
-                graph.writeLock();
-                try {
-                    for (Edge edge : graph.getEdges()) {
-                        score = (float) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
-                        if (score < newValue) {
-                            graph.removeEdge(edge);
-                        }
-                    }
-                } finally {
-                    graph.writeUnlock();
-                }
-            }
-        }
-    }
-
-    private void refreshCSNView() {
-        GraphViz graphViz = pc.getGraphViz();
-        GraphModel graphModel = pc.getGraphModel();
-        Graph graph = graphModel.getGraphVisible();
-        int simRelType = graphModel.getEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-        if (simRelType != -1) {
-            Edge edge;
-            float score;
-            Node[] nodes = graph.getNodes().toArray();
-            graph.writeLock();
-            try {
-                if (graphViz.isCsnVisible()) {
-                    for (int i = 0; i < nodes.length - 1; i++) {
-                        for (int j = i + 1; j < nodes.length; j++) {
-                            edge = graphModel.getGraph().getEdge(nodes[i], nodes[j], simRelType);
-                            if (edge != null) {
-                                score = (float) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
-                                if (score >= graphViz.getSimilarityThreshold()) {
-                                    graph.addEdge(edge);
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    for (Node node : nodes) {
-                        graph.clearEdges(node, simRelType);
-                    }
-                }
-            } finally {
-                graph.writeUnlock();
-            }
-        }
-    }
-
     @Override
     public void refreshGraphView(List<Node> toAddNodes, List<Node> toRemoveNodes) {
         GraphViz graphViz = pc.getGraphViz();
@@ -281,24 +205,9 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
 
         Set<Node> toAddMetadataNodes = new HashSet<>();
         List<Edge> toAddEdges = new LinkedList<>();
-        int simRelType = graphModel.getEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-        float score;
         int relType;
 
         for (Node node : toAddNodes) {
-            // Add similarity edges to list
-            if (simRelType != -1 && graphViz.isCsnVisible()) {
-                for (Node node2 : graph.getNodes()) {
-                    Edge edge = graphModel.getGraph().getEdge(node, node2, simRelType);
-                    if (edge != null) {
-                        score = (float) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
-                        if (score >= graphViz.getSimilarityThreshold()) {
-                            toAddEdges.add(edge);
-                        }
-                    }
-                }
-            }
-
             // Add metada nodes and relationships to list
             for (AnnotationType aType : AnnotationType.values()) {
                 relType = graphModel.getEdgeType(aType.getRelationType());

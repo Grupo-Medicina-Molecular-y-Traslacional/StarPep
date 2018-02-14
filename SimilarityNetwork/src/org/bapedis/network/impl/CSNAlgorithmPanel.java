@@ -40,7 +40,6 @@ import org.openide.WizardDescriptor;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
@@ -48,8 +47,7 @@ import org.openide.util.NbBundle;
  * @author Home
  */
 public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSetupUI, PropertyChangeListener {
-
-    protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+    
     protected final JXHyperlink openWizardLink;
     private CSNAlgorithm csnAlgo;
     private RichTooltip richTooltip;
@@ -215,10 +213,10 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 5, 5);
         add(topPanel, gridBagConstraints);
 
-        centerPanel.setBorder(null);
+        centerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(CSNAlgorithmPanel.class, "CSNAlgorithmPanel.centerPanel.border.title"))); // NOI18N
         centerPanel.setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jCutoffInfoLabel, org.openide.util.NbBundle.getMessage(CSNAlgorithmPanel.class, "CSNAlgorithmPanel.jCutoffInfoLabel.text")); // NOI18N
@@ -240,7 +238,7 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
 
         jCutoffToolBar.setFloatable(false);
         jCutoffToolBar.setRollover(true);
-        jCutoffToolBar.setPreferredSize(new java.awt.Dimension(338, 90));
+        jCutoffToolBar.setPreferredSize(new java.awt.Dimension(420, 90));
 
         jLessCutoffButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/network/resources/less.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLessCutoffButton, org.openide.util.NbBundle.getMessage(CSNAlgorithmPanel.class, "CSNAlgorithmPanel.jLessCutoffButton.text")); // NOI18N
@@ -285,24 +283,23 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         centerPanel.add(jCutoffToolBar, gridBagConstraints);
 
+        histogramPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(CSNAlgorithmPanel.class, "CSNAlgorithmPanel.histogramPanel.border.title"))); // NOI18N
         histogramPanel.setMinimumSize(new java.awt.Dimension(0, 180));
         histogramPanel.setOpaque(false);
         histogramPanel.setPreferredSize(new java.awt.Dimension(0, 180));
         histogramPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         centerPanel.add(histogramPanel, gridBagConstraints);
 
         jApplyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/network/resources/applyFilter.png"))); // NOI18N
@@ -330,7 +327,7 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         centerPanel.add(infoLabel, gridBagConstraints);
 
@@ -340,7 +337,7 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 5, 5);
         add(centerPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -379,83 +376,7 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
 
     private void jApplyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jApplyButtonActionPerformed
         if (csnAlgo != null && csnAlgo.getSimilarityMatrix() != null) {
-            SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-                private final SimilarityMatrix matrix = csnAlgo.getSimilarityMatrix();
-                private final AtomicBoolean stopRun = new AtomicBoolean(false);
-                private final GraphModel graphModel = pc.getGraphModel();
-                private final float cutoff = csnAlgo.getCutoffValue()/100.f;
-                private final ProgressTicket ticket = new ProgressTicket("Applying similarity cutoff", new Cancellable() {
-                    @Override
-                    public boolean cancel() {
-                        stopRun.set(true);
-                        return true;
-                    }
-                });
-
-                @Override
-                protected Void doInBackground() throws Exception {
-                    Edge graphEdge;
-                    Float score;
-                    Graph graph = graphModel.getGraphVisible();
-                    AttributesModel attrModel = pc.getAttributesModel();
-                    if (attrModel != null) {
-                        Peptide[] peptides = attrModel.getPeptides().toArray(new Peptide[0]);
-                        for (int i = 0; i < peptides.length - 1; i++) {
-                            for (int j = i + 1; j < peptides.length; j++) {
-                                score = matrix.getValue(peptides[i], peptides[j]);
-                                if (score != null && score >= cutoff) {
-                                    graphEdge = createGraphEdge(peptides[i], peptides[j], score);
-                                    graph.writeLock();
-                                    try {
-                                        graph.addEdge(graphEdge);
-                                    } finally {
-                                        graph.writeUnlock();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    return null;
-                }
-
-                private Edge createGraphEdge(Peptide peptide1, Peptide peptide2, Float score) {
-                    int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-                    String id = String.format("%s-%s", peptide1.getId(), peptide2.getId());
-
-                    // Create Edge
-                    Edge graphEdge = graphModel.factory().newEdge(id, peptide1.getGraphNode(), peptide2.getGraphNode(), relType, ProjectManager.GRAPH_EDGE_WEIGHT, false);
-                    graphEdge.setLabel(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-
-                    //Set color
-                    graphEdge.setR(ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f);
-                    graphEdge.setG(ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f);
-                    graphEdge.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
-                    graphEdge.setAlpha(0f);
-
-                    // Add edge to main graph
-                    Graph mainGraph = graphModel.getGraph();
-                    mainGraph.writeLock();
-                    try {
-                        mainGraph.addEdge(graphEdge);
-                        graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, score);
-                    } finally {
-                        mainGraph.writeUnlock();
-                    }
-
-                    return graphEdge;
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        get();
-                    } catch (InterruptedException | ExecutionException ex) {
-                        Exceptions.printStackTrace(ex);
-                    }
-                }
-
-            };
-
+            ApplyCutoffValue worker = new ApplyCutoffValue(csnAlgo);
             worker.execute();
         }
     }//GEN-LAST:event_jApplyButtonActionPerformed

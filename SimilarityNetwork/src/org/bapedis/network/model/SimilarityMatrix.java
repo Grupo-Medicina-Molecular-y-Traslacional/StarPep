@@ -18,11 +18,13 @@ import org.bapedis.network.impl.JQuickHistogram;
  */
 public class SimilarityMatrix implements Serializable {
 
+    protected final Peptide[] peptides;
     protected final JQuickHistogram histogram;
     protected static PeptideAttribute INDEX_ATTR = new PeptideAttribute("indexAttr", "indexAttr", Integer.class);
     protected Float[] data;
 
     public SimilarityMatrix(Peptide[] peptides) {
+        this.peptides = peptides;
         for (int index = 0; index < peptides.length; index++) {
             peptides[index].setAttributeValue(INDEX_ATTR, index);
         }
@@ -30,6 +32,10 @@ public class SimilarityMatrix implements Serializable {
         data = new Float[size * (size - 1) / 2];
         histogram = new JQuickHistogram();
     }
+
+    public Peptide[] getPeptides() {
+        return peptides;
+    }        
 
     public void setValue(Peptide peptide1, Peptide peptide2, Float value) {
         if (peptide1.hasAttribute(INDEX_ATTR) && peptide2.hasAttribute(INDEX_ATTR)) {

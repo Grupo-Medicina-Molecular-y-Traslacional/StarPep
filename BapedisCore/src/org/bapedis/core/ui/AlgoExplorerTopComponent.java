@@ -372,7 +372,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 }
                 algoModel.setSelectedAlgorithm(algorithm);
                 setEnableState(true);
-            }else {
+            } else {
                 algoComboBox.setSelectedItem(NO_SELECTION);
                 setEnableState(false);
             }
@@ -401,7 +401,10 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
     @Override
     public void componentClosed() {
+        removeLookupListener();
         pc.removeWorkspaceEventListener(this);
+        AlgorithmModel oldModel = pc.getAlgorithmModel();
+        oldModel.removePropertyChangeListener(this);
     }
 
     void writeProperties(java.util.Properties p) {

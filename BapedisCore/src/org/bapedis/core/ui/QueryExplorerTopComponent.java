@@ -293,6 +293,8 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
     @Override
     public void componentClosed() {
         pc.removeWorkspaceEventListener(this);
+        QueryModel model = pc.getQueryModel();
+        model.removePropertyChangeListener(this);
     }
 
     void writeProperties(java.util.Properties p) {

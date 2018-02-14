@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.spi.algo.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -37,6 +36,7 @@ public class SequenceClustering implements Algorithm {
     private Peptide[] peptides;
     private final List<Cluster> clusterList;
     private final HashMap<String, Cluster> clusterMap;
+    private Workspace workspace;
     private SequenceAlignmentModel alignmentModel;
 
     protected static final int MAX_REJECTS = 8;
@@ -71,6 +71,7 @@ public class SequenceClustering implements Algorithm {
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
+        this.workspace = workspace;
         if (peptides == null) {
             AttributesModel attrModel = pc.getAttributesModel(workspace);
             if (attrModel != null) {
@@ -85,6 +86,7 @@ public class SequenceClustering implements Algorithm {
 
     @Override
     public void endAlgo() {
+        workspace = null;
         peptides = null;
         ticket = null;
         clusterMap.clear();
@@ -164,7 +166,8 @@ public class SequenceClustering implements Algorithm {
 
                 ticket.progress();
             }
-
+            
+            pc.reportMsg("Number of clusters: " + clusterList.size(), workspace);
         }
     }
 }

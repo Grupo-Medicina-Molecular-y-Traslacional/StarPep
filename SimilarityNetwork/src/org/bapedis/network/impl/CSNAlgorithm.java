@@ -45,6 +45,9 @@ import org.openide.util.NbBundle;
  */
 public class CSNAlgorithm implements Algorithm {
 
+    public static final int MAX_NODES=500000;
+    public static final int MAX_EDGES=1000000;
+                
     public static final int[] SIMILARITY_CUTOFF_REFS = new int[]{50, 70, 100};
     public static final int SIMILARITY_CUTOFF_MIN = 50;
     public static final int SIMILARITY_CUTOFF_MAX = 100;
@@ -60,7 +63,7 @@ public class CSNAlgorithm implements Algorithm {
     private final AllDescriptors descriptorAlgo;
     private final FeatureSelectionAlgo featureSelectionAlgo;
     private SimilarityMeasure simMeasure;
-    private float cutoffValue;
+    private int cutoffValue;
     private SimilarityMatrix similarityMatrix;
 
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
@@ -83,7 +86,7 @@ public class CSNAlgorithm implements Algorithm {
         optionModel = new WizardOptionModel();
         descriptorAlgo = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
         featureSelectionAlgo = (FeatureSelectionAlgo) new FeatureSelectionFactory().createAlgorithm();
-        cutoffValue = -1;
+        cutoffValue = SIMILARITY_DEFAULT_VALUE;
 
         emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithm.class, "ChemicalSpaceNetwork.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
         notEnoughFeatures = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithm.class, "ChemicalSpaceNetwork.features.notEnough", MIN_AVAILABLE_FEATURES), NotifyDescriptor.ERROR_MESSAGE);
@@ -115,13 +118,13 @@ public class CSNAlgorithm implements Algorithm {
         this.simMeasure = simMeasure;
     }
 
-    public float getCutoffValue() {
+    public int getCutoffValue() {
         return cutoffValue;
     }
 
-    public void setCutoffValue(float cutoffValue) {
-        if (cutoffValue < 0 || cutoffValue > 1) {
-            throw new IllegalArgumentException("Invalid value for cutoff. It should be between 0 and 1");
+    public void setCutoffValue(int cutoffValue) {
+        if (cutoffValue < SIMILARITY_CUTOFF_MIN || cutoffValue > SIMILARITY_CUTOFF_MAX) {
+            throw new IllegalArgumentException("Invalid value for cutoff. It should be between " + SIMILARITY_CUTOFF_MIN + " and " + SIMILARITY_CUTOFF_MAX);
         }
         this.cutoffValue = cutoffValue;
     }
@@ -146,11 +149,9 @@ public class CSNAlgorithm implements Algorithm {
             graph = graphModel.getGraphVisible();
 
             // Setup Similarity Matrix Builder
-            SimilarityMatrixkBuilder.setStopRun(stopRun); 
-            
-            similarityMatrix = null;
+            SimilarityMatrixkBuilder.setStopRun(stopRun);                         
         }
-        
+        similarityMatrix = null;
         running = true;
         propertyChangeSupport.firePropertyChange(RUNNING, false, true);
     }
@@ -174,7 +175,10 @@ public class CSNAlgorithm implements Algorithm {
 
     @Override
     public boolean cancel() {
-        stopRun = true;
+        stopRun = true;        
+        clusteringAlgo.cancel();
+        descriptorAlgo.cancel();
+        featureSelectionAlgo.cancel();
         SimilarityMatrixkBuilder.setStopRun(stopRun);
         return true;
     }
@@ -258,7 +262,7 @@ public class CSNAlgorithm implements Algorithm {
         String msg = NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.clusterize");
         pc.reportMsg(msg, workspace);
         ticket.progress(msg);
-
+        
         clusteringAlgo.initAlgo(workspace, ticket);
         clusteringAlgo.run();
         clusteringAlgo.endAlgo();

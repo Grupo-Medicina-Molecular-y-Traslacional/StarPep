@@ -255,6 +255,8 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     @Override
     public void componentClosed() {
         pc.removeWorkspaceEventListener(this);
+        FilterModel oldModel = pc.getFilterModel();
+        oldModel.removePropertyChangeListener(this);
     }
 
     void writeProperties(java.util.Properties p) {
@@ -335,7 +337,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
             executor.cancel();
         }
     }
-    
+
     @Override
     public ExplorerManager getExplorerManager() {
         return explorerMgr;

@@ -24,8 +24,9 @@ import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.bapedis.network.model.SimilarityMatrix;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXHyperlink;
-import org.jfree.chart.ChartPanel;
+import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -39,7 +40,6 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
     protected final JXHyperlink openWizardLink;
     private CSNAlgorithm csnAlgo;
     private RichTooltip richTooltip;
-    private ChartPanel chartPanel;
     protected final JXBusyLabel busyLabel;
     private final DecimalFormat formatter;
 
@@ -116,35 +116,23 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
     private void setBusy(boolean busy) {
         busyLabel.setBusy(busy);
         if (busy) {
-            if (chartPanel != null) {
-                histogramPanel.remove(chartPanel);
-            }
-            histogramPanel.add(busyLabel, BorderLayout.CENTER);
-            infoLabel.setEnabled(false);
+            topPanel.add(busyLabel);
         } else {
-            histogramPanel.remove(busyLabel);
-            setupHistogram();
-            if (chartPanel != null) {
-                histogramPanel.add(chartPanel, BorderLayout.CENTER);
-                infoLabel.setEnabled(true);
-            }
+            topPanel.remove(busyLabel);
         }
-        histogramPanel.revalidate();
-        histogramPanel.repaint();
+
     }
 
     private void setupHistogram() {
-        if (chartPanel != null) {
-            histogramPanel.remove(chartPanel);
-        }
-        SimilarityMatrix matrix = csnAlgo.getSimilarityMatrix();
-        if (matrix != null) {
+        histogramPanel.removeAll();
+        if (csnAlgo != null && csnAlgo.getSimilarityMatrix() != null) {
+            SimilarityMatrix matrix = csnAlgo.getSimilarityMatrix();
             JQuickHistogram histogram = matrix.getHistogram();
-            chartPanel = histogram.createChartPanel();
+            histogramPanel.add(histogram.createChartPanel(), BorderLayout.CENTER);
             resetTooltip(histogram);
-        } else {
-            chartPanel = null;
         }
+        histogramPanel.revalidate();
+        histogramPanel.repaint();
     }
 
     private void resetTooltip(JQuickHistogram histogram) {
@@ -160,15 +148,19 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         topPanel.setEnabled(enabled);
+        centerPanel.setEnabled(enabled);
+
         openWizardLink.setEnabled(enabled);
-        jCutoffInfoLabel.setEnabled(enabled);
-        jCutoffValueLabel.setEnabled(enabled);
-        jApplyButton.setEnabled(enabled);
-        jCutoffToolBar.setEnabled(enabled);
+
+        boolean flag = csnAlgo != null && csnAlgo.getSimilarityMatrix() != null;
+        jCutoffInfoLabel.setEnabled(enabled && flag);
+        jCutoffValueLabel.setEnabled(enabled && flag);
+        jCutoffToolBar.setEnabled(enabled && flag);
         for (Component c : jCutoffToolBar.getComponents()) {
-            c.setEnabled(enabled);
+            c.setEnabled(enabled && flag);
         }
-        infoLabel.setEnabled(enabled);
+        jApplyButton.setEnabled(enabled && flag);
+        infoLabel.setEnabled(enabled && flag);
     }
 
     /**
@@ -361,24 +353,28 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
 
     private void jApplyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jApplyButtonActionPerformed
         if (csnAlgo != null && csnAlgo.getSimilarityMatrix() != null) {
-            csnAlgo.setCutoffValue(cutoffSlider.getValue() / 100.f);
-            ApplyCutoffValue worker = new ApplyCutoffValue(csnAlgo);
-            worker.execute();
+            SimilarityMatrix matrix = csnAlgo.getSimilarityMatrix();
+            JQuickHistogram histogram = matrix.getHistogram();
+            float cutoff = cutoffSlider.getValue() / 100.f;
+            if (histogram.countValues(cutoff) > CSNAlgorithm.MAX_EDGES) {
+                 NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithmPanel.class, "CSNAlgorithmPanel.applyCutoffValue.error"), NotifyDescriptor.ERROR_MESSAGE); 
+                 DialogDisplayer.getDefault().notify(nd);
+            } else {
+                csnAlgo.setCutoffValue(cutoffSlider.getValue());
+                ApplyCutoffValue worker = new ApplyCutoffValue(csnAlgo);
+                worker.execute();
+            }
         }
     }//GEN-LAST:event_jApplyButtonActionPerformed
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         this.csnAlgo = (CSNAlgorithm) algo;
-        if (csnAlgo.getCutoffValue() != -1) {
-            int cutoff = (int) (csnAlgo.getCutoffValue() * 100);
-            cutoffSlider.setValue(cutoff);
-            jCutoffValueLabel.setText(cutoff + "%");
-        } else {
-            cutoffSlider.setValue(CSNAlgorithm.SIMILARITY_DEFAULT_VALUE);
-            jCutoffValueLabel.setText(CSNAlgorithm.SIMILARITY_DEFAULT_VALUE + "%");
-        }
+        int cutoff = csnAlgo.getCutoffValue();
+        cutoffSlider.setValue(cutoff);
+        jCutoffValueLabel.setText(cutoff + "%");
         setBusy(csnAlgo.isRunning());
+        setupHistogram();
         return this;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -400,6 +396,7 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
         if (csnAlgo != null && evt.getSource().equals(csnAlgo)
                 && evt.getPropertyName().equals(CSNAlgorithm.RUNNING)) {
             setBusy((boolean) evt.getNewValue());
+            setupHistogram();
         }
     }
 }

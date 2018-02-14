@@ -530,10 +530,12 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     @Override
     public void componentClosed() {
         removeLookupListener();
-        pc.removeWorkspaceEventListener(this);
+        pc.removeWorkspaceEventListener(this);        
         if (currentModel != null) {
             currentModel.removeQuickFilterChangeListener(this);
         }
+        FilterModel filterModel = pc.getFilterModel();
+        filterModel.removePropertyChangeListener(this);
     }
 
     void writeProperties(java.util.Properties p) {

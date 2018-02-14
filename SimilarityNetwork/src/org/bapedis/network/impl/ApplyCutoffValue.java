@@ -8,11 +8,9 @@ package org.bapedis.network.impl;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.SwingWorker;
-import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.task.ProgressTicket;
-import org.bapedis.network.impl.CSNAlgorithm;
 import org.bapedis.network.model.SimilarityMatrix;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
@@ -21,6 +19,7 @@ import org.gephi.graph.api.Node;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -29,18 +28,16 @@ import org.openide.util.Lookup;
 public class ApplyCutoffValue extends SwingWorker<Void, Void> {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-    private final SimilarityMatrix matrix;
-    private final AtomicBoolean stopRun;
     private final GraphModel graphModel;
-    private final float cutoff;
+    private final CSNAlgorithm csnAlgo;    
+    private final AtomicBoolean stopRun;
     private final ProgressTicket ticket;
 
     public ApplyCutoffValue(CSNAlgorithm csnAlgo) {
-        this.matrix = csnAlgo.getSimilarityMatrix();
-        stopRun = new AtomicBoolean(false);
+        this.csnAlgo = csnAlgo;
         graphModel = pc.getGraphModel();
-        this.cutoff = csnAlgo.getCutoffValue();
-        ticket = new ProgressTicket("Applying similarity cutoff", new Cancellable() {
+        stopRun = new AtomicBoolean(false);
+        ticket = new ProgressTicket(NbBundle.getMessage(ApplyCutoffValue.class, "ApplyCutoffValue.task.name"), new Cancellable() {
             @Override
             public boolean cancel() {
                 stopRun.set(true);
@@ -69,7 +66,10 @@ public class ApplyCutoffValue extends SwingWorker<Void, Void> {
         
         Edge graphEdge;
         Float score;
+        
         Graph graph = graphModel.getGraphVisible();
+        float cutoff = csnAlgo.getCutoffValue()  / 100.f;
+        SimilarityMatrix matrix = csnAlgo.getSimilarityMatrix();
         Peptide[] peptides = matrix.getPeptides();
         clearGraph();        
         for (int i = 0; i < peptides.length - 1 && !stopRun.get(); i++) {

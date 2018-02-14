@@ -103,7 +103,7 @@ public class JQuickHistogram {
         minValue = Math.min(minValue, data);
         maxValue = Math.max(maxValue, data);
         sum += data;
-    }
+    }      
 
     public float getMinValue() {
         return minValue;
@@ -132,6 +132,16 @@ public class JQuickHistogram {
             count += c;
         }
         return count;
+    }
+    
+    public int countValues(float cuttof){
+        int count = 0;        
+        for(String key: data.keySet()){
+            if (Float.parseFloat(key) >= cuttof){
+                count += data.get(key);
+            }
+        }
+        return count;        
     }
 
     private String getChartColumnKey(String key) {

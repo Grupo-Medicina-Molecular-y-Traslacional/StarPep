@@ -40,7 +40,7 @@ public class FeatureSelectionAlgo implements Algorithm {
     public static final int[] ENTROPY_CUTOFF_REFS = new int[]{10, 25, 50};
     public static final int ENTROPY_CUTOFF_MIN = 10;
     public static final int ENTROPY_CUTOFF_MAX = 50;
-    public static final int ENTROPY_DEFAULT_VALUE = 25;
+    public static final int ENTROPY_DEFAULT_VALUE = 20;
     public static final int ENTROPY_MAJORTICKSPACING = 15;
     public static final int ENTROPY_MINORTICKSPACING = 5;
 
@@ -53,7 +53,7 @@ public class FeatureSelectionAlgo implements Algorithm {
     public static final int[] CORRELATION_CUTOFF_REFS = new int[]{50, 70, 100};
     public static final int CORRELATION_CUTOFF_MIN = 50;
     public static final int CORRELATION_CUTOFF_MAX = 100;
-    public static final int CORRELATION_DEFAULT_VALUE = 70;
+    public static final int CORRELATION_DEFAULT_VALUE = 95;
     public static final int CORRELATION_MAJORTICKSPACING = 10;
     public static final int CORRELATION_MINORTICKSPACING = 5;
 

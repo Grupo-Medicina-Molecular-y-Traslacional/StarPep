@@ -96,7 +96,7 @@ import org.w3c.dom.NodeList;
 @Messages({
     "CTL_AlgoExplorerAction=Tool",
     "CTL_AlgoExplorerTopComponent=Tool",
-    "HINT_AlgoExplorerTopComponent=This is the Tool window"
+    "HINT_AlgoExplorerTopComponent=Tool window"
 })
 public final class AlgoExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener, LookupListener {
 

@@ -163,7 +163,7 @@ public class CSNAlgorithm implements Algorithm {
         graphModel = null;
         graph = null;
         ticket = null;
-        SimilarityMatrixkBuilder.setContext(null, null, null);
+        SimilarityMatrixkBuilder.setContext(null, null, null, null);
         
         if (stopRun){ // Cancelled
             similarityMatrix = null;
@@ -252,7 +252,7 @@ public class CSNAlgorithm implements Algorithm {
                 simMeasure.setMolecularDescriptors(featureList);
 
                 // Compute new similarity matrix
-                similarityMatrix = computeSimilarityMatrix(peptides);                
+                similarityMatrix = computeSimilarityMatrix(peptides, clusterList.toArray(new Cluster[0]));                
             }
         }
 
@@ -341,12 +341,12 @@ public class CSNAlgorithm implements Algorithm {
 
     }
 
-    private SimilarityMatrix computeSimilarityMatrix(Peptide[] peptides) {
+    private SimilarityMatrix computeSimilarityMatrix(Peptide[] peptides, Cluster[] cluster) {
         String msg = NbBundle.getMessage(CSNAlgorithm.class, "CSNAlgorithm.task.simMatrix");
         pc.reportMsg(msg, workspace);
         ticket.progress(msg);
 
-        SimilarityMatrixkBuilder.setContext(peptides, ticket, simMeasure);
+        SimilarityMatrixkBuilder.setContext(cluster, peptides, ticket, simMeasure);
         SimilarityMatrixkBuilder task = new SimilarityMatrixkBuilder();
         int workunits = task.getWorkUnits();
         ticket.switchToDeterminate(workunits);

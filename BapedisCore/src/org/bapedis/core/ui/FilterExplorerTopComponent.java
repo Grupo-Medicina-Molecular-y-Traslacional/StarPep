@@ -63,8 +63,8 @@ import org.openide.util.lookup.ProxyLookup;
 )
 @Messages({
     "CTL_FilterExplorerAction=Peptides Filter",
-    "CTL_FilterExplorerTopComponent=Peptides Filter",
-    "HINT_FilterExplorerTopComponent=This is the Filter window"
+    "CTL_FilterExplorerTopComponent=Filter",
+    "HINT_FilterExplorerTopComponent=Peptides Filter window"
 })
 public final class FilterExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener, ExplorerManager.Provider {
 

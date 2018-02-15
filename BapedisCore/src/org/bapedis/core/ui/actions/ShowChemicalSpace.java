@@ -7,7 +7,6 @@ package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -22,22 +21,22 @@ import org.openide.util.NbBundle;
  */
 @ActionID(
         category = "View",
-        id = "org.bapedis.core.ui.actions.ShowGraphDB"
+        id = "org.bapedis.core.ui.actions.ShowChemicalSpace"
 )
 @ActionRegistration(
-        displayName = "#CTL_ShowGraphDB",
+        displayName = "#CTL_ShowChemicalSpace",
         lazy = false
 )
 @ActionReferences({
     @ActionReference(path = "Menu/View", position = 310)
 })
-public class ShowGraphDB extends WorkspaceContextSensitiveAction<AttributesModel> {
+public class ShowChemicalSpace extends WorkspaceContextSensitiveAction<AttributesModel> {
 
     private final GraphWindowController graphWC;
 
-    public ShowGraphDB() {
+    public ShowChemicalSpace() {
         super(AttributesModel.class);
-        String name = NbBundle.getMessage(ShowGraphDB.class, "CTL_ShowGraphDB");
+        String name = NbBundle.getMessage(ShowChemicalSpace.class, "CTL_ShowChemicalSpace");
         putValue(NAME, name);
         graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
     }
@@ -49,13 +48,4 @@ public class ShowGraphDB extends WorkspaceContextSensitiveAction<AttributesModel
         }
     }
 
-//    @Override
-//    public JMenuItem getPopupPresenter() {
-//        JMenu main = new JMenu(NbBundle.getMessage(ShowPeptideNodes.class, "CTL_ShowGraph"));
-//        List<? extends Action> actionsForPath = Utilities.actionsForPath("Actions/ShowDataFromLibrary/InWorkspace");
-//        for (Action action : actionsForPath) {
-//            main.add(action);
-//        }
-//        return main;
-//    }
 }

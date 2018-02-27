@@ -96,17 +96,21 @@ class SimilarityMatrixkBuilder extends RecursiveAction {
             for (int x = xlow; x < Math.min(xhigh, y); x++) {
                 if (!stopRun.get()) {
                     try {
-                        clusterY = cluster[y];
-                        clusterX = cluster[x];
                         score = similarityMeasure.computeSimilarity(peptides[y], peptides[x]);
-                        int count = 1;
-                        for (Peptide p1 : clusterY.getMembers()) {
-                            for (Peptide p2 : clusterX.getMembers()) {
-                                score += similarityMeasure.computeSimilarity(p1, p2);
-                                count ++;
-                            }                            
+
+                        if (cluster != null) {
+                            clusterY = cluster[y];
+                            clusterX = cluster[x];
+                            int count = 1;
+                            for (Peptide p1 : clusterY.getMembers()) {
+                                for (Peptide p2 : clusterX.getMembers()) {
+                                    score += similarityMeasure.computeSimilarity(p1, p2);
+                                    count++;
+                                }
+                            }
+                            score = score / count;
                         }
-                        score = score / count;                        
+                        
                     } catch (MolecularDescriptorNotFoundException ex) {
                         DialogDisplayer.getDefault().notify(ex.getErrorND());
                         stopRun.set(true);

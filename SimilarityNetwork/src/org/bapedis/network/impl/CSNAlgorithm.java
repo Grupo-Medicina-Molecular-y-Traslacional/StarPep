@@ -252,7 +252,7 @@ public class CSNAlgorithm implements Algorithm {
                 simMeasure.setMolecularDescriptors(featureList);
 
                 // Compute new similarity matrix
-                similarityMatrix = computeSimilarityMatrix(peptides, clusterList.toArray(new Cluster[0]));                
+                similarityMatrix = computeSimilarityMatrix(peptides, clusterList != null? clusterList.toArray(new Cluster[0]): null);                
             }
         }
 

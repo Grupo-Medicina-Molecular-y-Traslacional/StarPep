@@ -98,24 +98,15 @@ public class ForceAtlas2 extends AbstractLayout {
     @Override
     public void initLayout() {
         ensureSafeLayoutNodePositions(graphModel);
-        
+
         speed = 1.;
         speedEfficiency = 1.;
 
         nodes = graph.getNodes().toArray();
         edges = graph.getEdges().toArray();
 
-        // Repulsion (and gravity)
-        double scaling = scalingRatio;
-        if (scaling < 0) {
-            if (nodes.length >= 100) {
-                scaling = 10.0;
-            } else {
-                scaling = 100.0;
-            }
-        }
-        repulsion = ForceFactory.builder.buildRepulsion(isAdjustSizes(), scaling);
-        gravityForce = ForceFactory.builder.getStrongGravity(scaling);
+        repulsion = ForceFactory.builder.buildRepulsion(isAdjustSizes(), scalingRatio);
+        gravityForce = ForceFactory.builder.getStrongGravity(scalingRatio);
 
         // Attraction
         attraction = ForceFactory.builder.buildAttraction(isLinLogMode(), isOutboundAttractionDistribution(), isAdjustSizes(), 1 * ((isOutboundAttractionDistribution()) ? (outboundAttCompensation) : (1)));
@@ -436,7 +427,18 @@ public class ForceAtlas2 extends AbstractLayout {
     }
 
     private void resetPropertiesValues() {
-        setScalingRatio(-1.0);
+        int nodesCount = 0;
+
+        if (graphModel != null) {
+            nodesCount = graphModel.getGraphVisible().getNodeCount();
+        }
+
+        // Tuning
+        if (nodesCount >= 100) {
+            setScalingRatio(2.0);
+        } else {
+            setScalingRatio(10.0);
+        }
         setStrongGravityMode(false);
         setGravity(1.);
 
@@ -448,7 +450,11 @@ public class ForceAtlas2 extends AbstractLayout {
 
         // Performance
         setJitterTolerance(1d);
-        setBarnesHutOptimize(true);
+        if (nodesCount >= 1000) {
+            setBarnesHutOptimize(true);
+        } else {
+            setBarnesHutOptimize(false);
+        }
         setBarnesHutTheta(1.2);
         setThreadsCount(Math.max(1, Runtime.getRuntime().availableProcessors() - 1));
     }

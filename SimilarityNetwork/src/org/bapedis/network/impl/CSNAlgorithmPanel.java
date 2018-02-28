@@ -149,9 +149,13 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
         super.setEnabled(enabled);
         topPanel.setEnabled(enabled);
         centerPanel.setEnabled(enabled);
-
         openWizardLink.setEnabled(enabled);
 
+        refreshState();
+    }
+    
+    private void refreshState(){
+        boolean enabled = isEnabled();
         boolean flag = csnAlgo != null && csnAlgo.getSimilarityMatrix() != null;
         jCutoffInfoLabel.setEnabled(enabled && flag);
         jCutoffValueLabel.setEnabled(enabled && flag);
@@ -160,7 +164,7 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
             c.setEnabled(enabled && flag);
         }
         jApplyButton.setEnabled(enabled && flag);
-        infoLabel.setEnabled(enabled && flag);
+        infoLabel.setEnabled(enabled && flag);        
     }
 
     /**
@@ -357,11 +361,11 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
             JQuickHistogram histogram = matrix.getHistogram();
             float cutoff = cutoffSlider.getValue() / 100.f;
             if (histogram.countValues(cutoff) > CSNAlgorithm.MAX_EDGES) {
-                 NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithmPanel.class, "CSNAlgorithmPanel.applyCutoffValue.error"), NotifyDescriptor.ERROR_MESSAGE); 
+                 NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithmPanel.class, "CSNAlgorithmPanel.applyCutoffValue.error", String.valueOf(CSNAlgorithm.MAX_EDGES)), NotifyDescriptor.ERROR_MESSAGE); 
                  DialogDisplayer.getDefault().notify(nd);
             } else {
                 csnAlgo.setCutoffValue(cutoffSlider.getValue());
-                ApplyCutoffValue worker = new ApplyCutoffValue(csnAlgo);
+                ApplyCutoffValue worker = new ApplyCutoffValue(csnAlgo, jApplyButton);
                 worker.execute();
             }
         }
@@ -375,6 +379,7 @@ public class CSNAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSe
         jCutoffValueLabel.setText(cutoff + "%");
         setBusy(csnAlgo.isRunning());
         setupHistogram();
+        refreshState();
         return this;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables

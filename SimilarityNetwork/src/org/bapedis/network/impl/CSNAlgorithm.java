@@ -45,9 +45,9 @@ import org.openide.util.NbBundle;
  */
 public class CSNAlgorithm implements Algorithm {
 
-    public static final int MAX_NODES=500000;
-    public static final int MAX_EDGES=1000000;
-                
+    public static final int MAX_NODES=100000;
+    public static final int MAX_EDGES=600000;
+    
     public static final int[] SIMILARITY_CUTOFF_REFS = new int[]{50, 70, 100};
     public static final int SIMILARITY_CUTOFF_MIN = 50;
     public static final int SIMILARITY_CUTOFF_MAX = 100;

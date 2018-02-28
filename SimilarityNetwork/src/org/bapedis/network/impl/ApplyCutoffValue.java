@@ -7,6 +7,7 @@ package org.bapedis.network.impl;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.swing.JButton;
 import javax.swing.SwingWorker;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.project.ProjectManager;
@@ -32,8 +33,9 @@ public class ApplyCutoffValue extends SwingWorker<Void, Void> {
     private final CSNAlgorithm csnAlgo;    
     private final AtomicBoolean stopRun;
     private final ProgressTicket ticket;
+    private final JButton actionButton;
 
-    public ApplyCutoffValue(CSNAlgorithm csnAlgo) {
+    public ApplyCutoffValue(CSNAlgorithm csnAlgo, JButton actionButton) {
         this.csnAlgo = csnAlgo;
         graphModel = pc.getGraphModel();
         stopRun = new AtomicBoolean(false);
@@ -44,6 +46,8 @@ public class ApplyCutoffValue extends SwingWorker<Void, Void> {
                 return true;
             }
         });
+        actionButton.setEnabled(false);
+        this.actionButton = actionButton;
     }
 
     private void clearGraph() {
@@ -63,7 +67,7 @@ public class ApplyCutoffValue extends SwingWorker<Void, Void> {
     @Override
     protected Void doInBackground() throws Exception {
         ticket.start();
-        
+               
         Edge graphEdge;
         Float score;
         
@@ -127,6 +131,7 @@ public class ApplyCutoffValue extends SwingWorker<Void, Void> {
         } finally {
             pc.getGraphViz().fireChangedGraphView();
             ticket.finish();
+            actionButton.setEnabled(true);
         }
     }
 

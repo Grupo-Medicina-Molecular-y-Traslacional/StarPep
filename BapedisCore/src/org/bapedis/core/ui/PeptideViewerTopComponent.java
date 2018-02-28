@@ -82,7 +82,7 @@ import org.openide.util.lookup.ProxyLookup;
 )
 @TopComponent.Registration(mode = "editor", openAtStartup = true)
 @ActionID(category = "Window", id = "org.bapedis.core.ui.PeptideViewerTopComponent")
-@ActionReference(path = "Menu/Window" /*, position = 333 */)
+@ActionReference(path = "Menu/Window" , position = 233 )
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_PeptideViewerAction",
         preferredID = "PeptideViewerTopComponent"

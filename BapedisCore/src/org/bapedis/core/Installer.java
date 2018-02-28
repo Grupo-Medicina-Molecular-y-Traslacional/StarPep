@@ -61,7 +61,7 @@ public class Installer extends ModuleInstall implements WorkspaceEventListener, 
 
             @Override
             public void run() {
-                WindowManager.getDefault().getMainWindow().setTitle("Bapedis - " + workspace.getName());
+                WindowManager.getDefault().getMainWindow().setTitle("Bapedis v0.5.7 - " + workspace.getName());
             }
         });
     }

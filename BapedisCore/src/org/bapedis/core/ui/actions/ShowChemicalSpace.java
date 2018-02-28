@@ -24,11 +24,11 @@ import org.openide.util.NbBundle;
         id = "org.bapedis.core.ui.actions.ShowChemicalSpace"
 )
 @ActionRegistration(
-        displayName = "#CTL_ShowChemicalSpace",
+        displayName = "#CTL_ChemicalSpace",
         lazy = false
 )
 @ActionReferences({
-    @ActionReference(path = "Menu/View", position = 310)
+    @ActionReference(path = "Menu/Window" , position = 243 )
 })
 public class ShowChemicalSpace extends WorkspaceContextSensitiveAction<AttributesModel> {
 
@@ -36,7 +36,7 @@ public class ShowChemicalSpace extends WorkspaceContextSensitiveAction<Attribute
 
     public ShowChemicalSpace() {
         super(AttributesModel.class);
-        String name = NbBundle.getMessage(ShowChemicalSpace.class, "CTL_ShowChemicalSpace");
+        String name = NbBundle.getMessage(ShowChemicalSpace.class, "CTL_ChemicalSpace");
         putValue(NAME, name);
         graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
     }

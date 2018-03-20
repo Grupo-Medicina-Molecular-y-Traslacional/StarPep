@@ -14,7 +14,7 @@ import org.openide.util.NbBundle;
 public enum AlgorithmCategory {
     Sequence("seq"),
     MolecularDescriptor("md"),
-    SimilarityNetwork("csn"),
+    ChemicalSpace("cs"),
     GraphLayout("graphLayout"),
     GraphMeasure("graphMeasure");
     

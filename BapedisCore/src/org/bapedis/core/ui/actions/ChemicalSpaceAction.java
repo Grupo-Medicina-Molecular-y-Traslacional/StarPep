@@ -6,8 +6,6 @@
 package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import org.bapedis.core.model.AlgorithmCategory;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -20,18 +18,18 @@ import org.openide.util.NbBundle;
  */
 @ActionID(
         category = "Tools",
-        id = "org.bapedis.core.ui.actions.SimilarityNetworkAction"
+        id = "org.bapedis.core.ui.actions.ChemicalSpaceAction"
 )
 @ActionRegistration(
-        displayName = "#CTL_SimilarityNetworkAction"
+        displayName = "#CTL_ChemicalSpaceAction"
 )
 @ActionReference(path = "Menu/Tools", position = 300)
-@NbBundle.Messages({"CTL_SimilarityNetworkAction=Similarity Network"})
-public class SimilarityNetworkAction extends ToolAction {
+@NbBundle.Messages({"CTL_ChemicalSpaceAction=Chemical Space"})
+public class ChemicalSpaceAction extends ToolAction {
     
     
-    public SimilarityNetworkAction() {
-        super(AlgorithmCategory.SimilarityNetwork);
+    public ChemicalSpaceAction() {
+        super(AlgorithmCategory.ChemicalSpace);
     }
 
     @Override

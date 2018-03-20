@@ -27,7 +27,7 @@ public class CSNAlgorithmFactory implements AlgorithmFactory {
     
     @Override
     public AlgorithmCategory getCategory() {
-        return AlgorithmCategory.SimilarityNetwork;
+        return AlgorithmCategory.ChemicalSpace;
     }
 
     @Override

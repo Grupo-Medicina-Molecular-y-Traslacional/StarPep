@@ -5,7 +5,6 @@
  */
 package org.bapedis.network.spi.impl;
 
-import org.bapedis.core.model.Peptide;
 import org.bapedis.network.spi.SimilarityMeasure;
 import org.bapedis.network.spi.SimilarityMeasureFactory;
 import org.bapedis.network.spi.SimilarityMeasureSetupUI;

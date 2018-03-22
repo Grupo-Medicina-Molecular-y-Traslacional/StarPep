@@ -5,6 +5,7 @@
  */
 package org.bapedis.chemspace.impl;
 
+import org.bapedis.chemspace.model.WizardOptionModel;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Workspace;
@@ -12,8 +13,8 @@ import org.bapedis.core.spi.algo.Algorithm;
 import org.bapedis.core.spi.algo.AlgorithmFactory;
 import org.bapedis.core.spi.algo.impl.AllDescriptors;
 import org.bapedis.core.spi.algo.impl.AllDescriptorsFactory;
-import org.bapedis.core.spi.algo.impl.FeatureSelectionAlgo;
-import org.bapedis.core.spi.algo.impl.FeatureSelectionFactory;
+import org.bapedis.core.spi.algo.impl.FeatureFilteringAlgo;
+import org.bapedis.core.spi.algo.impl.FeatureFilteringFactory;
 import org.bapedis.core.spi.algo.impl.SequenceClustering;
 import org.bapedis.core.spi.algo.impl.SequenceClusteringFactory;
 import org.bapedis.core.task.ProgressTicket;
@@ -26,6 +27,7 @@ import org.gephi.graph.api.GraphModel;
  */
 public class MapperAlgorithm implements Algorithm {
 
+    public static final int MIN_AVAILABLE_FEATURES = 2;
     public static final String RUNNING = "running";
 
     private final MapperAlgorithmFactory factory;
@@ -36,21 +38,23 @@ public class MapperAlgorithm implements Algorithm {
     protected Graph graph;
     protected ProgressTicket ticket;
     protected boolean stopRun, running;
+    private final WizardOptionModel optionModel;
 
-    // Algorithms
-    private final SequenceClustering seqClustering;    
+    // Algorithms    
     private final AllDescriptors featureExtraction;
-    private final FeatureSelectionAlgo featureSelection;
+    private final FeatureFilteringAlgo featureFiltering;
+    private final SequenceClustering seqClustering;    
 
     public MapperAlgorithm(MapperAlgorithmFactory factory) {
         this.factory = factory;
         running = false;
+        optionModel = new WizardOptionModel();
 
         // Algorithms
         seqClustering = (SequenceClustering) new SequenceClusteringFactory().createAlgorithm();
-        featureExtraction = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();        
-        featureSelection = (FeatureSelectionAlgo) new FeatureSelectionFactory().createAlgorithm();
-                
+        featureExtraction = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
+        featureFiltering = (FeatureFilteringAlgo) new FeatureFilteringFactory().createAlgorithm();
+
     }
 
     public boolean isRunning() {
@@ -59,6 +63,13 @@ public class MapperAlgorithm implements Algorithm {
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
+
+    }
+
+    @Override
+    public void run() {
+        if (attrModel != null) {
+        }
 
     }
 
@@ -79,6 +90,22 @@ public class MapperAlgorithm implements Algorithm {
         return true;
     }
 
+    public WizardOptionModel getOptionModel() {
+        return optionModel;
+    }
+
+    public AllDescriptors getFeatureExtraction() {
+        return featureExtraction;
+    }
+
+    public FeatureFilteringAlgo getFeatureSelection() {
+        return featureFiltering;
+    }        
+
+    public SequenceClustering getSequenceClustering() {
+        return seqClustering;
+    }        
+
     @Override
     public AlgorithmProperty[] getProperties() {
         return null;
@@ -87,13 +114,6 @@ public class MapperAlgorithm implements Algorithm {
     @Override
     public AlgorithmFactory getFactory() {
         return factory;
-    }
-
-    @Override
-    public void run() {
-        if (attrModel != null) {
-        }
-
     }
 
 }

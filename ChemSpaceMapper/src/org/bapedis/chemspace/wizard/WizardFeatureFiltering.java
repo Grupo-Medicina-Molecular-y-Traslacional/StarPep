@@ -3,39 +3,39 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.network.wizard;
+package org.bapedis.chemspace.wizard;
 
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
+import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.core.spi.algo.impl.FeatureFilteringAlgo;
-import org.bapedis.network.impl.CSNAlgorithm;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
-public class CSNWizardFeatureSelection implements WizardDescriptor.Panel<WizardDescriptor> {
+public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDescriptor> {
 
-    private final CSNAlgorithm csnAlgo;
+    private final MapperAlgorithm csMapper;
 
-    public CSNWizardFeatureSelection(CSNAlgorithm csnAlgo) {
-        this.csnAlgo = csnAlgo;
+    public WizardFeatureFiltering(MapperAlgorithm csMapper) {
+        this.csMapper = csMapper;
     }
         
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private CSNVisualFeatureSelection component;
+    private VisualFeatureFiltering component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public CSNVisualFeatureSelection getComponent() {
+    public VisualFeatureFiltering getComponent() {
         if (component == null) {
-            FeatureFilteringAlgo algo = csnAlgo.getFeatureSelectionAlgo();
+            FeatureFilteringAlgo algo = csMapper.getFeatureSelection();
             JPanel settingPanel = algo.getFactory().getSetupUI().getSettingPanel(algo);
-            component = new CSNVisualFeatureSelection(csnAlgo.getMdOptionModel(), settingPanel);
+            component = new VisualFeatureFiltering(csMapper.getOptionModel(), settingPanel);
         }
         return component;
     }

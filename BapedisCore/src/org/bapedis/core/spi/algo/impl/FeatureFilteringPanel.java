@@ -23,25 +23,25 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class FeatureSelectionPanel extends javax.swing.JPanel implements AlgorithmSetupUI, PropertyChangeListener {
+public class FeatureFilteringPanel extends javax.swing.JPanel implements AlgorithmSetupUI, PropertyChangeListener {
 
-    private FeatureSelectionAlgo algorithm;
+    private FeatureFilteringAlgo algorithm;
 
-    public FeatureSelectionPanel() {
+    public FeatureFilteringPanel() {
         initComponents();
         
         //Configure correlation methods
         DefaultComboBoxModel model = new DefaultComboBoxModel();
-        for(String method: FeatureSelectionAlgo.CORRELATION_METHODS){
+        for(String method: FeatureFilteringAlgo.CORRELATION_METHODS){
             model.addElement(method);
         }
         redundantComboBox.setModel(model);
 
         // Configure sliders        
-        uselessSlider.setMinimum(FeatureSelectionAlgo.ENTROPY_CUTOFF_MIN);
-        uselessSlider.setMaximum(FeatureSelectionAlgo.ENTROPY_CUTOFF_MAX);
-        uselessSlider.setMajorTickSpacing(FeatureSelectionAlgo.ENTROPY_MAJORTICKSPACING);
-        uselessSlider.setMinorTickSpacing(FeatureSelectionAlgo.ENTROPY_MINORTICKSPACING);
+        uselessSlider.setMinimum(FeatureFilteringAlgo.ENTROPY_CUTOFF_MIN);
+        uselessSlider.setMaximum(FeatureFilteringAlgo.ENTROPY_CUTOFF_MAX);
+        uselessSlider.setMajorTickSpacing(FeatureFilteringAlgo.ENTROPY_MAJORTICKSPACING);
+        uselessSlider.setMinorTickSpacing(FeatureFilteringAlgo.ENTROPY_MINORTICKSPACING);
         uselessSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -56,15 +56,15 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         });
 
         Hashtable<Integer, JLabel> uselessLabelTable = new Hashtable<>();
-        uselessLabelTable.put(FeatureSelectionAlgo.ENTROPY_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.low")));
-        uselessLabelTable.put(FeatureSelectionAlgo.ENTROPY_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.middle")));
-        uselessLabelTable.put(FeatureSelectionAlgo.ENTROPY_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.high")));
+        uselessLabelTable.put(FeatureFilteringAlgo.ENTROPY_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.uselessSlider.low")));
+        uselessLabelTable.put(FeatureFilteringAlgo.ENTROPY_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.uselessSlider.middle")));
+        uselessLabelTable.put(FeatureFilteringAlgo.ENTROPY_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.uselessSlider.high")));
         uselessSlider.setLabelTable(uselessLabelTable);
 
-        redundantSlider.setMinimum(FeatureSelectionAlgo.CORRELATION_CUTOFF_MIN);
-        redundantSlider.setMaximum(FeatureSelectionAlgo.CORRELATION_CUTOFF_MAX);
-        redundantSlider.setMajorTickSpacing(FeatureSelectionAlgo.CORRELATION_MAJORTICKSPACING);
-        redundantSlider.setMinorTickSpacing(FeatureSelectionAlgo.CORRELATION_MINORTICKSPACING);
+        redundantSlider.setMinimum(FeatureFilteringAlgo.CORRELATION_CUTOFF_MIN);
+        redundantSlider.setMaximum(FeatureFilteringAlgo.CORRELATION_CUTOFF_MAX);
+        redundantSlider.setMajorTickSpacing(FeatureFilteringAlgo.CORRELATION_MAJORTICKSPACING);
+        redundantSlider.setMinorTickSpacing(FeatureFilteringAlgo.CORRELATION_MINORTICKSPACING);
         redundantSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -79,9 +79,9 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         });
 
         Hashtable<Integer, JLabel> redundantLabelTable = new Hashtable<>();
-        redundantLabelTable.put(FeatureSelectionAlgo.CORRELATION_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.low")));
-        redundantLabelTable.put(FeatureSelectionAlgo.CORRELATION_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.middle")));
-        redundantLabelTable.put(FeatureSelectionAlgo.CORRELATION_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.high")));
+        redundantLabelTable.put(FeatureFilteringAlgo.CORRELATION_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.redundantSlider.low")));
+        redundantLabelTable.put(FeatureFilteringAlgo.CORRELATION_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.redundantSlider.middle")));
+        redundantLabelTable.put(FeatureFilteringAlgo.CORRELATION_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.redundantSlider.high")));
         redundantSlider.setLabelTable(redundantLabelTable);                
 
     }
@@ -156,7 +156,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         setLayout(new java.awt.GridBagLayout());
 
         buttonGroup1.add(option1Button);
-        org.openide.awt.Mnemonics.setLocalizedText(option1Button, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.removeUselessRButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(option1Button, org.openide.util.NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.removeUselessRButton.text")); // NOI18N
         option1Button.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 option1ButtonItemStateChanged(evt);
@@ -177,7 +177,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         add(option1Button, gridBagConstraints);
 
         buttonGroup1.add(option2Button);
-        org.openide.awt.Mnemonics.setLocalizedText(option2Button, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.selectRankedRButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(option2Button, org.openide.util.NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.selectRankedRButton.text")); // NOI18N
         option2Button.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 option2ButtonItemStateChanged(evt);
@@ -200,7 +200,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         jSettingPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jSettingPanel.setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(jResetButton, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.jResetButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jResetButton, org.openide.util.NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.jResetButton.text")); // NOI18N
         jResetButton.setMaximumSize(new java.awt.Dimension(145, 23));
         jResetButton.setMinimumSize(new java.awt.Dimension(145, 23));
         jResetButton.setPreferredSize(new java.awt.Dimension(145, 23));
@@ -217,7 +217,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         gridBagConstraints.insets = new java.awt.Insets(2, 0, 5, 5);
         jSettingPanel.add(jResetButton, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(entropyLabel, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.entropyLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(entropyLabel, org.openide.util.NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.entropyLabel.text")); // NOI18N
         entropyLabel.setMaximumSize(new java.awt.Dimension(31, 14));
         entropyLabel.setMinimumSize(new java.awt.Dimension(31, 14));
         entropyLabel.setPreferredSize(new java.awt.Dimension(31, 14));
@@ -231,7 +231,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         jSettingPanel.add(entropyLabel, gridBagConstraints);
 
         entropyInfoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(entropyInfoLabel, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.entropyInfoLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(entropyInfoLabel, org.openide.util.NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.entropyInfoLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -244,7 +244,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         jEntropyToolBar.setPreferredSize(new java.awt.Dimension(420, 90));
 
         jLessUselessButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/less.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLessUselessButton, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.jLessUselessButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLessUselessButton, org.openide.util.NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.jLessUselessButton.text")); // NOI18N
         jLessUselessButton.setFocusable(false);
         jLessUselessButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jLessUselessButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -256,14 +256,14 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         uselessSlider.setMinorTickSpacing(5);
         uselessSlider.setPaintLabels(true);
         uselessSlider.setPaintTicks(true);
-        uselessSlider.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.uselessSlider.toolTipText")); // NOI18N
+        uselessSlider.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.uselessSlider.toolTipText")); // NOI18N
         uselessSlider.setEnabled(false);
         uselessSlider.setMinimumSize(new java.awt.Dimension(360, 80));
         uselessSlider.setPreferredSize(new java.awt.Dimension(360, 80));
         jEntropyToolBar.add(uselessSlider);
 
         jMoreUselessButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/more.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jMoreUselessButton, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.jMoreUselessButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jMoreUselessButton, org.openide.util.NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.jMoreUselessButton.text")); // NOI18N
         jMoreUselessButton.setFocusable(false);
         jMoreUselessButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jMoreUselessButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -285,7 +285,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
         jSettingPanel.add(jSeparator1, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(correlationLabel, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.correlationLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(correlationLabel, org.openide.util.NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.correlationLabel.text")); // NOI18N
         correlationLabel.setMaximumSize(new java.awt.Dimension(31, 14));
         correlationLabel.setMinimumSize(new java.awt.Dimension(31, 14));
         correlationLabel.setPreferredSize(new java.awt.Dimension(31, 14));
@@ -299,7 +299,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         jSettingPanel.add(correlationLabel, gridBagConstraints);
 
         correlationInfoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(correlationInfoLabel, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.correlationInfoLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(correlationInfoLabel, org.openide.util.NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.correlationInfoLabel.text")); // NOI18N
         correlationInfoLabel.setMaximumSize(new java.awt.Dimension(23, 14));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -313,7 +313,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         jRedundantToolBar.setPreferredSize(new java.awt.Dimension(420, 90));
 
         jLessRedundantButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/less.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLessRedundantButton, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.jLessRedundantButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLessRedundantButton, org.openide.util.NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.jLessRedundantButton.text")); // NOI18N
         jLessRedundantButton.setFocusable(false);
         jLessRedundantButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jLessRedundantButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -324,14 +324,14 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         redundantSlider.setMinorTickSpacing(5);
         redundantSlider.setPaintLabels(true);
         redundantSlider.setPaintTicks(true);
-        redundantSlider.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantSlider.toolTipText")); // NOI18N
+        redundantSlider.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.redundantSlider.toolTipText")); // NOI18N
         redundantSlider.setEnabled(false);
         redundantSlider.setMinimumSize(new java.awt.Dimension(360, 80));
         redundantSlider.setPreferredSize(new java.awt.Dimension(360, 80));
         jRedundantToolBar.add(redundantSlider);
 
         jMoreRedundantButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/more.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jMoreRedundantButton, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.jMoreRedundantButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jMoreRedundantButton, org.openide.util.NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.jMoreRedundantButton.text")); // NOI18N
         jMoreRedundantButton.setFocusable(false);
         jMoreRedundantButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jMoreRedundantButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -358,8 +358,8 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         jSettingPanel.add(redundantComboBox, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(redundantLabel, org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantLabel.text")); // NOI18N
-        redundantLabel.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSelectionPanel.class, "FeatureSelectionPanel.redundantLabel.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(redundantLabel, org.openide.util.NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.redundantLabel.text")); // NOI18N
+        redundantLabel.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.redundantLabel.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -400,9 +400,9 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
     }//GEN-LAST:event_option1ButtonItemStateChanged
 
     private void jResetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jResetButtonActionPerformed
-        uselessSlider.setValue(FeatureSelectionAlgo.ENTROPY_DEFAULT_VALUE);
-        redundantComboBox.setSelectedIndex(FeatureSelectionAlgo.CORRELATION_DEFAULT_INDEX);
-        redundantSlider.setValue(FeatureSelectionAlgo.CORRELATION_DEFAULT_VALUE);
+        uselessSlider.setValue(FeatureFilteringAlgo.ENTROPY_DEFAULT_VALUE);
+        redundantComboBox.setSelectedIndex(FeatureFilteringAlgo.CORRELATION_DEFAULT_INDEX);
+        redundantSlider.setValue(FeatureFilteringAlgo.CORRELATION_DEFAULT_VALUE);
     }//GEN-LAST:event_jResetButtonActionPerformed
 
     private void redundantComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_redundantComboBoxActionPerformed
@@ -436,7 +436,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
-        this.algorithm = (FeatureSelectionAlgo) algo;
+        this.algorithm = (FeatureFilteringAlgo) algo;
         int val = this.algorithm.getEntropyCutoff();
         uselessSlider.setValue(val);
         entropyLabel.setText(val + "%");
@@ -458,12 +458,12 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
         addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
-                algorithm.addPropertyChangeListener(FeatureSelectionPanel.this);
+                algorithm.addPropertyChangeListener(FeatureFilteringPanel.this);
             }
 
             @Override
             public void ancestorRemoved(AncestorEvent event) {
-                algorithm.removePropertyChangeListener(FeatureSelectionPanel.this);
+                algorithm.removePropertyChangeListener(FeatureFilteringPanel.this);
             }
 
             @Override
@@ -478,7 +478,7 @@ public class FeatureSelectionPanel extends javax.swing.JPanel implements Algorit
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource().equals(algorithm) && evt.getPropertyName().equals(FeatureSelectionAlgo.RUNNING)) {
+        if (evt.getSource().equals(algorithm) && evt.getPropertyName().equals(FeatureFilteringAlgo.RUNNING)) {
             refreshState();
         }
     }

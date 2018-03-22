@@ -31,10 +31,10 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class FeatureSelectionAlgo implements Algorithm {
+public class FeatureFilteringAlgo implements Algorithm {
 
     protected final ProjectManager pc;
-    protected final FeatureSelectionFactory factory;
+    protected final FeatureFilteringFactory factory;
 
     //Entropy cutoff for reference: 
     public static final int[] ENTROPY_CUTOFF_REFS = new int[]{10, 25, 50};
@@ -71,7 +71,7 @@ public class FeatureSelectionAlgo implements Algorithm {
     private int entropyCutoff, correlationIndex, correlationCutoff;
     private NotifyDescriptor emptyMDs;
 
-    public FeatureSelectionAlgo(FeatureSelectionFactory factory) {
+    public FeatureFilteringAlgo(FeatureFilteringFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         this.factory = factory;
 
@@ -84,7 +84,7 @@ public class FeatureSelectionAlgo implements Algorithm {
         running = false;
         propertyChangeSupport = new PropertyChangeSupport(this);
 
-        emptyMDs = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureSelectionAlgo.class, "FeatureSelectionAlgo.emptyMDs.info"), NotifyDescriptor.ERROR_MESSAGE);
+        emptyMDs = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureFilteringAlgo.class, "FeatureFilteringAlgo.emptyMDs.info"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
     public boolean isRemoveUseless() {
@@ -215,7 +215,7 @@ public class FeatureSelectionAlgo implements Algorithm {
 
             //---------------Remove Useless--------------
             List<Peptide> peptides = attrModel.getPeptides();
-            String state1 = NbBundle.getMessage(FeatureSelectionAlgo.class, "FeatureSelectionAlgo.task.removeUseless");
+            String state1 = NbBundle.getMessage(FeatureFilteringAlgo.class, "FeatureFilteringAlgo.task.removeUseless");
             pc.reportMsg(state1 + "\n", workspace);
             ticket.progress(state1);
             ticket.switchToDeterminate(allFeatures.size());
@@ -276,7 +276,7 @@ public class FeatureSelectionAlgo implements Algorithm {
                 int workUnits = rankedFeatures.length + (rankedFeatures.length * (rankedFeatures.length - 1)) / 2;
                 ticket.switchToDeterminate(workUnits);
 
-                String state2 = NbBundle.getMessage(FeatureSelectionAlgo.class, "FeatureSelectionAlgo.task.removeRedundant");
+                String state2 = NbBundle.getMessage(FeatureFilteringAlgo.class, "FeatureFilteringAlgo.task.removeRedundant");
                 ticket.progress(state2);
                 pc.reportMsg("\n", workspace);
                 pc.reportMsg(state2 + "\n", workspace);

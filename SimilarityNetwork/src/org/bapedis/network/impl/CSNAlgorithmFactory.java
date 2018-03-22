@@ -20,7 +20,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author loge
  */
-@ServiceProvider(service = AlgorithmFactory.class)
+//@ServiceProvider(service = AlgorithmFactory.class)
 public class CSNAlgorithmFactory implements AlgorithmFactory {
 
     private final CSNAlgorithmPanel setupUI = new CSNAlgorithmPanel();

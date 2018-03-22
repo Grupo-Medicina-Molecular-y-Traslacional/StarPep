@@ -25,10 +25,10 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
 
     public MyWizardIterator(MapperAlgorithm csMapper) {
         panels = new ArrayList<>(MAX_PANELS);
-//        panels.add(new CSNWizardInputSequence(csnAlgo));
-//        panels.add(new CSNWizardMolecularDescriptor(csnAlgo));
-//        panels.add(new CSNWizardFeatureSelection(csnAlgo));
-//        panels.add(new CSNWizardSimilarityMeasure(csnAlgo));
+        panels.add(new WizardChemSpaceRepresentation(csMapper));
+        panels.add(new WizardFeatureExtraction(csMapper));
+        panels.add(new WizardFeatureFiltering(csMapper));
+        panels.add(new WizardFeatureWeighting(csMapper));
 
         String[] steps = new String[panels.size()];
         for (int i = 0; i < panels.size(); i++) {

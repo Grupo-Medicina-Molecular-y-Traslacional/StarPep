@@ -15,9 +15,9 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class FeatureSelectionFactory implements AlgorithmFactory {
+public class FeatureFilteringFactory implements AlgorithmFactory {
 
-    private FeatureSelectionPanel panel;
+    private FeatureFilteringPanel panel;
     
     @Override
     public AlgorithmCategory getCategory() {
@@ -26,25 +26,25 @@ public class FeatureSelectionFactory implements AlgorithmFactory {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(FeatureSelectionAlgo.class, "FeatureSelectionAlgo.name");
+        return NbBundle.getMessage(FeatureFilteringAlgo.class, "FeatureFilteringAlgo.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(FeatureSelectionAlgo.class, "FeatureSelectionAlgo.desc");
+        return NbBundle.getMessage(FeatureFilteringAlgo.class, "FeatureFilteringAlgo.desc");
     }
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
         if (panel == null){
-            panel = new FeatureSelectionPanel();
+            panel = new FeatureFilteringPanel();
         }
         return panel;
     }
 
     @Override
     public Algorithm createAlgorithm() {
-        return new FeatureSelectionAlgo(this);
+        return new FeatureFilteringAlgo(this);
     }
     
 }

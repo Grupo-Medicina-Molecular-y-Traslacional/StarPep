@@ -51,10 +51,9 @@ public class MapperAlgorithm implements Algorithm {
         optionModel = new WizardOptionModel();
 
         // Algorithms
-        seqClustering = (SequenceClustering) new SequenceClusteringFactory().createAlgorithm();
         featureExtraction = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
         featureFiltering = (FeatureFilteringAlgo) new FeatureFilteringFactory().createAlgorithm();
-
+        seqClustering = (SequenceClustering) new SequenceClusteringFactory().createAlgorithm();                
     }
 
     public boolean isRunning() {

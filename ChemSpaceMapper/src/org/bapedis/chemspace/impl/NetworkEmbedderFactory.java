@@ -32,7 +32,7 @@ public class NetworkEmbedderFactory extends AbstractEmbedderFactory{
 
     @Override
     public Algorithm createAlgorithm() {
-        return new NetworkEmbedder();
+        return new NetworkEmbedder(this);
     }
     
 }

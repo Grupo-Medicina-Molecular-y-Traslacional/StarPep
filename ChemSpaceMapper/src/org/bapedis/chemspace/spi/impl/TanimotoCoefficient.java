@@ -5,7 +5,6 @@
  */
 package org.bapedis.chemspace.spi.impl;
 
-import java.util.List;
 import org.bapedis.chemspace.spi.SimilarityMeasure;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
@@ -16,12 +15,12 @@ import org.bapedis.core.model.Peptide;
  * @author loge
  */
 public class TanimotoCoefficient implements SimilarityMeasure {
-    protected List<MolecularDescriptor> featureList;
+    protected MolecularDescriptor[] features;
     protected int normalizationIndex = 1;
     
     @Override
-    public void setMolecularDescriptors(List<MolecularDescriptor> featureList) {
-        this.featureList = featureList;
+    public void setMolecularFeatures(MolecularDescriptor[] features) {
+        this.features = features;
     }
     
     @Override
@@ -30,7 +29,7 @@ public class TanimotoCoefficient implements SimilarityMeasure {
         double a2 = 0.0;
         double b2 = 0.0;
         double val1, val2;
-        for (MolecularDescriptor descriptor : featureList) {
+        for (MolecularDescriptor descriptor : features) {
             val1 = normalizedValue(peptide1, descriptor);
             val2 = normalizedValue(peptide2, descriptor);
             ab += val1 * val2;

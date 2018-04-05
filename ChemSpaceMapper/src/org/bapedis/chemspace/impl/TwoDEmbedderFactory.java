@@ -32,7 +32,7 @@ public class TwoDEmbedderFactory extends AbstractEmbedderFactory {
 
     @Override
     public Algorithm createAlgorithm() {
-        return new TwoDEmbedder();
+        return new TwoDEmbedder(this);
     }
     
 }

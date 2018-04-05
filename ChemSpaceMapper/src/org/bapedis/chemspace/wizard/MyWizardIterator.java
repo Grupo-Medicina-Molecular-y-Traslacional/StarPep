@@ -25,7 +25,7 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
 
     public MyWizardIterator(MapperAlgorithm csMapper) {
         panels = new ArrayList<>(MAX_PANELS);
-        panels.add(new WizardChemSpaceRepresentation(csMapper));
+        panels.add(new WizardRepresentation(csMapper));
         panels.add(new WizardFeatureExtraction(csMapper));
         panels.add(new WizardFeatureFiltering(csMapper));
         panels.add(new WizardFeatureWeighting(csMapper));

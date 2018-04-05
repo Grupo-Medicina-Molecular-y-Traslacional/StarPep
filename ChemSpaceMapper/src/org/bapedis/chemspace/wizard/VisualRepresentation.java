@@ -9,11 +9,11 @@ import javax.swing.JPanel;
 import org.bapedis.chemspace.model.WizardOptionModel;
 import org.openide.util.NbBundle;
 
-public final class VisualChemSpaceRepresentation extends JPanel {
+public final class VisualRepresentation extends JPanel {
 
     private final WizardOptionModel optionModel;
 
-    public VisualChemSpaceRepresentation(WizardOptionModel optionModel) {
+    public VisualRepresentation(WizardOptionModel optionModel) {
         initComponents();
         this.optionModel = optionModel;
 
@@ -29,7 +29,7 @@ public final class VisualChemSpaceRepresentation extends JPanel {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(VisualChemSpaceRepresentation.class, "ChemSpaceRepresentation.name");
+        return NbBundle.getMessage(VisualRepresentation.class, "ChemSpaceRepresentation.name");
     }
 
     /**
@@ -62,7 +62,7 @@ public final class VisualChemSpaceRepresentation extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(bottomPanel, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(VisualChemSpaceRepresentation.class, "VisualChemSpaceRepresentation.jQuestionLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jQuestionLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -72,7 +72,7 @@ public final class VisualChemSpaceRepresentation extends JPanel {
         add(jQuestionLabel, gridBagConstraints);
 
         buttonGroup1.add(jOption2);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(VisualChemSpaceRepresentation.class, "VisualChemSpaceRepresentation.jOption2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jOption2.text")); // NOI18N
         jOption2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOption2ActionPerformed(evt);
@@ -86,7 +86,7 @@ public final class VisualChemSpaceRepresentation extends JPanel {
         add(jOption2, gridBagConstraints);
 
         buttonGroup1.add(jOption1);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(VisualChemSpaceRepresentation.class, "VisualChemSpaceRepresentation.jOption1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jOption1.text")); // NOI18N
         jOption1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOption1ActionPerformed(evt);

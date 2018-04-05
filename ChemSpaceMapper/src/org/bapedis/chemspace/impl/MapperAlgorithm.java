@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.chemspace.model.WizardOptionModel;
 import org.bapedis.core.model.AlgorithmProperty;
-import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.algo.Algorithm;
@@ -21,8 +20,6 @@ import org.bapedis.core.spi.algo.impl.FeatureFilteringFactory;
 import org.bapedis.core.spi.algo.impl.SequenceClustering;
 import org.bapedis.core.spi.algo.impl.SequenceClusteringFactory;
 import org.bapedis.core.task.ProgressTicket;
-import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphModel;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -39,14 +36,12 @@ public class MapperAlgorithm implements Algorithm {
     protected Workspace workspace;
     protected ProgressTicket progressTicket;
     protected boolean stopRun;
-    private final WizardOptionModel optionModel;
 
     // Algorithms    
-    private final AllDescriptors featureExtraction;
-    private final FeatureFilteringAlgo featureFiltering;
-    private final SequenceClustering seqClustering;
-    private final NetworkEmbedder networkEmbeder;
-    private final TwoDEmbedder twoDEmbedder;
+    private AllDescriptors featureExtraction;
+    private FeatureFilteringAlgo featureFiltering;
+//    private final SequenceClustering seqClustering;
+    private AbstractEmbedder chemSpaceEmbedder;
 
     //Algorithm workflow
     private final List<Algorithm> workFlow;
@@ -54,15 +49,14 @@ public class MapperAlgorithm implements Algorithm {
 
     public MapperAlgorithm(MapperAlgorithmFactory factory) {
         this.factory = factory;
-        optionModel = new WizardOptionModel();
         workFlow = new LinkedList<>();
 
         // Algorithms
-        featureExtraction = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
-        featureFiltering = (FeatureFilteringAlgo) new FeatureFilteringFactory().createAlgorithm();
-        seqClustering = (SequenceClustering) new SequenceClusteringFactory().createAlgorithm();
-        networkEmbeder = (NetworkEmbedder) new NetworkEmbedderFactory().createAlgorithm();
-        twoDEmbedder = (TwoDEmbedder) new TwoDEmbedderFactory().createAlgorithm();
+//        featureExtraction = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
+//        featureFiltering = (FeatureFilteringAlgo) new FeatureFilteringFactory().createAlgorithm();
+//        seqClustering = (SequenceClustering) new SequenceClusteringFactory().createAlgorithm();
+//        networkEmbeder = (NetworkEmbedder) new NetworkEmbedderFactory().createAlgorithm();
+//        twoDEmbedder = (TwoDEmbedder) new TwoDEmbedderFactory().createAlgorithm();
     }
 
     @Override
@@ -74,22 +68,19 @@ public class MapperAlgorithm implements Algorithm {
         // Populate algorithm workflow        
 
         // Feature Extraction
-        if (optionModel.getMolecularDescriptorOption() == WizardOptionModel.MolecularDescriptorOption.NEW) {
+        if (featureExtraction != null) {
             workFlow.add(featureExtraction);
         }
 
         // Feature Filtering
-        if (optionModel.getFeatureFilteringOption() == WizardOptionModel.FeatureFiltering.YES) {
+        if (featureFiltering != null) {
             workFlow.add(featureFiltering);
         }
 
         // Chemical Space Embedder
-        if (optionModel.getRepresentationOption() == WizardOptionModel.RepresentationOption.CS2D) {
-            workFlow.add(twoDEmbedder);
-        } else if (optionModel.getRepresentationOption() == WizardOptionModel.RepresentationOption.CSN) {
-            workFlow.add(networkEmbeder);
+        if (chemSpaceEmbedder != null) {
+            workFlow.add(chemSpaceEmbedder);
         }
-
     }
 
     @Override
@@ -125,30 +116,30 @@ public class MapperAlgorithm implements Algorithm {
         return stopRun;
     }
 
-    public WizardOptionModel getOptionModel() {
-        return optionModel;
+    public void setFeatureExtraction(AllDescriptors featureExtraction) {
+        this.featureExtraction = featureExtraction;
     }
-
-    public NetworkEmbedder getNetworkEmbeder() {
-        return networkEmbeder;
-    }
-
-    public TwoDEmbedder getTwoDEmbedder() {
-        return twoDEmbedder;
-    }
-
+    
     public AllDescriptors getFeatureExtraction() {
         return featureExtraction;
     }
 
+    public void setFeatureFiltering(FeatureFilteringAlgo featureFiltering) {
+        this.featureFiltering = featureFiltering;
+    }
+    
     public FeatureFilteringAlgo getFeatureSelection() {
         return featureFiltering;
     }
 
-    public SequenceClustering getSequenceClustering() {
-        return seqClustering;
+    public AbstractEmbedder getChemSpaceEmbedder() {
+        return chemSpaceEmbedder;
     }
 
+    public void setChemSpaceEmbedder(AbstractEmbedder chemSpaceEmbedder) {
+        this.chemSpaceEmbedder = chemSpaceEmbedder;
+    }
+    
     @Override
     public AlgorithmProperty[] getProperties() {
         return null;

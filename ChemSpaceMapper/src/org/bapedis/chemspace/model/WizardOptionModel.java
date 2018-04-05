@@ -10,7 +10,8 @@ package org.bapedis.chemspace.model;
  * @author loge
  */
 public class WizardOptionModel {
-
+    public static final String PROPERTY_NAME = "WOM";
+    
     public enum RepresentationOption{CS2D, CSN};
     public enum MolecularDescriptorOption{AVAILABLE, NEW};
     public enum FeatureFiltering{YES, NO};

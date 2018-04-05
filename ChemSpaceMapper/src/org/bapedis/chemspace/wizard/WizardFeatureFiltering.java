@@ -35,7 +35,7 @@ public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDesc
         if (component == null) {
             FeatureFilteringAlgo algo = csMapper.getFeatureSelection();
             JPanel settingPanel = algo.getFactory().getSetupUI().getSettingPanel(algo);
-            component = new VisualFeatureFiltering(csMapper.getOptionModel(), settingPanel);
+//            component = new VisualFeatureFiltering(csMapper.getOptionModel(), settingPanel);
         }
         return component;
     }

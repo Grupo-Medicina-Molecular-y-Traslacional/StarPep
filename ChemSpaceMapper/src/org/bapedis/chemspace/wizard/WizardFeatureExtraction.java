@@ -19,6 +19,7 @@ import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.algo.impl.AllDescriptors;
+import org.bapedis.core.spi.algo.impl.AllDescriptorsFactory;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
@@ -51,14 +52,28 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
     @Override
     public VisualFeatureExtraction getComponent() {
         if (component == null) {
-            WizardOptionModel optionModel = csMapper.getOptionModel();
-            AllDescriptors algo = csMapper.getFeatureExtraction();
-            JPanel settingPanel = algo.getFactory().getSetupUI().getSettingPanel(algo);
-
+            MolecularDescriptorOption optionModel = MolecularDescriptorOption.AVAILABLE;
+            AllDescriptors alg = csMapper.getFeatureExtraction();            
+            if (alg != null) {
+                optionModel = MolecularDescriptorOption.NEW;
+            }
+            alg = createCopy(alg);
+            JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
             component = new VisualFeatureExtraction(optionModel, settingPanel);
             component.addPropertyChangeListener(this);
         }
         return component;
+    }
+    
+    private AllDescriptors createCopy(AllDescriptors alg){
+       AllDescriptors copy = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
+       if (alg != null){
+           copy.excludeAll();
+           for(String key: alg.getDescriptorKeys()){
+               copy.includeAlgorithm(key);
+           }
+       }
+       return copy;
     }
 
     @Override
@@ -101,11 +116,11 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
 
     @Override
     public void validate() throws WizardValidationException {
-        if (getComponent().getSelectedOption() == WizardOptionModel.MolecularDescriptorOption.AVAILABLE &&
-            getAvailableFeatureSize() < MapperAlgorithm.MIN_AVAILABLE_FEATURES){
+        if (getComponent().getSelectedOption() == WizardOptionModel.MolecularDescriptorOption.AVAILABLE
+                && getAvailableFeatureSize() < MapperAlgorithm.MIN_AVAILABLE_FEATURES) {
             isValid = false;
-            throw new WizardValidationException(null, NbBundle.getMessage(WizardFeatureExtraction.class, "WizardFeatureExtraction.invalidOption.text"), null);            
-        } else if (getComponent().getSelectedOption() == WizardOptionModel.MolecularDescriptorOption.NEW){
+            throw new WizardValidationException(null, NbBundle.getMessage(WizardFeatureExtraction.class, "WizardFeatureExtraction.invalidOption.text"), null);
+        } else if (getComponent().getSelectedOption() == WizardOptionModel.MolecularDescriptorOption.NEW) {
             // validate selection empty
         }
     }
@@ -125,8 +140,8 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         boolean oldState = isValid;
-        if (evt.getPropertyName().equals(VisualFeatureExtraction.MD_OPTION)){
-            switch((WizardOptionModel.MolecularDescriptorOption)evt.getNewValue()){
+        if (evt.getPropertyName().equals(VisualFeatureExtraction.MD_OPTION)) {
+            switch ((WizardOptionModel.MolecularDescriptorOption) evt.getNewValue()) {
                 case NEW:
                     isValid = true;
                     break;
@@ -137,9 +152,11 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
             for (ChangeListener listener : listeners.getListeners(ChangeListener.class)) {
                 listener.stateChanged(srcEvt);
             }
-        }        
+        }
     }
 
-
-
 }
+
+enum MolecularDescriptorOption {
+    AVAILABLE, NEW
+};

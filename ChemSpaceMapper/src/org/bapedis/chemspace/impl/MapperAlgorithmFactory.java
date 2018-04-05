@@ -6,6 +6,7 @@
 package org.bapedis.chemspace.impl;
 
 import java.text.MessageFormat;
+import org.bapedis.chemspace.model.WizardOptionModel;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
 import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.algo.Algorithm;
@@ -52,12 +53,20 @@ public class MapperAlgorithmFactory implements AlgorithmFactory {
         // Create wizard
         WizardDescriptor wiz = createWizardDescriptor(csnAlgo);
         
+        // Set wizard option model
+        wiz.putProperty(WizardOptionModel.PROPERTY_NAME, new WizardOptionModel());
+        
         //The image in the left sidebar of the wizard is set like this:
         //wiz.putProperty(WizardDescriptor.PROP_IMAGE, ImageUtilities.loadImage("org/demo/wizard/banner.PNG", true));
         if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
+            setUp(csnAlgo, wiz);
            return csnAlgo;            
         }
         return null;
+    }
+    
+    public static void setUp(MapperAlgorithm csnAlgo, WizardDescriptor wiz){
+        
     }
     
     public static WizardDescriptor  createWizardDescriptor(MapperAlgorithm csnAlgo){
@@ -65,7 +74,7 @@ public class MapperAlgorithmFactory implements AlgorithmFactory {
         WizardDescriptor.Iterator<WizardDescriptor> iterator = new MyWizardIterator(csnAlgo);
 
         // Open wizard
-        WizardDescriptor wiz = new WizardDescriptor(iterator);
+        WizardDescriptor wiz = new WizardDescriptor(iterator);                        
         
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wiz.setTitleFormat(new MessageFormat("{0}"));

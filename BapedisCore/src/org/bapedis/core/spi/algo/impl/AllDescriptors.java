@@ -33,13 +33,11 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
 
     private final List<AbstractMD> algorithms;
     private final Set<String> descriptorKeys;
-    private int buttonGroupIndex;
     protected final NotifyDescriptor emptyKeys;
 
     public AllDescriptors(AlgorithmFactory factory) {
         super(factory);
         algorithms = new LinkedList<>();
-        buttonGroupIndex = 0;
         emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(AllDescriptors.class, "AllDescriptors.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
         descriptorKeys = new LinkedHashSet<>();
         String key;
@@ -67,13 +65,9 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
     public boolean isIncluded(String algoName) {
         return descriptorKeys.contains(algoName);
     }
-
-    public int getButtonGroupIndex() {
-        return buttonGroupIndex;
-    }
-
-    public void setButtonGroupIndex(int buttonGroupIndex) {
-        this.buttonGroupIndex = buttonGroupIndex;
+    
+    public void excludeAll(){
+        descriptorKeys.clear();
     }
 
     @Override

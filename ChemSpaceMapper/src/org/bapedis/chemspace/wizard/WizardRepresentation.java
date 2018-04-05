@@ -32,8 +32,8 @@ public class WizardRepresentation implements WizardDescriptor.Panel<WizardDescri
     @Override
     public VisualRepresentation getComponent() {
         if (component == null) {
-            WizardOptionModel optionModel = csMapper.getOptionModel();
-            component = new VisualRepresentation(optionModel);
+//            WizardOptionModel optionModel = csMapper.getOptionModel();
+//            component = new VisualRepresentation(optionModel);
         }
         return component;
     }

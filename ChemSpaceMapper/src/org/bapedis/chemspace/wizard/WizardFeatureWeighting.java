@@ -33,10 +33,10 @@ public class WizardFeatureWeighting implements WizardDescriptor.Panel<WizardDesc
     @Override
     public VisualFeatureWeighting getComponent() {
         if (component == null) {
-            WizardOptionModel optionModel = csMapper.getOptionModel();
-            SequenceClustering clusteringAlgo = csMapper.getSequenceClustering();
-            JPanel settingPanel = clusteringAlgo.getFactory().getSetupUI().getSettingPanel(clusteringAlgo);
-            component = new VisualFeatureWeighting(optionModel, settingPanel);
+//            WizardOptionModel optionModel = csMapper.getOptionModel();
+//            SequenceClustering clusteringAlgo = csMapper.getSequenceClustering();
+//            JPanel settingPanel = clusteringAlgo.getFactory().getSetupUI().getSettingPanel(clusteringAlgo);
+//            component = new VisualFeatureWeighting(optionModel, settingPanel);
         }
         return component;
     }

@@ -13,18 +13,18 @@ import org.openide.util.NbBundle;
 public final class VisualFeatureExtraction extends JPanel {
 
     public static final String MD_OPTION = "md_option";
-    private final WizardOptionModel optionModel;
     private final JPanel settingPanel;
+    private MolecularDescriptorOption optionModel;
 
-    public VisualFeatureExtraction(WizardOptionModel optionModel, JPanel settingPanel) {
+    public VisualFeatureExtraction(MolecularDescriptorOption optionModel, JPanel settingPanel) {
         initComponents();
 
         this.optionModel = optionModel;
         this.settingPanel = settingPanel;
 
         bottomPanel.add(settingPanel, BorderLayout.CENTER);
-   
-        switch (optionModel.getMolecularDescriptorOption()) {
+
+        switch (optionModel) {
             case AVAILABLE:
                 jOption1.setSelected(true);
                 break;
@@ -32,21 +32,23 @@ public final class VisualFeatureExtraction extends JPanel {
                 jOption2.setSelected(true);
                 break;
         }
-        settingPanel.setEnabled(optionModel.getMolecularDescriptorOption() == WizardOptionModel.MolecularDescriptorOption.NEW);
+        settingPanel.setEnabled(optionModel == MolecularDescriptorOption.NEW);
     }
 
     @Override
     public String getName() {
         return NbBundle.getMessage(VisualFeatureExtraction.class, "FeatureExtraction.name");
     }
-    
-    public WizardOptionModel.MolecularDescriptorOption getSelectedOption(){
-        if (jOption2.isSelected())
+
+    public WizardOptionModel.MolecularDescriptorOption getSelectedOption() {
+        if (jOption2.isSelected()) {
             return WizardOptionModel.MolecularDescriptorOption.NEW;
-        if (jOption1.isSelected())
+        }
+        if (jOption1.isSelected()) {
             return WizardOptionModel.MolecularDescriptorOption.AVAILABLE;
+        }
         return null;
-    }    
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -116,19 +118,17 @@ public final class VisualFeatureExtraction extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
-        if (optionModel.getMolecularDescriptorOption() != WizardOptionModel.MolecularDescriptorOption.NEW) {
-            optionModel.setMolecularDescriptorOption(WizardOptionModel.MolecularDescriptorOption.NEW);
-            settingPanel.setEnabled(true);
-            firePropertyChange(MD_OPTION, WizardOptionModel.MolecularDescriptorOption.AVAILABLE, WizardOptionModel.MolecularDescriptorOption.NEW);
-        }        
+        MolecularDescriptorOption oldOption = optionModel;
+        optionModel = MolecularDescriptorOption.NEW;
+        settingPanel.setEnabled(true);
+        firePropertyChange(MD_OPTION, oldOption, optionModel);
     }//GEN-LAST:event_jOption2ActionPerformed
 
     private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
-        if (optionModel.getMolecularDescriptorOption() != WizardOptionModel.MolecularDescriptorOption.AVAILABLE) {
-            optionModel.setMolecularDescriptorOption(WizardOptionModel.MolecularDescriptorOption.AVAILABLE);
-            settingPanel.setEnabled(false);
-            firePropertyChange(MD_OPTION, WizardOptionModel.MolecularDescriptorOption.NEW, WizardOptionModel.MolecularDescriptorOption.AVAILABLE);
-        }        
+        MolecularDescriptorOption oldOption = optionModel;
+        optionModel = MolecularDescriptorOption.AVAILABLE;
+        settingPanel.setEnabled(false);
+        firePropertyChange(MD_OPTION, oldOption, optionModel);
     }//GEN-LAST:event_jOption1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

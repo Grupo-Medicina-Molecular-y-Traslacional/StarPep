@@ -8,8 +8,7 @@ package org.bapedis.chemspace.wizard;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
-import org.bapedis.chemspace.model.WizardOptionModel;
-import org.bapedis.core.spi.algo.impl.SequenceClustering;
+import org.bapedis.chemspace.model.FeatureWeightingOption;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
@@ -33,10 +32,11 @@ public class WizardFeatureWeighting implements WizardDescriptor.Panel<WizardDesc
     @Override
     public VisualFeatureWeighting getComponent() {
         if (component == null) {
-//            WizardOptionModel optionModel = csMapper.getOptionModel();
 //            SequenceClustering clusteringAlgo = csMapper.getSequenceClustering();
 //            JPanel settingPanel = clusteringAlgo.getFactory().getSetupUI().getSettingPanel(clusteringAlgo);
-//            component = new VisualFeatureWeighting(optionModel, settingPanel);
+            JPanel settingPanel = new JPanel();
+            component = new VisualFeatureWeighting(settingPanel);
+            component.setFWOption(csMapper.getFWOption());
         }
         return component;
     }
@@ -75,6 +75,8 @@ public class WizardFeatureWeighting implements WizardDescriptor.Panel<WizardDesc
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
+        wiz.putProperty(FeatureWeightingOption.class.getName(), wiz);
+        
     }
 
 }

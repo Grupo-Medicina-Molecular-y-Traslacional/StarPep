@@ -8,7 +8,6 @@ package org.bapedis.core.spi.algo.impl;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -29,10 +28,10 @@ import org.openide.util.NbBundle;
  *
  * @author beltran, loge
  */
-public class AllDescriptors extends AbstractMD implements PropertyChangeListener {
+public class AllDescriptors extends AbstractMD implements PropertyChangeListener, Cloneable {
 
-    private final List<AbstractMD> algorithms;
-    private final Set<String> descriptorKeys;
+    private Set<String> descriptorKeys;
+    private final List<AbstractMD> algorithms;    
     protected final NotifyDescriptor emptyKeys;
 
     public AllDescriptors(AlgorithmFactory factory) {
@@ -65,14 +64,14 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
     public boolean isIncluded(String algoName) {
         return descriptorKeys.contains(algoName);
     }
-    
-    public void excludeAll(){
+
+    public void excludeAll() {
         descriptorKeys.clear();
     }
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
-        super.initAlgo(workspace, progressTicket); 
+        super.initAlgo(workspace, progressTicket);
         algorithms.clear();
         if (descriptorKeys.isEmpty()) {
             DialogDisplayer.getDefault().notify(emptyKeys);
@@ -104,10 +103,9 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
                 algo.addMolecularDescriptorChangeListener(this);
                 algo.initAlgo(workspace, null);
             }
-        }        
+        }
     }
-    
-    
+
     @Override
     protected void compute(Peptide peptide) {
         for (AbstractMD algo : algorithms) {
@@ -117,15 +115,13 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
 
     @Override
     public void endAlgo() {
-        super.endAlgo(); 
+        super.endAlgo();
         // End all algoritms
         for (AbstractMD algo : algorithms) {
             algo.removeMolecularDescriptorChangeListener(this);
             algo.endAlgo();
-        }        
+        }
     }
-
-    
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -133,6 +129,13 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
                 && evt.getNewValue() != null) {
             addAttribute((MolecularDescriptor) evt.getNewValue());
         }
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        AllDescriptors copy = (AllDescriptors) super.clone();
+        copy.descriptorKeys = (Set) ((LinkedHashSet) descriptorKeys).clone();
+        return copy;
     }
 
 }

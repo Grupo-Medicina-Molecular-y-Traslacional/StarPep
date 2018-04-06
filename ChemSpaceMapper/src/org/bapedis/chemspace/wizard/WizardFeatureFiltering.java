@@ -8,18 +8,21 @@ package org.bapedis.chemspace.wizard;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
+import org.bapedis.chemspace.model.FeatureFilteringOption;
 import org.bapedis.core.spi.algo.impl.FeatureFilteringAlgo;
 import org.openide.WizardDescriptor;
+import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 
 public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDescriptor> {
 
     private final MapperAlgorithm csMapper;
+    private FeatureFilteringAlgo algo;
 
     public WizardFeatureFiltering(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
     }
-        
+
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
@@ -33,9 +36,15 @@ public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDesc
     @Override
     public VisualFeatureFiltering getComponent() {
         if (component == null) {
-            FeatureFilteringAlgo algo = csMapper.getFeatureSelection();
-            JPanel settingPanel = algo.getFactory().getSetupUI().getSettingPanel(algo);
-//            component = new VisualFeatureFiltering(csMapper.getOptionModel(), settingPanel);
+            try {
+                algo = (FeatureFilteringAlgo)csMapper.getFeatureFiltering().clone();
+                JPanel settingPanel = algo.getFactory().getSetupUI().getSettingPanel(algo);
+                component = new VisualFeatureFiltering(settingPanel);
+                component.setFFOption(csMapper.getFFOption());
+            } catch (CloneNotSupportedException ex) {
+                Exceptions.printStackTrace(ex);
+                algo = null;
+            }
         }
         return component;
     }
@@ -74,6 +83,8 @@ public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDesc
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
+        wiz.putProperty(FeatureFilteringOption.class.getName(), component.getFFOption());
+        wiz.putProperty(FeatureFilteringAlgo.class.getName(), algo);
     }
 
 }

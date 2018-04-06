@@ -7,22 +7,28 @@ package org.bapedis.chemspace.wizard;
 
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
-import org.bapedis.chemspace.model.WizardOptionModel;
+import org.bapedis.chemspace.model.FeatureWeightingOption;
 import org.openide.util.NbBundle;
 
 public final class VisualFeatureWeighting extends JPanel {
 
-    private final WizardOptionModel optionModel;
+    static final String CHANGED_OPTION = "weighting_changed";
     private final JPanel settingPanel;
+    private FeatureWeightingOption fwOption;
 
-    public VisualFeatureWeighting(WizardOptionModel optionModel, JPanel settingPanel) {
+    public VisualFeatureWeighting(JPanel settingPanel) {
         initComponents();
-        this.optionModel = optionModel;
         this.settingPanel = settingPanel;
-        
         bottomPanel.add(settingPanel, BorderLayout.CENTER);
-        
-        switch (optionModel.getFeatureWeightingOption()) {
+    }
+
+    public FeatureWeightingOption getFWOption() {
+        return fwOption;
+    }
+
+    public void setFWOption(FeatureWeightingOption fwOption) {
+        this.fwOption = fwOption;
+        switch (fwOption) {
             case NO:
                 jOption1.setSelected(true);
                 break;
@@ -30,7 +36,8 @@ public final class VisualFeatureWeighting extends JPanel {
                 jOption2.setSelected(true);
                 break;
         }
-        settingPanel.setEnabled(optionModel.getFeatureWeightingOption() == WizardOptionModel.FeatureWeighting.YES);
+        settingPanel.setEnabled(fwOption == FeatureWeightingOption.YES);
+
     }
 
     @Override
@@ -107,17 +114,17 @@ public final class VisualFeatureWeighting extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
-        if (optionModel.getFeatureWeightingOption() != WizardOptionModel.FeatureWeighting.NO) {
-            optionModel.setFeatureWeightingOption(WizardOptionModel.FeatureWeighting.NO);
-            settingPanel.setEnabled(false);
-        }
+        FeatureWeightingOption oldOption = fwOption;
+        fwOption = FeatureWeightingOption.NO;
+        settingPanel.setEnabled(false);
+        firePropertyChange(CHANGED_OPTION, oldOption, fwOption);
     }//GEN-LAST:event_jOption1ActionPerformed
 
     private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
-        if (optionModel.getFeatureWeightingOption()!= WizardOptionModel.FeatureWeighting.YES) {
-            optionModel.setFeatureWeightingOption(WizardOptionModel.FeatureWeighting.YES);
-            settingPanel.setEnabled(true);
-        }
+        FeatureWeightingOption oldOption = fwOption;
+        fwOption = FeatureWeightingOption.YES;
+        settingPanel.setEnabled(true);
+        firePropertyChange(CHANGED_OPTION, oldOption, fwOption);
     }//GEN-LAST:event_jOption2ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

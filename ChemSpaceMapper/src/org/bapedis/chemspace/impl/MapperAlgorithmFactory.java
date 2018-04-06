@@ -6,7 +6,6 @@
 package org.bapedis.chemspace.impl;
 
 import java.text.MessageFormat;
-import org.bapedis.chemspace.model.WizardOptionModel;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
 import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.algo.Algorithm;
@@ -52,9 +51,6 @@ public class MapperAlgorithmFactory implements AlgorithmFactory {
         
         // Create wizard
         WizardDescriptor wiz = createWizardDescriptor(csnAlgo);
-        
-        // Set wizard option model
-        wiz.putProperty(WizardOptionModel.PROPERTY_NAME, new WizardOptionModel());
         
         //The image in the left sidebar of the wizard is set like this:
         //wiz.putProperty(WizardDescriptor.PROP_IMAGE, ImageUtilities.loadImage("org/demo/wizard/banner.PNG", true));

@@ -19,7 +19,9 @@ import org.bapedis.core.task.ProgressTicket;
  * @author loge
  */
 public class NetworkEmbedder extends AbstractEmbedder {
-
+    public static final int MAX_NODES=1000;
+    public static final int MAX_EDGES=100000;
+    
     private static final ForkJoinPool fjPool = new ForkJoinPool();
     private SimilarityMeasure simMeasure;
     private SimilarityMatrix similarityMatrix;
@@ -63,6 +65,7 @@ public class NetworkEmbedder extends AbstractEmbedder {
         fjPool.invoke(task);
         task.join();
         similarityMatrix = task.getSimilarityMatrix();
+        
     }
 
     @Override

@@ -7,7 +7,10 @@ package org.bapedis.chemspace.impl;
 
 import java.util.LinkedList;
 import java.util.List;
-import org.bapedis.chemspace.model.WizardOptionModel;
+import org.bapedis.chemspace.model.FeatureFilteringOption;
+import org.bapedis.chemspace.model.FeatureWeightingOption;
+import org.bapedis.chemspace.model.FeatureExtractionOption;
+import org.bapedis.chemspace.model.ChemSpaceOption;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
@@ -17,8 +20,6 @@ import org.bapedis.core.spi.algo.impl.AllDescriptors;
 import org.bapedis.core.spi.algo.impl.AllDescriptorsFactory;
 import org.bapedis.core.spi.algo.impl.FeatureFilteringAlgo;
 import org.bapedis.core.spi.algo.impl.FeatureFilteringFactory;
-import org.bapedis.core.spi.algo.impl.SequenceClustering;
-import org.bapedis.core.spi.algo.impl.SequenceClusteringFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -37,11 +38,19 @@ public class MapperAlgorithm implements Algorithm {
     protected ProgressTicket progressTicket;
     protected boolean stopRun;
 
+    //Mapping Options
+    protected ChemSpaceOption csOption;
+    protected FeatureExtractionOption feOption;
+    protected FeatureFilteringOption ffOption;
+    protected FeatureWeightingOption fwOption;
+    
+    
     // Algorithms    
     private AllDescriptors featureExtraction;
     private FeatureFilteringAlgo featureFiltering;
+    private AbstractEmbedder chemSpaceEmbedder;    
 //    private final SequenceClustering seqClustering;
-    private AbstractEmbedder chemSpaceEmbedder;
+
 
     //Algorithm workflow
     private final List<Algorithm> workFlow;
@@ -51,11 +60,17 @@ public class MapperAlgorithm implements Algorithm {
         this.factory = factory;
         workFlow = new LinkedList<>();
 
+        //Mapping Options        
+        csOption = ChemSpaceOption.NONE;
+        feOption = FeatureExtractionOption.NEW;
+        ffOption = FeatureFilteringOption.YES;
+        fwOption = FeatureWeightingOption.NO;
+        
         // Algorithms
-//        featureExtraction = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
-//        featureFiltering = (FeatureFilteringAlgo) new FeatureFilteringFactory().createAlgorithm();
-//        seqClustering = (SequenceClustering) new SequenceClusteringFactory().createAlgorithm();
-//        networkEmbeder = (NetworkEmbedder) new NetworkEmbedderFactory().createAlgorithm();
+        featureExtraction = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
+        featureFiltering = (FeatureFilteringAlgo) new FeatureFilteringFactory().createAlgorithm();
+        chemSpaceEmbedder = (NetworkEmbedder) new NetworkEmbedderFactory().createAlgorithm();
+//        seqClustering = (SequenceClustering) new SequenceClusteringFactory().createAlgorithm();        
 //        twoDEmbedder = (TwoDEmbedder) new TwoDEmbedderFactory().createAlgorithm();
     }
 
@@ -116,6 +131,38 @@ public class MapperAlgorithm implements Algorithm {
         return stopRun;
     }
 
+    public ChemSpaceOption getChemSpaceOption() {
+        return csOption;
+    }
+
+    public void setChemSpaceOption(ChemSpaceOption csOption) {
+        this.csOption = csOption;
+    }
+
+    public FeatureExtractionOption getFEOption() {
+        return feOption;
+    }
+
+    public void setFEOption(FeatureExtractionOption feOption) {
+        this.feOption = feOption;
+    }
+
+    public FeatureFilteringOption getFFOption() {
+        return ffOption;
+    }
+
+    public void setFFOption(FeatureFilteringOption ffOption) {
+        this.ffOption = ffOption;
+    }
+
+    public FeatureWeightingOption getFWOption() {
+        return fwOption;
+    }
+
+    public void setFWOption(FeatureWeightingOption fwOption) {
+        this.fwOption = fwOption;
+    }        
+
     public void setFeatureExtraction(AllDescriptors featureExtraction) {
         this.featureExtraction = featureExtraction;
     }
@@ -128,7 +175,7 @@ public class MapperAlgorithm implements Algorithm {
         this.featureFiltering = featureFiltering;
     }
     
-    public FeatureFilteringAlgo getFeatureSelection() {
+    public FeatureFilteringAlgo getFeatureFiltering() {
         return featureFiltering;
     }
 
@@ -150,4 +197,5 @@ public class MapperAlgorithm implements Algorithm {
         return factory;
     }
 
+    
 }

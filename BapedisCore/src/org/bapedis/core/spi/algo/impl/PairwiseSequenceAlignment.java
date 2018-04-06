@@ -5,16 +5,13 @@
  */
 package org.bapedis.core.spi.algo.impl;
 
-import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.SequenceAlignmentModel;
 import org.biojava.nbio.alignment.Alignments;
 import org.biojava.nbio.alignment.SimpleGapPenalty;
 import org.biojava.nbio.core.alignment.template.SequencePair;
 import org.biojava.nbio.core.alignment.template.SubstitutionMatrix;
-import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
 import org.biojava.nbio.core.sequence.ProteinSequence;
 import org.biojava.nbio.core.sequence.compound.AminoAcidCompound;
-import org.openide.util.Exceptions;
 
 /**
  *

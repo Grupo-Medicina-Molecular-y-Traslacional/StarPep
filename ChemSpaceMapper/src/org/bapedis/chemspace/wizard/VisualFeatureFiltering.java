@@ -7,22 +7,28 @@ package org.bapedis.chemspace.wizard;
 
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
-import org.bapedis.chemspace.model.WizardOptionModel;
+import org.bapedis.chemspace.model.FeatureFilteringOption;
 import org.openide.util.NbBundle;
 
 public final class VisualFeatureFiltering extends JPanel {
 
-    private final WizardOptionModel optionModel;
+    static final String CHANGED_OPTION = "filtering_changed";
     private final JPanel settingPanel;
+    private FeatureFilteringOption ffOption;
 
-    public VisualFeatureFiltering(WizardOptionModel optionModel, JPanel settingPanel) {        
+    public VisualFeatureFiltering(JPanel settingPanel) {
         initComponents();
-        this.optionModel = optionModel;
         this.settingPanel = settingPanel;
-        
         bottomPanel.add(settingPanel, BorderLayout.CENTER);
-        
-        switch (optionModel.getFeatureFilteringOption()) {
+    }
+
+    public FeatureFilteringOption getFFOption() {
+        return ffOption;
+    }
+
+    public void setFFOption(FeatureFilteringOption ffOption) {
+        this.ffOption = ffOption;
+        switch (ffOption) {
             case NO:
                 jOption1.setSelected(true);
                 break;
@@ -30,7 +36,7 @@ public final class VisualFeatureFiltering extends JPanel {
                 jOption2.setSelected(true);
                 break;
         }
-        settingPanel.setEnabled(optionModel.getFeatureFilteringOption() == WizardOptionModel.FeatureFiltering.YES);
+        settingPanel.setEnabled(ffOption == FeatureFilteringOption.YES);
     }
 
     @Override
@@ -106,17 +112,17 @@ public final class VisualFeatureFiltering extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
-        if (optionModel.getFeatureFilteringOption() != WizardOptionModel.FeatureFiltering.YES) {
-            optionModel.setFeatureFilteringOption(WizardOptionModel.FeatureFiltering.YES);
-            settingPanel.setEnabled(true);
-        }
+        FeatureFilteringOption oldOption = ffOption;
+        ffOption = FeatureFilteringOption.YES;
+        settingPanel.setEnabled(true);
+        firePropertyChange(CHANGED_OPTION, oldOption, ffOption);
     }//GEN-LAST:event_jOption2ActionPerformed
 
     private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
-        if (optionModel.getFeatureFilteringOption() != WizardOptionModel.FeatureFiltering.NO) {
-            optionModel.setFeatureFilteringOption(WizardOptionModel.FeatureFiltering.NO);
-            settingPanel.setEnabled(false);
-        }
+        FeatureFilteringOption oldOption = ffOption;
+        ffOption = FeatureFilteringOption.NO;
+        settingPanel.setEnabled(false);
+        firePropertyChange(CHANGED_OPTION, oldOption, ffOption);
     }//GEN-LAST:event_jOption1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

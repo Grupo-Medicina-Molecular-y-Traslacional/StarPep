@@ -31,7 +31,7 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class FeatureFilteringAlgo implements Algorithm {
+public class FeatureFilteringAlgo implements Algorithm, Cloneable {
 
     protected final ProjectManager pc;
     protected final FeatureFilteringFactory factory;
@@ -345,6 +345,12 @@ public class FeatureFilteringAlgo implements Algorithm {
             pc.reportError(ex.getMessage(), workspace);
         }
     }
+    
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        FeatureFilteringAlgo copy = (FeatureFilteringAlgo)super.clone(); //To change body of generated methods, choose Tools | Templates.
+        return copy;
+    }    
 
     private void fillBins(MolecularDescriptor descriptor, List<Peptide> peptides, Bin[] bins) throws MolecularDescriptorNotFoundException {
         Bin bin;
@@ -657,6 +663,5 @@ class CorrelationPair implements Comparable<CorrelationPair> {
     @Override
     public int compareTo(CorrelationPair other) {
         return Double.compare(val, other.val);
-    }
-
+    }            
 }

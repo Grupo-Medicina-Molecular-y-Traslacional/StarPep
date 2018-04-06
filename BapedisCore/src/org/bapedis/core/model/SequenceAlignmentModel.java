@@ -167,14 +167,8 @@ public class SequenceAlignmentModel implements Cloneable{
 
     @Override
     public Object clone() throws CloneNotSupportedException {
-        SequenceAlignmentModel copyModel = new SequenceAlignmentModel();
-        copyModel.setAlignmentTypeIndex(getAlignmentTypeIndex());
-        copyModel.setSubstitutionMatrixIndex(getSubstitutionMatrixIndex());
-        copyModel.setPercentIdentity(getPercentIdentity());
+        SequenceAlignmentModel copyModel = (SequenceAlignmentModel)super.clone();
         return copyModel;        
     }
-    
-    
-    
-    
+        
 }

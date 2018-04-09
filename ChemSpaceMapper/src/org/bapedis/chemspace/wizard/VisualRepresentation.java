@@ -5,7 +5,6 @@
  */
 package org.bapedis.chemspace.wizard;
 
-import java.awt.CardLayout;
 import javax.swing.JPanel;
 import org.bapedis.chemspace.model.ChemSpaceOption;
 import org.openide.util.NbBundle;
@@ -27,38 +26,20 @@ public final class VisualRepresentation extends JPanel {
 
     public void setChemSpaceOption(ChemSpaceOption csOption) {
         this.csOption = csOption;
-        CardLayout cl = (CardLayout) bottomPanel.getLayout();
         switch (csOption) {
             case TWODIMENSIONAL:
                 jOption1.setSelected(true);
-                jOption1_1.setSelected(true);
-                cl.show(bottomPanel, "coordinateBased");
-                break;
-            case THREEDIMENSIONAL:
-                jOption1.setSelected(true);
-                jOption1_2.setSelected(true);
-                cl.show(bottomPanel, "coordinateBased");
                 break;
             case FULL_NETWORK:
                 jOption2.setSelected(true);
-                jOption2_1.setSelected(true);
-                cl.show(bottomPanel, "coordinateFree");
                 break;
-            case REDUCED_NETWORK_BY_COMMUNITY:
-                jOption2.setSelected(true);
-                jOption2_2.setSelected(true);
-                jOption2_2_Items.setSelectedIndex(COMMUNITY_INDEX);
-                cl.show(bottomPanel, "coordinateFree");
+            case COMPRESSED_NETWORK:
+                jOption3.setSelected(true);
                 break;
             case NONE:
-                jOption1_1.setSelected(false);
-                jOption1_2.setSelected(false);
-                jOption2_1.setSelected(false);
-                jOption2_2.setSelected(false);
                 jOption1.setSelected(false);
-                jOption2.setSelected(false);                
-                cl.show(bottomPanel, "info");
-                break;
+                jOption2.setSelected(false);
+                jOption3.setSelected(false);
         }
     }
 
@@ -77,136 +58,22 @@ public final class VisualRepresentation extends JPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        buttonGroup2 = new javax.swing.ButtonGroup();
-        buttonGroup3 = new javax.swing.ButtonGroup();
-        bottomPanel = new javax.swing.JPanel();
-        coordinateBasedPanel = new javax.swing.JPanel();
-        jOption1_1 = new javax.swing.JRadioButton();
-        jextLabel1 = new javax.swing.JLabel();
-        jOption1_2 = new javax.swing.JRadioButton();
-        coordinateFreePanel = new javax.swing.JPanel();
-        jOption2_1 = new javax.swing.JRadioButton();
-        jOption2_2 = new javax.swing.JRadioButton();
-        jOption2_2_Items = new javax.swing.JComboBox<>();
-        jextLabel2 = new javax.swing.JLabel();
-        jInfoLabel = new javax.swing.JLabel();
         jQuestionLabel = new javax.swing.JLabel();
-        jOption2 = new javax.swing.JRadioButton();
+        jInfo1 = new javax.swing.JLabel();
+        jInfo2 = new javax.swing.JLabel();
         jOption1 = new javax.swing.JRadioButton();
+        jOption2 = new javax.swing.JRadioButton();
+        jOption3 = new javax.swing.JRadioButton();
+        bottomPanel = new javax.swing.JPanel();
+        jOption2_2_Items = new javax.swing.JComboBox<>();
+        extLabel = new javax.swing.JLabel();
+        jBasedOnLabel = new javax.swing.JLabel();
+        jMaxNumberLabel = new javax.swing.JLabel();
+        jComboBox1 = new javax.swing.JComboBox<>();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
         setPreferredSize(new java.awt.Dimension(500, 460));
         setLayout(new java.awt.GridBagLayout());
-
-        bottomPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        bottomPanel.setLayout(new java.awt.CardLayout());
-
-        coordinateBasedPanel.setLayout(new java.awt.GridBagLayout());
-
-        buttonGroup2.add(jOption1_1);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption1_1, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jOption1_1.text")); // NOI18N
-        jOption1_1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jOption1_1ActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        coordinateBasedPanel.add(jOption1_1, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jextLabel1, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jextLabel1.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        coordinateBasedPanel.add(jextLabel1, gridBagConstraints);
-
-        buttonGroup2.add(jOption1_2);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption1_2, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jOption1_2.text")); // NOI18N
-        jOption1_2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jOption1_2ActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        coordinateBasedPanel.add(jOption1_2, gridBagConstraints);
-
-        bottomPanel.add(coordinateBasedPanel, "coordinateBased");
-
-        coordinateFreePanel.setLayout(new java.awt.GridBagLayout());
-
-        buttonGroup3.add(jOption2_1);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption2_1, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jOption2_1.text")); // NOI18N
-        jOption2_1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jOption2_1ActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        coordinateFreePanel.add(jOption2_1, gridBagConstraints);
-
-        buttonGroup3.add(jOption2_2);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption2_2, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jOption2_2.text")); // NOI18N
-        jOption2_2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jOption2_2ActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        coordinateFreePanel.add(jOption2_2, gridBagConstraints);
-
-        jOption2_2_Items.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "communities" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 25, 0, 0);
-        coordinateFreePanel.add(jOption2_2_Items, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jextLabel2, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jextLabel2.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        coordinateFreePanel.add(jextLabel2, gridBagConstraints);
-
-        bottomPanel.add(coordinateFreePanel, "coordinateFree");
-
-        jInfoLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jInfoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jInfoLabel.text")); // NOI18N
-        bottomPanel.add(jInfoLabel, "info");
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(bottomPanel, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jQuestionLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -217,19 +84,23 @@ public final class VisualRepresentation extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jQuestionLabel, gridBagConstraints);
 
-        buttonGroup1.add(jOption2);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jOption2.text")); // NOI18N
-        jOption2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jOption2ActionPerformed(evt);
-            }
-        });
+        org.openide.awt.Mnemonics.setLocalizedText(jInfo1, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jInfo1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(jOption2, gridBagConstraints);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(7, 5, 0, 0);
+        add(jInfo1, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jInfo2, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jInfo2.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(7, 5, 0, 0);
+        add(jInfo2, gridBagConstraints);
 
         buttonGroup1.add(jOption1);
         org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jOption1.text")); // NOI18N
@@ -240,93 +111,133 @@ public final class VisualRepresentation extends JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jOption1, gridBagConstraints);
+
+        buttonGroup1.add(jOption2);
+        org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jOption2.text")); // NOI18N
+        jOption2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOption2ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(jOption2, gridBagConstraints);
+
+        buttonGroup1.add(jOption3);
+        org.openide.awt.Mnemonics.setLocalizedText(jOption3, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jOption3.text")); // NOI18N
+        jOption3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOption3ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(jOption3, gridBagConstraints);
+
+        bottomPanel.setLayout(new java.awt.GridBagLayout());
+
+        jOption2_2_Items.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "communities" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
+        bottomPanel.add(jOption2_2_Items, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(extLabel, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.extLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        bottomPanel.add(extLabel, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jBasedOnLabel, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jBasedOnLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 25, 0, 0);
+        bottomPanel.add(jBasedOnLabel, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jMaxNumberLabel, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jMaxNumberLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
+        bottomPanel.add(jMaxNumberLabel, gridBagConstraints);
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1000", "500", "250", "100", "50", "10" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
+        bottomPanel.add(jComboBox1, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(bottomPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
-        CardLayout cl = (CardLayout) bottomPanel.getLayout();
-        cl.show(bottomPanel, "coordinateFree");
-        ChemSpaceOption oldOption = csOption;
-        if (jOption2_1.isSelected()) {
-            csOption = ChemSpaceOption.FULL_NETWORK;
-        } else if (jOption2_2.isSelected()) {
-            switch (jOption2_2_Items.getSelectedIndex()) {
-                case COMMUNITY_INDEX:
-                    csOption = ChemSpaceOption.REDUCED_NETWORK_BY_COMMUNITY;
-                    break;
-                default:
-                    csOption = ChemSpaceOption.NONE;
-            }
-        } else {
-            csOption = ChemSpaceOption.NONE;
-        }
-        firePropertyChange(CHANGED_OPTION, oldOption, csOption);
-    }//GEN-LAST:event_jOption2ActionPerformed
-
     private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
-        CardLayout cl = (CardLayout) bottomPanel.getLayout();
-        cl.show(bottomPanel, "coordinateBased");
-        ChemSpaceOption oldOption = csOption;
-        if (jOption1_1.isSelected()) {
-            csOption = ChemSpaceOption.TWODIMENSIONAL;
-        } else if (jOption1_2.isSelected()) {
-            csOption = ChemSpaceOption.THREEDIMENSIONAL;
-        } else {
-            csOption = ChemSpaceOption.NONE;
-        }
-        firePropertyChange(CHANGED_OPTION, oldOption, csOption);
-    }//GEN-LAST:event_jOption1ActionPerformed
-
-    private void jOption1_1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1_1ActionPerformed
         ChemSpaceOption oldOption = csOption;
         csOption = ChemSpaceOption.TWODIMENSIONAL;
         firePropertyChange(CHANGED_OPTION, oldOption, csOption);
-    }//GEN-LAST:event_jOption1_1ActionPerformed
+    }//GEN-LAST:event_jOption1ActionPerformed
 
-    private void jOption2_1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2_1ActionPerformed
+    private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
         ChemSpaceOption oldOption = csOption;
         csOption = ChemSpaceOption.FULL_NETWORK;
         firePropertyChange(CHANGED_OPTION, oldOption, csOption);
-    }//GEN-LAST:event_jOption2_1ActionPerformed
+    }//GEN-LAST:event_jOption2ActionPerformed
 
-    private void jOption2_2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2_2ActionPerformed
+    private void jOption3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption3ActionPerformed
         ChemSpaceOption oldOption = csOption;
         switch (jOption2_2_Items.getSelectedIndex()) {
             case COMMUNITY_INDEX:
-                csOption = ChemSpaceOption.REDUCED_NETWORK_BY_COMMUNITY;
+                csOption = ChemSpaceOption.COMPRESSED_NETWORK;
                 break;
             default:
                 csOption = ChemSpaceOption.NONE;
         }
         firePropertyChange(CHANGED_OPTION, oldOption, csOption);
-    }//GEN-LAST:event_jOption2_2ActionPerformed
-
-    private void jOption1_2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1_2ActionPerformed
-        ChemSpaceOption oldOption = csOption;
-        csOption = ChemSpaceOption.THREEDIMENSIONAL;
-        firePropertyChange(CHANGED_OPTION, oldOption, csOption);
-    }//GEN-LAST:event_jOption1_2ActionPerformed
+    }//GEN-LAST:event_jOption3ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bottomPanel;
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.ButtonGroup buttonGroup2;
-    private javax.swing.ButtonGroup buttonGroup3;
-    private javax.swing.JPanel coordinateBasedPanel;
-    private javax.swing.JPanel coordinateFreePanel;
-    private javax.swing.JLabel jInfoLabel;
+    private javax.swing.JLabel extLabel;
+    private javax.swing.JLabel jBasedOnLabel;
+    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JLabel jInfo1;
+    private javax.swing.JLabel jInfo2;
+    private javax.swing.JLabel jMaxNumberLabel;
     private javax.swing.JRadioButton jOption1;
-    private javax.swing.JRadioButton jOption1_1;
-    private javax.swing.JRadioButton jOption1_2;
     private javax.swing.JRadioButton jOption2;
-    private javax.swing.JRadioButton jOption2_1;
-    private javax.swing.JRadioButton jOption2_2;
     private javax.swing.JComboBox<String> jOption2_2_Items;
+    private javax.swing.JRadioButton jOption3;
     private javax.swing.JLabel jQuestionLabel;
-    private javax.swing.JLabel jextLabel1;
-    private javax.swing.JLabel jextLabel2;
     // End of variables declaration//GEN-END:variables
 }

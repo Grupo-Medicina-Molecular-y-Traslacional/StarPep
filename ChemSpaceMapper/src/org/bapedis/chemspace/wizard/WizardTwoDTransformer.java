@@ -11,20 +11,20 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
-import org.bapedis.chemspace.spi.SimilarityMeasureFactory;
+import org.bapedis.chemspace.spi.ThreeDTransformerFactory;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
-public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel<WizardDescriptor>,
+public class WizardTwoDTransformer implements WizardDescriptor.ValidatingPanel<WizardDescriptor>,
         PropertyChangeListener {
 
     private final MapperAlgorithm csMapper;
     private final EventListenerList listeners = new EventListenerList();
     private boolean isValid;
 
-    public WizardSimilarityMeasure(MapperAlgorithm csMapper) {
+    public WizardTwoDTransformer(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
         isValid = true;
     }
@@ -33,16 +33,16 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private VisualSimilarityMeasure component;
+    private VisualTwoDTransformer component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public VisualSimilarityMeasure getComponent() {
+    public VisualTwoDTransformer getComponent() {
         if (component == null) {
-            component = new VisualSimilarityMeasure();
+            component = new VisualTwoDTransformer();
             component.addPropertyChangeListener(this);
         }
         return component;
@@ -84,7 +84,7 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        SimilarityMeasureFactory factory = component.getSimilarityMeasureFactory();
+        ThreeDTransformerFactory factory = component.getThreeDTransformerFactory();
 //        if (factory != null) {
 //            csnAlgo.setSimMeasure(factory.createAlgorithm());
 //        }
@@ -92,16 +92,16 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
 
     @Override
     public void validate() throws WizardValidationException {
-        if (getComponent().getSimilarityMeasureFactory() == null) {
+        if (getComponent().getThreeDTransformerFactory() == null) {
             isValid = false;
-            throw new WizardValidationException(null, NbBundle.getMessage(WizardSimilarityMeasure.class, "VisualSimilarityMeasure.invalid.text"), null);
+            throw new WizardValidationException(null, NbBundle.getMessage(WizardTwoDTransformer.class, "VisualTwoDTransformer.invalid.text"), null);
         }
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         boolean oldState = isValid;
-        if (evt.getPropertyName().equals(VisualSimilarityMeasure.NETWORK_FACTORY)) {
+        if (evt.getPropertyName().equals(VisualTwoDTransformer.TRANSFORMER_FACTORY)) {
             isValid = evt.getNewValue() != null;
         }
         if (oldState != isValid) {

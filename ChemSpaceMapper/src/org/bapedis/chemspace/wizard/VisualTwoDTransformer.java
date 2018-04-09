@@ -14,40 +14,40 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import org.bapedis.chemspace.spi.SimilarityMeasureFactory;
+import org.bapedis.chemspace.spi.ThreeDTransformerFactory;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
-public final class VisualSimilarityMeasure extends JPanel {
+public final class VisualTwoDTransformer extends JPanel {
 
-    public static final String NETWORK_FACTORY = "network_factory";
+    public static final String TRANSFORMER_FACTORY = "transformer_factory";
     private final DefaultMutableTreeNode treeNode;
-    private SimilarityMeasureFactory factory;
+    private ThreeDTransformerFactory factory;
 
-    public VisualSimilarityMeasure() {
+    public VisualTwoDTransformer() {
         initComponents();
-        treeNode = new DefaultMutableTreeNode(NbBundle.getMessage(VisualSimilarityMeasure.class, "VisualSimilarityMeasure.root.name"), true);
+        treeNode = new DefaultMutableTreeNode(NbBundle.getMessage(VisualTwoDTransformer.class, "VisualTwoDTransformer.root.name"), true);
         populateJTree();
         jTree1.setModel(new DefaultTreeModel(treeNode));
         jTree1.setRootVisible(true);
-        jTree1.setCellRenderer(new SimilarityFactoryNodeRenderer());
+        jTree1.setCellRenderer(new TransformerFactoryNodeRenderer());
     }
 
-    public SimilarityMeasureFactory getSimilarityMeasureFactory() {
+    public ThreeDTransformerFactory getThreeDTransformerFactory() {
         return factory;
     }        
 
     private void populateJTree() {
-        Collection<? extends SimilarityMeasureFactory> factories = Lookup.getDefault().lookupAll(SimilarityMeasureFactory.class);
-        for (SimilarityMeasureFactory factory : factories) {
-            treeNode.add(new SimilarityFactoryTreeNode(factory));
+        Collection<? extends ThreeDTransformerFactory> factories = Lookup.getDefault().lookupAll(ThreeDTransformerFactory.class);
+        for (ThreeDTransformerFactory factory : factories) {
+            treeNode.add(new TransformerFactoryTreeNode(factory));
         }
     }
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(VisualSimilarityMeasure.class, "SimilarityMeasure.name");
+        return NbBundle.getMessage(VisualTwoDTransformer.class, "VisualTwoDTransformer.name");
     }
 
     /**
@@ -102,7 +102,7 @@ public final class VisualSimilarityMeasure extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jScrollPane2, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualSimilarityMeasure.class, "VisualSimilarityMeasure.jInfoLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualTwoDTransformer.class, "VisualTwoDTransformer.jInfoLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -115,15 +115,15 @@ public final class VisualSimilarityMeasure extends JPanel {
     private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
         TreePath newPath = evt.getNewLeadSelectionPath();
         
-        if (newPath != null && newPath.getLastPathComponent() instanceof SimilarityFactoryTreeNode) {
-            SimilarityFactoryTreeNode newNode = (SimilarityFactoryTreeNode) newPath.getLastPathComponent();
+        if (newPath != null && newPath.getLastPathComponent() instanceof TransformerFactoryTreeNode) {
+            TransformerFactoryTreeNode newNode = (TransformerFactoryTreeNode) newPath.getLastPathComponent();
             factory = newNode.getFactory();
             jTextArea1.setText(factory.getDescription());            
         } else {
             factory = null;
             jTextArea1.setText("");
         }
-        firePropertyChange(NETWORK_FACTORY, null, factory);
+        firePropertyChange(TRANSFORMER_FACTORY, null, factory);
     }//GEN-LAST:event_jTree1ValueChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -134,14 +134,14 @@ public final class VisualSimilarityMeasure extends JPanel {
     private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
 
-    private static class SimilarityFactoryTreeNode extends DefaultMutableTreeNode {
+    private static class TransformerFactoryTreeNode extends DefaultMutableTreeNode {
 
-        public SimilarityFactoryTreeNode(SimilarityMeasureFactory factory) {
+        public TransformerFactoryTreeNode(ThreeDTransformerFactory factory) {
             super(factory, false);
         }
 
-        public SimilarityMeasureFactory getFactory() {
-            return (SimilarityMeasureFactory) userObject;
+        public ThreeDTransformerFactory getFactory() {
+            return (ThreeDTransformerFactory) userObject;
         }
 
         @Override
@@ -151,11 +151,11 @@ public final class VisualSimilarityMeasure extends JPanel {
 
     }
 
-    private static class SimilarityFactoryNodeRenderer extends DefaultTreeCellRenderer {
+    private static class TransformerFactoryNodeRenderer extends DefaultTreeCellRenderer {
 
         Icon icon;
 
-        public SimilarityFactoryNodeRenderer() {
+        public TransformerFactoryNodeRenderer() {
             icon = ImageUtilities.loadImageIcon("org/bapedis/chemspace/resources/network.png", false);
         }
 
@@ -174,7 +174,7 @@ public final class VisualSimilarityMeasure extends JPanel {
                     expanded, leaf, row,
                     hasFocus);
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-            if (!(node instanceof SimilarityFactoryTreeNode)) {
+            if (!(node instanceof TransformerFactoryTreeNode)) {
                 // Root node
                 setIcon(icon);
             }

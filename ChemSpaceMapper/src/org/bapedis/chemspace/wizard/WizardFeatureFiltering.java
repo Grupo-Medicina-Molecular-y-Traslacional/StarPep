@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.model.FeatureFilteringOption;
-import org.bapedis.core.spi.algo.impl.FeatureFilteringAlgo;
+import org.bapedis.core.spi.alg.impl.FeatureFiltering;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
@@ -17,7 +17,7 @@ import org.openide.util.HelpCtx;
 public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDescriptor> {
 
     private final MapperAlgorithm csMapper;
-    private FeatureFilteringAlgo algo;
+    private FeatureFiltering alg;
 
     public WizardFeatureFiltering(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
@@ -37,13 +37,13 @@ public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDesc
     public VisualFeatureFiltering getComponent() {
         if (component == null) {
             try {
-                algo = (FeatureFilteringAlgo)csMapper.getFeatureFiltering().clone();
-                JPanel settingPanel = algo.getFactory().getSetupUI().getSettingPanel(algo);
+                alg = (FeatureFiltering)csMapper.getFeatureFilteringAlg().clone();
+                JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
                 component = new VisualFeatureFiltering(settingPanel);
                 component.setFFOption(csMapper.getFFOption());
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
-                algo = null;
+                alg = null;
             }
         }
         return component;
@@ -84,7 +84,7 @@ public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDesc
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
         wiz.putProperty(FeatureFilteringOption.class.getName(), component.getFFOption());
-        wiz.putProperty(FeatureFilteringAlgo.class.getName(), algo);
+        wiz.putProperty(FeatureFiltering.class.getName(), alg);
     }
 
 }

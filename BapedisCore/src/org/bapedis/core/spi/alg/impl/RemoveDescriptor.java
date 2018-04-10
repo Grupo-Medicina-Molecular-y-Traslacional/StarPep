@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.spi.algo.impl;
+package org.bapedis.core.spi.alg.impl;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -13,8 +13,8 @@ import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.util.Lookup;
 
@@ -22,7 +22,7 @@ import org.openide.util.Lookup;
  *
  * @author loge
  */
-public class RemoveDescriptorAlgo implements Algorithm {
+public class RemoveDescriptor implements Algorithm {
 
     private final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private final RemoveDescriptorFactory factory;
@@ -37,7 +37,7 @@ public class RemoveDescriptorAlgo implements Algorithm {
     protected boolean running;
     protected transient final PropertyChangeSupport propertyChangeSupport;
 
-    public RemoveDescriptorAlgo(RemoveDescriptorFactory factory) {
+    public RemoveDescriptor(RemoveDescriptorFactory factory) {
         descriptorKeys = new LinkedHashSet<>();
         running = false;
         propertyChangeSupport = new PropertyChangeSupport(this);

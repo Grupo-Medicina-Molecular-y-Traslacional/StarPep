@@ -41,11 +41,8 @@
  */
 package org.gephi.layout.plugin.scale;
 
-import javax.swing.Icon;
-import javax.swing.JPanel;
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.gephi.layout.plugin.AbstractLayoutFactory;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;

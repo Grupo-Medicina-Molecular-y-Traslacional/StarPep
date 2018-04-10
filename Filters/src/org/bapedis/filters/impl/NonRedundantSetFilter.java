@@ -12,9 +12,9 @@ import java.util.TreeSet;
 import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.SequenceAlignmentModel;
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.impl.SequenceClustering;
-import org.bapedis.core.spi.algo.impl.SequenceClusteringFactory;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.impl.SequenceClustering;
+import org.bapedis.core.spi.alg.impl.SequenceClusteringFactory;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
 

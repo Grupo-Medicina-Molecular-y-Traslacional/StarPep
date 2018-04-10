@@ -5,7 +5,7 @@
  */
 package org.bapedis.modamp.impl;
 
-import org.bapedis.core.spi.algo.impl.AbstractMD;
+import org.bapedis.core.spi.alg.impl.AbstractMD;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;

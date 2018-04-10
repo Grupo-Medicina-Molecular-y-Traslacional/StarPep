@@ -7,13 +7,10 @@ package org.bapedis.filters.impl;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
-import java.util.TreeSet;
 import org.bapedis.core.model.AlgorithmProperty;
-import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 
 /**

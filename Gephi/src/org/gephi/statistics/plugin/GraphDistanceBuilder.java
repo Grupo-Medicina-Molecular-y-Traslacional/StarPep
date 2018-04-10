@@ -42,9 +42,9 @@ Portions Copyrighted 2011 Gephi Consortium.
 package org.gephi.statistics.plugin;
 
 import org.bapedis.core.model.AlgorithmCategory;
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 

@@ -7,7 +7,7 @@ package org.bapedis.core.spi.filters;
 
 import java.util.List;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.alg.Algorithm;
 
 /**
  *

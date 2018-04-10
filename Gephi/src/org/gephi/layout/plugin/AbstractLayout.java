@@ -43,8 +43,8 @@ package org.gephi.layout.plugin;
 
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;

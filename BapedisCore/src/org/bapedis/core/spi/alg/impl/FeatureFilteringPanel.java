@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.spi.algo.impl;
+package org.bapedis.core.spi.alg.impl;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -15,8 +15,8 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.openide.util.NbBundle;
 
 /**
@@ -25,23 +25,23 @@ import org.openide.util.NbBundle;
  */
 public class FeatureFilteringPanel extends javax.swing.JPanel implements AlgorithmSetupUI, PropertyChangeListener {
 
-    private FeatureFilteringAlgo algorithm;
+    private FeatureFiltering algorithm;
 
     public FeatureFilteringPanel() {
         initComponents();
         
         //Configure correlation methods
         DefaultComboBoxModel model = new DefaultComboBoxModel();
-        for(String method: FeatureFilteringAlgo.CORRELATION_METHODS){
+        for(String method: FeatureFiltering.CORRELATION_METHODS){
             model.addElement(method);
         }
         redundantComboBox.setModel(model);
 
         // Configure sliders        
-        uselessSlider.setMinimum(FeatureFilteringAlgo.ENTROPY_CUTOFF_MIN);
-        uselessSlider.setMaximum(FeatureFilteringAlgo.ENTROPY_CUTOFF_MAX);
-        uselessSlider.setMajorTickSpacing(FeatureFilteringAlgo.ENTROPY_MAJORTICKSPACING);
-        uselessSlider.setMinorTickSpacing(FeatureFilteringAlgo.ENTROPY_MINORTICKSPACING);
+        uselessSlider.setMinimum(FeatureFiltering.ENTROPY_CUTOFF_MIN);
+        uselessSlider.setMaximum(FeatureFiltering.ENTROPY_CUTOFF_MAX);
+        uselessSlider.setMajorTickSpacing(FeatureFiltering.ENTROPY_MAJORTICKSPACING);
+        uselessSlider.setMinorTickSpacing(FeatureFiltering.ENTROPY_MINORTICKSPACING);
         uselessSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -56,15 +56,15 @@ public class FeatureFilteringPanel extends javax.swing.JPanel implements Algorit
         });
 
         Hashtable<Integer, JLabel> uselessLabelTable = new Hashtable<>();
-        uselessLabelTable.put(FeatureFilteringAlgo.ENTROPY_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.uselessSlider.low")));
-        uselessLabelTable.put(FeatureFilteringAlgo.ENTROPY_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.uselessSlider.middle")));
-        uselessLabelTable.put(FeatureFilteringAlgo.ENTROPY_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.uselessSlider.high")));
+        uselessLabelTable.put(FeatureFiltering.ENTROPY_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.uselessSlider.low")));
+        uselessLabelTable.put(FeatureFiltering.ENTROPY_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.uselessSlider.middle")));
+        uselessLabelTable.put(FeatureFiltering.ENTROPY_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.uselessSlider.high")));
         uselessSlider.setLabelTable(uselessLabelTable);
 
-        redundantSlider.setMinimum(FeatureFilteringAlgo.CORRELATION_CUTOFF_MIN);
-        redundantSlider.setMaximum(FeatureFilteringAlgo.CORRELATION_CUTOFF_MAX);
-        redundantSlider.setMajorTickSpacing(FeatureFilteringAlgo.CORRELATION_MAJORTICKSPACING);
-        redundantSlider.setMinorTickSpacing(FeatureFilteringAlgo.CORRELATION_MINORTICKSPACING);
+        redundantSlider.setMinimum(FeatureFiltering.CORRELATION_CUTOFF_MIN);
+        redundantSlider.setMaximum(FeatureFiltering.CORRELATION_CUTOFF_MAX);
+        redundantSlider.setMajorTickSpacing(FeatureFiltering.CORRELATION_MAJORTICKSPACING);
+        redundantSlider.setMinorTickSpacing(FeatureFiltering.CORRELATION_MINORTICKSPACING);
         redundantSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -79,9 +79,9 @@ public class FeatureFilteringPanel extends javax.swing.JPanel implements Algorit
         });
 
         Hashtable<Integer, JLabel> redundantLabelTable = new Hashtable<>();
-        redundantLabelTable.put(FeatureFilteringAlgo.CORRELATION_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.redundantSlider.low")));
-        redundantLabelTable.put(FeatureFilteringAlgo.CORRELATION_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.redundantSlider.middle")));
-        redundantLabelTable.put(FeatureFilteringAlgo.CORRELATION_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.redundantSlider.high")));
+        redundantLabelTable.put(FeatureFiltering.CORRELATION_CUTOFF_REFS[0], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.redundantSlider.low")));
+        redundantLabelTable.put(FeatureFiltering.CORRELATION_CUTOFF_REFS[1], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.redundantSlider.middle")));
+        redundantLabelTable.put(FeatureFiltering.CORRELATION_CUTOFF_REFS[2], new JLabel(NbBundle.getMessage(FeatureFilteringPanel.class, "FeatureFilteringPanel.redundantSlider.high")));
         redundantSlider.setLabelTable(redundantLabelTable);                
 
     }
@@ -400,9 +400,9 @@ public class FeatureFilteringPanel extends javax.swing.JPanel implements Algorit
     }//GEN-LAST:event_option1ButtonItemStateChanged
 
     private void jResetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jResetButtonActionPerformed
-        uselessSlider.setValue(FeatureFilteringAlgo.ENTROPY_DEFAULT_VALUE);
-        redundantComboBox.setSelectedIndex(FeatureFilteringAlgo.CORRELATION_DEFAULT_INDEX);
-        redundantSlider.setValue(FeatureFilteringAlgo.CORRELATION_DEFAULT_VALUE);
+        uselessSlider.setValue(FeatureFiltering.ENTROPY_DEFAULT_VALUE);
+        redundantComboBox.setSelectedIndex(FeatureFiltering.CORRELATION_DEFAULT_INDEX);
+        redundantSlider.setValue(FeatureFiltering.CORRELATION_DEFAULT_VALUE);
     }//GEN-LAST:event_jResetButtonActionPerformed
 
     private void redundantComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_redundantComboBoxActionPerformed
@@ -436,7 +436,7 @@ public class FeatureFilteringPanel extends javax.swing.JPanel implements Algorit
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
-        this.algorithm = (FeatureFilteringAlgo) algo;
+        this.algorithm = (FeatureFiltering) algo;
         int val = this.algorithm.getEntropyCutoff();
         uselessSlider.setValue(val);
         entropyLabel.setText(val + "%");
@@ -478,7 +478,7 @@ public class FeatureFilteringPanel extends javax.swing.JPanel implements Algorit
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource().equals(algorithm) && evt.getPropertyName().equals(FeatureFilteringAlgo.RUNNING)) {
+        if (evt.getSource().equals(algorithm) && evt.getPropertyName().equals(FeatureFiltering.RUNNING)) {
             refreshState();
         }
     }

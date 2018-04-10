@@ -6,8 +6,8 @@
 package org.gephi.layout.plugin;
 
 import org.bapedis.core.model.AlgorithmCategory;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 
 
 public abstract class AbstractLayoutFactory implements AlgorithmFactory {

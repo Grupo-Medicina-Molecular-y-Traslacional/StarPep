@@ -42,7 +42,7 @@ Portions Copyrighted 2011 Gephi Consortium.
 package org.bapedis.core.model;
 
 import java.beans.PropertyEditor;
-import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.alg.Algorithm;
 import org.openide.nodes.Node.Property;
 import org.openide.nodes.PropertySupport;
 

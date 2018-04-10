@@ -3,20 +3,22 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.spi.algo.impl;
+package org.bapedis.core.spi.alg.impl;
 
 import org.bapedis.core.model.AlgorithmCategory;
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author loge
  */
-public class RemoveDescriptorFactory implements AlgorithmFactory{
+public class FeatureFilteringFactory implements AlgorithmFactory {
 
+    private FeatureFilteringPanel panel;
+    
     @Override
     public AlgorithmCategory getCategory() {
         return null;
@@ -24,22 +26,25 @@ public class RemoveDescriptorFactory implements AlgorithmFactory{
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(RemoveDescriptorAlgo.class, "RemoveDescriptor.name");
+        return NbBundle.getMessage(FeatureFiltering.class, "FeatureFiltering.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(RemoveDescriptorAlgo.class, "RemoveDescriptor.desc");
+        return NbBundle.getMessage(FeatureFiltering.class, "FeatureFiltering.desc");
     }
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        return null;
+        if (panel == null){
+            panel = new FeatureFilteringPanel();
+        }
+        return panel;
     }
 
     @Override
     public Algorithm createAlgorithm() {
-        return new RemoveDescriptorAlgo(this);
+        return new FeatureFiltering(this);
     }
     
 }

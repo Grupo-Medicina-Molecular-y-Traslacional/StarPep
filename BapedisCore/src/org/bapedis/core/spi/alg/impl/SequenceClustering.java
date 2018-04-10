@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.spi.algo.impl;
+package org.bapedis.core.spi.alg.impl;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,8 +16,8 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
 import org.openide.util.Exceptions;

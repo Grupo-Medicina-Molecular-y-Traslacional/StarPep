@@ -6,11 +6,16 @@
 package org.bapedis.chemspace.impl;
 
 import java.text.MessageFormat;
+import org.bapedis.chemspace.model.ChemSpaceOption;
+import org.bapedis.chemspace.model.FeatureExtractionOption;
+import org.bapedis.chemspace.model.FeatureFilteringOption;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
 import org.bapedis.core.model.AlgorithmCategory;
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.impl.AllDescriptors;
+import org.bapedis.core.spi.alg.impl.FeatureFiltering;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
@@ -47,27 +52,60 @@ public class MapperAlgorithmFactory implements AlgorithmFactory {
 
     @Override
     public Algorithm createAlgorithm() {
-        MapperAlgorithm csnAlgo = new MapperAlgorithm(this);   
+        MapperAlgorithm csMapper = new MapperAlgorithm(this);   
         
         // Create wizard
-        WizardDescriptor wiz = createWizardDescriptor(csnAlgo);
+        WizardDescriptor wiz = createWizardDescriptor(csMapper);
         
         //The image in the left sidebar of the wizard is set like this:
         //wiz.putProperty(WizardDescriptor.PROP_IMAGE, ImageUtilities.loadImage("org/demo/wizard/banner.PNG", true));
         if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
-            setUp(csnAlgo, wiz);
-           return csnAlgo;            
+            setUp(csMapper, wiz);
+           return csMapper;            
         }
         return null;
     }
     
-    public static void setUp(MapperAlgorithm csnAlgo, WizardDescriptor wiz){
+    public static void setUp(MapperAlgorithm csMapper, WizardDescriptor wiz){
+        // Chemical Space Option
+        ChemSpaceOption csOption = (ChemSpaceOption)wiz.getProperty(ChemSpaceOption.class.getName());
+        csMapper.setChemSpaceOption(csOption);
         
+        // Feature Extraction Option
+        FeatureExtractionOption feOption = (FeatureExtractionOption)wiz.getProperty(FeatureExtractionOption.class.getName());
+        csMapper.setFEOption(feOption);
+        if (feOption == FeatureExtractionOption.NEW){
+            AllDescriptors alg = (AllDescriptors)wiz.getProperty(AllDescriptors.class.getName());
+            csMapper.setFeatureExtractionAlg(alg);
+        }
+        
+        // Feature Filtering Option
+        FeatureFilteringOption ffOption = (FeatureFilteringOption)wiz.getProperty(FeatureFilteringOption.class.getName());
+        csMapper.setFFOption(ffOption);
+        if (ffOption == FeatureFilteringOption.YES){
+            FeatureFiltering alg = (FeatureFiltering)wiz.getProperty(FeatureFiltering.class.getName());
+            csMapper.setFeatureFilteringAlg(alg);
+        }     
+        
+        //Chemical Space Embbeder
+        AbstractEmbedder embedder;
+        switch(csOption){
+            case THREE_DIMENSIONAL:
+                embedder = (ThreeDEmbedder)wiz.getProperty(ThreeDEmbedder.class.getName());
+                break;
+            case FULL_NETWORK:
+            case COMPRESSED_NETWORK:
+                embedder = (NetworkEmbedder)wiz.getProperty(NetworkEmbedder.class.getName());
+                break;
+            default:
+                embedder = null;
+        }
+        csMapper.setChemSpaceEmbedderAlg(embedder);
     }
     
-    public static WizardDescriptor  createWizardDescriptor(MapperAlgorithm csnAlgo){
+    public static WizardDescriptor  createWizardDescriptor(MapperAlgorithm csMapper){
         // Wizard iterator
-        MyWizardIterator iterator = new MyWizardIterator(csnAlgo);
+        MyWizardIterator iterator = new MyWizardIterator(csMapper);
 
         // Open wizard
         WizardDescriptor wiz = new WizardDescriptor(iterator);        

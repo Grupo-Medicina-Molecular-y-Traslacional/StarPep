@@ -7,9 +7,9 @@ package org.bapedis.network.impl;
 
 import java.text.MessageFormat;
 import org.bapedis.core.model.AlgorithmCategory;
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.network.wizard.CSNWizardIterator;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;

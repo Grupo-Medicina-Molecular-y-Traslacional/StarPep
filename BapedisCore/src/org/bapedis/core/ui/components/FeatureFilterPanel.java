@@ -5,7 +5,7 @@
  */
 package org.bapedis.core.ui.components;
 
-import org.bapedis.core.spi.algo.impl.FeatureFilteringPanel;
+import org.bapedis.core.spi.alg.impl.FeatureFilteringPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
@@ -14,8 +14,8 @@ import javax.swing.SwingConstants;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.spi.algo.impl.FeatureFilteringAlgo;
-import org.bapedis.core.spi.algo.impl.FeatureFilteringFactory;
+import org.bapedis.core.spi.alg.impl.FeatureFiltering;
+import org.bapedis.core.spi.alg.impl.FeatureFilteringFactory;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
@@ -27,7 +27,7 @@ import org.openide.util.NbBundle;
 public class FeatureFilterPanel extends javax.swing.JPanel implements PropertyChangeListener {
 
     protected Workspace workspace;
-    protected FeatureFilteringAlgo algo;
+    protected FeatureFiltering algo;
     protected final JXBusyLabel busyLabel;
     protected final FeatureFilteringPanel settingPanel;
     protected DialogDescriptor dd;
@@ -42,9 +42,9 @@ public class FeatureFilterPanel extends javax.swing.JPanel implements PropertyCh
 
         this.workspace = workspace;
 
-        algo = workspace.getLookup().lookup(FeatureFilteringAlgo.class);
+        algo = workspace.getLookup().lookup(FeatureFiltering.class);
         if (algo == null) {
-            algo = (FeatureFilteringAlgo) new FeatureFilteringFactory().createAlgorithm();
+            algo = (FeatureFiltering) new FeatureFilteringFactory().createAlgorithm();
             workspace.add(algo);
         }
 
@@ -79,7 +79,7 @@ public class FeatureFilterPanel extends javax.swing.JPanel implements PropertyCh
         centerPanel.add(settingPanel, BorderLayout.CENTER);
     }
 
-    public FeatureFilteringAlgo getAlgorithm() {
+    public FeatureFiltering getAlgorithm() {
         return algo;
     }
 
@@ -113,7 +113,7 @@ public class FeatureFilterPanel extends javax.swing.JPanel implements PropertyCh
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource().equals(algo) && evt.getPropertyName().equals(FeatureFilteringAlgo.RUNNING)) {
+        if (evt.getSource().equals(algo) && evt.getPropertyName().equals(FeatureFiltering.RUNNING)) {
             boolean running = algo.isRunning();
             busyLabel.setBusy(running);
             busyLabel.setVisible(running);

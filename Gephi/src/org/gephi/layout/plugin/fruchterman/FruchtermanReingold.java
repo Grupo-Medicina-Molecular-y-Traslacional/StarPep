@@ -44,7 +44,7 @@ package org.gephi.layout.plugin.fruchterman;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
 import org.gephi.layout.plugin.AbstractLayout;

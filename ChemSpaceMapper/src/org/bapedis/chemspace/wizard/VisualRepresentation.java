@@ -28,7 +28,7 @@ public final class VisualRepresentation extends JPanel {
         ChemSpaceOption oldOption = this.csOption;
         this.csOption = csOption;
         switch (csOption) {
-            case TWODIMENSIONAL:
+            case THREE_DIMENSIONAL:
                 if (!jOption1.isSelected()) {
                     jOption1.setSelected(true);                    
                 }
@@ -226,7 +226,7 @@ public final class VisualRepresentation extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
-        setChemSpaceOption(ChemSpaceOption.TWODIMENSIONAL);
+        setChemSpaceOption(ChemSpaceOption.THREE_DIMENSIONAL);
     }//GEN-LAST:event_jOption1ActionPerformed
 
     private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed

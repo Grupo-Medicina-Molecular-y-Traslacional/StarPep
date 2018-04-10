@@ -16,7 +16,7 @@ import javax.swing.event.EventListenerList;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.project.ProjectManager;
-import org.bapedis.core.spi.algo.impl.AllDescriptors;
+import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.network.impl.CSNAlgorithm;
 import org.bapedis.network.model.WizardOptionModel;
 import org.openide.WizardDescriptor;

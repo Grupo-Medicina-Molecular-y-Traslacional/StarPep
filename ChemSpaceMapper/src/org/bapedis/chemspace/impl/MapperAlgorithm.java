@@ -14,12 +14,12 @@ import org.bapedis.chemspace.model.ChemSpaceOption;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
-import org.bapedis.core.spi.algo.impl.AllDescriptors;
-import org.bapedis.core.spi.algo.impl.AllDescriptorsFactory;
-import org.bapedis.core.spi.algo.impl.FeatureFilteringAlgo;
-import org.bapedis.core.spi.algo.impl.FeatureFilteringFactory;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.impl.AllDescriptors;
+import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
+import org.bapedis.core.spi.alg.impl.FeatureFiltering;
+import org.bapedis.core.spi.alg.impl.FeatureFilteringFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -43,33 +43,31 @@ public class MapperAlgorithm implements Algorithm {
     protected FeatureExtractionOption feOption;
     protected FeatureFilteringOption ffOption;
     protected FeatureWeightingOption fwOption;
-    
-    
+
     // Algorithms    
-    private AllDescriptors featureExtraction;
-    private FeatureFilteringAlgo featureFiltering;
-    private AbstractEmbedder chemSpaceEmbedder;    
+    private AllDescriptors featureExtractionAlg;
+    private FeatureFiltering featureFilteringAlg;
+    private AbstractEmbedder chemSpaceEmbedderAlg;
 //    private final SequenceClustering seqClustering;
 
-
     //Algorithm workflow
-    private final List<Algorithm> workFlow;
+    private final List<Algorithm> algorithms;
     private Algorithm currentAlg;
 
     public MapperAlgorithm(MapperAlgorithmFactory factory) {
         this.factory = factory;
-        workFlow = new LinkedList<>();
+        algorithms = new LinkedList<>();
 
         //Mapping Options        
         csOption = ChemSpaceOption.NONE;
         feOption = FeatureExtractionOption.NEW;
         ffOption = FeatureFilteringOption.YES;
         fwOption = FeatureWeightingOption.NO;
-        
+
         // Algorithms
-        featureExtraction = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
-        featureFiltering = (FeatureFilteringAlgo) new FeatureFilteringFactory().createAlgorithm();
-        chemSpaceEmbedder = (NetworkEmbedder) new NetworkEmbedderFactory().createAlgorithm();
+        featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
+        featureFilteringAlg = (FeatureFiltering) new FeatureFilteringFactory().createAlgorithm();
+        chemSpaceEmbedderAlg = (NetworkEmbedder) new NetworkEmbedderFactory().createAlgorithm();
 //        seqClustering = (SequenceClustering) new SequenceClusteringFactory().createAlgorithm();        
 //        twoDEmbedder = (TwoDEmbedder) new TwoDEmbedderFactory().createAlgorithm();
     }
@@ -79,33 +77,32 @@ public class MapperAlgorithm implements Algorithm {
         this.workspace = workspace;
         this.progressTicket = progressTicket;
 
-        workFlow.clear();
+        algorithms.clear();
         // Populate algorithm workflow        
 
         // Feature Extraction
-        if (featureExtraction != null) {
-            workFlow.add(featureExtraction);
+        if (feOption == FeatureExtractionOption.NEW) {
+            algorithms.add(featureExtractionAlg);
         }
 
         // Feature Filtering
-        if (featureFiltering != null) {
-            workFlow.add(featureFiltering);
+        if (ffOption == FeatureFilteringOption.YES) {
+            algorithms.add(featureFilteringAlg);
         }
 
         // Chemical Space Embedder
-        if (chemSpaceEmbedder != null) {
-            workFlow.add(chemSpaceEmbedder);
-        }
+        assert (chemSpaceEmbedderAlg != null) : "Internal error: Chemical Space Embedder is null";
+        algorithms.add(chemSpaceEmbedderAlg);
     }
 
     @Override
     public void run() {
         String taskName;
         int count = 1;
-        for (Algorithm algorithm : workFlow) {
+        for (Algorithm algorithm : algorithms) {
             if (!stopRun) {
                 currentAlg = algorithm;
-                taskName = NbBundle.getMessage(MapperAlgorithm.class, "MapperAlgorithm.workflow.taskName", count++, workFlow.size(), algorithm.getFactory().getName());
+                taskName = NbBundle.getMessage(MapperAlgorithm.class, "MapperAlgorithm.workflow.taskName", count++, algorithms.size(), algorithm.getFactory().getName());
                 progressTicket.progress(taskName);
                 progressTicket.switchToIndeterminate();
                 pc.reportMsg(taskName, workspace);
@@ -161,32 +158,32 @@ public class MapperAlgorithm implements Algorithm {
 
     public void setFWOption(FeatureWeightingOption fwOption) {
         this.fwOption = fwOption;
-    }        
-
-    public void setFeatureExtraction(AllDescriptors featureExtraction) {
-        this.featureExtraction = featureExtraction;
-    }
-    
-    public AllDescriptors getFeatureExtraction() {
-        return featureExtraction;
     }
 
-    public void setFeatureFiltering(FeatureFilteringAlgo featureFiltering) {
-        this.featureFiltering = featureFiltering;
-    }
-    
-    public FeatureFilteringAlgo getFeatureFiltering() {
-        return featureFiltering;
+    public void setFeatureExtractionAlg(AllDescriptors alg) {
+        this.featureExtractionAlg = alg;
     }
 
-    public AbstractEmbedder getChemSpaceEmbedder() {
-        return chemSpaceEmbedder;
+    public AllDescriptors getFeatureExtractionAlg() {
+        return featureExtractionAlg;
     }
 
-    public void setChemSpaceEmbedder(AbstractEmbedder chemSpaceEmbedder) {
-        this.chemSpaceEmbedder = chemSpaceEmbedder;
+    public void setFeatureFilteringAlg(FeatureFiltering alg) {
+        this.featureFilteringAlg = alg;
     }
-    
+
+    public FeatureFiltering getFeatureFilteringAlg() {
+        return featureFilteringAlg;
+    }
+
+    public AbstractEmbedder getChemSpaceEmbedderAlg() {
+        return chemSpaceEmbedderAlg;
+    }
+
+    public void setChemSpaceEmbedderAlg(AbstractEmbedder alg) {
+        this.chemSpaceEmbedderAlg = alg;
+    }
+
     @Override
     public AlgorithmProperty[] getProperties() {
         return null;
@@ -197,5 +194,4 @@ public class MapperAlgorithm implements Algorithm {
         return factory;
     }
 
-    
 }

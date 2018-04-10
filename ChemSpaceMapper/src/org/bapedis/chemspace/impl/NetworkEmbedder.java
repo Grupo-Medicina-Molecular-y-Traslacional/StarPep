@@ -64,8 +64,7 @@ public class NetworkEmbedder extends AbstractEmbedder {
         ticket.switchToDeterminate(workunits);
         fjPool.invoke(task);
         task.join();
-        similarityMatrix = task.getSimilarityMatrix();
-        
+        similarityMatrix = task.getSimilarityMatrix();        
     }
 
     @Override
@@ -82,8 +81,6 @@ public class NetworkEmbedder extends AbstractEmbedder {
         super.cancel();
         SimilarityMatrixkBuilder.setStopRun(stopRun);
         return stopRun;
-    }
-    
-    
+    }       
 
 }

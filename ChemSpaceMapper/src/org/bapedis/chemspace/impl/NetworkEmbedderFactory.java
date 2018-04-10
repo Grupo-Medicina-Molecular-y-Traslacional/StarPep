@@ -6,14 +6,16 @@
 package org.bapedis.chemspace.impl;
 
 import org.bapedis.core.model.AlgorithmCategory;
-import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author loge
  */
-public class NetworkEmbedderFactory extends AbstractEmbedderFactory{
+public class NetworkEmbedderFactory implements AlgorithmFactory{
 
     @Override
     public AlgorithmCategory getCategory() {
@@ -34,5 +36,10 @@ public class NetworkEmbedderFactory extends AbstractEmbedderFactory{
     public Algorithm createAlgorithm() {
         return new NetworkEmbedder(this);
     }
-    
+
+    @Override
+    public AlgorithmSetupUI getSetupUI() {
+        return null;
+    }
+        
 }

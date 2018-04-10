@@ -10,10 +10,15 @@ import java.beans.PropertyChangeListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
+import org.bapedis.chemspace.impl.AbstractEmbedder;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
+import org.bapedis.chemspace.impl.NetworkEmbedder;
+import org.bapedis.chemspace.impl.ThreeDEmbedder;
+import org.bapedis.chemspace.impl.ThreeDEmbedderFactory;
 import org.bapedis.chemspace.spi.ThreeDTransformerFactory;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
+import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
@@ -21,6 +26,7 @@ public class WizardTwoDTransformer implements WizardDescriptor.ValidatingPanel<W
         PropertyChangeListener {
 
     private final MapperAlgorithm csMapper;
+    private ThreeDEmbedder alg;
     private final EventListenerList listeners = new EventListenerList();
     private boolean isValid;
 
@@ -42,8 +48,19 @@ public class WizardTwoDTransformer implements WizardDescriptor.ValidatingPanel<W
     @Override
     public VisualTwoDTransformer getComponent() {
         if (component == null) {
-            component = new VisualTwoDTransformer();
-            component.addPropertyChangeListener(this);
+            try {
+                AbstractEmbedder current = csMapper.getChemSpaceEmbedderAlg();
+                if (current == null || current instanceof NetworkEmbedder) {
+                    alg = (ThreeDEmbedder) new ThreeDEmbedderFactory().createAlgorithm();
+                } else if (current instanceof ThreeDEmbedder) {
+                    alg = (ThreeDEmbedder) current.clone();
+                }
+                component = new VisualTwoDTransformer();
+                component.addPropertyChangeListener(this);                
+            } catch (CloneNotSupportedException ex) {
+                Exceptions.printStackTrace(ex);
+                alg = null;
+            }
         }
         return component;
     }
@@ -85,9 +102,10 @@ public class WizardTwoDTransformer implements WizardDescriptor.ValidatingPanel<W
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
         ThreeDTransformerFactory factory = component.getThreeDTransformerFactory();
-//        if (factory != null) {
-//            csnAlgo.setSimMeasure(factory.createAlgorithm());
-//        }
+        if (factory != null) {
+            alg.setTransformer(factory.createAlgorithm());
+            wiz.putProperty(ThreeDEmbedder.class.getName(), alg);
+        }
     }
 
     @Override

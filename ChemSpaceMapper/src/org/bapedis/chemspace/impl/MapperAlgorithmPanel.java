@@ -6,8 +6,8 @@
 package org.bapedis.chemspace.impl;
 
 import javax.swing.JPanel;
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 
 /**
  *

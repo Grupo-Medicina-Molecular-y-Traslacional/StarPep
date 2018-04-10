@@ -5,10 +5,10 @@
  */
 package org.bapedis.modamp.impl;
 
-import org.bapedis.core.spi.algo.impl.AbstractMD;
+import org.bapedis.core.spi.alg.impl.AbstractMD;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.modamp.MD;
 

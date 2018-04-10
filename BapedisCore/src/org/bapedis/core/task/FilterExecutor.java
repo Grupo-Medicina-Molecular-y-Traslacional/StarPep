@@ -18,7 +18,7 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideNode;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
-import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Graph;

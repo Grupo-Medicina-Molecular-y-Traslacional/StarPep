@@ -7,7 +7,7 @@ package org.bapedis.network.wizard;
 
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
-import org.bapedis.core.spi.algo.impl.SequenceClustering;
+import org.bapedis.core.spi.alg.impl.SequenceClustering;
 import org.bapedis.network.impl.CSNAlgorithm;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;

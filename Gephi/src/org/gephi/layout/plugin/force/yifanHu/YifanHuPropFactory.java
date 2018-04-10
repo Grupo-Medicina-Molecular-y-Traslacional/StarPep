@@ -41,7 +41,7 @@
  */
 package org.gephi.layout.plugin.force.yifanHu;
 
-import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.gephi.layout.plugin.AbstractLayoutFactory;
 import org.gephi.layout.plugin.force.ProportionalDisplacement;
 import org.openide.util.NbBundle;

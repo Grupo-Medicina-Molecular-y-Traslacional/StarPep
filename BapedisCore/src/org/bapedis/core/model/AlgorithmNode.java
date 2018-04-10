@@ -7,7 +7,7 @@ package org.bapedis.core.model;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.alg.Algorithm;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Sheet;

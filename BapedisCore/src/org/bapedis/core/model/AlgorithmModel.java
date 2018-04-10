@@ -8,7 +8,7 @@ package org.bapedis.core.model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.alg.Algorithm;
 
 /**
  *

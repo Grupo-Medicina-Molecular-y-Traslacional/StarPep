@@ -123,8 +123,20 @@
                 <package>weka.knowledgeflow.steps</package>
             </public-packages>
             <class-path-extension>
+                <runtime-relative-path>ext/mtj.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/mtj.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/arpack_combined_all.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/arpack_combined_all.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/weka.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/weka.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/core.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/core.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.spi.algo.impl;
+package org.bapedis.core.spi.alg.impl;
 
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.ui.components.SequenceAlignmentPanel;
 
 /**

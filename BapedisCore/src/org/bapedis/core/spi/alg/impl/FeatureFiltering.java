@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.spi.algo.impl;
+package org.bapedis.core.spi.alg.impl;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -19,8 +19,8 @@ import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -31,7 +31,7 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class FeatureFilteringAlgo implements Algorithm, Cloneable {
+public class FeatureFiltering implements Algorithm, Cloneable {
 
     protected final ProjectManager pc;
     protected final FeatureFilteringFactory factory;
@@ -71,7 +71,7 @@ public class FeatureFilteringAlgo implements Algorithm, Cloneable {
     private int entropyCutoff, correlationIndex, correlationCutoff;
     private NotifyDescriptor emptyMDs;
 
-    public FeatureFilteringAlgo(FeatureFilteringFactory factory) {
+    public FeatureFiltering(FeatureFilteringFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         this.factory = factory;
 
@@ -84,7 +84,7 @@ public class FeatureFilteringAlgo implements Algorithm, Cloneable {
         running = false;
         propertyChangeSupport = new PropertyChangeSupport(this);
 
-        emptyMDs = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureFilteringAlgo.class, "FeatureFilteringAlgo.emptyMDs.info"), NotifyDescriptor.ERROR_MESSAGE);
+        emptyMDs = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureFiltering.class, "FeatureFiltering.emptyMDs.info"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
     public boolean isRemoveUseless() {
@@ -215,7 +215,7 @@ public class FeatureFilteringAlgo implements Algorithm, Cloneable {
 
             //---------------Remove Useless--------------
             List<Peptide> peptides = attrModel.getPeptides();
-            String state1 = NbBundle.getMessage(FeatureFilteringAlgo.class, "FeatureFilteringAlgo.task.removeUseless");
+            String state1 = NbBundle.getMessage(FeatureFiltering.class, "FeatureFiltering.task.removeUseless");
             pc.reportMsg(state1 + "\n", workspace);
             ticket.progress(state1);
             ticket.switchToDeterminate(allFeatures.size());
@@ -276,7 +276,7 @@ public class FeatureFilteringAlgo implements Algorithm, Cloneable {
                 int workUnits = rankedFeatures.length + (rankedFeatures.length * (rankedFeatures.length - 1)) / 2;
                 ticket.switchToDeterminate(workUnits);
 
-                String state2 = NbBundle.getMessage(FeatureFilteringAlgo.class, "FeatureFilteringAlgo.task.removeRedundant");
+                String state2 = NbBundle.getMessage(FeatureFiltering.class, "FeatureFiltering.task.removeRedundant");
                 ticket.progress(state2);
                 pc.reportMsg("\n", workspace);
                 pc.reportMsg(state2 + "\n", workspace);
@@ -348,7 +348,7 @@ public class FeatureFilteringAlgo implements Algorithm, Cloneable {
     
     @Override
     public Object clone() throws CloneNotSupportedException {
-        FeatureFilteringAlgo copy = (FeatureFilteringAlgo)super.clone(); //To change body of generated methods, choose Tools | Templates.
+        FeatureFiltering copy = (FeatureFiltering)super.clone(); //To change body of generated methods, choose Tools | Templates.
         return copy;
     }    
 

@@ -15,8 +15,8 @@ import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
@@ -29,11 +29,11 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public abstract class AbstractEmbedder implements Algorithm {
+public abstract class AbstractEmbedder implements Algorithm, Cloneable {
 
     public static final int MIN_AVAILABLE_FEATURES = 2;
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-    protected final AbstractEmbedderFactory factory;
+    protected final AlgorithmFactory factory;
     protected Workspace workspace;
     protected AttributesModel attrModel;
     protected GraphModel graphModel;
@@ -42,7 +42,7 @@ public abstract class AbstractEmbedder implements Algorithm {
     protected boolean stopRun;
     protected final NotifyDescriptor notEnoughFeatures;
 
-    public AbstractEmbedder(AbstractEmbedderFactory factory) {
+    public AbstractEmbedder(AlgorithmFactory factory) {
         this.factory = factory;
         notEnoughFeatures = new NotifyDescriptor.Message(NbBundle.getMessage(AbstractEmbedder.class, "AbstractEmbedder.features.notEnoughHTML"), NotifyDescriptor.ERROR_MESSAGE);        
     }
@@ -137,6 +137,11 @@ public abstract class AbstractEmbedder implements Algorithm {
     public AlgorithmFactory getFactory() {
         return factory;
     }
+    
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone(); 
+    }    
     
     protected abstract void embed(Peptide[] peptides, MolecularDescriptor[] features);
 

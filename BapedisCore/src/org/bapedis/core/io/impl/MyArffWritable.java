@@ -1,0 +1,77 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.bapedis.core.io.impl;
+
+import java.util.List;
+import org.bapedis.core.model.MolecularDescriptor;
+import org.bapedis.core.model.Peptide;
+import org.bapedis.core.util.ArffWritable;
+
+/**
+ *
+ * @author loge
+ */
+public class MyArffWritable implements ArffWritable {
+    private final Peptide[] peptides;
+    private final MolecularDescriptor[] features;
+
+    public MyArffWritable(Peptide[] peptides, MolecularDescriptor[] features) {
+        this.peptides = peptides;
+        this.features = features;
+    }
+
+    @Override
+    public List<String> getAdditionalInfo() {
+        return null;
+    }
+
+    @Override
+    public String getRelationName() {
+        return "AMP - Dataset";
+    }
+
+    @Override
+    public int getNumAttributes() {
+        return features.length;
+    }
+
+    @Override
+    public String getAttributeName(int attribute) {
+        return features[attribute].getDisplayName();
+    }
+
+    @Override
+    public String[] getAttributeDomain(int attribute) {
+        return null;
+    }
+
+    @Override
+    public int getNumInstances() {
+        return peptides.length;
+    }
+
+    @Override
+    public String getAttributeValue(int instance, int attribute) throws Exception {
+        return peptides[instance].getAttributeValue(features[attribute]).toString();
+    }
+
+    @Override
+    public double getAttributeValueAsDouble(int instance, int attribute) throws Exception {
+        return Double.valueOf(getAttributeValue(instance, attribute));
+    }
+
+    @Override
+    public boolean isSparse() {
+        return false;
+    }
+
+    @Override
+    public String getMissingValue(int attribute) {
+        return "?";
+    }
+    
+    
+}

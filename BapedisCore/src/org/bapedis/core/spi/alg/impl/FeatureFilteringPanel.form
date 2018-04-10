@@ -34,7 +34,7 @@
           <ComponentRef name="buttonGroup1"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/bapedis/core/spi/algo/impl/Bundle.properties" key="FeatureFilteringPanel.removeUselessRButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="FeatureFilteringPanel.removeUselessRButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
@@ -53,7 +53,7 @@
           <ComponentRef name="buttonGroup1"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/bapedis/core/spi/algo/impl/Bundle.properties" key="FeatureFilteringPanel.selectRankedRButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="FeatureFilteringPanel.selectRankedRButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
@@ -85,7 +85,7 @@
         <Component class="javax.swing.JButton" name="jResetButton">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/bapedis/core/spi/algo/impl/Bundle.properties" key="FeatureFilteringPanel.jResetButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="FeatureFilteringPanel.jResetButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[145, 23]"/>
@@ -109,7 +109,7 @@
         <Component class="javax.swing.JLabel" name="entropyLabel">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/bapedis/core/spi/algo/impl/Bundle.properties" key="FeatureFilteringPanel.entropyLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="FeatureFilteringPanel.entropyLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[31, 14]"/>
@@ -133,7 +133,7 @@
               <Image iconType="3" name="/org/bapedis/core/resources/info.png"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/bapedis/core/spi/algo/impl/Bundle.properties" key="FeatureFilteringPanel.entropyInfoLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="FeatureFilteringPanel.entropyInfoLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -164,7 +164,7 @@
                   <Image iconType="3" name="/org/bapedis/core/resources/less.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/bapedis/core/spi/algo/impl/Bundle.properties" key="FeatureFilteringPanel.jLessUselessButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="FeatureFilteringPanel.jLessUselessButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -180,7 +180,7 @@
                 <Property name="paintLabels" type="boolean" value="true"/>
                 <Property name="paintTicks" type="boolean" value="true"/>
                 <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/bapedis/core/spi/algo/impl/Bundle.properties" key="FeatureFilteringPanel.uselessSlider.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="FeatureFilteringPanel.uselessSlider.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
                 <Property name="enabled" type="boolean" value="false"/>
                 <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -197,7 +197,7 @@
                   <Image iconType="3" name="/org/bapedis/core/resources/more.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/bapedis/core/spi/algo/impl/Bundle.properties" key="FeatureFilteringPanel.jMoreUselessButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="FeatureFilteringPanel.jMoreUselessButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -216,7 +216,7 @@
         <Component class="javax.swing.JLabel" name="correlationLabel">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/bapedis/core/spi/algo/impl/Bundle.properties" key="FeatureFilteringPanel.correlationLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="FeatureFilteringPanel.correlationLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[31, 14]"/>
@@ -240,7 +240,7 @@
               <Image iconType="3" name="/org/bapedis/core/resources/info.png"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/bapedis/core/spi/algo/impl/Bundle.properties" key="FeatureFilteringPanel.correlationInfoLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="FeatureFilteringPanel.correlationInfoLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[23, 14]"/>
@@ -274,7 +274,7 @@
                   <Image iconType="3" name="/org/bapedis/core/resources/less.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/bapedis/core/spi/algo/impl/Bundle.properties" key="FeatureFilteringPanel.jLessRedundantButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="FeatureFilteringPanel.jLessRedundantButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -289,7 +289,7 @@
                 <Property name="paintLabels" type="boolean" value="true"/>
                 <Property name="paintTicks" type="boolean" value="true"/>
                 <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/bapedis/core/spi/algo/impl/Bundle.properties" key="FeatureFilteringPanel.redundantSlider.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="FeatureFilteringPanel.redundantSlider.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
                 <Property name="enabled" type="boolean" value="false"/>
                 <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -306,7 +306,7 @@
                   <Image iconType="3" name="/org/bapedis/core/resources/more.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/bapedis/core/spi/algo/impl/Bundle.properties" key="FeatureFilteringPanel.jMoreRedundantButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="FeatureFilteringPanel.jMoreRedundantButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -336,10 +336,10 @@
         <Component class="javax.swing.JLabel" name="redundantLabel">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/bapedis/core/spi/algo/impl/Bundle.properties" key="FeatureFilteringPanel.redundantLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="FeatureFilteringPanel.redundantLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/bapedis/core/spi/algo/impl/Bundle.properties" key="FeatureFilteringPanel.redundantLabel.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="FeatureFilteringPanel.redundantLabel.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>

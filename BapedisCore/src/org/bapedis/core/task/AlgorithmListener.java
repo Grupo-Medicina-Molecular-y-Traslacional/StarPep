@@ -41,7 +41,7 @@ Portions Copyrighted 2011 Gephi Consortium.
 */
 package org.bapedis.core.task;
 
-import org.bapedis.core.spi.algo.Algorithm;
+import org.bapedis.core.spi.alg.Algorithm;
 
 /**
  * Basic listener to be notified when a long task terminates.

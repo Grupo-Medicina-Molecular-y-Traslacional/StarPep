@@ -18,8 +18,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import org.bapedis.core.spi.algo.impl.AllDescriptors;
-import org.bapedis.core.spi.algo.impl.AllDescriptorsFactory;
+import org.bapedis.core.spi.alg.impl.AllDescriptors;
+import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
 import org.jdesktop.swingx.JXTable;
 import org.openide.util.NbBundle;
 

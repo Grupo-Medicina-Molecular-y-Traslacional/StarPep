@@ -27,8 +27,6 @@ public class Neo4jDB {
     public static final String ZIP_DB = "org/bapedis/db/resources/neo4jDB.zip";
     private static final int BUFFER_SIZE = 4096;
     private static GraphDatabaseService graphDb;
-//    private static ArrayList<String> representatives, allPeptides;
-//    private static AttributeModelDAO modelDAO;
 
     @SuppressWarnings("empty-statement")
     public synchronized static void extractDatabase(File dbDir) throws IOException {
@@ -69,64 +67,10 @@ public class Neo4jDB {
         return graphDb;
     }
 
-//    public static void loadPwIdMatrix() throws Exception {
-//        File fileBase = new File("pwidmtx");
-//        try (ObjectInputStream objIn = new ObjectInputStream(new GZIPInputStream(new BufferedInputStream(new FileInputStream(new File(fileBase, "data.dat")))))) {
-//            pwIdMatrix = (PairwiseIdentityMatrix) objIn.readObject();
-//        }
-//    }
-//    private static ArrayList<String> loadFastaFile(FileReader fr) throws Exception {
-//        ArrayList<String> sequences = new ArrayList<>();
-//        try (BufferedReader br = new BufferedReader(fr)) {
-//            StringBuilder sb = new StringBuilder();
-//            String line = br.readLine();
-//
-//            while (line != null) {
-//                if (line.charAt(0) == '>') {
-//                    if (sb.length() > 0) {
-//                        sequences.add(sb.toString());
-//                        sb.delete(0, sb.length());
-//                    }
-//                } else {
-//                    sb.append(line);
-//                }
-//                line = br.readLine();
-//            }
-//            String genome = sb.toString();
-//        }
-//        return sequences;
-//    }
-//
-//    public static void loadRepresentatives() throws Exception {
-//        File fileBase = new File("pwidmtx");
-//        representatives = loadFastaFile(new FileReader(new File(fileBase, "AMPs-0.30.fasta")));
-//    }
-//
-//    public static void loadAllPeptides() throws Exception {
-//        File fileBase = new File("pwidmtx");
-//        allPeptides = loadFastaFile(new FileReader(new File(fileBase, "AMPs.fasta")));
-//    }
     public synchronized static GraphDatabaseService getDbService() {
         return graphDb;
     }
-
-//    public static PairwiseIdentityMatrix getPwIdMatrix() {
-//        return pwIdMatrix;
-//    }
-//
-//    public static ArrayList<String> getRepresentatives() {
-//        return representatives;
-//    }
-//
-//    public static ArrayList<String> getAllPeptides() {
-//        return allPeptides;
-//    }
-//    public static AttributeModelDAO getAttributeModelDAO(){
-//        if (modelDAO == null){
-//            modelDAO = new AttributeModelDAO(graphDb);
-//        }
-//        return modelDAO;
-//    }        
+      
     private static void registerShutdownHook(final GraphDatabaseService graphDb) {
         // Registers a shutdown hook for the Neo4j instance so that it
         // shuts down nicely when the VM exits (even if you "Ctrl-C" the

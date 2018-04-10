@@ -41,7 +41,7 @@
  */
 package org.gephi.layout.plugin.scale;
 
-import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 
 public class ExpandLayout extends AbstractScaleLayout {
     

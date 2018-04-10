@@ -41,8 +41,8 @@ Portions Copyrighted 2011 Gephi Consortium.
  */
 package org.gephi.layout.plugin.openord;
 
-import org.bapedis.core.spi.algo.Algorithm;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.gephi.layout.plugin.AbstractLayoutFactory;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;

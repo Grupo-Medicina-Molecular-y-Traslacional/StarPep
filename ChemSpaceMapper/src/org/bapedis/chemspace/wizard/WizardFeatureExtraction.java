@@ -18,7 +18,7 @@ import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.project.ProjectManager;
-import org.bapedis.core.spi.algo.impl.AllDescriptors;
+import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.Exceptions;
@@ -55,7 +55,7 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
     public VisualFeatureExtraction getComponent() {
         if (component == null) {
             try {
-                alg = (AllDescriptors) csMapper.getFeatureExtraction().clone();
+                alg = (AllDescriptors) csMapper.getFeatureExtractionAlg().clone();
                 JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
                 component = new VisualFeatureExtraction(settingPanel);
                 component.addPropertyChangeListener(this);
@@ -77,15 +77,15 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
     }
 
     @Override
-    public void readSettings(WizardDescriptor data) {
+    public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
     }
 
     @Override
-    public void storeSettings(WizardDescriptor data) {
+    public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        data.putProperty(FeatureExtractionOption.class.getName(), component.getFEOption());
-        data.putProperty(AllDescriptors.class.getName(), alg);
+        wiz.putProperty(FeatureExtractionOption.class.getName(), component.getFEOption());
+        wiz.putProperty(AllDescriptors.class.getName(), alg);
     }
 
     @Override
@@ -115,7 +115,9 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
             isValid = false;
             throw new WizardValidationException(null, NbBundle.getMessage(WizardFeatureExtraction.class, "WizardFeatureExtraction.invalidOption.text"), null);
         } else if (component.getFEOption() == FeatureExtractionOption.NEW) {
-            // validate selection empty
+            if (alg.getDescriptorKeys().isEmpty()){
+                throw new WizardValidationException(null, NbBundle.getMessage(WizardFeatureExtraction.class, "WizardFeatureExtraction.emptyKeys.info"), null);
+            }
         }
     }
 

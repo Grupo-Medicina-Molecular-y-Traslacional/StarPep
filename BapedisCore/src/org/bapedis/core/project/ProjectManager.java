@@ -22,7 +22,7 @@ import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.GraphViz;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.spi.algo.AlgorithmFactory;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.gephi.graph.api.Configuration;
 import org.gephi.graph.api.GraphModel;

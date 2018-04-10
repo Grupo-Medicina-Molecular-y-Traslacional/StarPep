@@ -19,8 +19,8 @@ import javax.swing.table.TableModel;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.spi.algo.impl.RemoveDescriptorAlgo;
-import org.bapedis.core.spi.algo.impl.RemoveDescriptorFactory;
+import org.bapedis.core.spi.alg.impl.RemoveDescriptor;
+import org.bapedis.core.spi.alg.impl.RemoveDescriptorFactory;
 import org.bapedis.core.task.AlgorithmExecutor;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.openide.DialogDisplayer;
@@ -34,7 +34,7 @@ public class RemoveDescriptorPanel extends javax.swing.JPanel implements Propert
 
     protected static final AlgorithmExecutor executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
     protected final Workspace workspace;
-    protected RemoveDescriptorAlgo algo;
+    protected RemoveDescriptor algo;
     protected final DescriptorSelectionPanel selectionPanel;
     protected final JXBusyLabel busyLabel;
 
@@ -43,9 +43,9 @@ public class RemoveDescriptorPanel extends javax.swing.JPanel implements Propert
 
         this.workspace = workspace;
 
-        algo = workspace.getLookup().lookup(RemoveDescriptorAlgo.class);
+        algo = workspace.getLookup().lookup(RemoveDescriptor.class);
         if (algo == null) {
-            algo = (RemoveDescriptorAlgo) new RemoveDescriptorFactory().createAlgorithm();
+            algo = (RemoveDescriptor) new RemoveDescriptorFactory().createAlgorithm();
             workspace.add(algo);
         }
 
@@ -190,7 +190,7 @@ public class RemoveDescriptorPanel extends javax.swing.JPanel implements Propert
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource().equals(algo) && evt.getPropertyName().equals(RemoveDescriptorAlgo.RUNNING)) {
+        if (evt.getSource().equals(algo) && evt.getPropertyName().equals(RemoveDescriptor.RUNNING)) {
             boolean running = algo.isRunning();
             busyLabel.setBusy(running);
             busyLabel.setVisible(running);

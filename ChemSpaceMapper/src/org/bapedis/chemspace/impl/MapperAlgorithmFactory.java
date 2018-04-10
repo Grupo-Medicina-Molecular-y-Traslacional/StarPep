@@ -67,10 +67,11 @@ public class MapperAlgorithmFactory implements AlgorithmFactory {
     
     public static WizardDescriptor  createWizardDescriptor(MapperAlgorithm csnAlgo){
         // Wizard iterator
-        WizardDescriptor.Iterator<WizardDescriptor> iterator = new MyWizardIterator(csnAlgo);
+        MyWizardIterator iterator = new MyWizardIterator(csnAlgo);
 
         // Open wizard
-        WizardDescriptor wiz = new WizardDescriptor(iterator);                        
+        WizardDescriptor wiz = new WizardDescriptor(iterator);        
+        iterator.initialize(wiz);        
         
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wiz.setTitleFormat(new MessageFormat("{0}"));

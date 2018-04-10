@@ -8,13 +8,13 @@ package org.bapedis.chemspace.wizard;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import javax.swing.JComponent;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
+import org.bapedis.chemspace.model.ChemSpaceOption;
 import org.openide.WizardDescriptor;
 
 /**
@@ -23,27 +23,28 @@ import org.openide.WizardDescriptor;
  */
 public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescriptor>, PropertyChangeListener {
 
-    private static final int MAX_PANELS = 5;
-    private final ArrayList<WizardDescriptor.Panel<WizardDescriptor>> panels;
-    private final EventListenerList listeners;
+    private final WizardDescriptor.Panel<WizardDescriptor>[] defaultPanels, twoDPanels, networkPanels;
+    private WizardDescriptor.Panel<WizardDescriptor>[] currentPanels;
+    private final String[] defaultSteps, twoDSteps, networkSteps;
+    private WizardDescriptor wizardDesc;
     private int index;
 
     public MyWizardIterator(MapperAlgorithm csMapper) {
-        listeners = new EventListenerList();
         
-        panels = new ArrayList<>(MAX_PANELS);
-
         WizardRepresentation wizRep = new WizardRepresentation(csMapper);
         wizRep.getComponent().addPropertyChangeListener(this);
-        
-        panels.add(wizRep);
-        panels.add(new WizardFeatureExtraction(csMapper));
-        panels.add(new WizardFeatureFiltering(csMapper));
-        panels.add(new WizardFeatureWeighting(csMapper));
 
-        String[] steps = new String[panels.size()];
-        for (int i = 0; i < panels.size(); i++) {
-            Component c = panels.get(i).getComponent();
+        WizardDescriptor.Panel<WizardDescriptor>[] allPanels = new WizardDescriptor.Panel[]{
+            wizRep,
+            new WizardFeatureExtraction(csMapper),
+            new WizardFeatureFiltering(csMapper),
+            new WizardSimilarityMeasure(csMapper),
+            new WizardTwoDTransformer(csMapper)            
+        };
+        
+        String[] steps = new String[allPanels.length];
+        for (int i = 0; i < allPanels.length; i++) {
+            Component c = allPanels[i].getComponent();
             // Default step name to component name of panel.
             steps[i] = c.getName();
             if (c instanceof JComponent) { // assume Swing components
@@ -54,23 +55,91 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
                 jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DISPLAYED, true);
                 jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, true);
             }
-        }
+        }           
+        
+        //Default Panels
+        defaultPanels = new WizardDescriptor.Panel[]{
+            allPanels[0],
+            allPanels[1],
+            allPanels[2]
+        };        
+        defaultSteps = new String[]{
+            steps[0],
+            steps[1],
+            steps[2]
+        };
+        
+        //TwoDimensional Panels
+        twoDPanels = new WizardDescriptor.Panel[]{
+            allPanels[0],
+            allPanels[1],
+            allPanels[2],
+            allPanels[4]
+        };        
+        twoDSteps = new String[]{
+            steps[0],
+            steps[1],
+            steps[2],
+            steps[4]
+        };
+
+        //Network Panels
+        networkPanels = new WizardDescriptor.Panel[]{
+            allPanels[0],
+            allPanels[1],
+            allPanels[2],
+            allPanels[3]
+        };        
+        networkSteps = new String[]{
+            steps[0],
+            steps[1],
+            steps[2],
+            steps[3]
+        };
+        
+        currentPanels = defaultPanels;
         index = 0;
+    }
+
+    public void initialize(WizardDescriptor wizardDesc) {
+        this.wizardDesc = wizardDesc;
+        setChemSpaceOption(ChemSpaceOption.NONE);
+    }        
+    
+    public void setChemSpaceOption(ChemSpaceOption csOption){
+        String[] steps = null;
+        switch(csOption){
+            case TWODIMENSIONAL:
+                currentPanels = twoDPanels;
+                steps = twoDSteps;
+                break;
+            case FULL_NETWORK:
+            case COMPRESSED_NETWORK:
+                currentPanels = networkPanels;
+                steps = networkSteps;
+                break;
+            case NONE:
+                currentPanels = defaultPanels;
+                steps = defaultSteps;
+        }
+        if (steps != null){
+             wizardDesc.putProperty(WizardDescriptor.PROP_CONTENT_DATA, steps);
+        }
     }
 
     @Override
     public WizardDescriptor.Panel<WizardDescriptor> current() {
-        return panels.get(index);
+        return currentPanels[index];
     }
 
     @Override
     public String name() {
-        return panels.get(index).getComponent().getName();
+        return currentPanels[index].getComponent().getName();
     }
 
     @Override
     public boolean hasNext() {
-        return index < panels.size() - 1;
+        return index < currentPanels.length - 1;
     }
 
     @Override
@@ -97,12 +166,10 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
     // If nothing unusual changes in the middle of the wizard, simply:
     @Override
     public void addChangeListener(ChangeListener l) {
-        listeners.add(ChangeListener.class, l);
     }
 
     @Override
     public void removeChangeListener(ChangeListener l) {
-        listeners.remove(ChangeListener.class, l);
     }
     // If something changes dynamically (besides moving between panels), e.g.
     // the number of panels changes in response to user input, then use
@@ -112,10 +179,7 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(VisualRepresentation.CHANGED_OPTION)) {
-            ChangeEvent srcEvt = new ChangeEvent(evt);
-            for (ChangeListener listener : listeners.getListeners(ChangeListener.class)) {
-                listener.stateChanged(srcEvt);
-            }
+            setChemSpaceOption((ChemSpaceOption) evt.getNewValue());
         }
     }
 }

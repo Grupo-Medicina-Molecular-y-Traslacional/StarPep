@@ -33,7 +33,9 @@ public class WekaPCATransformer implements ThreeDTransformer {
         Position[] positions = null;
         try {
             ArffWriter.DEBUG = true;
-            File f = ArffWriter.writeToArffFile(new MyArffWritable(peptides, features));
+            MyArffWritable writable = new MyArffWritable(peptides, features);
+            writable.setOutputOption(MyArffWritable.OUTPUT_OPTION.Z_SCORE);
+            File f = ArffWriter.writeToArffFile(writable);
             BufferedReader reader = new BufferedReader(new FileReader(f));
             Instances data = new Instances(reader);
             pca.setCenterData(true);

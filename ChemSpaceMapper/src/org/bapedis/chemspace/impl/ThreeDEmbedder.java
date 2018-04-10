@@ -45,9 +45,11 @@ public class ThreeDEmbedder extends AbstractEmbedder {
                 for (int i = 0; i < positions.length; i++) {
                     p = positions[i];
                     node = peptides[i].getGraphNode();
-                    node.setPosition(p.getX(), p.getY(), p.getZ());
+                    node.setX(p.getX());
+                    node.setY(p.getY());
+//                    node.setPosition(p.getX(), p.getY(), p.getZ());
                 }
-                scaler.doScale(peptides);
+//                scaler.doScale(peptides);
             } finally {
                 graph.writeUnlock();
             }

@@ -15,13 +15,29 @@ import org.bapedis.core.util.ArffWritable;
  * @author loge
  */
 public class MyArffWritable implements ArffWritable {
+
+    public enum OUTPUT_OPTION {
+        NORMAL, Z_SCORE, MIN_MAX
+    }
     private final Peptide[] peptides;
     private final MolecularDescriptor[] features;
+    private OUTPUT_OPTION output;
 
     public MyArffWritable(Peptide[] peptides, MolecularDescriptor[] features) {
         this.peptides = peptides;
         this.features = features;
+        output = OUTPUT_OPTION.NORMAL;
     }
+
+    public OUTPUT_OPTION getOutputOption() {
+        return output;
+    }
+
+    public void setOutputOption(OUTPUT_OPTION output) {
+        this.output = output;
+    }
+    
+    
 
     @Override
     public List<String> getAdditionalInfo() {
@@ -55,7 +71,15 @@ public class MyArffWritable implements ArffWritable {
 
     @Override
     public String getAttributeValue(int instance, int attribute) throws Exception {
-        return peptides[instance].getAttributeValue(features[attribute]).toString();
+        MolecularDescriptor attr = features[attribute];
+        Peptide peptide = peptides[instance];
+        switch (output) {
+            case Z_SCORE:
+                 return String.valueOf(attr.getNormalizedZscoreValue(peptide));
+            case MIN_MAX:
+                return String.valueOf(attr.getNormalizedMinMaxValue(peptide));
+        }
+        return peptide.getAttributeValue(attr).toString();
     }
 
     @Override
@@ -72,6 +96,5 @@ public class MyArffWritable implements ArffWritable {
     public String getMissingValue(int attribute) {
         return "?";
     }
-    
-    
+
 }

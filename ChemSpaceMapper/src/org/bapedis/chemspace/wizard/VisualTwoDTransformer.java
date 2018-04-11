@@ -14,16 +14,16 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import org.bapedis.chemspace.spi.ThreeDTransformerFactory;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.bapedis.chemspace.spi.TwoDTransformerFactory;
 
 public final class VisualTwoDTransformer extends JPanel {
 
     public static final String TRANSFORMER_FACTORY = "transformer_factory";
     private final DefaultMutableTreeNode treeNode;
-    private ThreeDTransformerFactory factory;
+    private TwoDTransformerFactory factory;
 
     public VisualTwoDTransformer() {
         initComponents();
@@ -34,13 +34,13 @@ public final class VisualTwoDTransformer extends JPanel {
         jTree1.setCellRenderer(new TransformerFactoryNodeRenderer());
     }
 
-    public ThreeDTransformerFactory getThreeDTransformerFactory() {
+    public TwoDTransformerFactory getThreeDTransformerFactory() {
         return factory;
     }        
 
     private void populateJTree() {
-        Collection<? extends ThreeDTransformerFactory> factories = Lookup.getDefault().lookupAll(ThreeDTransformerFactory.class);
-        for (ThreeDTransformerFactory factory : factories) {
+        Collection<? extends TwoDTransformerFactory> factories = Lookup.getDefault().lookupAll(TwoDTransformerFactory.class);
+        for (TwoDTransformerFactory factory : factories) {
             treeNode.add(new TransformerFactoryTreeNode(factory));
         }
     }
@@ -136,12 +136,12 @@ public final class VisualTwoDTransformer extends JPanel {
 
     private static class TransformerFactoryTreeNode extends DefaultMutableTreeNode {
 
-        public TransformerFactoryTreeNode(ThreeDTransformerFactory factory) {
+        public TransformerFactoryTreeNode(TwoDTransformerFactory factory) {
             super(factory, false);
         }
 
-        public ThreeDTransformerFactory getFactory() {
-            return (ThreeDTransformerFactory) userObject;
+        public TwoDTransformerFactory getFactory() {
+            return (TwoDTransformerFactory) userObject;
         }
 
         @Override

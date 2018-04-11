@@ -80,6 +80,10 @@
                 </dependency>
             </module-dependencies>
             <public-packages/>
+            <class-path-extension>
+                <runtime-relative-path>ext/vecmath-1.5.2.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/vecmath-1.5.2.jar</binary-origin>
+            </class-path-extension>
         </data>
     </configuration>
 </project>

@@ -91,7 +91,7 @@ public class MapperAlgorithmFactory implements AlgorithmFactory {
         AbstractEmbedder embedder;
         switch(csOption){
             case THREE_DIMENSIONAL:
-                embedder = (ThreeDEmbedder)wiz.getProperty(ThreeDEmbedder.class.getName());
+                embedder = (TwoDEmbedder)wiz.getProperty(TwoDEmbedder.class.getName());
                 break;
             case FULL_NETWORK:
             case COMPRESSED_NETWORK:

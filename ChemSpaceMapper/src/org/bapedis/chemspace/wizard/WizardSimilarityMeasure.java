@@ -14,7 +14,7 @@ import org.bapedis.chemspace.impl.AbstractEmbedder;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.impl.NetworkEmbedder;
 import org.bapedis.chemspace.impl.NetworkEmbedderFactory;
-import org.bapedis.chemspace.impl.ThreeDEmbedder;
+import org.bapedis.chemspace.impl.TwoDEmbedder;
 import org.bapedis.chemspace.spi.SimilarityMeasureFactory;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
@@ -50,9 +50,9 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
         if (component == null) {
             try {
                 AbstractEmbedder current = csMapper.getChemSpaceEmbedderAlg();
-                if (current == null || current instanceof ThreeDEmbedder) {
+                if (current == null || current instanceof TwoDEmbedder) {
                     alg = (NetworkEmbedder) new NetworkEmbedderFactory().createAlgorithm();
-                } else if (current instanceof ThreeDEmbedder) {
+                } else if (current instanceof TwoDEmbedder) {
                     alg = (NetworkEmbedder) current.clone();
                 }
                 component = new VisualSimilarityMeasure();

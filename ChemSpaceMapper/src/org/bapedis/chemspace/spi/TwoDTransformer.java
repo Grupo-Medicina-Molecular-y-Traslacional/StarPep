@@ -5,12 +5,15 @@
  */
 package org.bapedis.chemspace.spi;
 
-import javax.swing.JPanel;
+import javax.vecmath.Vector2f;
+import org.bapedis.core.model.MolecularDescriptor;
+import org.bapedis.core.model.Peptide;
 
 /**
  *
  * @author loge
  */
-public interface ThreeDTransformerSetupUI {
-    public JPanel getSettingPanel(ThreeDTransformer transformer);
+public interface TwoDTransformer {
+    
+   public Vector2f[] transform(Peptide[] peptides, MolecularDescriptor[] features);
 }

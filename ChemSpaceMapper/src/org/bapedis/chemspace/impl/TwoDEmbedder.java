@@ -5,51 +5,50 @@
  */
 package org.bapedis.chemspace.impl;
 
-import org.bapedis.chemspace.model.Position;
-import org.bapedis.chemspace.spi.ThreeDTransformer;
+import javax.vecmath.Vector2f;
 import org.bapedis.chemspace.util.GephiScaler;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.gephi.graph.api.Node;
+import org.bapedis.chemspace.spi.TwoDTransformer;
 
 /**
  *
  * @author loge
  */
-public class ThreeDEmbedder extends AbstractEmbedder {
+public class TwoDEmbedder extends AbstractEmbedder {
 
-    private ThreeDTransformer transformer;
+    private TwoDTransformer transformer;
     private final GephiScaler scaler;
 
-    public ThreeDEmbedder(ThreeDEmbedderFactory factory) {
+    public TwoDEmbedder(TwoDEmbedderFactory factory) {
         super(factory);
         scaler = new GephiScaler();
     }
 
-    public ThreeDTransformer getTransformer() {
+    public TwoDTransformer getTransformer() {
         return transformer;
     }
 
-    public void setTransformer(ThreeDTransformer transformer) {
+    public void setTransformer(TwoDTransformer transformer) {
         this.transformer = transformer;
     }
 
     @Override
     protected void embed(Peptide[] peptides, MolecularDescriptor[] features) {
-        Position[] positions = transformer.transform(peptides, features);
+        Vector2f[] positions = transformer.transform(peptides, features);
         if (positions != null) {
             graph.writeLock();
             try {
                 Node node;
-                Position p;
+                Vector2f p;
                 for (int i = 0; i < positions.length; i++) {
                     p = positions[i];
                     node = peptides[i].getGraphNode();
                     node.setX(p.getX());
                     node.setY(p.getY());
-//                    node.setPosition(p.getX(), p.getY(), p.getZ());
                 }
-//                scaler.doScale(peptides);
+                scaler.doScale(peptides);
             } finally {
                 graph.writeUnlock();
             }

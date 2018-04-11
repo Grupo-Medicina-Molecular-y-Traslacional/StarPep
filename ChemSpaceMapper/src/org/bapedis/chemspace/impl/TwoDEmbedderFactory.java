@@ -15,7 +15,7 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class ThreeDEmbedderFactory implements AlgorithmFactory{
+public class TwoDEmbedderFactory implements AlgorithmFactory{
 
     @Override
     public AlgorithmCategory getCategory() {
@@ -24,17 +24,17 @@ public class ThreeDEmbedderFactory implements AlgorithmFactory{
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(ThreeDEmbedderFactory.class, "ThreeDEmbedder.name");
+        return NbBundle.getMessage(TwoDEmbedderFactory.class, "TwoDEmbedder.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(ThreeDEmbedderFactory.class, "ThreeDEmbedder.desc");
+        return NbBundle.getMessage(TwoDEmbedderFactory.class, "TwoDEmbedder.desc");
     }
 
     @Override
     public Algorithm createAlgorithm() {
-        return new ThreeDEmbedder(this);
+        return new TwoDEmbedder(this);
     }
 
     @Override

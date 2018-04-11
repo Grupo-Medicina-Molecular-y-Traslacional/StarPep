@@ -8,9 +8,7 @@ package org.bapedis.chemspace.spi.impl;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
-import org.bapedis.chemspace.model.Position;
-import org.bapedis.chemspace.spi.ThreeDTransformer;
+import javax.vecmath.Vector2f;
 import org.bapedis.core.io.impl.MyArffWritable;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
@@ -19,18 +17,19 @@ import org.openide.util.Exceptions;
 import weka.attributeSelection.PrincipalComponents;
 import weka.core.Instance;
 import weka.core.Instances;
+import org.bapedis.chemspace.spi.TwoDTransformer;
 
 /**
  *
  * @author loge
  */
-public class WekaPCATransformer implements ThreeDTransformer {
+public class WekaPCATransformer implements TwoDTransformer {
 
     PrincipalComponents pca = new PrincipalComponents();
 
     @Override
-    public Position[] transform(Peptide[] peptides, MolecularDescriptor[] features) {
-        Position[] positions = null;
+    public Vector2f[] transform(Peptide[] peptides, MolecularDescriptor[] features) {
+        Vector2f[] positions = null;
         try {
             ArffWriter.DEBUG = true;
             MyArffWritable writable = new MyArffWritable(peptides, features);
@@ -42,7 +41,7 @@ public class WekaPCATransformer implements ThreeDTransformer {
             pca.buildEvaluator(data);
             Instances resultData = pca.transformedData(data);
             
-            positions = new Position[peptides.length];
+            positions = new Vector2f[peptides.length];
             Instance in;
             for (int i = 0; i < resultData.numInstances(); i++) {
                 in = resultData.instance(i);
@@ -51,11 +50,11 @@ public class WekaPCATransformer implements ThreeDTransformer {
                 if (resultData.numAttributes() > 1) {
                     y = (float) in.value(1);
                 }
-                float z = 0;
-                if (resultData.numAttributes() > 2) {
-                    z = (float) in.value(2);
-                }
-                positions[i] = new Position(x, y, z);
+//                float z = 0;
+//                if (resultData.numAttributes() > 2) {
+//                    z = (float) in.value(2);
+//                }
+                positions[i] = new Vector2f(x, y);
             }
 
         } catch (Exception ex) {

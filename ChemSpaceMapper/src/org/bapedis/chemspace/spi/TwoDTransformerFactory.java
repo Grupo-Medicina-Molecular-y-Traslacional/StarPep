@@ -9,7 +9,7 @@ package org.bapedis.chemspace.spi;
  *
  * @author loge
  */
-public interface ThreeDTransformerFactory {
+public interface TwoDTransformerFactory {
     /**
      * The name of the behaviour of the algorithm's provided by this factory.
      * @return  the display name of the algorithm
@@ -27,11 +27,11 @@ public interface ThreeDTransformerFactory {
      * built by this factory.
      * @return a <code>LayoutUI</code> instance
      */
-    public ThreeDTransformerSetupUI getSetupUI();
+    public TwoDTransformerSetupUI getSetupUI();
 
     /**
      * Builds an instance of the algorithm.
      * @return  a new <code>Layout</code> instance
      */
-    public ThreeDTransformer createAlgorithm();
+    public TwoDTransformer createAlgorithm();
 }

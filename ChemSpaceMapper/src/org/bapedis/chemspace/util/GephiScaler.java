@@ -62,7 +62,7 @@ public class GephiScaler {
             node = peptide.getGraphNode();
             node.setX((float) (node.x() - centroidX));
             node.setY((float) (node.y() - centroidY));
-            node.setZ((float) (node.y() - centroidZ));
+            node.setZ((float) (node.z() - centroidZ));
         }
 
         //Measure
@@ -113,9 +113,9 @@ public class GephiScaler {
                 node = peptide.getGraphNode();
                 float size = (node.size() - sizeMin) * sizeRatio + sizeMinimum;
                 node.setSize(size);
-                node.setX(node.size() * sizeRatio);
-                node.setY(node.size() * sizeRatio);
-                node.setZ(node.size() * sizeRatio);
+                node.setX(node.x() * sizeRatio);
+                node.setY(node.y() * sizeRatio);
+                node.setZ(node.z() * sizeRatio);
                 averageSize += size;
             }
             averageSize /= nodeSize;

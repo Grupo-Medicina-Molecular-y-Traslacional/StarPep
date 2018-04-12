@@ -14,7 +14,8 @@ import java.util.Date;
 
 /**
  *
- * @author mguetlein Modified by loge
+ * @author mguetlein 
+ * Modified by loge
  */
 public class ArffWriter {
 

@@ -8,7 +8,6 @@ package org.bapedis.chemspace.impl;
 import java.util.Arrays;
 import java.util.Random;
 import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 import org.bapedis.chemspace.util.GephiScaler;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
@@ -16,6 +15,8 @@ import org.gephi.graph.api.Node;
 import org.bapedis.chemspace.spi.TwoDTransformer;
 import org.bapedis.chemspace.util.Jittering;
 import org.bapedis.chemspace.util.NNComputer;
+import org.bapedis.core.model.Workspace;
+import org.bapedis.core.task.ProgressTicket;
 
 /**
  *
@@ -25,10 +26,19 @@ public class TwoDEmbedder extends AbstractEmbedder {
 
     private TwoDTransformer transformer;
     private final GephiScaler scaler;
+    private int maxSize;
+    private int size;
 
     public TwoDEmbedder(TwoDEmbedderFactory factory) {
         super(factory);
         scaler = new GephiScaler();
+    }
+
+    @Override
+    public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
+        super.initAlgo(workspace, progressTicket);
+        maxSize = attrModel.getPeptides().size();
+        size = graph.getNodeCount();
     }
 
     public TwoDTransformer getTransformer() {
@@ -45,9 +55,9 @@ public class TwoDEmbedder extends AbstractEmbedder {
 
         if (positions != null) {
 //            jittering(positions);
-//            scaleFactor(positions);
-            
-            graph.writeLock();
+            scaling(positions);
+
+            graph.readLock();
             try {
                 Node node;
                 Vector2f p;
@@ -56,15 +66,15 @@ public class TwoDEmbedder extends AbstractEmbedder {
                     node = peptides[i].getGraphNode();
                     node.setX(p.getX());
                     node.setY(p.getY());
-                }
-//                scaler.doScale(peptides);
+                }                
             } finally {
-                graph.writeUnlock();
+                graph.readUnlock();
             }
         }
     }
 
-    private void scaleFactor(Vector2f[] v) {
+
+    private void scaling(Vector2f[] v) {
         // the average min distance mean distance of each compound to its closest neighbor compound
         float d = avgMinDist(v);
         if (d == 0) {
@@ -84,23 +94,20 @@ public class TwoDEmbedder extends AbstractEmbedder {
             s = max_scale;
         }
 
-        int COMPOUND_SIZE_MAX = 16990;
-        int COMPOUND_SIZE = v.length;
-
         // convert "int range 0 - COMPOUND_SIZE_MAX" to "float range 4.0 - 0.1"  
-        float density = (float) (((1 - COMPOUND_SIZE / ((double) COMPOUND_SIZE_MAX)) * 3.9f) + 0.1f);
+        float density = (float) (((1 - size / ((double) maxSize)) * 3.9f) + 0.1f);
         //Settings.LOGGER.debug("compound size: " + ClusteringUtil.COMPOUND_SIZE + " -> scale multiplier: " + density);
 
         // scale is multiplied with the DENSITY, which is configurable by the user
         float scale = s * density;
-
-        for (int i = 0; i < v.length; i++) {
-            v[i].scale(scale);
-        }
+        for(Vector2f v1 : v){
+            v1.scale(scale);
+        }        
     }
 
     private void jittering(Vector2f[] v) {
-        int STEPS = 10;
+        int STEPS = Jittering.STEPS;
+        int Level = 1;
 
         NNComputer nn = new NNComputer(v);
         nn.computeNaive();
@@ -114,8 +121,7 @@ public class TwoDEmbedder extends AbstractEmbedder {
             minDistances[j] = dist + add * log[j].floatValue();
         }
 
-        Jittering.STEPS = STEPS;
-        Jittering j = new Jittering(v, minDistances[1], new Random());
+        Jittering j = new Jittering(v, minDistances[Level], new Random());
         j.jitter();
     }
 
@@ -199,14 +205,6 @@ public class TwoDEmbedder extends AbstractEmbedder {
             sum += data[i];
         }
         return sum / data.length;
-    }
-
-    public static double[] toPrimitiveDoubleArray(int[] ints) {
-        double[] d = new double[ints.length];
-        for (int j = 0; j < d.length; j++) {
-            d[j] = ints[j];
-        }
-        return d;
     }
 
     public static float avgMinDist(Vector2f[] vectors) {

@@ -5,13 +5,12 @@
  */
 package org.bapedis.chemspace.impl;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import org.bapedis.chemspace.model.EmbedderModel;
+import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
-import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.openide.util.Lookup;
+import org.bapedis.core.ui.components.AlgorithmFactoryItem;
 import org.openide.util.NbBundle;
 import org.bapedis.core.ui.components.PropertySheetPanel;
 
@@ -19,38 +18,56 @@ import org.bapedis.core.ui.components.PropertySheetPanel;
  *
  * @author loge
  */
-public abstract class AbstractEmbedderPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
+public abstract class BaseChemSpacePanel extends javax.swing.JPanel {
 
+    protected AbstractEmbedder embedder;
     protected final String NO_SELECTION;
+
     /**
-     * Creates new form AbstractEmbedderPanel
+     * Creates new form BaseChemSpacePanel
      */
-    public AbstractEmbedderPanel() {
+    public BaseChemSpacePanel(List<? extends AlgorithmFactory> factories) {
         initComponents();
-        NO_SELECTION = NbBundle.getMessage(AbstractEmbedderPanel.class, "AbstractEmbedderPanel.choose.text");
+        NO_SELECTION = NbBundle.getMessage(BaseChemSpacePanel.class, "BaseChemSpacePanel.choose.text");
+        DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
+        comboBoxModel.addElement(NO_SELECTION);
+        comboBoxModel.setSelectedItem(NO_SELECTION);
+
+        for (AlgorithmFactory factory : factories) {
+            AlgorithmFactoryItem item = new AlgorithmFactoryItem(factory);
+            comboBoxModel.addElement(item);
+        }
+
+        algComboBox.setModel(comboBoxModel);
+        setEnableState(false);
+    }        
+
+    protected void refreshAlgChooser(AbstractEmbedder embedder) {
+        EmbedderModel embedderModel = embedder.getEmbedderModel();
+        if (embedderModel != null) {
+            DefaultComboBoxModel comboBoxModel = (DefaultComboBoxModel) algComboBox.getModel();
+            Algorithm alg = embedderModel.getSelectedAlgorithm();
+            AlgorithmFactory factory = (alg != null) ? alg.getFactory() : null;
+            if (factory != null) {
+                for (int i = 1; i < comboBoxModel.getSize(); i++) {
+                    if (factory == ((AlgorithmFactoryItem) comboBoxModel.getElementAt(i)).getFactory()) {
+                        comboBoxModel.setSelectedItem(comboBoxModel.getElementAt(i));
+                    }
+                }
+            } else {
+                comboBoxModel.setSelectedItem(NO_SELECTION);
+            }
+            setEnableState(!comboBoxModel.getSelectedItem().equals(NO_SELECTION));
+        }
+
     }
-    
-    
-//    private void refreshAlgChooser(AlgorithmModel algoModel) {
-//        DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
-//        comboBoxModel.addElement(NO_SELECTION);
-//        comboBoxModel.setSelectedItem(NO_SELECTION);
-//
-//        List<? extends AlgorithmFactory> factories = new ArrayList<>(Lookup.getDefault().lookupAll(AlgorithmFactory.class));
-//        for (Iterator<? extends AlgorithmFactory> it = factories.iterator(); it.hasNext();) {
-//            AlgorithmFactory f = it.next();
-//            if (f.getCategory() != algoModel.getCategory()) {
-//                it.remove();
-//            }
-//        }
-//
-//        for (AlgorithmFactory factory : factories) {
-//            AlgoExplorerTopComponent.AlgorithmFactoryItem item = new AlgoExplorerTopComponent.AlgorithmFactoryItem(factory);
-//            comboBoxModel.addElement(item);
-//        }
-//        algoComboBox.setModel(comboBoxModel);
-//        setEnableState(!comboBoxModel.getSelectedItem().equals(NO_SELECTION));
-//    }    
+
+    private void setEnableState(boolean enabled) {
+        infoLabel.setEnabled(enabled);
+        applyButton.setEnabled(enabled);
+        propSheetPanel.setEnabled(enabled);
+        scrollPane.setEnabled(enabled);
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -64,7 +81,7 @@ public abstract class AbstractEmbedderPanel extends javax.swing.JPanel implement
 
         algComboBox = new javax.swing.JComboBox<>();
         infoLabel = new javax.swing.JLabel();
-        runButton = new javax.swing.JButton();
+        applyButton = new javax.swing.JButton();
         scrollPane = new javax.swing.JScrollPane();
         propSheetPanel = new PropertySheetPanel();
 
@@ -85,7 +102,7 @@ public abstract class AbstractEmbedderPanel extends javax.swing.JPanel implement
         add(algComboBox, gridBagConstraints);
 
         infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(infoLabel, org.openide.util.NbBundle.getMessage(AbstractEmbedderPanel.class, "AbstractEmbedderPanel.infoLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(infoLabel, org.openide.util.NbBundle.getMessage(BaseChemSpacePanel.class, "BaseChemSpacePanel.infoLabel.text")); // NOI18N
         infoLabel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 infoLabelMouseExited(evt);
@@ -101,12 +118,12 @@ public abstract class AbstractEmbedderPanel extends javax.swing.JPanel implement
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
         add(infoLabel, gridBagConstraints);
 
-        runButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/apply.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(runButton, org.openide.util.NbBundle.getMessage(AbstractEmbedderPanel.class, "AbstractEmbedderPanel.runButton.text")); // NOI18N
-        runButton.setToolTipText(org.openide.util.NbBundle.getMessage(AbstractEmbedderPanel.class, "AbstractEmbedderPanel.runButton.toolTipText")); // NOI18N
-        runButton.addActionListener(new java.awt.event.ActionListener() {
+        applyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/apply.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(applyButton, org.openide.util.NbBundle.getMessage(BaseChemSpacePanel.class, "BaseChemSpacePanel.applyButton.text")); // NOI18N
+        applyButton.setToolTipText(org.openide.util.NbBundle.getMessage(BaseChemSpacePanel.class, "BaseChemSpacePanel.applyButton.toolTipText")); // NOI18N
+        applyButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                runButtonActionPerformed(evt);
+                applyButtonActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -114,7 +131,7 @@ public abstract class AbstractEmbedderPanel extends javax.swing.JPanel implement
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
-        add(runButton, gridBagConstraints);
+        add(applyButton, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -188,7 +205,7 @@ public abstract class AbstractEmbedderPanel extends javax.swing.JPanel implement
 //        }
     }//GEN-LAST:event_infoLabelMouseEntered
 
-    private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
+    private void applyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyButtonActionPerformed
 //        AlgorithmModel algoModel = pc.getAlgorithmModel();
 //        Algorithm algo = algoModel.getSelectedAlgorithm();
 //        if (algo != null) {
@@ -204,14 +221,14 @@ public abstract class AbstractEmbedderPanel extends javax.swing.JPanel implement
 //                }
 //            }
 //        }
-    }//GEN-LAST:event_runButtonActionPerformed
+    }//GEN-LAST:event_applyButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> algComboBox;
+    private javax.swing.JButton applyButton;
     private javax.swing.JLabel infoLabel;
     private javax.swing.JPanel propSheetPanel;
-    private javax.swing.JButton runButton;
     private javax.swing.JScrollPane scrollPane;
     // End of variables declaration//GEN-END:variables
 }

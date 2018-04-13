@@ -5,16 +5,22 @@
  */
 package org.bapedis.chemspace.impl;
 
+import java.util.List;
+import javax.swing.JPanel;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
+
 /**
  *
- * @author cicese
+ * @author loge
  */
-public class NetworkEmbedderPanel extends javax.swing.JPanel {
+public class NetworkPanel extends BaseChemSpacePanel {
 
     /**
      * Creates new form NetworkEmbedderPanel
      */
-    public NetworkEmbedderPanel() {
+    public NetworkPanel(List<? extends AlgorithmFactory> factories) {
+        super(factories);
         initComponents();
     }
 
@@ -38,6 +44,7 @@ public class NetworkEmbedderPanel extends javax.swing.JPanel {
             .addGap(0, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

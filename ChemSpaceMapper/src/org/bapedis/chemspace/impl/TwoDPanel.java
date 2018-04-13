@@ -5,16 +5,22 @@
  */
 package org.bapedis.chemspace.impl;
 
+import java.util.List;
+import javax.swing.JPanel;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
+
 /**
  *
- * @author cicese
+ * @author loge
  */
-public class TwoDEmbedderPanel extends javax.swing.JPanel {
+public class TwoDPanel extends BaseChemSpacePanel {
 
     /**
      * Creates new form TwoDEmbedderPanel
      */
-    public TwoDEmbedderPanel() {
+    public TwoDPanel(List<? extends AlgorithmFactory> factories) {
+        super(factories);
         initComponents();
     }
 

@@ -15,7 +15,8 @@ public enum AlgorithmCategory {
     Sequence("seq"),
     MolecularDescriptor("md"),
     ChemicalSpace("cs"),
-    GraphLayout("graphLayout"),
+    NDChemSpace("ndcs"),
+    ChemSpaceNetwork("csn"),
     GraphMeasure("graphMeasure");
     
     private final String displayName;

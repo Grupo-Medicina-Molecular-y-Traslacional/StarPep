@@ -14,7 +14,7 @@ public abstract class AbstractLayoutFactory implements AlgorithmFactory {
 
     @Override
     public AlgorithmCategory getCategory() {
-        return AlgorithmCategory.GraphLayout;
+        return AlgorithmCategory.NDChemSpace;
     }
     
     @Override

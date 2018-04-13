@@ -28,7 +28,7 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service = AlgorithmFactory.class)
 public class MapperAlgorithmFactory implements AlgorithmFactory {
 
-    private final MapperAlgorithmPanel setupUI = new MapperAlgorithmPanel();
+    private MapperAlgorithmSetupUI setupUI;
     
     @Override
     public AlgorithmCategory getCategory() {
@@ -47,6 +47,9 @@ public class MapperAlgorithmFactory implements AlgorithmFactory {
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
+        if (setupUI == null){
+           setupUI  = new MapperAlgorithmSetupUI();
+        }
         return setupUI;
     }
 
@@ -90,11 +93,9 @@ public class MapperAlgorithmFactory implements AlgorithmFactory {
         //Chemical Space Embbeder
         AbstractEmbedder embedder;
         switch(csOption){
-            case TWO_DIMENSIONAL:
+            case N_DIMENSIONAL:
                 embedder = (TwoDEmbedder)wiz.getProperty(TwoDEmbedder.class.getName());
                 break;
-            case THREE_DIMENSIONAL:
-                throw new UnsupportedOperationException("Not supported yet.");
             case FULL_NETWORK:
             case COMPRESSED_NETWORK:
                 embedder = (NetworkEmbedder)wiz.getProperty(NetworkEmbedder.class.getName());

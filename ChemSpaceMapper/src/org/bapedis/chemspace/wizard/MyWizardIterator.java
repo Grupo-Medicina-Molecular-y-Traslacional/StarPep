@@ -107,13 +107,9 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
     public void setChemSpaceOption(ChemSpaceOption csOption){
         String[] steps = null;
         switch(csOption){
-            case TWO_DIMENSIONAL:
+            case N_DIMENSIONAL:
                 currentPanels = twoDPanels;
                 steps = twoDSteps;
-                break;
-            case THREE_DIMENSIONAL:
-                currentPanels = defaultPanels;
-                steps = defaultSteps;
                 break;
             case FULL_NETWORK:
             case COMPRESSED_NETWORK:

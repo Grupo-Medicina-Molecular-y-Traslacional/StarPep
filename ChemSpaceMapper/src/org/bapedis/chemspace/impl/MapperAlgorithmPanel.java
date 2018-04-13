@@ -6,10 +6,7 @@
 package org.bapedis.chemspace.impl;
 
 import java.awt.Dimension;
-import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import org.bapedis.core.spi.alg.Algorithm;
-import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXHyperlink;
 import org.openide.DialogDisplayer;
@@ -21,24 +18,24 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class MapperAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
+public class MapperAlgorithmPanel extends javax.swing.JPanel {
 
     protected final JXHyperlink openWizardLink;
-    protected final JXBusyLabel busyLabel;    
-    private MapperAlgorithm csMapper;
+    protected final JXBusyLabel busyLabel;
+    protected MapperAlgorithm csMapper;
 
     /**
      * Creates new form MapperAlgorithmPanel
      */
     public MapperAlgorithmPanel() {
         initComponents();
-        
-        openWizardLink = new JXHyperlink();              
-        configureOpenWizardLink();        
-        topPanel.add(openWizardLink);  
-        
+
+        openWizardLink = new JXHyperlink();
+        configureOpenWizardLink();
+        topPanel.add(openWizardLink);
+
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
-        busyLabel.setHorizontalAlignment(SwingConstants.CENTER);        
+        busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
     }
 
     private void configureOpenWizardLink() {
@@ -68,7 +65,25 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
             topPanel.remove(busyLabel);
         }
 
-    }    
+    }
+
+    public MapperAlgorithm getCheSMapper() {
+        return csMapper;
+    }
+
+    public void setCheSMapperAlg(MapperAlgorithm csMapper) {
+        this.csMapper = csMapper;
+    }
+
+    public void addChemSpacePanel(BaseChemSpacePanel csPanel) {
+        centerPanel.removeAll();
+        if (csPanel != null) {
+            centerPanel.add(csPanel);
+        }
+        centerPanel.revalidate();
+        centerPanel.repaint();
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -113,12 +128,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 5, 5);
         add(centerPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
-
-    @Override
-    public JPanel getSettingPanel(Algorithm algo) {
-        csMapper = (MapperAlgorithm) algo;
-        return this;
-    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

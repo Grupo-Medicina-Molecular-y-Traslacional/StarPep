@@ -49,6 +49,14 @@ public abstract class AbstractEmbedder implements Algorithm, Cloneable {
         this.factory = factory;
         notEnoughFeatures = new NotifyDescriptor.Message(NbBundle.getMessage(AbstractEmbedder.class, "AbstractEmbedder.features.notEnoughHTML"), NotifyDescriptor.ERROR_MESSAGE);        
     }
+    
+    public EmbedderModel getEmbedderModel() {
+        return embedderModel;
+    }    
+
+    public void setEmbedderModel(EmbedderModel embedderModel) {
+        this.embedderModel = embedderModel;
+    }    
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
@@ -59,7 +67,7 @@ public abstract class AbstractEmbedder implements Algorithm, Cloneable {
         if (attrModel != null) {
             graphModel = pc.getGraphModel(workspace);
             graph = graphModel.getGraphVisible();
-        }
+        }        
     }
 
     @Override
@@ -144,10 +152,6 @@ public abstract class AbstractEmbedder implements Algorithm, Cloneable {
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone(); 
-    }    
-
-    public EmbedderModel getEmbedderModel() {
-        return embedderModel;
     }        
     
     protected abstract void embed(Peptide[] peptides, MolecularDescriptor[] features);

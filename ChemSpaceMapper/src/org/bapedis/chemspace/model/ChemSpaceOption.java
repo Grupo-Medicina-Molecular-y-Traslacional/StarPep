@@ -10,5 +10,5 @@ package org.bapedis.chemspace.model;
  * @author loge
  */
 public enum ChemSpaceOption {
-    NONE, THREE_DIMENSIONAL, FULL_NETWORK, COMPRESSED_NETWORK
+    NONE, TWO_DIMENSIONAL, THREE_DIMENSIONAL, FULL_NETWORK, COMPRESSED_NETWORK
 }

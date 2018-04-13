@@ -90,9 +90,11 @@ public class MapperAlgorithmFactory implements AlgorithmFactory {
         //Chemical Space Embbeder
         AbstractEmbedder embedder;
         switch(csOption){
-            case THREE_DIMENSIONAL:
+            case TWO_DIMENSIONAL:
                 embedder = (TwoDEmbedder)wiz.getProperty(TwoDEmbedder.class.getName());
                 break;
+            case THREE_DIMENSIONAL:
+                throw new UnsupportedOperationException("Not supported yet.");
             case FULL_NETWORK:
             case COMPRESSED_NETWORK:
                 embedder = (NetworkEmbedder)wiz.getProperty(NetworkEmbedder.class.getName());

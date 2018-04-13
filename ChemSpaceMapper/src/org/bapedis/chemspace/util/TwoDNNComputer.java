@@ -9,7 +9,7 @@ import javax.vecmath.Vector2f;
  *
  * @author mguetlein
  */
-public class NNComputer {
+public class TwoDNNComputer {
 
     int nn[];
     Vector2f[] v;
@@ -18,12 +18,12 @@ public class NNComputer {
     float maxMinDist = -Float.MAX_VALUE;
     Boolean neigborFound;
 
-    public NNComputer(Vector2f[] v, float minDist) {
+    public TwoDNNComputer(Vector2f[] v, float minDist) {
         this.v = v;
         this.minDist = minDist;
     }
 
-    public NNComputer(Vector2f[] v) {
+    public TwoDNNComputer(Vector2f[] v) {
         this.v = v;
     }
 
@@ -107,7 +107,7 @@ public class NNComputer {
                             continue; //do not measure distance to self
                         }							//										System.out.println("dist to j:" + j);
                         //										num++;
-                        float d = dist(v[i], v[j]);
+                        float d = VectorUtil.dist(v[i], v[j]);
                         if (d < minD) {
                             minD = d;
                             minIdx = j;
@@ -131,7 +131,7 @@ public class NNComputer {
             dist[i][i] = Float.MAX_VALUE;
             for (int j = i + 1; j < v.length; j++) {
                 //				num++;
-                float d = dist(v[i], v[j]);
+                float d = VectorUtil.dist(v[i], v[j]);
                 dist[i][j] = d;
                 dist[j][i] = d;
             }
@@ -139,7 +139,7 @@ public class NNComputer {
         nn = new int[v.length];
         for (int i = 0; i < v.length; i++) {
             nn[i] = -1;
-            int idx = getMinIndex(dist[i]);
+            int idx = ArrayUtil.getMinIndex(dist[i]);
             if (dist[i][idx] < minMinDist) {
                 minMinDist = dist[i][idx];
             }
@@ -184,24 +184,4 @@ public class NNComputer {
         return neigborFound;
     }
 
-    public static float dist(Vector2f v1, Vector2f v2) {
-        float sum = 0;
-        float dp = v1.x - v2.x;
-        sum += dp * dp;
-        dp = v1.y - v2.y;
-        sum += dp * dp;
-        return (float) Math.sqrt(sum);
-    }
-
-    public static int getMinIndex(float[] array) {
-        float min = Float.MAX_VALUE;
-        int idx = -1;
-        for (int i = 0; i < array.length; i++) {
-            if (array[i] < min) {
-                min = array[i];
-                idx = i;
-            }
-        }
-        return idx;
-    }
 }

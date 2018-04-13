@@ -10,9 +10,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.NoSuchElementException;
 import javax.swing.JComponent;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.EventListenerList;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.model.ChemSpaceOption;
 import org.openide.WizardDescriptor;
@@ -109,9 +107,13 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
     public void setChemSpaceOption(ChemSpaceOption csOption){
         String[] steps = null;
         switch(csOption){
-            case THREE_DIMENSIONAL:
+            case TWO_DIMENSIONAL:
                 currentPanels = twoDPanels;
                 steps = twoDSteps;
+                break;
+            case THREE_DIMENSIONAL:
+                currentPanels = defaultPanels;
+                steps = defaultSteps;
                 break;
             case FULL_NETWORK:
             case COMPRESSED_NETWORK:

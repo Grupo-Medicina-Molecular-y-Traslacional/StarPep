@@ -10,7 +10,7 @@ import javax.vecmath.Vector2f;
 * [ min-min-dist , min-min-dist + delta(max-min-distance,min-min-dist)/2 ]
 * the interval chunks are not equi-distant but using a log-scale  
  */
-public class Jittering {
+public class TwoDJittering {
 
     Vector2f[] v;
     float minDist;
@@ -19,9 +19,9 @@ public class Jittering {
     Vector2f dirs[];
     public static int STEPS = 10;
     int steps = STEPS;
-    NNComputer nn;
+    TwoDNNComputer nn;
 
-    public Jittering(Vector2f[] v, float minDist, Random r) {
+    public TwoDJittering(Vector2f[] v, float minDist, Random r) {
         this.v = v;
         this.minDist = minDist;
         this.r = r;
@@ -37,7 +37,7 @@ public class Jittering {
      * returns true if neighbors found < min dist
      */
     private Boolean computeDist() {
-        nn = new NNComputer(v, minDist);
+        nn = new TwoDNNComputer(v, minDist);
         nn.computeFast();
         return nn.isNeighborFound();
     }
@@ -63,15 +63,15 @@ public class Jittering {
             if (neighbor == -1) {
                 dir = null;
             } else if (dirs[neighbor] != null && nn.getNeigbohrs()[neighbor] == i) {
-                dir = negate(dirs[neighbor]);
+                dir = VectorUtil.negate(dirs[neighbor]);
             } else if (v[i].equals(v[neighbor])) {
-                dir = randomVector(1.0F, r);
+                dir = VectorUtil.random2DVector(1.0F, r);
                 if (v[i].y == 0 && v[neighbor].y == 0) {
                     dir.y = 0;
                 }
                 normalize(dir, stepWidth);
             } else {
-                dir = direction(v[i], v[neighbor]);
+                dir = VectorUtil.direction(v[i], v[neighbor]);
                 //					List<Vector3f> v1 = new ArrayList<Vector3f>();
                 //					for (Vector3f v : objects[i].getOffsets())
                 //						v1.add(Vector3fUtil.sum(v, objects[i].getPosition()));
@@ -115,49 +115,11 @@ public class Jittering {
             }
         }
     }
-
-    public static Vector2f negate(Vector2f vector2f) {
-        Vector2f v = new Vector2f(vector2f);
-        v.negate();
-        return v;
-    }
-
-    public static Vector2f randomVector(float radius, Random random) {
-        float max = radius;
-        float x = random.nextFloat() * max * (random.nextBoolean() ? 1 : -1);
-
-        max = (float) Math.sqrt(Math.pow(radius, 2) - Math.pow(x, 2));
-        float y = random.nextFloat() * max * (random.nextBoolean() ? 1 : -1);
-
-        max = (float) Math.sqrt(Math.pow(radius, 2) - (Math.pow(x, 2) + Math.pow(y, 2)));
-        float z = random.nextFloat() * max * (random.nextBoolean() ? 1 : -1);
-
-        float[] vec = new float[]{x, y};
-        scramble(vec, random);
-        return new Vector2f(vec);
-    }
-
-    public static void scramble(float[] array) {
-        scramble(array, new Random());
-    }
-
-    public static void scramble(float[] array, Random r) {
-        for (int i = 0; i < array.length; i++) {
-            int j = r.nextInt(array.length);
-            float tmp = array[j];
-            array[j] = array[i];
-            array[i] = tmp;
-        }
-    }
-
-    public static void normalize(Vector2f v, float length) {
+    
+    
+    private void normalize(Vector2f v, float length) {
         v.normalize();
-        v.scale(length);
-    }
+        v.scale(length);  
+    }    
 
-    public static Vector2f direction(Vector2f v1, Vector2f v2) {
-        Vector2f v = new Vector2f(v1);
-        v.sub(v2);
-        return v;
-    }
 }

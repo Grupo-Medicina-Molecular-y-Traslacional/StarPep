@@ -3,7 +3,13 @@ package org.bapedis.chemspace.util;
 import java.util.Random;
 import javax.vecmath.Vector2f;
 
-
+/*
+* jittering in ches-mapper has fixed number of steps
+* each step has a min-distance that compounds should have
+* the min-distance is computed based on the entire data, within interval:
+* [ min-min-dist , min-min-dist + delta(max-min-distance,min-min-dist)/2 ]
+* the interval chunks are not equi-distant but using a log-scale  
+ */
 public class Jittering {
 
     Vector2f[] v;

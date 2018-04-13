@@ -23,40 +23,41 @@ import org.bapedis.core.task.ProgressTicket;
  * @author loge
  */
 public class TwoDEmbedder extends AbstractEmbedder {
-
+    
     private TwoDTransformer transformer;
     private final GephiScaler scaler;
     private int maxSize;
     private int size;
-
+    
     public TwoDEmbedder(TwoDEmbedderFactory factory) {
         super(factory);
         scaler = new GephiScaler();
     }
-
+    
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         super.initAlgo(workspace, progressTicket);
         maxSize = attrModel.getPeptides().size();
         size = graph.getNodeCount();
     }
-
+    
     public TwoDTransformer getTransformer() {
         return transformer;
     }
-
+    
     public void setTransformer(TwoDTransformer transformer) {
         this.transformer = transformer;
     }
-
+    
     @Override
     protected void embed(Peptide[] peptides, MolecularDescriptor[] features) {
         Vector2f[] positions = transformer.transform(peptides, features);
-
+        
         if (positions != null) {
-//            jittering(positions);
-            scaling(positions);
-
+            jittering(positions);
+//            scaling(positions);
+            normalize(positions);
+            
             graph.readLock();
             try {
                 Node node;
@@ -66,14 +67,43 @@ public class TwoDEmbedder extends AbstractEmbedder {
                     node = peptides[i].getGraphNode();
                     node.setX(p.getX());
                     node.setY(p.getY());
-                }                
+                    
+                    node.setX((float) ((0.01 + p.getX()) * 1000) - 500);
+                    node.setY((float) ((0.01 + p.getY()) * 1000) - 500);
+                }
             } finally {
                 graph.readUnlock();
             }
         }
     }
-
-
+    
+    private void normalize(Vector2f[] v) {
+        float minX = Float.POSITIVE_INFINITY;
+        float maxX = Float.NEGATIVE_INFINITY;
+        float minY = Float.POSITIVE_INFINITY;
+        float maxY = Float.NEGATIVE_INFINITY;
+        
+        for (Vector2f v1 : v) {
+            minX = Math.min(minX, v1.getX());
+            maxX = Math.max(maxX, v1.getX());
+            minY = Math.min(minY, v1.getY());
+            maxY = Math.max(maxY, v1.getY());
+        }
+        
+        float x, y;
+        for (Vector2f v1 : v) {
+            x = v1.getX();
+            if (x != 0.0) {
+                v1.setX((x - minX) / (maxX - minX));                
+            }
+            
+            y = v1.getY();
+            if (y != 0.0) {
+                v1.setY((y - minY) / (maxY - minY));
+            }
+        }
+    }
+    
     private void scaling(Vector2f[] v) {
         // the average min distance mean distance of each compound to its closest neighbor compound
         float d = avgMinDist(v);
@@ -100,31 +130,31 @@ public class TwoDEmbedder extends AbstractEmbedder {
 
         // scale is multiplied with the DENSITY, which is configurable by the user
         float scale = s * density;
-        for(Vector2f v1 : v){
+        for (Vector2f v1 : v) {
             v1.scale(scale);
-        }        
+        }
     }
-
+    
     private void jittering(Vector2f[] v) {
         int STEPS = Jittering.STEPS;
         int Level = 1;
-
+        
         NNComputer nn = new NNComputer(v);
         nn.computeNaive();
-
+        
         float dist = nn.getMinMinDist();
         float add = (nn.getMaxMinDist() - nn.getMinMinDist()) * 0.5f;
         Double log[] = logBinning(STEPS, 1.2);
-
+        
         float minDistances[] = new float[STEPS + 1];
         for (int j = 1; j <= STEPS; j++) {
             minDistances[j] = dist + add * log[j].floatValue();
         }
-
+        
         Jittering j = new Jittering(v, minDistances[Level], new Random());
         j.jitter();
     }
-
+    
     public static Double[] logBinning(int numBins, double base) {
         Double[] d = new Double[numBins + 1];
         for (int i = 0; i < numBins + 1; i++) {
@@ -132,7 +162,7 @@ public class TwoDEmbedder extends AbstractEmbedder {
         }
         //return d;
         return normalize(d, 0, 1, false);
-
+        
     }
 
     /**
@@ -159,7 +189,7 @@ public class TwoDEmbedder extends AbstractEmbedder {
                 if (replaceNullWithMedian && (v == null || Double.isNaN(v))) {
                     v = arrMean;
                 }
-
+                
                 if (v == null) {
                     a[i] = null;
                 } else {
@@ -169,7 +199,7 @@ public class TwoDEmbedder extends AbstractEmbedder {
             return a;
         }
     }
-
+    
     public static double max(Double[] data) {
         double max = Double.NEGATIVE_INFINITY;
         for (int i = 0; i < data.length; i++) {
@@ -182,7 +212,7 @@ public class TwoDEmbedder extends AbstractEmbedder {
         }
         return max;
     }
-
+    
     public static double min(Double[] data) {
         double min = Double.POSITIVE_INFINITY;
         for (int i = 0; i < data.length; i++) {
@@ -195,7 +225,7 @@ public class TwoDEmbedder extends AbstractEmbedder {
         }
         return min;
     }
-
+    
     public static double mean(Double[] data) {
         if (data.length == 0) {
             return Double.NaN;
@@ -206,7 +236,7 @@ public class TwoDEmbedder extends AbstractEmbedder {
         }
         return sum / data.length;
     }
-
+    
     public static float avgMinDist(Vector2f[] vectors) {
         float dist = 0;
         for (int i = 0; i < vectors.length; i++) {
@@ -221,7 +251,7 @@ public class TwoDEmbedder extends AbstractEmbedder {
         dist /= vectors.length;
         return dist;
     }
-
+    
     public static float maxDist(Vector2f[] vectors) {
         float max = 0;
         for (int i = 0; i < vectors.length - 1; i++) {
@@ -231,5 +261,5 @@ public class TwoDEmbedder extends AbstractEmbedder {
         }
         return max;
     }
-
+    
 }

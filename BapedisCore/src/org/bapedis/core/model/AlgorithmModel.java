@@ -16,7 +16,7 @@ import org.bapedis.core.spi.alg.Algorithm;
  */
 public class AlgorithmModel {
     protected final Workspace owner;
-    protected AlgorithmCategory category;
+    protected Class tag;
     protected Algorithm selectedAlgorithm;
     protected transient final PropertyChangeSupport propertyChangeSupport;
     public static final String CHANGED_CATEGORY = "CATEGORY";
@@ -34,14 +34,14 @@ public class AlgorithmModel {
         return owner;
     }        
 
-    public AlgorithmCategory getCategory() {
-        return category;
+    public Class getTagInterface() {
+        return tag;
     }
 
-    public void setCategory(AlgorithmCategory category) {
-        AlgorithmCategory oldValue = this.category;
-        this.category = category;
-        propertyChangeSupport.firePropertyChange(CHANGED_CATEGORY, oldValue, category);
+    public void setTagInterface(Class tag) {
+        Class oldTag = this.tag;
+        this.tag = tag;
+        propertyChangeSupport.firePropertyChange(CHANGED_CATEGORY, oldTag, tag);
     }
 
     public Algorithm getSelectedAlgorithm() {

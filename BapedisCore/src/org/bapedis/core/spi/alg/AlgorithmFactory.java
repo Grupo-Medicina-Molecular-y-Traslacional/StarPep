@@ -5,8 +5,6 @@
  */
 package org.bapedis.core.spi.alg;
 
-import org.bapedis.core.model.AlgorithmCategory;
-
 /**
  *
  * @author loge
@@ -17,7 +15,7 @@ public interface AlgorithmFactory {
      * The category of the algorithm's provided by this factory.
      * @return  the category of the algorithm
      */
-    public AlgorithmCategory getCategory();
+    public String getCategory();
     
      /**
      * The name of the behaviour of the algorithm's provided by this factory.

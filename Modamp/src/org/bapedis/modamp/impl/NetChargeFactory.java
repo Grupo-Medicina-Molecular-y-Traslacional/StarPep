@@ -5,10 +5,10 @@
  */
 package org.bapedis.modamp.impl;
 
-import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.MolecularDescriptorTag;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -17,11 +17,11 @@ import org.openide.util.lookup.ServiceProvider;
  * @author beltran, loge
  */
 @ServiceProvider(service = AlgorithmFactory.class, position = 100)
-public class NetChargeFactory implements AlgorithmFactory{
+public class NetChargeFactory implements AlgorithmFactory, MolecularDescriptorTag{
 
     @Override
-    public AlgorithmCategory getCategory() {
-        return AlgorithmCategory.MolecularDescriptor;
+    public String getCategory() {
+        return null;
     }
 
     @Override

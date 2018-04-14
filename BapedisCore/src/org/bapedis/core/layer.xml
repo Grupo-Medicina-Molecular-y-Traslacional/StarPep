@@ -11,8 +11,9 @@
             <file name="org-bapedis-core-ui-actions-ResetDefaultWorkspace.instance_hidden"/>
         </folder>
         <folder name="Tools">
-            <file name="org-bapedis-core-ui-actions-GraphLayoutAction.instance"/>
+            <file name="org-bapedis-core-ui-actions-FeatureExtractionAction.instance"/>
             <file name="org-bapedis-core-ui-actions-LayoutTool.instance_hidden"/>
+            <file name="org-bapedis-core-ui-actions-MolecularDescriptorAction.instance_hidden"/>
         </folder>
     </folder>
     <folder name="Menu">

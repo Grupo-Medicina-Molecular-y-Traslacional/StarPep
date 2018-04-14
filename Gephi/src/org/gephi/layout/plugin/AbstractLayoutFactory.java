@@ -5,7 +5,6 @@
  */
 package org.gephi.layout.plugin;
 
-import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 
@@ -13,8 +12,8 @@ import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 public abstract class AbstractLayoutFactory implements AlgorithmFactory {
 
     @Override
-    public AlgorithmCategory getCategory() {
-        return AlgorithmCategory.NDChemSpace;
+    public String getCategory() {
+        return null;
     }
     
     @Override

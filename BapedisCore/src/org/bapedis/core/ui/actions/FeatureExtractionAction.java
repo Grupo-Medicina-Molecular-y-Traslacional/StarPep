@@ -5,11 +5,11 @@
  */
 package org.bapedis.core.ui.actions;
 
-import org.bapedis.core.model.AlgorithmCategory;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
+import org.bapedis.core.spi.alg.MolecularDescriptorTag;
 
 /**
  *
@@ -17,17 +17,18 @@ import org.openide.util.NbBundle;
  */
 @ActionID(
         category = "Tools",
-        id = "org.bapedis.core.ui.actions.MolecularDescriptorAction"
+        id = "org.bapedis.core.ui.actions.FeatureExtraction"
 )
 @ActionRegistration(
-        displayName = "#CTL_MolecularDescriptorAction"
+        displayName = "#CTL_FeatureExtraction"
 )
 @ActionReference(path = "Menu/Tools", position = 200)
-@NbBundle.Messages("CTL_MolecularDescriptorAction=Molecular Descriptor")
-public class MolecularDescriptorAction extends ToolAction{
+@NbBundle.Messages("CTL_FeatureExtraction=Feature Extraction")
+public class FeatureExtractionAction extends ToolAction{
     
-    public MolecularDescriptorAction() {
-        super(AlgorithmCategory.MolecularDescriptor);
+    public FeatureExtractionAction() {
+        super(NbBundle.getMessage(FeatureExtractionAction.class, "CTL_FeatureExtraction"),
+                MolecularDescriptorTag.class);
     }
           
 }

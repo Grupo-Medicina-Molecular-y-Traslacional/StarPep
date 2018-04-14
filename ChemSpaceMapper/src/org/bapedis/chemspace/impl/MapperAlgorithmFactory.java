@@ -10,10 +10,10 @@ import org.bapedis.chemspace.model.ChemSpaceOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.FeatureFilteringOption;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
-import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.ChemSpaceTag;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.FeatureFiltering;
 import org.openide.DialogDisplayer;
@@ -26,13 +26,13 @@ import org.openide.util.lookup.ServiceProvider;
  * @author loge
  */
 @ServiceProvider(service = AlgorithmFactory.class)
-public class MapperAlgorithmFactory implements AlgorithmFactory {
+public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
 
     private MapperAlgorithmSetupUI setupUI;
     
     @Override
-    public AlgorithmCategory getCategory() {
-        return AlgorithmCategory.ChemicalSpace;
+    public String getCategory() {
+        return null;
     }
 
     @Override

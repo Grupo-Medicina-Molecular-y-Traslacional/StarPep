@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.JPanel;
-import org.bapedis.core.model.AlgorithmCategory;
+import org.bapedis.chemspace.spi.ChemSpaceNetworkTag;
+import org.bapedis.chemspace.spi.NDChemSpaceTag;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
@@ -20,6 +21,7 @@ import org.openide.util.Lookup;
  * @author loge
  */
 public class MapperAlgorithmSetupUI implements AlgorithmSetupUI {
+
     private final BaseChemSpacePanel networkPanel;
     private final BaseChemSpacePanel twoDPanel;
     private final MapperAlgorithmPanel setupPanel;
@@ -29,35 +31,35 @@ public class MapperAlgorithmSetupUI implements AlgorithmSetupUI {
         twoDPanel = createNetworkPanel();
         networkPanel = createTwoDPanel();
     }
-    
-    private BaseChemSpacePanel createNetworkPanel(){
+
+    private BaseChemSpacePanel createNetworkPanel() {
         List<? extends AlgorithmFactory> factories = new ArrayList<>(Lookup.getDefault().lookupAll(AlgorithmFactory.class));
         for (Iterator<? extends AlgorithmFactory> it = factories.iterator(); it.hasNext();) {
             AlgorithmFactory f = it.next();
-            if (f.getCategory() != AlgorithmCategory.ChemSpaceNetwork) {
-                it.remove();
-            }
-        }        
-        return new NetworkPanel(factories);
-    }
-    
-    private BaseChemSpacePanel createTwoDPanel(){
-        List<? extends AlgorithmFactory> factories = new ArrayList<>(Lookup.getDefault().lookupAll(AlgorithmFactory.class));
-        for (Iterator<? extends AlgorithmFactory> it = factories.iterator(); it.hasNext();) {
-            AlgorithmFactory f = it.next();
-            if (f.getCategory() != AlgorithmCategory.NDChemSpace) {
+            if (!(f instanceof ChemSpaceNetworkTag)) {
                 it.remove();
             }
         }
-        
+        return new NetworkPanel(factories);
+    }
+
+    private BaseChemSpacePanel createTwoDPanel() {
+        List<? extends AlgorithmFactory> factories = new ArrayList<>(Lookup.getDefault().lookupAll(AlgorithmFactory.class));
+        for (Iterator<? extends AlgorithmFactory> it = factories.iterator(); it.hasNext();) {
+            AlgorithmFactory f = it.next();
+            if (!(f instanceof NDChemSpaceTag)) {
+                it.remove();
+            }
+        }
+
         return new TwoDPanel(factories);
     }
-    
+
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
-        MapperAlgorithm csMapper = (MapperAlgorithm)algo;
+        MapperAlgorithm csMapper = (MapperAlgorithm) algo;
         setupPanel.setCheSMapperAlg(csMapper);
-        switch(csMapper.getChemSpaceOption()){
+        switch (csMapper.getChemSpaceOption()) {
             case N_DIMENSIONAL:
                 setupPanel.addChemSpacePanel(twoDPanel);
                 break;
@@ -67,5 +69,5 @@ public class MapperAlgorithmSetupUI implements AlgorithmSetupUI {
         }
         return setupPanel;
     }
-    
+
 }

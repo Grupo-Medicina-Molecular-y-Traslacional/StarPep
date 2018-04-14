@@ -6,7 +6,7 @@
 package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
-import org.bapedis.core.model.AlgorithmCategory;
+import org.bapedis.core.spi.alg.ChemSpaceTag;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
@@ -23,13 +23,14 @@ import org.openide.util.NbBundle;
 @ActionRegistration(
         displayName = "#CTL_ChemicalSpaceAction"
 )
-@ActionReference(path = "Menu/Tools", position = 300)
+@ActionReference(path = "Menu/Tools", position = 400)
 @NbBundle.Messages({"CTL_ChemicalSpaceAction=Chemical Space"})
 public class ChemicalSpaceAction extends ToolAction {
     
     
     public ChemicalSpaceAction() {
-        super(AlgorithmCategory.ChemicalSpace);
+        super(NbBundle.getMessage(ChemicalSpaceAction.class, "CTL_ChemicalSpaceAction"),
+                ChemSpaceTag.class);
     }
 
     @Override

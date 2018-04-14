@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.spi.alg.impl;
 
-import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
@@ -20,8 +19,8 @@ import org.openide.util.lookup.ServiceProvider;
 public class SequenceSearchFactory implements AlgorithmFactory{
 
     @Override
-    public AlgorithmCategory getCategory() {
-        return AlgorithmCategory.Sequence;
+    public String getCategory() {
+        return null;
     }
 
     @Override

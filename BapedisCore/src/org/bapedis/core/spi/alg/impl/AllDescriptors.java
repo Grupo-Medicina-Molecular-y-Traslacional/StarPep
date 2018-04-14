@@ -13,12 +13,12 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.MolecularDescriptorTag;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -42,7 +42,7 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
         String key;
         for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
             final AlgorithmFactory f = it.next();
-            if (!f.equals(factory) && f.getCategory() == AlgorithmCategory.MolecularDescriptor) {
+            if (!f.equals(factory) && f instanceof MolecularDescriptorTag) {
                 key = f.getName();
                 descriptorKeys.add(key);
             }

@@ -5,12 +5,8 @@
  */
 package org.bapedis.core.ui;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -42,7 +38,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.bapedis.core.events.WorkspaceEventListener;
-import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.model.AlgorithmModel;
 import org.bapedis.core.model.AlgorithmNode;
 import org.bapedis.core.model.AlgorithmProperty;
@@ -424,17 +419,17 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
         removeLookupListener();
-        AlgorithmCategory oldAlgoCategory = null;
+        Class oldAlgTag = null;
         if (oldWs != null) {
             AlgorithmModel oldModel = pc.getAlgorithmModel(oldWs);
             oldModel.removePropertyChangeListener(this);
-            oldAlgoCategory = oldModel.getCategory();
+            oldAlgTag = oldModel.getTagInterface();
         }
         AlgorithmModel algoModel = pc.getAlgorithmModel(newWs);
-        if (algoModel.getCategory() == null && oldAlgoCategory != null) {
-            algoModel.setCategory(oldAlgoCategory);
+        if (algoModel.getTagInterface() == null && oldAlgTag != null) {
+            algoModel.setTagInterface(oldAlgTag);
         }
-        if (algoModel.getCategory() != null) {
+        if (algoModel.getTagInterface() != null) {
             refreshAlgChooser(algoModel);
             refreshProperties(algoModel);
             refreshRunning(algoModel.isRunning());
@@ -450,7 +445,8 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     }
 
     private void refreshAlgChooser(AlgorithmModel algoModel) {
-        setDisplayName(algoModel.getCategory().getDisplayName());
+        Class tag = algoModel.getTagInterface();
+        setDisplayName(NbBundle.getMessage(AlgoExplorerTopComponent.class, String.format("AlgoExplorerTopComponent.%s.name", tag.getSimpleName())));
         DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
         comboBoxModel.addElement(NO_SELECTION);
         comboBoxModel.setSelectedItem(NO_SELECTION);
@@ -458,7 +454,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         List<? extends AlgorithmFactory> factories = new ArrayList<>(Lookup.getDefault().lookupAll(AlgorithmFactory.class));
         for (Iterator<? extends AlgorithmFactory> it = factories.iterator(); it.hasNext();) {
             AlgorithmFactory f = it.next();
-            if (f.getCategory() != algoModel.getCategory()) {
+            if (!tag.isAssignableFrom(f.getClass())) {
                 it.remove();
             }
         }

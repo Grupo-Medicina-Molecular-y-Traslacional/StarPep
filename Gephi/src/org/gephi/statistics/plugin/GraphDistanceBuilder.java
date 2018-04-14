@@ -41,7 +41,6 @@ Portions Copyrighted 2011 Gephi Consortium.
 */
 package org.gephi.statistics.plugin;
 
-import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
@@ -61,8 +60,8 @@ public class GraphDistanceBuilder implements AlgorithmFactory {
     }
 
     @Override
-    public AlgorithmCategory getCategory() {
-        return AlgorithmCategory.GraphMeasure;
+    public String getCategory() {
+        return null;
     }
 
     @Override

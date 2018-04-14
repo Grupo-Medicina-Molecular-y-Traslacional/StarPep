@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.spi.alg.impl;
 
-import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
@@ -20,7 +19,7 @@ public class FeatureFilteringFactory implements AlgorithmFactory {
     private FeatureFilteringPanel panel;
     
     @Override
-    public AlgorithmCategory getCategory() {
+    public String getCategory() {
         return null;
     }
 

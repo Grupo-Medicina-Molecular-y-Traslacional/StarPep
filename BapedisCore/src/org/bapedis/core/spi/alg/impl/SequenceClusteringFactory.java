@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.spi.alg.impl;
 
-import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
@@ -22,8 +21,8 @@ public class SequenceClusteringFactory implements AlgorithmFactory {
     private final SequenceClusteringPanel setupUI = new SequenceClusteringPanel();
     
     @Override
-    public AlgorithmCategory getCategory() {
-        return AlgorithmCategory.Sequence;
+    public String getCategory() {
+        return null;
     }
 
     @Override

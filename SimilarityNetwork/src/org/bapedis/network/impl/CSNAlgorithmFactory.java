@@ -6,7 +6,6 @@
 package org.bapedis.network.impl;
 
 import java.text.MessageFormat;
-import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
@@ -26,8 +25,8 @@ public class CSNAlgorithmFactory implements AlgorithmFactory {
     private final CSNAlgorithmPanel setupUI = new CSNAlgorithmPanel();
     
     @Override
-    public AlgorithmCategory getCategory() {
-        return AlgorithmCategory.ChemicalSpace;
+    public String getCategory() {
+        return null;
     }
 
     @Override

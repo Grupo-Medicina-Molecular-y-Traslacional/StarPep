@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.model.AlgorithmModel;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Workspace;
@@ -29,13 +28,13 @@ import org.openide.windows.WindowManager;
  */
 public class ToolAction extends WorkspaceContextSensitiveAction<AttributesModel> implements Presenter.Menu {
 
-    protected final AlgorithmCategory category;
+    protected final Class tag;
     protected final JMenu main;
 
-    public ToolAction(AlgorithmCategory category) {
+    public ToolAction(String name, Class tag) {
         super(AttributesModel.class);
-        this.category = category;
-        main = new JMenu(category.getDisplayName());
+        this.tag = tag;
+        main = new JMenu(name);
         main.setEnabled(enabled);
     }
 
@@ -56,7 +55,7 @@ public class ToolAction extends WorkspaceContextSensitiveAction<AttributesModel>
         JMenuItem item;
         for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
             final AlgorithmFactory factory = it.next();
-            if (factory.getCategory() == category) {
+            if (tag.isAssignableFrom(factory.getClass())) {
                 item = new JMenuItem(factory.getName());
                 item.addActionListener(new ActionListener() {
                     @Override
@@ -66,7 +65,7 @@ public class ToolAction extends WorkspaceContextSensitiveAction<AttributesModel>
                             DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
                         } else {
                             AlgorithmModel algoModel = pc.getAlgorithmModel();
-                            algoModel.setCategory(category);
+                            algoModel.setTagInterface(tag);
 
                             Workspace currentWs = pc.getCurrentWorkspace();
                             Collection<? extends Algorithm> savedAlgo = currentWs.getLookup().lookupAll(Algorithm.class);

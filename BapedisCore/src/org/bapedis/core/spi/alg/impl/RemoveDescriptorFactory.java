@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.spi.alg.impl;
 
-import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
@@ -18,7 +17,7 @@ import org.openide.util.NbBundle;
 public class RemoveDescriptorFactory implements AlgorithmFactory{
 
     @Override
-    public AlgorithmCategory getCategory() {
+    public String getCategory() {
         return null;
     }
 

@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.spi.alg.impl;
 
-import org.bapedis.core.model.AlgorithmCategory;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
@@ -23,8 +22,8 @@ public class AllDescriptorsFactory implements AlgorithmFactory, ToolMenuItem {
     private AllDescriptorsPanel panel;
 
     @Override
-    public AlgorithmCategory getCategory() {
-        return AlgorithmCategory.MolecularDescriptor;
+    public String getCategory() {
+        return null;
     }
 
     @Override

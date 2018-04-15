@@ -29,8 +29,8 @@ import org.openide.util.NbBundle.Messages;
         iconBase = "org/bapedis/core/resources/filter_md.png",
         displayName = "#CTL_FeatureFiltering"
 )
-@ActionReference(path = "Menu/Tools", position = 300)
-@Messages("CTL_FeatureFiltering=Feature Filtering")
+@ActionReference(path = "Menu/Tools/Feature", position = 300)
+@Messages("CTL_FeatureFiltering=Filtering")
 public final class FeatureFilteringAction extends WorkspaceContextSensitiveAction<AttributesModel> {
     protected final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected final AlgorithmExecutor executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);

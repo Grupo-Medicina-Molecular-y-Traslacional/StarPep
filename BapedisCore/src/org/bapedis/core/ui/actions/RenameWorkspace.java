@@ -23,7 +23,7 @@ import org.openide.util.NbBundle;
         displayName = "#CTL_RenameWorkspace"
 )
 @ActionReferences({
-    @ActionReference(path = "Menu/File", position = 1100),
+    @ActionReference(path = "Menu/File", position = 240),
     @ActionReference(path = "Toolbars/Workspace", position = 150)
 })
 public class RenameWorkspace implements ActionListener {

@@ -5,6 +5,7 @@
  */
 package org.bapedis.chemspace.impl;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import javax.swing.SwingConstants;
 import org.jdesktop.swingx.JXBusyLabel;
@@ -75,13 +76,15 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel {
         this.csMapper = csMapper;
     }
 
-    public void addChemSpacePanel(BaseChemSpacePanel csPanel) {
+    public void addChemSpacePanel(ChemSpacePanel csPanel) {
         centerPanel.removeAll();
         if (csPanel != null) {
-            centerPanel.add(csPanel);
+            centerPanel.add(csPanel, BorderLayout.CENTER);
+            centerPanel.revalidate();
+            centerPanel.repaint();
         }
-        centerPanel.revalidate();
-        centerPanel.repaint();
+        revalidate();
+        repaint();
     }
 
     /**
@@ -108,17 +111,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 5, 5);
         add(topPanel, gridBagConstraints);
 
-        javax.swing.GroupLayout centerPanelLayout = new javax.swing.GroupLayout(centerPanel);
-        centerPanel.setLayout(centerPanelLayout);
-        centerPanelLayout.setHorizontalGroup(
-            centerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 390, Short.MAX_VALUE)
-        );
-        centerPanelLayout.setVerticalGroup(
-            centerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 276, Short.MAX_VALUE)
-        );
-
+        centerPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;

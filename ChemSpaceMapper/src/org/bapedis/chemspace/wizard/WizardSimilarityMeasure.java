@@ -52,7 +52,7 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
                 AbstractEmbedder current = csMapper.getChemSpaceEmbedderAlg();
                 if (current == null || current instanceof TwoDEmbedder) {
                     alg = (NetworkEmbedder) new NetworkEmbedderFactory().createAlgorithm();
-                } else if (current instanceof TwoDEmbedder) {
+                } else if (current instanceof NetworkEmbedder) {
                     alg = (NetworkEmbedder) current.clone();
                 }
                 component = new VisualSimilarityMeasure();

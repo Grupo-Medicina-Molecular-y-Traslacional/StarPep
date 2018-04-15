@@ -18,7 +18,7 @@ import org.bapedis.core.ui.components.PropertySheetPanel;
  *
  * @author loge
  */
-public abstract class BaseChemSpacePanel extends javax.swing.JPanel {
+public class ChemSpacePanel extends javax.swing.JPanel {
 
     protected AbstractEmbedder embedder;
     protected final String NO_SELECTION;
@@ -26,21 +26,23 @@ public abstract class BaseChemSpacePanel extends javax.swing.JPanel {
     /**
      * Creates new form BaseChemSpacePanel
      */
-    public BaseChemSpacePanel(List<? extends AlgorithmFactory> factories) {
+    public ChemSpacePanel(List<? extends AlgorithmFactory> factories) {
         initComponents();
-        NO_SELECTION = NbBundle.getMessage(BaseChemSpacePanel.class, "BaseChemSpacePanel.choose.text");
+        NO_SELECTION = NbBundle.getMessage(ChemSpacePanel.class, "ChemSpacePanel.choose.text");
         DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
         comboBoxModel.addElement(NO_SELECTION);
         comboBoxModel.setSelectedItem(NO_SELECTION);
 
-        for (AlgorithmFactory factory : factories) {
-            AlgorithmFactoryItem item = new AlgorithmFactoryItem(factory);
-            comboBoxModel.addElement(item);
+        if (factories != null) {
+            for (AlgorithmFactory factory : factories) {
+                AlgorithmFactoryItem item = new AlgorithmFactoryItem(factory);
+                comboBoxModel.addElement(item);
+            }
         }
 
         algComboBox.setModel(comboBoxModel);
         setEnableState(false);
-    }        
+    }
 
     protected void refreshAlgChooser(AbstractEmbedder embedder) {
         EmbedderModel embedderModel = embedder.getEmbedderModel();
@@ -102,7 +104,7 @@ public abstract class BaseChemSpacePanel extends javax.swing.JPanel {
         add(algComboBox, gridBagConstraints);
 
         infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(infoLabel, org.openide.util.NbBundle.getMessage(BaseChemSpacePanel.class, "BaseChemSpacePanel.infoLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(infoLabel, org.openide.util.NbBundle.getMessage(ChemSpacePanel.class, "ChemSpacePanel.infoLabel.text")); // NOI18N
         infoLabel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 infoLabelMouseExited(evt);
@@ -119,8 +121,8 @@ public abstract class BaseChemSpacePanel extends javax.swing.JPanel {
         add(infoLabel, gridBagConstraints);
 
         applyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/apply.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(applyButton, org.openide.util.NbBundle.getMessage(BaseChemSpacePanel.class, "BaseChemSpacePanel.applyButton.text")); // NOI18N
-        applyButton.setToolTipText(org.openide.util.NbBundle.getMessage(BaseChemSpacePanel.class, "BaseChemSpacePanel.applyButton.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(applyButton, org.openide.util.NbBundle.getMessage(ChemSpacePanel.class, "ChemSpacePanel.applyButton.text")); // NOI18N
+        applyButton.setToolTipText(org.openide.util.NbBundle.getMessage(ChemSpacePanel.class, "ChemSpacePanel.applyButton.toolTipText")); // NOI18N
         applyButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 applyButtonActionPerformed(evt);

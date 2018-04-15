@@ -36,22 +36,10 @@ public class ToolAction extends WorkspaceContextSensitiveAction<AttributesModel>
         this.tag = tag;
         main = new JMenu(name);
         main.setEnabled(enabled);
+        populateMenu();
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-    }
-
-    @Override
-    public void setEnabled(boolean newValue) {
-        super.setEnabled(newValue); //To change body of generated methods, choose Tools | Templates.
-        if (main != null) {
-            main.setEnabled(newValue);
-        }
-    }
-
-    @Override
-    public JMenuItem getMenuPresenter() {
+    private void populateMenu() {
         JMenuItem item;
         for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
             final AlgorithmFactory factory = it.next();
@@ -105,6 +93,22 @@ public class ToolAction extends WorkspaceContextSensitiveAction<AttributesModel>
                 }
             }
         }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+    }
+
+    @Override
+    public void setEnabled(boolean newValue) {
+        super.setEnabled(newValue); //To change body of generated methods, choose Tools | Templates.
+        if (main != null) {
+            main.setEnabled(newValue);
+        }
+    }
+
+    @Override
+    public JMenuItem getMenuPresenter() {
         return main;
     }
 

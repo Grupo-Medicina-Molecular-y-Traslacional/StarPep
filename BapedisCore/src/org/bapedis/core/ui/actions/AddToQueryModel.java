@@ -13,24 +13,30 @@ import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.project.ProjectManager;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 /**
  *
  * @author loge
  */
 public class AddToQueryModel extends AbstractAction {
-        private final Metadata metadata;
-    
-        public AddToQueryModel(Metadata metadata) {
-            this.metadata = metadata;
-            putValue(NAME, NbBundle.getMessage(AddToQueryModel.class, "AddToQueryModel.name"));
-//            putValue(SMALL_ICON, ImageUtilities.loadImage("org/bapedis/core/resources/add.png", true));
-        }                
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            QueryModel queryModel = Lookup.getDefault().lookup(ProjectManager.class).getQueryModel();
-            queryModel.add(metadata);
-        }
-    
+    private final Metadata metadata;
+
+    public AddToQueryModel(Metadata metadata) {
+        this.metadata = metadata;
+        putValue(NAME, NbBundle.getMessage(AddToQueryModel.class, "AddToQueryModel.name"));
+//            putValue(SMALL_ICON, ImageUtilities.loadImage("org/bapedis/core/resources/add.png", true));
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        TopComponent tc = WindowManager.getDefault().findTopComponent("QueryExplorerTopComponent");
+        tc.open();
+        tc.requestActive();
+        QueryModel queryModel = Lookup.getDefault().lookup(ProjectManager.class).getQueryModel();
+        queryModel.add(metadata);
+    }
+
 }

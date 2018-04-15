@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.model.Workspace;
-import static org.bapedis.core.ui.actions.EditFilter.pc;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionID;

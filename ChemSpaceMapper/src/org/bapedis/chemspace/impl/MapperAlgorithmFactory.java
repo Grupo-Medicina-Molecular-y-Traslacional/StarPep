@@ -108,11 +108,12 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
     
     public static WizardDescriptor  createWizardDescriptor(MapperAlgorithm csMapper){
         // Wizard iterator
-        MyWizardIterator iterator = new MyWizardIterator(csMapper);
+        MyWizardIterator iterator = new MyWizardIterator(csMapper);        
 
         // Open wizard
         WizardDescriptor wiz = new WizardDescriptor(iterator);        
-        iterator.initialize(wiz);        
+        iterator.initialize(wiz);
+        iterator.setChemSpaceOption(csMapper.getChemSpaceOption());
         
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wiz.setTitleFormat(new MessageFormat("{0}"));

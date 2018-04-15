@@ -27,7 +27,7 @@ import org.openide.util.NbBundle;
         displayName = "#CTL_NewWorkspace"
 )
 @ActionReferences({
-    @ActionReference(path = "Menu/File", position = 1000),
+    @ActionReference(path = "Menu/File", position = 220),
     @ActionReference(path = "Toolbars/Workspace", position = 100)
 })
 public final class NewWorkspace implements ActionListener {

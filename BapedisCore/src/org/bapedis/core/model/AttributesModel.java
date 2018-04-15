@@ -6,7 +6,6 @@
 package org.bapedis.core.model;
 
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -15,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.event.SwingPropertyChangeSupport;
 import org.netbeans.swing.etable.QuickFilter;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Index;
@@ -40,7 +40,7 @@ public class AttributesModel {
     public static final String MD_ATTR_ADDED = "md_attribute_add";
     public static final String MD_ATTR_REMOVED = "md_attribute_remove";
         
-    protected transient final PropertyChangeSupport propertyChangeSupport;
+    protected transient final SwingPropertyChangeSupport propertyChangeSupport;
     protected Node rootNode;    
 
     public AttributesModel() {
@@ -48,7 +48,7 @@ public class AttributesModel {
         nodeList = new LinkedList<>();
         container = new PeptideNodeContainer();
         rootNode = new AbstractNode(container);
-        propertyChangeSupport = new PropertyChangeSupport(this);
+        propertyChangeSupport = new SwingPropertyChangeSupport(this, true);
 
         displayedColumnsModel = new LinkedHashSet<>();
         displayedColumnsModel.add(Peptide.ID);
@@ -77,7 +77,7 @@ public class AttributesModel {
     }
 
     public boolean removeDisplayedColumn(PeptideAttribute attr) {
-        if (displayedColumnsModel.remove(attr)) {
+        if (displayedColumnsModel.remove(attr)) {            
             propertyChangeSupport.firePropertyChange(DISPLAY_ATTR_REMOVED, attr, null);
             return true;
         }

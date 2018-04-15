@@ -13,6 +13,8 @@ import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.project.ProjectManager;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -29,6 +31,10 @@ public class RemoveFromQueryModel extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        TopComponent tc = WindowManager.getDefault().findTopComponent("QueryExplorerTopComponent");
+        tc.open();
+        tc.requestActive();
+        
         QueryModel queryModel = Lookup.getDefault().lookup(ProjectManager.class).getQueryModel();
         queryModel.remove(metadata);
     }

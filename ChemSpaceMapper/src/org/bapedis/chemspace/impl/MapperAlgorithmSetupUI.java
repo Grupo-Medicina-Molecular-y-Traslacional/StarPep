@@ -22,17 +22,17 @@ import org.openide.util.Lookup;
  */
 public class MapperAlgorithmSetupUI implements AlgorithmSetupUI {
 
-    private final BaseChemSpacePanel networkPanel;
-    private final BaseChemSpacePanel twoDPanel;
+    private final ChemSpacePanel networkPanel;
+    private final ChemSpacePanel twoDPanel;
     private final MapperAlgorithmPanel setupPanel;
 
     public MapperAlgorithmSetupUI() {
         setupPanel = new MapperAlgorithmPanel();
-        twoDPanel = createNetworkPanel();
-        networkPanel = createTwoDPanel();
+        networkPanel = createNetworkPanel();
+        twoDPanel = createTwoDPanel();
     }
 
-    private BaseChemSpacePanel createNetworkPanel() {
+    private ChemSpacePanel createNetworkPanel() {
         List<? extends AlgorithmFactory> factories = new ArrayList<>(Lookup.getDefault().lookupAll(AlgorithmFactory.class));
         for (Iterator<? extends AlgorithmFactory> it = factories.iterator(); it.hasNext();) {
             AlgorithmFactory f = it.next();
@@ -40,10 +40,10 @@ public class MapperAlgorithmSetupUI implements AlgorithmSetupUI {
                 it.remove();
             }
         }
-        return new NetworkPanel(factories);
+        return new ChemSpacePanel(factories);
     }
 
-    private BaseChemSpacePanel createTwoDPanel() {
+    private ChemSpacePanel createTwoDPanel() {
         List<? extends AlgorithmFactory> factories = new ArrayList<>(Lookup.getDefault().lookupAll(AlgorithmFactory.class));
         for (Iterator<? extends AlgorithmFactory> it = factories.iterator(); it.hasNext();) {
             AlgorithmFactory f = it.next();
@@ -52,7 +52,7 @@ public class MapperAlgorithmSetupUI implements AlgorithmSetupUI {
             }
         }
 
-        return new TwoDPanel(factories);
+        return new ChemSpacePanel(factories);
     }
 
     @Override

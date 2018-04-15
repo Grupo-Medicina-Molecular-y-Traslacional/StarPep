@@ -478,7 +478,6 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
             if (selectedAlgorithm.getFactory().getSetupUI() != null) {
                 JPanel settingPanel = selectedAlgorithm.getFactory().getSetupUI().getSettingPanel(selectedAlgorithm);
-                settingPanel.setBorder(BorderFactory.createTitledBorder(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.settingPanel.bordertitle"))); // NOI18N
                 propSheetPanel.setVisible(false);
                 scrollPane.setViewportView(settingPanel);
                 scrollPane.setVisible(true);

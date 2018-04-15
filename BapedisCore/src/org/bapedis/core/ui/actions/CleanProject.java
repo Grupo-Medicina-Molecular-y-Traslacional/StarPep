@@ -21,7 +21,7 @@ import org.openide.util.NbBundle;
         displayName = "#CTL_CleanProject"
 )
 @ActionReferences({
-    @ActionReference(path = "Menu/File", position = 1500),
+    @ActionReference(path = "Menu/File", position = 1320),
     @ActionReference(path = "Toolbars/File", position = 300)
 })
 public class CleanProject implements ActionListener {

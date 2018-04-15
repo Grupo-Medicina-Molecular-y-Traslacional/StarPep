@@ -6,7 +6,6 @@
 package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import org.bapedis.core.io.impl.GraphMLExportPanel;
 import org.bapedis.core.io.impl.GraphMLExporter;
 import org.bapedis.core.model.AttributesModel;
@@ -25,7 +24,7 @@ import org.openide.util.NbBundle.Messages;
 @ActionRegistration(
         displayName = "#CTL_ExportGraph"
 )
-@ActionReference(path = "Menu/File/ExportData", position = 3433)
+@ActionReference(path = "Menu/File/ExportData", position = 400)
 @Messages("CTL_ExportGraph=Graph (GraphML format)")
 public final class ExportGraph extends WorkspaceContextSensitiveAction<AttributesModel> {
 

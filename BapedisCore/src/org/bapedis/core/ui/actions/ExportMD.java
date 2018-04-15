@@ -11,8 +11,6 @@ import org.bapedis.core.io.impl.FileExporterUI;
 import org.bapedis.core.io.impl.MDExporter;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.components.SetupDialog;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;

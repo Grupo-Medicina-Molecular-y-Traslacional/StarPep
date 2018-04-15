@@ -25,8 +25,8 @@ import org.openide.util.NbBundle.Messages;
         iconBase = "org/bapedis/core/resources/select_md.png",
         displayName = "#CTL_FeatureExplorer"
 )
-@ActionReference(path = "Menu/Tools", position = 350)
-@Messages("CTL_FeatureExplorer=Feature Explorer")
+@ActionReference(path = "Menu/Tools/Feature", position = 350)
+@Messages("CTL_FeatureExplorer=Explorer")
 public final class FeatureExplorerAction extends WorkspaceContextSensitiveAction<AttributesModel> {
 
     public FeatureExplorerAction() {

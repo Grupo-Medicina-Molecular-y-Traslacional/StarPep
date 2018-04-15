@@ -23,7 +23,7 @@ import org.bapedis.core.spi.alg.MolecularDescriptorTag;
         displayName = "#CTL_FeatureExtraction"
 )
 @ActionReference(path = "Menu/Tools", position = 200)
-@NbBundle.Messages("CTL_FeatureExtraction=Feature Extraction")
+@NbBundle.Messages("CTL_FeatureExtraction=Molecular Descriptor")
 public class FeatureExtractionAction extends ToolAction{
     
     public FeatureExtractionAction() {

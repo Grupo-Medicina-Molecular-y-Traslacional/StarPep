@@ -7,6 +7,7 @@ package org.bapedis.core.ui;
 
 import java.awt.CardLayout;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -236,7 +237,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             view.setPropertyColumns(new String[]{});
         }
 
-    }
+    }    
 
     private void populateFilterFields(AttributesModel attrModel) {
         jFieldComboBox.removeAllItems();
@@ -587,11 +588,12 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             } else if (evt.getPropertyName().equals(AttributesModel.DISPLAY_ATTR_ADDED)) {
                 PeptideAttribute attr = (PeptideAttribute) evt.getNewValue();
                 jFieldComboBox.addItem(attr);
-                populateVisibleColumns(currentModel);
+                view.addPropertyColumn(attr.getId(), attr.getDisplayName());
             } else if (evt.getPropertyName().equals(AttributesModel.DISPLAY_ATTR_REMOVED)) {
                 PeptideAttribute attr = (PeptideAttribute) evt.getOldValue();
                 jFieldComboBox.removeItem(attr);
-                populateVisibleColumns(currentModel);
+                System.out.println("DispatchThread: " + EventQueue.isDispatchThread());
+                view.removePropertyColumn(attr.getId());
             }
         } else if (evt.getSource() instanceof QueryModel) {
             if (evt.getPropertyName().equals(QueryModel.RUNNING)) {

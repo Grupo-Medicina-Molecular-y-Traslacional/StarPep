@@ -21,7 +21,7 @@ public class RATransitionFactory implements AlgorithmFactory, MolecularDescripto
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(RATransitionFactory.class, "RATransition.category");
     }
 
     @Override

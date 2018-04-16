@@ -21,7 +21,7 @@ public class HydrophobicMomentFactory implements AlgorithmFactory, MolecularDesc
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(HydrophobicMomentFactory.class, "HydrophobicMoment.category");
     }
 
     @Override

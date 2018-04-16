@@ -21,7 +21,7 @@ public class IsoelectricPointFactory implements AlgorithmFactory, MolecularDescr
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(IsoelectricPointFactory.class, "IsoelectricPoint.category");
     }
 
     @Override

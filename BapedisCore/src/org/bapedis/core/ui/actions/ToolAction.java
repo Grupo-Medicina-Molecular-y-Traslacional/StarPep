@@ -83,16 +83,34 @@ public class ToolAction extends WorkspaceContextSensitiveAction<AttributesModel>
                         }
                     }
                 });
+                JMenu menu = factory.getCategory() == null? main: getOrCreateMenu(factory.getCategory());
                 ToolMenuItem toolItem = factory instanceof ToolMenuItem ? (ToolMenuItem) factory : null;
                 if (toolItem != null && toolItem.addSeparatorBefore()) {
-                    main.addSeparator();
+                    menu.addSeparator();
                 }
-                main.add(item);
+                menu.add(item);
                 if (toolItem != null && toolItem.addSeparatorAfter()) {
-                    main.addSeparator();
+                    menu.addSeparator();
                 }
             }
         }
+    }
+
+    private JMenu getOrCreateMenu(String category) {
+        JMenu menu = null;
+        JMenuItem item;
+        for (int i = 0; i < main.getItemCount(); i++) {
+            item = main.getItem(i);
+            if (item instanceof JMenu && item.getName().equals(category)) {
+                menu = (JMenu) item;
+            }
+        }
+        if (menu == null){
+            menu = new JMenu(category);
+            menu.setName(category);
+            main.add(menu);
+        }
+        return menu;
     }
 
     @Override

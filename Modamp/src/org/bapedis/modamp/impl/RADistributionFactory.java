@@ -21,7 +21,7 @@ public class RADistributionFactory implements AlgorithmFactory, MolecularDescrip
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(RADistributionFactory.class, "RADistribution.category");
     }
 
     @Override

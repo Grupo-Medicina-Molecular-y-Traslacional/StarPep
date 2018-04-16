@@ -21,7 +21,7 @@ public class RACompositionFactory implements AlgorithmFactory, MolecularDescript
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(RACompositionFactory.class, "RAComposition.category");
     }
 
     @Override

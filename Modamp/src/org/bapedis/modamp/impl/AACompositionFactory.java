@@ -21,7 +21,7 @@ public class AACompositionFactory implements AlgorithmFactory, MolecularDescript
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(AACompositionFactory.class, "AAComposition.category");
     }
 
     @Override

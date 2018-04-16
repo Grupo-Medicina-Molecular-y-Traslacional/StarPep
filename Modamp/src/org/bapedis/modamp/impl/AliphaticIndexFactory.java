@@ -21,7 +21,7 @@ public class AliphaticIndexFactory implements AlgorithmFactory, MolecularDescrip
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(AliphaticIndexFactory.class, "AliphaticIndex.category");
     }
 
     @Override

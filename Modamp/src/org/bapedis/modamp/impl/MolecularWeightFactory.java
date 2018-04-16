@@ -21,7 +21,7 @@ public class MolecularWeightFactory implements AlgorithmFactory, MolecularDescri
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(MolecularWeightFactory.class, "MolecularWeight.category");
     }
 
     @Override

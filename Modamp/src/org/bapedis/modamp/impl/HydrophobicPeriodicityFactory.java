@@ -21,7 +21,7 @@ public class HydrophobicPeriodicityFactory implements AlgorithmFactory, Molecula
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(HydrophobicPeriodicityFactory.class, "HydrophobicPeriodicity.category");
     }
 
     @Override

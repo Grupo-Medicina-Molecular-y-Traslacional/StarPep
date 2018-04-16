@@ -21,7 +21,7 @@ public class InestabilityIndexFactory implements AlgorithmFactory, MolecularDesc
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(InestabilityIndexFactory.class, "InestabilityIndex.category");
     }
 
     @Override

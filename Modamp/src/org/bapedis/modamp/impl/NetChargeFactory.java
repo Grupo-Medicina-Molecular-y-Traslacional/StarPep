@@ -21,7 +21,7 @@ public class NetChargeFactory implements AlgorithmFactory, MolecularDescriptorTa
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(NetChargeFactory.class, "NetCharge.category");
     }
 
     @Override

@@ -21,7 +21,7 @@ public class BomanIndexFactory implements AlgorithmFactory, MolecularDescriptorT
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(BomanIndexFactory.class, "BomanIndex.category");
     }
 
     @Override

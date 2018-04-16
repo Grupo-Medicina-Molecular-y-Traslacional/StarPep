@@ -21,7 +21,7 @@ public class TripeptideCompositionFactory implements AlgorithmFactory, Molecular
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(TripeptideCompositionFactory.class, "TripeptideComposition.category");
     }
 
     @Override

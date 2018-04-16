@@ -21,7 +21,7 @@ public class AverageHydrophilicityFactory implements AlgorithmFactory, Molecular
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(AverageHydrophilicityFactory.class, "AverageHydrophilicity.category");
     }
 
     @Override

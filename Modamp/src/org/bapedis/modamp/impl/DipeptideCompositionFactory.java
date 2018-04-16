@@ -21,7 +21,7 @@ public class DipeptideCompositionFactory implements AlgorithmFactory, MolecularD
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(DipeptideCompositionFactory.class, "DipeptideComposition.category");
     }
 
     @Override

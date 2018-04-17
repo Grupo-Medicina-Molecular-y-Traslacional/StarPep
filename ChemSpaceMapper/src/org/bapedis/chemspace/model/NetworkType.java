@@ -9,6 +9,6 @@ package org.bapedis.chemspace.model;
  *
  * @author loge
  */
-public enum ChemSpaceOption {
-    NONE, N_DIMENSIONAL_SPACE, CHEM_SPACE_NETWORK
+public enum NetworkType {
+    NONE, FULL, STOCHASTIC, COMPRESSED
 }

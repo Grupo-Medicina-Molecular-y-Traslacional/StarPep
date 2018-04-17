@@ -25,10 +25,10 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author loge
  */
-@ServiceProvider(service = AlgorithmFactory.class)
+@ServiceProvider(service = AlgorithmFactory.class, position = 0)
 public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
 
-    private MapperAlgorithmSetupUI setupUI;
+    private MapperAlgorithmPanel setupUI = new MapperAlgorithmPanel();
     
     @Override
     public String getCategory() {
@@ -47,9 +47,6 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        if (setupUI == null){
-           setupUI  = new MapperAlgorithmSetupUI();
-        }
         return setupUI;
     }
 
@@ -93,11 +90,10 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
         //Chemical Space Embbeder
         AbstractEmbedder embedder;
         switch(csOption){
-            case N_DIMENSIONAL:
+            case N_DIMENSIONAL_SPACE:
                 embedder = (TwoDEmbedder)wiz.getProperty(TwoDEmbedder.class.getName());
                 break;
-            case FULL_NETWORK:
-            case COMPRESSED_NETWORK:
+            case CHEM_SPACE_NETWORK:
                 embedder = (NetworkEmbedder)wiz.getProperty(NetworkEmbedder.class.getName());
                 break;
             default:

@@ -52,7 +52,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Helder Suzuki <heldersuzuki@gephi.org>
  */
-@ServiceProvider(service = AlgorithmFactory.class)
+@ServiceProvider(service = AlgorithmFactory.class, position = 500)
 public class YifanHuFactory extends AbstractLayoutFactory {
 
     @Override

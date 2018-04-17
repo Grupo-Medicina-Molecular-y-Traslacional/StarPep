@@ -41,8 +41,6 @@
  */
 package org.gephi.layout.plugin.scale;
 
-import org.bapedis.chemspace.spi.NDChemSpaceTag;
-import org.bapedis.chemspace.spi.NetworkChemSpaceTag;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.gephi.layout.plugin.AbstractLayoutFactory;
@@ -53,8 +51,8 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Helder Suzuki <heldersuzuki@gephi.org>>
  */
-@ServiceProvider(service = AlgorithmFactory.class)
-public class ExpandFactory extends AbstractLayoutFactory implements NDChemSpaceTag, NetworkChemSpaceTag{
+@ServiceProvider(service = AlgorithmFactory.class, position = 50)
+public class ExpandFactory extends AbstractLayoutFactory{
 
     @Override
     public String getName() {

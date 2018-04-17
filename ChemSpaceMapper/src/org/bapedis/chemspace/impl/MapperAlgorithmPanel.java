@@ -8,7 +8,12 @@ package org.bapedis.chemspace.impl;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
+import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import org.bapedis.chemspace.model.ChemSpaceOption;
+import org.bapedis.chemspace.model.NetworkType;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXHyperlink;
 import org.openide.DialogDisplayer;
@@ -20,11 +25,13 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class MapperAlgorithmPanel extends javax.swing.JPanel {
+public class MapperAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
 
     protected final JXHyperlink openWizardLink;
     protected final JXBusyLabel busyLabel;
     protected MapperAlgorithm csMapper;
+    protected final ChemSpaceNetworkPanel networkPanel;
+    protected final NDChemSpacePanel nDPanel;
 
     /**
      * Creates new form MapperAlgorithmPanel
@@ -38,6 +45,12 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel {
 
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        nDPanel = new NDChemSpacePanel();
+        centerPanel.add(nDPanel, "nDChemSpace");
+
+        networkPanel = new ChemSpaceNetworkPanel();
+        centerPanel.add(networkPanel, "chemSpaceNetwork");        
     }
 
     private void configureOpenWizardLink() {
@@ -53,20 +66,37 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel {
                     WizardDescriptor wiz = MapperAlgorithmFactory.createWizardDescriptor(csMapper);
                     if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
                         MapperAlgorithmFactory.setUp(csMapper, wiz);
-                        setCheSMapperAlg(csMapper);
-                        MapperAlgorithmSetupUI setupUI = (MapperAlgorithmSetupUI) csMapper.getFactory().getSetupUI();
-                        switch (csMapper.getChemSpaceOption()) {
-                            case N_DIMENSIONAL:
-                                addChemSpacePanel(setupUI.getTwoDPanel());
-                                break;
-                            case FULL_NETWORK:
-                            case COMPRESSED_NETWORK:
-                                addChemSpacePanel(setupUI.getNetworkPanel());
-                        }
+                        refreshChemSpaceOption();
                     }
                 }
             }
         });
+    }
+
+
+        
+    private void refreshChemSpaceOption() {
+        CardLayout centerCL = (CardLayout) centerPanel.getLayout();
+        CardLayout topLeftCl = (CardLayout) topLeftPanel.getLayout();
+        switch (csMapper.getChemSpaceOption()) {
+            case N_DIMENSIONAL_SPACE:
+                nDPanel.setUp(csMapper);
+                topLeftCl.show(topLeftPanel, "nDChemSpace");
+                centerCL.show(centerPanel, "nDChemSpace");
+                break;
+            case CHEM_SPACE_NETWORK:
+                networkPanel.setUp(csMapper);
+                topLeftCl.show(topLeftPanel, "chemSpaceNetwork");
+                centerCL.show(centerPanel, "chemSpaceNetwork");
+                break;
+        }
+    }
+
+    @Override
+    public JPanel getSettingPanel(Algorithm algo) {
+        this.csMapper = (MapperAlgorithm) algo;
+        refreshChemSpaceOption();
+        return this;
     }
 
     @Override
@@ -75,8 +105,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel {
         openWizardLink.setEnabled(enabled);
         centerPanel.setEnabled(enabled);
     }
-    
-    
 
     public void setBusy(boolean busy) {
         busyLabel.setBusy(busy);
@@ -92,31 +120,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel {
         return csMapper;
     }
 
-    public void setCheSMapperAlg(MapperAlgorithm csMapper) {
-        this.csMapper = csMapper;
-        CardLayout cl = (CardLayout) topLeftPanel.getLayout();             
-        switch (csMapper.getChemSpaceOption()) {
-            case N_DIMENSIONAL:
-                cl.show(topLeftPanel, "nDChemSpace");   
-                break;
-            case FULL_NETWORK:
-                cl.show(topLeftPanel, "chemSpaceNetwork");   
-                break;
-            case COMPRESSED_NETWORK:
-                cl.show(topLeftPanel, "compressedChemSpaceNetwork");
-                break;
-        }        
-    }
-
-    public void addChemSpacePanel(ChemSpacePanel csPanel) {
-        centerPanel.removeAll();
-        if (csPanel != null) {
-            centerPanel.add(csPanel, BorderLayout.CENTER);
-            centerPanel.revalidate();
-            centerPanel.repaint();
-        }
-    }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -130,7 +133,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel {
         topLeftPanel = new javax.swing.JPanel();
         nDLabel = new javax.swing.JLabel();
         csnLabel = new javax.swing.JLabel();
-        ccsnLabel = new javax.swing.JLabel();
         topRightPanel = new javax.swing.JPanel();
         centerPanel = new javax.swing.JPanel();
 
@@ -147,11 +149,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(csnLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.csnLabel.text")); // NOI18N
         csnLabel.setToolTipText(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.csnLabel.toolTipText")); // NOI18N
         topLeftPanel.add(csnLabel, "chemSpaceNetwork");
-
-        ccsnLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(ccsnLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.ccsnLabel.text")); // NOI18N
-        ccsnLabel.setToolTipText(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.ccsnLabel.toolTipText")); // NOI18N
-        topLeftPanel.add(ccsnLabel, "compressedChemSpaceNetwork");
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -170,7 +167,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
         add(topRightPanel, gridBagConstraints);
 
-        centerPanel.setLayout(new java.awt.BorderLayout());
+        centerPanel.setLayout(new java.awt.CardLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -184,11 +181,11 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel ccsnLabel;
     private javax.swing.JPanel centerPanel;
     private javax.swing.JLabel csnLabel;
     private javax.swing.JLabel nDLabel;
     private javax.swing.JPanel topLeftPanel;
     private javax.swing.JPanel topRightPanel;
     // End of variables declaration//GEN-END:variables
+
 }

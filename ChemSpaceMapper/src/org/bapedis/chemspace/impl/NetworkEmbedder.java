@@ -6,6 +6,8 @@
 package org.bapedis.chemspace.impl;
 
 import java.util.concurrent.ForkJoinPool;
+import org.bapedis.chemspace.model.CompressedModel;
+import org.bapedis.chemspace.model.NetworkType;
 import org.bapedis.chemspace.model.SimilarityMatrix;
 import org.bapedis.chemspace.spi.SimilarityMeasure;
 import org.bapedis.chemspace.spi.impl.TanimotoCoefficientFactory;
@@ -25,10 +27,14 @@ public class NetworkEmbedder extends AbstractEmbedder {
     private static final ForkJoinPool fjPool = new ForkJoinPool();
     private SimilarityMeasure simMeasure;
     private SimilarityMatrix similarityMatrix;
+    private NetworkType networkType;
+    private CompressedModel compressedModel;
 
     public NetworkEmbedder(NetworkEmbedderFactory factory) {
         super(factory);
         simMeasure = new TanimotoCoefficientFactory().createAlgorithm();
+        networkType = NetworkType.NONE;
+        compressedModel = new CompressedModel();
     }
 
     public SimilarityMeasure getSimMeasure() {
@@ -42,6 +48,22 @@ public class NetworkEmbedder extends AbstractEmbedder {
     public SimilarityMatrix getSimilarityMatrix() {
         return similarityMatrix;
     }
+
+    public NetworkType getNetworkType() {
+        return networkType;
+    }
+
+    public void setNetworkType(NetworkType networkType) {
+        this.networkType = networkType;
+    }        
+
+    public CompressedModel getCompressedModel() {
+        return compressedModel;
+    }
+
+    public void setCompressedModel(CompressedModel compressedModel) {
+        this.compressedModel = compressedModel;
+    }        
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
@@ -64,7 +86,7 @@ public class NetworkEmbedder extends AbstractEmbedder {
         ticket.switchToDeterminate(workunits);
         fjPool.invoke(task);
         task.join();
-        similarityMatrix = task.getSimilarityMatrix();        
+        similarityMatrix = task.getSimilarityMatrix();                 
     }
 
     @Override

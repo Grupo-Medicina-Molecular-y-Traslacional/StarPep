@@ -7,7 +7,6 @@ package org.bapedis.chemspace.model;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import static org.bapedis.core.model.AlgorithmModel.CHANGED_ALGORITHM;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.alg.Algorithm;
 
@@ -15,7 +14,7 @@ import org.bapedis.core.spi.alg.Algorithm;
  *
  * @author loge
  */
-public class EmbedderModel {
+public class ChemSpaceModel {
     protected final Workspace workspace;
     protected Algorithm selectedAlgorithm;
     protected transient final PropertyChangeSupport propertyChangeSupport;
@@ -23,7 +22,7 @@ public class EmbedderModel {
     public static final String RUNNING = "RUNNING";
     private boolean running;
 
-    public EmbedderModel(Workspace workspace) {
+    public ChemSpaceModel(Workspace workspace) {
         this.workspace = workspace;
         propertyChangeSupport = new PropertyChangeSupport(this);
         running = false;

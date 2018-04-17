@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -265,16 +264,20 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
     private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
         Workspace currentWs = pc.getCurrentWorkspace();
-        AlgorithmModel algoModel = pc.getAlgorithmModel();
-        Algorithm oldAlgo = algoModel.getSelectedAlgorithm();
-        AlgorithmFactory factory;
-        if (algoComboBox.getSelectedItem() instanceof AlgorithmFactoryItem) {
-            factory = ((AlgorithmFactoryItem) algoComboBox.getSelectedItem()).getFactory();
-            Algorithm newAlgo = factory.createAlgorithm();
-            if (newAlgo != null) {
-                currentWs.remove(oldAlgo);
-                currentWs.add(newAlgo);
-                algoModel.setSelectedAlgorithm(newAlgo);
+        if (currentWs.isBusy()) {
+            DialogDisplayer.getDefault().notify(currentWs.getBusyNotifyDescriptor());
+        } else {
+            AlgorithmModel algoModel = pc.getAlgorithmModel();
+            Algorithm oldAlgo = algoModel.getSelectedAlgorithm();
+            AlgorithmFactory factory;
+            if (algoComboBox.getSelectedItem() instanceof AlgorithmFactoryItem) {
+                factory = ((AlgorithmFactoryItem) algoComboBox.getSelectedItem()).getFactory();
+                Algorithm newAlgo = factory.createAlgorithm();
+                if (newAlgo != null) {
+                    currentWs.remove(oldAlgo);
+                    currentWs.add(newAlgo);
+                    algoModel.setSelectedAlgorithm(newAlgo);
+                }
             }
         }
     }//GEN-LAST:event_resetButtonActionPerformed

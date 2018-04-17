@@ -7,6 +7,7 @@ package org.bapedis.chemspace.impl;
 
 import java.util.LinkedList;
 import java.util.List;
+import org.bapedis.chemspace.model.ChemSpaceModel;
 import org.bapedis.chemspace.model.FeatureFilteringOption;
 import org.bapedis.chemspace.model.FeatureWeightingOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
@@ -42,7 +43,7 @@ public class MapperAlgorithm implements Algorithm {
     protected ChemSpaceOption csOption;
     protected FeatureExtractionOption feOption;
     protected FeatureFilteringOption ffOption;
-    protected FeatureWeightingOption fwOption;
+    protected FeatureWeightingOption fwOption;      
 
     // Algorithms    
     private AllDescriptors featureExtractionAlg;
@@ -52,7 +53,7 @@ public class MapperAlgorithm implements Algorithm {
 
     //Algorithm workflow
     private final List<Algorithm> algorithms;
-    private Algorithm currentAlg;
+    private Algorithm currentAlg;   
 
     public MapperAlgorithm(MapperAlgorithmFactory factory) {
         this.factory = factory;
@@ -135,7 +136,7 @@ public class MapperAlgorithm implements Algorithm {
     public void setChemSpaceOption(ChemSpaceOption csOption) {
         this.csOption = csOption;
     }
-
+    
     public FeatureExtractionOption getFEOption() {
         return feOption;
     }

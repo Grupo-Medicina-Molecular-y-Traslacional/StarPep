@@ -9,6 +9,6 @@ package org.bapedis.chemspace.spi;
  *
  * @author loge
  */
-public interface ChemSpaceNetworkTag {
+public interface NetworkChemSpaceTag {
     
 }

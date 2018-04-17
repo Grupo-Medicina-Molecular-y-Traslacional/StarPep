@@ -41,6 +41,7 @@
  */
 package org.gephi.layout.plugin.fruchterman;
 
+import org.bapedis.chemspace.spi.NetworkChemSpaceTag;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.gephi.layout.plugin.AbstractLayoutFactory;
@@ -52,7 +53,7 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Mathieu Bastian
  */
 @ServiceProvider(service = AlgorithmFactory.class)
-public class FruchtermanReingoldFactory extends AbstractLayoutFactory {
+public class FruchtermanReingoldFactory extends AbstractLayoutFactory implements NetworkChemSpaceTag{
 
     @Override
     public String getName() {

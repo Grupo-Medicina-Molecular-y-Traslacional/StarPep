@@ -13,13 +13,17 @@ import javax.swing.event.EventListenerList;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.impl.NetworkEmbedder;
 import org.bapedis.chemspace.model.ChemSpaceOption;
+import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.project.ProjectManager;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<WizardDescriptor>, PropertyChangeListener {
 
+    private final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private final MapperAlgorithm csMapper;
     private boolean isValid;
     private final EventListenerList listeners;
@@ -91,9 +95,13 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(VisualRepresentation.CHANGED_OPTION)) {
-            boolean oldState = isValid;
+        boolean oldState = isValid;
+        if (evt.getPropertyName().equals(VisualRepresentation.CHANGED_CHEM_SPACE)) {
             switch ((ChemSpaceOption) evt.getNewValue()) {
+//                case FULL_NETWORK:
+//                    AttributesModel attrModel = pc.getAttributesModel();
+//                    isValid = attrModel.getPeptides().size() <= NetworkEmbedder.MAX_NODES;                    
+//                    break;                
                 case NONE:
                     isValid = false;
                     break;
@@ -101,11 +109,14 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
                     isValid = true;
                     break;
             }
-            if (oldState != isValid) {
-                ChangeEvent srcEvt = new ChangeEvent(evt);
-                for (ChangeListener listener : listeners.getListeners(ChangeListener.class)) {
-                    listener.stateChanged(srcEvt);
-                }
+
+        } else if (evt.getPropertyName().equals(VisualRepresentation.CHANGED_NETWORK_TYPE)) {
+            
+        }
+        if (oldState != isValid) {
+            ChangeEvent srcEvt = new ChangeEvent(evt);
+            for (ChangeListener listener : listeners.getListeners(ChangeListener.class)) {
+                listener.stateChanged(srcEvt);
             }
         }
     }
@@ -113,6 +124,12 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
     @Override
     public void validate() throws WizardValidationException {
         switch (component.getChemSpaceOption()) {
+            case CHEM_SPACE_NETWORK:            
+                AttributesModel attrModel = pc.getAttributesModel();
+                if (attrModel.getPeptides().size() > NetworkEmbedder.MAX_NODES) {
+                    throw new WizardValidationException(component, NbBundle.getMessage(WizardFeatureExtraction.class, "VisualRepresentation.invalidFullNetwork.text", String.valueOf(NetworkEmbedder.MAX_NODES)), null);
+                }
+                break;                
             case NONE:
                 throw new WizardValidationException(component, NbBundle.getMessage(WizardFeatureExtraction.class, "VisualRepresentation.invalidOption.text", String.valueOf(NetworkEmbedder.MAX_NODES)), null);
         }

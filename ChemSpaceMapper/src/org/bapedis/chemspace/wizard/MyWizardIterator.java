@@ -175,7 +175,7 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(VisualRepresentation.CHANGED_OPTION)) {
+        if (evt.getPropertyName().equals(VisualRepresentation.CHANGED_CHEM_SPACE)) {
             setChemSpaceOption((ChemSpaceOption) evt.getNewValue());
         }
     }

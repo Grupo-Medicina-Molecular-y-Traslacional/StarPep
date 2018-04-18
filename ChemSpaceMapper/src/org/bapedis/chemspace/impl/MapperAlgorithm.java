@@ -7,7 +7,6 @@ package org.bapedis.chemspace.impl;
 
 import java.util.LinkedList;
 import java.util.List;
-import org.bapedis.chemspace.model.ChemSpaceModel;
 import org.bapedis.chemspace.model.FeatureFilteringOption;
 import org.bapedis.chemspace.model.FeatureWeightingOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;

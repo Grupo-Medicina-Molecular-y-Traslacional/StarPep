@@ -27,13 +27,15 @@ public class NetworkEmbedder extends AbstractEmbedder {
     private static final ForkJoinPool fjPool = new ForkJoinPool();
     private SimilarityMeasure simMeasure;
     private SimilarityMatrix similarityMatrix;
+    private float similarityThreshold;
     private NetworkType networkType;
     private CompressedModel compressedModel;
 
     public NetworkEmbedder(NetworkEmbedderFactory factory) {
         super(factory);
         simMeasure = new TanimotoCoefficientFactory().createAlgorithm();
-        networkType = NetworkType.NONE;
+        similarityThreshold = 0.7f;
+        networkType = NetworkType.FULL;
         compressedModel = new CompressedModel();
     }
 
@@ -44,6 +46,14 @@ public class NetworkEmbedder extends AbstractEmbedder {
     public void setSimMeasure(SimilarityMeasure simMeasure) {
         this.simMeasure = simMeasure;
     }
+
+    public float getSimilarityThreshold() {
+        return similarityThreshold;
+    }
+
+    public void setSimilarityThreshold(float similarityThreshold) {
+        this.similarityThreshold = similarityThreshold;
+    }        
 
     public SimilarityMatrix getSimilarityMatrix() {
         return similarityMatrix;

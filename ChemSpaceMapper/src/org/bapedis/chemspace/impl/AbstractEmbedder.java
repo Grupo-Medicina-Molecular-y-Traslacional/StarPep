@@ -8,7 +8,6 @@ package org.bapedis.chemspace.impl;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import org.bapedis.chemspace.model.ChemSpaceModel;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
@@ -40,7 +39,6 @@ public abstract class AbstractEmbedder implements Algorithm, Cloneable {
     protected GraphModel graphModel;
     protected Graph graph;
     protected ProgressTicket ticket;
-    protected ChemSpaceModel embedderModel;
     protected boolean stopRun;
     protected final NotifyDescriptor notEnoughFeatures;
     
@@ -48,15 +46,7 @@ public abstract class AbstractEmbedder implements Algorithm, Cloneable {
     public AbstractEmbedder(AlgorithmFactory factory) {
         this.factory = factory;
         notEnoughFeatures = new NotifyDescriptor.Message(NbBundle.getMessage(AbstractEmbedder.class, "AbstractEmbedder.features.notEnoughHTML"), NotifyDescriptor.ERROR_MESSAGE);        
-    }
-    
-    public ChemSpaceModel getEmbedderModel() {
-        return embedderModel;
-    }    
-
-    public void setEmbedderModel(ChemSpaceModel embedderModel) {
-        this.embedderModel = embedderModel;
-    }    
+    }     
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {

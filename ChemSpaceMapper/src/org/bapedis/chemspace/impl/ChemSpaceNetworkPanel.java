@@ -5,6 +5,9 @@
  */
 package org.bapedis.chemspace.impl;
 
+import java.util.Hashtable;
+import javax.swing.JLabel;
+
 /**
  *
  * @author loge
@@ -18,18 +21,24 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel {
      */
     public ChemSpaceNetworkPanel() {
         initComponents();
+        
+        Hashtable<Integer, JLabel> thresholdLabelTable = new Hashtable<>();
+        thresholdLabelTable.put(50, new JLabel("0.5"));
+        thresholdLabelTable.put(60, new JLabel("0.6"));
+        thresholdLabelTable.put(70, new JLabel("0.7"));
+        thresholdLabelTable.put(80, new JLabel("0.8"));
+        thresholdLabelTable.put(90, new JLabel("0.9"));
+        thresholdLabelTable.put(100, new JLabel("1"));
+        cutoffSlider.setLabelTable(thresholdLabelTable);
     }
 
     public void setUp(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
-        refreshOptions();
-    }
-
-    private void refreshOptions() {
         NetworkEmbedder embedder = (NetworkEmbedder) csMapper.getChemSpaceEmbedderAlg();
+        float similarityThreshold = embedder.getSimilarityThreshold();
+        jCutoffValueLabel.setText(String.valueOf(similarityThreshold));
+        cutoffSlider.setValue((int)(similarityThreshold*100));
     }
-
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -175,7 +184,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 5, 5);
         add(thresholdPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -204,7 +213,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jLessCutoffButtonActionPerformed
 
     private void cutoffSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_cutoffSliderStateChanged
-        jCutoffValueLabel.setText(cutoffSlider.getValue() + "%");
+        jCutoffValueLabel.setText(String.valueOf(cutoffSlider.getValue()/100.f));
     }//GEN-LAST:event_cutoffSliderStateChanged
 
     private void jMoreCutoffButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMoreCutoffButtonActionPerformed

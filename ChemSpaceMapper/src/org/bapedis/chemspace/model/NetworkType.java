@@ -10,5 +10,5 @@ package org.bapedis.chemspace.model;
  * @author loge
  */
 public enum NetworkType {
-    NONE, FULL, STOCHASTIC, COMPRESSED
+    FULL, COMPRESSED
 }

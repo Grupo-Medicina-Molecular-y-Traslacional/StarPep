@@ -7,8 +7,10 @@ package org.bapedis.chemspace.impl;
 
 import java.text.MessageFormat;
 import org.bapedis.chemspace.model.ChemSpaceOption;
+import org.bapedis.chemspace.model.CompressedModel;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.FeatureFilteringOption;
+import org.bapedis.chemspace.model.NetworkType;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
@@ -94,7 +96,14 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
                 embedder = (TwoDEmbedder)wiz.getProperty(TwoDEmbedder.class.getName());
                 break;
             case CHEM_SPACE_NETWORK:
-                embedder = (NetworkEmbedder)wiz.getProperty(NetworkEmbedder.class.getName());
+                NetworkEmbedder networkEmbedder = (NetworkEmbedder)wiz.getProperty(NetworkEmbedder.class.getName());
+                embedder = networkEmbedder;
+                networkEmbedder.setNetworkType((NetworkType)wiz.getProperty(NetworkType.class.getName()));
+                switch(networkEmbedder.getNetworkType()){
+                    case COMPRESSED:
+                        networkEmbedder.setCompressedModel((CompressedModel)wiz.getProperty(CompressedModel.class.getName()));
+                        break;
+                }                
                 break;
             default:
                 embedder = null;

@@ -9,9 +9,9 @@ package org.bapedis.chemspace.model;
  *
  * @author loge
  */
-public class CompressedModel {
+public class CompressedModel implements Cloneable{
     public static final int COMMUNITY_INDEX=0;
-    public static final int DEFAULT_MAX_SUPER_NODES=50;
+    public static final int DEFAULT_MAX_SUPER_NODES=1000;
     
     private int strategyIndex;
     private int maxSuperNodes;
@@ -36,5 +36,11 @@ public class CompressedModel {
     public void setMaxSuperNodes(int maxSuperNodes) {
         this.maxSuperNodes = maxSuperNodes;
     }
-        
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone(); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
 }

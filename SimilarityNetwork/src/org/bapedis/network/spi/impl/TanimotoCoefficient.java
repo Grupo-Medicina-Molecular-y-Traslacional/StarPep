@@ -10,14 +10,25 @@ import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.network.spi.SimilarityMeasure;
+import org.bapedis.network.spi.SimilarityMeasureFactory;
 
 /**
  *
  * @author loge
  */
 public class TanimotoCoefficient implements SimilarityMeasure {
+    private final TanimotoCoefficientFactory factory;
     protected List<MolecularDescriptor> featureList;
     protected int normalizationIndex = 1;
+
+    public TanimotoCoefficient(TanimotoCoefficientFactory factory) {
+        this.factory = factory;
+    }
+    
+    @Override
+    public SimilarityMeasureFactory getFactory() {
+        return factory;
+    }    
     
     @Override
     public void setMolecularDescriptors(List<MolecularDescriptor> featureList) {

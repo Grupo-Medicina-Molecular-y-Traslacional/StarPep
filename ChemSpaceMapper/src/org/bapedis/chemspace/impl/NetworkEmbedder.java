@@ -5,6 +5,8 @@
  */
 package org.bapedis.chemspace.impl;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.concurrent.ForkJoinPool;
 import org.bapedis.chemspace.model.CompressedModel;
 import org.bapedis.chemspace.model.NetworkType;
@@ -14,7 +16,12 @@ import org.bapedis.chemspace.spi.impl.TanimotoCoefficientFactory;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.task.ProgressTicket;
+import org.gephi.graph.api.Edge;
+import org.gephi.graph.api.Graph;
+import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.Node;
 
 /**
  *
@@ -25,6 +32,8 @@ public class NetworkEmbedder extends AbstractEmbedder {
     public static final int MAX_EDGES=100000;
     
     private static final ForkJoinPool fjPool = new ForkJoinPool();
+    protected final PropertyChangeSupport propertyChangeSupport;
+    static final String CHANGED_THRESHOLD = "threshold";
     private SimilarityMeasure simMeasure;
     private SimilarityMatrix similarityMatrix;
     private float similarityThreshold;
@@ -37,6 +46,7 @@ public class NetworkEmbedder extends AbstractEmbedder {
         similarityThreshold = 0.7f;
         networkType = NetworkType.FULL;
         compressedModel = new CompressedModel();
+        propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
     public SimilarityMeasure getSimMeasure() {
@@ -52,7 +62,9 @@ public class NetworkEmbedder extends AbstractEmbedder {
     }
 
     public void setSimilarityThreshold(float similarityThreshold) {
+        float oldThreshold = this.similarityThreshold;
         this.similarityThreshold = similarityThreshold;
+        propertyChangeSupport.firePropertyChange(CHANGED_THRESHOLD, oldThreshold, similarityThreshold);
     }        
 
     public SimilarityMatrix getSimilarityMatrix() {
@@ -96,8 +108,81 @@ public class NetworkEmbedder extends AbstractEmbedder {
         ticket.switchToDeterminate(workunits);
         fjPool.invoke(task);
         task.join();
-        similarityMatrix = task.getSimilarityMatrix();                 
+        similarityMatrix = task.getSimilarityMatrix(); 
+        
+        switch(networkType){
+            case FULL:
+                createFullNetwork();
+                break;
+            case COMPRESSED:
+                break;
+        }
+    }     
+    
+    private void createFullNetwork(){
+        Peptide[] peptides = similarityMatrix.getPeptides();
+        clearGraph(graphModel);   
+        Edge graphEdge;
+        Float score;
+        String id;
+        for (int i = 0; i < peptides.length - 1 && !stopRun; i++) {
+            for (int j = i + 1; j < peptides.length && !stopRun; j++) {
+                score = similarityMatrix.getValue(peptides[i], peptides[j]);
+                if (score != null && score >= similarityThreshold) {
+                    if (graph.contains(peptides[i].getGraphNode()) && graph.contains(peptides[j].getGraphNode())) {
+                        id = String.format("%s-%s", peptides[i].getId(), peptides[j].getId());
+                        graphEdge = createGraphEdge(graphModel, id, peptides[i].getGraphNode(), peptides[j].getGraphNode(), score);
+                        graph.writeLock();
+                        try {
+                            graph.addEdge(graphEdge);
+                        } finally {
+                            graph.writeUnlock();
+                        }
+                    }
+                }
+            }
+        }    
     }
+    
+    public static void clearGraph(GraphModel graphModel) {
+        // Remove all similarity edges..
+        int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+        Graph mainGraph = graphModel.getGraph();
+        mainGraph.writeLock();
+        try {
+            for (Node node : mainGraph.getNodes()) {
+                mainGraph.clearEdges(node, relType);
+            }
+        } finally {
+            mainGraph.writeUnlock();
+        }
+    }   
+
+    public static Edge createGraphEdge(GraphModel graphModel, String id, Node node1, Node node2, Float score) {
+        int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+        
+        // Create Edge
+        Edge graphEdge = graphModel.factory().newEdge(id, node1, node2, relType, ProjectManager.GRAPH_EDGE_WEIGHT, false);
+        graphEdge.setLabel(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+
+        //Set color
+        graphEdge.setR(ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f);
+        graphEdge.setG(ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f);
+        graphEdge.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
+        graphEdge.setAlpha(0f);
+
+        // Add edge to main graph
+        Graph mainGraph = graphModel.getGraph();
+        mainGraph.writeLock();
+        try {
+            mainGraph.addEdge(graphEdge);
+            graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, score);
+        } finally {
+            mainGraph.writeUnlock();
+        }
+
+        return graphEdge;
+    }    
 
     @Override
     public void endAlgo() {
@@ -109,10 +194,25 @@ public class NetworkEmbedder extends AbstractEmbedder {
     }
 
     @Override
+    public Object clone() throws CloneNotSupportedException {
+        NetworkEmbedder copy = (NetworkEmbedder) super.clone(); //To change body of generated methods, choose Tools | Templates.
+        copy.compressedModel = (CompressedModel)compressedModel.clone();
+        return copy;
+    }
+        
+    @Override
     public boolean cancel() {
         super.cancel();
         SimilarityMatrixkBuilder.setStopRun(stopRun);
         return stopRun;
-    }       
+    }      
+    
+    public void addThresholdListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removeThresholdListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }      
 
 }

@@ -15,6 +15,8 @@ import org.bapedis.core.model.Peptide;
  */
 public interface SimilarityMeasure {
 
+    SimilarityMeasureFactory getFactory();
+    
     void setMolecularFeatures(MolecularDescriptor[] features);
     
     float computeSimilarity(Peptide peptide1, Peptide peptide2) throws MolecularDescriptorNotFoundException;

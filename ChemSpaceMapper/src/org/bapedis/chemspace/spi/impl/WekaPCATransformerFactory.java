@@ -35,7 +35,7 @@ public class WekaPCATransformerFactory implements TwoDTransformerFactory{
 
     @Override
     public TwoDTransformer createAlgorithm() {
-        return new WekaPCATransformer();
+        return new WekaPCATransformer(this);
     }
     
 }

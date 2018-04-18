@@ -15,8 +15,18 @@ import org.bapedis.core.model.Peptide;
  * @author loge
  */
 public class TanimotoCoefficient implements SimilarityMeasure {
+    private final TanimotoCoefficientFactory factory;    
     protected MolecularDescriptor[] features;
     protected int normalizationIndex = 1;
+    
+    public TanimotoCoefficient(TanimotoCoefficientFactory factory) {
+        this.factory = factory;
+    }
+    
+    @Override
+    public TanimotoCoefficientFactory getFactory() {
+        return factory;
+    }   
     
     @Override
     public void setMolecularFeatures(MolecularDescriptor[] features) {

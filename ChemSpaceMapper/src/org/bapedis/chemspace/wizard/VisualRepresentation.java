@@ -8,24 +8,21 @@ package org.bapedis.chemspace.wizard;
 import java.awt.CardLayout;
 import javax.swing.JPanel;
 import org.bapedis.chemspace.model.ChemSpaceOption;
-import org.bapedis.chemspace.model.CompressedModel;
 import org.bapedis.chemspace.model.NetworkType;
 import org.openide.util.NbBundle;
 
 public final class VisualRepresentation extends JPanel {
 
     static final String CHANGED_CHEM_SPACE = "chemspace";
-    static final String CHANGED_NETWORK_TYPE = "network";
     private ChemSpaceOption csOption;
     private NetworkType networkType;
-    private CompressedModel compressedModel;
+    private int compressedStrategyIndex, compressedMaxSuperNodes;
 
     public VisualRepresentation() {
         initComponents();
         networkType = NetworkType.FULL;
-        setNetworkType(networkType);
-        compressedModel = new CompressedModel();
-        setCompressedModel(compressedModel);
+        compressedStrategyIndex = 0;
+        compressedMaxSuperNodes = 1000;
     }
 
     public ChemSpaceOption getChemSpaceOption() {
@@ -50,21 +47,24 @@ public final class VisualRepresentation extends JPanel {
                 break;
             case NONE:
                 jOption1.setSelected(false);
-                jOption2.setSelected(false);
-                refreshOptionPanel(false);
+                jOption2.setSelected(false);                
                 extLabel.setText(NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.extLabel.text"));
         }
         firePropertyChange(CHANGED_CHEM_SPACE, oldOption, csOption);
+        refreshNetworkOptionPanel(jOption2.isSelected());
     }
 
     public NetworkType getNetworkType() {
         return networkType;
     }
 
-    public void setNetworkType(NetworkType type) {
-        CardLayout optionSettingCL = (CardLayout) optionSettingPanel.getLayout();
-        NetworkType oldtype = this.networkType;
-        this.networkType = type;
+    public void setNetworkType(NetworkType networkType) {
+        this.networkType = networkType;
+        refeshNetworkType();
+    }        
+
+    private void refeshNetworkType() {
+        CardLayout optionSettingCL = (CardLayout) optionSettingPanel.getLayout();        
         switch (networkType) {
             case FULL:
                 if (!jOptionFN.isSelected()) {
@@ -79,22 +79,29 @@ public final class VisualRepresentation extends JPanel {
                 optionSettingCL.show(optionSettingPanel, "compressed");
                 break;            
         }
-        firePropertyChange(CHANGED_NETWORK_TYPE, oldtype, networkType);
     }
 
-    public CompressedModel getCompressedModel() {
-        return compressedModel;
+    public int getCompressedStrategyIndex() {
+        return compressedStrategyIndex;
     }
 
-    public void setCompressedModel(CompressedModel compressedModel) {
-        this.compressedModel = compressedModel;
-        if (jOptionCN_1_Items.getSelectedIndex() != compressedModel.getStrategyIndex()) {
-            jOptionCN_1_Items.setSelectedIndex(compressedModel.getStrategyIndex());
-        }
-        String val = String.valueOf(compressedModel.getMaxSuperNodes());
+    public void setCompressedStrategyIndex(int compressedStrategyIndex) {
+        this.compressedStrategyIndex = compressedStrategyIndex;
+        if (jOptionCN_1_Items.getSelectedIndex() != compressedStrategyIndex) {
+            jOptionCN_1_Items.setSelectedIndex(compressedStrategyIndex);
+        }        
+    }
+
+    public int getCompressedMaxSuperNodes() {
+        return compressedMaxSuperNodes;
+    }
+
+    public void setCompressedMaxSuperNodes(int maxSuperNodes) {
+        this.compressedMaxSuperNodes = maxSuperNodes;
+        String val = String.valueOf(maxSuperNodes);
         if (!jOptionCN_2_Items.getSelectedItem().equals(val)) {
             jOptionCN_2_Items.setSelectedItem(val);
-        }
+        }        
     }
 
     @Override
@@ -102,11 +109,12 @@ public final class VisualRepresentation extends JPanel {
         return NbBundle.getMessage(VisualRepresentation.class, "ChemSpaceRepresentation.name");
     }
     
-    private void refreshOptionPanel(boolean enable){
+    private void refreshNetworkOptionPanel(boolean enable){
         networkTypePanel.setEnabled(enable);
         
         jOptionFN.setEnabled(enable);
         optionFNPanel.setEnabled(enable);
+        jFNWaringLabel.setEnabled(enable);
 
         jOptionCN.setEnabled(enable);
         optionCNPanel.setEnabled(enable);
@@ -138,6 +146,7 @@ public final class VisualRepresentation extends JPanel {
         optionSettingPanel = new javax.swing.JPanel();
         jNoneLabel = new javax.swing.JLabel();
         optionFNPanel = new javax.swing.JPanel();
+        jFNWaringLabel = new javax.swing.JLabel();
         optionCNPanel = new javax.swing.JPanel();
         jBasedOnLabel = new javax.swing.JLabel();
         jOptionCN_1_Items = new javax.swing.JComboBox<>();
@@ -227,10 +236,12 @@ public final class VisualRepresentation extends JPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         networkTypePanel.add(jOptionFN, gridBagConstraints);
 
         buttonGroup2.add(jOptionCN);
         org.openide.awt.Mnemonics.setLocalizedText(jOptionCN, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jOptionCN.text")); // NOI18N
+        jOptionCN.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
         jOptionCN.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOptionCNActionPerformed(evt);
@@ -241,12 +252,27 @@ public final class VisualRepresentation extends JPanel {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         networkTypePanel.add(jOptionCN, gridBagConstraints);
 
         optionSettingPanel.setLayout(new java.awt.CardLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jNoneLabel, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jNoneLabel.text")); // NOI18N
         optionSettingPanel.add(jNoneLabel, "none");
+
+        optionFNPanel.setLayout(new java.awt.GridBagLayout());
+
+        jFNWaringLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jFNWaringLabel, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jFNWaringLabel.text")); // NOI18N
+        jFNWaringLabel.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        optionFNPanel.add(jFNWaringLabel, gridBagConstraints);
+
         optionSettingPanel.add(optionFNPanel, "full");
 
         optionCNPanel.setLayout(new java.awt.GridBagLayout());
@@ -256,7 +282,7 @@ public final class VisualRepresentation extends JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         optionCNPanel.add(jBasedOnLabel, gridBagConstraints);
 
         jOptionCN_1_Items.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "communities" }));
@@ -269,7 +295,7 @@ public final class VisualRepresentation extends JPanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         optionCNPanel.add(jOptionCN_1_Items, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jMaxNumberLabel, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jMaxNumberLabel.text")); // NOI18N
@@ -277,7 +303,7 @@ public final class VisualRepresentation extends JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         optionCNPanel.add(jMaxNumberLabel, gridBagConstraints);
 
         jOptionCN_2_Items.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1000", "500", "250", "100", "50", "10" }));
@@ -297,9 +323,9 @@ public final class VisualRepresentation extends JPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         networkTypePanel.add(optionSettingPanel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -342,28 +368,30 @@ public final class VisualRepresentation extends JPanel {
     }//GEN-LAST:event_jOption2ActionPerformed
 
     private void jOptionFNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOptionFNActionPerformed
-        setNetworkType(NetworkType.FULL);
+        networkType = NetworkType.FULL;
+        refeshNetworkType();
     }//GEN-LAST:event_jOptionFNActionPerformed
 
     private void jOptionCNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOptionCNActionPerformed
-        setNetworkType(NetworkType.COMPRESSED);
+        networkType = NetworkType.COMPRESSED;
+        refeshNetworkType();        
     }//GEN-LAST:event_jOptionCNActionPerformed
 
     private void jOptionCN_1_ItemsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOptionCN_1_ItemsActionPerformed
-        if (compressedModel.getStrategyIndex() != jOptionCN_1_Items.getSelectedIndex()) {
-            compressedModel.setStrategyIndex(jOptionCN_1_Items.getSelectedIndex());
+        if (compressedStrategyIndex != jOptionCN_1_Items.getSelectedIndex()) {
+            compressedStrategyIndex = jOptionCN_1_Items.getSelectedIndex();
         }
     }//GEN-LAST:event_jOptionCN_1_ItemsActionPerformed
 
     private void jOptionCN_2_ItemsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOptionCN_2_ItemsActionPerformed
-        String val = String.valueOf(compressedModel.getMaxSuperNodes());
+        String val = String.valueOf(compressedMaxSuperNodes);
         if (!val.equals(jOptionCN_2_Items.getSelectedItem())) {
-            compressedModel.setMaxSuperNodes(Integer.parseInt((String) jOptionCN_2_Items.getSelectedItem()));
+            compressedMaxSuperNodes = Integer.parseInt((String) jOptionCN_2_Items.getSelectedItem());
         }
     }//GEN-LAST:event_jOptionCN_2_ItemsActionPerformed
 
     private void jOption2ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jOption2ItemStateChanged
-        refreshOptionPanel(jOption2.isSelected());
+        refreshNetworkOptionPanel(jOption2.isSelected());
     }//GEN-LAST:event_jOption2ItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -372,6 +400,7 @@ public final class VisualRepresentation extends JPanel {
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JLabel extLabel;
     private javax.swing.JLabel jBasedOnLabel;
+    private javax.swing.JLabel jFNWaringLabel;
     private javax.swing.JLabel jInfo1;
     private javax.swing.JLabel jInfo2;
     private javax.swing.JLabel jMaxNumberLabel;

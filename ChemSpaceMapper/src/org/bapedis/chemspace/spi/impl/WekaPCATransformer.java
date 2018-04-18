@@ -24,9 +24,18 @@ import org.bapedis.chemspace.spi.TwoDTransformer;
  * @author loge
  */
 public class WekaPCATransformer implements TwoDTransformer {
+    private final WekaPCATransformerFactory factory;
+    private PrincipalComponents pca = new PrincipalComponents();
 
-    PrincipalComponents pca = new PrincipalComponents();
+    public WekaPCATransformer(WekaPCATransformerFactory factory) {
+        this.factory = factory;
+    }
 
+    @Override
+    public WekaPCATransformerFactory getFactory() {
+        return factory;
+    }
+    
     @Override
     public Vector2f[] transform(Peptide[] peptides, MolecularDescriptor[] features) {
         Vector2f[] positions = null;

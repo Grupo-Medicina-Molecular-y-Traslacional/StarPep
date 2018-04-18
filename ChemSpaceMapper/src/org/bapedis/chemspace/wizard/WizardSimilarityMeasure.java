@@ -13,12 +13,9 @@ import javax.swing.event.EventListenerList;
 import org.bapedis.chemspace.impl.AbstractEmbedder;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.impl.NetworkEmbedder;
-import org.bapedis.chemspace.impl.NetworkEmbedderFactory;
-import org.bapedis.chemspace.impl.TwoDEmbedder;
 import org.bapedis.chemspace.spi.SimilarityMeasureFactory;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
-import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
@@ -48,19 +45,8 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
     @Override
     public VisualSimilarityMeasure getComponent() {
         if (component == null) {
-            try {
-                AbstractEmbedder current = csMapper.getChemSpaceEmbedderAlg();
-                if (current == null || current instanceof TwoDEmbedder) {
-                    alg = (NetworkEmbedder) new NetworkEmbedderFactory().createAlgorithm();
-                } else if (current instanceof NetworkEmbedder) {
-                    alg = (NetworkEmbedder) current.clone();
-                }
-                component = new VisualSimilarityMeasure();
-                component.addPropertyChangeListener(this);
-            } catch (CloneNotSupportedException ex) {
-                Exceptions.printStackTrace(ex);
-                alg = null;
-            }
+            component = new VisualSimilarityMeasure();
+            component.addPropertyChangeListener(this);
         }
         return component;
     }
@@ -95,7 +81,11 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
 
     @Override
     public void readSettings(WizardDescriptor wiz) {
-        // use wiz.getProperty to retrieve previous panel state        
+        // use wiz.getProperty to retrieve previous panel state  
+        alg = (NetworkEmbedder)wiz.getProperty(AbstractEmbedder.class.getName());
+        if (alg.getSimMeasure() != null){
+            component.setFactory(alg.getSimMeasure().getFactory());
+        }
     }
 
     @Override
@@ -104,7 +94,6 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
         SimilarityMeasureFactory factory = component.getSimilarityMeasureFactory();
         if (factory != null) {
             alg.setSimMeasure(factory.createAlgorithm());
-            wiz.putProperty(NetworkEmbedder.class.getName(), alg);
         }
     }
 

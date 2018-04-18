@@ -13,21 +13,20 @@ import javax.swing.event.EventListenerList;
 import org.bapedis.chemspace.impl.AbstractEmbedder;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.impl.NetworkEmbedder;
+import org.bapedis.chemspace.impl.TwoDEmbedder;
 import org.bapedis.chemspace.model.ChemSpaceOption;
 import org.bapedis.chemspace.model.CompressedModel;
-import org.bapedis.chemspace.model.NetworkType;
-import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.project.ProjectManager;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<WizardDescriptor>, PropertyChangeListener {
 
     private final MapperAlgorithm csMapper;
+    private NetworkEmbedder networkEmbedder;
+    private TwoDEmbedder twoDEmbedder;
     private boolean isValid;
     private final EventListenerList listeners;
 
@@ -36,7 +35,7 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
         isValid = csMapper.getChemSpaceOption() != ChemSpaceOption.NONE;
         listeners = new EventListenerList();
     }
-    
+
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
@@ -50,19 +49,24 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
     @Override
     public VisualRepresentation getComponent() {
         if (component == null) {
-            component = new VisualRepresentation();
-            component.setChemSpaceOption(csMapper.getChemSpaceOption());
-            AbstractEmbedder embeder = csMapper.getChemSpaceEmbedderAlg();
-            if (embeder != null && embeder instanceof NetworkEmbedder) {
-                try {
-                    NetworkEmbedder networkEmbedder = (NetworkEmbedder) embeder;
-                    component.setNetworkType(networkEmbedder.getNetworkType());
-                    component.setCompressedModel((CompressedModel)networkEmbedder.getCompressedModel().clone());
-                } catch (CloneNotSupportedException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
-            }
-            component.addPropertyChangeListener(this);
+            try {                               
+                component = new VisualRepresentation();
+                component.setChemSpaceOption(csMapper.getChemSpaceOption());
+                
+                //TwoD Embedder
+                twoDEmbedder = (TwoDEmbedder) csMapper.getTwoDEmbedderAlg().clone();
+                
+                //Setting for Network embedder                
+                networkEmbedder = (NetworkEmbedder) csMapper.getNetworkEmbedderAlg().clone();                
+                component.setNetworkType(networkEmbedder.getNetworkType());
+                CompressedModel compressedModel = networkEmbedder.getCompressedModel();
+                component.setCompressedStrategyIndex(compressedModel.getStrategyIndex());
+                component.setCompressedMaxSuperNodes(compressedModel.getMaxSuperNodes());
+                
+                component.addPropertyChangeListener(this);
+            } catch (CloneNotSupportedException ex) {
+                Exceptions.printStackTrace(ex);
+            }            
         }
         return component;
     }
@@ -103,12 +107,23 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        wiz.putProperty(ChemSpaceOption.class.getName(), component.getChemSpaceOption());
-        wiz.putProperty(NetworkType.class.getName(), component.getNetworkType());
-        switch(component.getNetworkType()){
-            case COMPRESSED:
-                wiz.putProperty(CompressedModel.class.getName(), component.getCompressedModel());
-        }
+        ChemSpaceOption csOption = component.getChemSpaceOption();
+        wiz.putProperty(ChemSpaceOption.class.getName(), csOption);
+        switch(csOption){
+            case CHEM_SPACE_NETWORK:
+                networkEmbedder.setNetworkType(component.getNetworkType());
+                CompressedModel compressedModel = networkEmbedder.getCompressedModel();
+                compressedModel.setStrategyIndex(component.getCompressedStrategyIndex());
+                compressedModel.setMaxSuperNodes(component.getCompressedMaxSuperNodes());
+                wiz.putProperty(AbstractEmbedder.class.getName(), networkEmbedder);
+                break;
+            case N_DIMENSIONAL_SPACE:
+                wiz.putProperty(AbstractEmbedder.class.getName(), twoDEmbedder);
+                break;
+            case NONE:
+                wiz.putProperty(AbstractEmbedder.class.getName(), null);
+                break;                
+        }        
     }
 
     @Override
@@ -123,7 +138,7 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
                     isValid = true;
                     break;
             }
-        } 
+        }
         if (oldState != isValid) {
             ChangeEvent srcEvt = new ChangeEvent(evt);
             for (ChangeListener listener : listeners.getListeners(ChangeListener.class)) {
@@ -137,7 +152,7 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
         switch (component.getChemSpaceOption()) {
             case NONE:
                 throw new WizardValidationException(component, NbBundle.getMessage(WizardFeatureExtraction.class, "VisualRepresentation.invalidOption.text"), null);
-        }        
+        }
     }
 
 }

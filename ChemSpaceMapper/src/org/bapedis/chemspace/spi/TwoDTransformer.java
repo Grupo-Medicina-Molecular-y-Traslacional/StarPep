@@ -14,6 +14,8 @@ import org.bapedis.core.model.Peptide;
  * @author loge
  */
 public interface TwoDTransformer {
-    
+   
+   public TwoDTransformerFactory getFactory();
+   
    public Vector2f[] transform(Peptide[] peptides, MolecularDescriptor[] features);
 }

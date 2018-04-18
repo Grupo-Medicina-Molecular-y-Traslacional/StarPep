@@ -8,10 +8,12 @@ package org.bapedis.chemspace.impl;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import org.bapedis.chemspace.model.ChemSpaceOption;
-import org.bapedis.chemspace.model.NetworkType;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.jdesktop.swingx.JXBusyLabel;
@@ -25,7 +27,7 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class MapperAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
+public class MapperAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSetupUI, PropertyChangeListener {
 
     protected final JXHyperlink openWizardLink;
     protected final JXBusyLabel busyLabel;
@@ -45,12 +47,34 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        busyLabel.setText(NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.busyLabel.text"));
+        centerPanel.add(busyLabel, "busy");
         
         nDPanel = new NDChemSpacePanel();
         centerPanel.add(nDPanel, "nDChemSpace");
 
         networkPanel = new ChemSpaceNetworkPanel();
-        centerPanel.add(networkPanel, "chemSpaceNetwork");        
+        centerPanel.add(networkPanel, "chemSpaceNetwork");                  
+        
+        addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent event) {
+                if (csMapper != null) {
+                    csMapper.addRunningListener(MapperAlgorithmPanel.this);
+                }
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+                if (csMapper != null) {
+                    csMapper.removeRunningListener(MapperAlgorithmPanel.this);
+                }
+            }
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) {
+            }
+        });        
     }
 
     private void configureOpenWizardLink() {
@@ -72,8 +96,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
             }
         });
     }
-
-
         
     private void refreshChemSpaceOption() {
         CardLayout centerCL = (CardLayout) centerPanel.getLayout();
@@ -96,24 +118,22 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     public JPanel getSettingPanel(Algorithm algo) {
         this.csMapper = (MapperAlgorithm) algo;
         refreshChemSpaceOption();
+        setBusy(csMapper.isRunning());
         return this;
     }
 
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled); //To change body of generated methods, choose Tools | Templates.
-        openWizardLink.setEnabled(enabled);
-        centerPanel.setEnabled(enabled);
-    }
 
     public void setBusy(boolean busy) {
         busyLabel.setBusy(busy);
         if (busy) {
-            topRightPanel.add(busyLabel);
+            CardLayout centerCL = (CardLayout) centerPanel.getLayout();
+            centerCL.show(centerPanel, "busy");
         } else {
-            topRightPanel.remove(busyLabel);
+            refreshChemSpaceOption();
         }
         openWizardLink.setEnabled(!busy);
+        topLeftPanel.setEnabled(!busy);
+        topRightPanel.setEnabled(!busy);
     }
 
     public MapperAlgorithm getCheSMapper() {
@@ -187,5 +207,13 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private javax.swing.JPanel topLeftPanel;
     private javax.swing.JPanel topRightPanel;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (csMapper != null && evt.getSource().equals(csMapper)
+                && evt.getPropertyName().equals(MapperAlgorithm.RUNNING)) {
+            setBusy((boolean) evt.getNewValue());
+        }
+    }
 
 }

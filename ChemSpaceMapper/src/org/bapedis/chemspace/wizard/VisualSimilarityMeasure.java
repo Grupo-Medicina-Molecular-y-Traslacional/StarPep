@@ -36,7 +36,17 @@ public final class VisualSimilarityMeasure extends JPanel {
 
     public SimilarityMeasureFactory getSimilarityMeasureFactory() {
         return factory;
-    }        
+    }   
+    
+    public void setFactory(SimilarityMeasureFactory factory){
+        SimilarityFactoryTreeNode factoryNode;
+        for(int i=0; i< treeNode.getChildCount(); i++){
+            factoryNode = (SimilarityFactoryTreeNode)treeNode.getChildAt(i);
+            if (factoryNode.getFactory().equals(factory)){
+                jTree1.setSelectionPath(new TreePath(factoryNode.getPath()));
+            }
+        }
+    }    
 
     private void populateJTree() {
         Collection<? extends SimilarityMeasureFactory> factories = Lookup.getDefault().lookupAll(SimilarityMeasureFactory.class);

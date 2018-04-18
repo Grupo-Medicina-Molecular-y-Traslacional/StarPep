@@ -7,10 +7,8 @@ package org.bapedis.chemspace.impl;
 
 import java.text.MessageFormat;
 import org.bapedis.chemspace.model.ChemSpaceOption;
-import org.bapedis.chemspace.model.CompressedModel;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.FeatureFilteringOption;
-import org.bapedis.chemspace.model.NetworkType;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
@@ -89,26 +87,19 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
             csMapper.setFeatureFilteringAlg(alg);
         }     
         
-        //Chemical Space Embbeder
-        AbstractEmbedder embedder;
+        //Chemical Space Embbeder Options
         switch(csOption){
             case N_DIMENSIONAL_SPACE:
-                embedder = (TwoDEmbedder)wiz.getProperty(TwoDEmbedder.class.getName());
+                TwoDEmbedder embedder = (TwoDEmbedder)wiz.getProperty(AbstractEmbedder.class.getName());
+                csMapper.setTwoDEmbedderAlg(embedder);
                 break;
             case CHEM_SPACE_NETWORK:
-                NetworkEmbedder networkEmbedder = (NetworkEmbedder)wiz.getProperty(NetworkEmbedder.class.getName());
-                embedder = networkEmbedder;
-                networkEmbedder.setNetworkType((NetworkType)wiz.getProperty(NetworkType.class.getName()));
-                switch(networkEmbedder.getNetworkType()){
-                    case COMPRESSED:
-                        networkEmbedder.setCompressedModel((CompressedModel)wiz.getProperty(CompressedModel.class.getName()));
-                        break;
-                }                
+                NetworkEmbedder networkEmbedder = (NetworkEmbedder)wiz.getProperty(AbstractEmbedder.class.getName());
+                csMapper.setNetworkEmbedderAlg(networkEmbedder);
                 break;
-            default:
-                embedder = null;
+            case NONE:
+                throw new RuntimeException("Internal error: Chemical Space Embedder is null");
         }
-        csMapper.setChemSpaceEmbedderAlg(embedder);
     }
     
     public static WizardDescriptor  createWizardDescriptor(MapperAlgorithm csMapper){

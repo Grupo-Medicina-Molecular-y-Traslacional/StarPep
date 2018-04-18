@@ -35,7 +35,7 @@ public class TanimotoCoefficientFactory implements SimilarityMeasureFactory{
 
     @Override
     public SimilarityMeasure createAlgorithm() {
-        return new TanimotoCoefficient();
+        return new TanimotoCoefficient(this);
     }
     
 }

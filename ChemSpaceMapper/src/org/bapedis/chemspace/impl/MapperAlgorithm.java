@@ -5,6 +5,8 @@
  */
 package org.bapedis.chemspace.impl;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.chemspace.model.FeatureFilteringOption;
@@ -32,31 +34,35 @@ public class MapperAlgorithm implements Algorithm {
 
     public static final int MIN_AVAILABLE_FEATURES = 2;
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+    public static final String RUNNING = "running";
 
     private final MapperAlgorithmFactory factory;
+    protected final PropertyChangeSupport propertyChangeSupport;
     protected Workspace workspace;
     protected ProgressTicket progressTicket;
-    protected boolean stopRun;
+    protected boolean stopRun, running;
 
     //Mapping Options
     protected ChemSpaceOption csOption;
     protected FeatureExtractionOption feOption;
     protected FeatureFilteringOption ffOption;
-    protected FeatureWeightingOption fwOption;      
+    protected FeatureWeightingOption fwOption;
 
     // Algorithms    
     private AllDescriptors featureExtractionAlg;
     private FeatureFiltering featureFilteringAlg;
-    private AbstractEmbedder chemSpaceEmbedderAlg;
-//    private final SequenceClustering seqClustering;
+    private NetworkEmbedder networkEmbedderAlg;
+    private TwoDEmbedder twoDEmbedderAlg;
 
     //Algorithm workflow
     private final List<Algorithm> algorithms;
-    private Algorithm currentAlg;   
+    private Algorithm currentAlg;
 
     public MapperAlgorithm(MapperAlgorithmFactory factory) {
         this.factory = factory;
         algorithms = new LinkedList<>();
+        propertyChangeSupport = new PropertyChangeSupport(this);
+        running = false;
 
         //Mapping Options        
         csOption = ChemSpaceOption.NONE;
@@ -67,18 +73,22 @@ public class MapperAlgorithm implements Algorithm {
         // Algorithms
         featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
         featureFilteringAlg = (FeatureFiltering) new FeatureFilteringFactory().createAlgorithm();
-        chemSpaceEmbedderAlg = (NetworkEmbedder) new NetworkEmbedderFactory().createAlgorithm();
-//        seqClustering = (SequenceClustering) new SequenceClusteringFactory().createAlgorithm();        
-//        twoDEmbedder = (TwoDEmbedder) new TwoDEmbedderFactory().createAlgorithm();
+        networkEmbedderAlg = (NetworkEmbedder) new NetworkEmbedderFactory().createAlgorithm();
+        twoDEmbedderAlg = (TwoDEmbedder) new TwoDEmbedderFactory().createAlgorithm();
     }
 
+    public boolean isRunning() {
+        return running;
+    }  
+    
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
         this.progressTicket = progressTicket;
-
-        algorithms.clear();
+        stopRun = false;
+        
         // Populate algorithm workflow        
+        algorithms.clear();
 
         // Feature Extraction
         if (feOption == FeatureExtractionOption.NEW) {
@@ -91,8 +101,20 @@ public class MapperAlgorithm implements Algorithm {
         }
 
         // Chemical Space Embedder
-        assert (chemSpaceEmbedderAlg != null) : "Internal error: Chemical Space Embedder is null";
-        algorithms.add(chemSpaceEmbedderAlg);
+        // Chemical Space Embedder
+        switch(csOption){
+            case CHEM_SPACE_NETWORK:
+                algorithms.add(networkEmbedderAlg);
+                break;
+            case N_DIMENSIONAL_SPACE:
+                algorithms.add(twoDEmbedderAlg);
+                break;
+            case NONE:
+                throw new RuntimeException("Internal error: Chemical Space Embedder is null");
+        }
+        
+        running = true;
+        propertyChangeSupport.firePropertyChange(RUNNING, false, true);        
     }
 
     @Override
@@ -117,6 +139,9 @@ public class MapperAlgorithm implements Algorithm {
     public void endAlgo() {
         workspace = null;
         progressTicket = null;
+        
+        running = false;
+        propertyChangeSupport.firePropertyChange(RUNNING, true, false);        
     }
 
     @Override
@@ -135,7 +160,7 @@ public class MapperAlgorithm implements Algorithm {
     public void setChemSpaceOption(ChemSpaceOption csOption) {
         this.csOption = csOption;
     }
-    
+
     public FeatureExtractionOption getFEOption() {
         return feOption;
     }
@@ -176,12 +201,20 @@ public class MapperAlgorithm implements Algorithm {
         return featureFilteringAlg;
     }
 
-    public AbstractEmbedder getChemSpaceEmbedderAlg() {
-        return chemSpaceEmbedderAlg;
+    public NetworkEmbedder getNetworkEmbedderAlg() {
+        return networkEmbedderAlg;
     }
 
-    public void setChemSpaceEmbedderAlg(AbstractEmbedder alg) {
-        this.chemSpaceEmbedderAlg = alg;
+    public void setNetworkEmbedderAlg(NetworkEmbedder networkEmbedderAlg) {
+        this.networkEmbedderAlg = networkEmbedderAlg;
+    }
+
+    public TwoDEmbedder getTwoDEmbedderAlg() {
+        return twoDEmbedderAlg;
+    }
+
+    public void setTwoDEmbedderAlg(TwoDEmbedder twoDEmbedderAlg) {
+        this.twoDEmbedderAlg = twoDEmbedderAlg;
     }
 
     @Override
@@ -193,5 +226,13 @@ public class MapperAlgorithm implements Algorithm {
     public AlgorithmFactory getFactory() {
         return factory;
     }
+    
+    public void addRunningListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removeRunningListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }        
 
 }

@@ -29,7 +29,7 @@ import org.openide.util.lookup.ServiceProvider;
 public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
 
     private MapperAlgorithmPanel setupUI = new MapperAlgorithmPanel();
-    
+
     @Override
     public String getCategory() {
         return null;
@@ -52,69 +52,77 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
 
     @Override
     public Algorithm createAlgorithm() {
-        MapperAlgorithm csMapper = new MapperAlgorithm(this);   
-        
+        MapperAlgorithm csMapper = new MapperAlgorithm(this);
+
         // Create wizard
         WizardDescriptor wiz = createWizardDescriptor(csMapper);
-        
+
         //The image in the left sidebar of the wizard is set like this:
         //wiz.putProperty(WizardDescriptor.PROP_IMAGE, ImageUtilities.loadImage("org/demo/wizard/banner.PNG", true));
         if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
             setUp(csMapper, wiz);
-           return csMapper;            
+            return csMapper;
         }
         return null;
     }
-    
-    public static void setUp(MapperAlgorithm csMapper, WizardDescriptor wiz){
+
+    public static void setUp(MapperAlgorithm csMapper, WizardDescriptor wiz) {
         // Chemical Space Option
-        ChemSpaceOption csOption = (ChemSpaceOption)wiz.getProperty(ChemSpaceOption.class.getName());
+        ChemSpaceOption csOption = (ChemSpaceOption) wiz.getProperty(ChemSpaceOption.class.getName());
         csMapper.setChemSpaceOption(csOption);
-        
+
         // Feature Extraction Option
-        FeatureExtractionOption feOption = (FeatureExtractionOption)wiz.getProperty(FeatureExtractionOption.class.getName());
-        csMapper.setFEOption(feOption);
-        if (feOption == FeatureExtractionOption.NEW){
-            AllDescriptors alg = (AllDescriptors)wiz.getProperty(AllDescriptors.class.getName());
-            csMapper.setFeatureExtractionAlg(alg);
+        FeatureExtractionOption feOption = (FeatureExtractionOption) wiz.getProperty(FeatureExtractionOption.class.getName());
+        if (feOption != null) {
+            csMapper.setFEOption(feOption);
+            if (feOption == FeatureExtractionOption.NEW) {
+                AllDescriptors alg = (AllDescriptors) wiz.getProperty(AllDescriptors.class.getName());
+                csMapper.setFeatureExtractionAlg(alg);
+            }
         }
-        
+
         // Feature Filtering Option
-        FeatureFilteringOption ffOption = (FeatureFilteringOption)wiz.getProperty(FeatureFilteringOption.class.getName());
-        csMapper.setFFOption(ffOption);
-        if (ffOption == FeatureFilteringOption.YES){
-            FeatureFiltering alg = (FeatureFiltering)wiz.getProperty(FeatureFiltering.class.getName());
-            csMapper.setFeatureFilteringAlg(alg);
-        }     
-        
+        FeatureFilteringOption ffOption = (FeatureFilteringOption) wiz.getProperty(FeatureFilteringOption.class.getName());
+        if (ffOption != null) {
+            csMapper.setFFOption(ffOption);
+            if (ffOption == FeatureFilteringOption.YES) {
+                FeatureFiltering alg = (FeatureFiltering) wiz.getProperty(FeatureFiltering.class.getName());
+                csMapper.setFeatureFilteringAlg(alg);
+            }
+        }
+
         //Chemical Space Embbeder Options
-        switch(csOption){
+        switch (csOption) {
             case N_DIMENSIONAL_SPACE:
-                TwoDEmbedder embedder = (TwoDEmbedder)wiz.getProperty(AbstractEmbedder.class.getName());
-                csMapper.setTwoDEmbedderAlg(embedder);
+                TwoDEmbedder embedder = (TwoDEmbedder) wiz.getProperty(AbstractEmbedder.class.getName());
+                if (embedder != null) {
+                    csMapper.setTwoDEmbedderAlg(embedder);
+                }
                 break;
             case CHEM_SPACE_NETWORK:
-                NetworkEmbedder networkEmbedder = (NetworkEmbedder)wiz.getProperty(AbstractEmbedder.class.getName());
-                csMapper.setNetworkEmbedderAlg(networkEmbedder);
+                NetworkEmbedder networkEmbedder = (NetworkEmbedder) wiz.getProperty(AbstractEmbedder.class.getName());
+                if (networkEmbedder != null) {
+                    csMapper.setNetworkEmbedderAlg(networkEmbedder);
+                }
                 break;
             case NONE:
                 throw new RuntimeException("Internal error: Chemical Space Embedder is null");
         }
     }
-    
-    public static WizardDescriptor  createWizardDescriptor(MapperAlgorithm csMapper){
+
+    public static WizardDescriptor createWizardDescriptor(MapperAlgorithm csMapper) {
         // Wizard iterator
-        MyWizardIterator iterator = new MyWizardIterator(csMapper);        
+        MyWizardIterator iterator = new MyWizardIterator(csMapper);
 
         // Open wizard
-        WizardDescriptor wiz = new WizardDescriptor(iterator);        
+        WizardDescriptor wiz = new WizardDescriptor(iterator);
         iterator.initialize(wiz);
         iterator.setChemSpaceOption(csMapper.getChemSpaceOption());
-        
+
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wiz.setTitleFormat(new MessageFormat("{0}"));
-        wiz.setTitle(NbBundle.getMessage(MapperAlgorithmFactory.class, "MapperAlgorithm.wizard.title")); 
-        
+        wiz.setTitle(NbBundle.getMessage(MapperAlgorithmFactory.class, "MapperAlgorithm.wizard.title"));
+
         return wiz;
     }
 

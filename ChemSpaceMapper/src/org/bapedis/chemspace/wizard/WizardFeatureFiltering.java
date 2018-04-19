@@ -14,7 +14,8 @@ import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 
-public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDescriptor> {
+public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDescriptor>,
+        WizardDescriptor.FinishablePanel<WizardDescriptor>{
 
     private final MapperAlgorithm csMapper;
     private FeatureFiltering alg;
@@ -37,10 +38,9 @@ public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDesc
     public VisualFeatureFiltering getComponent() {
         if (component == null) {
             try {
-                alg = (FeatureFiltering)csMapper.getFeatureFilteringAlg().clone();
+                alg = (FeatureFiltering) csMapper.getFeatureFilteringAlg().clone();
                 JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
                 component = new VisualFeatureFiltering(settingPanel);
-                component.setFFOption(csMapper.getFFOption());
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
                 alg = null;
@@ -68,6 +68,26 @@ public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDesc
     }
 
     @Override
+    public void readSettings(WizardDescriptor wiz) {
+        // use wiz.getProperty to retrieve previous panel state
+        FeatureFilteringOption ffOption = (FeatureFilteringOption)wiz.getProperty(FeatureFilteringOption.class.getName());
+        if (ffOption == null){
+            ffOption = csMapper.getFFOption();
+        }
+        getComponent().setFFOption(ffOption);
+    }
+
+    @Override
+    public void storeSettings(WizardDescriptor wiz) {
+        // use wiz.putProperty to remember current panel state
+        FeatureFilteringOption ffOption = getComponent().getFFOption();
+        wiz.putProperty(FeatureFilteringOption.class.getName(), ffOption);
+        if (ffOption == FeatureFilteringOption.YES) {
+            wiz.putProperty(FeatureFiltering.class.getName(), alg);
+        }
+    }
+
+    @Override
     public void addChangeListener(ChangeListener l) {
     }
 
@@ -76,15 +96,7 @@ public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDesc
     }
 
     @Override
-    public void readSettings(WizardDescriptor wiz) {
-        // use wiz.getProperty to retrieve previous panel state
+    public boolean isFinishPanel() {
+        return true;
     }
-
-    @Override
-    public void storeSettings(WizardDescriptor wiz) {
-        // use wiz.putProperty to remember current panel state
-        wiz.putProperty(FeatureFilteringOption.class.getName(), component.getFFOption());
-        wiz.putProperty(FeatureFiltering.class.getName(), alg);
-    }
-
 }

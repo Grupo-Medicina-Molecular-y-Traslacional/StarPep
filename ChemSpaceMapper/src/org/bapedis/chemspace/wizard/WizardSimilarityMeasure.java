@@ -26,6 +26,7 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
     private NetworkEmbedder alg;
     private final EventListenerList listeners = new EventListenerList();
     private boolean isValid;
+    private WizardDescriptor model;
 
     public WizardSimilarityMeasure(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
@@ -82,9 +83,10 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state  
-        alg = (NetworkEmbedder)wiz.getProperty(AbstractEmbedder.class.getName());
-        if (alg.getSimMeasure() != null){
-            component.setFactory(alg.getSimMeasure().getFactory());
+        this.model = wiz;
+        alg = (NetworkEmbedder) wiz.getProperty(AbstractEmbedder.class.getName());
+        if (alg.getSimMeasure() != null) {
+            getComponent().setFactory(alg.getSimMeasure().getFactory());
         }
     }
 
@@ -106,15 +108,18 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        boolean oldState = isValid;
+    public void propertyChange(PropertyChangeEvent evt) {        
         if (evt.getPropertyName().equals(VisualSimilarityMeasure.NETWORK_FACTORY)) {
+            boolean oldState = isValid;
             isValid = evt.getNewValue() != null;
-        }
-        if (oldState != isValid) {
-            ChangeEvent srcEvt = new ChangeEvent(evt);
-            for (ChangeListener listener : listeners.getListeners(ChangeListener.class)) {
-                listener.stateChanged(srcEvt);
+            if (oldState != isValid) {
+                ChangeEvent srcEvt = new ChangeEvent(evt);
+                for (ChangeListener listener : listeners.getListeners(ChangeListener.class)) {
+                    listener.stateChanged(srcEvt);
+                }
+            }
+            if (isValid) {
+                model.getNotificationLineSupport().setErrorMessage(null);
             }
         }
     }

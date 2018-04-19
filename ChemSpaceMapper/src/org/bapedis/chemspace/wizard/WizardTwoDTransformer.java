@@ -26,6 +26,7 @@ public class WizardTwoDTransformer implements WizardDescriptor.ValidatingPanel<W
     private TwoDEmbedder alg;
     private final EventListenerList listeners = new EventListenerList();
     private boolean isValid;
+    private WizardDescriptor model;
 
     public WizardTwoDTransformer(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
@@ -82,11 +83,12 @@ public class WizardTwoDTransformer implements WizardDescriptor.ValidatingPanel<W
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state 
-        alg = (TwoDEmbedder)wiz.getProperty(AbstractEmbedder.class.getName());
-        if (alg.getTransformer()!= null){
-            component.setFactory(alg.getTransformer().getFactory());
+        this.model = wiz;
+        alg = (TwoDEmbedder) wiz.getProperty(AbstractEmbedder.class.getName());
+        if (alg.getTransformer() != null) {
+            getComponent().setFactory(alg.getTransformer().getFactory());
         }
-        
+
     }
 
     @Override
@@ -108,16 +110,20 @@ public class WizardTwoDTransformer implements WizardDescriptor.ValidatingPanel<W
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        boolean oldState = isValid;
         if (evt.getPropertyName().equals(VisualTwoDTransformer.TRANSFORMER_FACTORY)) {
+            boolean oldState = isValid;
             isValid = evt.getNewValue() != null;
-        }
-        if (oldState != isValid) {
-            ChangeEvent srcEvt = new ChangeEvent(evt);
-            for (ChangeListener listener : listeners.getListeners(ChangeListener.class)) {
-                listener.stateChanged(srcEvt);
+            if (oldState != isValid) {
+                ChangeEvent srcEvt = new ChangeEvent(evt);
+                for (ChangeListener listener : listeners.getListeners(ChangeListener.class)) {
+                    listener.stateChanged(srcEvt);
+                }
+            }
+            if (isValid) {
+                model.getNotificationLineSupport().setErrorMessage(null);
             }
         }
+
     }
 
 }

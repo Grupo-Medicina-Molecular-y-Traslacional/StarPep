@@ -22,6 +22,21 @@ public class NDChemSpacePanel extends javax.swing.JPanel {
 
     public void setUp(MapperAlgorithm csMapper){
         this.csMapper = csMapper;
+        TwoDEmbedder twoDEmbedder = csMapper.getTwoDEmbedderAlg();
+        int level = twoDEmbedder.getJitterLevel();
+        jLevelCurrentValue.setText(String.valueOf(level));
+        levelSlider.setValue(level);
+        jLevelNewLabel.setVisible(false);
+        jLevelNewValue.setVisible(false);
+    }   
+    
+    
+    private void setNewLevel(int level){
+        csMapper.getTwoDEmbedderAlg().setJitterLevel(level);
+        jLevelCurrentValue.setText(String.valueOf(level));
+        jLevelNewLabel.setVisible(false);
+        jLevelNewValue.setVisible(false);
+        jApplyButton.setEnabled(false);    
     }
     
     /**
@@ -32,20 +47,217 @@ public class NDChemSpacePanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        jApplyButton = new javax.swing.JButton();
+        jitterPanel = new javax.swing.JPanel();
+        jLevelCurrentLabel = new javax.swing.JLabel();
+        jLevelCurrentValue = new javax.swing.JLabel();
+        jLevelNewLabel = new javax.swing.JLabel();
+        jLevelNewValue = new javax.swing.JLabel();
+        jLevelToolBar = new javax.swing.JToolBar();
+        jLessLevelButton = new javax.swing.JButton();
+        levelSlider = new javax.swing.JSlider();
+        jMoreLevelButton = new javax.swing.JButton();
+        extLabel = new javax.swing.JLabel();
+
+        setLayout(new java.awt.GridBagLayout());
+
+        jApplyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/apply.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jApplyButton, org.openide.util.NbBundle.getMessage(NDChemSpacePanel.class, "NDChemSpacePanel.jApplyButton.text")); // NOI18N
+        jApplyButton.setToolTipText(org.openide.util.NbBundle.getMessage(NDChemSpacePanel.class, "NDChemSpacePanel.jApplyButton.toolTipText")); // NOI18N
+        jApplyButton.setEnabled(false);
+        jApplyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jApplyButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
+        add(jApplyButton, gridBagConstraints);
+
+        jitterPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(NDChemSpacePanel.class, "NDChemSpacePanel.jitterPanel.border.title"))); // NOI18N
+        jitterPanel.setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLevelCurrentLabel, org.openide.util.NbBundle.getMessage(NDChemSpacePanel.class, "NDChemSpacePanel.jLevelCurrentLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        jitterPanel.add(jLevelCurrentLabel, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLevelCurrentValue, org.openide.util.NbBundle.getMessage(NDChemSpacePanel.class, "NDChemSpacePanel.jLevelCurrentValue.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        jitterPanel.add(jLevelCurrentValue, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLevelNewLabel, org.openide.util.NbBundle.getMessage(NDChemSpacePanel.class, "NDChemSpacePanel.jLevelNewLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        jitterPanel.add(jLevelNewLabel, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLevelNewValue, org.openide.util.NbBundle.getMessage(NDChemSpacePanel.class, "NDChemSpacePanel.jLevelNewValue.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        jitterPanel.add(jLevelNewValue, gridBagConstraints);
+
+        jLevelToolBar.setFloatable(false);
+        jLevelToolBar.setRollover(true);
+        jLevelToolBar.setPreferredSize(new java.awt.Dimension(420, 90));
+
+        jLessLevelButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/less.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLessLevelButton, org.openide.util.NbBundle.getMessage(NDChemSpacePanel.class, "NDChemSpacePanel.jLessLevelButton.text")); // NOI18N
+        jLessLevelButton.setFocusable(false);
+        jLessLevelButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jLessLevelButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jLessLevelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jLessLevelButtonActionPerformed(evt);
+            }
+        });
+        jLevelToolBar.add(jLessLevelButton);
+
+        levelSlider.setMajorTickSpacing(2);
+        levelSlider.setMaximum(10);
+        levelSlider.setMinorTickSpacing(1);
+        levelSlider.setPaintLabels(true);
+        levelSlider.setPaintTicks(true);
+        levelSlider.setToolTipText(org.openide.util.NbBundle.getMessage(NDChemSpacePanel.class, "NDChemSpacePanel.levelSlider.toolTipText")); // NOI18N
+        levelSlider.setValue(0);
+        levelSlider.setMinimumSize(new java.awt.Dimension(360, 80));
+        levelSlider.setPreferredSize(new java.awt.Dimension(360, 80));
+        levelSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                levelSliderStateChanged(evt);
+            }
+        });
+        jLevelToolBar.add(levelSlider);
+
+        jMoreLevelButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/more.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jMoreLevelButton, org.openide.util.NbBundle.getMessage(NDChemSpacePanel.class, "NDChemSpacePanel.jMoreLevelButton.text")); // NOI18N
+        jMoreLevelButton.setFocusable(false);
+        jMoreLevelButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jMoreLevelButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jMoreLevelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMoreLevelButtonActionPerformed(evt);
+            }
+        });
+        jLevelToolBar.add(jMoreLevelButton);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jitterPanel.add(jLevelToolBar, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
+        add(jitterPanel, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(extLabel, org.openide.util.NbBundle.getMessage(NDChemSpacePanel.class, "NDChemSpacePanel.extLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.weighty = 1.0;
+        add(extLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jApplyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jApplyButtonActionPerformed
+        if (csMapper != null){
+            int newValue = levelSlider.getValue();
+            TwoDEmbedder embedder = csMapper.getTwoDEmbedderAlg();
+            if (embedder.getTwoDSpace() != null){
+            
+            }else{
+                setNewLevel(newValue);
+            }
+        }
+
+//        if (csMapper != null) {
+//            float oldValue = Float.parseFloat(jCutoffCurrentValue.getText());
+//            float newValue = Float.parseFloat(jCutoffNewValue.getText());
+//            NetworkEmbedder embedder = csMapper.getNetworkEmbedderAlg();
+//            switch (embedder.getNetworkType()) {
+//                case FULL:
+//                if (embedder.getSimilarityMatrix() != null) {
+//                    FullNetworkUpdater fnUpdater = new FullNetworkUpdater(oldValue, newValue, embedder.getSimilarityMatrix());
+//                    fnUpdater.addPropertyChangeListener(this);
+//                    setRunning(true);
+//                    fnUpdater.execute();
+//                } else {
+//                    setNewThreshold(newValue);
+//                }
+//                break;
+//                case COMPRESSED:
+//                break;
+//            }
+//        }
+    }//GEN-LAST:event_jApplyButtonActionPerformed
+
+    private void jLessLevelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLessLevelButtonActionPerformed
+        int level = levelSlider.getValue();
+        if (level > levelSlider.getMinimum()) {
+            levelSlider.setValue(level - 1);
+        }
+    }//GEN-LAST:event_jLessLevelButtonActionPerformed
+
+    private void levelSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_levelSliderStateChanged
+        int level = levelSlider.getValue();
+        if (level != Integer.parseInt(jLevelCurrentValue.getText())) {
+            jLevelNewLabel.setVisible(true);
+            jLevelNewValue.setVisible(true);
+            jLevelNewValue.setText(String.valueOf(level));
+            jApplyButton.setEnabled(true);
+        } else {
+            jLevelNewLabel.setVisible(false);
+            jLevelNewValue.setVisible(false);
+            jApplyButton.setEnabled(false);
+            jLevelNewValue.setText("");
+        }
+    }//GEN-LAST:event_levelSliderStateChanged
+
+    private void jMoreLevelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMoreLevelButtonActionPerformed
+        int level = levelSlider.getValue();
+        if (level < levelSlider.getMaximum()) {
+            levelSlider.setValue(level + 1);
+        }
+    }//GEN-LAST:event_jMoreLevelButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel extLabel;
+    private javax.swing.JButton jApplyButton;
+    private javax.swing.JButton jLessLevelButton;
+    private javax.swing.JLabel jLevelCurrentLabel;
+    private javax.swing.JLabel jLevelCurrentValue;
+    private javax.swing.JLabel jLevelNewLabel;
+    private javax.swing.JLabel jLevelNewValue;
+    private javax.swing.JToolBar jLevelToolBar;
+    private javax.swing.JButton jMoreLevelButton;
+    private javax.swing.JPanel jitterPanel;
+    private javax.swing.JSlider levelSlider;
     // End of variables declaration//GEN-END:variables
 }

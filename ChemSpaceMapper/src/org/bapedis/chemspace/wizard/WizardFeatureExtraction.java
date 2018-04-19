@@ -27,13 +27,14 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel<WizardDescriptor>,
-        PropertyChangeListener {
+        WizardDescriptor.FinishablePanel<WizardDescriptor>, PropertyChangeListener {
 
     private final MapperAlgorithm csMapper;
     private AllDescriptors alg;
     private final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private final EventListenerList listeners;
     private boolean isValid;
+    private WizardDescriptor model;
 
     public WizardFeatureExtraction(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
@@ -58,8 +59,7 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
                 alg = (AllDescriptors) csMapper.getFeatureExtractionAlg().clone();
                 JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
                 component = new VisualFeatureExtraction(settingPanel);
-                component.addPropertyChangeListener(this);
-                component.setFEOption(csMapper.getFEOption());
+                component.addPropertyChangeListener(this);                
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
                 alg = null;
@@ -79,6 +79,12 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
+        this.model = wiz;
+        FeatureExtractionOption feOption = (FeatureExtractionOption)wiz.getProperty(FeatureExtractionOption.class.getName());
+        if (feOption == null){
+            feOption = csMapper.getFEOption();
+        }
+        getComponent().setFEOption(feOption);
     }
 
     @Override
@@ -148,8 +154,16 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
                     listener.stateChanged(srcEvt);
                 }
             }
+            if (isValid){
+                model.getNotificationLineSupport().setErrorMessage(null);
+            }
         }
 
+    }
+
+    @Override
+    public boolean isFinishPanel() {
+        return true;
     }
 
 }

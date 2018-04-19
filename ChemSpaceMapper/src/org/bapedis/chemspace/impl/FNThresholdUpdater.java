@@ -24,21 +24,21 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class FullNetworkUpdater extends SwingWorker<Void, Void> {
+public class FNThresholdUpdater extends SwingWorker<Void, Void> {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     static final String CHANGED_THRESHOLD = "changed_threshold";
-    private final NetworkEmbedder networkEmbedder;
+    private final SimilarityMatrix matrix;
     private final AtomicBoolean stopRun;
     private final ProgressTicket ticket;
     private final float oldThreshold, newThreshold;
 
-    public FullNetworkUpdater(float oldThreshold, float newThreshold, NetworkEmbedder networkEmbedder) {
-        this.networkEmbedder = networkEmbedder;
+    public FNThresholdUpdater(float oldThreshold, float newThreshold, SimilarityMatrix matrix) {
+        this.matrix = matrix;
         this.oldThreshold = oldThreshold;
         this.newThreshold = newThreshold;
         stopRun = new AtomicBoolean(false);
-        ticket = new ProgressTicket(NbBundle.getMessage(FullNetworkUpdater.class, "FullNetworkUpdater.task.name"), new Cancellable() {
+        ticket = new ProgressTicket(NbBundle.getMessage(FNThresholdUpdater.class, "FNThresholdUpdater.task.name"), new Cancellable() {
             @Override
             public boolean cancel() {
                 stopRun.set(true);
@@ -57,7 +57,6 @@ public class FullNetworkUpdater extends SwingWorker<Void, Void> {
         if (newThreshold < oldThreshold) { // to add edges 
             Edge graphEdge;
             String id;
-            SimilarityMatrix matrix = networkEmbedder.getSimilarityMatrix();
             Peptide[] peptides = matrix.getPeptides();
             for (int i = 0; i < peptides.length - 1 && !stopRun.get(); i++) {
                 for (int j = i + 1; j < peptides.length && !stopRun.get(); j++) {
@@ -98,8 +97,7 @@ public class FullNetworkUpdater extends SwingWorker<Void, Void> {
     @Override
     protected void done() {
         try {
-            get();
-            networkEmbedder.setSimilarityThreshold(newThreshold);
+            get();            
             firePropertyChange(CHANGED_THRESHOLD, oldThreshold, newThreshold);
         } catch (InterruptedException | ExecutionException ex) {
             Exceptions.printStackTrace(ex);

@@ -107,13 +107,21 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
         richTooltip.addDescriptionSection("Min: " + (histogram != null && histogram.countValues() > 0 ? formatter.format(histogram.getMinValue()) : "NaN"));
         richTooltip.addDescriptionSection("Max: " + (histogram != null && histogram.countValues() > 0 ? formatter.format(histogram.getMaxValue()) : "NaN"));
     }
-    
-    private void setRunning(boolean running){
+
+    private void setRunning(boolean running) {
         jApplyButton.setEnabled(!running);
         jCutoffToolBar.setEnabled(!running);
         jLessCutoffButton.setEnabled(!running);
         jMoreCutoffButton.setEnabled(!running);
         cutoffSlider.setEnabled(!running);
+    }
+
+    private void setNewThreshold(float value) {
+        csMapper.getNetworkEmbedderAlg().setSimilarityThreshold(value);
+        jCutoffCurrentValue.setText(formatter.format(value));
+        jCutoffNewLabel.setVisible(false);
+        jCutoffNewValue.setVisible(false);
+        jApplyButton.setEnabled(false);
     }
 
     /**
@@ -216,6 +224,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
         cutoffSlider.setPaintLabels(true);
         cutoffSlider.setPaintTicks(true);
         cutoffSlider.setToolTipText(org.openide.util.NbBundle.getMessage(ChemSpaceNetworkPanel.class, "ChemSpaceNetworkPanel.cutoffSlider.toolTipText")); // NOI18N
+        cutoffSlider.setValue(70);
         cutoffSlider.setMinimumSize(new java.awt.Dimension(360, 80));
         cutoffSlider.setPreferredSize(new java.awt.Dimension(360, 80));
         cutoffSlider.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -291,26 +300,20 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
             float oldValue = Float.parseFloat(jCutoffCurrentValue.getText());
             float newValue = Float.parseFloat(jCutoffNewValue.getText());
             NetworkEmbedder embedder = csMapper.getNetworkEmbedderAlg();
-            switch(embedder.getNetworkType()){
+            switch (embedder.getNetworkType()) {
                 case FULL:
-                    FullNetworkUpdater fnUpdater = new FullNetworkUpdater(oldValue, newValue, embedder);
-                    fnUpdater.addPropertyChangeListener(this);
-                    setRunning(true);
-                    fnUpdater.execute();
+                    if (embedder.getSimilarityMatrix() != null) {
+                        FNThresholdUpdater fnUpdater = new FNThresholdUpdater(oldValue, newValue, embedder.getSimilarityMatrix());
+                        fnUpdater.addPropertyChangeListener(this);
+                        setRunning(true);
+                        fnUpdater.execute();
+                    } else {
+                        setNewThreshold(newValue);
+                    }
                     break;
                 case COMPRESSED:
+                    break;
             }
-            //            SimilarityMatrix matrix = csnAlgo.getSimilarityMatrix();
-            //            JQuickHistogram histogram = matrix.getHistogram();
-            //            float cutoff = cutoffSlider.getValue() / 100.f;
-            //            if (histogram.countValues(cutoff) > CSNAlgorithm.MAX_EDGES) {
-            //                NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithmPanel.class, "CSNAlgorithmPanel.applyCutoffValue.error", String.valueOf(CSNAlgorithm.MAX_EDGES)), NotifyDescriptor.ERROR_MESSAGE);
-            //                DialogDisplayer.getDefault().notify(nd);
-            //            } else {
-            //                csnAlgo.setCutoffValue(cutoffSlider.getValue());
-            //                ApplyCutoffValue worker = new ApplyCutoffValue(csnAlgo, jApplyButton);
-            //                worker.execute();
-            //            }
         }
     }//GEN-LAST:event_jApplyButtonActionPerformed
 
@@ -328,9 +331,9 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
             jCutoffNewValue.setVisible(true);
             jCutoffNewValue.setText(formatter.format(threshold));
             jApplyButton.setEnabled(true);
-        } else{
+        } else {
             jCutoffNewLabel.setVisible(false);
-            jCutoffNewValue.setVisible(false);                        
+            jCutoffNewValue.setVisible(false);
             jApplyButton.setEnabled(false);
             jCutoffNewValue.setText("");
         }
@@ -378,11 +381,9 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
                 if (evt.getPropertyName().equals(MapperAlgorithm.RUNNING)) {
                     setupHistogram(csMapper.isRunning());
                 }
-            } else if (evt.getPropertyName().equals(FullNetworkUpdater.CHANGED_THRESHOLD)){
+            } else if (evt.getPropertyName().equals(FNThresholdUpdater.CHANGED_THRESHOLD)) {
                 setRunning(false);
-                jCutoffCurrentValue.setText(jCutoffNewValue.getText());
-                jCutoffNewLabel.setVisible(false);
-                jCutoffNewValue.setVisible(false);                
+                setNewThreshold((float) evt.getNewValue());
             }
         }
     }

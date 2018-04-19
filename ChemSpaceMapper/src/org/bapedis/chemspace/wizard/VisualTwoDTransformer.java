@@ -38,7 +38,7 @@ public final class VisualTwoDTransformer extends JPanel {
         TransformerFactoryTreeNode factoryNode;
         for(int i=0; i< treeNode.getChildCount(); i++){
             factoryNode = (TransformerFactoryTreeNode)treeNode.getChildAt(i);
-            if (factoryNode.getFactory().equals(factory)){
+            if (factoryNode.getFactory().getName().equals(factory.getName())){
                 jTree1.setSelectionPath(new TreePath(factoryNode.getPath()));
             }
         }

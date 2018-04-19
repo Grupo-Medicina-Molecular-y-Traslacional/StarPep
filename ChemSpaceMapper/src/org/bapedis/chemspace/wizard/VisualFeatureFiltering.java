@@ -63,7 +63,7 @@ public final class VisualFeatureFiltering extends JPanel {
         setPreferredSize(new java.awt.Dimension(500, 460));
         setLayout(new java.awt.GridBagLayout());
 
-        bottomPanel.setBorder(null);
+        bottomPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         bottomPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

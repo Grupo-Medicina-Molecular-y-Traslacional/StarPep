@@ -31,9 +31,7 @@ public class NetworkEmbedder extends AbstractEmbedder {
     public static final int MAX_NODES=1000;
     public static final int MAX_EDGES=100000;
     
-    private static final ForkJoinPool fjPool = new ForkJoinPool();
-    protected final PropertyChangeSupport propertyChangeSupport;
-    static final String CHANGED_THRESHOLD = "threshold";
+    private static final ForkJoinPool fjPool = new ForkJoinPool();    
     private SimilarityMeasure simMeasure;
     private SimilarityMatrix similarityMatrix;
     private float similarityThreshold;
@@ -46,7 +44,6 @@ public class NetworkEmbedder extends AbstractEmbedder {
         similarityThreshold = 0.7f;
         networkType = NetworkType.FULL;
         compressedModel = new CompressedModel();
-        propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
     public SimilarityMeasure getSimMeasure() {
@@ -62,9 +59,7 @@ public class NetworkEmbedder extends AbstractEmbedder {
     }
 
     public void setSimilarityThreshold(float similarityThreshold) {
-        float oldThreshold = this.similarityThreshold;
         this.similarityThreshold = similarityThreshold;
-        propertyChangeSupport.firePropertyChange(CHANGED_THRESHOLD, oldThreshold, similarityThreshold);
     }        
 
     public SimilarityMatrix getSimilarityMatrix() {
@@ -205,14 +200,5 @@ public class NetworkEmbedder extends AbstractEmbedder {
         super.cancel();
         SimilarityMatrixkBuilder.setStopRun(stopRun);
         return stopRun;
-    }      
-    
-    public void addThresholdListener(PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
-    }
-
-    public void removeThresholdListener(PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
-    }      
-
+    }             
 }

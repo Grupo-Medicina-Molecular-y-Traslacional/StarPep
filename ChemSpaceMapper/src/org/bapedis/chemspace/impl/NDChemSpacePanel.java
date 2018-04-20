@@ -5,14 +5,18 @@
  */
 package org.bapedis.chemspace.impl;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import org.bapedis.chemspace.model.TwoDSpace;
+
 /**
  *
  * @author loge
  */
-public class NDChemSpacePanel extends javax.swing.JPanel {
+public class NDChemSpacePanel extends javax.swing.JPanel implements PropertyChangeListener {
 
     protected MapperAlgorithm csMapper;
-    
+
     /**
      * Creates new form NDChemSpacePanel
      */
@@ -20,7 +24,7 @@ public class NDChemSpacePanel extends javax.swing.JPanel {
         initComponents();
     }
 
-    public void setUp(MapperAlgorithm csMapper){
+    public void setUp(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
         TwoDEmbedder twoDEmbedder = csMapper.getTwoDEmbedderAlg();
         int level = twoDEmbedder.getJitterLevel();
@@ -28,17 +32,23 @@ public class NDChemSpacePanel extends javax.swing.JPanel {
         levelSlider.setValue(level);
         jLevelNewLabel.setVisible(false);
         jLevelNewValue.setVisible(false);
-    }   
-    
-    
-    private void setNewLevel(int level){
-        csMapper.getTwoDEmbedderAlg().setJitterLevel(level);
+    }
+
+    private void changeLevel(int level) {
         jLevelCurrentValue.setText(String.valueOf(level));
         jLevelNewLabel.setVisible(false);
         jLevelNewValue.setVisible(false);
-        jApplyButton.setEnabled(false);    
+        jApplyButton.setEnabled(false);
     }
-    
+
+    private void setRunning(boolean running) {
+        jApplyButton.setEnabled(!running);
+        jLevelToolBar.setEnabled(!running);
+        jLessLevelButton.setEnabled(!running);
+        jMoreLevelButton.setEnabled(!running);
+        levelSlider.setEnabled(!running);
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -186,35 +196,19 @@ public class NDChemSpacePanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jApplyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jApplyButtonActionPerformed
-        if (csMapper != null){
+        if (csMapper != null) {
             int newValue = levelSlider.getValue();
             TwoDEmbedder embedder = csMapper.getTwoDEmbedderAlg();
-            if (embedder.getTwoDSpace() != null){
-            
-            }else{
-                setNewLevel(newValue);
+            if (embedder.getTwoDSpace() != null) {
+                TwoDSpace twoDSpace = embedder.getTwoDSpace();
+                JitterLevelUpdater updater = new JitterLevelUpdater(twoDSpace, newValue);
+                updater.addPropertyChangeListener(this);
+                setRunning(true);
+                updater.execute();
+            } else {
+                changeLevel(newValue);
             }
         }
-
-//        if (csMapper != null) {
-//            float oldValue = Float.parseFloat(jCutoffCurrentValue.getText());
-//            float newValue = Float.parseFloat(jCutoffNewValue.getText());
-//            NetworkEmbedder embedder = csMapper.getNetworkEmbedderAlg();
-//            switch (embedder.getNetworkType()) {
-//                case FULL:
-//                if (embedder.getSimilarityMatrix() != null) {
-//                    FullNetworkUpdater fnUpdater = new FullNetworkUpdater(oldValue, newValue, embedder.getSimilarityMatrix());
-//                    fnUpdater.addPropertyChangeListener(this);
-//                    setRunning(true);
-//                    fnUpdater.execute();
-//                } else {
-//                    setNewThreshold(newValue);
-//                }
-//                break;
-//                case COMPRESSED:
-//                break;
-//            }
-//        }
     }//GEN-LAST:event_jApplyButtonActionPerformed
 
     private void jLessLevelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLessLevelButtonActionPerformed
@@ -236,6 +230,9 @@ public class NDChemSpacePanel extends javax.swing.JPanel {
             jLevelNewValue.setVisible(false);
             jApplyButton.setEnabled(false);
             jLevelNewValue.setText("");
+        }
+        if (csMapper != null) {
+            csMapper.getTwoDEmbedderAlg().setJitterLevel(level);
         }
     }//GEN-LAST:event_levelSliderStateChanged
 
@@ -260,4 +257,12 @@ public class NDChemSpacePanel extends javax.swing.JPanel {
     private javax.swing.JPanel jitterPanel;
     private javax.swing.JSlider levelSlider;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(JitterLevelUpdater.CHANGED_LEVEL)) {
+            setRunning(false);
+            changeLevel((int) evt.getNewValue());
+        }
+    }
 }

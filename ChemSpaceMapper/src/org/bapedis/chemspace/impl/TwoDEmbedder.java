@@ -7,6 +7,7 @@ package org.bapedis.chemspace.impl;
 
 import java.util.Random;
 import javax.vecmath.Vector2f;
+import org.bapedis.chemspace.model.JitterModel;
 import org.bapedis.chemspace.model.TwoDSpace;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
@@ -47,7 +48,7 @@ public class TwoDEmbedder extends AbstractEmbedder {
 
     public TwoDSpace getTwoDSpace() {
         return twoDSpace;
-    }        
+    }
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
@@ -68,16 +69,19 @@ public class TwoDEmbedder extends AbstractEmbedder {
         Vector2f[] positions = transformer.transform(peptides, features);
 
         if (positions != null) {
+            VectorUtil.normalize(positions);
             twoDSpace = new TwoDSpace(peptides, positions);
             if (jitterLevel > 0) {
-                positions = jittering(positions, jitterLevel);
+                JitterModel jitterModel = twoDSpace.getJitterModel();
+                jitterModel.setLevel(jitterLevel);
+                positions = jittering(twoDSpace);
             }
             setGraphNodePositions(graph, peptides, positions);
         }
     }
 
     public static void setGraphNodePositions(Graph graph, Peptide[] peptides, Vector2f[] positions) {
-        VectorUtil.normalize(positions);
+
         graph.readLock();
         try {
             Node node;
@@ -96,30 +100,28 @@ public class TwoDEmbedder extends AbstractEmbedder {
         }
     }
 
-    public static Vector2f[] jittering(Vector2f[] positions, int level) {
-        if (level < 1 || level > TwoDJittering.STEPS) {
-            throw new IllegalArgumentException("Jitter Level should be between 1 and " + TwoDJittering.STEPS);
+    public static Vector2f[] jittering(TwoDSpace twoDSpace) {
+        Vector2f[] positions = twoDSpace.getPositions();
+        Vector2f[] v = VectorUtil.arrayCopy(positions);
+
+        JitterModel jitterModel = twoDSpace.getJitterModel();
+        if (jitterModel.getMinDistances() == null) {
+            TwoDNNComputer nn = new TwoDNNComputer(positions);
+            nn.computeNaive();
+            float dist = nn.getMinMinDist();
+            float add = (nn.getMaxMinDist() - nn.getMinMinDist()) * 0.5f;
+            Double log[] = ArrayUtil.logBinning(JitterModel.STEPS, 1.2);
+
+            float minDistances[] = new float[JitterModel.STEPS + 1];
+            for (int j = 1; j <= JitterModel.STEPS; j++) {
+                minDistances[j] = dist + add * log[j].floatValue();
+            }
+            jitterModel.setMinDistances(minDistances);
         }
-
-        Vector2f[] v = new Vector2f[positions.length];
-        System.arraycopy(positions, 0, v, 0, positions.length);
-
-        TwoDNNComputer nn = new TwoDNNComputer(v);
-        nn.computeNaive();
-
-        float dist = nn.getMinMinDist();
-        float add = (nn.getMaxMinDist() - nn.getMinMinDist()) * 0.5f;
-        Double log[] = ArrayUtil.logBinning(TwoDJittering.STEPS, 1.2);
-
-        float minDistances[] = new float[TwoDJittering.STEPS + 1];
-        for (int j = 1; j <= TwoDJittering.STEPS; j++) {
-            minDistances[j] = dist + add * log[j].floatValue();
-        }
-        TwoDJittering j = new TwoDJittering(v, minDistances[level], new Random());
+        TwoDJittering j = new TwoDJittering(v, jitterModel.getMinDistance(), new Random());
         j.jitter();
-
+        VectorUtil.normalize(v);
         return v;
     }
-       
 
 }

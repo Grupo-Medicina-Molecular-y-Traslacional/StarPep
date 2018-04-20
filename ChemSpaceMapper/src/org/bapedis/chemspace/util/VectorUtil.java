@@ -151,4 +151,12 @@ public class VectorUtil {
         return max;
     }
 
+    public static Vector2f[] arrayCopy(Vector2f[] vectors) {
+        Vector2f[] v = new Vector2f[vectors.length];
+        for(int i=0; i<vectors.length; i++){
+            v[i] = (Vector2f)vectors[i].clone();
+        }
+        return v;
+    }
+
 }

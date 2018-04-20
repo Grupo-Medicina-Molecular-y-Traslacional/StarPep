@@ -116,8 +116,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
         cutoffSlider.setEnabled(!running);
     }
 
-    private void setNewThreshold(float value) {
-        csMapper.getNetworkEmbedderAlg().setSimilarityThreshold(value);
+    private void changeThreshold(float value) {
         jCutoffCurrentValue.setText(formatter.format(value));
         jCutoffNewLabel.setVisible(false);
         jCutoffNewValue.setVisible(false);
@@ -308,7 +307,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
                         setRunning(true);
                         fnUpdater.execute();
                     } else {
-                        setNewThreshold(newValue);
+                        changeThreshold(newValue);
                     }
                     break;
                 case COMPRESSED:
@@ -336,6 +335,9 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
             jCutoffNewValue.setVisible(false);
             jApplyButton.setEnabled(false);
             jCutoffNewValue.setText("");
+        }
+        if (csMapper != null) {
+            csMapper.getNetworkEmbedderAlg().setSimilarityThreshold(threshold);
         }
     }//GEN-LAST:event_cutoffSliderStateChanged
 
@@ -383,7 +385,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
                 }
             } else if (evt.getPropertyName().equals(FNThresholdUpdater.CHANGED_THRESHOLD)) {
                 setRunning(false);
-                setNewThreshold((float) evt.getNewValue());
+                changeThreshold((float) evt.getNewValue());
             }
         }
     }

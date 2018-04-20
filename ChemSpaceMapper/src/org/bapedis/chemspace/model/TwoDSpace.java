@@ -15,10 +15,12 @@ import org.bapedis.core.model.Peptide;
 public class TwoDSpace {
     protected final Peptide[] peptides;
     protected final Vector2f[] positions;
+    protected final JitterModel jitterModel;
 
     public TwoDSpace(Peptide[] peptides, Vector2f[] positions) {
         this.peptides = peptides;
         this.positions = positions;
+        jitterModel = new JitterModel();
     }
 
     public Peptide[] getPeptides() {
@@ -28,5 +30,8 @@ public class TwoDSpace {
     public Vector2f[] getPositions() {
         return positions;
     }
-        
+
+    public JitterModel getJitterModel() {
+        return jitterModel;
+    }        
 }

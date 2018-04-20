@@ -51,8 +51,9 @@ public class MapperAlgorithm implements Algorithm {
     // Algorithms    
     private AllDescriptors featureExtractionAlg;
     private FeatureFiltering featureFilteringAlg;
-    private NetworkEmbedder networkEmbedderAlg;
     private TwoDEmbedder twoDEmbedderAlg;
+    private CSNEmbedder csnEmbedderAlg;
+    private SSNEmbedder ssnEmbedderAlg;
 
     //Algorithm workflow
     private final List<Algorithm> algorithms;
@@ -72,49 +73,55 @@ public class MapperAlgorithm implements Algorithm {
 
         // Algorithms
         featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
-        featureFilteringAlg = (FeatureFiltering) new FeatureFilteringFactory().createAlgorithm();
-        networkEmbedderAlg = (NetworkEmbedder) new NetworkEmbedderFactory().createAlgorithm();
+        featureFilteringAlg = (FeatureFiltering) new FeatureFilteringFactory().createAlgorithm();        
         twoDEmbedderAlg = (TwoDEmbedder) new TwoDEmbedderFactory().createAlgorithm();
+        csnEmbedderAlg = (CSNEmbedder) new CSNEmbedderFactory().createAlgorithm();
+        ssnEmbedderAlg = (SSNEmbedder) new SSNEmbedderFactory().createAlgorithm();
     }
 
     public boolean isRunning() {
         return running;
-    }  
-    
+    }
+
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
         this.progressTicket = progressTicket;
         stopRun = false;
-        
+
         // Populate algorithm workflow        
         algorithms.clear();
-
-        // Feature Extraction
-        if (feOption == FeatureExtractionOption.NEW) {
-            algorithms.add(featureExtractionAlg);
-        }
-
-        // Feature Filtering
-        if (ffOption == FeatureFilteringOption.YES) {
-            algorithms.add(featureFilteringAlg);
-        }
-
-        // Chemical Space Embedder
-        // Chemical Space Embedder
-        switch(csOption){
-            case CHEM_SPACE_NETWORK:
-                algorithms.add(networkEmbedderAlg);
-                break;
+        
+        switch (csOption) {
             case N_DIMENSIONAL_SPACE:
-                algorithms.add(twoDEmbedderAlg);
+            case CHEM_SPACE_NETWORK:
+                // Feature Extraction
+                if (feOption == FeatureExtractionOption.NEW) {
+                    algorithms.add(featureExtractionAlg);
+                }
+
+                // Feature Filtering
+                if (ffOption == FeatureFilteringOption.YES) {
+                    algorithms.add(featureFilteringAlg);
+                }
+                // Chemical Space Embedder
+                DescriptorBasedEmbedder embedder = null;
+                if (csOption == ChemSpaceOption.N_DIMENSIONAL_SPACE) {
+                    embedder = twoDEmbedderAlg;
+                } else if (csOption == ChemSpaceOption.CHEM_SPACE_NETWORK) {
+                    embedder = csnEmbedderAlg;
+                }
+                algorithms.add(embedder);
+                break;
+            case SEQ_SIMILARITY_NETWORK:
+                algorithms.add(ssnEmbedderAlg);
                 break;
             case NONE:
                 throw new RuntimeException("Internal error: Chemical Space Embedder is null");
         }
-        
+
         running = true;
-        propertyChangeSupport.firePropertyChange(RUNNING, false, true);        
+        propertyChangeSupport.firePropertyChange(RUNNING, false, true);
     }
 
     @Override
@@ -139,9 +146,9 @@ public class MapperAlgorithm implements Algorithm {
     public void endAlgo() {
         workspace = null;
         progressTicket = null;
-        
+
         running = false;
-        propertyChangeSupport.firePropertyChange(RUNNING, true, false);        
+        propertyChangeSupport.firePropertyChange(RUNNING, true, false);
     }
 
     @Override
@@ -201,14 +208,23 @@ public class MapperAlgorithm implements Algorithm {
         return featureFilteringAlg;
     }
 
-    public NetworkEmbedder getNetworkEmbedderAlg() {
-        return networkEmbedderAlg;
+    public CSNEmbedder getCSNEmbedderAlg() {
+        return csnEmbedderAlg;
     }
 
-    public void setNetworkEmbedderAlg(NetworkEmbedder networkEmbedderAlg) {
-        this.networkEmbedderAlg = networkEmbedderAlg;
+    public void setCSNEmbedderAlg(CSNEmbedder networkEmbedderAlg) {
+        this.csnEmbedderAlg = networkEmbedderAlg;
     }
 
+    public SSNEmbedder getSSNEmbedderAlg() {
+        return ssnEmbedderAlg;
+    }
+
+    public void setSSNEmbedderAlg(SSNEmbedder ssnEmbedderAlg) {
+        this.ssnEmbedderAlg = ssnEmbedderAlg;
+    }
+
+    
     public TwoDEmbedder getTwoDEmbedderAlg() {
         return twoDEmbedderAlg;
     }
@@ -226,13 +242,13 @@ public class MapperAlgorithm implements Algorithm {
     public AlgorithmFactory getFactory() {
         return factory;
     }
-    
+
     public void addRunningListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
     public void removeRunningListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
-    }        
+    }
 
 }

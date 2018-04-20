@@ -6,7 +6,6 @@
 package org.bapedis.chemspace.spi;
 
 import org.bapedis.core.model.MolecularDescriptor;
-import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 
 /**
@@ -19,6 +18,6 @@ public interface SimilarityMeasure {
     
     void setMolecularFeatures(MolecularDescriptor[] features);
     
-    float computeSimilarity(Peptide peptide1, Peptide peptide2) throws MolecularDescriptorNotFoundException;
+    float computeSimilarity(Peptide peptide1, Peptide peptide2) throws Exception;
     
 }

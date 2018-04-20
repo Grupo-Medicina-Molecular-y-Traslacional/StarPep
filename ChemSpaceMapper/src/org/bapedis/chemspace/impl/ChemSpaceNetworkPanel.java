@@ -76,7 +76,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
 
     public void setUp(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
-        NetworkEmbedder embedder = csMapper.getNetworkEmbedderAlg();
+        CSNEmbedder embedder = csMapper.getCSNEmbedderAlg();
         float similarityThreshold = embedder.getSimilarityThreshold();
         jCutoffCurrentValue.setText(formatter.format(similarityThreshold));
         cutoffSlider.setValue((int) (similarityThreshold * 100));
@@ -87,7 +87,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
 
     private void setupHistogram(boolean running) {
         histogramPanel.removeAll();
-        NetworkEmbedder embedder = csMapper.getNetworkEmbedderAlg();
+        CSNEmbedder embedder = csMapper.getCSNEmbedderAlg();
         SimilarityMatrix matrix = embedder.getSimilarityMatrix();
         JQuickHistogram histogram = null;
         if (!running && matrix != null) {
@@ -298,7 +298,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
         if (csMapper != null) {
             float oldValue = Float.parseFloat(jCutoffCurrentValue.getText());
             float newValue = Float.parseFloat(jCutoffNewValue.getText());
-            NetworkEmbedder embedder = csMapper.getNetworkEmbedderAlg();
+            CSNEmbedder embedder = csMapper.getCSNEmbedderAlg();
             switch (embedder.getNetworkType()) {
                 case FULL:
                     if (embedder.getSimilarityMatrix() != null) {
@@ -337,7 +337,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
             jCutoffNewValue.setText("");
         }
         if (csMapper != null) {
-            csMapper.getNetworkEmbedderAlg().setSimilarityThreshold(threshold);
+            csMapper.getCSNEmbedderAlg().setSimilarityThreshold(threshold);
         }
     }//GEN-LAST:event_cutoffSliderStateChanged
 

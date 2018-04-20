@@ -100,9 +100,9 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
                 }
                 break;
             case CHEM_SPACE_NETWORK:
-                NetworkEmbedder networkEmbedder = (NetworkEmbedder) wiz.getProperty(AbstractEmbedder.class.getName());
+                CSNEmbedder networkEmbedder = (CSNEmbedder) wiz.getProperty(AbstractEmbedder.class.getName());
                 if (networkEmbedder != null) {
-                    csMapper.setNetworkEmbedderAlg(networkEmbedder);
+                    csMapper.setCSNEmbedderAlg(networkEmbedder);
                 }
                 break;
             case NONE:

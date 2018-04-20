@@ -101,9 +101,9 @@ class SimilarityMatrixkBuilder extends RecursiveAction {
                         DialogDisplayer.getDefault().notify(ex.getErrorND());
                         stopRun.set(true);
                         throw new RuntimeException(ex);
-                    } catch(Throwable t){
+                    } catch(Exception ex){
                         stopRun.set(true);
-                        throw t;
+                        throw new RuntimeException(ex);
                     }                    
                 }
             }

@@ -8,6 +8,7 @@ package org.bapedis.chemspace.wizard;
 import java.awt.CardLayout;
 import javax.swing.JPanel;
 import org.bapedis.chemspace.model.ChemSpaceOption;
+import org.bapedis.chemspace.model.CompressedModel;
 import org.bapedis.chemspace.model.NetworkType;
 import org.openide.util.NbBundle;
 
@@ -22,8 +23,8 @@ public final class VisualRepresentation extends JPanel {
     public VisualRepresentation() {
         initComponents();
         networkType = NetworkType.NONE;
-        compressedStrategyIndex = 0;
-        compressedMaxSuperNodes = 1000;
+        compressedStrategyIndex = CompressedModel.DEFAULT_STRATEGY_INDEX;
+        compressedMaxSuperNodes = CompressedModel.DEFAULT_MAX_SUPER_NODES;
     }
 
     public ChemSpaceOption getChemSpaceOption() {
@@ -46,12 +47,19 @@ public final class VisualRepresentation extends JPanel {
                 }
                 extLabel.setText(NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.extLabel.option2.text"));
                 break;
+            case SEQ_SIMILARITY_NETWORK:
+                if (!jOption3.isSelected()){
+                    jOption3.setSelected(true);
+                }
+                extLabel.setText(NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.extLabel.option3.text"));
+                break;
             case NONE:
                 jOption1.setSelected(false);
                 jOption2.setSelected(false);
+                jOption3.setSelected(false);
                 extLabel.setText(NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.extLabel.text"));
         }
-        refreshNetworkOptionPanel(jOption2.isSelected());
+        refreshNetworkOptionPanel(jOption2.isSelected() || jOption3.isSelected());
         firePropertyChange(CHANGED_CHEM_SPACE, oldOption, csOption);
     }
 
@@ -138,10 +146,9 @@ public final class VisualRepresentation extends JPanel {
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
         jQuestionLabel = new javax.swing.JLabel();
-        jInfo1 = new javax.swing.JLabel();
-        jInfo2 = new javax.swing.JLabel();
         jOption1 = new javax.swing.JRadioButton();
         jOption2 = new javax.swing.JRadioButton();
+        jOption3 = new javax.swing.JRadioButton();
         networkTypePanel = new javax.swing.JPanel();
         jOptionFN = new javax.swing.JRadioButton();
         jOptionCN = new javax.swing.JRadioButton();
@@ -168,24 +175,6 @@ public final class VisualRepresentation extends JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jQuestionLabel, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jInfo1, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jInfo1.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(7, 5, 0, 0);
-        add(jInfo1, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jInfo2, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jInfo2.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(7, 5, 0, 0);
-        add(jInfo2, gridBagConstraints);
 
         buttonGroup1.add(jOption1);
         org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jOption1.text")); // NOI18N
@@ -216,13 +205,28 @@ public final class VisualRepresentation extends JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jOption2, gridBagConstraints);
 
-        networkTypePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.networkTypePanel.border.title"))); // NOI18N
+        buttonGroup1.add(jOption3);
+        org.openide.awt.Mnemonics.setLocalizedText(jOption3, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jOption3.text")); // NOI18N
+        jOption3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOption3ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(jOption3, gridBagConstraints);
+
+        networkTypePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.networkTypePanel.border.title"), javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
         networkTypePanel.setLayout(new java.awt.GridBagLayout());
 
         buttonGroup2.add(jOptionFN);
@@ -381,18 +385,21 @@ public final class VisualRepresentation extends JPanel {
         refreshNetworkOptionPanel(jOption2.isSelected());
     }//GEN-LAST:event_jOption2ItemStateChanged
 
+    private void jOption3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption3ActionPerformed
+        setChemSpaceOption(ChemSpaceOption.SEQ_SIMILARITY_NETWORK);
+    }//GEN-LAST:event_jOption3ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bottomPanel;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JLabel extLabel;
     private javax.swing.JLabel jBasedOnLabel;
-    private javax.swing.JLabel jInfo1;
-    private javax.swing.JLabel jInfo2;
     private javax.swing.JLabel jMaxNumberLabel;
     private javax.swing.JLabel jNoneLabel;
     private javax.swing.JRadioButton jOption1;
     private javax.swing.JRadioButton jOption2;
+    private javax.swing.JRadioButton jOption3;
     private javax.swing.JRadioButton jOptionCN;
     private javax.swing.JComboBox<String> jOptionCN_1_Items;
     private javax.swing.JComboBox<String> jOptionCN_2_Items;

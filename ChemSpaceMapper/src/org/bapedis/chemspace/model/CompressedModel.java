@@ -11,13 +11,15 @@ package org.bapedis.chemspace.model;
  */
 public class CompressedModel implements Cloneable{
     public static final int COMMUNITY_INDEX=0;
+    
+    public static final int DEFAULT_STRATEGY_INDEX=COMMUNITY_INDEX;
     public static final int DEFAULT_MAX_SUPER_NODES=1000;
     
     private int strategyIndex;
     private int maxSuperNodes;
 
     public CompressedModel() {
-        strategyIndex = COMMUNITY_INDEX;
+        strategyIndex = DEFAULT_STRATEGY_INDEX;
         maxSuperNodes = DEFAULT_MAX_SUPER_NODES;
     }
 

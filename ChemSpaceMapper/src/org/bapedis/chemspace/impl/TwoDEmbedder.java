@@ -26,7 +26,7 @@ import org.gephi.graph.api.Graph;
  *
  * @author loge
  */
-public class TwoDEmbedder extends AbstractEmbedder {
+public class TwoDEmbedder extends DescriptorBasedEmbedder {
 
     private TwoDTransformer transformer;
     private TwoDSpace twoDSpace;

@@ -12,7 +12,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 import org.bapedis.chemspace.impl.AbstractEmbedder;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
-import org.bapedis.chemspace.impl.NetworkEmbedder;
+import org.bapedis.chemspace.impl.CSNEmbedder;
 import org.bapedis.chemspace.spi.SimilarityMeasureFactory;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
@@ -23,7 +23,7 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
         PropertyChangeListener {
 
     private final MapperAlgorithm csMapper;
-    private NetworkEmbedder alg;
+    private CSNEmbedder alg;
     private final EventListenerList listeners = new EventListenerList();
     private boolean isValid;
     private WizardDescriptor model;
@@ -84,7 +84,7 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state  
         this.model = wiz;
-        alg = (NetworkEmbedder) wiz.getProperty(AbstractEmbedder.class.getName());
+        alg = (CSNEmbedder) wiz.getProperty(AbstractEmbedder.class.getName());
         if (alg.getSimMeasure() != null) {
             getComponent().setFactory(alg.getSimMeasure().getFactory());
         }

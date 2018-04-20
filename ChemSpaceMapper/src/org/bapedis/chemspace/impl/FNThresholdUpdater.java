@@ -66,7 +66,7 @@ public class FNThresholdUpdater extends SwingWorker<Void, Void> {
                             id = String.format("%s-%s", peptides[i].getId(), peptides[j].getId());
                             graphEdge = mainGraph.getEdge(id);
                             if (graphEdge == null) {
-                                graphEdge = NetworkEmbedder.createGraphEdge(graphModel, id, peptides[i].getGraphNode(), peptides[j].getGraphNode(), score);
+                                graphEdge = CSNEmbedder.createGraphEdge(graphModel, id, peptides[i].getGraphNode(), peptides[j].getGraphNode(), score);
                             }
                             graph.writeLock();
                             try {

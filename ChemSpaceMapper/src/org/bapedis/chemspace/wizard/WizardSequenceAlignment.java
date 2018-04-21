@@ -7,18 +7,25 @@ package org.bapedis.chemspace.wizard;
 
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
+import org.bapedis.chemspace.impl.AbstractEmbedder;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
-import org.bapedis.core.spi.alg.impl.SequenceClustering;
+import org.bapedis.chemspace.impl.SSNEmbedder;
+import org.bapedis.core.model.SequenceAlignmentModel;
+import org.bapedis.core.ui.components.SequenceAlignmentPanel;
 import org.openide.WizardDescriptor;
+import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 
-public class WizardSequenceAlignment implements WizardDescriptor.Panel<WizardDescriptor> {   
+public class WizardSequenceAlignment implements WizardDescriptor.Panel<WizardDescriptor> {
+
     private final MapperAlgorithm csMapper;
+    private SequenceAlignmentModel alignmentModel;
+    private SSNEmbedder ssnEmbedder;
 
     public WizardSequenceAlignment(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
-    }        
-    
+    }
+
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
@@ -32,8 +39,12 @@ public class WizardSequenceAlignment implements WizardDescriptor.Panel<WizardDes
     @Override
     public VisualSequenceAlignment getComponent() {
         if (component == null) {
-//            JPanel settingPanel = clusteringAlgo.getFactory().getSetupUI().getSettingPanel(clusteringAlgo);
-            component = new VisualSequenceAlignment(new JPanel());
+            try {
+                alignmentModel = (SequenceAlignmentModel) csMapper.getSSNEmbedderAlg().getAlignmentModel().clone();
+                component = new VisualSequenceAlignment(new SequenceAlignmentPanel(alignmentModel));
+            } catch (CloneNotSupportedException ex) {
+                Exceptions.printStackTrace(ex);
+            }
         }
         return component;
     }
@@ -67,11 +78,15 @@ public class WizardSequenceAlignment implements WizardDescriptor.Panel<WizardDes
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
+        ssnEmbedder = (SSNEmbedder)wiz.getProperty(AbstractEmbedder.class.getName());
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
+        if(ssnEmbedder != null){
+            ssnEmbedder.setAlignmentModel(alignmentModel);
+        }
     }
 
 }

@@ -6,6 +6,7 @@
 package org.bapedis.chemspace.impl;
 
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.bapedis.chemspace.model.CompressedModel;
 import org.bapedis.chemspace.model.NetworkType;
 import org.bapedis.chemspace.model.SimilarityMatrix;
@@ -29,7 +30,9 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
     public static final int MAX_NODES=1000;
     public static final int MAX_EDGES=100000;
     
-    private static final ForkJoinPool fjPool = new ForkJoinPool();    
+    private static final ForkJoinPool fjPool = new ForkJoinPool();   
+    private SimilarityMatrixBuilder task;
+    private AtomicBoolean atomicRun;
     private SimilarityMeasure simMeasure;
     private SimilarityMatrix similarityMatrix;
     private float similarityThreshold;
@@ -91,6 +94,7 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         super.initAlgo(workspace, progressTicket);
         similarityMatrix = null;
+        atomicRun = new AtomicBoolean(stopRun);
     }
 
     @Override
@@ -99,13 +103,12 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
         simMeasure.setMolecularFeatures(features);
 
         // Setup Similarity Matrix Builder
-        SimilarityMatrixkBuilder.setStopRun(stopRun);
-        SimilarityMatrixkBuilder.setContext(peptides, simMeasure, ticket);
-
-        // Compute new similarity matrix        
-        SimilarityMatrixkBuilder task = new SimilarityMatrixkBuilder();
+        task = new SimilarityMatrixBuilder(peptides);
+        task.setContext(simMeasure, ticket, atomicRun);
         int workunits = task.getWorkUnits();
         ticket.switchToDeterminate(workunits);
+        
+        // Compute new similarity matrix        
         fjPool.invoke(task);
         task.join();
         similarityMatrix = task.getSimilarityMatrix(); 
@@ -119,9 +122,9 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
         }
     }     
     
-    private void createFullNetwork(){
+    private  void createFullNetwork(){
         Peptide[] peptides = similarityMatrix.getPeptides();
-        clearGraph(graphModel);   
+        NetworkEmbedder.clearGraph(graphModel);   
         Edge graphEdge;
         Float score;
         String id;
@@ -131,7 +134,7 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
                 if (score != null && score >= similarityThreshold) {
                     if (graph.contains(peptides[i].getGraphNode()) && graph.contains(peptides[j].getGraphNode())) {
                         id = String.format("%s-%s", peptides[i].getId(), peptides[j].getId());
-                        graphEdge = createGraphEdge(graphModel, id, peptides[i].getGraphNode(), peptides[j].getGraphNode(), score);
+                        graphEdge = NetworkEmbedder.createGraphEdge(graphModel, id, peptides[i].getGraphNode(), peptides[j].getGraphNode(), score);
                         graph.writeLock();
                         try {
                             graph.addEdge(graphEdge);
@@ -142,55 +145,18 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
                 }
             }
         }    
-    }
-    
-    public static void clearGraph(GraphModel graphModel) {
-        // Remove all similarity edges..
-        int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-        Graph mainGraph = graphModel.getGraph();
-        mainGraph.writeLock();
-        try {
-            for (Node node : mainGraph.getNodes()) {
-                mainGraph.clearEdges(node, relType);
-            }
-        } finally {
-            mainGraph.writeUnlock();
-        }
-    }   
-
-    public static Edge createGraphEdge(GraphModel graphModel, String id, Node node1, Node node2, Float score) {
-        int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-        
-        // Create Edge
-        Edge graphEdge = graphModel.factory().newEdge(id, node1, node2, relType, ProjectManager.GRAPH_EDGE_WEIGHT, false);
-        graphEdge.setLabel(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-
-        //Set color
-        graphEdge.setR(ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f);
-        graphEdge.setG(ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f);
-        graphEdge.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
-        graphEdge.setAlpha(0f);
-
-        // Add edge to main graph
-        Graph mainGraph = graphModel.getGraph();
-        mainGraph.writeLock();
-        try {
-            mainGraph.addEdge(graphEdge);
-            graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, score);
-        } finally {
-            mainGraph.writeUnlock();
-        }
-
-        return graphEdge;
-    }    
+    }            
 
     @Override
     public void endAlgo() {
         super.endAlgo();
-        SimilarityMatrixkBuilder.setContext(null, null, null);
-        if (stopRun) { // Cancelled
+        if (task != null)
+        task.setContext(null, null, null);
+        if (stopRun){ // Cancelled
             similarityMatrix = null;
         }
+        task = null;
+        atomicRun = null;
     }
 
     @Override
@@ -203,7 +169,7 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
     @Override
     public boolean cancel() {
         super.cancel();
-        SimilarityMatrixkBuilder.setStopRun(stopRun);
+        atomicRun.set(stopRun);
         return stopRun;
     }             
 }

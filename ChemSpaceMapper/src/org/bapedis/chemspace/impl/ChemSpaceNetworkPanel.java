@@ -27,6 +27,7 @@ import org.openide.util.NbBundle;
 public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements PropertyChangeListener {
 
     protected MapperAlgorithm csMapper;
+    protected NetworkEmbedder netEmbedder;
     private RichTooltip richTooltip;
     private final DecimalFormat formatter;
 
@@ -76,8 +77,15 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
 
     public void setUp(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
-        CSNEmbedder embedder = csMapper.getCSNEmbedderAlg();
-        float similarityThreshold = embedder.getSimilarityThreshold();
+        switch(csMapper.getChemSpaceOption()){
+            case CHEM_SPACE_NETWORK:
+                netEmbedder = csMapper.getCSNEmbedderAlg();
+                break;
+            case SEQ_SIMILARITY_NETWORK:
+                netEmbedder = csMapper.getSSNEmbedderAlg();
+                break;
+        }
+        float similarityThreshold = netEmbedder.getSimilarityThreshold();
         jCutoffCurrentValue.setText(formatter.format(similarityThreshold));
         cutoffSlider.setValue((int) (similarityThreshold * 100));
         jCutoffNewLabel.setVisible(false);
@@ -87,8 +95,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
 
     private void setupHistogram(boolean running) {
         histogramPanel.removeAll();
-        CSNEmbedder embedder = csMapper.getCSNEmbedderAlg();
-        SimilarityMatrix matrix = embedder.getSimilarityMatrix();
+        SimilarityMatrix matrix = netEmbedder.getSimilarityMatrix();
         JQuickHistogram histogram = null;
         if (!running && matrix != null) {
             histogram = matrix.getHistogram();
@@ -298,11 +305,10 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
         if (csMapper != null) {
             float oldValue = Float.parseFloat(jCutoffCurrentValue.getText());
             float newValue = Float.parseFloat(jCutoffNewValue.getText());
-            CSNEmbedder embedder = csMapper.getCSNEmbedderAlg();
-            switch (embedder.getNetworkType()) {
+            switch (netEmbedder.getNetworkType()) {
                 case FULL:
-                    if (embedder.getSimilarityMatrix() != null) {
-                        FNThresholdUpdater fnUpdater = new FNThresholdUpdater(oldValue, newValue, embedder.getSimilarityMatrix());
+                    if (netEmbedder.getSimilarityMatrix() != null) {
+                        FNThresholdUpdater fnUpdater = new FNThresholdUpdater(oldValue, newValue, netEmbedder.getSimilarityMatrix());
                         fnUpdater.addPropertyChangeListener(this);
                         setRunning(true);
                         fnUpdater.execute();
@@ -336,8 +342,8 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
             jApplyButton.setEnabled(false);
             jCutoffNewValue.setText("");
         }
-        if (csMapper != null) {
-            csMapper.getCSNEmbedderAlg().setSimilarityThreshold(threshold);
+        if (netEmbedder != null) {
+            netEmbedder.setSimilarityThreshold(threshold);
         }
     }//GEN-LAST:event_cutoffSliderStateChanged
 

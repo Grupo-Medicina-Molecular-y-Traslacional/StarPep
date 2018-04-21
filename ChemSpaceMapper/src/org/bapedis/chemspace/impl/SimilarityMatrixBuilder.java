@@ -18,31 +18,32 @@ import org.openide.DialogDisplayer;
  *
  * @author Longendri Aguilera Mendoza
  */
-class SimilarityMatrixkBuilder extends RecursiveAction {
+class SimilarityMatrixBuilder extends RecursiveAction {
 
     private static final int SEQUENTIAL_THRESHOLD = 10;
-    private static Peptide[] peptides;
-    private static ProgressTicket progressTicket;
-    private static SimilarityMeasure similarityMeasure;
     private static float MIN_VALUE = 0.5f;
-
+    private Peptide[] peptides;
+    private ProgressTicket progressTicket;
+    private SimilarityMeasure similarityMeasure;
+    private AtomicBoolean stopRun;    
+    
     private final SimilarityMatrix matrix;
     private int xlow, xhigh, ylow, yhigh;
 
-    private final static Logger log = Logger.getLogger(SimilarityMatrixkBuilder.class.getName());
-    private static AtomicBoolean stopRun = new AtomicBoolean(false);
+    private final static Logger log = Logger.getLogger(SimilarityMatrixBuilder.class.getName());
 
-    SimilarityMatrixkBuilder() {
-        this(new SimilarityMatrix(peptides), 0, peptides.length, 0, peptides.length);
+    SimilarityMatrixBuilder(Peptide[] peptides) {
+        this(peptides, new SimilarityMatrix(peptides), 0, peptides.length, 0, peptides.length);   
     }
 
-    static void setContext(Peptide[] peptides, SimilarityMeasure similarityMeasure, ProgressTicket progressTicket) {
-        SimilarityMatrixkBuilder.peptides = peptides;
-        SimilarityMatrixkBuilder.similarityMeasure = similarityMeasure;
-        SimilarityMatrixkBuilder.progressTicket = progressTicket;        
+    void setContext(SimilarityMeasure similarityMeasure, ProgressTicket progressTicket, AtomicBoolean stopRun) {        
+        this.similarityMeasure = similarityMeasure;
+        this.progressTicket = progressTicket;        
+        this.stopRun = stopRun;
     }
 
-    private SimilarityMatrixkBuilder(SimilarityMatrix matrix, int xlow, int xhigh, int ylow, int yhigh) {
+    private SimilarityMatrixBuilder(Peptide[] peptides, SimilarityMatrix matrix, int xlow, int xhigh, int ylow, int yhigh) {
+        this.peptides = peptides;
         this.matrix = matrix;
         this.xlow = xlow;
         this.xhigh = xhigh;
@@ -50,7 +51,7 @@ class SimilarityMatrixkBuilder extends RecursiveAction {
         this.yhigh = yhigh;
     }
 
-    static void setStopRun(boolean stop) {
+    void setStopRun(boolean stop) {
         stopRun.set(stop);
     }
 
@@ -75,14 +76,20 @@ class SimilarityMatrixkBuilder extends RecursiveAction {
             } else if (!stopRun.get()) {
                 int middle = ylow + (yhigh - ylow) / 2;
                 // up and down
-                invokeAll(new SimilarityMatrixkBuilder(matrix, xlow, xhigh, ylow, middle),
-                        new SimilarityMatrixkBuilder(matrix, xlow, xhigh, middle, yhigh));
+                SimilarityMatrixBuilder up = new SimilarityMatrixBuilder(peptides, matrix, xlow, xhigh, ylow, middle);
+                up.setContext(similarityMeasure, progressTicket, stopRun);
+                SimilarityMatrixBuilder down = new SimilarityMatrixBuilder(peptides, matrix, xlow, xhigh, middle, yhigh);
+                down.setContext(similarityMeasure, progressTicket, stopRun);
+                invokeAll(up, down);
             }
         } else if (!stopRun.get()) {
             int middle = xlow + (xhigh - xlow) / 2;
             // left and right            
-            invokeAll(new SimilarityMatrixkBuilder(matrix, xlow, middle, ylow, yhigh),
-                    new SimilarityMatrixkBuilder(matrix, middle, xhigh, ylow, yhigh));
+            SimilarityMatrixBuilder left = new SimilarityMatrixBuilder(peptides, matrix, xlow, middle, ylow, yhigh);
+            left.setContext(similarityMeasure, progressTicket, stopRun);
+            SimilarityMatrixBuilder right = new SimilarityMatrixBuilder(peptides, matrix, middle, xhigh, ylow, yhigh);        
+            right.setContext(similarityMeasure, progressTicket, stopRun);
+            invokeAll(left, right);
         }
     }
 

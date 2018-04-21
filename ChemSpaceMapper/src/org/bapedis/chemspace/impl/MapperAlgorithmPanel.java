@@ -31,8 +31,9 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     protected final JXHyperlink openWizardLink;
     protected final JXBusyLabel busyLabel;
     protected MapperAlgorithm csMapper;
-    protected final ChemSpaceNetworkPanel networkPanel;
     protected final NDChemSpacePanel nDPanel;
+    protected final ChemSpaceNetworkPanel csnPanel;
+    protected final ChemSpaceNetworkPanel ssnPanel;    
 
     /**
      * Creates new form MapperAlgorithmPanel
@@ -52,8 +53,11 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         nDPanel = new NDChemSpacePanel();
         centerPanel.add(nDPanel, "nDChemSpace");
 
-        networkPanel = new ChemSpaceNetworkPanel();
-        centerPanel.add(networkPanel, "chemSpaceNetwork");                  
+        csnPanel = new ChemSpaceNetworkPanel();
+        centerPanel.add(csnPanel, "chemSpaceNetwork");   
+        
+        ssnPanel = new ChemSpaceNetworkPanel();
+        centerPanel.add(ssnPanel, "seqSimilarityNetwork");
         
         addAncestorListener(new AncestorListener() {
             @Override
@@ -106,9 +110,14 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
                 centerCL.show(centerPanel, "nDChemSpace");
                 break;
             case CHEM_SPACE_NETWORK:
-                networkPanel.setUp(csMapper);
+                csnPanel.setUp(csMapper);
                 topLeftCl.show(topLeftPanel, "chemSpaceNetwork");
                 centerCL.show(centerPanel, "chemSpaceNetwork");
+                break;
+            case SEQ_SIMILARITY_NETWORK:
+                ssnPanel.setUp(csMapper);
+                topLeftCl.show(topLeftPanel, "seqSimilarityNetwork");
+                centerCL.show(centerPanel, "seqSimilarityNetwork");
                 break;
         }
     }
@@ -152,6 +161,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         topLeftPanel = new javax.swing.JPanel();
         nDLabel = new javax.swing.JLabel();
         csnLabel = new javax.swing.JLabel();
+        ssnLabel = new javax.swing.JLabel();
         topRightPanel = new javax.swing.JPanel();
         centerPanel = new javax.swing.JPanel();
 
@@ -168,6 +178,11 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         org.openide.awt.Mnemonics.setLocalizedText(csnLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.csnLabel.text")); // NOI18N
         csnLabel.setToolTipText(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.csnLabel.toolTipText")); // NOI18N
         topLeftPanel.add(csnLabel, "chemSpaceNetwork");
+
+        ssnLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(ssnLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.ssnLabel.text")); // NOI18N
+        ssnLabel.setToolTipText(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.ssnLabel.toolTipText")); // NOI18N
+        topLeftPanel.add(ssnLabel, "seqSimilarityNetwork");
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -203,6 +218,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private javax.swing.JPanel centerPanel;
     private javax.swing.JLabel csnLabel;
     private javax.swing.JLabel nDLabel;
+    private javax.swing.JLabel ssnLabel;
     private javax.swing.JPanel topLeftPanel;
     private javax.swing.JPanel topRightPanel;
     // End of variables declaration//GEN-END:variables

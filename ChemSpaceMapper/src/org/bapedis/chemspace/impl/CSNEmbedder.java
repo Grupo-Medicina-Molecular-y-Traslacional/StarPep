@@ -5,7 +5,6 @@
  */
 package org.bapedis.chemspace.impl;
 
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.bapedis.chemspace.model.CompressedModel;
 import org.bapedis.chemspace.model.NetworkType;
@@ -15,12 +14,7 @@ import org.bapedis.chemspace.spi.impl.TanimotoCoefficientFactory;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.task.ProgressTicket;
-import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.Node;
 
 /**
  *
@@ -30,8 +24,6 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
     public static final int MAX_NODES=1000;
     public static final int MAX_EDGES=100000;
     
-    private static final ForkJoinPool fjPool = new ForkJoinPool();   
-    private SimilarityMatrixBuilder task;
     private AtomicBoolean atomicRun;
     private SimilarityMeasure simMeasure;
     private SimilarityMatrix similarityMatrix;
@@ -43,7 +35,7 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
         super(factory);
         simMeasure = new TanimotoCoefficientFactory().createAlgorithm();
         similarityThreshold = 0.7f;
-        networkType = NetworkType.FULL;
+        networkType = NetworkType.NONE;
         compressedModel = new CompressedModel();
     }
 
@@ -103,7 +95,7 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
         simMeasure.setMolecularFeatures(features);
 
         // Setup Similarity Matrix Builder
-        task = new SimilarityMatrixBuilder(peptides);
+        SimilarityMatrixBuilder task = new SimilarityMatrixBuilder(peptides);
         task.setContext(simMeasure, ticket, atomicRun);
         int workunits = task.getWorkUnits();
         ticket.switchToDeterminate(workunits);
@@ -113,49 +105,18 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
         task.join();
         similarityMatrix = task.getSimilarityMatrix(); 
         
-        switch(networkType){
-            case FULL:
-                createFullNetwork();
-                break;
-            case COMPRESSED:
-                break;
-        }
+        runEmbed(graphModel, atomicRun);
     }     
     
-    private  void createFullNetwork(){
-        Peptide[] peptides = similarityMatrix.getPeptides();
-        NetworkEmbedder.clearGraph(graphModel);   
-        Edge graphEdge;
-        Float score;
-        String id;
-        for (int i = 0; i < peptides.length - 1 && !stopRun; i++) {
-            for (int j = i + 1; j < peptides.length && !stopRun; j++) {
-                score = similarityMatrix.getValue(peptides[i], peptides[j]);
-                if (score != null && score >= similarityThreshold) {
-                    if (graph.contains(peptides[i].getGraphNode()) && graph.contains(peptides[j].getGraphNode())) {
-                        id = String.format("%s-%s", peptides[i].getId(), peptides[j].getId());
-                        graphEdge = NetworkEmbedder.createGraphEdge(graphModel, id, peptides[i].getGraphNode(), peptides[j].getGraphNode(), score);
-                        graph.writeLock();
-                        try {
-                            graph.addEdge(graphEdge);
-                        } finally {
-                            graph.writeUnlock();
-                        }
-                    }
-                }
-            }
-        }    
-    }            
+               
 
     @Override
     public void endAlgo() {
         super.endAlgo();
-        if (task != null)
-        task.setContext(null, null, null);
+
         if (stopRun){ // Cancelled
             similarityMatrix = null;
         }
-        task = null;
         atomicRun = null;
     }
 

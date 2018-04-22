@@ -77,7 +77,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
 
     public void setUp(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
-        switch(csMapper.getChemSpaceOption()){
+        switch (csMapper.getChemSpaceOption()) {
             case CHEM_SPACE_NETWORK:
                 netEmbedder = csMapper.getCSNEmbedderAlg();
                 break;
@@ -302,23 +302,11 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
     }// </editor-fold>//GEN-END:initComponents
 
     private void jApplyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jApplyButtonActionPerformed
-        if (csMapper != null) {
-            float oldValue = Float.parseFloat(jCutoffCurrentValue.getText());
-            float newValue = Float.parseFloat(jCutoffNewValue.getText());
-            switch (netEmbedder.getNetworkType()) {
-                case FULL:
-                    if (netEmbedder.getSimilarityMatrix() != null) {
-                        FNThresholdUpdater fnUpdater = new FNThresholdUpdater(oldValue, newValue, netEmbedder.getSimilarityMatrix());
-                        fnUpdater.addPropertyChangeListener(this);
-                        setRunning(true);
-                        fnUpdater.execute();
-                    } else {
-                        changeThreshold(newValue);
-                    }
-                    break;
-                case COMPRESSED:
-                    break;
-            }
+        if (netEmbedder != null && netEmbedder.getSimilarityMatrix() != null) {
+            NetworkThresholdUpdater fnUpdater = new NetworkThresholdUpdater(netEmbedder);
+            fnUpdater.addPropertyChangeListener(this);
+            setRunning(true);
+            fnUpdater.execute();
         }
     }//GEN-LAST:event_jApplyButtonActionPerformed
 
@@ -335,7 +323,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
             jCutoffNewLabel.setVisible(true);
             jCutoffNewValue.setVisible(true);
             jCutoffNewValue.setText(formatter.format(threshold));
-            jApplyButton.setEnabled(true);
+            jApplyButton.setEnabled(netEmbedder != null && netEmbedder.getSimilarityMatrix() != null);
         } else {
             jCutoffNewLabel.setVisible(false);
             jCutoffNewValue.setVisible(false);
@@ -389,7 +377,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
                 if (evt.getPropertyName().equals(MapperAlgorithm.RUNNING)) {
                     setupHistogram(csMapper.isRunning());
                 }
-            } else if (evt.getPropertyName().equals(FNThresholdUpdater.CHANGED_THRESHOLD)) {
+            } else if (evt.getPropertyName().equals(NetworkThresholdUpdater.CHANGED_THRESHOLD)) {
                 setRunning(false);
                 changeThreshold((float) evt.getNewValue());
             }

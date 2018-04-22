@@ -161,15 +161,20 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
         boolean oldState = isValid;
         if (evt.getPropertyName().equals(VisualRepresentation.CHANGED_CHEM_SPACE)) {
             model.getNotificationLineSupport().setWarningMessage(null);
-            switch ((ChemSpaceOption) evt.getNewValue()) {
+            ChemSpaceOption csOption = (ChemSpaceOption) evt.getNewValue();
+            switch (csOption) {
                 case N_DIMENSIONAL_SPACE:
                     isValid = true;
                     break;
                 case CHEM_SPACE_NETWORK:
-                case SEQ_SIMILARITY_NETWORK:
-                    if (component.getNetworkType() == NetworkType.FULL) {
+                case SEQ_SIMILARITY_NETWORK:                    
+                    NetworkType networkType = component.getNetworkType();
+                    if (networkType == NetworkType.FULL) {
                         model.getNotificationLineSupport().setWarningMessage(NbBundle.getMessage(WizardRepresentation.class, "VisualRepresentation.FNWaring.text"));
-                    }
+                    } else if (networkType == NetworkType.NONE){
+                        NetworkEmbedder embedder = (csOption == ChemSpaceOption.CHEM_SPACE_NETWORK) ? csnEmbedder : ssnEmbedder;
+                        component.setNetworkType(embedder.getNetworkType());
+                    }                    
                     isValid = true;
                     break;
                 case NONE:
@@ -207,7 +212,7 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
             case SEQ_SIMILARITY_NETWORK:
                 switch (component.getNetworkType()) {
                     case NONE:
-                        throw new WizardValidationException(component, NbBundle.getMessage(WizardFeatureExtraction.class, "VisualRepresentation.invalidOption.text"), null);
+                        throw new WizardValidationException(component, NbBundle.getMessage(WizardFeatureExtraction.class, "VisualRepresentation.invalidNetwork.text"), null);
                 }
                 break;
             case NONE:

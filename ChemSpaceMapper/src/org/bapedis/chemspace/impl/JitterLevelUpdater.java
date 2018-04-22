@@ -37,7 +37,7 @@ public class JitterLevelUpdater extends SwingWorker<Void, Void> {
         this.twoDSpace = twoDSpace;
         this.level = level;
         stopRun = new AtomicBoolean(false);
-        ticket = new ProgressTicket(NbBundle.getMessage(FNThresholdUpdater.class, "JitterLevelUpdater.task.name"), new Cancellable() {
+        ticket = new ProgressTicket(NbBundle.getMessage(NetworkThresholdUpdater.class, "JitterLevelUpdater.task.name"), new Cancellable() {
             @Override
             public boolean cancel() {
                 stopRun.set(true);

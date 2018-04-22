@@ -6,7 +6,6 @@
 package org.bapedis.chemspace.impl;
 
 import java.util.List;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.bapedis.chemspace.model.CompressedModel;
 import org.bapedis.chemspace.model.NetworkType;
@@ -18,7 +17,6 @@ import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
-import org.gephi.graph.api.Edge;
 
 /**
  *
@@ -26,8 +24,6 @@ import org.gephi.graph.api.Edge;
  */
 public class SSNEmbedder extends AbstractEmbedder implements NetworkEmbedder {
 
-    private static final ForkJoinPool fjPool = new ForkJoinPool();
-    private SimilarityMatrixBuilder task;
     private AtomicBoolean atomicRun;
     private final AlignmentBasedSimilarity similarityMeasure;
     private SequenceAlignmentModel alignmentModel;
@@ -41,7 +37,7 @@ public class SSNEmbedder extends AbstractEmbedder implements NetworkEmbedder {
         alignmentModel = new SequenceAlignmentModel();
         similarityMeasure = (AlignmentBasedSimilarity) new AlignmentBasedSimilarityFactory().createAlgorithm();
         similarityThreshold = 0.7f;
-        networkType = NetworkType.FULL;
+        networkType = NetworkType.NONE;
         compressedModel = new CompressedModel();
     }
 
@@ -59,7 +55,8 @@ public class SSNEmbedder extends AbstractEmbedder implements NetworkEmbedder {
 
             // Setup Similarity Matrix Builder
             similarityMeasure.setAlignmentModel(alignmentModel);
-            task = new SimilarityMatrixBuilder(peptides.toArray(new Peptide[0]));
+                        
+            SimilarityMatrixBuilder task = new SimilarityMatrixBuilder(peptides.toArray(new Peptide[0]));
             task.setContext(similarityMeasure, ticket, atomicRun);
             int workunits = task.getWorkUnits();
             ticket.switchToDeterminate(workunits);
@@ -69,40 +66,26 @@ public class SSNEmbedder extends AbstractEmbedder implements NetworkEmbedder {
             task.join();
             similarityMatrix = task.getSimilarityMatrix();
 
-            switch (networkType) {
-                case FULL:
-                    createFullNetwork();
-                    break;
-                case COMPRESSED:
-                    break;
-            }
+            runEmbed(graphModel, atomicRun);
         }
-    }
-    
-    private  void createFullNetwork(){
-        Peptide[] peptides = similarityMatrix.getPeptides();
-        NetworkEmbedder.clearGraph(graphModel);   
-        Edge graphEdge;
-        Float score;
-        String id;
-        for (int i = 0; i < peptides.length - 1 && !stopRun; i++) {
-            for (int j = i + 1; j < peptides.length && !stopRun; j++) {
-                score = similarityMatrix.getValue(peptides[i], peptides[j]);
-                if (score != null && score >= similarityThreshold) {
-                    if (graph.contains(peptides[i].getGraphNode()) && graph.contains(peptides[j].getGraphNode())) {
-                        id = String.format("%s-%s", peptides[i].getId(), peptides[j].getId());
-                        graphEdge = NetworkEmbedder.createGraphEdge(graphModel, id, peptides[i].getGraphNode(), peptides[j].getGraphNode(), score);
-                        graph.writeLock();
-                        try {
-                            graph.addEdge(graphEdge);
-                        } finally {
-                            graph.writeUnlock();
-                        }
-                    }
-                }
-            }
-        }    
-    }      
+    } 
+
+    @Override
+    public boolean cancel() {
+        super.cancel();
+        atomicRun.set(stopRun);
+        return stopRun;        
+    }        
+
+    @Override
+    public void endAlgo() {
+        super.endAlgo(); //To change body of generated methods, choose Tools | Templates.
+
+        if (stopRun){ // Cancelled
+            similarityMatrix = null;
+        }
+        atomicRun = null;        
+    }        
 
     public SequenceAlignmentModel getAlignmentModel() {
         return alignmentModel;

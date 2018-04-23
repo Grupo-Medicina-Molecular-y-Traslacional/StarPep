@@ -48,13 +48,45 @@ public class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
     protected Void doInBackground() throws Exception {
         ticket.start();
         GraphModel graphModel = pc.getGraphModel();
-        switch(embedder.getNetworkType()){
-            case FULL:
-                embedder.createFullNetwork(graphModel, stopRun);
-            case COMPRESSED:
-                embedder.createCompressedNetwork(graphModel, stopRun);
-        }
-        
+        embedder.runEmbed(graphModel, stopRun);
+
+//            if (newThreshold < oldThreshold) { // to add edges 
+//            Edge graphEdge;
+//            String id;
+//            Peptide[] peptides = matrix.getPeptides();
+//            for (int i = 0; i < peptides.length - 1 && !stopRun.get(); i++) {
+//                for (int j = i + 1; j < peptides.length && !stopRun.get(); j++) {
+//                    score = matrix.getValue(peptides[i], peptides[j]);
+//                    if (score != null && score >= newThreshold && score < oldThreshold) {
+//                        if (graph.contains(peptides[i].getGraphNode()) && graph.contains(peptides[j].getGraphNode())) {
+//                            id = String.format("%s-%s", peptides[i].getId(), peptides[j].getId());
+//                            graphEdge = mainGraph.getEdge(id);
+//                            if (graphEdge == null) {
+//                                graphEdge = NetworkEmbedder.createGraphEdge(graphModel, id, peptides[i].getGraphNode(), peptides[j].getGraphNode(), score);
+//                            }
+//                            graph.writeLock();
+//                            try {
+//                                graph.addEdge(graphEdge);
+//                            } finally {
+//                                graph.writeUnlock();
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        } else if (newThreshold > oldThreshold) { // to remove edges
+//            graph.writeLock();
+//            try {
+//                for (Edge edge : graph.getEdges()) {
+//                    score = (Float) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
+//                    if (score < newThreshold) {
+//                        graph.removeEdge(edge);
+//                    }
+//                }
+//            } finally {
+//                graph.writeUnlock();
+//            }
+//        }
         return null;
     }
 

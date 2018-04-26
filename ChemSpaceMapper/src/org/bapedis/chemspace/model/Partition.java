@@ -5,7 +5,10 @@
  */
 package org.bapedis.chemspace.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -17,12 +20,17 @@ public class Partition implements Iterable<Boolean> {
     public final static boolean LEFT_SIDE = false;
     public final static boolean RIGHT_SIDE = true;
 
-    private final boolean[] array;
+    private final List<Boolean> arrayList;
     private final int lowerIndex, higherIndex;
     private final int middle;
 
-    public Partition(boolean[] array, int lowerIndex, int higherIndex) {
-        this.array = array;
+    public Partition(int lowerIndex, int higherIndex) {
+        this(Collections.synchronizedList(new ArrayList<Boolean>(higherIndex - lowerIndex + 1)),
+                lowerIndex, higherIndex);
+    }
+
+    private Partition(List<Boolean> array, int lowerIndex, int higherIndex) {
+        this.arrayList = array;
         this.lowerIndex = lowerIndex;
         this.higherIndex = higherIndex;
         this.middle = lowerIndex + (higherIndex - lowerIndex) / 2;
@@ -40,13 +48,21 @@ public class Partition implements Iterable<Boolean> {
         return higherIndex;
     }
 
+    public Partition getLeftPartition() {
+        return new Partition(arrayList, lowerIndex, middle);
+    }
+
+    public Partition getRightPartition() {
+        return new Partition(arrayList, middle + 1, higherIndex);
+    }
+
     public void initializePartition() {
-            for (int i = lowerIndex; i <= middle; i++) {
-                array[i] = LEFT_SIDE;
-            }
-            for (int i = middle + 1; i <= higherIndex; i++) {
-                array[i] = RIGHT_SIDE;
-            }
+        for (int i = lowerIndex; i <= middle; i++) {
+            arrayList.add(i, LEFT_SIDE);
+        }
+        for (int i = middle + 1; i <= higherIndex; i++) {
+            arrayList.add(i, RIGHT_SIDE);
+        }
     }
 
     public void randomizePartition() {
@@ -62,29 +78,32 @@ public class Partition implements Iterable<Boolean> {
     }
 
     public void swap(int i, int j) {
-            boolean tmp = array[i];
-            array[i] = array[j];
-            array[j] = tmp;
+        boolean tmp = arrayList.get(i);
+        arrayList.set(i, arrayList.get(j));
+        arrayList.set(j, tmp);
     }
 
-    public boolean[] getArray() {
-            int size = getSize();
-            boolean[] partition = new boolean[size];
-            System.arraycopy(array, lowerIndex, partition, 0, size);
-            return partition;
+    public Boolean[] getArray() {
+        int size = getSize();
+        Boolean[] partition = new Boolean[size];
+        for (int i = 0; i < partition.length; i++) {
+            partition[i] = arrayList.get(lowerIndex + i);
+        }
+        return partition;
     }
 
-    public void setArray(boolean[] partition) {
-            int size = getSize();
-            System.arraycopy(partition, 0, array, lowerIndex, size);
+    public void setArray(Boolean[] partition) {
+        for(int i=0; i< partition.length; i++){
+            arrayList.set(lowerIndex + i, partition[i]);
+        }
     }
 
     public boolean getSideAt(int index) {
-            return array[index];
+        return arrayList.get(index);
     }
 
     public void doMoveAt(int index) {
-            array[index] = !array[index];
+        arrayList.set(index, !arrayList.get(index));
     }
 
     @Override
@@ -103,7 +122,7 @@ public class Partition implements Iterable<Boolean> {
 
         @Override
         public Boolean next() {
-                return array[cursor++];
+            return arrayList.get(cursor++);
         }
 
     }

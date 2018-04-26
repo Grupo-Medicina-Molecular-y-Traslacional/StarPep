@@ -22,7 +22,7 @@ import org.bapedis.core.task.ProgressTicket;
 public class MinCutPartition extends RecursiveTask<Batch[]> {
 
     public static final int K_MOVES = 100;
-    private boolean[] bestPartition;
+    private Boolean[] bestPartition;
     private int bestCost;
     private boolean currentSide;
     private final ProgressTicket ticket;

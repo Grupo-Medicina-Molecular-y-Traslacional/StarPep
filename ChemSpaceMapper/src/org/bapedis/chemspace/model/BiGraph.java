@@ -19,8 +19,8 @@ public class BiGraph implements Iterable<Vertex> {
     private final Partition partition;
     private final int maxDegree;
 
-    public BiGraph(Vertex[] vertices, SimilarityMatrix corrMatrix, double threshold) {
-        this(vertices, new Partition(new boolean[vertices.length], 0, vertices.length - 1), corrMatrix, threshold);
+    public BiGraph(Vertex[] vertices, SimilarityMatrix simMatrix, double threshold) {
+        this(vertices, new Partition(0, vertices.length - 1), simMatrix, threshold);
     }
 
     private BiGraph(Vertex[] vertices, Partition partition, SimilarityMatrix simMatrix, double threshold) {
@@ -80,9 +80,7 @@ public class BiGraph implements Iterable<Vertex> {
     }
 
     public BiGraph getLeftGraph() {
-        int lowerIndex = partition.getLowerIndex();
-        int middle = partition.getMiddle();
-        return new BiGraph(vertices, new Partition(partition.getArray(), lowerIndex, middle), simMatrix, threshold);
+        return new BiGraph(vertices, partition.getLeftPartition() , simMatrix, threshold);
     }
 
     public void rearrange() {
@@ -114,10 +112,8 @@ public class BiGraph implements Iterable<Vertex> {
         vertices[j] = tmp;
     }
 
-    public BiGraph getRightGraph() {
-        int higherIndex = partition.getHigherIndex();
-        int middle = partition.getMiddle();        
-        return new BiGraph(vertices, new Partition(partition.getArray(), middle + 1, higherIndex), simMatrix, threshold);
+    public BiGraph getRightGraph() {       
+        return new BiGraph(vertices, partition.getRightPartition(), simMatrix, threshold);
     }
 
     public int size() {

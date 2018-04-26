@@ -8,12 +8,8 @@ package org.bapedis.chemspace.impl;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.SwingWorker;
-import org.bapedis.chemspace.model.SimilarityMatrix;
-import org.bapedis.core.model.Peptide;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.task.ProgressTicket;
-import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
@@ -48,7 +44,7 @@ public class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
     protected Void doInBackground() throws Exception {
         ticket.start();
         GraphModel graphModel = pc.getGraphModel();
-        embedder.runEmbed(graphModel, stopRun);
+        embedder.runEmbed(graphModel, ticket, stopRun);
 
 //            if (newThreshold < oldThreshold) { // to add edges 
 //            Edge graphEdge;

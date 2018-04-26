@@ -5,122 +5,142 @@
  */
 package org.bapedis.chemspace.model;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.Iterator;
 
 /**
  *
  * @author loge
  */
-public class BiGraph {
+public class BiGraph implements Iterable<Vertex> {
 
-    public final static boolean LEFT_SIDE = false;
-    public final static boolean RIGHT_SIDE = true;
     private final Vertex[] vertices;
     private final SimilarityMatrix simMatrix;
     protected final double threshold;
-    private boolean[] partition;
+    private final Partition partition;
+    private final int maxDegree;
 
-    public BiGraph(Vertex[] vertices, SimilarityMatrix simMatrix, double threshold) {
+    public BiGraph(Vertex[] vertices, SimilarityMatrix corrMatrix, double threshold) {
+        this(vertices, new Partition(new boolean[vertices.length], 0, vertices.length - 1), corrMatrix, threshold);
+    }
+
+    private BiGraph(Vertex[] vertices, Partition partition, SimilarityMatrix simMatrix, double threshold) {
         this.vertices = vertices;
         this.simMatrix = simMatrix;
         this.threshold = threshold;
-        partition = new boolean[vertices.length];
-        for (int i = 0; i < vertices.length; i++) {
-            vertices[i].setVertexIndex(i);
-            vertices[i].setGain(0);
+        this.partition = partition;
+        maxDegree = calculateMaxDegree();
+    }
+
+    public void freeLockedVertices() {
+        int lowerIndex = partition.getLowerIndex();
+        int higherIndex = partition.getHigherIndex();
+        for (int i = lowerIndex; i <= higherIndex; i++) {
+            vertices[i].setLocked(false);
         }
     }
 
-    public SimilarityMatrix getSimMatrix() {
+    public SimilarityMatrix getSimilarityMatrix() {
         return simMatrix;
-    }        
+    }
 
     public double getThreshold() {
         return threshold;
     }
 
-    public Vertex[] getVertices() {
-        return vertices;
-    }
-
-    public boolean[] getPartition() {
+    public Partition getPartition() {
         return partition;
     }
 
-    public void setPartition(boolean[] partition) {
-        assert partition.length == vertices.length : "Incompatible partition size";
-        this.partition = partition;
-    }
-
-    public void initializePartition() {
-        int size = vertices.length;
-        int mid = size / 2;
-
-        for (int i = 0; i < mid; i++) {
-            partition[i] = false;
-        }
-        for (int i = mid; i < size; i++) {
-            partition[i] = true;
-        }
-    }
-
-    public void randomizePartition() {
-        Random rnd = new Random();
-        // Shuffle array
-        for (int i = partition.length; i > 1; i--) {
-            swap(i - 1, rnd.nextInt(i));
-        }
-    }
-
-    private void swap(int i, int j) {
-        boolean tmp = partition[i];
-        partition[i] = partition[j];
-        partition[j] = tmp;
-    }
-
     public boolean isNeighbour(Vertex vertex1, Vertex vertex2) {
-        Float score = simMatrix.getValue(vertex1.getPeptide(), vertex2.getPeptide());
-        return !vertex1.equals(vertex2) && score != null && score >= threshold;
+        Float f = simMatrix.getValue(vertex1.getPeptide(), vertex2.getPeptide());
+        return !vertex1.equals(vertex2) && f != null && f >= threshold;
     }
 
-    public int calculateMaxDegree() {
-        int maxDegree = 0;
+    public int getMaxDegree() {
+        return maxDegree;
+    }
+
+    private int calculateMaxDegree() {
+        int lowerIndex = partition.getLowerIndex();
+        int higherIndex = partition.getHigherIndex();        
+        int maxValue = 0;
         int degree;
-        for (int i = 0; i < vertices.length; i++) {
+        for (int i = lowerIndex; i <= higherIndex; i++) {
             degree = 0;
-            for (int j = 0; j < vertices.length; j++) {
+            for (int j = lowerIndex; j <= higherIndex; j++) {
                 if (j != i && isNeighbour(vertices[i], vertices[j])) {
                     degree++;
                 }
             }
-            if (degree > maxDegree) {
-                maxDegree = degree;
+            if (degree > maxValue) {
+                maxValue = degree;
             }
         }
-        return maxDegree;
+        return maxValue;
     }
 
-    public Vertex[] getLeftVertices() {
-        return getVertices(LEFT_SIDE);
+    public BiGraph getLeftGraph() {
+        int lowerIndex = partition.getLowerIndex();
+        int middle = partition.getMiddle();
+        return new BiGraph(vertices, new Partition(partition.getArray(), lowerIndex, middle), simMatrix, threshold);
     }
 
-    private Vertex[] getVertices(boolean side) {
-        List<Vertex> vertexList = new LinkedList<>();
-        for (int i = 0; i < partition.length; i++) {
-            if (partition[i] == side) {
-                vertexList.add(vertices[i]);
+    public void rearrange() {
+        int lowerIndex = partition.getLowerIndex();
+        int higherIndex = partition.getHigherIndex();        
+        int i = lowerIndex;
+        int j = higherIndex;
+        int middle = partition.getMiddle();
+        boolean change;
+        do {
+            change = false;
+            while (partition.getSideAt(i) == Partition.LEFT_SIDE && i <= middle) {
+                i++;
             }
-        }
-        return vertexList.toArray(new Vertex[0]);
+            while (partition.getSideAt(j) == Partition.RIGHT_SIDE && j > middle) {
+                j--;
+            }
+            if (i < j && partition.getSideAt(i) == Partition.RIGHT_SIDE && partition.getSideAt(j) == Partition.LEFT_SIDE) {
+                change = true;
+                swapVertices(i, j);
+                partition.swap(i, j);
+            }
+        } while (change);
     }
 
-    public Vertex[] getRightVertices() {
-        return getVertices(RIGHT_SIDE);
+    private void swapVertices(int i, int j) {
+        Vertex tmp = vertices[i];
+        vertices[i] = vertices[j];
+        vertices[j] = tmp;
+    }
+
+    public BiGraph getRightGraph() {
+        int higherIndex = partition.getHigherIndex();
+        int middle = partition.getMiddle();        
+        return new BiGraph(vertices, new Partition(partition.getArray(), middle + 1, higherIndex), simMatrix, threshold);
     }
 
     public int size() {
-        return vertices.length;
+        return partition.getSize();
+    }
+
+    @Override
+    public Iterator<Vertex> iterator() {
+        return new MyIterator();
+    }
+
+    private class MyIterator implements Iterator<Vertex> {
+        int cursor = partition.getLowerIndex();
+
+        @Override
+        public boolean hasNext() {
+            return cursor <= partition.getHigherIndex();
+        }
+
+        @Override
+        public Vertex next() {
+            return vertices[cursor++];
+        }
+
     }
 }

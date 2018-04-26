@@ -66,7 +66,7 @@ public class SSNEmbedder extends AbstractEmbedder implements NetworkEmbedder {
             task.join();
             similarityMatrix = task.getSimilarityMatrix();
 
-            runEmbed(graphModel, atomicRun);
+            runEmbed(graphModel, ticket, atomicRun);
         }
     } 
 

@@ -8,6 +8,7 @@ package org.bapedis.chemspace.util;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.chemspace.model.BiGraph;
+import org.bapedis.chemspace.model.Partition;
 import org.bapedis.chemspace.model.Vertex;
 
 /**
@@ -25,7 +26,7 @@ public class Bucket {
     public Bucket(BiGraph graph, boolean side) {
         this.graph = graph;
         this.side = side;
-        maxDegree = graph.calculateMaxDegree();
+        this.maxDegree = graph.getMaxDegree();
         array = new List[2 * maxDegree + 1];
         maxGainIndex = -1;
     }
@@ -42,24 +43,24 @@ public class Bucket {
         for (int i = 0; i < array.length; i++) {
             array[i] = null;
         }
-        Vertex[] vertices = graph.getVertices();
-        boolean[] partition = graph.getPartition();
-        for (int i = 0; i < vertices.length; i++) {
-            if (partition[i] == side) {
+        Partition partition = graph.getPartition();
+        int i,j;
+        for (Vertex v: graph) {
+            i = v.getVertexIndex();
+            if (partition.getSideAt(i) == side) {
                 int gain = 0;
-                for (int j = 0; j < vertices.length; j++) {
-                    if (i != j) {
-                        if (graph.isNeighbour(vertices[i], vertices[j])) {
-                            if (partition[i] == partition[j]) {
-                                gain--;
-                            } else {
-                                gain++;
-                            }
+                for (Vertex u: graph) {
+                    if (v != u && graph.isNeighbour(v,u)) {
+                        j = u.getVertexIndex();
+                        if (partition.getSideAt(i) == partition.getSideAt(j)) {
+                            gain--;
+                        } else {
+                            gain++;
                         }
                     }
                 }
-                vertices[i].setGain(gain);
-                add(vertices[i]);
+                v.setGain(gain);
+                add(v);
             }
         }
     }
@@ -78,7 +79,7 @@ public class Bucket {
     private void remove(Vertex vertex) {
         int gainIndex = maxDegree + vertex.getGain();
         List<Vertex> vertices = array[gainIndex];
-
+        
         assert vertices.remove(vertex) : "Vertex not found in bucket data structure";
     }
 

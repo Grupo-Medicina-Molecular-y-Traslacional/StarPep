@@ -97,7 +97,7 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
         // Setup Similarity Matrix Builder
         SimilarityMatrixBuilder task = new SimilarityMatrixBuilder(peptides);
         task.setContext(simMeasure, ticket, atomicRun);
-        int workunits = task.getWorkUnits();
+        int workunits = task.getWorkUnits();        
         ticket.switchToDeterminate(workunits);
         
         // Compute new similarity matrix        
@@ -105,7 +105,7 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
         task.join();
         similarityMatrix = task.getSimilarityMatrix(); 
         
-        runEmbed(graphModel, atomicRun);
+        runEmbed(graphModel, ticket, atomicRun);
     }     
     
                

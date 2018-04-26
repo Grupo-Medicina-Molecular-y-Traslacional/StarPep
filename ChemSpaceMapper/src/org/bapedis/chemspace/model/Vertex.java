@@ -15,15 +15,17 @@ public class Vertex {
     private final Peptide peptide;
     private int vertexIndex;
     private int gain;
+    private boolean locked;
 
     public Vertex(Peptide peptide) {
         this.peptide = peptide;
         gain = 0;
+        locked = false;
     }
 
     public Peptide getPeptide() {
         return peptide;
-    }    
+    }   
 
     public void setVertexIndex(int vertexIndex) {
         this.vertexIndex = vertexIndex;
@@ -39,5 +41,13 @@ public class Vertex {
 
     public void setGain(int gain) {
         this.gain = gain;
-    }                 
+    }   
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }        
 }

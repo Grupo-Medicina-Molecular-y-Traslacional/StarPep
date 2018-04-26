@@ -15,12 +15,11 @@ import org.bapedis.chemspace.model.CompressedModel;
 import org.bapedis.chemspace.model.NetworkType;
 import org.bapedis.chemspace.model.SimilarityMatrix;
 import org.bapedis.chemspace.model.Vertex;
-import org.bapedis.chemspace.spi.SimilarityMeasure;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.project.ProjectManager;
+import org.bapedis.core.task.ProgressTicket;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphFactory;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 
@@ -46,24 +45,25 @@ public interface NetworkEmbedder {
 
     public SimilarityMatrix getSimilarityMatrix();
 
-    public default void runEmbed(GraphModel graphModel, AtomicBoolean stopRun) {       
+    public default void runEmbed(GraphModel graphModel, ProgressTicket ticket, AtomicBoolean stopRun) {       
         switch (getNetworkType()) {
             case FULL:
-                createFullNetwork(graphModel, stopRun);
+                createFullNetwork(graphModel, ticket, stopRun);
                 break;
             case COMPRESSED:
-                createCompressedNetwork(graphModel, stopRun);
+                createCompressedNetwork(graphModel, ticket, stopRun);
                 break;
         }
     }
 
-    public default void createFullNetwork(GraphModel graphModel, AtomicBoolean stopRun) {
+    public default void createFullNetwork(GraphModel graphModel, ProgressTicket ticket, AtomicBoolean stopRun) {
         NetworkEmbedder.clearSimilarityEdges(graphModel);
         Graph graph = graphModel.getGraphVisible();
         float similarityThreshold = getSimilarityThreshold();
         Peptide[] peptides = getSimilarityMatrix().getPeptides();
         Edge graphEdge;
         Float score;
+        ticket.switchToDeterminate(peptides.length - 1);
         for (int i = 0; i < peptides.length - 1 && !stopRun.get(); i++) {
             for (int j = i + 1; j < peptides.length && !stopRun.get(); j++) {
                 score = getSimilarityMatrix().getValue(peptides[i], peptides[j]);
@@ -79,10 +79,11 @@ public interface NetworkEmbedder {
                     }
                 }
             }
+            ticket.progress();
         }
     }
 
-    default public void createCompressedNetwork(GraphModel graphModel, AtomicBoolean stopRun) {
+    default public void createCompressedNetwork(GraphModel graphModel, ProgressTicket ticket, AtomicBoolean stopRun) {
         Graph graph = graphModel.getGraphVisible();
         graph.clear();
         NetworkEmbedder.clearSuperNodes(graphModel);
@@ -96,13 +97,18 @@ public interface NetworkEmbedder {
             //Create vertices
             for (int i = 0; i < peptides.length; i++) {
                 vertices[i] = new Vertex(peptides[i]);
+                vertices[i].setVertexIndex(i);
             }
+            
+            ticket.switchToDeterminate(compressedModel.getMaxSuperNodes());
+            
             BiGraph bigraph = new BiGraph(vertices, simMatrix, similarityThreshold);
-            int cacheSize = (int) Math.ceil((double) peptides.length / compressedModel.getMaxSuperNodes());
-            MinCutPartition partition = new MinCutPartition(bigraph, cacheSize, stopRun);
-            fjPool.invoke(partition);
+            int cacheSize = (int) Math.ceil((double) peptides.length / compressedModel.getMaxSuperNodes());            
+            MinCutPartition partition = new MinCutPartition(bigraph, cacheSize, ticket, stopRun);
 
+            fjPool.invoke(partition);
             Batch[] batches = partition.join();
+            
             Batch b1, b2;
             Node superNode1, superNode2;
             Edge superEdge;

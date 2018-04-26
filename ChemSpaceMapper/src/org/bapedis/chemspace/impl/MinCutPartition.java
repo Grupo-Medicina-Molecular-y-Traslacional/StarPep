@@ -5,14 +5,15 @@
  */
 package org.bapedis.chemspace.impl;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.bapedis.chemspace.model.Batch;
 import org.bapedis.chemspace.model.BiGraph;
+import org.bapedis.chemspace.model.Partition;
 import org.bapedis.chemspace.model.Vertex;
 import org.bapedis.chemspace.util.Bucket;
+import org.bapedis.core.task.ProgressTicket;
 
 /**
  *
@@ -20,97 +21,100 @@ import org.bapedis.chemspace.util.Bucket;
  */
 public class MinCutPartition extends RecursiveTask<Batch[]> {
 
-    public static final int k_Moves = 100;
+    public static final int K_MOVES = 100;
     private boolean[] bestPartition;
     private int bestCost;
     private boolean currentSide;
-    private final AtomicBoolean stopRun; 
+    private final ProgressTicket ticket;
+    private final AtomicBoolean stopRun;
 
     protected final int cacheSize;
     protected final BiGraph bigraph;
 
-    public MinCutPartition(BiGraph bigraph, int cacheSize, AtomicBoolean stopRun) {
+    public MinCutPartition(BiGraph bigraph, int cacheSize, ProgressTicket ticket, AtomicBoolean stopRun) {
         this.bigraph = bigraph;
         this.cacheSize = cacheSize;
+        this.ticket = ticket;
         this.stopRun = stopRun;
     }
 
     @Override
     protected Batch[] compute() {
-        if (!stopRun.get() && bigraph.size() > cacheSize ) {
-            bigraph.initializePartition();
+        if (!stopRun.get() && bigraph.size() > cacheSize) {
             findGraphPartition(bigraph);
-            MinCutPartition left = new MinCutPartition(new BiGraph(bigraph.getLeftVertices(), bigraph.getSimMatrix(), bigraph.getThreshold()),cacheSize, stopRun);
-            MinCutPartition right = new MinCutPartition(new BiGraph(bigraph.getRightVertices(), bigraph.getSimMatrix(), bigraph.getThreshold()), cacheSize, stopRun);
+            MinCutPartition left = new MinCutPartition(bigraph.getLeftGraph(), cacheSize, ticket, stopRun);
+            MinCutPartition right = new MinCutPartition(bigraph.getRightGraph(), cacheSize, ticket, stopRun);
+            right.fork();
             Batch[] leftBatches = left.compute();
             Batch[] righBatchs = right.join();
-            
+
             Batch[] batches = new Batch[leftBatches.length + righBatchs.length];
             System.arraycopy(leftBatches, 0, batches, 0, leftBatches.length);
             System.arraycopy(righBatchs, 0, batches, leftBatches.length, righBatchs.length);
-            
+
             return batches;
         }
 
         Batch batch = new Batch(bigraph.size());
-        for (Vertex u : bigraph.getVertices()) {
+        for (Vertex u : bigraph) {
             batch.addPeptide(u.getPeptide());
-        }
-        return new Batch[]{batch};        
+        }        
+        ticket.progress();
+        return new Batch[]{batch};
     }
-    
-    protected void findGraphPartition(BiGraph graph) {
-        graph.randomizePartition();
 
-        Bucket leftBucket = new Bucket(graph, BiGraph.LEFT_SIDE);
-        Bucket rightBucket = new Bucket(graph, BiGraph.RIGHT_SIDE);
+    protected void findGraphPartition(BiGraph graph) {
+        graph.getPartition().initializePartition();
+        graph.getPartition().randomizePartition();
+
+        Bucket leftBucket = new Bucket(graph, Partition.LEFT_SIDE);
+        Bucket rightBucket = new Bucket(graph, Partition.RIGHT_SIDE);
 
         bestCost = getCost(graph);
-        bestPartition = Arrays.copyOf(graph.getPartition(), graph.size());
+        bestPartition = graph.getPartition().getArray();
 
         //Set which side to begin, to maintain balance
         int leftCount = 0;
         int rightCount = 0;
         for (boolean side : graph.getPartition()) {
-            if (side == BiGraph.LEFT_SIDE) {
+            if (side == Partition.LEFT_SIDE) {
                 leftCount++;
             } else {
                 rightCount++;
             }
         }
         if (rightCount > leftCount) {
-            currentSide = BiGraph.RIGHT_SIDE;
+            currentSide = Partition.RIGHT_SIDE;
         } else {
-            currentSide = BiGraph.LEFT_SIDE;
+            currentSide = Partition.LEFT_SIDE;
         }
 
         int iterations = 0;
-        boolean[] lockedVertices = new boolean[graph.size()];
-        while (!stopRun.get() && iterations < 10 && doMoves(graph, lockedVertices, leftBucket, rightBucket)) {
+        while (!stopRun.get() && iterations < 10 && doMoves(graph, leftBucket, rightBucket)) {
             iterations++;
         }
 
-        graph.setPartition(bestPartition);
+        graph.getPartition().setArray(bestPartition);
+        graph.rearrange();
     }
 
-    private boolean doMoves(BiGraph graph, boolean[] lockedVertices, Bucket leftBucket, Bucket rightBucket) {
+    private boolean doMoves(BiGraph graph, Bucket leftBucket, Bucket rightBucket) {
         boolean improvement = false;
-        Vertex[] vertices = graph.getVertices();
 
         //Initialize Buckets
         leftBucket.initialize();
         rightBucket.initialize();
 
         // Free all locked vertices.
-        resetLockedVertices(lockedVertices);
+        graph.freeLockedVertices();
 
         //The first k moves
         int cost;
-        for (int i = 0; i < Math.min(k_Moves, vertices.length) && !stopRun.get(); i++) {
-            doMove(graph, lockedVertices, leftBucket, rightBucket);
+        for (int i = 0; i < Math.min(K_MOVES, graph.size()) && !stopRun.get(); i++) {
+            doMove(graph, leftBucket, rightBucket);
             cost = getCost(graph);
             if (cost < bestCost) {
-                bestPartition = Arrays.copyOf(graph.getPartition(), vertices.length);
+                bestPartition = graph.getPartition().getArray();
                 bestCost = cost;
                 improvement = true;
             }
@@ -119,11 +123,11 @@ public class MinCutPartition extends RecursiveTask<Batch[]> {
         return improvement;
     }
 
-    private void doMove(BiGraph graph, boolean[] locked, Bucket leftBucket, Bucket rightBucket) {
-        boolean[] partition = graph.getPartition();
+    private void doMove(BiGraph graph, Bucket leftBucket, Bucket rightBucket) {
+        Partition partition = graph.getPartition();
         Bucket currentBucket, complementBucket;
 
-        if (currentSide == BiGraph.LEFT_SIDE) {
+        if (currentSide == Partition.LEFT_SIDE) {
             currentBucket = leftBucket;
             complementBucket = rightBucket;
         } else {
@@ -140,7 +144,7 @@ public class MinCutPartition extends RecursiveTask<Batch[]> {
             vertices = currentBucket.getVeritcesAt(gainIndex);
             if (vertices != null) {
                 for (Vertex v : vertices) {
-                    if (!locked[v.getVertexIndex()]) {
+                    if (!v.isLocked()) {
                         found = true;
                         vertex = v;
                         break;
@@ -153,18 +157,18 @@ public class MinCutPartition extends RecursiveTask<Batch[]> {
         if (vertex != null) {
             //Move the vertex
             int i = vertex.getVertexIndex();
-            assert partition[i] == currentSide : "Incompatibility for vertex partition and current side";
-            partition[i] = !partition[i];
+            assert partition.getSideAt(i) == currentSide : "Incompatibility for vertex partition and current side";
+            partition.doMoveAt(i);
 
             // Lock Vertex
-            locked[i] = true;
+            vertex.setLocked(true);
 
             //For each neighbour vertex update the gain
             int j;
-            for (Vertex u : graph.getVertices()) {
-                j = u.getVertexIndex();
-                if (!locked[j] && graph.isNeighbour(vertex, u)) { // Consider only free vertices
-                    if (partition[j] == currentSide) { // u is in current block
+            for (Vertex u : graph) {
+                if (!stopRun.get() && !u.isLocked() && graph.isNeighbour(vertex, u)) { // Consider only free vertices
+                    j = u.getVertexIndex();
+                    if (partition.getSideAt(j) == currentSide) { // u is in current block
                         currentBucket.incrementGain(u);
                     } else { // u is in complementary block
                         complementBucket.decrementGain(u);
@@ -179,24 +183,18 @@ public class MinCutPartition extends RecursiveTask<Batch[]> {
 
     private int getCost(BiGraph graph) {
         int cost = 0;
-        Vertex[] vertices = graph.getVertices();
-        boolean[] partition = graph.getPartition();
+        Partition partition = graph.getPartition();
         //only look at vertices in one partition to avoid checking edges twice
-        for (int i = 0; i < vertices.length; i++) {
-            if (partition[i]) {
-                for (int j = 0; j < vertices.length; j++) {
-                    if (!partition[j] && graph.isNeighbour(vertices[i], vertices[j])) {
+        for (Vertex v : graph) {
+            if (partition.getSideAt(v.getVertexIndex())) {
+                for (Vertex u : graph) {
+                    if (!partition.getSideAt(u.getVertexIndex())
+                            && graph.isNeighbour(v, u)) {
                         cost++;
                     }
                 }
             }
         }
         return cost;
-    }
-
-    private void resetLockedVertices(boolean[] locked) {
-        for (int i = 0; i < locked.length; i++) {
-            locked[i] = false;
-        }
     }
 }

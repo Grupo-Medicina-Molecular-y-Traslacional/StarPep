@@ -11,7 +11,7 @@ import java.util.Iterator;
  *
  * @author loge
  */
-public class BiGraph implements Iterable<Vertex> {
+public class BiGraph {
 
     private final Vertex[] vertices;
     private final SimilarityMatrix simMatrix;
@@ -52,8 +52,8 @@ public class BiGraph implements Iterable<Vertex> {
     }
 
     public boolean isNeighbour(Vertex vertex1, Vertex vertex2) {
-        Float f = simMatrix.getValue(vertex1.getPeptide(), vertex2.getPeptide());
-        return !vertex1.equals(vertex2) && f != null && f >= threshold;
+        Float value = simMatrix.getValue(vertex1.getPeptide(), vertex2.getPeptide());
+        return !vertex1.equals(vertex2) && value >= threshold;
     }
 
     public int getMaxDegree() {
@@ -62,7 +62,7 @@ public class BiGraph implements Iterable<Vertex> {
 
     private int calculateMaxDegree() {
         int lowerIndex = partition.getLowerIndex();
-        int higherIndex = partition.getHigherIndex();        
+        int higherIndex = partition.getHigherIndex();
         int maxValue = 0;
         int degree;
         for (int i = lowerIndex; i <= higherIndex; i++) {
@@ -80,12 +80,12 @@ public class BiGraph implements Iterable<Vertex> {
     }
 
     public BiGraph getLeftGraph() {
-        return new BiGraph(vertices, partition.getLeftPartition() , simMatrix, threshold);
+        return new BiGraph(vertices, partition.getLeftPartition(), simMatrix, threshold);
     }
 
     public void rearrange() {
         int lowerIndex = partition.getLowerIndex();
-        int higherIndex = partition.getHigherIndex();        
+        int higherIndex = partition.getHigherIndex();
         int i = lowerIndex;
         int j = higherIndex;
         int middle = partition.getMiddle();
@@ -101,9 +101,12 @@ public class BiGraph implements Iterable<Vertex> {
             if (i < j && partition.getSideAt(i) == Partition.RIGHT_SIDE && partition.getSideAt(j) == Partition.LEFT_SIDE) {
                 change = true;
                 swapVertices(i, j);
+                vertices[i].setVertexIndex(i);
+                vertices[j].setVertexIndex(j);
                 partition.swap(i, j);
             }
         } while (change);
+        
     }
 
     private void swapVertices(int i, int j) {
@@ -112,7 +115,7 @@ public class BiGraph implements Iterable<Vertex> {
         vertices[j] = tmp;
     }
 
-    public BiGraph getRightGraph() {       
+    public BiGraph getRightGraph() {
         return new BiGraph(vertices, partition.getRightPartition(), simMatrix, threshold);
     }
 
@@ -120,12 +123,27 @@ public class BiGraph implements Iterable<Vertex> {
         return partition.getSize();
     }
 
-    @Override
-    public Iterator<Vertex> iterator() {
-        return new MyIterator();
+    public Iterator<Vertex> getVerticesAtSide(boolean side) {
+        if (side == Partition.LEFT_SIDE) {
+            return getLeftVertices();
+        }
+        return getRightVertices();
     }
 
-    private class MyIterator implements Iterator<Vertex> {
+    public Iterator<Vertex> getAllVertices() {
+        return new AllIterator();
+    }
+
+    public Iterator<Vertex> getLeftVertices() {
+        return new LeftIterator();
+    }
+
+    public Iterator<Vertex> getRightVertices() {
+        return new RightIterator();
+    }
+
+    private class AllIterator implements Iterator<Vertex> {
+
         int cursor = partition.getLowerIndex();
 
         @Override
@@ -138,5 +156,75 @@ public class BiGraph implements Iterable<Vertex> {
             return vertices[cursor++];
         }
 
+    }
+
+    private class LeftIterator implements Iterator<Vertex> {
+        int cursor;
+
+        public LeftIterator() {
+            cursor = partition.getLowerIndex();
+            findNext();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return cursor != -1;
+        }
+
+        @Override
+        public Vertex next() {
+            Vertex v = vertices[cursor++];
+            findNext();
+            return v;
+        }
+
+        private void findNext() {
+            boolean found = false;
+            while (!found && cursor <= partition.getHigherIndex()) {
+                if (partition.getSideAt(cursor) == Partition.LEFT_SIDE) {
+                    found = true;
+                } else {
+                    cursor++;
+                }
+            }
+            if (!found) {
+                cursor = -1;
+            }
+        }
+    }
+
+    private class RightIterator implements Iterator<Vertex> {
+        int cursor;
+
+        public RightIterator() {
+            cursor = partition.getHigherIndex();
+            findNext();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return cursor != -1;
+        }
+
+        @Override
+        public Vertex next() {
+            Vertex v = vertices[cursor--];
+            findNext();
+            return v;
+        }
+
+        private void findNext() {
+            boolean found = false;
+            while (!found && cursor >= partition.getLowerIndex()) {
+                if (partition.getSideAt(cursor) == Partition.RIGHT_SIDE) {
+                    found = true;
+                } else {
+                    cursor--;
+                }
+            }
+            if (!found) {
+                cursor = -1;
+            }
+        }
     }
 }

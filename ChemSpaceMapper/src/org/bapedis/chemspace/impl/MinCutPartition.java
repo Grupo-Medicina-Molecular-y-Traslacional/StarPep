@@ -5,6 +5,7 @@
  */
 package org.bapedis.chemspace.impl;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -56,9 +57,11 @@ public class MinCutPartition extends RecursiveTask<Batch[]> {
         }
 
         Batch batch = new Batch(bigraph.size());
-        for (Vertex u : bigraph) {
+        Vertex u;
+        for (Iterator<Vertex> it = bigraph.getAllVertices(); it.hasNext();) {
+            u = it.next();
             batch.addPeptide(u.getPeptide());
-        }        
+        }   
         ticket.progress();
         return new Batch[]{batch};
     }
@@ -90,7 +93,7 @@ public class MinCutPartition extends RecursiveTask<Batch[]> {
         }
 
         int iterations = 0;
-        while (!stopRun.get() && iterations < 10 && doMoves(graph, leftBucket, rightBucket)) {
+        while (iterations < 10 && doMoves(graph,leftBucket, rightBucket)) {
             iterations++;
         }
 
@@ -110,7 +113,7 @@ public class MinCutPartition extends RecursiveTask<Batch[]> {
 
         //The first k moves
         int cost;
-        for (int i = 0; i < Math.min(K_MOVES, graph.size()) && !stopRun.get(); i++) {
+        for (int i = 0; i < Math.min(K_MOVES, graph.size()); i++) {
             doMove(graph, leftBucket, rightBucket);
             cost = getCost(graph);
             if (cost < bestCost) {
@@ -165,8 +168,10 @@ public class MinCutPartition extends RecursiveTask<Batch[]> {
 
             //For each neighbour vertex update the gain
             int j;
-            for (Vertex u : graph) {
-                if (!stopRun.get() && !u.isLocked() && graph.isNeighbour(vertex, u)) { // Consider only free vertices
+            Vertex u;
+            for (Iterator<Vertex> it = graph.getAllVertices(); it.hasNext();) {
+                u = it.next();
+                if (!u.isLocked() && graph.isNeighbour(vertex, u)) { // Consider only free vertices
                     j = u.getVertexIndex();
                     if (partition.getSideAt(j) == currentSide) { // u is in current block
                         currentBucket.incrementGain(u);
@@ -183,18 +188,18 @@ public class MinCutPartition extends RecursiveTask<Batch[]> {
 
     private int getCost(BiGraph graph) {
         int cost = 0;
-        Partition partition = graph.getPartition();
         //only look at vertices in one partition to avoid checking edges twice
-        for (Vertex v : graph) {
-            if (partition.getSideAt(v.getVertexIndex())) {
-                for (Vertex u : graph) {
-                    if (!partition.getSideAt(u.getVertexIndex())
-                            && graph.isNeighbour(v, u)) {
-                        cost++;
-                    }
+        Vertex v, u;
+        for (Iterator<Vertex> left = graph.getLeftVertices(); left.hasNext();) {
+            v = left.next();
+            for (Iterator<Vertex> right = graph.getRightVertices(); right.hasNext();) {
+                u = right.next();
+                if (graph.isNeighbour(v, u)) {
+                    cost++;
                 }
             }
         }
         return cost;
     }
+
 }

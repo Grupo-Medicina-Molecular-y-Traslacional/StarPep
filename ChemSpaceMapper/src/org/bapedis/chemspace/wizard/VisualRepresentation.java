@@ -299,7 +299,7 @@ public final class VisualRepresentation extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         optionCNPanel.add(jMaxNumberLabel, gridBagConstraints);
 
-        jOptionCN_2_Items.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1000", "500", "250", "100", "50", "10" }));
+        jOptionCN_2_Items.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1000", "500", "250", "100", "50", "10", "5" }));
         jOptionCN_2_Items.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOptionCN_2_ItemsActionPerformed(evt);

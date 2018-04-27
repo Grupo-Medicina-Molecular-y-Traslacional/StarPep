@@ -5,10 +5,7 @@
  */
 package org.bapedis.chemspace.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -17,20 +14,20 @@ import java.util.Random;
  */
 public class Partition implements Iterable<Boolean> {
 
-    public final static boolean LEFT_SIDE = false;
+public final static boolean LEFT_SIDE = false;
     public final static boolean RIGHT_SIDE = true;
 
-    private final List<Boolean> arrayList;
+    private final boolean[] array;    
     private final int lowerIndex, higherIndex;
-    private final int middle;
+    private int middle;
 
     public Partition(int lowerIndex, int higherIndex) {
-        this(Collections.synchronizedList(new ArrayList<Boolean>(higherIndex - lowerIndex + 1)),
+        this(new boolean[higherIndex - lowerIndex + 1],
                 lowerIndex, higherIndex);
     }
 
-    private Partition(List<Boolean> array, int lowerIndex, int higherIndex) {
-        this.arrayList = array;
+    private Partition(boolean[] array, int lowerIndex, int higherIndex) {
+        this.array = array;
         this.lowerIndex = lowerIndex;
         this.higherIndex = higherIndex;
         this.middle = lowerIndex + (higherIndex - lowerIndex) / 2;
@@ -49,20 +46,38 @@ public class Partition implements Iterable<Boolean> {
     }
 
     public Partition getLeftPartition() {
-        return new Partition(arrayList, lowerIndex, middle);
+        if (array[middle] == RIGHT_SIDE){
+            middle--;
+        }
+        Partition left = new Partition(array, lowerIndex, middle);
+        left.checkPartition(LEFT_SIDE);
+        return left;
     }
 
     public Partition getRightPartition() {
-        return new Partition(arrayList, middle + 1, higherIndex);
+        if (array[middle] == RIGHT_SIDE){
+            middle--;
+        }        
+        Partition right = new Partition(array, middle + 1, higherIndex);
+        right.checkPartition(RIGHT_SIDE);
+        return right;
     }
 
-    public void initializePartition() {
+    private void checkPartition(boolean side) {
+        for (int i = lowerIndex; i <= higherIndex; i++) {
+            if (array[i] != side) {
+                throw new IllegalStateException("Invalid partition at position " + i);
+            }
+        }
+    }
+    
+    public void initializePartition(){
         for (int i = lowerIndex; i <= middle; i++) {
-            arrayList.add(i, LEFT_SIDE);
+            array[i] = LEFT_SIDE;
         }
         for (int i = middle + 1; i <= higherIndex; i++) {
-            arrayList.add(i, RIGHT_SIDE);
-        }
+            array[i] = RIGHT_SIDE;
+        }    
     }
 
     public void randomizePartition() {
@@ -78,32 +93,32 @@ public class Partition implements Iterable<Boolean> {
     }
 
     public void swap(int i, int j) {
-        boolean tmp = arrayList.get(i);
-        arrayList.set(i, arrayList.get(j));
-        arrayList.set(j, tmp);
+        boolean tmp = array[i];
+        array[i] = array[j];
+        array[j] = tmp;
     }
 
     public Boolean[] getArray() {
         int size = getSize();
         Boolean[] partition = new Boolean[size];
         for (int i = 0; i < partition.length; i++) {
-            partition[i] = arrayList.get(lowerIndex + i);
+            partition[i] = array[lowerIndex + i];
         }
         return partition;
     }
 
     public void setArray(Boolean[] partition) {
-        for(int i=0; i< partition.length; i++){
-            arrayList.set(lowerIndex + i, partition[i]);
+        for (int i = 0; i < partition.length; i++) {
+            array[lowerIndex + i] = partition[i];
         }
     }
 
     public boolean getSideAt(int index) {
-        return arrayList.get(index);
+        return array[index];
     }
 
     public void doMoveAt(int index) {
-        arrayList.set(index, !arrayList.get(index));
+        array[index] = !array[index];
     }
 
     @Override
@@ -113,7 +128,7 @@ public class Partition implements Iterable<Boolean> {
 
     private class MyIterator implements Iterator<Boolean> {
 
-        int cursor = lowerIndex;
+        private int cursor = lowerIndex;
 
         @Override
         public boolean hasNext() {
@@ -122,7 +137,7 @@ public class Partition implements Iterable<Boolean> {
 
         @Override
         public Boolean next() {
-            return arrayList.get(cursor++);
+            return array[cursor++];
         }
 
     }

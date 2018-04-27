@@ -84,6 +84,7 @@ public interface NetworkEmbedder {
     }
 
     default public void createCompressedNetwork(GraphModel graphModel, ProgressTicket ticket, AtomicBoolean stopRun) {
+        Graph mainGraph = graphModel.getGraph();
         Graph graph = graphModel.getGraphVisible();
         graph.clear();
         NetworkEmbedder.clearSuperNodes(graphModel);
@@ -117,9 +118,18 @@ public interface NetworkEmbedder {
             Float score;
             float sum;
             int count;
+            
+            //Create super nodes            
+            for (int i = 0; i < batches.length && !stopRun.get(); i++){
+                NetworkEmbedder.createSuperNode(graphModel, i);
+            }
+            
+            //Create super edges
+            String id;
             for (int i = 0; i < batches.length - 1 && !stopRun.get(); i++) {
                 b1 = batches[i];
-                superNode1 = NetworkEmbedder.createSuperNode(graphModel, i);
+                id = String.format("superNode_%d", i);
+                superNode1 = mainGraph.getNode(id);
                 graph.writeLock();
                 try {
                     graph.addNode(superNode1);
@@ -127,14 +137,15 @@ public interface NetworkEmbedder {
                     graph.writeUnlock();
                 }
                 for (int j = i + 1; j < batches.length && !stopRun.get(); j++) {
-                    superNode2 = NetworkEmbedder.createSuperNode(graphModel, j);
+                    b2 = batches[j];
+                    id = String.format("superNode_%d", j);
+                    superNode2 = mainGraph.getNode(id);
                     graph.writeLock();
                     try {
                         graph.addNode(superNode2);
                     } finally {
                         graph.writeUnlock();
-                    }
-                    b2 = batches[j];
+                    }                    
                     isSuperEdge = false;
                     sum = 0;
                     count = 0;

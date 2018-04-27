@@ -53,7 +53,7 @@ public class BiGraph {
 
     public boolean isNeighbour(Vertex vertex1, Vertex vertex2) {
         Float value = simMatrix.getValue(vertex1.getPeptide(), vertex2.getPeptide());
-        return !vertex1.equals(vertex2) && value >= threshold;
+        return !vertex1.equals(vertex2) && value != null && value >= threshold;
     }
 
     public int getMaxDegree() {
@@ -98,6 +98,7 @@ public class BiGraph {
             while (partition.getSideAt(j) == Partition.RIGHT_SIDE && j > middle) {
                 j--;
             }
+            
             if (i < j && partition.getSideAt(i) == Partition.RIGHT_SIDE && partition.getSideAt(j) == Partition.LEFT_SIDE) {
                 change = true;
                 swapVertices(i, j);

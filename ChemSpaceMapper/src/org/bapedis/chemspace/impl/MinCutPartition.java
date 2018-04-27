@@ -67,14 +67,15 @@ public class MinCutPartition extends RecursiveTask<Batch[]> {
     }
 
     protected void findGraphPartition(BiGraph graph) {
-        graph.getPartition().initializePartition();
-        graph.getPartition().randomizePartition();
+        Partition p = graph.getPartition();
+        p.initializePartition();
+        p.randomizePartition();
 
         Bucket leftBucket = new Bucket(graph, Partition.LEFT_SIDE);
         Bucket rightBucket = new Bucket(graph, Partition.RIGHT_SIDE);
 
         bestCost = getCost(graph);
-        bestPartition = graph.getPartition().getArray();
+        bestPartition = p.getArray();
 
         //Set which side to begin, to maintain balance
         int leftCount = 0;
@@ -97,7 +98,7 @@ public class MinCutPartition extends RecursiveTask<Batch[]> {
             iterations++;
         }
 
-        graph.getPartition().setArray(bestPartition);
+        p.setArray(bestPartition);
         graph.rearrange();
     }
 

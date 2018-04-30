@@ -45,7 +45,7 @@ public interface NetworkEmbedder {
 
     public SimilarityMatrix getSimilarityMatrix();
 
-    public default void runEmbed(GraphModel graphModel, ProgressTicket ticket, AtomicBoolean stopRun) {       
+    public default void runEmbed(GraphModel graphModel, ProgressTicket ticket, AtomicBoolean stopRun) {
         switch (getNetworkType()) {
             case FULL:
                 createFullNetwork(graphModel, ticket, stopRun);
@@ -93,89 +93,96 @@ public interface NetworkEmbedder {
         Peptide[] peptides = getSimilarityMatrix().getPeptides();
         CompressedModel compressedModel = getCompressedModel();
 
-        if (compressedModel.getStrategyIndex() == CompressedModel.COMMUNITY_INDEX) {
-            Vertex[] vertices = new Vertex[peptides.length];
-            //Create vertices
-            for (int i = 0; i < peptides.length; i++) {
-                vertices[i] = new Vertex(peptides[i]);
-                vertices[i].setVertexIndex(i);
-            }
-            
-            ticket.switchToDeterminate(compressedModel.getMaxSuperNodes());
-            
-            BiGraph bigraph = new BiGraph(vertices, simMatrix, similarityThreshold);
-            int cacheSize = (int) Math.ceil((double) peptides.length / compressedModel.getMaxSuperNodes());            
-            MinCutPartition partition = new MinCutPartition(bigraph, cacheSize, ticket, stopRun);
+        Vertex[] vertices = new Vertex[peptides.length];
+        //Create vertices
+        for (int i = 0; i < peptides.length; i++) {
+            vertices[i] = new Vertex(peptides[i]);
+            vertices[i].setVertexIndex(i);
+        }
 
-            fjPool.invoke(partition);
-            Batch[] batches = partition.join();
-            
-            Batch b1, b2;
-            Node superNode1, superNode2;
-            Edge superEdge;
-            boolean isSuperEdge;
-            Peptide peptide1, peptide2;
-            Float score;
-            float sum;
-            int count;
-            
-            //Create super nodes            
-            for (int i = 0; i < batches.length && !stopRun.get(); i++){
-                NetworkEmbedder.createSuperNode(graphModel, i);
+        ticket.switchToDeterminate(compressedModel.getMaxSuperNodes());
+
+        BiGraph bigraph = new BiGraph(vertices, simMatrix, similarityThreshold);
+        int cacheSize = (int) Math.ceil((double) peptides.length / compressedModel.getMaxSuperNodes());
+        int level = 64;
+        BasePartition partition = null;
+        switch (compressedModel.getStrategyIndex()) {
+            case CompressedModel.MIN_CUT_PARTITION:
+                partition = new MinCutPartition(bigraph, level, ticket, stopRun);
+                break;
+            case CompressedModel.RANDOM_PARTITION:
+                partition = new RandomPartition(bigraph, level, ticket, stopRun);
+                break;
+        }
+
+        fjPool.invoke(partition);
+        Batch[] batches = partition.join();
+
+        Batch b1, b2;
+        Node superNode1, superNode2;
+        Edge superEdge;
+        boolean isSuperEdge;
+        Peptide peptide1, peptide2;
+        Float score;
+        float sum;
+        int count;
+
+        //Create super nodes            
+        for (int i = 0; i < batches.length && !stopRun.get(); i++) {
+            NetworkEmbedder.createSuperNode(graphModel, i);
+        }
+
+        //Create super edges
+        String id;
+        for (int i = 0; i < batches.length - 1 && !stopRun.get(); i++) {
+            b1 = batches[i];
+            id = String.format("superNode_%d", i);
+            superNode1 = mainGraph.getNode(id);
+            graph.writeLock();
+            try {
+                graph.addNode(superNode1);
+            } finally {
+                graph.writeUnlock();
             }
-            
-            //Create super edges
-            String id;
-            for (int i = 0; i < batches.length - 1 && !stopRun.get(); i++) {
-                b1 = batches[i];
-                id = String.format("superNode_%d", i);
-                superNode1 = mainGraph.getNode(id);
+            for (int j = i + 1; j < batches.length && !stopRun.get(); j++) {
+                b2 = batches[j];
+                id = String.format("superNode_%d", j);
+                superNode2 = mainGraph.getNode(id);
                 graph.writeLock();
                 try {
-                    graph.addNode(superNode1);
+                    graph.addNode(superNode2);
                 } finally {
                     graph.writeUnlock();
                 }
-                for (int j = i + 1; j < batches.length && !stopRun.get(); j++) {
-                    b2 = batches[j];
-                    id = String.format("superNode_%d", j);
-                    superNode2 = mainGraph.getNode(id);
-                    graph.writeLock();
-                    try {
-                        graph.addNode(superNode2);
-                    } finally {
-                        graph.writeUnlock();
-                    }                    
-                    isSuperEdge = false;
-                    sum = 0;
-                    count = 0;
-                    for (int l = 0; l < b1.getSize() && !stopRun.get(); l++) {
-                        peptide1 = b1.getPeptide(l);
-                        for (int k = 0; k < b2.getSize() && !stopRun.get(); k++) {
-                            peptide2 = b2.getPeptide(k);
-                            score = simMatrix.getValue(peptide1, peptide2);
-                            if (score != null) {
-                                if (score >= similarityThreshold) {
-                                    isSuperEdge = true;
-                                }
-                                sum += score;
-                                count++;
+                isSuperEdge = false;
+                sum = 0;
+                count = 0;
+                for (int l = 0; l < b1.getSize() && !stopRun.get(); l++) {
+                    peptide1 = b1.getPeptide(l);
+                    for (int k = 0; k < b2.getSize() && !stopRun.get(); k++) {
+                        peptide2 = b2.getPeptide(k);
+                        score = simMatrix.getValue(peptide1, peptide2);
+                        if (score != null) {
+                            if (score >= similarityThreshold) {
+                                isSuperEdge = true;
                             }
-                        }
-                        if (isSuperEdge) {
-                            break;
+                            sum += score;
+                            count++;
                         }
                     }
                     if (isSuperEdge) {
-                        superEdge = NetworkEmbedder.createSuperEdge(graphModel, superNode1, superNode2, sum / count);
-                        graph.writeLock();
-                        try {
-                            graph.addEdge(superEdge);
-                        } finally {
-                            graph.writeUnlock();
-                        }
-
+                        break;
                     }
+                }
+                if (isSuperEdge) {
+                    superEdge = NetworkEmbedder.createSuperEdge(graphModel, superNode1, superNode2, sum / count);
+                    graph.writeLock();
+                    try {
+                        graph.addEdge(superEdge);
+                    } finally {
+                        graph.writeUnlock();
+                    }
+
                 }
             }
         }

@@ -10,10 +10,11 @@ package org.bapedis.chemspace.model;
  * @author loge
  */
 public class CompressedModel implements Cloneable{
-    public static final int COMMUNITY_INDEX=0;
+    public static final int MIN_CUT_PARTITION=0;
+    public static final int RANDOM_PARTITION=1;
     
-    public static final int DEFAULT_STRATEGY_INDEX=COMMUNITY_INDEX;
-    public static final int DEFAULT_MAX_SUPER_NODES=1000;
+    public static final int DEFAULT_STRATEGY_INDEX=MIN_CUT_PARTITION;
+    public static final int DEFAULT_MAX_SUPER_NODES=1024;
     
     private int strategyIndex;
     private int maxSuperNodes;

@@ -12,6 +12,7 @@ import org.openide.util.NbBundle;
  * @author loge
  */
 public enum AnnotationType { 
+    /*
     NAME("named") {
 
         @Override
@@ -24,6 +25,7 @@ public enum AnnotationType {
             return NbBundle.getMessage(AnnotationType.class, "AnnotationType.name.desc");
         }
     },
+    */
     ORIGIN("produced_by") {
 
         @Override
@@ -36,7 +38,7 @@ public enum AnnotationType {
             return NbBundle.getMessage(AnnotationType.class, "AnnotationType.origin.desc");
         }
     },
-    TARGET("active_against") {
+    TARGET("assessed_against") {
 
         @Override
         public String getDisplayName() {
@@ -48,16 +50,16 @@ public enum AnnotationType {
             return NbBundle.getMessage(AnnotationType.class, "AnnotationType.target.desc");
         }
     },
-    BIOCATEGORY("instance_of") {
+    FUNCTION("related_to") {
 
         @Override
         public String getDisplayName() {
-            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.biocategory");
+            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.function");
         }
 
         @Override
         public String getDescription() {
-            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.biocategory.desc");
+            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.function.desc");
         }
     },
     DATABASE("compiled_in") {
@@ -72,6 +74,7 @@ public enum AnnotationType {
             return NbBundle.getMessage(AnnotationType.class, "AnnotationType.database.desc");
         }
     },
+    /*
     LITERATURE("referenced_by") {
 
         @Override
@@ -83,7 +86,8 @@ public enum AnnotationType {
         public String getDescription() {
             return NbBundle.getMessage(AnnotationType.class, "AnnotationType.literature.desc");
         }
-    },
+    }
+    */
     CROSSREF("linked_to") {
 
         @Override

@@ -39,18 +39,18 @@ public class MetadataDAOImpl implements MetadataDAO {
     @Override
     public List<Metadata> getMetadata(AnnotationType type) {
         switch (type) {
-            case NAME:
-                return getMetadata(type, MyLabel.Name);
+//            case NAME:
+//                return getMetadata(type, MyLabel.Name);
             case ORIGIN:
                 return getMetadata(type, MyLabel.Origin);
             case TARGET:
                 return getMetadata(type, MyLabel.Target);
-            case BIOCATEGORY:
+            case FUNCTION:
                 return getBioCategory();
             case DATABASE:
                 return getMetadata(type, MyLabel.Database);
-            case LITERATURE:
-                return getMetadata(type, MyLabel.Literature);
+//            case LITERATURE:
+//                return getMetadata(type, MyLabel.Literature);
             case CROSSREF:
                 return getMetadata(type, MyLabel.CrossRef);
         }
@@ -88,7 +88,7 @@ public class MetadataDAOImpl implements MetadataDAO {
     protected Metadata getBioCategory(Metadata parent, Node root) {
         Iterable<Relationship> rels = root.getRelationships(Direction.INCOMING, MyRelationship.is_a);
         boolean isLeaf = !rels.iterator().hasNext();
-        Metadata category = new Metadata(parent, String.valueOf(root.getId()), root.getProperty(PRO_NAME).toString(), AnnotationType.BIOCATEGORY, isLeaf);
+        Metadata category = new Metadata(parent, String.valueOf(root.getId()), root.getProperty(PRO_NAME).toString(), AnnotationType.FUNCTION, isLeaf);
         for (Relationship rel : rels) {
             Node startNode = rel.getStartNode();
             category.addChild(getBioCategory(category, startNode));

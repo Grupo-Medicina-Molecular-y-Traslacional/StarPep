@@ -7,6 +7,926 @@
             <suite-component/>
             <module-dependencies/>
             <public-packages>
+                <package>au.com.bytecode.opencsv</package>
+                <package>au.com.bytecode.opencsv.bean</package>
+                <package>com.github.benmanes.caffeine</package>
+                <package>com.github.benmanes.caffeine.base</package>
+                <package>com.github.benmanes.caffeine.cache</package>
+                <package>com.github.benmanes.caffeine.cache.stats</package>
+                <package>com.googlecode.concurrentlinkedhashmap</package>
+                <package>com.profesorfalken.jpowershell</package>
+                <package>com.profesorfalken.wmi4java</package>
+                <package>com.sun.jersey.api</package>
+                <package>com.sun.jersey.api.container</package>
+                <package>com.sun.jersey.api.container.filter</package>
+                <package>com.sun.jersey.api.container.httpserver</package>
+                <package>com.sun.jersey.api.core</package>
+                <package>com.sun.jersey.api.core.servlet</package>
+                <package>com.sun.jersey.api.model</package>
+                <package>com.sun.jersey.api.provider.jaxb</package>
+                <package>com.sun.jersey.api.representation</package>
+                <package>com.sun.jersey.api.uri</package>
+                <package>com.sun.jersey.api.view</package>
+                <package>com.sun.jersey.api.wadl.config</package>
+                <package>com.sun.jersey.core.header</package>
+                <package>com.sun.jersey.core.header.reader</package>
+                <package>com.sun.jersey.core.impl.provider.entity</package>
+                <package>com.sun.jersey.core.impl.provider.header</package>
+                <package>com.sun.jersey.core.impl.provider.xml</package>
+                <package>com.sun.jersey.core.osgi</package>
+                <package>com.sun.jersey.core.provider</package>
+                <package>com.sun.jersey.core.provider.jaxb</package>
+                <package>com.sun.jersey.core.reflection</package>
+                <package>com.sun.jersey.core.spi.component</package>
+                <package>com.sun.jersey.core.spi.component.ioc</package>
+                <package>com.sun.jersey.core.spi.factory</package>
+                <package>com.sun.jersey.core.spi.scanning</package>
+                <package>com.sun.jersey.core.spi.scanning.uri</package>
+                <package>com.sun.jersey.core.util</package>
+                <package>com.sun.jersey.impl</package>
+                <package>com.sun.jersey.localization</package>
+                <package>com.sun.jersey.server.impl</package>
+                <package>com.sun.jersey.server.impl.application</package>
+                <package>com.sun.jersey.server.impl.cdi</package>
+                <package>com.sun.jersey.server.impl.component</package>
+                <package>com.sun.jersey.server.impl.container</package>
+                <package>com.sun.jersey.server.impl.container.filter</package>
+                <package>com.sun.jersey.server.impl.container.httpserver</package>
+                <package>com.sun.jersey.server.impl.container.servlet</package>
+                <package>com.sun.jersey.server.impl.ejb</package>
+                <package>com.sun.jersey.server.impl.inject</package>
+                <package>com.sun.jersey.server.impl.managedbeans</package>
+                <package>com.sun.jersey.server.impl.model</package>
+                <package>com.sun.jersey.server.impl.model.method</package>
+                <package>com.sun.jersey.server.impl.model.method.dispatch</package>
+                <package>com.sun.jersey.server.impl.model.parameter</package>
+                <package>com.sun.jersey.server.impl.model.parameter.multivalued</package>
+                <package>com.sun.jersey.server.impl.modelapi.annotation</package>
+                <package>com.sun.jersey.server.impl.modelapi.validation</package>
+                <package>com.sun.jersey.server.impl.monitoring</package>
+                <package>com.sun.jersey.server.impl.provider</package>
+                <package>com.sun.jersey.server.impl.resource</package>
+                <package>com.sun.jersey.server.impl.template</package>
+                <package>com.sun.jersey.server.impl.uri</package>
+                <package>com.sun.jersey.server.impl.uri.rules</package>
+                <package>com.sun.jersey.server.impl.uri.rules.automata</package>
+                <package>com.sun.jersey.server.impl.wadl</package>
+                <package>com.sun.jersey.server.probes</package>
+                <package>com.sun.jersey.server.spi.component</package>
+                <package>com.sun.jersey.server.wadl</package>
+                <package>com.sun.jersey.server.wadl.generators</package>
+                <package>com.sun.jersey.server.wadl.generators.resourcedoc</package>
+                <package>com.sun.jersey.server.wadl.generators.resourcedoc.model</package>
+                <package>com.sun.jersey.server.wadl.generators.resourcedoc.xhtml</package>
+                <package>com.sun.jersey.spi</package>
+                <package>com.sun.jersey.spi.container</package>
+                <package>com.sun.jersey.spi.container.servlet</package>
+                <package>com.sun.jersey.spi.dispatch</package>
+                <package>com.sun.jersey.spi.inject</package>
+                <package>com.sun.jersey.spi.monitoring</package>
+                <package>com.sun.jersey.spi.resource</package>
+                <package>com.sun.jersey.spi.scanning</package>
+                <package>com.sun.jersey.spi.scanning.servlet</package>
+                <package>com.sun.jersey.spi.service</package>
+                <package>com.sun.jersey.spi.template</package>
+                <package>com.sun.jersey.spi.uri.rules</package>
+                <package>com.sun.research.ws.wadl</package>
+                <package>io.netty.bootstrap</package>
+                <package>io.netty.buffer</package>
+                <package>io.netty.channel</package>
+                <package>io.netty.channel.embedded</package>
+                <package>io.netty.channel.epoll</package>
+                <package>io.netty.channel.group</package>
+                <package>io.netty.channel.internal</package>
+                <package>io.netty.channel.kqueue</package>
+                <package>io.netty.channel.local</package>
+                <package>io.netty.channel.nio</package>
+                <package>io.netty.channel.oio</package>
+                <package>io.netty.channel.pool</package>
+                <package>io.netty.channel.rxtx</package>
+                <package>io.netty.channel.sctp</package>
+                <package>io.netty.channel.sctp.nio</package>
+                <package>io.netty.channel.sctp.oio</package>
+                <package>io.netty.channel.socket</package>
+                <package>io.netty.channel.socket.nio</package>
+                <package>io.netty.channel.socket.oio</package>
+                <package>io.netty.channel.udt</package>
+                <package>io.netty.channel.udt.nio</package>
+                <package>io.netty.channel.unix</package>
+                <package>io.netty.handler.codec</package>
+                <package>io.netty.handler.codec.base64</package>
+                <package>io.netty.handler.codec.bytes</package>
+                <package>io.netty.handler.codec.compression</package>
+                <package>io.netty.handler.codec.dns</package>
+                <package>io.netty.handler.codec.haproxy</package>
+                <package>io.netty.handler.codec.http</package>
+                <package>io.netty.handler.codec.http.cookie</package>
+                <package>io.netty.handler.codec.http.cors</package>
+                <package>io.netty.handler.codec.http.multipart</package>
+                <package>io.netty.handler.codec.http.websocketx</package>
+                <package>io.netty.handler.codec.http.websocketx.extensions</package>
+                <package>io.netty.handler.codec.http.websocketx.extensions.compression</package>
+                <package>io.netty.handler.codec.http2</package>
+                <package>io.netty.handler.codec.json</package>
+                <package>io.netty.handler.codec.marshalling</package>
+                <package>io.netty.handler.codec.memcache</package>
+                <package>io.netty.handler.codec.memcache.binary</package>
+                <package>io.netty.handler.codec.mqtt</package>
+                <package>io.netty.handler.codec.protobuf</package>
+                <package>io.netty.handler.codec.redis</package>
+                <package>io.netty.handler.codec.rtsp</package>
+                <package>io.netty.handler.codec.sctp</package>
+                <package>io.netty.handler.codec.serialization</package>
+                <package>io.netty.handler.codec.smtp</package>
+                <package>io.netty.handler.codec.socks</package>
+                <package>io.netty.handler.codec.socksx</package>
+                <package>io.netty.handler.codec.socksx.v4</package>
+                <package>io.netty.handler.codec.socksx.v5</package>
+                <package>io.netty.handler.codec.spdy</package>
+                <package>io.netty.handler.codec.stomp</package>
+                <package>io.netty.handler.codec.string</package>
+                <package>io.netty.handler.codec.xml</package>
+                <package>io.netty.handler.flow</package>
+                <package>io.netty.handler.flush</package>
+                <package>io.netty.handler.ipfilter</package>
+                <package>io.netty.handler.logging</package>
+                <package>io.netty.handler.proxy</package>
+                <package>io.netty.handler.ssl</package>
+                <package>io.netty.handler.ssl.ocsp</package>
+                <package>io.netty.handler.ssl.util</package>
+                <package>io.netty.handler.stream</package>
+                <package>io.netty.handler.timeout</package>
+                <package>io.netty.handler.traffic</package>
+                <package>io.netty.resolver</package>
+                <package>io.netty.resolver.dns</package>
+                <package>io.netty.util</package>
+                <package>io.netty.util.collection</package>
+                <package>io.netty.util.concurrent</package>
+                <package>io.netty.util.internal</package>
+                <package>io.netty.util.internal.logging</package>
+                <package>io.netty.util.internal.shaded.org.jctools.queues</package>
+                <package>io.netty.util.internal.shaded.org.jctools.queues.atomic</package>
+                <package>io.netty.util.internal.shaded.org.jctools.util</package>
+                <package>javax.servlet</package>
+                <package>javax.servlet.annotation</package>
+                <package>javax.servlet.descriptor</package>
+                <package>javax.servlet.http</package>
+                <package>javax.ws.rs</package>
+                <package>javax.ws.rs.core</package>
+                <package>javax.ws.rs.ext</package>
+                <package>jersey.repackaged.org.objectweb.asm</package>
+                <package>jline</package>
+                <package>jline.console</package>
+                <package>jline.console.completer</package>
+                <package>jline.console.history</package>
+                <package>jline.console.internal</package>
+                <package>jline.internal</package>
+                <package>org.apache.commons.compress</package>
+                <package>org.apache.commons.compress.archivers</package>
+                <package>org.apache.commons.compress.archivers.ar</package>
+                <package>org.apache.commons.compress.archivers.arj</package>
+                <package>org.apache.commons.compress.archivers.cpio</package>
+                <package>org.apache.commons.compress.archivers.dump</package>
+                <package>org.apache.commons.compress.archivers.jar</package>
+                <package>org.apache.commons.compress.archivers.sevenz</package>
+                <package>org.apache.commons.compress.archivers.tar</package>
+                <package>org.apache.commons.compress.archivers.zip</package>
+                <package>org.apache.commons.compress.changes</package>
+                <package>org.apache.commons.compress.compressors</package>
+                <package>org.apache.commons.compress.compressors.brotli</package>
+                <package>org.apache.commons.compress.compressors.bzip2</package>
+                <package>org.apache.commons.compress.compressors.deflate</package>
+                <package>org.apache.commons.compress.compressors.deflate64</package>
+                <package>org.apache.commons.compress.compressors.gzip</package>
+                <package>org.apache.commons.compress.compressors.lz4</package>
+                <package>org.apache.commons.compress.compressors.lz77support</package>
+                <package>org.apache.commons.compress.compressors.lzma</package>
+                <package>org.apache.commons.compress.compressors.lzw</package>
+                <package>org.apache.commons.compress.compressors.pack200</package>
+                <package>org.apache.commons.compress.compressors.snappy</package>
+                <package>org.apache.commons.compress.compressors.xz</package>
+                <package>org.apache.commons.compress.compressors.z</package>
+                <package>org.apache.commons.compress.compressors.zstandard</package>
+                <package>org.apache.commons.compress.parallel</package>
+                <package>org.apache.commons.compress.utils</package>
+                <package>org.apache.commons.configuration</package>
+                <package>org.apache.commons.configuration.beanutils</package>
+                <package>org.apache.commons.configuration.event</package>
+                <package>org.apache.commons.configuration.interpol</package>
+                <package>org.apache.commons.configuration.plist</package>
+                <package>org.apache.commons.configuration.reloading</package>
+                <package>org.apache.commons.configuration.resolver</package>
+                <package>org.apache.commons.configuration.tree</package>
+                <package>org.apache.commons.configuration.tree.xpath</package>
+                <package>org.apache.commons.configuration.web</package>
+                <package>org.apache.commons.io</package>
+                <package>org.apache.commons.io.comparator</package>
+                <package>org.apache.commons.io.filefilter</package>
+                <package>org.apache.commons.io.input</package>
+                <package>org.apache.commons.io.monitor</package>
+                <package>org.apache.commons.io.output</package>
+                <package>org.apache.commons.io.serialization</package>
+                <package>org.apache.commons.lang</package>
+                <package>org.apache.commons.lang.builder</package>
+                <package>org.apache.commons.lang.enums</package>
+                <package>org.apache.commons.lang.exception</package>
+                <package>org.apache.commons.lang.math</package>
+                <package>org.apache.commons.lang.mutable</package>
+                <package>org.apache.commons.lang.reflect</package>
+                <package>org.apache.commons.lang.text</package>
+                <package>org.apache.commons.lang.time</package>
+                <package>org.apache.commons.lang3</package>
+                <package>org.apache.commons.lang3.arch</package>
+                <package>org.apache.commons.lang3.builder</package>
+                <package>org.apache.commons.lang3.concurrent</package>
+                <package>org.apache.commons.lang3.event</package>
+                <package>org.apache.commons.lang3.exception</package>
+                <package>org.apache.commons.lang3.math</package>
+                <package>org.apache.commons.lang3.mutable</package>
+                <package>org.apache.commons.lang3.reflect</package>
+                <package>org.apache.commons.lang3.text</package>
+                <package>org.apache.commons.lang3.text.translate</package>
+                <package>org.apache.commons.lang3.time</package>
+                <package>org.apache.commons.lang3.tuple</package>
+                <package>org.apache.commons.logging</package>
+                <package>org.apache.commons.logging.impl</package>
+                <package>org.apache.commons.text</package>
+                <package>org.apache.commons.text.diff</package>
+                <package>org.apache.commons.text.lookup</package>
+                <package>org.apache.commons.text.matcher</package>
+                <package>org.apache.commons.text.similarity</package>
+                <package>org.apache.commons.text.translate</package>
+                <package>org.apache.lucene</package>
+                <package>org.apache.lucene.analysis</package>
+                <package>org.apache.lucene.analysis.ar</package>
+                <package>org.apache.lucene.analysis.bg</package>
+                <package>org.apache.lucene.analysis.br</package>
+                <package>org.apache.lucene.analysis.ca</package>
+                <package>org.apache.lucene.analysis.charfilter</package>
+                <package>org.apache.lucene.analysis.cjk</package>
+                <package>org.apache.lucene.analysis.ckb</package>
+                <package>org.apache.lucene.analysis.commongrams</package>
+                <package>org.apache.lucene.analysis.compound</package>
+                <package>org.apache.lucene.analysis.compound.hyphenation</package>
+                <package>org.apache.lucene.analysis.core</package>
+                <package>org.apache.lucene.analysis.custom</package>
+                <package>org.apache.lucene.analysis.cz</package>
+                <package>org.apache.lucene.analysis.da</package>
+                <package>org.apache.lucene.analysis.de</package>
+                <package>org.apache.lucene.analysis.el</package>
+                <package>org.apache.lucene.analysis.en</package>
+                <package>org.apache.lucene.analysis.es</package>
+                <package>org.apache.lucene.analysis.eu</package>
+                <package>org.apache.lucene.analysis.fa</package>
+                <package>org.apache.lucene.analysis.fi</package>
+                <package>org.apache.lucene.analysis.fr</package>
+                <package>org.apache.lucene.analysis.ga</package>
+                <package>org.apache.lucene.analysis.gl</package>
+                <package>org.apache.lucene.analysis.hi</package>
+                <package>org.apache.lucene.analysis.hu</package>
+                <package>org.apache.lucene.analysis.hunspell</package>
+                <package>org.apache.lucene.analysis.hy</package>
+                <package>org.apache.lucene.analysis.id</package>
+                <package>org.apache.lucene.analysis.in</package>
+                <package>org.apache.lucene.analysis.it</package>
+                <package>org.apache.lucene.analysis.lt</package>
+                <package>org.apache.lucene.analysis.lv</package>
+                <package>org.apache.lucene.analysis.miscellaneous</package>
+                <package>org.apache.lucene.analysis.ngram</package>
+                <package>org.apache.lucene.analysis.nl</package>
+                <package>org.apache.lucene.analysis.no</package>
+                <package>org.apache.lucene.analysis.path</package>
+                <package>org.apache.lucene.analysis.pattern</package>
+                <package>org.apache.lucene.analysis.payloads</package>
+                <package>org.apache.lucene.analysis.pt</package>
+                <package>org.apache.lucene.analysis.query</package>
+                <package>org.apache.lucene.analysis.reverse</package>
+                <package>org.apache.lucene.analysis.ro</package>
+                <package>org.apache.lucene.analysis.ru</package>
+                <package>org.apache.lucene.analysis.shingle</package>
+                <package>org.apache.lucene.analysis.sinks</package>
+                <package>org.apache.lucene.analysis.snowball</package>
+                <package>org.apache.lucene.analysis.sr</package>
+                <package>org.apache.lucene.analysis.standard</package>
+                <package>org.apache.lucene.analysis.standard.std40</package>
+                <package>org.apache.lucene.analysis.sv</package>
+                <package>org.apache.lucene.analysis.synonym</package>
+                <package>org.apache.lucene.analysis.th</package>
+                <package>org.apache.lucene.analysis.tokenattributes</package>
+                <package>org.apache.lucene.analysis.tr</package>
+                <package>org.apache.lucene.analysis.util</package>
+                <package>org.apache.lucene.analysis.wikipedia</package>
+                <package>org.apache.lucene.codecs</package>
+                <package>org.apache.lucene.codecs.autoprefix</package>
+                <package>org.apache.lucene.codecs.blockterms</package>
+                <package>org.apache.lucene.codecs.blocktree</package>
+                <package>org.apache.lucene.codecs.blocktreeords</package>
+                <package>org.apache.lucene.codecs.bloom</package>
+                <package>org.apache.lucene.codecs.compressing</package>
+                <package>org.apache.lucene.codecs.lucene50</package>
+                <package>org.apache.lucene.codecs.lucene53</package>
+                <package>org.apache.lucene.codecs.lucene54</package>
+                <package>org.apache.lucene.codecs.memory</package>
+                <package>org.apache.lucene.codecs.perfield</package>
+                <package>org.apache.lucene.codecs.simpletext</package>
+                <package>org.apache.lucene.collation</package>
+                <package>org.apache.lucene.collation.tokenattributes</package>
+                <package>org.apache.lucene.document</package>
+                <package>org.apache.lucene.index</package>
+                <package>org.apache.lucene.queryparser.analyzing</package>
+                <package>org.apache.lucene.queryparser.classic</package>
+                <package>org.apache.lucene.queryparser.complexPhrase</package>
+                <package>org.apache.lucene.queryparser.ext</package>
+                <package>org.apache.lucene.queryparser.flexible.core</package>
+                <package>org.apache.lucene.queryparser.flexible.core.builders</package>
+                <package>org.apache.lucene.queryparser.flexible.core.config</package>
+                <package>org.apache.lucene.queryparser.flexible.core.messages</package>
+                <package>org.apache.lucene.queryparser.flexible.core.nodes</package>
+                <package>org.apache.lucene.queryparser.flexible.core.parser</package>
+                <package>org.apache.lucene.queryparser.flexible.core.processors</package>
+                <package>org.apache.lucene.queryparser.flexible.core.util</package>
+                <package>org.apache.lucene.queryparser.flexible.messages</package>
+                <package>org.apache.lucene.queryparser.flexible.precedence</package>
+                <package>org.apache.lucene.queryparser.flexible.precedence.processors</package>
+                <package>org.apache.lucene.queryparser.flexible.standard</package>
+                <package>org.apache.lucene.queryparser.flexible.standard.builders</package>
+                <package>org.apache.lucene.queryparser.flexible.standard.config</package>
+                <package>org.apache.lucene.queryparser.flexible.standard.nodes</package>
+                <package>org.apache.lucene.queryparser.flexible.standard.parser</package>
+                <package>org.apache.lucene.queryparser.flexible.standard.processors</package>
+                <package>org.apache.lucene.queryparser.simple</package>
+                <package>org.apache.lucene.queryparser.surround.parser</package>
+                <package>org.apache.lucene.queryparser.surround.query</package>
+                <package>org.apache.lucene.queryparser.xml</package>
+                <package>org.apache.lucene.queryparser.xml.builders</package>
+                <package>org.apache.lucene.search</package>
+                <package>org.apache.lucene.search.similarities</package>
+                <package>org.apache.lucene.search.spans</package>
+                <package>org.apache.lucene.store</package>
+                <package>org.apache.lucene.util</package>
+                <package>org.apache.lucene.util.automaton</package>
+                <package>org.apache.lucene.util.fst</package>
+                <package>org.apache.lucene.util.mutable</package>
+                <package>org.apache.lucene.util.packed</package>
+                <package>org.bouncycastle</package>
+                <package>org.bouncycastle.asn1</package>
+                <package>org.bouncycastle.asn1.anssi</package>
+                <package>org.bouncycastle.asn1.bc</package>
+                <package>org.bouncycastle.asn1.bsi</package>
+                <package>org.bouncycastle.asn1.cmc</package>
+                <package>org.bouncycastle.asn1.cmp</package>
+                <package>org.bouncycastle.asn1.cms</package>
+                <package>org.bouncycastle.asn1.cms.ecc</package>
+                <package>org.bouncycastle.asn1.crmf</package>
+                <package>org.bouncycastle.asn1.cryptopro</package>
+                <package>org.bouncycastle.asn1.dvcs</package>
+                <package>org.bouncycastle.asn1.eac</package>
+                <package>org.bouncycastle.asn1.esf</package>
+                <package>org.bouncycastle.asn1.ess</package>
+                <package>org.bouncycastle.asn1.est</package>
+                <package>org.bouncycastle.asn1.gm</package>
+                <package>org.bouncycastle.asn1.gnu</package>
+                <package>org.bouncycastle.asn1.iana</package>
+                <package>org.bouncycastle.asn1.icao</package>
+                <package>org.bouncycastle.asn1.isismtt</package>
+                <package>org.bouncycastle.asn1.isismtt.ocsp</package>
+                <package>org.bouncycastle.asn1.isismtt.x509</package>
+                <package>org.bouncycastle.asn1.iso</package>
+                <package>org.bouncycastle.asn1.kisa</package>
+                <package>org.bouncycastle.asn1.microsoft</package>
+                <package>org.bouncycastle.asn1.misc</package>
+                <package>org.bouncycastle.asn1.mozilla</package>
+                <package>org.bouncycastle.asn1.nist</package>
+                <package>org.bouncycastle.asn1.nsri</package>
+                <package>org.bouncycastle.asn1.ntt</package>
+                <package>org.bouncycastle.asn1.ocsp</package>
+                <package>org.bouncycastle.asn1.oiw</package>
+                <package>org.bouncycastle.asn1.pkcs</package>
+                <package>org.bouncycastle.asn1.rosstandart</package>
+                <package>org.bouncycastle.asn1.sec</package>
+                <package>org.bouncycastle.asn1.smime</package>
+                <package>org.bouncycastle.asn1.teletrust</package>
+                <package>org.bouncycastle.asn1.tsp</package>
+                <package>org.bouncycastle.asn1.ua</package>
+                <package>org.bouncycastle.asn1.util</package>
+                <package>org.bouncycastle.asn1.x500</package>
+                <package>org.bouncycastle.asn1.x500.style</package>
+                <package>org.bouncycastle.asn1.x509</package>
+                <package>org.bouncycastle.asn1.x509.qualified</package>
+                <package>org.bouncycastle.asn1.x509.sigi</package>
+                <package>org.bouncycastle.asn1.x9</package>
+                <package>org.bouncycastle.cert</package>
+                <package>org.bouncycastle.cert.bc</package>
+                <package>org.bouncycastle.cert.cmp</package>
+                <package>org.bouncycastle.cert.crmf</package>
+                <package>org.bouncycastle.cert.crmf.bc</package>
+                <package>org.bouncycastle.cert.crmf.jcajce</package>
+                <package>org.bouncycastle.cert.dane</package>
+                <package>org.bouncycastle.cert.dane.fetcher</package>
+                <package>org.bouncycastle.cert.jcajce</package>
+                <package>org.bouncycastle.cert.ocsp</package>
+                <package>org.bouncycastle.cert.ocsp.jcajce</package>
+                <package>org.bouncycastle.cert.path</package>
+                <package>org.bouncycastle.cert.path.validations</package>
+                <package>org.bouncycastle.cert.selector</package>
+                <package>org.bouncycastle.cert.selector.jcajce</package>
+                <package>org.bouncycastle.cmc</package>
+                <package>org.bouncycastle.cms</package>
+                <package>org.bouncycastle.cms.bc</package>
+                <package>org.bouncycastle.cms.jcajce</package>
+                <package>org.bouncycastle.crypto</package>
+                <package>org.bouncycastle.crypto.agreement</package>
+                <package>org.bouncycastle.crypto.agreement.jpake</package>
+                <package>org.bouncycastle.crypto.agreement.kdf</package>
+                <package>org.bouncycastle.crypto.agreement.srp</package>
+                <package>org.bouncycastle.crypto.commitments</package>
+                <package>org.bouncycastle.crypto.digests</package>
+                <package>org.bouncycastle.crypto.ec</package>
+                <package>org.bouncycastle.crypto.encodings</package>
+                <package>org.bouncycastle.crypto.engines</package>
+                <package>org.bouncycastle.crypto.examples</package>
+                <package>org.bouncycastle.crypto.generators</package>
+                <package>org.bouncycastle.crypto.io</package>
+                <package>org.bouncycastle.crypto.kems</package>
+                <package>org.bouncycastle.crypto.macs</package>
+                <package>org.bouncycastle.crypto.modes</package>
+                <package>org.bouncycastle.crypto.modes.gcm</package>
+                <package>org.bouncycastle.crypto.modes.kgcm</package>
+                <package>org.bouncycastle.crypto.paddings</package>
+                <package>org.bouncycastle.crypto.params</package>
+                <package>org.bouncycastle.crypto.parsers</package>
+                <package>org.bouncycastle.crypto.prng</package>
+                <package>org.bouncycastle.crypto.prng.drbg</package>
+                <package>org.bouncycastle.crypto.signers</package>
+                <package>org.bouncycastle.crypto.tls</package>
+                <package>org.bouncycastle.crypto.util</package>
+                <package>org.bouncycastle.dvcs</package>
+                <package>org.bouncycastle.eac</package>
+                <package>org.bouncycastle.eac.jcajce</package>
+                <package>org.bouncycastle.eac.operator</package>
+                <package>org.bouncycastle.eac.operator.jcajce</package>
+                <package>org.bouncycastle.est</package>
+                <package>org.bouncycastle.est.jcajce</package>
+                <package>org.bouncycastle.i18n</package>
+                <package>org.bouncycastle.i18n.filter</package>
+                <package>org.bouncycastle.iana</package>
+                <package>org.bouncycastle.jcajce</package>
+                <package>org.bouncycastle.jcajce.io</package>
+                <package>org.bouncycastle.jcajce.provider.asymmetric</package>
+                <package>org.bouncycastle.jcajce.provider.asymmetric.dh</package>
+                <package>org.bouncycastle.jcajce.provider.asymmetric.dsa</package>
+                <package>org.bouncycastle.jcajce.provider.asymmetric.dstu</package>
+                <package>org.bouncycastle.jcajce.provider.asymmetric.ec</package>
+                <package>org.bouncycastle.jcajce.provider.asymmetric.ecgost</package>
+                <package>org.bouncycastle.jcajce.provider.asymmetric.ecgost12</package>
+                <package>org.bouncycastle.jcajce.provider.asymmetric.elgamal</package>
+                <package>org.bouncycastle.jcajce.provider.asymmetric.gost</package>
+                <package>org.bouncycastle.jcajce.provider.asymmetric.ies</package>
+                <package>org.bouncycastle.jcajce.provider.asymmetric.rsa</package>
+                <package>org.bouncycastle.jcajce.provider.asymmetric.util</package>
+                <package>org.bouncycastle.jcajce.provider.asymmetric.x509</package>
+                <package>org.bouncycastle.jcajce.provider.config</package>
+                <package>org.bouncycastle.jcajce.provider.digest</package>
+                <package>org.bouncycastle.jcajce.provider.drbg</package>
+                <package>org.bouncycastle.jcajce.provider.keystore</package>
+                <package>org.bouncycastle.jcajce.provider.keystore.bc</package>
+                <package>org.bouncycastle.jcajce.provider.keystore.bcfks</package>
+                <package>org.bouncycastle.jcajce.provider.keystore.pkcs12</package>
+                <package>org.bouncycastle.jcajce.provider.symmetric</package>
+                <package>org.bouncycastle.jcajce.provider.symmetric.util</package>
+                <package>org.bouncycastle.jcajce.provider.util</package>
+                <package>org.bouncycastle.jcajce.spec</package>
+                <package>org.bouncycastle.jcajce.util</package>
+                <package>org.bouncycastle.jce</package>
+                <package>org.bouncycastle.jce.exception</package>
+                <package>org.bouncycastle.jce.interfaces</package>
+                <package>org.bouncycastle.jce.netscape</package>
+                <package>org.bouncycastle.jce.provider</package>
+                <package>org.bouncycastle.jce.spec</package>
+                <package>org.bouncycastle.math</package>
+                <package>org.bouncycastle.math.ec</package>
+                <package>org.bouncycastle.math.ec.custom.djb</package>
+                <package>org.bouncycastle.math.ec.custom.gm</package>
+                <package>org.bouncycastle.math.ec.custom.sec</package>
+                <package>org.bouncycastle.math.ec.endo</package>
+                <package>org.bouncycastle.math.ec.rfc7748</package>
+                <package>org.bouncycastle.math.ec.tools</package>
+                <package>org.bouncycastle.math.field</package>
+                <package>org.bouncycastle.math.raw</package>
+                <package>org.bouncycastle.mozilla</package>
+                <package>org.bouncycastle.mozilla.jcajce</package>
+                <package>org.bouncycastle.openssl</package>
+                <package>org.bouncycastle.openssl.bc</package>
+                <package>org.bouncycastle.openssl.jcajce</package>
+                <package>org.bouncycastle.operator</package>
+                <package>org.bouncycastle.operator.bc</package>
+                <package>org.bouncycastle.operator.jcajce</package>
+                <package>org.bouncycastle.pkcs</package>
+                <package>org.bouncycastle.pkcs.bc</package>
+                <package>org.bouncycastle.pkcs.jcajce</package>
+                <package>org.bouncycastle.pkix</package>
+                <package>org.bouncycastle.pkix.jcajce</package>
+                <package>org.bouncycastle.pqc.asn1</package>
+                <package>org.bouncycastle.pqc.crypto</package>
+                <package>org.bouncycastle.pqc.crypto.gmss</package>
+                <package>org.bouncycastle.pqc.crypto.gmss.util</package>
+                <package>org.bouncycastle.pqc.crypto.mceliece</package>
+                <package>org.bouncycastle.pqc.crypto.newhope</package>
+                <package>org.bouncycastle.pqc.crypto.rainbow</package>
+                <package>org.bouncycastle.pqc.crypto.rainbow.util</package>
+                <package>org.bouncycastle.pqc.crypto.sphincs</package>
+                <package>org.bouncycastle.pqc.crypto.xmss</package>
+                <package>org.bouncycastle.pqc.jcajce.interfaces</package>
+                <package>org.bouncycastle.pqc.jcajce.provider</package>
+                <package>org.bouncycastle.pqc.jcajce.provider.gmss</package>
+                <package>org.bouncycastle.pqc.jcajce.provider.mceliece</package>
+                <package>org.bouncycastle.pqc.jcajce.provider.newhope</package>
+                <package>org.bouncycastle.pqc.jcajce.provider.rainbow</package>
+                <package>org.bouncycastle.pqc.jcajce.provider.sphincs</package>
+                <package>org.bouncycastle.pqc.jcajce.provider.util</package>
+                <package>org.bouncycastle.pqc.jcajce.provider.xmss</package>
+                <package>org.bouncycastle.pqc.jcajce.spec</package>
+                <package>org.bouncycastle.pqc.math.linearalgebra</package>
+                <package>org.bouncycastle.tsp</package>
+                <package>org.bouncycastle.tsp.cms</package>
+                <package>org.bouncycastle.util</package>
+                <package>org.bouncycastle.util.encoders</package>
+                <package>org.bouncycastle.util.io</package>
+                <package>org.bouncycastle.util.io.pem</package>
+                <package>org.bouncycastle.util.test</package>
+                <package>org.bouncycastle.voms</package>
+                <package>org.bouncycastle.x509</package>
+                <package>org.bouncycastle.x509.extension</package>
+                <package>org.bouncycastle.x509.util</package>
+                <package>org.codehaus.jackson</package>
+                <package>org.codehaus.jackson.annotate</package>
+                <package>org.codehaus.jackson.format</package>
+                <package>org.codehaus.jackson.impl</package>
+                <package>org.codehaus.jackson.io</package>
+                <package>org.codehaus.jackson.jaxrs</package>
+                <package>org.codehaus.jackson.map</package>
+                <package>org.codehaus.jackson.map.annotate</package>
+                <package>org.codehaus.jackson.map.deser</package>
+                <package>org.codehaus.jackson.map.deser.impl</package>
+                <package>org.codehaus.jackson.map.deser.std</package>
+                <package>org.codehaus.jackson.map.exc</package>
+                <package>org.codehaus.jackson.map.ext</package>
+                <package>org.codehaus.jackson.map.introspect</package>
+                <package>org.codehaus.jackson.map.jsontype</package>
+                <package>org.codehaus.jackson.map.jsontype.impl</package>
+                <package>org.codehaus.jackson.map.module</package>
+                <package>org.codehaus.jackson.map.ser</package>
+                <package>org.codehaus.jackson.map.ser.impl</package>
+                <package>org.codehaus.jackson.map.ser.std</package>
+                <package>org.codehaus.jackson.map.type</package>
+                <package>org.codehaus.jackson.map.util</package>
+                <package>org.codehaus.jackson.node</package>
+                <package>org.codehaus.jackson.schema</package>
+                <package>org.codehaus.jackson.sym</package>
+                <package>org.codehaus.jackson.type</package>
+                <package>org.codehaus.jackson.util</package>
+                <package>org.eclipse.jetty.http</package>
+                <package>org.eclipse.jetty.http.pathmap</package>
+                <package>org.eclipse.jetty.io</package>
+                <package>org.eclipse.jetty.io.ssl</package>
+                <package>org.eclipse.jetty.security</package>
+                <package>org.eclipse.jetty.security.authentication</package>
+                <package>org.eclipse.jetty.server</package>
+                <package>org.eclipse.jetty.server.handler</package>
+                <package>org.eclipse.jetty.server.handler.gzip</package>
+                <package>org.eclipse.jetty.server.handler.jmx</package>
+                <package>org.eclipse.jetty.server.jmx</package>
+                <package>org.eclipse.jetty.server.nio</package>
+                <package>org.eclipse.jetty.server.session</package>
+                <package>org.eclipse.jetty.servlet</package>
+                <package>org.eclipse.jetty.servlet.jmx</package>
+                <package>org.eclipse.jetty.servlet.listener</package>
+                <package>org.eclipse.jetty.util</package>
+                <package>org.eclipse.jetty.util.annotation</package>
+                <package>org.eclipse.jetty.util.component</package>
+                <package>org.eclipse.jetty.util.log</package>
+                <package>org.eclipse.jetty.util.preventers</package>
+                <package>org.eclipse.jetty.util.resource</package>
+                <package>org.eclipse.jetty.util.security</package>
+                <package>org.eclipse.jetty.util.ssl</package>
+                <package>org.eclipse.jetty.util.statistic</package>
+                <package>org.eclipse.jetty.util.thread</package>
+                <package>org.eclipse.jetty.util.thread.strategy</package>
+                <package>org.eclipse.jetty.webapp</package>
+                <package>org.eclipse.jetty.xml</package>
+                <package>org.fusesource.hawtjni.runtime</package>
+                <package>org.fusesource.jansi</package>
+                <package>org.fusesource.jansi.internal</package>
+                <package>org.jutils.jprocesses</package>
+                <package>org.jutils.jprocesses.info</package>
+                <package>org.jutils.jprocesses.model</package>
+                <package>org.jutils.jprocesses.util</package>
+                <package>org.mozilla.classfile</package>
+                <package>org.mozilla.javascript</package>
+                <package>org.mozilla.javascript.annotations</package>
+                <package>org.mozilla.javascript.ast</package>
+                <package>org.mozilla.javascript.commonjs.module</package>
+                <package>org.mozilla.javascript.commonjs.module.provider</package>
+                <package>org.mozilla.javascript.debug</package>
+                <package>org.mozilla.javascript.jdk15</package>
+                <package>org.mozilla.javascript.jdk18</package>
+                <package>org.mozilla.javascript.json</package>
+                <package>org.mozilla.javascript.optimizer</package>
+                <package>org.mozilla.javascript.regexp</package>
+                <package>org.mozilla.javascript.serialize</package>
+                <package>org.mozilla.javascript.tools</package>
+                <package>org.mozilla.javascript.tools.debugger</package>
+                <package>org.mozilla.javascript.tools.debugger.treetable</package>
+                <package>org.mozilla.javascript.tools.idswitch</package>
+                <package>org.mozilla.javascript.tools.jsc</package>
+                <package>org.mozilla.javascript.tools.shell</package>
+                <package>org.mozilla.javascript.typedarrays</package>
+                <package>org.mozilla.javascript.v8dtoa</package>
+                <package>org.mozilla.javascript.xml</package>
+                <package>org.mozilla.javascript.xmlimpl</package>
+                <package>org.neo4j.bolt</package>
+                <package>org.neo4j.bolt.diagnostics</package>
+                <package>org.neo4j.bolt.logging</package>
+                <package>org.neo4j.bolt.messaging</package>
+                <package>org.neo4j.bolt.runtime</package>
+                <package>org.neo4j.bolt.security.auth</package>
+                <package>org.neo4j.bolt.transport</package>
+                <package>org.neo4j.bolt.transport.configuration</package>
+                <package>org.neo4j.bolt.transport.pipeline</package>
+                <package>org.neo4j.bolt.v1.messaging</package>
+                <package>org.neo4j.bolt.v1.packstream</package>
+                <package>org.neo4j.bolt.v1.packstream.utf8</package>
+                <package>org.neo4j.bolt.v1.runtime</package>
+                <package>org.neo4j.bolt.v1.runtime.bookmarking</package>
+                <package>org.neo4j.bolt.v1.runtime.spi</package>
+                <package>org.neo4j.bolt.v1.transport</package>
+                <package>org.neo4j.bolt.v2.messaging</package>
+                <package>org.neo4j.codegen</package>
+                <package>org.neo4j.codegen.asm</package>
+                <package>org.neo4j.codegen.asm.signature</package>
+                <package>org.neo4j.codegen.asm.tree</package>
+                <package>org.neo4j.codegen.asm.tree.analysis</package>
+                <package>org.neo4j.codegen.asm.util</package>
+                <package>org.neo4j.codegen.bytecode</package>
+                <package>org.neo4j.codegen.source</package>
+                <package>org.neo4j.collection</package>
+                <package>org.neo4j.collection.pool</package>
+                <package>org.neo4j.collection.primitive</package>
+                <package>org.neo4j.collection.primitive.base</package>
+                <package>org.neo4j.collection.primitive.hopscotch</package>
+                <package>org.neo4j.commandline</package>
+                <package>org.neo4j.commandline.admin</package>
+                <package>org.neo4j.commandline.admin.security</package>
+                <package>org.neo4j.commandline.arguments</package>
+                <package>org.neo4j.commandline.arguments.common</package>
+                <package>org.neo4j.commandline.dbms</package>
+                <package>org.neo4j.commandline.dbms.config</package>
+                <package>org.neo4j.concurrent</package>
+                <package>org.neo4j.configuration</package>
+                <package>org.neo4j.consistency</package>
+                <package>org.neo4j.consistency.checking</package>
+                <package>org.neo4j.consistency.checking.cache</package>
+                <package>org.neo4j.consistency.checking.full</package>
+                <package>org.neo4j.consistency.checking.index</package>
+                <package>org.neo4j.consistency.checking.labelscan</package>
+                <package>org.neo4j.consistency.internal</package>
+                <package>org.neo4j.consistency.repair</package>
+                <package>org.neo4j.consistency.report</package>
+                <package>org.neo4j.consistency.statistics</package>
+                <package>org.neo4j.consistency.store</package>
+                <package>org.neo4j.consistency.store.synthetic</package>
+                <package>org.neo4j.csv.reader</package>
+                <package>org.neo4j.cursor</package>
+                <package>org.neo4j.cypher</package>
+                <package>org.neo4j.cypher.export</package>
+                <package>org.neo4j.cypher.internal</package>
+                <package>org.neo4j.cypher.internal.codegen</package>
+                <package>org.neo4j.cypher.internal.compatibility</package>
+                <package>org.neo4j.cypher.internal.compatibility.v2_3</package>
+                <package>org.neo4j.cypher.internal.compatibility.v3_1</package>
+                <package>org.neo4j.cypher.internal.compatibility.v3_3</package>
+                <package>org.neo4j.cypher.internal.compatibility.v3_4</package>
+                <package>org.neo4j.cypher.internal.compatibility.v3_4.runtime</package>
+                <package>org.neo4j.cypher.internal.compatibility.v3_4.runtime.executionplan</package>
+                <package>org.neo4j.cypher.internal.compatibility.v3_4.runtime.executionplan.builders.prepare</package>
+                <package>org.neo4j.cypher.internal.compatibility.v3_4.runtime.executionplan.procs</package>
+                <package>org.neo4j.cypher.internal.compatibility.v3_4.runtime.helpers</package>
+                <package>org.neo4j.cypher.internal.compatibility.v3_4.runtime.phases</package>
+                <package>org.neo4j.cypher.internal.compatibility.v3_4.runtime.pipes</package>
+                <package>org.neo4j.cypher.internal.compatibility.v3_4.runtime.profiler</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.ast</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.ast.conditions</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.ast.convert.commands</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.ast.convert.plannerQuery</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.ast.rewriters</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.commands</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.commands.expressions</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.commands.predicates</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.commands.values</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.docgen</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.executionplan</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.executionplan.builders</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.executionplan.builders.prepare</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.executionplan.verifiers</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.helpers</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.helpers.Converge</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.mutation</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.pipes</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.pipes.aggregation</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.pipes.matching</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.planDescription</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.planner</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.planner.execution</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.planner.logical</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.planner.logical.cardinality</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.planner.logical.cardinality.assumeIndependence</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.planner.logical.cardinality.optional</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.planner.logical.cardinality.triplet</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.planner.logical.greedy</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.planner.logical.idp</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.planner.logical.plans</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.planner.logical.plans.rewriter</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.planner.logical.steps</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.prettifier</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.profiler</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.spi</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.symbols</package>
+                <package>org.neo4j.cypher.internal.compiler.v2_3.tracing.rewriters</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.ast</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.ast.conditions</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.ast.convert.commands</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.ast.convert.plannerQuery</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.ast.rewriters</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.codegen</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.codegen.ir</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.codegen.ir.expressions</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.codegen.ir.functions</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.codegen.profiling</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.commands</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.commands.expressions</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.commands.predicates</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.commands.values</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.executionplan</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.executionplan.builders</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.executionplan.builders.prepare</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.executionplan.procs</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.executionplan.verifiers</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.helpers</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.mutation</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.pipes</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.pipes.aggregation</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.pipes.matching</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.planDescription</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.planner</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.planner.execution</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.planner.logical</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.planner.logical.cardinality</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.planner.logical.cardinality.assumeIndependence</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.planner.logical.idp</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.planner.logical.plans</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.planner.logical.plans.rewriter</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.planner.logical.steps</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.prettifier</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.profiler</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.spi</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.symbols</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_1.tracing.rewriters</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3.ast</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3.ast.conditions</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3.ast.convert.plannerQuery</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3.ast.rewriters</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3.common</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3.helpers</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3.phases</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3.planner</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3.planner.logical</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3.planner.logical.cardinality</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3.planner.logical.cardinality.assumeIndependence</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3.planner.logical.idp</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3.planner.logical.plans</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3.planner.logical.plans.rewriter</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3.planner.logical.steps</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3.prettifier</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_3.spi</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4.ast</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4.ast.conditions</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4.ast.convert.plannerQuery</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4.ast.rewriters</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4.common</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4.helpers</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4.phases</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4.planner</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4.planner.logical</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4.planner.logical.cardinality</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4.planner.logical.cardinality.assumeIndependence</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4.planner.logical.debug</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4.planner.logical.idp</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4.planner.logical.plans</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4.planner.logical.plans.rewriter</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4.planner.logical.steps</package>
+                <package>org.neo4j.cypher.internal.compiler.v3_4.prettifier</package>
+                <package>org.neo4j.cypher.internal.frontend.v2_3</package>
+                <package>org.neo4j.cypher.internal.frontend.v2_3.ast</package>
+                <package>org.neo4j.cypher.internal.frontend.v2_3.ast.functions</package>
+                <package>org.neo4j.cypher.internal.frontend.v2_3.helpers</package>
+                <package>org.neo4j.cypher.internal.frontend.v2_3.notification</package>
+                <package>org.neo4j.cypher.internal.frontend.v2_3.parser</package>
+                <package>org.neo4j.cypher.internal.frontend.v2_3.parser.matchers</package>
+                <package>org.neo4j.cypher.internal.frontend.v2_3.perty</package>
+                <package>org.neo4j.cypher.internal.frontend.v2_3.perty.format</package>
+                <package>org.neo4j.cypher.internal.frontend.v2_3.perty.gen</package>
+                <package>org.neo4j.cypher.internal.frontend.v2_3.perty.handler</package>
+                <package>org.neo4j.cypher.internal.frontend.v2_3.perty.helpers</package>
+                <package>org.neo4j.cypher.internal.frontend.v2_3.perty.print</package>
+                <package>org.neo4j.cypher.internal.frontend.v2_3.perty.recipe</package>
+                <package>org.neo4j.cypher.internal.frontend.v2_3.perty.step</package>
+                <package>org.neo4j.cypher.internal.frontend.v2_3.spi</package>
+                <package>org.neo4j.cypher.internal.frontend.v2_3.symbols</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_1</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_1.ast</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_1.ast.functions</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_1.helpers</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_1.notification</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_1.parser</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_1.parser.matchers</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_1.spi</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_1.symbols</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_3</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_3.ast</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_3.ast.conditions</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_3.ast.functions</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_3.ast.rewriters</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_3.helpers</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_3.helpers.rewriting</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_3.notification</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_3.parser</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_3.parser.matchers</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_3.phases</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_3.spi</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_3.symbols</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_4</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_4.ast</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_4.ast.conditions</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_4.ast.rewriters</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_4.helpers</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_4.helpers.rewriting</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_4.notification</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_4.parser</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_4.parser.matchers</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_4.phases</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_4.prettifier</package>
+                <package>org.neo4j.cypher.internal.frontend.v3_4.semantics</package>
+                <package>org.neo4j.cypher.internal.ir.v3_3</package>
+                <package>org.neo4j.cypher.internal.ir.v3_3.helpers</package>
+                <package>org.neo4j.cypher.internal.ir.v3_4</package>
+                <package>org.neo4j.cypher.internal.ir.v3_4.helpers</package>
+                <package>org.neo4j.cypher.internal.javacompat</package>
+                <package>org.neo4j.cypher.internal.planner.v3_4.spi</package>
+                <package>org.neo4j.cypher.internal.runtime</package>
+                <package>org.neo4j.cypher.internal.runtime.interpreted</package>
+                <package>org.neo4j.cypher.internal.runtime.interpreted.commands</package>
+                <package>org.neo4j.cypher.internal.runtime.interpreted.commands.convert</package>
+                <package>org.neo4j.cypher.internal.runtime.interpreted.commands.expressions</package>
+                <package>org.neo4j.cypher.internal.runtime.interpreted.commands.predicates</package>
+                <package>org.neo4j.cypher.internal.runtime.interpreted.commands.values</package>
+                <package>org.neo4j.cypher.internal.runtime.interpreted.pipes</package>
+                <package>org.neo4j.cypher.internal.runtime.interpreted.pipes.aggregation</package>
+                <package>org.neo4j.cypher.internal.runtime.interpreted.pipes.matching</package>
+                <package>org.neo4j.cypher.internal.runtime.interpreted.symbols</package>
+                <package>org.neo4j.cypher.internal.runtime.planDescription</package>
+                <package>org.neo4j.cypher.internal.spi</package>
+                <package>org.neo4j.cypher.internal.spi.v2_3</package>
+                <package>org.neo4j.cypher.internal.spi.v3_1</package>
+                <package>org.neo4j.cypher.internal.spi.v3_3</package>
+                <package>org.neo4j.cypher.internal.tracing</package>
+                <package>org.neo4j.cypher.internal.util.v3_4</package>
+                <package>org.neo4j.cypher.internal.util.v3_4.attribution</package>
+                <package>org.neo4j.cypher.internal.util.v3_4.spi</package>
+                <package>org.neo4j.cypher.internal.util.v3_4.symbols</package>
+                <package>org.neo4j.cypher.internal.v3_3.logical.plans</package>
+                <package>org.neo4j.cypher.internal.v3_4.expressions</package>
+                <package>org.neo4j.cypher.internal.v3_4.functions</package>
+                <package>org.neo4j.cypher.internal.v3_4.logical.plans</package>
+                <package>org.neo4j.cypher.result</package>
+                <package>org.neo4j.dbms</package>
+                <package>org.neo4j.dbms.archive</package>
+                <package>org.neo4j.dbms.diagnostics.jmx</package>
+                <package>org.neo4j.diagnostics</package>
+                <package>org.neo4j.ext.udc</package>
+                <package>org.neo4j.ext.udc.impl</package>
+                <package>org.neo4j.function</package>
+                <package>org.neo4j.gis.spatial.index</package>
+                <package>org.neo4j.gis.spatial.index.curves</package>
+                <package>org.neo4j.graphalgo</package>
+                <package>org.neo4j.graphalgo.impl.ancestor</package>
+                <package>org.neo4j.graphalgo.impl.centrality</package>
+                <package>org.neo4j.graphalgo.impl.path</package>
+                <package>org.neo4j.graphalgo.impl.shortestpath</package>
+                <package>org.neo4j.graphalgo.impl.util</package>
                 <package>org.neo4j.graphdb</package>
                 <package>org.neo4j.graphdb.config</package>
                 <package>org.neo4j.graphdb.event</package>
@@ -21,186 +941,567 @@
                 <package>org.neo4j.graphdb.traversal</package>
                 <package>org.neo4j.graphmatching</package>
                 <package>org.neo4j.graphmatching.filter</package>
+                <package>org.neo4j.hashing</package>
+                <package>org.neo4j.helpers</package>
+                <package>org.neo4j.helpers.collection</package>
+                <package>org.neo4j.helpers.progress</package>
+                <package>org.neo4j.index.impl.lucene.explicit</package>
+                <package>org.neo4j.index.internal.gbptree</package>
+                <package>org.neo4j.index.lucene</package>
+                <package>org.neo4j.index.lucene.unsafe.batchinsert</package>
+                <package>org.neo4j.internal.kernel.api</package>
+                <package>org.neo4j.internal.kernel.api.exceptions</package>
+                <package>org.neo4j.internal.kernel.api.exceptions.explicitindex</package>
+                <package>org.neo4j.internal.kernel.api.exceptions.schema</package>
+                <package>org.neo4j.internal.kernel.api.helpers</package>
+                <package>org.neo4j.internal.kernel.api.procs</package>
+                <package>org.neo4j.internal.kernel.api.schema</package>
+                <package>org.neo4j.internal.kernel.api.schema.constraints</package>
+                <package>org.neo4j.internal.kernel.api.security</package>
+                <package>org.neo4j.io</package>
+                <package>org.neo4j.io.compress</package>
+                <package>org.neo4j.io.file</package>
+                <package>org.neo4j.io.fs</package>
+                <package>org.neo4j.io.fs.watcher</package>
+                <package>org.neo4j.io.fs.watcher.resource</package>
+                <package>org.neo4j.io.mem</package>
+                <package>org.neo4j.io.os</package>
+                <package>org.neo4j.io.pagecache</package>
+                <package>org.neo4j.io.pagecache.impl</package>
+                <package>org.neo4j.io.pagecache.impl.muninn</package>
+                <package>org.neo4j.io.pagecache.monitoring</package>
+                <package>org.neo4j.io.pagecache.tracing</package>
+                <package>org.neo4j.io.pagecache.tracing.cursor</package>
+                <package>org.neo4j.io.pagecache.tracing.cursor.context</package>
+                <package>org.neo4j.io.proc</package>
+                <package>org.neo4j.jmx</package>
+                <package>org.neo4j.jmx.impl</package>
+                <package>org.neo4j.kernel</package>
+                <package>org.neo4j.kernel.api</package>
+                <package>org.neo4j.kernel.api.bolt</package>
+                <package>org.neo4j.kernel.api.dbms</package>
+                <package>org.neo4j.kernel.api.direct</package>
+                <package>org.neo4j.kernel.api.exceptions</package>
+                <package>org.neo4j.kernel.api.exceptions.index</package>
+                <package>org.neo4j.kernel.api.exceptions.schema</package>
+                <package>org.neo4j.kernel.api.explicitindex</package>
+                <package>org.neo4j.kernel.api.impl.index</package>
+                <package>org.neo4j.kernel.api.impl.index.backup</package>
+                <package>org.neo4j.kernel.api.impl.index.builder</package>
+                <package>org.neo4j.kernel.api.impl.index.collector</package>
+                <package>org.neo4j.kernel.api.impl.index.partition</package>
+                <package>org.neo4j.kernel.api.impl.index.sampler</package>
+                <package>org.neo4j.kernel.api.impl.index.storage</package>
+                <package>org.neo4j.kernel.api.impl.index.storage.layout</package>
+                <package>org.neo4j.kernel.api.impl.schema</package>
+                <package>org.neo4j.kernel.api.impl.schema.populator</package>
+                <package>org.neo4j.kernel.api.impl.schema.reader</package>
+                <package>org.neo4j.kernel.api.impl.schema.sampler</package>
+                <package>org.neo4j.kernel.api.impl.schema.verification</package>
+                <package>org.neo4j.kernel.api.impl.schema.writer</package>
+                <package>org.neo4j.kernel.api.index</package>
+                <package>org.neo4j.kernel.api.labelscan</package>
+                <package>org.neo4j.kernel.api.proc</package>
+                <package>org.neo4j.kernel.api.properties</package>
+                <package>org.neo4j.kernel.api.query</package>
+                <package>org.neo4j.kernel.api.schema</package>
+                <package>org.neo4j.kernel.api.schema.constaints</package>
+                <package>org.neo4j.kernel.api.schema.index</package>
+                <package>org.neo4j.kernel.api.security</package>
+                <package>org.neo4j.kernel.api.security.exception</package>
+                <package>org.neo4j.kernel.api.txstate</package>
+                <package>org.neo4j.kernel.api.txtracking</package>
+                <package>org.neo4j.kernel.builtinprocs</package>
+                <package>org.neo4j.kernel.configuration</package>
+                <package>org.neo4j.kernel.configuration.ssl</package>
+                <package>org.neo4j.kernel.extension</package>
+                <package>org.neo4j.kernel.extension.dependency</package>
+                <package>org.neo4j.kernel.guard</package>
+                <package>org.neo4j.kernel.impl.annotations</package>
+                <package>org.neo4j.kernel.impl.api</package>
+                <package>org.neo4j.kernel.impl.api.cursor</package>
+                <package>org.neo4j.kernel.impl.api.dbms</package>
+                <package>org.neo4j.kernel.impl.api.explicitindex</package>
+                <package>org.neo4j.kernel.impl.api.index</package>
+                <package>org.neo4j.kernel.impl.api.index.sampling</package>
+                <package>org.neo4j.kernel.impl.api.index.updater</package>
+                <package>org.neo4j.kernel.impl.api.operations</package>
+                <package>org.neo4j.kernel.impl.api.scan</package>
+                <package>org.neo4j.kernel.impl.api.schema</package>
+                <package>org.neo4j.kernel.impl.api.security</package>
+                <package>org.neo4j.kernel.impl.api.state</package>
+                <package>org.neo4j.kernel.impl.api.store</package>
+                <package>org.neo4j.kernel.impl.cache</package>
+                <package>org.neo4j.kernel.impl.constraints</package>
+                <package>org.neo4j.kernel.impl.context</package>
+                <package>org.neo4j.kernel.impl.core</package>
+                <package>org.neo4j.kernel.impl.coreapi</package>
+                <package>org.neo4j.kernel.impl.coreapi.schema</package>
+                <package>org.neo4j.kernel.impl.factory</package>
+                <package>org.neo4j.kernel.impl.index</package>
+                <package>org.neo4j.kernel.impl.index.labelscan</package>
+                <package>org.neo4j.kernel.impl.index.schema</package>
+                <package>org.neo4j.kernel.impl.index.schema.config</package>
+                <package>org.neo4j.kernel.impl.index.schema.fusion</package>
+                <package>org.neo4j.kernel.impl.locking</package>
+                <package>org.neo4j.kernel.impl.locking.community</package>
+                <package>org.neo4j.kernel.impl.logging</package>
+                <package>org.neo4j.kernel.impl.newapi</package>
+                <package>org.neo4j.kernel.impl.pagecache</package>
+                <package>org.neo4j.kernel.impl.proc</package>
+                <package>org.neo4j.kernel.impl.proc.temporal</package>
+                <package>org.neo4j.kernel.impl.query</package>
+                <package>org.neo4j.kernel.impl.query.clientconnection</package>
+                <package>org.neo4j.kernel.impl.query.statistic</package>
+                <package>org.neo4j.kernel.impl.recovery</package>
+                <package>org.neo4j.kernel.impl.scheduler</package>
+                <package>org.neo4j.kernel.impl.security</package>
+                <package>org.neo4j.kernel.impl.spi</package>
+                <package>org.neo4j.kernel.impl.storageengine.impl.recordstorage</package>
+                <package>org.neo4j.kernel.impl.storageengine.impl.recordstorage.id</package>
+                <package>org.neo4j.kernel.impl.store</package>
+                <package>org.neo4j.kernel.impl.store.allocator</package>
+                <package>org.neo4j.kernel.impl.store.counts</package>
+                <package>org.neo4j.kernel.impl.store.counts.keys</package>
+                <package>org.neo4j.kernel.impl.store.format</package>
+                <package>org.neo4j.kernel.impl.store.format.standard</package>
+                <package>org.neo4j.kernel.impl.store.id</package>
+                <package>org.neo4j.kernel.impl.store.id.configuration</package>
+                <package>org.neo4j.kernel.impl.store.id.validation</package>
+                <package>org.neo4j.kernel.impl.store.kvstore</package>
+                <package>org.neo4j.kernel.impl.store.record</package>
+                <package>org.neo4j.kernel.impl.store.stats</package>
+                <package>org.neo4j.kernel.impl.storemigration</package>
+                <package>org.neo4j.kernel.impl.storemigration.monitoring</package>
+                <package>org.neo4j.kernel.impl.storemigration.participant</package>
+                <package>org.neo4j.kernel.impl.transaction</package>
+                <package>org.neo4j.kernel.impl.transaction.command</package>
+                <package>org.neo4j.kernel.impl.transaction.log</package>
+                <package>org.neo4j.kernel.impl.transaction.log.checkpoint</package>
+                <package>org.neo4j.kernel.impl.transaction.log.entry</package>
+                <package>org.neo4j.kernel.impl.transaction.log.files</package>
+                <package>org.neo4j.kernel.impl.transaction.log.pruning</package>
+                <package>org.neo4j.kernel.impl.transaction.log.reverse</package>
+                <package>org.neo4j.kernel.impl.transaction.log.rotation</package>
+                <package>org.neo4j.kernel.impl.transaction.state</package>
+                <package>org.neo4j.kernel.impl.transaction.state.storeview</package>
+                <package>org.neo4j.kernel.impl.transaction.tracing</package>
+                <package>org.neo4j.kernel.impl.traversal</package>
+                <package>org.neo4j.kernel.impl.util</package>
+                <package>org.neo4j.kernel.impl.util.collection</package>
+                <package>org.neo4j.kernel.impl.util.concurrent</package>
+                <package>org.neo4j.kernel.impl.util.dbstructure</package>
+                <package>org.neo4j.kernel.impl.util.diffsets</package>
+                <package>org.neo4j.kernel.impl.util.monitoring</package>
+                <package>org.neo4j.kernel.impl.util.statistics</package>
+                <package>org.neo4j.kernel.impl.util.watcher</package>
+                <package>org.neo4j.kernel.info</package>
+                <package>org.neo4j.kernel.internal</package>
+                <package>org.neo4j.kernel.internal.locker</package>
+                <package>org.neo4j.kernel.lifecycle</package>
+                <package>org.neo4j.kernel.monitoring</package>
+                <package>org.neo4j.kernel.monitoring.tracing</package>
+                <package>org.neo4j.kernel.recovery</package>
+                <package>org.neo4j.kernel.spi.explicitindex</package>
+                <package>org.neo4j.kernel.spi.legacyindex</package>
+                <package>org.neo4j.logging</package>
+                <package>org.neo4j.logging.async</package>
+                <package>org.neo4j.memory</package>
+                <package>org.neo4j.procedure</package>
+                <package>org.neo4j.register</package>
+                <package>org.neo4j.resources</package>
+                <package>org.neo4j.scheduler</package>
+                <package>org.neo4j.server</package>
+                <package>org.neo4j.server.configuration</package>
+                <package>org.neo4j.server.database</package>
+                <package>org.neo4j.server.diagnostics</package>
+                <package>org.neo4j.server.exception</package>
+                <package>org.neo4j.server.helpers</package>
+                <package>org.neo4j.server.logging</package>
+                <package>org.neo4j.server.modules</package>
+                <package>org.neo4j.server.plugins</package>
+                <package>org.neo4j.server.preflight</package>
+                <package>org.neo4j.server.rest.batch</package>
+                <package>org.neo4j.server.rest.dbms</package>
+                <package>org.neo4j.server.rest.discovery</package>
+                <package>org.neo4j.server.rest.domain</package>
+                <package>org.neo4j.server.rest.management</package>
+                <package>org.neo4j.server.rest.management.console</package>
+                <package>org.neo4j.server.rest.management.repr</package>
+                <package>org.neo4j.server.rest.paging</package>
+                <package>org.neo4j.server.rest.repr</package>
+                <package>org.neo4j.server.rest.repr.formats</package>
+                <package>org.neo4j.server.rest.repr.util</package>
+                <package>org.neo4j.server.rest.security</package>
+                <package>org.neo4j.server.rest.transactional</package>
+                <package>org.neo4j.server.rest.transactional.error</package>
+                <package>org.neo4j.server.rest.web</package>
+                <package>org.neo4j.server.scripting</package>
+                <package>org.neo4j.server.scripting.javascript</package>
+                <package>org.neo4j.server.security.auth</package>
+                <package>org.neo4j.server.security.auth.exception</package>
+                <package>org.neo4j.server.security.ssl</package>
+                <package>org.neo4j.server.web</package>
+                <package>org.neo4j.shell</package>
+                <package>org.neo4j.shell.apps</package>
+                <package>org.neo4j.shell.apps.extra</package>
+                <package>org.neo4j.shell.impl</package>
+                <package>org.neo4j.shell.kernel</package>
+                <package>org.neo4j.shell.kernel.apps</package>
+                <package>org.neo4j.shell.kernel.apps.cypher</package>
+                <package>org.neo4j.shell.util.json</package>
+                <package>org.neo4j.ssl</package>
+                <package>org.neo4j.storageengine.api</package>
+                <package>org.neo4j.storageengine.api.lock</package>
+                <package>org.neo4j.storageengine.api.schema</package>
+                <package>org.neo4j.storageengine.api.txstate</package>
+                <package>org.neo4j.stream</package>
+                <package>org.neo4j.string</package>
+                <package>org.neo4j.time</package>
+                <package>org.neo4j.tooling</package>
+                <package>org.neo4j.udc</package>
+                <package>org.neo4j.unsafe.batchinsert</package>
+                <package>org.neo4j.unsafe.batchinsert.internal</package>
+                <package>org.neo4j.unsafe.impl.batchimport</package>
+                <package>org.neo4j.unsafe.impl.batchimport.cache</package>
+                <package>org.neo4j.unsafe.impl.batchimport.cache.idmapping</package>
+                <package>org.neo4j.unsafe.impl.batchimport.cache.idmapping.string</package>
+                <package>org.neo4j.unsafe.impl.batchimport.executor</package>
+                <package>org.neo4j.unsafe.impl.batchimport.input</package>
+                <package>org.neo4j.unsafe.impl.batchimport.input.csv</package>
+                <package>org.neo4j.unsafe.impl.batchimport.staging</package>
+                <package>org.neo4j.unsafe.impl.batchimport.stats</package>
+                <package>org.neo4j.unsafe.impl.batchimport.store</package>
+                <package>org.neo4j.unsafe.impl.batchimport.store.io</package>
+                <package>org.neo4j.unsafe.impl.internal.dragons</package>
+                <package>org.neo4j.upgrade.loader</package>
+                <package>org.neo4j.upgrade.lucene</package>
+                <package>org.neo4j.util</package>
+                <package>org.neo4j.values</package>
+                <package>org.neo4j.values.storable</package>
+                <package>org.neo4j.values.utils</package>
+                <package>org.neo4j.values.virtual</package>
+                <package>org.objenesis</package>
+                <package>org.objenesis.instantiator</package>
+                <package>org.objenesis.instantiator.android</package>
+                <package>org.objenesis.instantiator.annotations</package>
+                <package>org.objenesis.instantiator.basic</package>
+                <package>org.objenesis.instantiator.gcj</package>
+                <package>org.objenesis.instantiator.perc</package>
+                <package>org.objenesis.instantiator.sun</package>
+                <package>org.objenesis.instantiator.util</package>
+                <package>org.objenesis.strategy</package>
+                <package>org.parboiled</package>
+                <package>org.parboiled.buffers</package>
+                <package>org.parboiled.common</package>
+                <package>org.parboiled.errors</package>
+                <package>org.parboiled.matchers</package>
+                <package>org.parboiled.matchervisitors</package>
+                <package>org.parboiled.parserunners</package>
+                <package>org.parboiled.scala</package>
+                <package>org.parboiled.scala.parserunners</package>
+                <package>org.parboiled.scala.rules</package>
+                <package>org.parboiled.scala.testing</package>
+                <package>org.parboiled.scala.utils</package>
+                <package>org.parboiled.support</package>
+                <package>org.parboiled.trees</package>
+                <package>org.tartarus.snowball</package>
+                <package>org.tartarus.snowball.ext</package>
+                <package>scala</package>
+                <package>scala.annotation</package>
+                <package>scala.annotation.meta</package>
+                <package>scala.annotation.unchecked</package>
+                <package>scala.beans</package>
+                <package>scala.collection</package>
+                <package>scala.collection.concurrent</package>
+                <package>scala.collection.convert</package>
+                <package>scala.collection.generic</package>
+                <package>scala.collection.immutable</package>
+                <package>scala.collection.mutable</package>
+                <package>scala.collection.parallel</package>
+                <package>scala.collection.parallel.immutable</package>
+                <package>scala.collection.parallel.mutable</package>
+                <package>scala.collection.script</package>
+                <package>scala.compat</package>
+                <package>scala.concurrent</package>
+                <package>scala.concurrent.duration</package>
+                <package>scala.concurrent.forkjoin</package>
+                <package>scala.concurrent.impl</package>
+                <package>scala.concurrent.util</package>
+                <package>scala.io</package>
+                <package>scala.math</package>
+                <package>scala.ref</package>
+                <package>scala.reflect</package>
+                <package>scala.reflect.api</package>
+                <package>scala.reflect.internal</package>
+                <package>scala.reflect.internal.annotations</package>
+                <package>scala.reflect.internal.pickling</package>
+                <package>scala.reflect.internal.settings</package>
+                <package>scala.reflect.internal.tpe</package>
+                <package>scala.reflect.internal.transform</package>
+                <package>scala.reflect.internal.util</package>
+                <package>scala.reflect.io</package>
+                <package>scala.reflect.macros</package>
+                <package>scala.reflect.macros.blackbox</package>
+                <package>scala.reflect.macros.internal</package>
+                <package>scala.reflect.macros.whitebox</package>
+                <package>scala.reflect.runtime</package>
+                <package>scala.runtime</package>
+                <package>scala.sys</package>
+                <package>scala.sys.process</package>
+                <package>scala.text</package>
+                <package>scala.util</package>
+                <package>scala.util.control</package>
+                <package>scala.util.hashing</package>
+                <package>scala.util.matching</package>
             </public-packages>
             <class-path-extension>
-                <runtime-relative-path>ext/lucene-queryparser-5.5.0.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/lucene-queryparser-5.5.0.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-kernel-api-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-kernel-api-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-browser-2.0.0-M10.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-browser-2.0.0-M10.jar</binary-origin>
+                <runtime-relative-path>ext/bcprov-jdk15on-1.59.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/bcprov-jdk15on-1.59.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-graph-matching-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-graph-matching-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-udc-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-udc-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-resource-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-resource-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-codegen-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-codegen-3.4.0.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/neo4j-cypher-frontend-3.3-3.3.5.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-cypher-frontend-3.3-3.3.5.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/objenesis-2.6.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/objenesis-2.6.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/jackson-jaxrs-1.9.13.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/jackson-jaxrs-1.9.13.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jetty-servlet-9.2.9.v20150224.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jetty-servlet-9.2.9.v20150224.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-unsafe-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-unsafe-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-import-tool-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-import-tool-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-lucene-index-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-lucene-index-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-graph-algo-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-graph-algo-3.1.1.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/neo4j-cypher-compiler-3.0-3.0.8.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-cypher-compiler-3.0-3.0.8.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/neo4j-cypher-compiler-2.3-2.3.8.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-cypher-compiler-2.3-2.3.8.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-server-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-server-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/opencsv-2.3.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/opencsv-2.3.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jersey-core-1.19.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jersey-core-1.19.jar</binary-origin>
+                <runtime-relative-path>ext/caffeine-2.6.2.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/caffeine-2.6.2.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-csv-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-csv-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-kernel-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-kernel-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-command-line-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-command-line-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/jetty-webapp-9.4.8.v20171121.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jetty-webapp-9.4.8.v20171121.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-consistency-check-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-consistency-check-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/jetty-io-9.4.8.v20171121.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jetty-io-9.4.8.v20171121.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-lucene-index-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-lucene-index-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-cypher-expression-3.4-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-cypher-expression-3.4-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jetty-io-9.2.9.v20150224.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jetty-io-9.2.9.v20150224.jar</binary-origin>
+                <runtime-relative-path>ext/commons-compress-1.16.1.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/commons-compress-1.16.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/concurrentlinkedhashmap-lru-1.4.2.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/concurrentlinkedhashmap-lru-1.4.2.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-udc-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-udc-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/jetty-servlet-9.4.8.v20171121.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jetty-servlet-9.4.8.v20171121.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/neo4j-cypher-frontend-3.1-3.1.8.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-cypher-frontend-3.1-3.1.8.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/neo4j-browser-3.1.12.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-browser-3.1.12.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/neo4j-configuration-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-configuration-3.4.0.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/scala-reflect-2.11.12.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/scala-reflect-2.11.12.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/jackson-core-asl-1.9.13.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/jackson-core-asl-1.9.13.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>ext/jetty-security-9.4.8.v20171121.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jetty-security-9.4.8.v20171121.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/commons-configuration-1.10.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/commons-configuration-1.10.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-security-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-security-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-resource-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-resource-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/asm-5.0.4.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/asm-5.0.4.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-import-tool-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-import-tool-3.4.0.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/netty-all-4.1.24.Final.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/netty-all-4.1.24.Final.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/jersey-server-1.19.3.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jersey-server-1.19.3.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/jersey-servlet-1.19.3.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jersey-servlet-1.19.3.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/rhino-1.7.9.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/rhino-1.7.9.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/parboiled-scala_2.11-1.1.7.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/parboiled-scala_2.11-1.1.7.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/server-api-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/server-api-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/scala-library-2.11.12.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/scala-library-2.11.12.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-cypher-compiler-3.1-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-cypher-compiler-3.1-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/bcpkix-jdk15on-1.59.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/bcpkix-jdk15on-1.59.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-cypher-frontend-2.3-2.3.8.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-cypher-frontend-2.3-2.3.8.jar</binary-origin>
+                <runtime-relative-path>ext/openCypher-frontend-1-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/openCypher-frontend-1-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-unsafe-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-unsafe-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/jPowerShell-1.9.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jPowerShell-1.9.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/lucene-core-5.5.0.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/lucene-core-5.5.0.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-collections-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-collections-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/caffeine-2.3.3.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/caffeine-2.3.3.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-cypher-logical-plans-3.3-3.3.5.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-cypher-logical-plans-3.3-3.3.5.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/lucene-codecs-5.5.0.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/lucene-codecs-5.5.0.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-logging-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-logging-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/rhino-1.7R4.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/rhino-1.7R4.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-io-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-io-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jetty-webapp-9.2.9.v20150224.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jetty-webapp-9.2.9.v20150224.jar</binary-origin>
+                <runtime-relative-path>ext/jersey-core-1.19.3.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jersey-core-1.19.3.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/commons-compress-1.12.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/commons-compress-1.12.jar</binary-origin>
+                <runtime-relative-path>ext/commons-io-2.6.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/commons-io-2.6.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jersey-multipart-1.19.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jersey-multipart-1.19.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-shell-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-shell-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jersey-servlet-1.19.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jersey-servlet-1.19.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-primitive-collections-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-primitive-collections-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-cypher-frontend-3.1-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-cypher-frontend-3.1-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/server-api-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/server-api-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jetty-server-9.2.9.v20150224.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jetty-server-9.2.9.v20150224.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-dbms-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-dbms-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jetty-xml-9.2.9.v20150224.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jetty-xml-9.2.9.v20150224.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-csv-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-csv-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-dbms-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-dbms-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/jetty-http-9.4.8.v20171121.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jetty-http-9.4.8.v20171121.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/commons-beanutils-1.8.3.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/commons-beanutils-1.8.3.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-cypher-compiler-3.1-3.1.8.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-cypher-compiler-3.1-3.1.8.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/lucene-queryparser-5.5.5.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/lucene-queryparser-5.5.5.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/neo4j-jmx-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-jmx-3.4.0.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/neo4j-lucene-upgrade-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-lucene-upgrade-3.4.0.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/jetty-xml-9.4.8.v20171121.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jetty-xml-9.4.8.v20171121.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/commons-lang3-3.7.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/commons-lang3-3.7.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/commons-logging-1.1.1.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/commons-logging-1.1.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-collections-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-collections-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-common-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-common-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/scala-library-2.11.8.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/scala-library-2.11.8.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-cypher-logical-plans-3.4-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-cypher-logical-plans-3.4-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jetty-util-9.2.9.v20150224.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jetty-util-9.2.9.v20150224.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-graph-matching-3.1.6.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-graph-matching-3.1.6.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/neo4j-cypher-runtime-util-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-cypher-runtime-util-3.4.0.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/neo4j-security-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-security-3.4.0.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/jProcesses-1.6.4.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jProcesses-1.6.4.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/javax.servlet-api-3.1.0.jar</runtime-relative-path>
@@ -211,108 +1512,108 @@
                 <binary-origin>release/modules/ext/jackson-mapper-asl-1.9.13.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-bolt-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-bolt-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-consistency-check-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-consistency-check-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-logging-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-logging-3.1.1.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/scala-reflect-2.11.8.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/scala-reflect-2.11.8.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-cypher-frontend-2.3-2.3.12.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-cypher-frontend-2.3-2.3.12.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/commons-lang-2.6.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/commons-lang-2.6.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-io-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-io-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/jetty-server-9.4.8.v20171121.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jetty-server-9.4.8.v20171121.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-primitive-collections-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-primitive-collections-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/jetty-util-9.4.8.v20171121.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jetty-util-9.4.8.v20171121.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-jmx-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-jmx-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-cypher-util-3.4-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-cypher-util-3.4-3.4.0.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/neo4j-cypher-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-cypher-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/jline-2.12.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/jline-2.12.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/bcprov-jdk15on-1.53.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/bcprov-jdk15on-1.53.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-graphdb-api-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-graphdb-api-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jersey-server-1.19.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jersey-server-1.19.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-cypher-planner-3.4-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-cypher-planner-3.4-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/commons-io-2.4.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/commons-io-2.4.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-cypher-ir-3.3-3.3.5.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-cypher-ir-3.3-3.3.5.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/lucene-analyzers-common-5.5.0.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/lucene-analyzers-common-5.5.0.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-index-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-index-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-shell-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-shell-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/commons-text-1.3.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/commons-text-1.3.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-codegen-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-codegen-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-graph-algo-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-graph-algo-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-lucene-upgrade-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-lucene-upgrade-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/lucene-core-5.5.5.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/lucene-core-5.5.5.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/commons-digester-2.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/commons-digester-2.1.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-spatial-index-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-spatial-index-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-common-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-common-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/WMI4Java-1.6.1.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/WMI4Java-1.6.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jetty-security-9.2.9.v20150224.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jetty-security-9.2.9.v20150224.jar</binary-origin>
+                <runtime-relative-path>ext/lucene-analyzers-common-5.5.5.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/lucene-analyzers-common-5.5.5.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/netty-all-4.1.6.Final.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/netty-all-4.1.6.Final.jar</binary-origin>
+                <runtime-relative-path>ext/lucene-codecs-5.5.5.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/lucene-codecs-5.5.5.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-cypher-frontend-3.0-3.0.8.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-cypher-frontend-3.0-3.0.8.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-cypher-ir-3.4-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-cypher-ir-3.4-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/commons-lang3-3.3.2.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/commons-lang3-3.3.2.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-command-line-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-command-line-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-graphdb-api-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-graphdb-api-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-bolt-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-bolt-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-kernel-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-kernel-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-cypher-compiler-3.3-3.3.5.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-cypher-compiler-3.3-3.3.5.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-cypher-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-cypher-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-cypher-interpreted-runtime-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-cypher-interpreted-runtime-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/bcpkix-jdk15on-1.53.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/bcpkix-jdk15on-1.53.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-cypher-planner-spi-3.4-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-cypher-planner-spi-3.4-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/mimepull-1.9.3.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/mimepull-1.9.3.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-ssl-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-ssl-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/jsr311-api-1.1.2.r612.jar</runtime-relative-path>
@@ -323,12 +1624,16 @@
                 <binary-origin>release/modules/ext/parboiled-core-1.1.7.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jetty-http-9.2.9.v20150224.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jetty-http-9.2.9.v20150224.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-values-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-values-3.4.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/neo4j-server-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/neo4j-server-3.1.1.jar</binary-origin>
+                <runtime-relative-path>ext/neo4j-cypher-compiler-2.3-2.3.12.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-cypher-compiler-2.3-2.3.12.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/neo4j-procedure-api-3.4.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/neo4j-procedure-api-3.4.0.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

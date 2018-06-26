@@ -20,67 +20,45 @@ import org.bapedis.core.task.ProgressTicket;
  *
  * @author loge
  */
-public class MinCutPartition extends RecursiveTask<Batch[]> {
+public class MinCutPartition extends BasePartition {
 
     public static final int K_MOVES = 100;
     private Boolean[] bestPartition;
     private int bestCost;
     private boolean currentSide;
-    private final ProgressTicket ticket;
-    private final AtomicBoolean stopRun;
 
-    protected final int cacheSize;
-    protected final BiGraph bigraph;
 
-    public MinCutPartition(BiGraph bigraph, int cacheSize, ProgressTicket ticket, AtomicBoolean stopRun) {
-        this.bigraph = bigraph;
-        this.cacheSize = cacheSize;
-        this.ticket = ticket;
-        this.stopRun = stopRun;
+    public MinCutPartition(BiGraph bigraph, int level, ProgressTicket ticket, AtomicBoolean stopRun) {
+        super(bigraph, level, ticket, stopRun);
     }
 
     @Override
     protected Batch[] compute() {
-        if (!stopRun.get() && bigraph.size() > cacheSize) {
-            findGraphPartition(bigraph);
-            MinCutPartition left = new MinCutPartition(bigraph.getLeftGraph(), cacheSize, ticket, stopRun);
-            MinCutPartition right = new MinCutPartition(bigraph.getRightGraph(), cacheSize, ticket, stopRun);
+        if (!stopRun.get() && bigraph.size() > MIN_SIZE && level > 0 ) {
+            findGraphPartition();
+            MinCutPartition left = new MinCutPartition(bigraph.getLeftGraph(), level -1, ticket, stopRun);
+            MinCutPartition right = new MinCutPartition(bigraph.getRightGraph(), level -1, ticket, stopRun);
             right.fork();
-            Batch[] leftBatches = left.compute();
-            Batch[] righBatchs = right.join();
-
-            Batch[] batches = new Batch[leftBatches.length + righBatchs.length];
-            System.arraycopy(leftBatches, 0, batches, 0, leftBatches.length);
-            System.arraycopy(righBatchs, 0, batches, leftBatches.length, righBatchs.length);
-
-            return batches;
+            return union(left.compute(), right.join());
         }
-
-        Batch batch = new Batch(bigraph.size());
-        Vertex u;
-        for (Iterator<Vertex> it = bigraph.getAllVertices(); it.hasNext();) {
-            u = it.next();
-            batch.addPeptide(u.getPeptide());
-        }   
-        ticket.progress();
-        return new Batch[]{batch};
+        return computeDirectly();
     }
 
-    protected void findGraphPartition(BiGraph graph) {
-        Partition p = graph.getPartition();
+    protected void findGraphPartition() {
+        Partition p = bigraph.getPartition();
         p.initializePartition();
         p.randomizePartition();
 
-        Bucket leftBucket = new Bucket(graph, Partition.LEFT_SIDE);
-        Bucket rightBucket = new Bucket(graph, Partition.RIGHT_SIDE);
+        Bucket leftBucket = new Bucket(bigraph, Partition.LEFT_SIDE);
+        Bucket rightBucket = new Bucket(bigraph, Partition.RIGHT_SIDE);
 
-        bestCost = getCost(graph);
+        bestCost = getCost(bigraph);
         bestPartition = p.getArray();
 
         //Set which side to begin, to maintain balance
         int leftCount = 0;
         int rightCount = 0;
-        for (boolean side : graph.getPartition()) {
+        for (boolean side : bigraph.getPartition()) {
             if (side == Partition.LEFT_SIDE) {
                 leftCount++;
             } else {
@@ -94,12 +72,12 @@ public class MinCutPartition extends RecursiveTask<Batch[]> {
         }
 
         int iterations = 0;
-        while (iterations < 10 && doMoves(graph,leftBucket, rightBucket)) {
+        while (iterations < 10 && doMoves(bigraph,leftBucket, rightBucket)) {
             iterations++;
         }
 
         p.setArray(bestPartition);
-        graph.rearrange();
+        bigraph.rearrange();
     }
 
     private boolean doMoves(BiGraph graph, Bucket leftBucket, Bucket rightBucket) {

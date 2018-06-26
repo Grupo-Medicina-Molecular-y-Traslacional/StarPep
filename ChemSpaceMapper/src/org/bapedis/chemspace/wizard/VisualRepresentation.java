@@ -25,6 +25,10 @@ public final class VisualRepresentation extends JPanel {
         networkType = NetworkType.NONE;
         compressedStrategyIndex = CompressedModel.DEFAULT_STRATEGY_INDEX;
         compressedMaxSuperNodes = CompressedModel.DEFAULT_MAX_SUPER_NODES;
+        
+        setNetworkType(networkType);
+        setCompressedStrategyIndex(compressedStrategyIndex);
+        setCompressedMaxSuperNodes(compressedMaxSuperNodes);
     }
 
     public ChemSpaceOption getChemSpaceOption() {
@@ -278,7 +282,7 @@ public final class VisualRepresentation extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         optionCNPanel.add(jBasedOnLabel, gridBagConstraints);
 
-        jOptionCN_1_Items.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "communities" }));
+        jOptionCN_1_Items.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Min-cut", "Random" }));
         jOptionCN_1_Items.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOptionCN_1_ItemsActionPerformed(evt);
@@ -287,6 +291,7 @@ public final class VisualRepresentation extends JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         optionCNPanel.add(jOptionCN_1_Items, gridBagConstraints);
@@ -299,7 +304,7 @@ public final class VisualRepresentation extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         optionCNPanel.add(jMaxNumberLabel, gridBagConstraints);
 
-        jOptionCN_2_Items.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1000", "500", "250", "100", "50", "10", "5" }));
+        jOptionCN_2_Items.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2", "4", "8", "16", "32", "64", "128", "256", "512", "1024" }));
         jOptionCN_2_Items.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOptionCN_2_ItemsActionPerformed(evt);

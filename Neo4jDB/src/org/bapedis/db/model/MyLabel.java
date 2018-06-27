@@ -13,11 +13,11 @@ import org.neo4j.graphdb.Label;
  */
 public enum MyLabel implements Label {
     Peptide,
-    BioCategory,
-    Name,
+    Function,
+//    Name,
     Origin,
     Target,
     Database,
-    Literature,
+//    Literature,
     CrossRef
 }

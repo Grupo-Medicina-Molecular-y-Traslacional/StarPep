@@ -30,6 +30,7 @@ import org.neo4j.graphdb.ResourceIterator;
 public class MetadataDAOImpl implements MetadataDAO {
 
     private final String PRO_NAME = "name";
+    private final String ROOT_METADATA = "RootMetaData";
     private final GraphDatabaseService graphDb;
 
     public MetadataDAOImpl() {
@@ -42,11 +43,11 @@ public class MetadataDAOImpl implements MetadataDAO {
 //            case NAME:
 //                return getMetadata(type, MyLabel.Name);
             case ORIGIN:
-                return getMetadata(type, MyLabel.Origin);
+                return getMetadataTree(type, MyLabel.Origin);
             case TARGET:
-                return getMetadata(type, MyLabel.Target);
+                return getMetadataTree(type, MyLabel.Target);
             case FUNCTION:
-                return getBioCategory();
+                return getMetadataTree(type, MyLabel.Function);
             case DATABASE:
                 return getMetadata(type, MyLabel.Database);
 //            case LITERATURE:
@@ -76,22 +77,22 @@ public class MetadataDAOImpl implements MetadataDAO {
         return list;
     }
 
-    protected List<Metadata> getBioCategory() {
+    protected List<Metadata> getMetadataTree(AnnotationType type, Label label) {
         try (Transaction tx = graphDb.beginTx()) {
-            Node node = graphDb.findNode(MyLabel.BioCategory, PRO_NAME, "Peptide");
-            Metadata category = getBioCategory(null, node);
+            Node node = graphDb.findNode(label, PRO_NAME, ROOT_METADATA);
+            Metadata category = getMetadataTree(type, null, node);
             tx.success();
             return category.getChilds();
         }
     }
 
-    protected Metadata getBioCategory(Metadata parent, Node root) {
+    protected Metadata getMetadataTree(AnnotationType type, Metadata parent, Node root) {
         Iterable<Relationship> rels = root.getRelationships(Direction.INCOMING, MyRelationship.is_a);
         boolean isLeaf = !rels.iterator().hasNext();
-        Metadata category = new Metadata(parent, String.valueOf(root.getId()), root.getProperty(PRO_NAME).toString(), AnnotationType.FUNCTION, isLeaf);
+        Metadata category = new Metadata(parent, String.valueOf(root.getId()), root.getProperty(PRO_NAME).toString(), type, isLeaf);
         for (Relationship rel : rels) {
             Node startNode = rel.getStartNode();
-            category.addChild(getBioCategory(category, startNode));
+            category.addChild(getMetadataTree(type, category, startNode));
         }
         return category;
     }

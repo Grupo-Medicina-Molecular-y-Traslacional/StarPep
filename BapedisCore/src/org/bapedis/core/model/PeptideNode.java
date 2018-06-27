@@ -106,7 +106,7 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
             for (Node neighbor : neighbors) {
                 edge = peptide.getEdge(neighbor, aType);
                 if (edge != null) {
-                    desc = Arrays.toString((String[]) edge.getAttribute("xref"));
+                    desc = Arrays.toString((String[]) edge.getAttribute("dbRef"));
                 } else {
                     desc = name;
                 }

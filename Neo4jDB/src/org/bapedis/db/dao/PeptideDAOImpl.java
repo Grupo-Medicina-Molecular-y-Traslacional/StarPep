@@ -51,7 +51,7 @@ public class PeptideDAOImpl implements PeptideDAO {
     private final String PRO_SEQ = "seq";
     private final String PRO_LENGHT = "length";
     private final String PRO_NAME = "name";
-    private final String PRO_XREF = "xref";
+    private final String PRO_XREF = "dbRef";
     
     private final TraversalDescription peptideTraversal, metadataTraversal;
 

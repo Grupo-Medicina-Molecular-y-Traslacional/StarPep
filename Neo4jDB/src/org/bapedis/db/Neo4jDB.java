@@ -23,7 +23,7 @@ import org.openide.util.Lookup;
  */
 public class Neo4jDB {
     
-    public static final String DB_NAME = "neo4jDB";
+    public static final String DB_NAME = "graph.db";
     public static final String ZIP_DB = "org/bapedis/db/resources/graph.db.zip";
     private static final int BUFFER_SIZE = 4096;
     private static GraphDatabaseService graphDb;

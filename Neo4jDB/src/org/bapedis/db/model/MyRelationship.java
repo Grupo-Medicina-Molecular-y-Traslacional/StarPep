@@ -13,11 +13,11 @@ import org.neo4j.graphdb.RelationshipType;
  */
 public enum MyRelationship implements RelationshipType {
     is_a, 
-    instance_of,
-    named,
+    related_to,
+//    named,
     produced_by,
-    active_against,
+    assessed_against,
     compiled_in,
-    referenced_by,
+//    referenced_by,
     linked_to    
 }

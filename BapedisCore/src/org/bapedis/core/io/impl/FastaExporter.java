@@ -42,7 +42,7 @@ public class FastaExporter implements Exporter {
             neighbors = pept.getNeighbors(AnnotationType.DATABASE);
             for (Node neighbor : neighbors){
                 edge = pept.getEdge(neighbor, AnnotationType.DATABASE);
-                for(String db: (String[]) edge.getAttribute("xref")){
+                for(String db: (String[]) edge.getAttribute("dbRef")){
                     header.append("|");
                     header.append(db);
                 }

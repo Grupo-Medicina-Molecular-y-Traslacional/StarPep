@@ -67,7 +67,7 @@ public class ProjectManager implements Lookup.Provider {
     
     public static final String NODE_TABLE_PRO_NAME = "name";
     public static final String NODE_TABLE_PRO_NAME_TITLE = NbBundle.getMessage(ProjectManager.class, "NodeTable.column.name.title");
-    public static final String EDGE_TABLE_PRO_XREF = "xref";
+    public static final String EDGE_TABLE_PRO_XREF = "dbRef";
     public static final String EDGE_TABLE_PRO_XREF_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.xref.title");
     public static final String EDGE_TABLE_PRO_SIMILARITY = "similarity";
     public static final String EDGE_TABLE_PRO_SIMILARITY_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.similarity.title");

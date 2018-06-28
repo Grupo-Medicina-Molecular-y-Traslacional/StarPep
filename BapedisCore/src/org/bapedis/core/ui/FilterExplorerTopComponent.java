@@ -56,7 +56,7 @@ import org.openide.util.lookup.ProxyLookup;
 )
 @TopComponent.Registration(mode = "explorer", openAtStartup = true, position = 433)
 @ActionID(category = "Window", id = "org.bapedis.core.ui.FilterExplorerTopComponent")
-@ActionReference(path = "Menu/Window", position = 433)
+@ActionReference(path = "Menu/Tools", position = 20)
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_FilterExplorerAction",
         preferredID = "FilterExplorerTopComponent"

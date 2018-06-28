@@ -52,7 +52,7 @@ import org.openide.windows.WindowManager;
 )
 @TopComponent.Registration(mode = "explorer", openAtStartup = true, position = 333)
 @ActionID(category = "Window", id = "org.bapedis.core.ui.QueryExplorerTopComponent")
-@ActionReference(path = "Menu/Window", position = 333)
+@ActionReference(path = "Menu/Tools", position = 10)
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_QueryExplorerAction",
         preferredID = "QueryExplorerTopComponent"

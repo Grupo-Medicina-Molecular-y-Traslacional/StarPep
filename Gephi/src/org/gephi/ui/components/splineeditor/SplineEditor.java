@@ -49,7 +49,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import org.jdesktop.swingx.JXHeader;
 import org.openide.util.NbBundle;
-import org.openide.windows.WindowManager;
 
 /**
  * Adaptation of the SwingX demo SplineEditor. Used to get a
@@ -63,8 +62,7 @@ public class SplineEditor extends JDialog {
 
     private SplineControlPanel splineControlPanel;
 
-    public SplineEditor(String title) throws HeadlessException {
-        super(WindowManager.getDefault().getMainWindow(), title, true);
+    public SplineEditor() throws HeadlessException {
         add(buildHeader(), BorderLayout.NORTH);
         add(buildControlPanel(), BorderLayout.CENTER);
 

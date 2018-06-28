@@ -64,14 +64,18 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
 
     @Override
     public void openGraphWindow() {
-        if (graphWindow != null && !graphWindow.isOpened()) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    graphWindow.open();
-                    graphWindow.requestActive();
-                }
-            });
+        if (graphWindow != null) {
+            if (!graphWindow.isOpened()) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        graphWindow.open();
+                        graphWindow.requestActive();
+                    }
+                });
+            }else{
+                graphWindow.requestActive();               
+            }
         }
     }
 

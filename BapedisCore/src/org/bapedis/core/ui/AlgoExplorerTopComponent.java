@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
@@ -54,7 +55,6 @@ import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
 import org.openide.awt.StatusDisplayer;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
@@ -84,7 +84,6 @@ import org.w3c.dom.NodeList;
 )
 @TopComponent.Registration(mode = "explorer", openAtStartup = false, position = 533)
 @ActionID(category = "Window", id = "org.bapedis.core.ui.AlgoExplorerTopComponent")
-@ActionReference(path = "Menu/Window", position = 533)
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_AlgoExplorerAction",
         preferredID = "AlgoExplorerTopComponent"
@@ -447,9 +446,24 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
     }
 
+    private void refreshDisplayName(AlgorithmModel algoModel) {
+        Class tag = algoModel.getTagInterface();
+        String displayName = Bundle.CTL_AlgoExplorerTopComponent();
+        try {
+            displayName = NbBundle.getMessage(AlgoExplorerTopComponent.class, String.format("AlgoExplorerTopComponent.%s.name", tag.getSimpleName()));
+        } catch (MissingResourceException ex) {
+            if (algoModel.getSelectedAlgorithm() != null) {
+                AlgorithmFactory factory = algoModel.getSelectedAlgorithm().getFactory();
+                if (factory.getCategory() != null) {
+                    displayName = factory.getCategory();
+                }
+            }
+        }
+        setDisplayName(displayName);
+    }
+
     private void refreshAlgChooser(AlgorithmModel algoModel) {
         Class tag = algoModel.getTagInterface();
-        setDisplayName(NbBundle.getMessage(AlgoExplorerTopComponent.class, String.format("AlgoExplorerTopComponent.%s.name", tag.getSimpleName())));
         DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
         comboBoxModel.addElement(NO_SELECTION);
         comboBoxModel.setSelectedItem(NO_SELECTION);
@@ -540,6 +554,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 refreshAlgChooser(algoModel);
             } else if (evt.getPropertyName().equals(AlgorithmModel.CHANGED_ALGORITHM)) {
                 AlgorithmModel algoModel = (AlgorithmModel) evt.getSource();
+                refreshDisplayName(algoModel);
                 refreshProperties(algoModel);
             } else if (evt.getPropertyName().equals(AlgorithmModel.RUNNING)) {
                 AlgorithmModel algoModel = (AlgorithmModel) evt.getSource();

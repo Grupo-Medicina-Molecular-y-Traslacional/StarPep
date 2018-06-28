@@ -44,6 +44,7 @@ package org.gephi.statistics.plugin;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.GephiTag;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -52,7 +53,7 @@ import org.openide.util.lookup.ServiceProvider;
  * @author pjmcswee
  */
 @ServiceProvider(service=AlgorithmFactory.class)
-public class GraphDistanceBuilder implements AlgorithmFactory {
+public class GraphDistanceBuilder implements AlgorithmFactory, GephiTag {
 
     @Override
     public String getName() {
@@ -61,7 +62,7 @@ public class GraphDistanceBuilder implements AlgorithmFactory {
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(GraphDistanceBuilder.class, "Measure.category");
     }
 
     @Override

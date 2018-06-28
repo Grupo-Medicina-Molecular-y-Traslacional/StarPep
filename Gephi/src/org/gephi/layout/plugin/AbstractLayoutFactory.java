@@ -7,11 +7,11 @@ package org.gephi.layout.plugin;
 
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.ChemSpaceTag;
+import org.bapedis.core.spi.alg.GephiTag;
 import org.openide.util.NbBundle;
 
 
-public abstract class AbstractLayoutFactory implements AlgorithmFactory, ChemSpaceTag {
+public abstract class AbstractLayoutFactory implements AlgorithmFactory, GephiTag {
 
     @Override
     public String getCategory() {

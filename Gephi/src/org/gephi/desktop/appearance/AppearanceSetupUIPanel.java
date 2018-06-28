@@ -39,7 +39,7 @@ Contributor(s):
 
 Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.desktop.visualization;
+package org.gephi.desktop.appearance;
 
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
@@ -54,38 +54,37 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.gephi.appearance.api.Function;
 import org.gephi.appearance.api.Interpolator;
 import org.gephi.appearance.api.RankingFunction;
 import org.gephi.appearance.spi.TransformerUI;
-import org.gephi.desktop.appearance.AppearanceToolbar;
-import org.gephi.desktop.appearance.AppearanceUIController;
-import org.gephi.desktop.appearance.AppearanceUIModel;
-import org.gephi.desktop.appearance.AppearanceUIModelEvent;
-import org.gephi.desktop.appearance.AppearanceUIModelListener;
 import org.gephi.ui.components.splineeditor.SplineEditor;
 import org.gephi.ui.utils.UIUtils;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author Mathieu Bastian
  */
-public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIModelListener {
+public class AppearanceSetupUIPanel extends javax.swing.JPanel implements AlgorithmSetupUI, AppearanceUIModelListener {
 
     private transient final AppearanceToolbar toolbar;
     private transient final AppearanceUIController controller;
     private transient AppearanceUIModel model;
     private transient ItemListener attributeListener;
     private final transient SplineEditor splineEditor;
-    private final String NO_SELECTION = NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.choose.text");
+    private final String NO_SELECTION = NbBundle.getMessage(AppearanceSetupUIPanel.class, "AppearanceSetupUIPanel.choose.text");
 
     /**
      * Creates new form VizExtendedBar
      */
-    public ExtendedPanel(AppearanceUIController controller, AppearanceToolbar toolbar) {
-        this.controller = controller;
-        this.toolbar = toolbar;
+    public AppearanceSetupUIPanel() {
+        controller = Lookup.getDefault().lookup(AppearanceUIController.class);
+        toolbar = new AppearanceToolbar(controller);
+        
         model = controller.getModel();
         controller.addPropertyChangeListener(this);
 
@@ -94,13 +93,34 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
             setBackground(UIManager.getColor("NbExplorerView.background"));
         }
 
+//        AppearanceToolbar.CategoryToolbar ctb = toolbar.getCategoryToolbar();
+//        ctb.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                categoryActionPerformed(e);
+//            }
+//        });
+
+        categoryPanel.add(toolbar.getCategoryToolbar(), BorderLayout.CENTER);        
         transformerPanel.add(toolbar.getTransformerToolbar(), BorderLayout.CENTER);
-        splineEditor = new SplineEditor(NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.splineEditor.title"));
+        splineEditor = new SplineEditor();
+        splineEditor.setModal(true);
+        splineEditor.setTitle(NbBundle.getMessage(AppearanceSetupUIPanel.class, "AppearanceSetupUIPanel.splineEditor.title"));
         splineEditor.setControl1(new Point2D.Float(0, 0));
         splineEditor.setControl2(new Point2D.Float(1, 1));
         refreshModel(model);
     }
 
+//    private void categoryActionPerformed(ActionEvent e) {
+//        TransformerCategory c = model.getSelectedCategory();
+//        String elementLabel = NbBundle.getMessage(ExtendedBar.class, "ExtendedBar." + model.getSelectedElementClass() + ".label");
+//        dd.setTitle(elementLabel + ": " + c.getDisplayName());
+//        if (DialogDisplayer.getDefault().notify(dd).equals(NotifyDescriptor.OK_OPTION)) {
+//            controller.getAppearanceController().transform(model.getSelectedFunction());
+//        }
+//    }  
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -111,6 +131,7 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        categoryPanel = new javax.swing.JPanel();
         transformerPanel = new javax.swing.JPanel();
         attributePanel = new javax.swing.JPanel();
         attibuteBox = new javax.swing.JComboBox();
@@ -124,11 +145,19 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
         setPreferredSize(new java.awt.Dimension(380, 220));
         setLayout(new java.awt.GridBagLayout());
 
-        transformerPanel.setLayout(new java.awt.BorderLayout());
+        categoryPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        add(categoryPanel, gridBagConstraints);
+
+        transformerPanel.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
         add(transformerPanel, gridBagConstraints);
 
         attributePanel.setLayout(new java.awt.BorderLayout());
@@ -137,14 +166,14 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         add(attributePanel, gridBagConstraints);
 
         centerPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -152,7 +181,7 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
 
         controlPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabelInterpo.setText(org.openide.util.NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.jLabelInterpo.text")); // NOI18N
+        jLabelInterpo.setText(org.openide.util.NbBundle.getMessage(AppearanceSetupUIPanel.class, "AppearanceSetupUIPanel.jLabelInterpo.text")); // NOI18N
         controlPanel.add(jLabelInterpo);
 
         jComboBoxInterpo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Linear", "Log2", "Bezier" }));
@@ -163,8 +192,8 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
         });
         controlPanel.add(jComboBoxInterpo);
 
-        splineButton1.setText(org.openide.util.NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.splineButton1.text")); // NOI18N
-        splineButton1.setToolTipText(org.openide.util.NbBundle.getMessage(ExtendedPanel.class, "ExtendedPanel.splineButton1.toolTipText")); // NOI18N
+        splineButton1.setText(org.openide.util.NbBundle.getMessage(AppearanceSetupUIPanel.class, "AppearanceSetupUIPanel.splineButton1.text")); // NOI18N
+        splineButton1.setToolTipText(org.openide.util.NbBundle.getMessage(AppearanceSetupUIPanel.class, "AppearanceSetupUIPanel.splineButton1.toolTipText")); // NOI18N
         splineButton1.setClickedColor(new java.awt.Color(0, 51, 255));
         splineButton1.setFocusPainted(false);
         splineButton1.setFocusable(false);
@@ -179,7 +208,7 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(controlPanel, gridBagConstraints);
@@ -228,6 +257,7 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox attibuteBox;
     private javax.swing.JPanel attributePanel;
+    private javax.swing.JPanel categoryPanel;
     private javax.swing.JPanel centerPanel;
     private javax.swing.JPanel controlPanel;
     private javax.swing.JComboBox<String> jComboBoxInterpo;
@@ -373,5 +403,10 @@ public class ExtendedPanel extends javax.swing.JPanel implements AppearanceUIMod
                 }
             }
         });
+    }
+
+    @Override
+    public JPanel getSettingPanel(Algorithm algo) {
+        return this;
     }
 }

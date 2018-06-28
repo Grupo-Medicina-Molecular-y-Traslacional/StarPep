@@ -6,61 +6,27 @@
 package org.gephi.desktop.visualization;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
 import javax.swing.UIManager;
-import org.gephi.appearance.spi.TransformerCategory;
-import org.gephi.desktop.appearance.AppearanceToolbar;
-import org.gephi.desktop.appearance.AppearanceUIController;
-import org.gephi.desktop.appearance.AppearanceUIModel;
-import org.gephi.desktop.appearance.AppearanceUIModelEvent;
-import org.gephi.desktop.appearance.AppearanceUIModelListener;
 import org.gephi.ui.utils.UIUtils;
-import org.openide.DialogDescriptor;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
-import org.openide.util.Lookup;
-import org.openide.util.NbBundle;
 
-public class ExtendedBar extends javax.swing.JPanel implements AppearanceUIModelListener {
+public class ExtendedBar extends javax.swing.JPanel {
 
-    private final AppearanceToolbar toolbar;
-    private final AppearanceUIController controller;
-    private final ExtendedPanel extendedPanel;
-    private final DialogDescriptor dd;
     private final DesktopToolController toolController;
-    private AppearanceUIModel model;
 
     /**
      * Creates new form ExtendedBar
      */
-    public ExtendedBar() {
-        controller = Lookup.getDefault().lookup(AppearanceUIController.class);
-        model = controller.getModel();
-
-        toolbar = new AppearanceToolbar(controller);
+    public ExtendedBar() {        
         initComponents();
         if (UIUtils.isAquaLookAndFeel()) {
             setBackground(UIManager.getColor("NbExplorerView.background"));
         }
-        controller.addPropertyChangeListener(this);
-
-        AppearanceToolbar.CategoryToolbar ctb = toolbar.getCategoryToolbar();
-        ctb.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                categoryActionPerformed(e);
-            }
-        });
-        leftPanel.add(ctb, BorderLayout.CENTER);
-
-        extendedPanel = new ExtendedPanel(controller, toolbar);
-        dd = new DialogDescriptor(extendedPanel, "");
 
         toolController = new DesktopToolController();
-        centerPanel.add(toolController.getToolbar(), BorderLayout.CENTER);
+        leftPanel.add(toolController.getToolbar(), BorderLayout.CENTER);
         rightPanel.add(toolController.getPropertiesBar(), BorderLayout.CENTER);
+        
+//            toolController.unselect();        
     }
 
     /**
@@ -74,7 +40,6 @@ public class ExtendedBar extends javax.swing.JPanel implements AppearanceUIModel
         java.awt.GridBagConstraints gridBagConstraints;
 
         leftPanel = new javax.swing.JPanel();
-        centerPanel = new javax.swing.JPanel();
         rightPanel = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
@@ -86,50 +51,18 @@ public class ExtendedBar extends javax.swing.JPanel implements AppearanceUIModel
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         add(leftPanel, gridBagConstraints);
 
-        centerPanel.setLayout(new java.awt.BorderLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        add(centerPanel, gridBagConstraints);
-
         rightPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         add(rightPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void categoryActionPerformed(ActionEvent e) {
-        TransformerCategory c = model.getSelectedCategory();
-        String elementLabel = NbBundle.getMessage(ExtendedBar.class, "ExtendedBar." + model.getSelectedElementClass() + ".label");
-        dd.setTitle(elementLabel + ": " + c.getDisplayName());
-        if (DialogDisplayer.getDefault().notify(dd).equals(NotifyDescriptor.OK_OPTION)) {
-            controller.getAppearanceController().transform(model.getSelectedFunction());
-        }
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(AppearanceUIModelEvent.MODEL)) {
-            model = (AppearanceUIModel) evt.getNewValue();
-            toolController.unselect();
-            centerPanel.setVisible(model.getSelectedElementClass().equals(AppearanceUIController.NODE_ELEMENT));            
-        } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_CATEGORY)
-                || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_TRANSFORMER_UI)
-                || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_FUNCTION)) {
-            dd.setValid(model.getSelectedFunction() != null);
-        } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_ELEMENT_CLASS)) {
-            toolController.unselect();
-            centerPanel.setVisible(model.getSelectedElementClass().equals(AppearanceUIController.NODE_ELEMENT));
-        }
-    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel centerPanel;
     private javax.swing.JPanel leftPanel;
     private javax.swing.JPanel rightPanel;
     // End of variables declaration//GEN-END:variables

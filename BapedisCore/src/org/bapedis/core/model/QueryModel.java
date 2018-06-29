@@ -21,7 +21,6 @@ public class QueryModel {
     protected final Workspace owner;
     public static final String ADDED_METADATA = "ADDED_METADATA";
     public static final String REMOVED_METADATA = "REMOVED_METADATA";
-    public static final String METADATA_ACTIVATED = "METADATA_ACTIVATED"; 
     public static final String CHANGED_RESTRICTION = "RESTRICTION";
     protected transient final PropertyChangeSupport propertyChangeSupport;
     protected final Node rootContext;
@@ -29,7 +28,6 @@ public class QueryModel {
     public static final String RUNNING = "RUNNING";
     protected final AtomicBoolean running;
     protected RestrictionLevel restriction;
-    protected boolean metadataActivated;
 
     public QueryModel(Workspace owner) {
         this.owner = owner;
@@ -38,7 +36,6 @@ public class QueryModel {
         metadatas = new LinkedList<>();
         running = new AtomicBoolean(false);
         restriction = RestrictionLevel.MATCH_ALL;
-        metadataActivated = false;
     }
     
     public Workspace getOwnerWS() {
@@ -53,16 +50,6 @@ public class QueryModel {
         RestrictionLevel old = this.restriction;
         this.restriction = restriction;
         propertyChangeSupport.firePropertyChange(CHANGED_RESTRICTION, old, restriction);
-    }
-
-    public boolean isMetadataActivated() {
-        return metadataActivated;
-    }
-
-    public void setMetadataActivated(boolean metadataActivated) {
-        boolean old = this.metadataActivated;
-        this.metadataActivated = metadataActivated;
-        propertyChangeSupport.firePropertyChange(METADATA_ACTIVATED, old, metadataActivated);
     }
 
     public Iterator<Metadata> getMetadataIterator() {

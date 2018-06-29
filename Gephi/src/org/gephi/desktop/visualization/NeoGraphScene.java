@@ -27,9 +27,9 @@ import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSlider;
@@ -39,6 +39,8 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AnnotationType;
 import org.bapedis.core.model.FilterModel;
@@ -48,7 +50,6 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.GraphElementNavigatorLookupHint;
 import org.bapedis.core.ui.MetadataNavigatorLookupHint;
-import org.bapedis.core.ui.actions.ExportGraph;
 import org.gephi.graph.api.Node;
 import org.gephi.ui.components.JColorBlackWhiteSwitcher;
 import org.gephi.ui.components.JColorButton;
@@ -100,10 +101,9 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     private final JColorBlackWhiteSwitcher backgroundColorSwitcher = new JColorBlackWhiteSwitcher(Color.BLACK);
     private final JColorButton backgroundColorButton = new JColorButton(Color.BLACK);
     private final JXHyperlink configureLink = new JXHyperlink();
-    private final JCheckBox autoSelectNeighborCheckbox = new JCheckBox();
-    private final JPopupMenu screenshotPopup = new JPopupMenu();
-    private final JButton screenshotButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/screenshot.png", false), screenshotPopup);
-    private final JButton expotToXML = new JButton();
+    private final JCheckBoxMenuItem autoSelectNeighborItem = new JCheckBoxMenuItem();
+    private final JPopupMenu configurePopup = new JPopupMenu();
+    private final JButton configureButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/configure.png", false), configurePopup);
     //Node
     private final JToggleButton showNodeLabelsButton = new JToggleButton();
     private final JButton nodeFontButton = new JButton();
@@ -319,50 +319,47 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
         topToolbar.addSeparator();
 
-        //Auto select neighbor
-        autoSelectNeighborCheckbox.setFocusable(false);
-        autoSelectNeighborCheckbox.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.autoSelectNeigborCheckbox.text"));
-        autoSelectNeighborCheckbox.addItemListener(new ItemListener() {
+        //Configure Button
+        configureButton.setFocusable(false);
+        configureButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.configureButton.toolTipText"));
+        configureButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                configurePopup.show(configureButton, 0, configureButton.getHeight());
+            }
+        });      
+        
+        configurePopup.addPopupMenuListener(new PopupMenuListener() {
 
             @Override
-            public void itemStateChanged(ItemEvent e) {
+            public void popupMenuCanceled(PopupMenuEvent e) {
+                configureButton.setSelected(false);
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                configureButton.setSelected(false);
+            }
+
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+            }
+        });                
+        
+        //Configure Button - Auto select neighbor
+        autoSelectNeighborItem.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.autoSelectNeigborCheckbox.text"));
+        autoSelectNeighborItem.setFocusable(false);
+        autoSelectNeighborItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 VizModel vizModel = VizController.getInstance().getVizModel();
-                vizModel.setAutoSelectNeighbor(autoSelectNeighborCheckbox.isSelected());
+                vizModel.setAutoSelectNeighbor(autoSelectNeighborItem.isSelected());
             }
         });
-        topToolbar.add(autoSelectNeighborCheckbox);
-
-        topToolbar.addSeparator();
-
-        //Screenshots        
-        JMenuItem configureScreenshotItem = new JMenuItem(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.screenshot.configure"));
-        configureScreenshotItem.setFocusable(false);
-        configureScreenshotItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                VizController.getInstance().getScreenshotMaker().configure();
-            }
-        });
-        screenshotPopup.add(configureScreenshotItem);
-
-        screenshotButton.setFocusable(false);
-        screenshotButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.screenshot.toolTipText"));
-        screenshotButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                VizController.getInstance().getScreenshotMaker().takeScreenshot();
-            }
-        });
-
-        topToolbar.add(screenshotButton);
-
-        expotToXML.setFocusable(false);
-        expotToXML.setAction(new ExportGraph());
-        expotToXML.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/xml.png", false));
-        expotToXML.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.expotToXML.toolTipText"));
-        topToolbar.add(expotToXML);
-
-        topToolbar.addSeparator();
+        configurePopup.add(autoSelectNeighborItem);
+        
+        topToolbar.add(configureButton);        
     }
 
     private JPopupMenu createPopup() {
@@ -599,7 +596,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
 //        graphPanel.add(extendedBar, BorderLayout.PAGE_START);
         final JToggleButton extendButton = new JToggleButton();
-        extendButton.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.extendButton.text"));
+        extendButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.extendButton.text"));
         if (extendButton.isSelected()) {
             extendButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowDown.png", false)); // NOI18N
             extendButton.setRolloverIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowDown_rollover.png", false)); // NOI18N
@@ -646,7 +643,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         backgroundColorButton.setColor(vizModel.getBackgroundColor());
 
         //Auto select neighbor
-        autoSelectNeighborCheckbox.setSelected(vizModel.isAutoSelectNeighbor());
+        autoSelectNeighborItem.setSelected(vizModel.isAutoSelectNeighbor());
 
         //Show node labels
         showNodeLabelsButton.setSelected(vizModel.getTextModel().isShowNodeLabels());

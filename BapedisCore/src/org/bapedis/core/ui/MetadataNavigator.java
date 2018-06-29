@@ -13,19 +13,15 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
-import javax.swing.SwingWorker;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -34,20 +30,17 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AnnotationType;
-import org.bapedis.core.model.GraphViz;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.MetadataNavigatorModel;
 import org.bapedis.core.model.MetadataNode;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
-import org.bapedis.core.spi.data.MetadataDAO;
+import org.bapedis.core.ui.components.MetadataTreeNodeLoader;
 import org.bapedis.core.ui.actions.AddToQueryModel;
 import org.bapedis.core.ui.actions.CenterNodeOnGraph;
 import org.bapedis.core.ui.actions.RemoveFromQueryModel;
 import org.bapedis.core.ui.actions.SelectNodeOnGraph;
-import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphModel;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTree;
 import org.openide.util.Lookup;
@@ -55,7 +48,6 @@ import org.openide.util.NbBundle;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
 import org.openide.awt.MouseUtils;
-import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
@@ -66,14 +58,13 @@ import org.openide.util.lookup.InstanceContent;
  */
 @NavigatorPanel.Registration(mimeType = "peptide/metadata", displayName = "#MetadataNavigator.name")
 public class MetadataNavigator extends JComponent implements
-        WorkspaceEventListener, PropertyChangeListener, NavigatorPanelWithToolbar {
+        WorkspaceEventListener, NavigatorPanelWithToolbar {
 
     protected final InstanceContent content;
     private final DefaultComboBoxModel comboBoxModel;
     protected final ProjectManager pc;
     protected final Lookup lookup;
     protected final JToolBar toolBar, bottomToolbar;
-    protected final JCheckBox showAllCheckBox;
     protected final JButton findButton;
     protected final JComboBox comboBox;
     protected final JXTree tree;
@@ -106,16 +97,6 @@ public class MetadataNavigator extends JComponent implements
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         busyLabel.setText(NbBundle.getMessage(GraphElementNavigator.class, "MetadataNavigator.busyLabel.text"));
 
-        showAllCheckBox = new JCheckBox();
-        showAllCheckBox.setSelected(true);
-        showAllCheckBox.setText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.showAllCheckBox.text"));
-        showAllCheckBox.setToolTipText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.showAllCheckBox.toolTipText"));
-        showAllCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showAllCheckBoxActionPerformed(evt);
-            }
-        });
-
         findButton = new JButton(tree.getActionMap().get("find"));
         findButton.setText("");
         findButton.setToolTipText(NbBundle.getMessage(GraphElementNavigator.class, "MetadataNavigator.findButton.toolTipText"));
@@ -140,27 +121,24 @@ public class MetadataNavigator extends JComponent implements
         toolBar = new JToolBar();
         toolBar.setFloatable(false);
         toolBar.add(comboBox);
-        toolBar.add(showAllCheckBox);
         toolBar.addSeparator();
         toolBar.add(findButton);
 
         pc = Lookup.getDefault().lookup(ProjectManager.class);
-        
+
         // Botton toolbar
         bottomToolbar = new JToolBar();
         bottomToolbar.setFloatable(false);
         metadataSizeLabel = new JLabel();
         bottomToolbar.add(metadataSizeLabel);
-        add(bottomToolbar, BorderLayout.SOUTH);        
+        add(bottomToolbar, BorderLayout.SOUTH);
     }
 
     private void comboBoxItemStateChanged(java.awt.event.ItemEvent evt) {
         if (evt.getStateChange() == ItemEvent.SELECTED) {
             if (comboBox.getSelectedItem() instanceof AnnotationItem) {
                 AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
-                showAllCheckBox.setEnabled(true);
                 findButton.setEnabled(true);
-                showAllCheckBox.setSelected(item.isShowAll());
                 item.reload();
                 if (navigatorModel.getSelectedIndex() != item.getAnnotationType().ordinal()) {
                     navigatorModel.setSelectedIndex(item.getAnnotationType().ordinal());
@@ -168,7 +146,6 @@ public class MetadataNavigator extends JComponent implements
             } else {
                 tree.setModel(null);
                 findButton.setEnabled(false);
-                showAllCheckBox.setEnabled(false);
                 if (navigatorModel.getSelectedIndex() != -1) {
                     navigatorModel.setSelectedIndex(-1);
                 }
@@ -177,21 +154,12 @@ public class MetadataNavigator extends JComponent implements
         }
     }
 
-    private void showAllCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {
-        if (comboBox.getSelectedItem() instanceof AnnotationItem) {
-            AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
-            item.setShowAll(showAllCheckBox.isSelected());
-            item.reload();
-            navigatorModel.setShowAll(item.getAnnotationType().ordinal(), showAllCheckBox.isSelected());
-        }
-    }
-
     private void setBusyLabel(boolean busy) {
         scrollPane.setViewportView(busy ? busyLabel : tree);
         for (Component c : toolBar.getComponents()) {
             c.setEnabled(!busy);
         }
-        bottomToolbar.setVisible(!busy);        
+        bottomToolbar.setVisible(!busy);
     }
 
     private void treeValueChanged(TreeSelectionEvent e) {
@@ -228,44 +196,17 @@ public class MetadataNavigator extends JComponent implements
 
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
-        if (oldWs != null) {
-            GraphViz oldModel = pc.getGraphViz(oldWs);
-            if (oldModel != null) {
-                oldModel.removeGraphViewChangeListener(this);
-            }
-        }
-
-        GraphViz vizModel = pc.getGraphViz(newWs);
-        if (vizModel != null) {
-            vizModel.addGraphViewChangeListener(this);
-        }
-
         navigatorModel = newWs.getLookup().lookup(MetadataNavigatorModel.class);
         if (navigatorModel == null) {
             navigatorModel = new MetadataNavigatorModel();
             newWs.add(navigatorModel);
         }
 
-        for (int i = 0; i < AnnotationType.values().length; i++) {
-            AnnotationItem item = (AnnotationItem) comboBoxModel.getElementAt(i + 1);
-            item.setShowAll(navigatorModel.isShowAll(i));
-        }
         comboBox.setSelectedIndex(-1);
         if (navigatorModel.getSelectedIndex() == -1) {
             comboBox.setSelectedItem(NO_SELECTION);
         } else {
             comboBox.setSelectedIndex(navigatorModel.getSelectedIndex() + 1);
-        }
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(GraphViz.CHANGED_GRAPH_VIEW)
-                && comboBox.getSelectedItem() instanceof AnnotationItem) {
-            AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
-            if (!item.isShowAll()) {
-                item.reload();
-            }
         }
     }
 
@@ -291,17 +232,11 @@ public class MetadataNavigator extends JComponent implements
         pc.addWorkspaceEventListener(this);
         Workspace currentWorkspace = pc.getCurrentWorkspace();
         workspaceChanged(null, currentWorkspace);
-        pc.getQueryModel().setMetadataActivated(true);
     }
 
     @Override
     public void panelDeactivated() {
         pc.removeWorkspaceEventListener(this);
-        GraphViz vizModel = pc.getGraphViz();
-        if (vizModel != null) {
-            vizModel.removeGraphViewChangeListener(this);
-        }
-        pc.getQueryModel().setMetadataActivated(false);
     }
 
     @Override
@@ -315,96 +250,19 @@ public class MetadataNavigator extends JComponent implements
 
     }
 
-    private class AnnotationItem {
+    private class AnnotationItem implements PropertyChangeListener {
 
         private final AnnotationType annotationType;
-        private final MetadataDAO metadataDAO;
-        private List<Metadata> allMetadata;
-        private boolean showAll;
 
         public AnnotationItem(AnnotationType annotationType) {
             this.annotationType = annotationType;
-            metadataDAO = Lookup.getDefault().lookup(MetadataDAO.class);
-            this.showAll = true;
-        }
-
-        public boolean isShowAll() {
-            return showAll;
-        }
-
-        public void setShowAll(boolean showAll) {
-            this.showAll = showAll;
         }
 
         public void reload() {
             setBusyLabel(true);
-            final DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode();
-            final DefaultTreeModel treeModel = new DefaultTreeModel(rootNode);
-            tree.setModel(treeModel);
-            SwingWorker<Integer, Void> worker = new SwingWorker<Integer, Void>() {
-                @Override
-                protected Integer doInBackground() throws Exception {
-                    int count=0;
-                    if (allMetadata == null) {
-                        allMetadata = metadataDAO.getMetadata(annotationType);
-                    }
-                    if (showAll) {
-                        for (Metadata m : allMetadata) {
-                            count += createNode(m, rootNode);
-                        }
-                    } else {
-                        GraphModel graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();
-                        Graph graph = graphModel.getGraphVisible();
-                        org.gephi.graph.api.Node node;
-                        graph.readLock();
-                        try {
-                            for (Metadata m : allMetadata) {
-                                node = graph.getNode(m.getUnderlyingNodeID());
-                                if (node != null) {
-                                    m.setGraphNode(node);
-                                    count += createNode(m, rootNode);
-                                }
-                            }
-                        } finally {
-                            graph.readUnlock();
-                        }
-                    }
-                    return count;
-                }
-
-                private int createNode(Metadata metadata, DefaultMutableTreeNode parentNode) {
-                    int count = 1;
-                    DefaultMutableTreeNode node = new DefaultMutableTreeNode(metadata);
-                    parentNode.add(node);
-                    if (metadata.hasChilds()) {
-                        for (Metadata m : metadata.getChilds()) {
-                            count += createNode(m, node);
-                        }
-                    }                    
-                    return count;
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        int count = get();
-                        metadataSizeLabel.setText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.metadataSizeLabel.text", count));
-                        if (rootNode.getChildCount() > 0) {
-                            treeModel.reload();
-                        } else {
-                            tree.setModel(null);
-                        }
-                    } catch (InterruptedException ex) {
-                        Exceptions.printStackTrace(ex);
-                    } catch (ExecutionException ex) {
-                        Exceptions.printStackTrace(ex);
-                    } finally {
-                        setBusyLabel(false);
-                    }
-                }
-
-            };
-            worker.execute();
+            MetadataTreeNodeLoader loader = new MetadataTreeNodeLoader(annotationType);
+            loader.addPropertyChangeListener(this);
+            loader.execute();
         }
 
         public AnnotationType getAnnotationType() {
@@ -414,6 +272,23 @@ public class MetadataNavigator extends JComponent implements
         @Override
         public String toString() {
             return annotationType.getDisplayName();
+        }
+
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (evt.getPropertyName().equals(MetadataTreeNodeLoader.FINISH)) {
+                MetadataTreeNodeLoader loader = (MetadataTreeNodeLoader) evt.getSource();
+                DefaultMutableTreeNode rootNode = loader.getRootNode();
+                DefaultTreeModel treeModel = new DefaultTreeModel(rootNode);
+                tree.setModel(treeModel);
+                metadataSizeLabel.setText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.metadataSizeLabel.text", loader.getEntriesloaded()));
+                if (rootNode.getChildCount() > 0) {
+                    treeModel.reload();
+                } else {
+                    tree.setModel(null);
+                }
+                setBusyLabel(false);
+            }
         }
 
     }

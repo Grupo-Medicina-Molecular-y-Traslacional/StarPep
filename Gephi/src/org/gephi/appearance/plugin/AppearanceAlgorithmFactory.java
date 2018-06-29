@@ -17,7 +17,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author loge
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 90)
+@ServiceProvider(service = AlgorithmFactory.class, position = 10)
 public class AppearanceAlgorithmFactory implements AlgorithmFactory, GephiTag{
 
     private final AppearanceSetupUIPanel setupUI = new AppearanceSetupUIPanel();

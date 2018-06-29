@@ -432,12 +432,14 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             algoModel.setTagInterface(oldAlgTag);
         }
         if (algoModel.getTagInterface() != null) {
+            refreshDisplayName(algoModel);
             refreshAlgChooser(algoModel);
             refreshProperties(algoModel);
             refreshRunning(algoModel.isRunning());
         }
         algoModel.addPropertyChangeListener(this);
         if (pc.getAttributesModel() == null) {
+            setDisplayName(Bundle.CTL_AlgoExplorerTopComponent());
             algoComboBox.setEnabled(false);
             setEnableState(false);
         }
@@ -456,6 +458,8 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 AlgorithmFactory factory = algoModel.getSelectedAlgorithm().getFactory();
                 if (factory.getCategory() != null) {
                     displayName = factory.getCategory();
+                } else{
+                    displayName = factory.getName();
                 }
             }
         }

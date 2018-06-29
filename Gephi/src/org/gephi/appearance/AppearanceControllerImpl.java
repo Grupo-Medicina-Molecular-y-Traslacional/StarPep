@@ -84,32 +84,6 @@ public class AppearanceControllerImpl implements AppearanceController, Workspace
     }    
 
     @Override
-    public void transform(Function function) {
-        if (model != null) {
-            GraphModel graphModel = model.getGraphModel();
-            Graph graph = graphModel.getGraphVisible();
-            ElementIterable<? extends Element> iterable;
-            if (function.getElementClass().equals(Node.class)) {
-                iterable = graph.getNodes();
-            } else {
-                iterable = graph.getEdges();
-            }
-            try {
-                for (Element element : iterable) {
-                    function.transform(element, graph);
-                }
-            } catch (Exception e) {
-                iterable.doBreak();
-                if (e instanceof RuntimeException) {
-                    throw (RuntimeException) e;
-                } else {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-    }
-
-    @Override
     public AppearanceModelImpl getModel() {
         return model;
     }

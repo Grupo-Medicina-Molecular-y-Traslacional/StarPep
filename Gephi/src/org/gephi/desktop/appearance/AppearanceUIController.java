@@ -210,7 +210,6 @@ public class AppearanceUIController implements WorkspaceEventListener {
         if (model != null) {
             TransformerUI oldValue = model.getSelectedTransformerUI();
             if (!oldValue.equals(ui)) {
-                model.setAutoApply(false);
                 model.setSelectedTransformerUI(ui);
 
                 firePropertyChangeEvent(AppearanceUIModelEvent.SELECTED_TRANSFORMER_UI, oldValue, ui);
@@ -222,7 +221,6 @@ public class AppearanceUIController implements WorkspaceEventListener {
         if (model != null) {
             Function oldValue = model.getSelectedFunction();
             if ((oldValue == null && function != null) || (oldValue != null && function == null) || (function != null && oldValue != null && !oldValue.equals(function))) {
-                model.setAutoApply(false);
                 model.setSelectedFunction(function);
 
                 firePropertyChangeEvent(AppearanceUIModelEvent.SELECTED_FUNCTION, oldValue, function);

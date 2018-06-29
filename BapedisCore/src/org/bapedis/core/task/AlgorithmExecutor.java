@@ -103,7 +103,7 @@ public final class AlgorithmExecutor {
 
     public AlgorithmErrorHandler getDefaultErrorHandler() {
         return defaultErrorHandler;
-    }        
+    }
 
     /**
      * Execute an algorithm with cancel and progress support.
@@ -234,12 +234,24 @@ public final class AlgorithmExecutor {
 
         private void finish() {
             if (taskList.remove(this)) {
-                algorithm.endAlgo();
-                ticket.finish();
-                if (listener != null) {
-                    listener.algorithmFinished(algorithm);
+                try {
+                    algorithm.endAlgo();
+                    pc.reportFinishedTask(algorithm.getFactory().getName(), workspace);
+                } catch (Throwable e) {
+                    if (errorHandler != null) {
+                        errorHandler.fatalError(e);
+                    } else {
+                        Logger.getLogger(AlgoExecutor.class.getName()).log(Level.SEVERE, "", e);
+                    }
+                    StringWriter errors = new StringWriter();
+                    e.printStackTrace(new PrintWriter(errors));
+                    pc.reportError(errors.toString(), workspace);
+                } finally {
+                    ticket.finish();
+                    if (listener != null) {
+                        listener.algorithmFinished(algorithm);
+                    }
                 }
-                pc.reportFinishedTask(algorithm.getFactory().getName(), workspace);
             }
         }
     }

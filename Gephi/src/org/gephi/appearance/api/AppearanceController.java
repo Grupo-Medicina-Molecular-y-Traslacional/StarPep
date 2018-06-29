@@ -66,14 +66,6 @@ public interface AppearanceController {
     public void setUseLocalScale(boolean useLocalScale);
 
     /**
-     * Apply the function's transformer. If the function is for nodes all nodes
-     * in the visible graph will be transformed. Similarly for edges.
-     *
-     * @param function function to transform
-     */
-    public void transform(Function function);
-
-    /**
      * Returns the appearance model for the current workspace.
      *
      * @return appearance model

@@ -93,14 +93,6 @@ public class AppearanceSetupUIPanel extends javax.swing.JPanel implements Algori
             setBackground(UIManager.getColor("NbExplorerView.background"));
         }
 
-//        AppearanceToolbar.CategoryToolbar ctb = toolbar.getCategoryToolbar();
-//        ctb.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                categoryActionPerformed(e);
-//            }
-//        });
-
         categoryPanel.add(toolbar.getCategoryToolbar(), BorderLayout.CENTER);        
         transformerPanel.add(toolbar.getTransformerToolbar(), BorderLayout.CENTER);
         splineEditor = new SplineEditor();

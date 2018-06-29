@@ -78,7 +78,6 @@ public class AppearanceUIModel {
     protected final Map<String, Map<TransformerCategory, TransformerUI>> selectedTransformerUI;
     protected final Map<String, Map<TransformerUI, Function>> selectedFunction;
     protected final Map<String, TransformerCategory> selectedCategory;
-    protected final Map<String, Map<TransformerCategory, AutoAppyTransformer>> selectedAutoTransformer;
     protected final Map<Function, Map<String, Object>> savedProperties;
     protected String selectedElementClass = AppearanceUIController.NODE_ELEMENT;
 
@@ -91,7 +90,6 @@ public class AppearanceUIModel {
         selectedCategory = new HashMap<>();
         selectedTransformerUI = new HashMap<>();
         selectedFunction = new HashMap<>();
-        selectedAutoTransformer = new HashMap<>();
         savedProperties = new HashMap<>();
 
         //Init selected
@@ -125,7 +123,6 @@ public class AppearanceUIModel {
 
         selectedTransformerUI.put(elementClass, newMap);
         selectedFunction.put(elementClass, new HashMap<TransformerUI, Function>());
-        selectedAutoTransformer.put(elementClass, new HashMap<TransformerCategory, AutoAppyTransformer>());
     }
 
     private void refreshSelectedFunctions(String elementClass) {
@@ -248,15 +245,6 @@ public class AppearanceUIModel {
         return selectedFunction.get(selectedElementClass).get(getSelectedTransformerUI());
     }
 
-    public AutoAppyTransformer getAutoAppyTransformer() {
-        String elm = getSelectedElementClass();
-        TransformerCategory ct = getSelectedCategory();
-        if (ct != null) {
-            return selectedAutoTransformer.get(elm).get(ct);
-        }
-        return null;
-    }
-
     public Collection<Function> getFunctions() {
         Graph graph = pm.getGraphModel(appearanceModel.getWorkspace()).getGraph();
         List<Function> functions = new ArrayList<>();
@@ -269,22 +257,6 @@ public class AppearanceUIModel {
             }
         }
         return functions;
-    }
-
-    protected void setAutoApply(boolean autoApply) {
-        if (!autoApply) {
-            AutoAppyTransformer aat = getAutoAppyTransformer();
-            if (aat != null) {
-                aat.stop();
-            }
-        }
-        String elmt = getSelectedElementClass();
-        TransformerCategory cat = getSelectedCategory();
-        if (autoApply) {
-            selectedAutoTransformer.get(elmt).put(cat, new AutoAppyTransformer(controller, getSelectedFunction()));
-        } else {
-            selectedAutoTransformer.get(elmt).put(cat, null);
-        }
     }
 
     public boolean isAttributeTransformerUI(TransformerUI ui) {

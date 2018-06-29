@@ -130,6 +130,7 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
         colorToolbar.setOpaque(false);
         colorToolbar.add(jSeparator1);
 
+        jButtonReset.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/gephi/ui/appearance/plugin/resources/chain.png"))); // NOI18N
         jButtonReset.setText(org.openide.util.NbBundle.getMessage(UniqueColorTransformerPanel.class, "UniqueColorTransformerPanel.jButtonReset.text")); // NOI18N
         jButtonReset.setToolTipText(org.openide.util.NbBundle.getMessage(UniqueColorTransformerPanel.class, "UniqueColorTransformerPanel.jButtonReset.toolTipText")); // NOI18N
         jButtonReset.setFocusable(false);
@@ -146,8 +147,8 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
         add(colorToolbar, gridBagConstraints);
 
         colorChooser.setMinimumSize(new java.awt.Dimension(14, 14));

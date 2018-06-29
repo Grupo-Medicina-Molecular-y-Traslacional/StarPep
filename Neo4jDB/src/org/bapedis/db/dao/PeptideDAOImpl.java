@@ -52,7 +52,7 @@ public class PeptideDAOImpl implements PeptideDAO {
     private final String PRO_LENGHT = "length";
     private final String PRO_NAME = "name";
     private final String PRO_XREF = "dbRef";
-    
+
     private final TraversalDescription peptideTraversal, metadataTraversal;
 
     public PeptideDAOImpl() {
@@ -128,7 +128,7 @@ public class PeptideDAOImpl implements PeptideDAO {
                     peptide.setAttributeValue(Peptide.ID, id);
                     peptide.setAttributeValue(Peptide.SEQ, seq);
                     peptide.setAttributeValue(Peptide.LENGHT, seq.length());
-                    
+
                     attrModel.addPeptide(peptide);
                 }
             } finally {
@@ -146,9 +146,10 @@ public class PeptideDAOImpl implements PeptideDAO {
     }
 
     protected ResourceIterator<Node> getPeptides(final List<Node> metadataNodes, RestrictionLevel restriction) {
-        Evaluator restrictiveEvaluator = null;
+        ResourceIterator<Node> nodes = null;
+        Evaluator restrictiveEvaluator;
+        if (metadataNodes.size() == 1 || restriction == RestrictionLevel.MATCH_ANY) {
 
-        if (restriction == RestrictionLevel.MATCH_ANY) {
             restrictiveEvaluator = new Evaluator() {
                 @Override
                 public Evaluation evaluate(Path path) {
@@ -156,13 +157,18 @@ public class PeptideDAOImpl implements PeptideDAO {
                     return accepted ? Evaluation.INCLUDE_AND_PRUNE : Evaluation.EXCLUDE_AND_CONTINUE;
                 }
             };
-        } else if (restriction == RestrictionLevel.MATCH_ALL) {
+            nodes = peptideTraversal.evaluator(restrictiveEvaluator)
+                    .traverse(metadataNodes)
+                    .nodes()
+                    .iterator();
+        } else if (metadataNodes.size() > 1 && restriction == RestrictionLevel.MATCH_ALL) {
             final Node[] endNodes = metadataNodes.toArray(new Node[0]);
+            final LinkedList<Node> metadataList = new LinkedList<>();
             restrictiveEvaluator = new Evaluator() {
                 @Override
                 public Evaluation evaluate(Path path) {
                     if (path.endNode().hasLabel(MyLabel.Peptide)) {
-                        LinkedList<Node> metadataList = new LinkedList<>();
+                        metadataList.clear();
                         try (ResourceIterator<Node> nodes = getMetadata(path.endNode(), endNodes)) {
                             while (nodes.hasNext()) {
                                 metadataList.add(nodes.next());
@@ -174,18 +180,17 @@ public class PeptideDAOImpl implements PeptideDAO {
                     return Evaluation.EXCLUDE_AND_CONTINUE;
                 }
             };
+            nodes = peptideTraversal.evaluator(restrictiveEvaluator)
+                    .traverse(metadataNodes.get(0))
+                    .nodes()
+                    .iterator();            
         }
-
-        ResourceIterator<Node> nodes = peptideTraversal.evaluator(restrictiveEvaluator)
-                .traverse(metadataNodes)
-                .nodes()
-                .iterator();
 
         return nodes;
     }
 
     private ResourceIterator<Node> getMetadata(Node peptideNode, Node[] metadataNodes) {
-        ResourceIterator<Node> nodes = metadataTraversal.evaluator(Evaluators.pruneWhereEndNodeIs(metadataNodes))
+        ResourceIterator<Node> nodes = metadataTraversal.evaluator(Evaluators.includeWhereEndNodeIs(metadataNodes))
                 .traverse(peptideNode)
                 .nodes()
                 .iterator();

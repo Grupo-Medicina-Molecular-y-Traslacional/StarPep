@@ -47,17 +47,18 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import javafx.scene.control.ComboBox;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
@@ -67,7 +68,6 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
-import org.gephi.appearance.api.Function;
 import org.gephi.appearance.spi.TransformerCategory;
 import org.gephi.appearance.spi.TransformerUI;
 import org.openide.awt.DropDownButtonFactory;
@@ -181,62 +181,34 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
     }
 
     public class CategoryToolbar extends AbstractToolbar {
-        private final JLabel elementClassLabel;
         private final List<ButtonGroup> buttonGroups = new ArrayList<>();
         private final List<ActionListener> actionListener = new LinkedList<>();
-        private final ButtonGroup popupGroup;
+        private final JComboBox<MyComboBoxItem> elementComboBox;
         
         public CategoryToolbar() {
             //Init components
-            elementClassLabel = new JLabel(NbBundle.getMessage(AppearanceToolbar.class, "AppearanceToolbar." + AppearanceUIController.ELEMENT_CLASSES[0] + ".label") + ": ");
-            popupGroup = new ButtonGroup();
-            final JPopupMenu popup = new JPopupMenu();
-            JCheckBoxMenuItem item;
+            elementComboBox = new JComboBox<>();
+            DefaultComboBoxModel<MyComboBoxItem> comboBoxModel = (DefaultComboBoxModel)elementComboBox.getModel();
+            MyComboBoxItem item;
+            String elmtTitle;
             for (final String elmtType : AppearanceUIController.ELEMENT_CLASSES) {
-                item = new JCheckBoxMenuItem();
-                final String btnLabel = NbBundle.getMessage(AppearanceToolbar.class, "AppearanceToolbar." + elmtType + ".label");
-                
-                item.setText(btnLabel);
-                item.setSelected(false);
-                item.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        controller.setSelectedElementClass(elmtType);
-                        elementClassLabel.setText(btnLabel + ": ");
-                    }
-                });
-                popup.add(item);
-                popupGroup.add(item);
+                elmtTitle = NbBundle.getMessage(AppearanceToolbar.class, "AppearanceToolbar." + elmtType + ".label");
+                item = new MyComboBoxItem(elmtType, elmtTitle);
+                comboBoxModel.addElement(item);                               
             }
-            final JButton btn = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("/org/gephi/desktop/appearance/resources/chain.png", false), popup);
-            btn.setToolTipText(NbBundle.getMessage(AppearanceToolbar.class, "AppearanceToolbar.chain.toolTipText"));
-            btn.setFocusable(false);
-            btn.addActionListener(new ActionListener() {
+            
+            elementComboBox.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    popup.show(btn, 0, btn.getHeight());
+                    if (elementComboBox.getSelectedItem() instanceof MyComboBoxItem){
+                        MyComboBoxItem item = (MyComboBoxItem)elementComboBox.getSelectedItem();
+                        controller.setSelectedElementClass(item.getElmtType());
+                    }
                 }
             });
-
-            popup.addPopupMenuListener(new PopupMenuListener() {
-
-                @Override
-                public void popupMenuCanceled(PopupMenuEvent e) {
-                    btn.setSelected(false);
-                }
-
-                @Override
-                public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-                    btn.setSelected(false);
-                }
-
-                @Override
-                public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                }
-            });
-            add(btn);
+            
+            add(elementComboBox);
             addSeparator();
-            add(elementClassLabel);
         }
 
         private void clear() {
@@ -281,7 +253,7 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
                     buttonGroups.add(buttonGroup);
                 }
             } else {
-                popupGroup.clearSelection();
+                elementComboBox.setSelectedIndex(-1);
             }
         }
 
@@ -304,17 +276,14 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
 
         protected void refreshSelectedElmntGroup() {
             String selected = model == null ? null : model.getSelectedElementClass();
-            JCheckBoxMenuItem item = null;
-            Enumeration<AbstractButton> items = popupGroup.getElements();
-            for (String elmtType : AppearanceUIController.ELEMENT_CLASSES) {
-                if (selected == null || elmtType.equals(selected)) {
-                    item = (JCheckBoxMenuItem) items.nextElement();
-                    item.setSelected(true);
-                    elementClassLabel.setText(NbBundle.getMessage(AppearanceToolbar.class, "AppearanceToolbar." + elmtType + ".label") + ": ");
-                    break;
+            DefaultComboBoxModel<MyComboBoxItem> comboBoxModel = (DefaultComboBoxModel)elementComboBox.getModel();
+            MyComboBoxItem item = null;
+            for(int i=0; i<comboBoxModel.getSize(); i++){
+                item = comboBoxModel.getElementAt(i);
+                if (item.getElmtType().equals(selected)){
+                    comboBoxModel.setSelectedItem(item);
                 }
-                items.nextElement();
-            }
+            }            
         }
         
         public void addActionListener(ActionListener listener){
@@ -323,6 +292,31 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
         
         public void removeActionListener(ActionListener listener){
             actionListener.remove(listener);
+        }
+        
+        
+        private class MyComboBoxItem {
+            private final String elmtType;
+            private final String elmtTitle;
+
+            public MyComboBoxItem(String elmtType, String elmtTitle) {
+                this.elmtType = elmtType;
+                this.elmtTitle = elmtTitle;
+            }
+
+            public String getElmtType() {
+                return elmtType;
+            }
+
+            public String getElmtTitle() {
+                return elmtTitle;
+            }        
+
+            @Override
+            public String toString() {
+                return elmtTitle;
+            }
+                        
         }
 
     }

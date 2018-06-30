@@ -181,8 +181,8 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(scrollPane, gridBagConstraints);
 
-        restrictiveComboBox.setMinimumSize(new java.awt.Dimension(150, 20));
-        restrictiveComboBox.setPreferredSize(new java.awt.Dimension(150, 20));
+        restrictiveComboBox.setMinimumSize(new java.awt.Dimension(150, 25));
+        restrictiveComboBox.setPreferredSize(new java.awt.Dimension(150, 25));
         restrictiveComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 restrictiveComboBoxActionPerformed(evt);

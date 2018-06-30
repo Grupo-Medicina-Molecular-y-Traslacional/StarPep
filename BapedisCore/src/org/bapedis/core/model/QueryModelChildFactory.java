@@ -7,7 +7,6 @@ package org.bapedis.core.model;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Arrays;
 import java.util.List;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Node;

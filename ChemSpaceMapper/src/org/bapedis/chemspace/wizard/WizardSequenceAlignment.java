@@ -5,7 +5,6 @@
  */
 package org.bapedis.chemspace.wizard;
 
-import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 import org.bapedis.chemspace.impl.AbstractEmbedder;
 import org.bapedis.chemspace.impl.MapperAlgorithm;

@@ -23,26 +23,25 @@ import org.openide.util.NbBundle;
  */
 public class AddQuery extends AbstractAction {
 
+    protected final static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private final AnnotationType type;
     protected final SetupDialog dialog;
     protected final String dialogTitle;
-
+    
     public AddQuery(AnnotationType type) {
         this.type = type;
         putValue(NAME, NbBundle.getMessage(AddQuery.class, "AddQueryBy.name", type.getDisplayName()));
         dialog = new SetupDialog();
-        dialogTitle = NbBundle.getMessage(AddFilter.class, "MetadataSelector.title", type.getDisplayName());
+        dialogTitle = NbBundle.getMessage(AddFilter.class, "MetadataSelector.title");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         MetadataSelectorPanel panel = new MetadataSelectorPanel(type);
         if (dialog.setup(panel, panel, dialogTitle)) {
-            QueryModel queryModel = Lookup.getDefault().lookup(ProjectManager.class).getQueryModel();
+            QueryModel queryModel = pc.getQueryModel();
             List<Metadata> selectedMetada = panel.getSelectedMetadata();
-            for (Metadata metadata : selectedMetada) {
-                queryModel.add(metadata);
-            }
+            queryModel.addAll(selectedMetada);
         }
     }
 

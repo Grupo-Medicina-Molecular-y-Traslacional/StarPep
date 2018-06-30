@@ -63,10 +63,22 @@ public class QueryModel {
     public void add(Metadata metadata) {
         if (!contains(metadata)) {
             if (metadatas.add(metadata)) {
-                propertyChangeSupport.firePropertyChange(ADDED_METADATA, null, metadata);
+                propertyChangeSupport.firePropertyChange(ADDED_METADATA, null, new Metadata[]{metadata});
             }
         }
     }
+    
+    public void addAll(List<Metadata> metadataList){
+        List<Metadata> toAdd = new LinkedList<>();
+        for(Metadata metadata: metadataList){
+            if (!contains(metadata)){
+                toAdd.add(metadata);
+            }
+        }
+        if (toAdd.size() > 0 && metadatas.addAll(toAdd)){
+            propertyChangeSupport.firePropertyChange(ADDED_METADATA, null, metadatas.toArray(new Metadata[0]));
+        }
+    }    
 
     public boolean contains(Metadata metadata) {
         for (Metadata m : metadatas) {

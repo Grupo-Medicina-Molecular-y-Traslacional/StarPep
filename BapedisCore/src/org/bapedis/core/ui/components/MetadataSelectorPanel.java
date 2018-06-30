@@ -81,8 +81,9 @@ public class MetadataSelectorPanel extends javax.swing.JPanel implements Propert
 
         topToolBar = new JToolBar();
         topToolBar.setFloatable(false);
+        topToolBar.addSeparator();        
+        topToolBar.add(new JLabel(annotationType.getDisplayName()));
         topToolBar.add(Box.createHorizontalGlue());
-        topToolBar.addSeparator();
         topToolBar.add(findButton);
 
         add(topToolBar, BorderLayout.NORTH);
@@ -102,7 +103,7 @@ public class MetadataSelectorPanel extends javax.swing.JPanel implements Propert
 
     public List<Metadata> getSelectedMetadata() {
         return selectedMetadata;
-    }        
+    }
 
     private void populateTree() {
         setBusyLabel(true);
@@ -120,7 +121,7 @@ public class MetadataSelectorPanel extends javax.swing.JPanel implements Propert
     }
 
     private void treeValueChanged(TreeSelectionEvent e) {
-        TreePath[] paths = tree.getSelectionPaths();        
+        TreePath[] paths = tree.getSelectionPaths();
         boolean oldValidState = validState;
         validState = paths != null;
         changeSupport.firePropertyChange(VALID_STATE, oldValidState, validState);
@@ -172,12 +173,14 @@ public class MetadataSelectorPanel extends javax.swing.JPanel implements Propert
     @Override
     public void saveSettings() {
         TreePath[] paths = tree.getSelectionPaths();
-        DefaultMutableTreeNode node;
-        Metadata metadata;
-        for (TreePath p : paths) {
-            node = (DefaultMutableTreeNode) p.getLastPathComponent();
-            metadata = (Metadata) node.getUserObject();
-            selectedMetadata.add(metadata);
+        if (paths != null) {
+            DefaultMutableTreeNode node;
+            Metadata metadata;
+            for (TreePath p : paths) {
+                node = (DefaultMutableTreeNode) p.getLastPathComponent();
+                metadata = (Metadata) node.getUserObject();
+                selectedMetadata.add(metadata);
+            }
         }
     }
 

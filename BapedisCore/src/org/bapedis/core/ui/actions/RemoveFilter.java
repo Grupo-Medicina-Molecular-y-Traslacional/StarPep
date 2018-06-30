@@ -10,7 +10,6 @@ import java.util.Collection;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.model.FilterModel;
-import static org.bapedis.core.ui.actions.EditFilter.pc;
 import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;

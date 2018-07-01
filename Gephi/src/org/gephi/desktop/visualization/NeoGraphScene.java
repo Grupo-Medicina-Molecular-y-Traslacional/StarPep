@@ -132,7 +132,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         graphPanel.add(drawable.getGraphComponent(), BorderLayout.CENTER);
         graphPanel.add(new BottomPanel(), BorderLayout.PAGE_END);
         content = new InstanceContent();
-        lookup = new ProxyLookup(new AbstractLookup(content), Lookups.singleton(new GraphElementNavigatorLookupHint()), Lookups.singleton(new MetadataNavigatorLookupHint()));
+        lookup = new ProxyLookup(new AbstractLookup(content), Lookups.singleton(new GraphElementNavigatorLookupHint()));
     }
 
     private void initComponents() {

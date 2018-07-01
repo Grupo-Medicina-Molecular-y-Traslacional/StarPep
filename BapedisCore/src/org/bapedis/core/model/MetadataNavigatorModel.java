@@ -15,7 +15,7 @@ public class MetadataNavigatorModel {
     private final boolean[] showAll;
 
     public MetadataNavigatorModel() {
-        selectedIndex = -1;
+        selectedIndex = 0;
         showAll = new boolean[AnnotationType.values().length];
         for (int i = 0; i < showAll.length; i++) {
             showAll[i] = true;

@@ -212,7 +212,7 @@ public class PeptideDAOImpl implements PeptideDAO {
 
     protected org.gephi.graph.api.Node getOrAddGraphNodeFromNeoNode(Node neoNode, GraphModel graphModel) {
         Graph mainGraph = graphModel.getGraph();
-        String id = String.valueOf(neoNode.getId());
+        String id = neoNode.hasProperty(PRO_ID) ? neoNode.getProperty(PRO_ID).toString(): String.valueOf(neoNode.getId());
         org.gephi.graph.api.Node graphNode = mainGraph.getNode(id);
         if (graphNode == null) {
             GraphFactory factory = graphModel.factory();

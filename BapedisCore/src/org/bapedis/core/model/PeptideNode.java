@@ -98,20 +98,16 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
         int count;
         for (AnnotationType aType : AnnotationType.values()) {
             count = 1;
-            name = aType.name().toLowerCase();
             set = Sheet.createPropertiesSet();
-            set.setName(name);
+            set.setName(aType.name().toLowerCase());
             set.setDisplayName(aType.getDisplayName());
             neighbors = peptide.getNeighbors(aType);
             for (Node neighbor : neighbors) {
                 edge = peptide.getEdge(neighbor, aType);
-                if (edge != null) {
-                    desc = Arrays.toString((String[]) edge.getAttribute("dbRef"));
-                } else {
-                    desc = name;
-                }
-                property = createPropertyField(name + count, aType.getDisplayName(),
-                        desc, String.class, neighbor.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
+                name = (String)neighbor.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME);
+                desc = edge.getLabel() + " " + name;
+                property = createPropertyField(aType.getDisplayName() + count, aType.getDisplayName(),
+                        desc, String.class, name);
                 set.put(property);
                 count++;
             }

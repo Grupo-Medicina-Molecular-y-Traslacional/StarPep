@@ -85,7 +85,7 @@ public class GraphElementNavigator extends JComponent implements
     protected final JButton availableColumnsButton;
     protected final JXBusyLabel busyLabel;
     protected final JXTable table;
-    protected final JLabel nodeSizeLabel, edgeSizeLabel;    
+    protected final JLabel nodeSizeLabel, edgeSizeLabel;
     protected GraphElementNavigatorModel navigatorModel;
     private final GraphElementDataColumn sourceColumn = new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Source);
     private final GraphElementDataColumn targetColumn = new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Targe);
@@ -111,7 +111,7 @@ public class GraphElementNavigator extends JComponent implements
                 tableValueChanged(e);
             }
         });
-        table.addMouseListener(new GraphElementPopupAdapter(table));
+        table.addMouseListener(new GraphElementPopupAdapter());
 
         nodesBtn = new JToggleButton(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.node.name"));
         initToogleButton(nodesBtn);
@@ -310,7 +310,7 @@ public class GraphElementNavigator extends JComponent implements
         table.setModel(dataModel);
         nodeSizeLabel.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.nodeSizeLabel.text", graph.getNodeCount()));
         edgeSizeLabel.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edgeSizeLabel.text", graph.getEdgeCount()));
-        
+
         SwingWorker worker = new SwingWorker<Void, Element>() {
             @Override
             protected Void doInBackground() throws Exception {
@@ -422,69 +422,67 @@ public class GraphElementNavigator extends JComponent implements
     public Lookup getLookup() {
         return lookup;
     }
-}
 
-class GraphElementPopupAdapter extends MouseUtils.PopupMouseAdapter {
+    class GraphElementPopupAdapter extends MouseUtils.PopupMouseAdapter {
 
-    protected final JXTable table;
 
-    public GraphElementPopupAdapter(JXTable table) {
-        this.table = table;
-    }
-
-    @Override
-    protected void showPopup(MouseEvent me) {
-        int selRow = table.rowAtPoint(me.getPoint());
-
-        if (selRow != -1) {
-            if (!table.getSelectionModel().isSelectedIndex(selRow)) {
-                table.getSelectionModel().clearSelection();
-                table.getSelectionModel().setSelectionInterval(selRow, selRow);
-            }
-            int rowIndex = table.getSelectedRow();
-            GraphElementsDataTable dataModel = (GraphElementsDataTable) table.getModel();
-            Element element = dataModel.getElementAtRow(table.convertRowIndexToModel(rowIndex));
-            JPopupMenu contextMenu = new JPopupMenu();
-            if (element instanceof Node) {
-                Node node = (Node) element;
-                contextMenu.add(new SelectNodeOnGraph(node));
-                contextMenu.add(new CenterNodeOnGraph(node));
-            } else if (element instanceof Edge) {
-                Edge edge = (Edge) element;
-                // Add select
-                JMenu selectMenu = new JMenu(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.selectOnGraph.name"));
-
-                JMenuItem selectEdge = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.name"));
-                selectEdge.addActionListener(new SelectEdgeOnGraph(edge));
-                selectMenu.add(selectEdge);
-
-                JMenuItem selectSource = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.source"));
-                selectSource.addActionListener(new SelectNodeOnGraph(edge.getSource()));
-                selectMenu.add(selectSource);
-
-                JMenuItem selectTarget = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.target"));
-                selectTarget.addActionListener(new SelectNodeOnGraph(edge.getTarget()));
-                selectMenu.add(selectTarget);
-                contextMenu.add(selectMenu);
-                // Add center
-                JMenu centerMenu = new JMenu(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.centerOnGraph.name"));
-
-                JMenuItem centerSource = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.source"));
-                centerSource.addActionListener(new CenterNodeOnGraph(edge.getSource()));
-                centerMenu.add(centerSource);
-
-                JMenuItem centerTarget = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.target"));
-                centerTarget.addActionListener(new CenterNodeOnGraph(edge.getTarget()));
-                centerMenu.add(centerTarget);
-
-                contextMenu.add(centerMenu);
-
-            }
-            contextMenu.show(table, me.getX(), me.getY());
-        } else {
-            table.getSelectionModel().clearSelection();
+        public GraphElementPopupAdapter() {
         }
-        me.consume();
-    }
 
+        @Override
+        protected void showPopup(MouseEvent me) {
+            int selRow = table.rowAtPoint(me.getPoint());
+
+            if (selRow != -1) {
+                if (!table.getSelectionModel().isSelectedIndex(selRow)) {
+                    table.getSelectionModel().clearSelection();
+                    table.getSelectionModel().setSelectionInterval(selRow, selRow);
+                }
+                int rowIndex = table.getSelectedRow();
+                GraphElementsDataTable dataModel = (GraphElementsDataTable) table.getModel();
+                Element element = dataModel.getElementAtRow(table.convertRowIndexToModel(rowIndex));
+                JPopupMenu contextMenu = new JPopupMenu();
+                if (element instanceof Node) {
+                    Node node = (Node) element;
+                    contextMenu.add(new SelectNodeOnGraph(node));
+                    contextMenu.add(new CenterNodeOnGraph(node));
+                } else if (element instanceof Edge) {
+                    Edge edge = (Edge) element;
+                    // Add select
+                    JMenu selectMenu = new JMenu(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.selectOnGraph.name"));
+
+                    JMenuItem selectEdge = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.name"));
+                    selectEdge.addActionListener(new SelectEdgeOnGraph(edge));
+                    selectMenu.add(selectEdge);
+
+                    JMenuItem selectSource = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.source"));
+                    selectSource.addActionListener(new SelectNodeOnGraph(edge.getSource()));
+                    selectMenu.add(selectSource);
+
+                    JMenuItem selectTarget = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.target"));
+                    selectTarget.addActionListener(new SelectNodeOnGraph(edge.getTarget()));
+                    selectMenu.add(selectTarget);
+                    contextMenu.add(selectMenu);
+                    // Add center
+                    JMenu centerMenu = new JMenu(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.centerOnGraph.name"));
+
+                    JMenuItem centerSource = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.source"));
+                    centerSource.addActionListener(new CenterNodeOnGraph(edge.getSource()));
+                    centerMenu.add(centerSource);
+
+                    JMenuItem centerTarget = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.target"));
+                    centerTarget.addActionListener(new CenterNodeOnGraph(edge.getTarget()));
+                    centerMenu.add(centerTarget);
+
+                    contextMenu.add(centerMenu);
+
+                }
+                contextMenu.show(table, me.getX(), me.getY());
+            } else {
+                table.getSelectionModel().clearSelection();
+            }
+            me.consume();
+        }
+
+    }
 }

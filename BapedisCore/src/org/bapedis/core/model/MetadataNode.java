@@ -6,6 +6,9 @@
 package org.bapedis.core.model;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.StringTokenizer;
+import org.bapedis.core.project.ProjectManager;
+import org.gephi.graph.api.Edge;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
@@ -19,35 +22,66 @@ import org.openide.util.NbBundle;
 public class MetadataNode extends AbstractNode {
 
 //    public static final DataFlavor DATA_FLAVOR = new DataFlavor(MetadataNode.class, "metadataNode");
-    protected final Metadata metadata;
+    protected final Edge edge;
 
-    public MetadataNode(Metadata metadata) {
-        super(metadata.hasChilds() ? Children.create(new MetadataChildFactory(metadata), false) : Children.LEAF);
-        this.metadata = metadata;
-        setDisplayName(metadata.getName());
+    public MetadataNode(Edge edge) {
+        super(Children.LEAF);
+        this.edge = edge;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return super.getDisplayName(); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     protected Sheet createSheet() {
         Sheet sheet = Sheet.createDefault();
+        Property property;
+
+        // Primary set
         Sheet.Set set = Sheet.createPropertiesSet();
-
+        sheet.put(set);
+        set.setName("primary");
+        set.setDisplayName(NbBundle.getMessage(MetadataNode.class, "PropertySet.primary"));
+        
+        //Source propery
+        property = createReadOnlyPropertyField("source", NbBundle.getMessage(MetadataNode.class, "PropertySet.edge.source"),
+                NbBundle.getMessage(MetadataNode.class, "PropertySet.edge.source.desc"), String.class, edge.getSource().getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
+        set.put(property);
+        
         // Label property
-        PropertySupport.ReadOnly labelProperty;
-        labelProperty = createPropertyField("label", NbBundle.getMessage(MetadataNode.class, "PropertySet.label"),
-                NbBundle.getMessage(MetadataNode.class, "PropertySet.label.desc"), String.class, metadata.getAnnotationType().getDisplayName());
-        set.put(labelProperty);
+        property = createReadOnlyPropertyField("label", NbBundle.getMessage(MetadataNode.class, "PropertySet.label"),
+                NbBundle.getMessage(MetadataNode.class, "PropertySet.label.desc"), String.class, edge.getLabel());
+        set.put(property);
 
-        // Name property
-        PropertySupport.ReadOnly nameProperty = createPropertyField("name", NbBundle.getMessage(GraphElementNode.class, "PropertySet.name"),
-                NbBundle.getMessage(MetadataNode.class, "PropertySet.name.desc"), String.class, metadata.getName());
-        set.put(nameProperty);
+        //Target propery
+        property = createReadOnlyPropertyField("target", NbBundle.getMessage(MetadataNode.class, "PropertySet.edge.target"),
+                NbBundle.getMessage(MetadataNode.class, "PropertySet.edge.target.desc"), String.class, edge.getTarget().getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
+        set.put(property);
+
+        sheet.put(set);
+
+        // Database reference
+        String[] xrefs = (String[]) edge.getAttribute("dbRef");
+        set = Sheet.createPropertiesSet();
+        set.setName("DbRef");
+        set.setDisplayName(NbBundle.getMessage(MetadataNode.class, "PropertySet.dbRef"));
+        StringTokenizer tokenizer;
+        String label, value;
+        for (String xref : xrefs) {
+            tokenizer = new StringTokenizer(xref, ":");
+            label = tokenizer.nextToken().trim();
+            value = tokenizer.nextToken().trim();
+            property = createReadOnlyPropertyField(label, label, NbBundle.getMessage(MetadataNode.class, "PropertySet.dbRef.desc"), String.class, value);
+            set.put(property);
+        }
 
         sheet.put(set);
         return sheet;
     }
 
-    private PropertySupport.ReadOnly createPropertyField(String name, String displayName, String description, Class type, final Object value) {
+    protected PropertySupport.ReadOnly createReadOnlyPropertyField(String name, String displayName, String description, Class type, final Object value) {
         PropertySupport.ReadOnly property = new PropertySupport.ReadOnly(name, type, displayName, description) {
 
             @Override

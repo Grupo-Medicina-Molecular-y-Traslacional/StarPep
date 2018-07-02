@@ -10,55 +10,35 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
-import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import javafx.scene.control.TableSelectionModel;
-import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
+import javax.swing.table.TableRowSorter;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AnnotationType;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.GraphEdgeAttributeColumn;
 import org.bapedis.core.model.GraphElementAttributeColumn;
 import org.bapedis.core.model.GraphElementDataColumn;
-import org.bapedis.core.model.GraphElementNode;
 import org.bapedis.core.model.GraphElementsDataTable;
-import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.MetadataNavigatorModel;
 import org.bapedis.core.model.MetadataNode;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.QueryModel;
+import org.bapedis.core.model.PeptideNode;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
-import org.bapedis.core.ui.components.MetadataTreeNodeLoader;
-import org.bapedis.core.ui.actions.AddToQueryModel;
-import org.bapedis.core.ui.actions.CenterNodeOnGraph;
-import org.bapedis.core.ui.actions.RemoveFromQueryModel;
-import org.bapedis.core.ui.actions.SelectNodeOnGraph;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.EdgeIterable;
 import org.gephi.graph.api.Element;
@@ -67,15 +47,16 @@ import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
-import org.openide.awt.MouseUtils;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
+import org.openide.util.LookupEvent;
+import org.openide.util.LookupListener;
+import org.openide.util.Utilities;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 
@@ -85,7 +66,7 @@ import org.openide.util.lookup.InstanceContent;
  */
 @NavigatorPanel.Registration(mimeType = "peptide/metadata", displayName = "#MetadataNavigator.name")
 public class MetadataNavigator extends JComponent implements
-        WorkspaceEventListener, NavigatorPanelWithToolbar {
+        WorkspaceEventListener, NavigatorPanelWithToolbar, LookupListener {
 
     protected final InstanceContent content;
     private final DefaultComboBoxModel comboBoxModel;
@@ -98,6 +79,7 @@ public class MetadataNavigator extends JComponent implements
     protected final JXBusyLabel busyLabel;
     protected final JLabel metadataSizeLabel;
     private MetadataNavigatorModel navigatorModel;
+    protected Lookup.Result<PeptideNode> lkpResult;
 
     /**
      * Creates new form LibraryPanel
@@ -107,6 +89,9 @@ public class MetadataNavigator extends JComponent implements
         initComponents();
         content = new InstanceContent();
         lookup = new AbstractLookup(content);
+
+        lkpResult = Utilities.actionsGlobalContext().lookupResult(PeptideNode.class);
+        lkpResult.addLookupListener(this);
 
         table = new JXTable();
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -140,7 +125,7 @@ public class MetadataNavigator extends JComponent implements
         for (AnnotationType aType : AnnotationType.values()) {
             comboBoxModel.addElement(new AnnotationItem(aType));
         }
-        
+
         comboBox = new JComboBox(comboBoxModel);
         comboBox.setSelectedIndex(-1);
         comboBox.addItemListener(new java.awt.event.ItemListener() {
@@ -272,10 +257,26 @@ public class MetadataNavigator extends JComponent implements
 
     }
 
+    @Override
+    public void resultChanged(LookupEvent le) {
+        if (le.getSource().equals(lkpResult)) {
+            AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
+            TableRowSorter sorter = item.getRowSorter();
+            if (sorter != null) {
+                Collection<? extends PeptideNode> peptideNodes = lkpResult.allInstances();
+                if (!peptideNodes.isEmpty()) {
+                    Peptide peptide = peptideNodes.iterator().next().getPeptide();
+                    sorter.setRowFilter(RowFilter.regexFilter("^" + peptide.getId() +"$", 0));
+                }
+            }
+        }
+    }
+
     private class AnnotationItem {
 
         private final GraphElementDataColumn[] columns;
         private final AnnotationType annotationType;
+        private TableRowSorter sorter;
 
         public AnnotationItem(AnnotationType annotationType) {
             this.annotationType = annotationType;
@@ -297,6 +298,8 @@ public class MetadataNavigator extends JComponent implements
             final AttributesModel peptidesModel = pc.getAttributesModel();
             final GraphElementsDataTable dataModel = new GraphElementsDataTable(count, columns);
             table.setModel(dataModel);
+            sorter = new TableRowSorter(dataModel);
+            table.setRowSorter(sorter);
 
             SwingWorker worker = new SwingWorker<Void, Element>() {
                 @Override
@@ -342,6 +345,10 @@ public class MetadataNavigator extends JComponent implements
 
         public AnnotationType getAnnotationType() {
             return annotationType;
+        }
+
+        public TableRowSorter getRowSorter() {
+            return sorter;
         }
 
         @Override

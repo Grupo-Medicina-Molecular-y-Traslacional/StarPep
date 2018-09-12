@@ -19,15 +19,15 @@ import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.actions.Presenter;
 
-@ActionID(
-        category = "View",
-        id = "org.bapedis.core.ui.actions.SelectToolbar"
-)
-@ActionRegistration(
-        displayName = "#CTL_SelectToolbar"
-)
-@ActionReference(path = "Menu/View", position = 650)
-@Messages("CTL_SelectToolbar=Select Toolbar")
+//@ActionID(
+//        category = "View",
+//        id = "org.bapedis.core.ui.actions.SelectToolbar"
+//)
+//@ActionRegistration(
+//        displayName = "#CTL_SelectToolbar"
+//)
+//@ActionReference(path = "Menu/View", position = 650)
+//@Messages("CTL_SelectToolbar=Toolbar")
 public final class SelectToolbar extends AbstractAction implements Presenter.Menu {
 
     public SelectToolbar() {        

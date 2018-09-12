@@ -49,7 +49,7 @@ import org.openide.util.actions.Presenter;
         lazy = false
 )
 @ActionReferences({
-    @ActionReference(path = "Menu/View", position = 80, separatorAfter = 99),
+    @ActionReference(path = "Menu/File", position = 80),
     @ActionReference(path = "Toolbars/Workspace", position = 50)
 })
 public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar, Presenter.Menu, WorkspaceEventListener, LookupListener, PropertyChangeListener {

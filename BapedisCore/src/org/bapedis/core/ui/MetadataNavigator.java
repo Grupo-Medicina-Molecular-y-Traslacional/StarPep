@@ -282,7 +282,8 @@ public class MetadataNavigator extends JComponent implements
             this.annotationType = annotationType;
             GraphModel graphModel = pc.getGraphModel();
             columns = new GraphElementDataColumn[]{new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Source),
-                new GraphElementAttributeColumn(graphModel.getEdgeTable().getColumn("label")),
+                new GraphElementAttributeColumn(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.labelColumn.name"), 
+                                                graphModel.getEdgeTable().getColumn("label")),
                 new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Targe)};
 
         }

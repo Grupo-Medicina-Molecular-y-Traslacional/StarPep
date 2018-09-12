@@ -14,8 +14,14 @@ import org.gephi.graph.api.Element;
  */
 public class GraphElementAttributeColumn implements GraphElementDataColumn{
     private final Column column;
+    private final String name;
 
     public GraphElementAttributeColumn(Column column) {
+        this(column.getTitle(), column);
+    }
+        
+    public GraphElementAttributeColumn(String name, Column column) {
+        this.name = name;
         this.column = column;
     }
 
@@ -26,7 +32,7 @@ public class GraphElementAttributeColumn implements GraphElementDataColumn{
 
     @Override
     public String getColumnName() {
-        return column.getTitle();
+        return name;
     }
 
     @Override

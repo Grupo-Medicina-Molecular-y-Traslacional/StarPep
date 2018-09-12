@@ -20,6 +20,7 @@ import org.openide.windows.WindowManager;
 public class Installer extends ModuleInstall implements WorkspaceEventListener, PropertyChangeListener {
 
     private ProjectManager pc;
+    private String titleWind;
 
     @Override
     public void restored() {
@@ -42,9 +43,9 @@ public class Installer extends ModuleInstall implements WorkspaceEventListener, 
                 
                 // Navigator windows
                 TopComponent tc = WindowManager.getDefault().findTopComponent("navigatorTC"); //NOI18N
-                tc.open();
+                tc.open();                
             }
-        });
+        });        
     }
 
     @Override
@@ -60,8 +61,11 @@ public class Installer extends ModuleInstall implements WorkspaceEventListener, 
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
 
             @Override
-            public void run() {
-                WindowManager.getDefault().getMainWindow().setTitle("Bapedis v0.5.7 - " + workspace.getName());
+            public void run() {  
+                if (titleWind == null){
+                    titleWind = WindowManager.getDefault().getMainWindow().getTitle();
+                }
+                WindowManager.getDefault().getMainWindow().setTitle(titleWind + " - " + workspace.getName());
             }
         });
     }

@@ -96,6 +96,7 @@ public class GraphElementNode extends AbstractNode {
         PropertySupport.Reflection property = new PropertySupport.Reflection(this, Color.class, "getElementColor", "setElementColor");
         property.setDisplayName(NbBundle.getMessage(GraphElementNode.class, "PropertySet.color.text"));
         property.setName("color");
+        property.setShortDescription(NbBundle.getMessage(GraphElementNode.class, "PropertySet.attributes.desc"));
         return property;
     }
 
@@ -103,6 +104,7 @@ public class GraphElementNode extends AbstractNode {
         PropertySupport.Reflection property = new PropertySupport.Reflection(this, Float.TYPE, "getLabelSize", "setLabelSize");
         property.setDisplayName(NbBundle.getMessage(GraphElementNode.class, "PropertySet.label.size.text"));
         property.setName("labelsize");
+        property.setShortDescription(NbBundle.getMessage(GraphElementNode.class, "PropertySet.attributes.desc"));
         return property;
     }
 
@@ -110,6 +112,7 @@ public class GraphElementNode extends AbstractNode {
         PropertySupport.Reflection property = new PropertySupport.Reflection(this, Color.class, "getLabelColor", "setLabelColor");
         property.setDisplayName(NbBundle.getMessage(GraphElementNode.class, "PropertySet.label.color.text"));
         property.setName("labelcolor");
+        property.setShortDescription(NbBundle.getMessage(GraphElementNode.class, "PropertySet.attributes.desc"));
         return property;
     }
 
@@ -117,6 +120,7 @@ public class GraphElementNode extends AbstractNode {
         PropertySupport.Reflection property = new PropertySupport.Reflection(this, Boolean.TYPE, "isLabelVisible", "setLabelVisible");
         property.setDisplayName(NbBundle.getMessage(GraphElementNode.class, "PropertySet.label.visible.text"));
         property.setName("labelvisible");
+        property.setShortDescription(NbBundle.getMessage(GraphElementNode.class, "PropertySet.attributes.desc"));
         return property;
     }
 

@@ -9,6 +9,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.util.Collection;
 import java.util.List;
@@ -25,6 +27,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.RowSorterEvent;
+import javax.swing.event.RowSorterListener;
 import javax.swing.table.TableRowSorter;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AnnotationType;
@@ -73,7 +77,7 @@ public class MetadataNavigator extends JComponent implements
     protected final ProjectManager pc;
     protected final Lookup lookup;
     protected final JToolBar toolBar, bottomToolbar;
-    protected final JButton findButton;
+    protected final JButton findButton, refreshButton;
     protected final JComboBox comboBox;
     protected final JXTable table;
     protected final JXBusyLabel busyLabel;
@@ -105,7 +109,7 @@ public class MetadataNavigator extends JComponent implements
             public void valueChanged(ListSelectionEvent e) {
                 tableValueChanged(e);
             }
-        });
+        });        
 
         scrollPane.setViewportView(table);
 
@@ -134,9 +138,24 @@ public class MetadataNavigator extends JComponent implements
             }
         });
 
+        // Tool bar
         toolBar = new JToolBar();
         toolBar.setFloatable(false);
         toolBar.add(comboBox);
+        
+        refreshButton = new JButton(ImageUtilities.loadImageIcon("org/bapedis/core/resources/refresh.png", false));
+        refreshButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
+                TableRowSorter sorter = item.getRowSorter();
+                if (sorter != null) {
+                    sorter.setRowFilter(null);
+                }
+            }
+        });
+        toolBar.add(refreshButton);
+        
         toolBar.addSeparator();
         toolBar.add(findButton);
 
@@ -144,6 +163,7 @@ public class MetadataNavigator extends JComponent implements
         bottomToolbar = new JToolBar();
         bottomToolbar.setFloatable(false);
         metadataSizeLabel = new JLabel();
+        metadataSizeLabel.setIcon(ImageUtilities.loadImageIcon("/org/bapedis/core/resources/rightArrow.png", false));        
         bottomToolbar.add(metadataSizeLabel);
         add(bottomToolbar, BorderLayout.SOUTH);
     }
@@ -266,7 +286,7 @@ public class MetadataNavigator extends JComponent implements
                 Collection<? extends PeptideNode> peptideNodes = lkpResult.allInstances();
                 if (!peptideNodes.isEmpty()) {
                     Peptide peptide = peptideNodes.iterator().next().getPeptide();
-                    sorter.setRowFilter(RowFilter.regexFilter("^" + peptide.getId() +"$", 0));
+                    sorter.setRowFilter(RowFilter.regexFilter("^" + peptide.getId() + "$", 0));                    
                 }
             }
         }
@@ -276,16 +296,22 @@ public class MetadataNavigator extends JComponent implements
 
         private final GraphElementDataColumn[] columns;
         private final AnnotationType annotationType;
+        private final RowSorterListener sorterListener;
         private TableRowSorter sorter;
 
         public AnnotationItem(AnnotationType annotationType) {
             this.annotationType = annotationType;
             GraphModel graphModel = pc.getGraphModel();
             columns = new GraphElementDataColumn[]{new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Source),
-                new GraphElementAttributeColumn(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.labelColumn.name"), 
-                                                graphModel.getEdgeTable().getColumn("label")),
+                new GraphElementAttributeColumn(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.labelColumn.name"),
+                graphModel.getEdgeTable().getColumn("label")),
                 new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Targe)};
-
+            sorterListener = new RowSorterListener() {
+                @Override
+                public void sorterChanged(RowSorterEvent e) {
+                    metadataSizeLabel.setText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.metadataSizeLabel.text", table.getRowCount()));                    
+                }
+            };
         }
 
         public void reload() {
@@ -300,6 +326,7 @@ public class MetadataNavigator extends JComponent implements
             final GraphElementsDataTable dataModel = new GraphElementsDataTable(count, columns);
             table.setModel(dataModel);
             sorter = new TableRowSorter(dataModel);
+            sorter.addRowSorterListener(sorterListener);
             table.setRowSorter(sorter);
 
             SwingWorker worker = new SwingWorker<Void, Element>() {
@@ -335,7 +362,7 @@ public class MetadataNavigator extends JComponent implements
                     } catch (InterruptedException | ExecutionException ex) {
                         Exceptions.printStackTrace(ex);
                     } finally {
-                        metadataSizeLabel.setText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.metadataSizeLabel.text", dataModel.getRowCount()));
+                        metadataSizeLabel.setText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.metadataSizeLabel.text", table.getRowCount()));
                         setBusyLabel(false);
                     }
                 }

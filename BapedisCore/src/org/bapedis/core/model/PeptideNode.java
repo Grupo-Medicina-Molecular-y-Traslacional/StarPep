@@ -89,51 +89,13 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
                 NbBundle.getMessage(PeptideNode.class, "PropertySet.seq.desc"), String.class, peptide.getSequence());
         set.put(property);
         sheet.put(set);
-
-        // Annotations
-        NodeIterable neighbors;
-        Edge edge;
-        String name;
-        String desc = "";
-        int count;
-        for (AnnotationType aType : AnnotationType.values()) {
-            count = 1;
-            set = Sheet.createPropertiesSet();
-            set.setName(aType.name().toLowerCase());
-            set.setDisplayName(aType.getDisplayName());
-            neighbors = peptide.getNeighbors(aType);
-            for (Node neighbor : neighbors) {
-                edge = peptide.getEdge(neighbor, aType);
-                name = (String)neighbor.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME);
-                desc = edge.getLabel() + " " + name;
-                property = createPropertyField(aType.getDisplayName() + count, aType.getDisplayName(),
-                        desc, String.class, name);
-                set.put(property);
-                count++;
-            }
-            sheet.put(set);
-        }
-
-        // Databases
-//        set = Sheet.createPropertiesSet();
-//        set.setName("databases");
-//        set.setDisplayName(NbBundle.getMessage(NeoPeptideNode.class, "PropertySet.databases"));
-//        StringTokenizer tokenizer;
-//        String label, value;
-//        for (String xref : ((NeoPeptide) peptide).getXref()) {
-//            tokenizer = new StringTokenizer(xref, ":");
-//            label = tokenizer.nextToken().trim();
-//            value = tokenizer.nextToken().trim();
-//            PropertySupport.ReadOnly property = createPropertyField(label, label, label, String.class, value);
-//            set.put(property);
-//        }
-//        sheet.put(set);
+        
         // Descriptors
         for (PeptideAttribute attr : peptide.getAttributes()) {
             if (attr instanceof MolecularDescriptor) {
                 setMolecularFeature((MolecularDescriptor)attr);
             }
-        }
+        }        
 
         return sheet;
     }
@@ -144,7 +106,7 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
         if (set == null) {
             set = Sheet.createPropertiesSet();
             set.setName(category);
-            set.setValue("tabName", NbBundle.getMessage(PeptideNode.class, "PropertySet.md.tabName"));
+//            set.setValue("tabName", NbBundle.getMessage(PeptideNode.class, "PropertySet.md.tabName"));
             set.setDisplayName(category);
             sheet.put(set);
         }

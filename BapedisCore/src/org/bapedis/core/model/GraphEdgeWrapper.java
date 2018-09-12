@@ -37,28 +37,28 @@ public class GraphEdgeWrapper extends GraphElementNode {
         Sheet.Set set = Sheet.createPropertiesSet();
         sheet.put(set);
         set.setName("primary");
-        set.setDisplayName(NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.primary"));
-
-        // Label property
-        property = createReadOnlyPropertyField("label", NbBundle.getMessage(GraphElementNode.class, "PropertySet.label"),
-                NbBundle.getMessage(GraphElementNode.class, "PropertySet.label.desc"), String.class, element.getLabel());
-        set.put(property);
+        set.setDisplayName(NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.relationship"));
 
         //Source propery
         property = createReadOnlyPropertyField("source", NbBundle.getMessage(GraphElementNode.class, "PropertySet.edge.source"),
-                NbBundle.getMessage(GraphElementNode.class, "PropertySet.edge.source.desc"), String.class, edge.getSource().getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
+                NbBundle.getMessage(GraphElementNode.class, "PropertySet.edge.source.desc", edge.getSource().getLabel()), String.class, edge.getSource().getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
+        set.put(property);
+        
+        // Label property
+        property = createReadOnlyPropertyField("label", NbBundle.getMessage(GraphElementNode.class, "PropertySet.edge.label"),
+                NbBundle.getMessage(GraphElementNode.class, "PropertySet.edge.label.desc"), String.class, element.getLabel());
         set.put(property);
 
         //Target propery
         property = createReadOnlyPropertyField("target", NbBundle.getMessage(GraphElementNode.class, "PropertySet.edge.target"),
-                NbBundle.getMessage(GraphElementNode.class, "PropertySet.edge.target.desc"), String.class, edge.getTarget().getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
+                NbBundle.getMessage(GraphElementNode.class, "PropertySet.edge.target.desc", edge.getTarget().getLabel()), String.class, edge.getTarget().getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
         set.put(property);
 
         // Graph set
         set = Sheet.createPropertiesSet();
         sheet.put(set);
         set.setName("graph");
-        set.setDisplayName(NbBundle.getMessage(GraphEdgeWrapper.class, "PropertySet.graph"));
+        set.setDisplayName(NbBundle.getMessage(GraphEdgeWrapper.class, "PropertySet.attributes"));
         
         try {
             //Color:                

@@ -40,7 +40,7 @@ public class GraphNodeWrapper extends GraphElementNode {
         Sheet.Set set = Sheet.createPropertiesSet();
         sheet.put(set);
         set.setName("primary");
-        set.setDisplayName(NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.primary"));
+        set.setDisplayName(NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.node"));
         
         // Name property
         name = NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.name");
@@ -60,13 +60,14 @@ public class GraphNodeWrapper extends GraphElementNode {
         set = Sheet.createPropertiesSet();
         sheet.put(set);
         set.setName("graph");
-        set.setDisplayName(NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.graph"));
+        set.setDisplayName(NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.attributes"));
 
         try {
             //Size:
             property = new PropertySupport.Reflection(node, Float.TYPE, "size", "setSize");
             property.setDisplayName(NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.size.text"));
             property.setName("size");
+            property.setShortDescription(NbBundle.getMessage(GraphElementNode.class, "PropertySet.attributes.desc"));
             set.put(property);            
 
             //All position coordinates:
@@ -107,6 +108,7 @@ public class GraphNodeWrapper extends GraphElementNode {
         Property p = new PropertySupport.Reflection(node, Float.TYPE, coordinate, "set" + coordinate.toUpperCase());
         p.setDisplayName(NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.position.text", coordinate));
         p.setName(coordinate);
+        p.setShortDescription(NbBundle.getMessage(GraphElementNode.class, "PropertySet.attributes.desc"));
         return p;
     }    
 }

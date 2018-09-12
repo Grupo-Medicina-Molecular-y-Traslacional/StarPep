@@ -43,21 +43,21 @@ public class MetadataNode extends AbstractNode {
         Sheet.Set set = Sheet.createPropertiesSet();
         sheet.put(set);
         set.setName("primary");
-        set.setDisplayName(NbBundle.getMessage(MetadataNode.class, "PropertySet.primary"));
+        set.setDisplayName(NbBundle.getMessage(MetadataNode.class, "PropertySet.relationship"));
         
         //Source propery
         property = createReadOnlyPropertyField("source", NbBundle.getMessage(MetadataNode.class, "PropertySet.edge.source"),
-                NbBundle.getMessage(MetadataNode.class, "PropertySet.edge.source.desc"), String.class, edge.getSource().getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
+                NbBundle.getMessage(MetadataNode.class, "PropertySet.edge.source.desc", edge.getSource().getLabel()), String.class, edge.getSource().getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
         set.put(property);
         
         // Label property
-        property = createReadOnlyPropertyField("label", NbBundle.getMessage(MetadataNode.class, "PropertySet.label"),
-                NbBundle.getMessage(MetadataNode.class, "PropertySet.label.desc"), String.class, edge.getLabel());
+        property = createReadOnlyPropertyField("label", NbBundle.getMessage(MetadataNode.class, "PropertySet.edge.label"),
+                NbBundle.getMessage(MetadataNode.class, "PropertySet.edge.label.desc"), String.class, edge.getLabel());
         set.put(property);
 
         //Target propery
         property = createReadOnlyPropertyField("target", NbBundle.getMessage(MetadataNode.class, "PropertySet.edge.target"),
-                NbBundle.getMessage(MetadataNode.class, "PropertySet.edge.target.desc"), String.class, edge.getTarget().getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
+                NbBundle.getMessage(MetadataNode.class, "PropertySet.edge.target.desc", edge.getTarget().getLabel()), String.class, edge.getTarget().getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
         set.put(property);
 
         sheet.put(set);

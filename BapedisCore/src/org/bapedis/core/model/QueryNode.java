@@ -66,6 +66,9 @@ public class QueryNode extends AbstractNode {
         Sheet sheet = Sheet.createDefault();
         Sheet.Set set = Sheet.createPropertiesSet();
 
+        // Primary set
+        set.setName("primary");
+        set.setDisplayName(NbBundle.getMessage(MetadataNode.class, "PropertySet.node"));        
         if (metadata != null) {
             // Label property
             PropertySupport.ReadOnly labelProperty;

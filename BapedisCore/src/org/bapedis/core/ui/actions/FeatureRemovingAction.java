@@ -20,16 +20,16 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 
-@ActionID(
-        category = "Tools",
-        id = "org.bapedis.core.ui.actions.FeatureRemoving"
-)
-@ActionRegistration(
-        iconBase = "org/bapedis/core/resources/delete_md.gif",
-        displayName = "#CTL_FeatureRemoving"
-)
-@ActionReference(path = "Menu/Tools/Feature", position = 250)
-@Messages("CTL_FeatureRemoving=Removing")
+//@ActionID(
+//        category = "Tools",
+//        id = "org.bapedis.core.ui.actions.FeatureRemoving"
+//)
+//@ActionRegistration(
+//        iconBase = "org/bapedis/core/resources/delete_md.gif",
+//        displayName = "#CTL_FeatureRemoving"
+//)
+//@ActionReference(path = "Menu/Tools/Feature", position = 250)
+//@Messages("CTL_FeatureRemoving=Removing")
 public final class FeatureRemovingAction extends WorkspaceContextSensitiveAction<AttributesModel> {
 
     protected final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);

@@ -13,9 +13,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -26,10 +23,8 @@ import java.util.Collection;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSlider;
@@ -42,14 +37,11 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import org.bapedis.core.events.WorkspaceEventListener;
-import org.bapedis.core.model.AnnotationType;
 import org.bapedis.core.model.FilterModel;
-import org.bapedis.core.model.GraphViz;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.GraphElementNavigatorLookupHint;
-import org.bapedis.core.ui.MetadataNavigatorLookupHint;
 import org.gephi.graph.api.Node;
 import org.gephi.ui.components.JColorBlackWhiteSwitcher;
 import org.gephi.ui.components.JColorButton;
@@ -70,8 +62,6 @@ import org.jdesktop.swingx.JXHyperlink;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
-import org.openide.DialogDescriptor;
-import org.openide.DialogDisplayer;
 import org.openide.awt.DropDownButtonFactory;
 import org.openide.awt.UndoRedo;
 import org.openide.util.ImageUtilities;
@@ -111,7 +101,6 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     private final JPopupButton labelSizeModeButton = new JPopupButton();
     private final JPopupButton labelColorModeButton = new JPopupButton();
     private final JSlider nodeSizeSlider = new JSlider();
-    private final JButton metadataButton = new JButton();
     //Edge
     private final JToggleButton showEdgeButton = new JToggleButton();
     private final JToggleButton edgeHasNodeColorButton = new JToggleButton();
@@ -289,33 +278,6 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                 }
             }
         });
-
-        topToolbar.addSeparator();
-
-        // Relationships
-        metadataButton.setFocusable(false);
-        metadataButton.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.metadataButton.text"));
-        metadataButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.metadataButton.toolTipText"));
-        metadataButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/relationships.png", false));
-        metadataButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GraphViz graphViz = pc.getGraphViz();
-                MetadataPanel metadataPanel = new MetadataPanel(graphViz);
-                DialogDescriptor dd = new DialogDescriptor(metadataPanel, NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.metadataPanel.title"));
-                dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION});
-                if (DialogDisplayer.getDefault().notify(dd) == DialogDescriptor.OK_OPTION) {
-                    for (MetadataCheckBox mcb : metadataPanel.getMetadataCheckBoxs()) {
-                        if (mcb.getCheckBox().isSelected()) {
-                            graphViz.addDisplayedMetadata(mcb.getAnnotationType());
-                        } else {
-                            graphViz.removeDisplayedMetadata(mcb.getAnnotationType());
-                        }
-                    }
-                }
-            }
-        });
-        topToolbar.add(metadataButton);
 
         topToolbar.addSeparator();
 
@@ -977,86 +939,4 @@ class MouseSelectionPopupPanel extends javax.swing.JPanel {
     }
 }
 
-class MetadataPanel extends JPanel {
 
-    MetadataCheckBox[] metadataCheckBoxs;
-    JLabel metadataInfoLabel;
-    JPanel centerPanel;
-
-    public MetadataPanel(GraphViz graphViz) {
-        super(new GridBagLayout());
-        setMinimumSize(new Dimension(440, 220));
-        setPreferredSize(new Dimension(440, 220));
-
-        GridBagConstraints gridBagConstraints;
-
-        // Label
-        metadataInfoLabel = new JLabel(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.metadataPanel.label"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        add(metadataInfoLabel, gridBagConstraints);
-
-        // Center Panel
-        centerPanel = new JPanel(new GridBagLayout());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 5);
-        add(centerPanel, gridBagConstraints);
-        initMetadataCheckBoxs(graphViz);
-    }
-
-    private void initMetadataCheckBoxs(GraphViz graphViz) {
-        GridBagConstraints gridBagConstraints;
-        AnnotationType[] arr = AnnotationType.values();
-        metadataCheckBoxs = new MetadataCheckBox[arr.length];
-        MetadataCheckBox mcb;
-        JCheckBox cb;
-        for (int i = 0; i < arr.length; i++) {
-            mcb = new MetadataCheckBox(arr[i]);
-            metadataCheckBoxs[i] = mcb;
-            cb = mcb.getCheckBox();
-            cb.setFocusable(false);
-            cb.setSelected(graphViz.isDisplayedMetadata(arr[i]));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = i;
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(2, 5, 0, 0);
-            centerPanel.add(cb, gridBagConstraints);
-        }
-    }
-
-    public MetadataCheckBox[] getMetadataCheckBoxs() {
-        return metadataCheckBoxs;
-    }
-
-}
-
-class MetadataCheckBox {
-
-    private final JCheckBox cb;
-    private final AnnotationType aType;
-
-    public MetadataCheckBox(AnnotationType aType) {
-        this.aType = aType;
-        cb = new JCheckBox(aType.getDisplayName());
-    }
-
-    public JCheckBox getCheckBox() {
-        return cb;
-    }
-
-    public AnnotationType getAnnotationType() {
-        return aType;
-    }
-
-}

@@ -19,12 +19,12 @@ import org.openide.util.NbBundle;
         id = "org.bapedis.core.ui.actions.RenameWorkspace"
 )
 @ActionRegistration(
-        iconBase = "org/bapedis/core/resources/renameWorkspace.png",
+//        iconBase = "org/bapedis/core/resources/renameWorkspace.png",
         displayName = "#CTL_RenameWorkspace"
 )
 @ActionReferences({
     @ActionReference(path = "Menu/File", position = 240),
-    @ActionReference(path = "Toolbars/Workspace", position = 150)
+//    @ActionReference(path = "Toolbars/Workspace", position = 150)
 })
 public class RenameWorkspace implements ActionListener {
 

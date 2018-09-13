@@ -94,9 +94,6 @@ public class MetadataNavigator extends JComponent implements
         content = new InstanceContent();
         lookup = new AbstractLookup(content);
 
-        lkpResult = Utilities.actionsGlobalContext().lookupResult(PeptideNode.class);
-        lkpResult.addLookupListener(this);
-
         table = new JXTable();
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setGridColor(Color.LIGHT_GRAY);
@@ -256,6 +253,9 @@ public class MetadataNavigator extends JComponent implements
 
     @Override
     public void panelActivated(Lookup lkp) {
+        lkpResult = Utilities.actionsGlobalContext().lookupResult(PeptideNode.class);
+        lkpResult.addLookupListener(this);
+        
         pc.addWorkspaceEventListener(this);
         Workspace currentWorkspace = pc.getCurrentWorkspace();
         workspaceChanged(null, currentWorkspace);
@@ -263,6 +263,7 @@ public class MetadataNavigator extends JComponent implements
 
     @Override
     public void panelDeactivated() {
+        lkpResult.removeLookupListener(this);
         pc.removeWorkspaceEventListener(this);
     }
 

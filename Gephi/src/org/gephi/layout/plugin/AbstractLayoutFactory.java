@@ -7,11 +7,11 @@ package org.gephi.layout.plugin;
 
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.GephiTag;
 import org.openide.util.NbBundle;
+import org.bapedis.core.spi.alg.NetworkTag;
 
 
-public abstract class AbstractLayoutFactory implements AlgorithmFactory, GephiTag {
+public abstract class AbstractLayoutFactory implements AlgorithmFactory, NetworkTag {
 
     @Override
     public String getCategory() {

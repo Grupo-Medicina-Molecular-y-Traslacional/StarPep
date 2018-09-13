@@ -39,51 +39,56 @@ public class ToolAction extends WorkspaceContextSensitiveAction<AttributesModel>
         populateMenu();
     }
 
+    public static ActionListener createActionListener(AlgorithmFactory factory, Class tagClass) {
+        
+        return new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Workspace currentWS = pc.getCurrentWorkspace();
+                if (currentWS.isBusy()) {
+                    DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
+                } else {
+                    AlgorithmModel algoModel = pc.getAlgorithmModel();
+                    algoModel.setTagInterface(tagClass);
+
+                    Workspace currentWs = pc.getCurrentWorkspace();
+                    Collection<? extends Algorithm> savedAlgo = currentWs.getLookup().lookupAll(Algorithm.class);
+                    Algorithm algorithm = null;
+                    for (Algorithm algo : savedAlgo) {
+                        if (algo.getFactory() == factory) {
+                            algorithm = algo;
+                            break;
+                        }
+                    }
+                    boolean addToWS = false;
+                    if (algorithm == null) {
+                        algorithm = factory.createAlgorithm();
+                        addToWS = true;
+                    }
+
+                    if (algorithm != null) {
+                        if (addToWS) {
+                            currentWs.add(algorithm);
+                        }
+                        algoModel.setSelectedAlgorithm(algorithm);
+
+                        TopComponent tc = WindowManager.getDefault().findTopComponent("AlgoExplorerTopComponent");
+                        tc.open();
+                        tc.requestActive();
+                    }
+                }
+            }
+        };
+    }
+
     private void populateMenu() {
         JMenuItem item;
         for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
             final AlgorithmFactory factory = it.next();
             if (tag.isAssignableFrom(factory.getClass())) {
                 item = new JMenuItem(factory.getName());
-                item.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        Workspace currentWS = pc.getCurrentWorkspace();
-                        if (currentWS.isBusy()) {
-                            DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
-                        } else {
-                            AlgorithmModel algoModel = pc.getAlgorithmModel();
-                            algoModel.setTagInterface(tag);
-
-                            Workspace currentWs = pc.getCurrentWorkspace();
-                            Collection<? extends Algorithm> savedAlgo = currentWs.getLookup().lookupAll(Algorithm.class);
-                            Algorithm algorithm = null;
-                            for (Algorithm algo : savedAlgo) {
-                                if (algo.getFactory() == factory) {
-                                    algorithm = algo;
-                                    break;
-                                }
-                            }
-                            boolean addToWS = false;
-                            if (algorithm == null) {
-                                algorithm = factory.createAlgorithm();
-                                addToWS = true;
-                            }
-
-                            if (algorithm != null) {
-                                if (addToWS) {
-                                    currentWs.add(algorithm);
-                                }
-                                algoModel.setSelectedAlgorithm(algorithm);
-
-                                TopComponent tc = WindowManager.getDefault().findTopComponent("AlgoExplorerTopComponent");
-                                tc.open();
-                                tc.requestActive();
-                            }
-                        }
-                    }
-                });
-                JMenu menu = factory.getCategory() == null? main: getOrCreateMenu(factory.getCategory());
+                item.addActionListener(createActionListener(factory, tag));
+                JMenu menu = factory.getCategory() == null ? main : getOrCreateMenu(factory.getCategory());
                 ToolMenuItem toolItem = factory instanceof ToolMenuItem ? (ToolMenuItem) factory : null;
                 if (toolItem != null && toolItem.addSeparatorBefore()) {
                     menu.addSeparator();
@@ -105,7 +110,7 @@ public class ToolAction extends WorkspaceContextSensitiveAction<AttributesModel>
                 menu = (JMenu) item;
             }
         }
-        if (menu == null){
+        if (menu == null) {
             menu = new JMenu(category);
             menu.setName(category);
             main.add(menu);

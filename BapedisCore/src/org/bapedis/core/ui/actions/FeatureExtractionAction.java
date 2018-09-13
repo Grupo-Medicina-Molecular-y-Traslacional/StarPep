@@ -15,15 +15,15 @@ import org.bapedis.core.spi.alg.MolecularDescriptorTag;
  *
  * @author loge
  */
-@ActionID(
-        category = "Tools",
-        id = "org.bapedis.core.ui.actions.FeatureExtraction"
-)
-@ActionRegistration(
-        displayName = "#CTL_FeatureExtraction"
-)
-@ActionReference(path = "Menu/Tools", position = 200)
-@NbBundle.Messages("CTL_FeatureExtraction=Molecular Descriptor")
+//@ActionID(
+//        category = "Tools",
+//        id = "org.bapedis.core.ui.actions.FeatureExtraction"
+//)
+//@ActionRegistration(
+//        displayName = "#CTL_FeatureExtraction"
+//)
+//@ActionReference(path = "Menu/Tools", position = 200)
+//@NbBundle.Messages("CTL_FeatureExtraction=Molecular Descriptor")
 public class FeatureExtractionAction extends ToolAction{
     
     public FeatureExtractionAction() {

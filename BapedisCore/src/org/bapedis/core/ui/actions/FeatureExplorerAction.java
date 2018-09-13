@@ -25,7 +25,7 @@ import org.openide.util.NbBundle.Messages;
         iconBase = "org/bapedis/core/resources/select_md.png",
         displayName = "#CTL_FeatureExplorer"
 )
-@ActionReference(path = "Menu/Tools/Feature", position = 350)
+@ActionReference(path = "Menu/Tools/MolecularDescriptor", position = 10)
 @Messages("CTL_FeatureExplorer=Explorer")
 public final class FeatureExplorerAction extends WorkspaceContextSensitiveAction<AttributesModel> {
 

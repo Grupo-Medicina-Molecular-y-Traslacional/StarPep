@@ -5,12 +5,11 @@
  */
 package org.bapedis.core.ui.actions;
 
-import javax.swing.JMenuItem;
-import org.bapedis.core.spi.alg.GephiTag;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
+import org.bapedis.core.spi.alg.NetworkTag;
 
 /**
  *
@@ -18,19 +17,20 @@ import org.openide.util.NbBundle;
  */
 @ActionID(
         category = "Tools",
-        id = "org.bapedis.core.ui.actions.GephiAction"
+        id = "org.bapedis.core.ui.actions.NetworkAction"
 )
 @ActionRegistration(
-        displayName = "#CTL_Gephi"
+        displayName = "#CTL_Network"
 )
 @ActionReference(path = "Menu/Tools", position = 100)
-@NbBundle.Messages("CTL_Gephi=Based on Gephi")
-public class GephiAction extends ToolAction {
+@NbBundle.Messages("CTL_Network=Network")
+public class NetworkAction extends ToolAction {
     
-    public GephiAction() {
-        super(NbBundle.getMessage(GephiAction.class, "CTL_Gephi"),
-                GephiTag.class);        
-        main.insert(new ShowGraph(), 0);
+    public NetworkAction() {
+        super(NbBundle.getMessage(NetworkAction.class, "CTL_Network"),
+                NetworkTag.class);        
+        main.insert(new ShowMetadataNetwork(), 0);
+//        main.insert(new ChemicalSpaceAction(), 1);
     }     
     
 }

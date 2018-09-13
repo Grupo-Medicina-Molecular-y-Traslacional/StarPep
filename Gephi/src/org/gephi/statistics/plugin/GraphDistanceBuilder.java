@@ -44,16 +44,16 @@ package org.gephi.statistics.plugin;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.GephiTag;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+import org.bapedis.core.spi.alg.NetworkTag;
 
 /**
  *
  * @author pjmcswee
  */
 @ServiceProvider(service=AlgorithmFactory.class)
-public class GraphDistanceBuilder implements AlgorithmFactory, GephiTag {
+public class GraphDistanceBuilder implements AlgorithmFactory, NetworkTag {
 
     @Override
     public String getName() {

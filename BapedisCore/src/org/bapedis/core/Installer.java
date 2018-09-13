@@ -28,24 +28,25 @@ public class Installer extends ModuleInstall implements WorkspaceEventListener, 
         pc.newProject();
         pc.addWorkspaceEventListener(this);
         workspaceChanged(null, pc.getCurrentWorkspace());
-        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
-
-            @Override
-            public void run() {
-                Toolbar tb = ToolbarPool.getDefault().findToolbar("Memory");
-                if (tb != null) {
-                    tb.setVisible(false);
-                }
-
-                // Property windows
-//                TopComponent tc = WindowManager.getDefault().findTopComponent("properties"); // NOI18N
-//                tc.open();
-                
-                // Navigator windows
-                TopComponent tc = WindowManager.getDefault().findTopComponent("navigatorTC"); //NOI18N
-                tc.open();                
-            }
-        });        
+//        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
+//
+//            @Override
+//            public void run() {
+////                Toolbar tb = ToolbarPool.getDefault().findToolbar("Memory");
+////                if (tb != null) {
+////                    tb.setVisible(false);
+////                }
+//                
+//                // Property windows
+////                TopComponent tc = WindowManager.getDefault().findTopComponent("properties"); // NOI18N
+////                tc.open();
+//                
+//                // Navigator windows
+////                TopComponent tc = WindowManager.getDefault().findTopComponent("navigatorTC"); //NOI18N
+////                tc.open();          
+//
+//            }
+//        });        
     }
 
     @Override

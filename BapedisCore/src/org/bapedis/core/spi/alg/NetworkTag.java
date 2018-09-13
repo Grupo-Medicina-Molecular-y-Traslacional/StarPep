@@ -9,6 +9,6 @@ package org.bapedis.core.spi.alg;
  *
  * @author loge
  */
-public interface GephiTag extends AlgorithmFactory{
+public interface NetworkTag extends AlgorithmFactory{
     
 }

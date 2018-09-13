@@ -8,17 +8,17 @@ package org.gephi.appearance.plugin;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.GephiTag;
 import org.gephi.desktop.appearance.AppearanceSetupUIPanel;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+import org.bapedis.core.spi.alg.NetworkTag;
 
 /**
  *
  * @author loge
  */
 @ServiceProvider(service = AlgorithmFactory.class, position = 10)
-public class AppearanceAlgorithmFactory implements AlgorithmFactory, GephiTag{
+public class AppearanceAlgorithmFactory implements AlgorithmFactory, NetworkTag{
 
     private final AppearanceSetupUIPanel setupUI = new AppearanceSetupUIPanel();
     

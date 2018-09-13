@@ -20,13 +20,12 @@ import org.openide.util.LookupListener;
  */
 public abstract class WorkspaceContextSensitiveAction<T> extends AbstractAction implements WorkspaceEventListener, LookupListener {
 
-    protected final ProjectManager pc;
+    protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected Lookup.Result<T> lkpResult;
     protected Class<T> contextClass;
 
     public WorkspaceContextSensitiveAction(Class<T> contextClass) {
         this.contextClass = contextClass;
-        pc = Lookup.getDefault().lookup(ProjectManager.class);
         pc.addWorkspaceEventListener(this);
         Workspace currentWorkspace = pc.getCurrentWorkspace();
         workspaceChanged(null, currentWorkspace);

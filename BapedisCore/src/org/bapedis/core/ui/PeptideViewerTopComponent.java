@@ -149,31 +149,31 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         centerPanel.add(errorLabel, "errorCard");
 
         // Left toolbar: Feature Extraction        
-        leftToolBar.add(createAddMDButton(), 0);
+//        leftToolBar.add(createAddMDButton(), 0);
         
         // Left toolbar: Feature Removing
-        JButton removeMDButton = new JButton(new FeatureRemovingAction());
-        removeMDButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.removeMDButton.toolTipText"));
-        removeMDButton.setIcon(new ImageIcon(getClass().getResource("/org/bapedis/core/resources/delete_md.gif")));
-        removeMDButton.setFocusable(false);
-        leftToolBar.add(removeMDButton, 1);
+//        JButton removeMDButton = new JButton(new FeatureRemovingAction());
+//        removeMDButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.removeMDButton.toolTipText"));
+//        removeMDButton.setIcon(new ImageIcon(getClass().getResource("/org/bapedis/core/resources/delete_md.gif")));
+//        removeMDButton.setFocusable(false);
+//        leftToolBar.add(removeMDButton, 1);
         
         // Left toolbar: Feature filtering
-        JButton filterMDButton = new JButton(new FeatureFilteringAction());
-        filterMDButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.filterMDButton.toolTipText"));
-        filterMDButton.setIcon(new ImageIcon(getClass().getResource("/org/bapedis/core/resources/filter_md.png")));
-        filterMDButton.setFocusable(false);
-        leftToolBar.add(filterMDButton, 2);
+//        JButton filterMDButton = new JButton(new FeatureFilteringAction());
+//        filterMDButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.filterMDButton.toolTipText"));
+//        filterMDButton.setIcon(new ImageIcon(getClass().getResource("/org/bapedis/core/resources/filter_md.png")));
+//        filterMDButton.setFocusable(false);
+//        leftToolBar.add(filterMDButton, 2);
         
         // Left toolbar: Feature explorer
-        JButton columnsButton = new JButton(new FeatureExplorerAction());
-        columnsButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.columnsButton.toolTipText"));
-        columnsButton.setIcon(new ImageIcon(getClass().getResource("/org/bapedis/core/resources/select_md.png")));
-        columnsButton.setFocusable(false);
-        leftToolBar.add(columnsButton, 3);
+//        JButton columnsButton = new JButton(new FeatureExplorerAction());
+//        columnsButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.columnsButton.toolTipText"));
+//        columnsButton.setIcon(new ImageIcon(getClass().getResource("/org/bapedis/core/resources/select_md.png")));
+//        columnsButton.setFocusable(false);
+//        leftToolBar.add(columnsButton, 3);
         
         // Left toolbar: Export button
-        leftToolBar.add(createExportButton(), 4);
+//        leftToolBar.add(createExportButton(), 4);
     }
 
     private JButton createAddMDButton() {

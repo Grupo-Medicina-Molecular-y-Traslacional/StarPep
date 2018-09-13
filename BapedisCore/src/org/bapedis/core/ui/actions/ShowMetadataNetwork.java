@@ -61,11 +61,10 @@ public class ShowMetadataNetwork extends AbstractAction {
                     graphViz.removeDisplayedMetadata(mrb.getAnnotationType());
                 }
             }
+            if (graphWC != null) {
+                graphWC.openGraphWindow();
+            }            
         }
-        if (graphWC != null) {
-            graphWC.openGraphWindow();
-        }
-
     }
 
 }

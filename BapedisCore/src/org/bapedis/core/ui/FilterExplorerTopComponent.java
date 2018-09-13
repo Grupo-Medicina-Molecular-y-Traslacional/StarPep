@@ -62,7 +62,7 @@ import org.openide.util.lookup.ProxyLookup;
         preferredID = "FilterExplorerTopComponent"
 )
 @Messages({
-    "CTL_FilterExplorerAction=Peptides Filter",
+    "CTL_FilterExplorerAction=Peptides filtering",
     "CTL_FilterExplorerTopComponent=Filter",
     "HINT_FilterExplorerTopComponent=Peptides Filter window"
 })

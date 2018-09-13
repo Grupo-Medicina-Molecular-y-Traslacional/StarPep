@@ -9,6 +9,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -25,11 +26,14 @@ public class MetadataNetworkPanel extends JPanel {
     private MetadataRadioButton[] metadataOptions;
     private final JLabel metadataInfoLabel;
     private final JPanel centerPanel;
+    private final ButtonGroup group;
 
     public MetadataNetworkPanel(GraphViz graphViz) {
         super(new GridBagLayout());
         setMinimumSize(new Dimension(440, 220));
         setPreferredSize(new Dimension(440, 220));
+
+        group = new ButtonGroup();
 
         GridBagConstraints gridBagConstraints;
 
@@ -52,30 +56,42 @@ public class MetadataNetworkPanel extends JPanel {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new Insets(5, 5, 0, 5);
         add(centerPanel, gridBagConstraints);
-        initMetadataRadioButtons(graphViz);
+        initMetadataOptions(graphViz);
     }
 
-    private void initMetadataRadioButtons(GraphViz graphViz) {
-        GridBagConstraints gridBagConstraints;
+    private void initMetadataOptions(GraphViz graphViz) {
         AnnotationType[] arr = AnnotationType.values();
-        metadataOptions = new MetadataRadioButton[arr.length];
-        MetadataRadioButton mrb;
+        metadataOptions = new MetadataRadioButton[arr.length + 1];
+        MetadataRadioButton mrb = new MetadataRadioButton(); // Default option     
+        metadataOptions[0] = mrb;
+        addOption(mrb, 0);
         JRadioButton rb;
+        rb = mrb.getRadioButton();
+        rb.setSelected(true);
         for (int i = 0; i < arr.length; i++) {
             mrb = new MetadataRadioButton(arr[i]);
-            metadataOptions[i] = mrb;
+            metadataOptions[i + 1] = mrb;
+            addOption(mrb, i + 1);
             rb = mrb.getRadioButton();
-            rb.setFocusable(false);
             rb.setSelected(graphViz.isDisplayedMetadata(arr[i]));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = i;
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(2, 5, 0, 0);
-            centerPanel.add(rb, gridBagConstraints);
         }
+    }
+
+    private void addOption(MetadataRadioButton mrb, int i) {
+        JRadioButton rb;
+        GridBagConstraints gridBagConstraints;
+        rb = mrb.getRadioButton();
+        rb.setFocusable(false);
+        group.add(rb);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = i + 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(2, 5, 0, 0);
+        centerPanel.add(rb, gridBagConstraints);
+
     }
 
     public MetadataRadioButton[] getMetadataOptions() {
@@ -86,6 +102,11 @@ public class MetadataNetworkPanel extends JPanel {
 
         private final JRadioButton radioButton;
         private final AnnotationType aType;
+
+        public MetadataRadioButton() {
+            this.aType = null;
+            radioButton = new JRadioButton(NbBundle.getMessage(MetadataNetworkPanel.class, "MetadataNetworkPanel.RadioButton.none"));
+        }
 
         public MetadataRadioButton(AnnotationType aType) {
             this.aType = aType;

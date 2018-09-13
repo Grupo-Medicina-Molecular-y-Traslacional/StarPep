@@ -71,7 +71,11 @@
         <folder name="Network">
             <attr name="position" intvalue="110"/>
             <attr name="displayName" bundlevalue="org.bapedis.core.ui.Bundle#Toolbar/Network"/>
-        </folder>        
+        </folder>
+        <folder name="MD">
+            <attr name="position" intvalue="120"/>
+            <attr name="displayName" bundlevalue="org.bapedis.core.ui.Bundle#Toolbar/MD"/>
+        </folder>                  
         <file name="QuickSearch_hidden"/> 
     </folder>
 </filesystem>

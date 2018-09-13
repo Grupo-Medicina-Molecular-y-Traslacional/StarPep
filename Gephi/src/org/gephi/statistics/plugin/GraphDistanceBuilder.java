@@ -57,7 +57,7 @@ public class GraphDistanceBuilder implements AlgorithmFactory, NetworkTag {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(GraphDistanceBuilder.class, "GraphDistance.name");
+        return NbBundle.getMessage(GraphDistanceBuilder.class, "GraphDistance.centralities.name");
     }
 
     @Override
@@ -67,7 +67,7 @@ public class GraphDistanceBuilder implements AlgorithmFactory, NetworkTag {
 
     @Override
     public String getDescription() {
-       return NbBundle.getMessage(GraphDistanceBuilder.class, "GraphDistance.desc");
+       return NbBundle.getMessage(GraphDistanceBuilder.class, "GraphDistance.centralities.desc");
     }
 
     @Override

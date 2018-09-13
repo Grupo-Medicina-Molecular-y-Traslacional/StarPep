@@ -13,6 +13,7 @@ import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
@@ -25,7 +26,10 @@ import org.openide.util.NbBundle.Messages;
         iconBase = "org/bapedis/core/resources/select_md.png",
         displayName = "#CTL_FeatureExplorer"
 )
-@ActionReference(path = "Menu/Tools/MolecularDescriptor", position = 10)
+@ActionReferences({
+    @ActionReference(path = "Menu/Tools/MolecularDescriptor", position = 10),
+    @ActionReference(path = "Toolbars/MD", position = 150)
+})
 @Messages("CTL_FeatureExplorer=Explorer")
 public final class FeatureExplorerAction extends WorkspaceContextSensitiveAction<AttributesModel> {
 

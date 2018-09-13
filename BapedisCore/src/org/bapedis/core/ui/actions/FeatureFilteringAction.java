@@ -21,16 +21,16 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 
-//@ActionID(
-//        category = "Tools",
-//        id = "org.bapedis.core.ui.actions.FeatureFiltering"
-//)
-//@ActionRegistration(
-//        iconBase = "org/bapedis/core/resources/filter_md.png",
-//        displayName = "#CTL_FeatureFiltering"
-//)
-//@ActionReference(path = "Menu/Tools/Feature", position = 300)
-//@Messages("CTL_FeatureFiltering=Filtering")
+@ActionID(
+        category = "Tools",
+        id = "org.bapedis.core.ui.actions.FeatureFiltering"
+)
+@ActionRegistration(
+        iconBase = "org/bapedis/core/resources/filter_md.png",
+        displayName = "#CTL_FeatureFiltering"
+)
+@ActionReference(path = "Menu/Tools/MolecularDescriptor", position = 30)
+@Messages("CTL_FeatureFiltering=Filtering")
 public final class FeatureFilteringAction extends WorkspaceContextSensitiveAction<AttributesModel> {
     protected final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected final AlgorithmExecutor executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);

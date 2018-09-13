@@ -35,10 +35,7 @@ import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.impl.AttributeFilter;
 import org.bapedis.core.spi.filters.impl.FilterHelper;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
-import org.bapedis.core.ui.actions.FeatureExplorerAction;
 import org.bapedis.core.ui.actions.FeatureExtractionAction;
-import org.bapedis.core.ui.actions.FeatureFilteringAction;
-import org.bapedis.core.ui.actions.FeatureRemovingAction;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.netbeans.swing.etable.ETableColumn;
 import org.netbeans.swing.etable.ETableColumnModel;
@@ -266,10 +263,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         java.awt.GridBagConstraints gridBagConstraints;
 
         topPanel = new javax.swing.JPanel();
-        leftToolBar = new javax.swing.JToolBar();
-        jSeparator1 = new javax.swing.JToolBar.Separator();
         detailsPanel = new javax.swing.JPanel();
-        jPeptideLabel = new javax.swing.JLabel();
         jFetchedLabel = new javax.swing.JLabel();
         jFilteredLabel = new javax.swing.JLabel();
         rightPanel = new javax.swing.JPanel();
@@ -287,14 +281,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
         topPanel.setLayout(new java.awt.GridBagLayout());
 
-        leftToolBar.setFloatable(false);
-        leftToolBar.setRollover(true);
-        leftToolBar.add(jSeparator1);
-
         detailsPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        org.openide.awt.Mnemonics.setLocalizedText(jPeptideLabel, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jPeptideLabel.text")); // NOI18N
-        detailsPanel.add(jPeptideLabel);
 
         jFetchedLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/rightArrow.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jFetchedLabel, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jFetchedLabel.text")); // NOI18N
@@ -304,15 +291,13 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         org.openide.awt.Mnemonics.setLocalizedText(jFilteredLabel, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jFilteredLabel.text")); // NOI18N
         detailsPanel.add(jFilteredLabel);
 
-        leftToolBar.add(detailsPanel);
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-        topPanel.add(leftToolBar, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
+        topPanel.add(detailsPanel, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabelFilter, org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jLabelFilter.text")); // NOI18N
         rightPanel.add(jLabelFilter);
@@ -433,10 +418,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     private javax.swing.JLabel jFilteredLabel;
     private javax.swing.JLabel jLabelFilter;
     private javax.swing.JComboBox jOperatorComboBox;
-    private javax.swing.JLabel jPeptideLabel;
-    private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JTextField jValueTextField;
-    private javax.swing.JToolBar leftToolBar;
     private javax.swing.JPanel rightPanel;
     private javax.swing.JScrollPane scrollPane;
     private javax.swing.JPanel topPanel;
@@ -558,8 +540,12 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             int filteredData = currentModel.getPeptides().size();            
             jFilteredLabel.setText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jFilteredLabel.text", filteredData));
             jFilteredLabel.setVisible(fetchedData != filteredData);
+        }else{
+            jFetchedLabel.setText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jFetchedLabel.text", 0));
+            jFilteredLabel.setText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jFilteredLabel.text", 0));
+            jFilteredLabel.setVisible(false);
         }
-        leftToolBar.setVisible(attrModel != null);
+        
     }
 
     private void setQuickFilter() {

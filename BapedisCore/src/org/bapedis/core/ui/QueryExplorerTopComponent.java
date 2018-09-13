@@ -61,7 +61,7 @@ import org.openide.util.lookup.ProxyLookup;
         preferredID = "QueryExplorerTopComponent"
 )
 @Messages({
-    "CTL_QueryExplorerAction=Database Query",
+    "CTL_QueryExplorerAction=Peptide retrieval",
     "CTL_QueryExplorerTopComponent=Query",
     "HINT_QueryExplorerTopComponent=Database Query window"
 })

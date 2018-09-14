@@ -19,10 +19,10 @@ public class Metadata{
     protected Node graphNode;
     protected final Metadata parent;
     protected final String name;
-    protected final AnnotationType annotationType;
+    protected final StarPepAnnotationType annotationType;
     protected final List<Metadata> childs;
 
-    public Metadata(Metadata parent, String underlyingNodeID, String name, AnnotationType annotationType, boolean isLeaf) {
+    public Metadata(Metadata parent, String underlyingNodeID, String name, StarPepAnnotationType annotationType, boolean isLeaf) {
         this.parent = parent;
         this.underlyingNodeID = underlyingNodeID;
         this.name = name;
@@ -30,7 +30,7 @@ public class Metadata{
         childs = isLeaf ? null: new LinkedList<>();
     }
 
-    public Metadata(String underlyingNodeID, String name, AnnotationType annotationType) {
+    public Metadata(String underlyingNodeID, String name, StarPepAnnotationType annotationType) {
         this(null, underlyingNodeID, name, annotationType, true);
     }
 
@@ -38,7 +38,7 @@ public class Metadata{
         return name;
     }
 
-    public AnnotationType getAnnotationType() {
+    public StarPepAnnotationType getAnnotationType() {
         return annotationType;
     }
 

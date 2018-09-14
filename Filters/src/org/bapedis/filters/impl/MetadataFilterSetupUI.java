@@ -13,7 +13,7 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterSetupUI;
@@ -78,7 +78,7 @@ public class MetadataFilterSetupUI extends javax.swing.JPanel implements FilterS
             public void ancestorMoved(AncestorEvent event) {               
             }
         });
-        for(AnnotationType aType: AnnotationType.values()){
+        for(StarPepAnnotationType aType: StarPepAnnotationType.values()){
             annotationComboBox.addItem(aType);
         }
         for(FilterOperator operator: StringFilterOperator.values()){
@@ -202,7 +202,7 @@ public class MetadataFilterSetupUI extends javax.swing.JPanel implements FilterS
     public JPanel getEditPanel(Filter filter) {
         this.filter = (MetadataFilter) filter;
         notCheckBox.setSelected(this.filter.isNegative());
-        AnnotationType annotationType = this.filter.getAnnotationType();
+        StarPepAnnotationType annotationType = this.filter.getAnnotationType();
         if (annotationType != null && !annotationType.equals(annotationComboBox.getSelectedItem())) {
             annotationComboBox.setSelectedItem(annotationType);
         }
@@ -223,7 +223,7 @@ public class MetadataFilterSetupUI extends javax.swing.JPanel implements FilterS
     @Override
     public void saveSettings() {
         filter.setNegative(notCheckBox.isSelected());
-        filter.setAnnotationType((AnnotationType) annotationComboBox.getSelectedItem());
+        filter.setAnnotationType((StarPepAnnotationType) annotationComboBox.getSelectedItem());
         filter.setOperator((FilterOperator) opComboBox.getSelectedItem());
         filter.setValue(valueTextField.getText().trim());
         filter.setMatchCase(matchCaseCheckBox.isSelected());

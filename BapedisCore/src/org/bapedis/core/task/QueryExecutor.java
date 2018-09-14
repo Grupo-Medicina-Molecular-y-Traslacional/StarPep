@@ -61,7 +61,6 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
 
         PeptideDAO dao = Lookup.getDefault().lookup(PeptideDAO.class);
         AttributesModel model = dao.getPeptides(queryModel, graphModel);
-
         //Set graph node for metadata
         Graph graph = graphModel.getGraph();
         graph.readLock();
@@ -80,15 +79,11 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
             toAddNodes.add(peptide.getGraphNode());
         }
 
-        // Reset graph view
-        GraphView oldView = graphModel.getVisibleView();
-        GraphView newView = graphModel.createView();
-        graphModel.setVisibleView(newView);
-        if (!oldView.isMainView()) {
-            graphModel.destroyView(oldView); //TODO: java.lang.IllegalArgumentException: The view doesn't exist
-        }
-
-        // To refresh graph view     
+        // To refresh graph view
+        GraphView graphView = pc.getGraphView(workspace);
+        graphModel.setVisibleView(graphView);
+        graph = graphModel.getGraph(graphView);
+        graph.clear();
         graphWC.refreshGraphView(toAddNodes, null);
 
         return model;

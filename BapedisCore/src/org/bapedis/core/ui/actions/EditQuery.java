@@ -11,7 +11,7 @@ import java.util.List;
 import static javax.swing.Action.NAME;
 import static javax.swing.Action.SHORT_DESCRIPTION;
 import static javax.swing.Action.SMALL_ICON;
-import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.project.ProjectManager;
@@ -68,7 +68,7 @@ public class EditQuery extends GlobalContextSensitiveAction<Metadata> {
         Collection<? extends Metadata> context = lkpResult.allInstances();
         if (!context.isEmpty()) {
             Metadata metadata = context.iterator().next();
-            AnnotationType type = metadata.getAnnotationType();
+            StarPepAnnotationType type = metadata.getAnnotationType();
             MetadataSelectorPanel panel = new MetadataSelectorPanel(type);
             if (dialog.setup(panel, panel, dialogTitle)) {
                 QueryModel queryModel = pc.getQueryModel();

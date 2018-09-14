@@ -11,7 +11,7 @@ import org.neo4j.graphdb.RelationshipType;
  *
  * @author loge
  */
-public enum MyRelationship implements RelationshipType {
+public enum StarPepRelationships implements RelationshipType {
     is_a, 
     related_to,
 //    named,

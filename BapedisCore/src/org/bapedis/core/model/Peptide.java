@@ -114,17 +114,17 @@ public class Peptide {
         return graph;
     }
 
-    public NodeIterable getNeighbors(AnnotationType aType) {
+    public NodeIterable getNeighbors(StarPepAnnotationType aType) {
         int relType = graph.getModel().getEdgeType(aType.getRelationType());
         return relType != -1 ? graph.getNeighbors(graphNode, relType) : new NodeIterable.NodeIterableEmpty();
     }
 
-    public Edge getEdge(Node neighbor, AnnotationType aType) {
+    public Edge getEdge(Node neighbor, StarPepAnnotationType aType) {
         int relType = graph.getModel().getEdgeType(aType.getRelationType());
         return relType != -1 ? graph.getEdge(graphNode, neighbor, relType) : null;
     }
 
-    public String[] getAnnotationValues(AnnotationType aType) {
+    public String[] getAnnotationValues(StarPepAnnotationType aType) {
         NodeIterable neighbors = getNeighbors(aType);
         List<String> values = new LinkedList<>();
         for (Node node : neighbors) {

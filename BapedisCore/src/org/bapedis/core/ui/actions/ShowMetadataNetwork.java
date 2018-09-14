@@ -8,7 +8,7 @@ package org.bapedis.core.ui.actions;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import static javax.swing.Action.SMALL_ICON;
-import org.bapedis.core.model.GraphViz;
+import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.ui.components.MetadataNetworkPanel;
@@ -49,7 +49,7 @@ public class ShowMetadataNetwork extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {        
-        GraphViz graphViz = pc.getGraphViz();
+        GraphVizSetting graphViz = pc.getGraphVizSetting();
         MetadataNetworkPanel metadataPanel = new MetadataNetworkPanel(graphViz);
         DialogDescriptor dd = new DialogDescriptor(metadataPanel, NbBundle.getMessage(ShowMetadataNetwork.class, "ShowMetadataNetwork.metadataPanel.title"));
         dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION});

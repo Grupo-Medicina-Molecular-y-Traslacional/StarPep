@@ -19,13 +19,14 @@ import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AlgorithmModel;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FilterModel;
-import org.bapedis.core.model.GraphViz;
+import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.gephi.graph.api.Configuration;
 import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.GraphView;
 import org.gephi.graph.api.Origin;
 import org.gephi.graph.api.Table;
 import org.openide.awt.NotificationDisplayer;
@@ -64,7 +65,7 @@ public class ProjectManager implements Lookup.Provider {
     public static final Color GRAPH_SUPER_NODE_COLOR = new Color(0.6f, 0.6f, 0.6f);
     public static final float GRAPH_SUPER_EDGE_WEIGHT = 1f;
     public static final String GRAPH_SUPER_EDGE_SIMALIRITY = "pairwise_similarity";
-    
+
     public static final String NODE_TABLE_PRO_NAME = "name";
     public static final String NODE_TABLE_PRO_NAME_TITLE = NbBundle.getMessage(ProjectManager.class, "NodeTable.column.name.title");
     public static final String EDGE_TABLE_PRO_XREF = "dbRef";
@@ -84,7 +85,7 @@ public class ProjectManager implements Lookup.Provider {
         });
     }
 
-    public void newProject() {
+    public synchronized void newProject() {
         content = new InstanceContent();
         lookup = new AbstractLookup(content);
         wsListeners = new LinkedList<>();
@@ -92,23 +93,23 @@ public class ProjectManager implements Lookup.Provider {
         content.add(currentWS);
     }
 
-    public String getProjectName() {
+    public synchronized String getProjectName() {
         return name;
     }
 
-    public void renameProject(String name) {
+    public synchronized void renameProject(String name) {
         this.name = name;
     }
 
-    public File getProjectFolder() {
+    public synchronized File getProjectFolder() {
         return folder;
     }
 
-    public Workspace getCurrentWorkspace() {
+    public synchronized Workspace getCurrentWorkspace() {
         return currentWS;
     }
 
-    public void setCurrentWorkspace(Workspace workspace) {
+    public synchronized void setCurrentWorkspace(Workspace workspace) {
         if (!currentWS.equals(workspace)) {
             Collection<? extends Workspace> workspaces = lookup.lookupAll(Workspace.class);
             if (workspace != null && !workspaces.contains(workspace)) {
@@ -124,7 +125,7 @@ public class ProjectManager implements Lookup.Provider {
         }
     }
 
-    public Workspace getPrevWorkspace() {
+    public synchronized Workspace getPrevWorkspace() {
         Workspace prev = null;
         for (Iterator<? extends Workspace> it = getWorkspaceIterator(); it.hasNext();) {
             Workspace w = it.next();
@@ -136,7 +137,7 @@ public class ProjectManager implements Lookup.Provider {
         return null;
     }
 
-    public Workspace getNextWorkspace() {
+    public synchronized Workspace getNextWorkspace() {
         Workspace prev = null;
         for (Iterator<? extends Workspace> it = getWorkspaceIterator(); it.hasNext();) {
             Workspace w = it.next();
@@ -153,7 +154,7 @@ public class ProjectManager implements Lookup.Provider {
         return workspaces.iterator();
     }
 
-    public void clean() {
+    public synchronized void clean() {
         Workspace.resetDefault();
         Workspace defaultWorkspace = Workspace.getDefault();
         Collection<? extends Workspace> workspaces = lookup.lookupAll(Workspace.class);
@@ -168,7 +169,7 @@ public class ProjectManager implements Lookup.Provider {
         setCurrentWorkspace(defaultWorkspace);
     }
 
-    public void workspaceChangeNotification(String text, Workspace ws) {
+    public synchronized void workspaceChangeNotification(String text, Workspace ws) {
         String reason = NbBundle.getMessage(ProjectManager.class, "ChangeWorkspace.notification.reason", ws.getName(), text);
         String action = NbBundle.getMessage(ProjectManager.class, "ChangeWorkspace.notification.action");
         NotificationDisplayer.getDefault().notify(reason, ImageUtilities.loadImageIcon("org/bapedis/core/resources/balloon.png", true), action, new ActionListener() {
@@ -179,7 +180,7 @@ public class ProjectManager implements Lookup.Provider {
         });
     }
 
-    public void reportRunningTask(String taskName, Workspace workspace) {
+    public synchronized void reportRunningTask(String taskName, Workspace workspace) {
         InputOutput io = IOProvider.getDefault().getIO(workspace.getName(), false);
         String text = dataFormat.format(new Date()) + " - " + NbBundle.getMessage(ProjectManager.class, "Workspace.task.begin", taskName);
         for (int i = 0; i < text.length(); i++) {
@@ -194,7 +195,7 @@ public class ProjectManager implements Lookup.Provider {
         io.getOut().close();
     }
 
-    public void reportFinishedTask(String taskName, Workspace workspace) {
+    public synchronized void reportFinishedTask(String taskName, Workspace workspace) {
         InputOutput io = IOProvider.getDefault().getIO(workspace.getName(), false);
         io.getOut().println();
         io.getOut().println(dataFormat.format(new Date()) + " - " + NbBundle.getMessage(ProjectManager.class, "Workspace.task.finish", taskName));
@@ -202,43 +203,43 @@ public class ProjectManager implements Lookup.Provider {
         io.getOut().close();
     }
 
-    public void reportMsg(String msg, Workspace workspace) {
+    public synchronized void reportMsg(String msg, Workspace workspace) {
         InputOutput io = IOProvider.getDefault().getIO(workspace.getName(), false);
         io.getOut().println(msg);
         io.getOut().close();
     }
 
-    public void reportError(String error, Workspace workspace) {
+    public synchronized void reportError(String error, Workspace workspace) {
         InputOutput io = IOProvider.getDefault().getIO(workspace.getName(), false);
         io.getErr().println(dataFormat.format(new Date()) + " - " + error);
         io.getErr().close();
     }
 
     // Factory Iterators
-    public Iterator<? extends FilterFactory> getFilterFactoryIterator() {
+    public synchronized Iterator<? extends FilterFactory> getFilterFactoryIterator() {
         Collection<? extends FilterFactory> factories = Lookup.getDefault().lookupAll(FilterFactory.class);
         return factories.iterator();
     }
 
-    public Iterator<? extends AlgorithmFactory> getAlgorithmFactoryIterator() {
+    public synchronized Iterator<? extends AlgorithmFactory> getAlgorithmFactoryIterator() {
         Collection<? extends AlgorithmFactory> factories = Lookup.getDefault().lookupAll(AlgorithmFactory.class);
         return factories.iterator();
     }
 
     // Data Models
-    public AttributesModel getAttributesModel() {
+    public synchronized AttributesModel getAttributesModel() {
         return getAttributesModel(currentWS);
     }
 
-    public AttributesModel getAttributesModel(Workspace workspace) {
+    public synchronized AttributesModel getAttributesModel(Workspace workspace) {
         return workspace.getLookup().lookup(AttributesModel.class);
     }
 
-    public GraphModel getGraphModel() {
+    public synchronized GraphModel getGraphModel() {
         return getGraphModel(currentWS);
     }
 
-    public GraphModel getGraphModel(Workspace workspace) {
+    public synchronized GraphModel getGraphModel(Workspace workspace) {
         GraphModel model = workspace.getLookup().lookup(GraphModel.class);
         if (model == null) {
             Configuration config = new Configuration();
@@ -249,14 +250,29 @@ public class ProjectManager implements Lookup.Provider {
         return model;
     }
     
-    public GraphViz getGraphViz(){
-        return getGraphViz(currentWS);
+    public synchronized GraphView getGraphView(){
+        return getGraphView(currentWS);
+    }
+    
+
+    public synchronized GraphView getGraphView(Workspace workspace) {
+        GraphView model = workspace.getLookup().lookup(GraphView.class);
+        if (model == null) {
+            GraphModel graphModel = getGraphModel(workspace);
+            model = graphModel.createView();
+            workspace.add(model);
+        }
+        return model;
     }
 
-    public GraphViz getGraphViz(Workspace workspace) {
-        GraphViz model = workspace.getLookup().lookup(GraphViz.class);
+    public synchronized GraphVizSetting getGraphVizSetting() {
+        return getGraphVizSetting(currentWS);
+    }
+
+    public synchronized GraphVizSetting getGraphVizSetting(Workspace workspace) {
+        GraphVizSetting model = workspace.getLookup().lookup(GraphVizSetting.class);
         if (model == null) {
-            model = new GraphViz();
+            model = new GraphVizSetting();
             workspace.add(model);
         }
         return model;
@@ -277,11 +293,11 @@ public class ProjectManager implements Lookup.Provider {
         }
     }
 
-    public QueryModel getQueryModel() {
+    public synchronized QueryModel getQueryModel() {
         return getQueryModel(getCurrentWorkspace());
     }
 
-    public QueryModel getQueryModel(Workspace workspace) {
+    public synchronized QueryModel getQueryModel(Workspace workspace) {
         QueryModel model = workspace.getLookup().lookup(QueryModel.class);
         if (model == null) {
             model = new QueryModel(workspace);
@@ -290,11 +306,11 @@ public class ProjectManager implements Lookup.Provider {
         return model;
     }
 
-    public FilterModel getFilterModel() {
+    public synchronized FilterModel getFilterModel() {
         return getFilterModel(currentWS);
     }
 
-    public FilterModel getFilterModel(Workspace workspace) {
+    public synchronized FilterModel getFilterModel(Workspace workspace) {
         FilterModel model = workspace.getLookup().lookup(FilterModel.class);
         if (model == null) {
             model = new FilterModel(workspace);
@@ -303,11 +319,11 @@ public class ProjectManager implements Lookup.Provider {
         return model;
     }
 
-    public AlgorithmModel getAlgorithmModel() {
+    public synchronized AlgorithmModel getAlgorithmModel() {
         return getAlgorithmModel(currentWS);
     }
 
-    public AlgorithmModel getAlgorithmModel(Workspace workspace) {
+    public synchronized AlgorithmModel getAlgorithmModel(Workspace workspace) {
         AlgorithmModel model = workspace.getLookup().lookup(AlgorithmModel.class);
         if (model == null) {
             model = new AlgorithmModel(workspace);
@@ -321,7 +337,7 @@ public class ProjectManager implements Lookup.Provider {
      *
      * @param instance the instance that is to be added to the lookup
      */
-    public void add(Object instance) {
+    public synchronized void add(Object instance) {
         content.add(instance);
     }
 
@@ -330,7 +346,7 @@ public class ProjectManager implements Lookup.Provider {
      *
      * @param instance the instance that is to be removed from the lookup
      */
-    public void remove(Object instance) {
+    public synchronized void remove(Object instance) {
         if (instance instanceof Workspace) {
             Workspace workspace = (Workspace) instance;
             if (currentWS == workspace) {
@@ -357,15 +373,15 @@ public class ProjectManager implements Lookup.Provider {
      * @return the project's lookup
      */
     @Override
-    public Lookup getLookup() {
+    public synchronized Lookup getLookup() {
         return lookup;
     }
 
-    public void addWorkspaceEventListener(WorkspaceEventListener listener) {
+    public synchronized void addWorkspaceEventListener(WorkspaceEventListener listener) {
         wsListeners.add(listener);
     }
 
-    public void removeWorkspaceEventListener(WorkspaceEventListener listener) {
+    public synchronized void removeWorkspaceEventListener(WorkspaceEventListener listener) {
         wsListeners.remove(listener);
     }
 
@@ -377,15 +393,15 @@ public class ProjectManager implements Lookup.Provider {
         }
     }
 
-    public boolean isProjectFolder(File folder) {
+    public synchronized boolean isProjectFolder(File folder) {
         return false;
     }
 
-    public Runnable openProject(File file) {
+    public synchronized Runnable openProject(File file) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public Runnable saveProject(File file) {
+    public synchronized Runnable saveProject(File file) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

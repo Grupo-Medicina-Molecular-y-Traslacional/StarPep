@@ -14,32 +14,32 @@ import java.util.Set;
  *
  * @author loge
  */
-public class GraphViz {
+public class GraphVizSetting {
     public static final String CHANGED_GRAPH_VIEW = "changed_graph_view";
     public static final String CHANGED_DISPLAYED_METADATA = "changed_metadata";
 
     protected transient final PropertyChangeSupport propertyChangeSupport;
-    protected final Set<AnnotationType> displayedMetadata;
+    protected final Set<StarPepAnnotationType> displayedMetadata;
     protected boolean csnVisible;
 
-    public GraphViz() {
+    public GraphVizSetting() {
         propertyChangeSupport = new PropertyChangeSupport(this);
-        displayedMetadata = new HashSet<>(AnnotationType.values().length);
+        displayedMetadata = new HashSet<>(StarPepAnnotationType.values().length);
 //        displayedMetadata.add(AnnotationType.DATABASE);
         csnVisible = true;
     }
     
-    public boolean isDisplayedMetadata(AnnotationType aType){
+    public boolean isDisplayedMetadata(StarPepAnnotationType aType){
         return displayedMetadata.contains(aType);
     }
     
-    public void addDisplayedMetadata(AnnotationType aType){
+    public void addDisplayedMetadata(StarPepAnnotationType aType){
         if (displayedMetadata.add(aType)){
             propertyChangeSupport.firePropertyChange(CHANGED_DISPLAYED_METADATA, null, aType);
         }
     }
     
-    public void removeDisplayedMetadata(AnnotationType aType){
+    public void removeDisplayedMetadata(StarPepAnnotationType aType){
         if (displayedMetadata.remove(aType)){
             propertyChangeSupport.firePropertyChange(CHANGED_DISPLAYED_METADATA, aType, null);
         }

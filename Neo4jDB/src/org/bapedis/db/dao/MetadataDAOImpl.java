@@ -7,7 +7,7 @@ package org.bapedis.db.dao;
 
 import java.util.LinkedList;
 import java.util.List;
-import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.db.Neo4jDB;
 import org.bapedis.core.model.Metadata;
 import org.neo4j.graphdb.Direction;
@@ -19,7 +19,7 @@ import org.neo4j.graphdb.Transaction;
 import org.openide.util.lookup.ServiceProvider;
 import org.bapedis.core.spi.data.MetadataDAO;
 import org.bapedis.db.model.MyLabel;
-import org.bapedis.db.model.MyRelationship;
+import org.bapedis.db.model.StarPepRelationships;
 import org.neo4j.graphdb.ResourceIterator;
 
 /**
@@ -29,8 +29,8 @@ import org.neo4j.graphdb.ResourceIterator;
 @ServiceProvider(service = MetadataDAO.class)
 public class MetadataDAOImpl implements MetadataDAO {
 
-    private final String PRO_NAME = "name";
-    private final String ROOT_METADATA = "RootMetaData";
+    static final String PRO_NAME = "name";
+    static final  String ROOT_METADATA = "RootMetaData";
     private final GraphDatabaseService graphDb;
 
     public MetadataDAOImpl() {
@@ -38,7 +38,7 @@ public class MetadataDAOImpl implements MetadataDAO {
     }
 
     @Override
-    public List<Metadata> getMetadata(AnnotationType type) {
+    public List<Metadata> getMetadata(StarPepAnnotationType type) {
         switch (type) {
 //            case NAME:
 //                return getMetadata(type, MyLabel.Name);
@@ -58,7 +58,7 @@ public class MetadataDAOImpl implements MetadataDAO {
         return null;
     }
 
-    protected List<Metadata> getMetadata(AnnotationType type, Label label) {
+    protected List<Metadata> getMetadata(StarPepAnnotationType type, Label label) {
         List<Metadata> list = new LinkedList<>();
         try (Transaction tx = graphDb.beginTx()) {
             ResourceIterator<Node> nodes = graphDb.findNodes(label);
@@ -77,7 +77,7 @@ public class MetadataDAOImpl implements MetadataDAO {
         return list;
     }
 
-    protected List<Metadata> getMetadataTree(AnnotationType type, Label label) {
+    protected List<Metadata> getMetadataTree(StarPepAnnotationType type, Label label) {
         try (Transaction tx = graphDb.beginTx()) {
             Node node = graphDb.findNode(label, PRO_NAME, ROOT_METADATA);
             Metadata category = getMetadataTree(type, null, node);
@@ -86,8 +86,8 @@ public class MetadataDAOImpl implements MetadataDAO {
         }
     }
 
-    protected Metadata getMetadataTree(AnnotationType type, Metadata parent, Node root) {
-        Iterable<Relationship> rels = root.getRelationships(Direction.INCOMING, MyRelationship.is_a);
+    protected Metadata getMetadataTree(StarPepAnnotationType type, Metadata parent, Node root) {
+        Iterable<Relationship> rels = root.getRelationships(Direction.INCOMING, StarPepRelationships.is_a);
         boolean isLeaf = !rels.iterator().hasNext();
         Metadata category = new Metadata(parent, String.valueOf(root.getId()), root.getProperty(PRO_NAME).toString(), type, isLeaf);
         for (Relationship rel : rels) {

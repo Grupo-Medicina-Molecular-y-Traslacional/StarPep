@@ -16,7 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JPopupMenu;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
-import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.RestrictionLevel;
@@ -105,7 +105,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
     
     private JButton createAddQueryButton() {
         final JPopupMenu popup = new JPopupMenu();
-        for (AnnotationType type: AnnotationType.values()) {
+        for (StarPepAnnotationType type: StarPepAnnotationType.values()) {
             popup.add(new AddQuery(type));
         }
 

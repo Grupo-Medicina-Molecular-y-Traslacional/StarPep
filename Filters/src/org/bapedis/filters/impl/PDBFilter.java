@@ -9,7 +9,7 @@ import java.util.StringTokenizer;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
-import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.spi.alg.Algorithm;
 
 /**
@@ -48,7 +48,7 @@ public class PDBFilter implements Filter {
     @Override
     public boolean accept(Peptide peptide) {
         boolean accepted = false;
-        String[] crossRefs = peptide.getAnnotationValues(AnnotationType.CROSSREF);
+        String[] crossRefs = peptide.getAnnotationValues(StarPepAnnotationType.CROSSREF);
         StringTokenizer tokenizer;
         String db;
         for (String crossRef : crossRefs) {

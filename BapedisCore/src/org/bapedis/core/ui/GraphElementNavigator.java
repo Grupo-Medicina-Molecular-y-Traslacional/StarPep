@@ -39,7 +39,7 @@ import org.bapedis.core.model.GraphElementNode;
 import org.bapedis.core.model.GraphElementType;
 import org.bapedis.core.model.GraphElementsDataTable;
 import org.bapedis.core.model.GraphNodeWrapper;
-import org.bapedis.core.model.GraphViz;
+import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.actions.CenterNodeOnGraph;
@@ -269,13 +269,13 @@ public class GraphElementNavigator extends JComponent implements
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
         if (oldWs != null) {
-            GraphViz oldModel = pc.getGraphViz(oldWs);
+            GraphVizSetting oldModel = pc.getGraphVizSetting(oldWs);
             if (oldModel != null) {
                 oldModel.removeGraphViewChangeListener(this);
             }
         }
 
-        GraphViz vizModel = pc.getGraphViz(newWs);
+        GraphVizSetting vizModel = pc.getGraphVizSetting(newWs);
         if (vizModel != null) {
             vizModel.addGraphViewChangeListener(this);
         }
@@ -302,8 +302,8 @@ public class GraphElementNavigator extends JComponent implements
     private void reload() {
         setBusyLabel(true);
         GraphModel graphModel = pc.getGraphModel();
-        Table columns = navigatorModel.getVisualElement() == GraphElementType.Node ? graphModel.getNodeTable() : graphModel.getEdgeTable();
         GraphView view = graphModel.getVisibleView();
+        Table columns = navigatorModel.getVisualElement() == GraphElementType.Node ? graphModel.getNodeTable() : graphModel.getEdgeTable();        
         final Graph graph = graphModel.getGraph(view);
         final GraphElementsDataTable dataModel = navigatorModel.getVisualElement() == GraphElementType.Node ? new GraphElementsDataTable(graph.getNodeCount(), getNodeColumns(columns))
                 : new GraphElementsDataTable(graph.getEdgeCount(), getEdgeColumns(columns));
@@ -374,7 +374,7 @@ public class GraphElementNavigator extends JComponent implements
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(GraphViz.CHANGED_GRAPH_VIEW)) {
+        if (evt.getPropertyName().equals(GraphVizSetting.CHANGED_GRAPH_VIEW)) {
             reload();
         }
     }
@@ -412,7 +412,7 @@ public class GraphElementNavigator extends JComponent implements
     @Override
     public void panelDeactivated() {
         pc.removeWorkspaceEventListener(this);
-        GraphViz vizModel = pc.getGraphViz();
+        GraphVizSetting vizModel = pc.getGraphVizSetting();
         if (vizModel != null) {
             vizModel.removeGraphViewChangeListener(this);
         }

@@ -9,7 +9,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.io.Exporter;
-import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
 import org.biojava.nbio.core.sequence.ProteinSequence;
@@ -39,9 +39,9 @@ public class FastaExporter implements Exporter {
         Edge edge;
         for (Peptide pept : attrModel.getPeptides()) {
             header = new StringBuilder(pept.getId());
-            neighbors = pept.getNeighbors(AnnotationType.DATABASE);
+            neighbors = pept.getNeighbors(StarPepAnnotationType.DATABASE);
             for (Node neighbor : neighbors){
-                edge = pept.getEdge(neighbor, AnnotationType.DATABASE);
+                edge = pept.getEdge(neighbor, StarPepAnnotationType.DATABASE);
                 for(String db: (String[]) edge.getAttribute("dbRef")){
                     header.append("|");
                     header.append(db);

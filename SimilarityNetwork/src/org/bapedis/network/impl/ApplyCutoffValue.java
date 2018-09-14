@@ -129,7 +129,7 @@ public class ApplyCutoffValue extends SwingWorker<Void, Void> {
         } catch (InterruptedException | ExecutionException ex) {
             Exceptions.printStackTrace(ex);
         } finally {
-            pc.getGraphViz().fireChangedGraphView();
+            pc.getGraphVizSetting().fireChangedGraphView();
             ticket.finish();
             actionButton.setEnabled(true);
         }

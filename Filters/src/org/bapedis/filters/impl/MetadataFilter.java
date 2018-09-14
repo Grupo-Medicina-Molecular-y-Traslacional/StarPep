@@ -5,7 +5,7 @@
  */
 package org.bapedis.filters.impl;
 
-import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.filters.Filter;
@@ -20,7 +20,7 @@ import org.bapedis.core.spi.filters.impl.StringFilterOperator;
 public class MetadataFilter implements Filter {
 
     protected final MetadataFilterFactory factory;
-    protected AnnotationType annotationType;
+    protected StarPepAnnotationType annotationType;
     protected FilterOperator operator;
     protected String value;
     protected boolean matchCase;
@@ -31,11 +31,11 @@ public class MetadataFilter implements Filter {
         operator = StringFilterOperator.values()[0];
     }
 
-    public AnnotationType getAnnotationType() {
+    public StarPepAnnotationType getAnnotationType() {
         return annotationType;
     }
 
-    public void setAnnotationType(AnnotationType annotationType) {
+    public void setAnnotationType(StarPepAnnotationType annotationType) {
         this.annotationType = annotationType;
     }
 

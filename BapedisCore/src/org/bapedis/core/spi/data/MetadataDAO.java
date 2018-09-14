@@ -6,7 +6,7 @@
 package org.bapedis.core.spi.data;
 
 import java.util.List;
-import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.Metadata;
 
 /**
@@ -14,5 +14,5 @@ import org.bapedis.core.model.Metadata;
  * @author loge
  */
 public interface MetadataDAO {
-    List<Metadata> getMetadata(AnnotationType type);
+    List<Metadata> getMetadata(StarPepAnnotationType type);
 }

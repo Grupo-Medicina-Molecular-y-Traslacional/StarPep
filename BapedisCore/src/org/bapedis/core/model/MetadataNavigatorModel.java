@@ -16,7 +16,7 @@ public class MetadataNavigatorModel {
 
     public MetadataNavigatorModel() {
         selectedIndex = 0;
-        showAll = new boolean[AnnotationType.values().length];
+        showAll = new boolean[StarPepAnnotationType.values().length];
         for (int i = 0; i < showAll.length; i++) {
             showAll[i] = true;
         }

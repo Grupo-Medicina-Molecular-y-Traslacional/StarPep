@@ -31,7 +31,7 @@ import javax.swing.event.RowSorterEvent;
 import javax.swing.event.RowSorterListener;
 import javax.swing.table.TableRowSorter;
 import org.bapedis.core.events.WorkspaceEventListener;
-import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.GraphEdgeAttributeColumn;
 import org.bapedis.core.model.GraphElementAttributeColumn;
@@ -123,7 +123,7 @@ public class MetadataNavigator extends JComponent implements
         comboBoxModel = new DefaultComboBoxModel();
 
         comboBoxModel.addElement(new AnnotationItem(null));
-        for (AnnotationType aType : AnnotationType.values()) {
+        for (StarPepAnnotationType aType : StarPepAnnotationType.values()) {
             comboBoxModel.addElement(new AnnotationItem(aType));
         }
 
@@ -296,11 +296,11 @@ public class MetadataNavigator extends JComponent implements
     private class AnnotationItem {
 
         private final GraphElementDataColumn[] columns;
-        private final AnnotationType annotationType;
+        private final StarPepAnnotationType annotationType;
         private final RowSorterListener sorterListener;
         private TableRowSorter sorter;
 
-        public AnnotationItem(AnnotationType annotationType) {
+        public AnnotationItem(StarPepAnnotationType annotationType) {
             this.annotationType = annotationType;
             GraphModel graphModel = pc.getGraphModel();
             columns = new GraphElementDataColumn[]{new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Source),
@@ -372,7 +372,7 @@ public class MetadataNavigator extends JComponent implements
 
         }
 
-        public AnnotationType getAnnotationType() {
+        public StarPepAnnotationType getAnnotationType() {
             return annotationType;
         }
 

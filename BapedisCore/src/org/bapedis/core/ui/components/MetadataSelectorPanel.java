@@ -24,7 +24,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.Metadata;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTree;
@@ -37,7 +37,7 @@ import org.openide.util.NbBundle;
  */
 public class MetadataSelectorPanel extends javax.swing.JPanel implements PropertyChangeListener, ValidationSupportUI {
 
-    private final AnnotationType annotationType;
+    private final StarPepAnnotationType annotationType;
     private boolean validState;
     protected final JXTree tree;
     protected final JButton findButton;
@@ -52,7 +52,7 @@ public class MetadataSelectorPanel extends javax.swing.JPanel implements Propert
      *
      * @param annotationType
      */
-    public MetadataSelectorPanel(AnnotationType annotationType) {
+    public MetadataSelectorPanel(StarPepAnnotationType annotationType) {
         this.annotationType = annotationType;
         selectedMetadata = new LinkedList<>();
         validState = false;

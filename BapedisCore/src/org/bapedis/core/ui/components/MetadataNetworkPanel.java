@@ -13,8 +13,8 @@ import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import org.bapedis.core.model.AnnotationType;
-import org.bapedis.core.model.GraphViz;
+import org.bapedis.core.model.StarPepAnnotationType;
+import org.bapedis.core.model.GraphVizSetting;
 import org.openide.util.NbBundle;
 
 /**
@@ -28,7 +28,7 @@ public class MetadataNetworkPanel extends JPanel {
     private final JPanel centerPanel;
     private final ButtonGroup group;
 
-    public MetadataNetworkPanel(GraphViz graphViz) {
+    public MetadataNetworkPanel(GraphVizSetting graphViz) {
         super(new GridBagLayout());
         setMinimumSize(new Dimension(440, 220));
         setPreferredSize(new Dimension(440, 220));
@@ -59,8 +59,8 @@ public class MetadataNetworkPanel extends JPanel {
         initMetadataOptions(graphViz);
     }
 
-    private void initMetadataOptions(GraphViz graphViz) {
-        AnnotationType[] arr = AnnotationType.values();
+    private void initMetadataOptions(GraphVizSetting graphViz) {
+        StarPepAnnotationType[] arr = StarPepAnnotationType.values();
         metadataOptions = new MetadataRadioButton[arr.length + 1];
         MetadataRadioButton mrb = new MetadataRadioButton(); // Default option     
         metadataOptions[0] = mrb;
@@ -101,14 +101,14 @@ public class MetadataNetworkPanel extends JPanel {
     public static class MetadataRadioButton {
 
         private final JRadioButton radioButton;
-        private final AnnotationType aType;
+        private final StarPepAnnotationType aType;
 
         public MetadataRadioButton() {
             this.aType = null;
             radioButton = new JRadioButton(NbBundle.getMessage(MetadataNetworkPanel.class, "MetadataNetworkPanel.RadioButton.none"));
         }
 
-        public MetadataRadioButton(AnnotationType aType) {
+        public MetadataRadioButton(StarPepAnnotationType aType) {
             this.aType = aType;
             radioButton = new JRadioButton(aType.getDisplayName());
         }
@@ -117,7 +117,7 @@ public class MetadataNetworkPanel extends JPanel {
             return radioButton;
         }
 
-        public AnnotationType getAnnotationType() {
+        public StarPepAnnotationType getAnnotationType() {
             return aType;
         }
 

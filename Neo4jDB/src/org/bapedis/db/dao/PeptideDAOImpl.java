@@ -17,7 +17,7 @@ import org.bapedis.core.model.RestrictionLevel;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.db.Neo4jDB;
 import org.bapedis.db.model.MyLabel;
-import org.bapedis.db.model.MyRelationship;
+import org.bapedis.db.model.StarPepRelationships;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphFactory;
@@ -43,26 +43,26 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service = PeptideDAO.class)
 public class PeptideDAOImpl implements PeptideDAO {
-
+    
     protected final GraphDatabaseService graphDb;
     protected final ProjectManager pm;
-
+    
     private final String PRO_ID = "id";
     private final String PRO_SEQ = "seq";
     private final String PRO_LENGHT = "length";
     private final String PRO_NAME = "name";
     private final String PRO_XREF = "dbRef";
-
+    
     private final TraversalDescription peptideTraversal, metadataTraversal;
-
+    
     public PeptideDAOImpl() {
         graphDb = Neo4jDB.getDbService();
         pm = Lookup.getDefault().lookup(ProjectManager.class);
-
+        
         TraversalDescription td;
         // Peptide traversal from metadata
         td = graphDb.traversalDescription();
-        for (MyRelationship edge : MyRelationship.values()) {
+        for (StarPepRelationships edge : StarPepRelationships.values()) {
             td = td.relationships(edge, Direction.INCOMING);
         }
         peptideTraversal = td.uniqueness(Uniqueness.NODE_GLOBAL)
@@ -70,8 +70,8 @@ public class PeptideDAOImpl implements PeptideDAO {
                 .evaluator(Evaluators.excludeStartPosition());
 
         // Metadata traversal from peptide node
-        td = graphDb.traversalDescription().breadthFirst();
-        for (MyRelationship edge : MyRelationship.values()) {
+        td = graphDb.traversalDescription();
+        for (StarPepRelationships edge : StarPepRelationships.values()) {
             td = td.relationships(edge, Direction.OUTGOING);
         }
         metadataTraversal = td.uniqueness(Uniqueness.NODE_GLOBAL)
@@ -84,12 +84,13 @@ public class PeptideDAOImpl implements PeptideDAO {
 //                        return isMetadata ? Evaluation.INCLUDE_AND_CONTINUE : Evaluation.EXCLUDE_AND_CONTINUE;
 //                    }
 //                });
-    }
 
+    }
+    
     @Override
     public AttributesModel getPeptides(QueryModel queryModel, GraphModel graphModel) {
         AttributesModel attrModel = new AttributesModel();
-
+        
         try (Transaction tx = graphDb.beginTx()) {
             // Get peptides
             ResourceIterator<Node> peptideNodes;
@@ -106,21 +107,23 @@ public class PeptideDAOImpl implements PeptideDAO {
 
             // Write lock
             graphModel.getGraph().writeLock();
-
+            
             Peptide peptide;
             org.gephi.graph.api.Node graphNode, graphNeighborNode;
-            org.gephi.graph.api.Edge graphEdge;
             String id, seq;
+            Node neoNode, neoNeighborNode;
             try {
                 while (peptideNodes.hasNext()) {
-                    Node neoNode = peptideNodes.next();
+                    neoNode = peptideNodes.next();
                     id = neoNode.getProperty(PRO_ID).toString();
                     seq = neoNode.getProperty(PRO_SEQ).toString();
                     // Fill graph
                     graphNode = getOrAddGraphNodeFromNeoNode(neoNode, graphModel);
                     for (Relationship relation : neoNode.getRelationships(Direction.OUTGOING)) {
-                        graphNeighborNode = getOrAddGraphNodeFromNeoNode(relation.getEndNode(), graphModel);
-                        graphEdge = getOrAddGraphEdgeFromNeoRelationship(graphNode, graphNeighborNode, relation, graphModel);
+                        neoNeighborNode = relation.getEndNode();
+                        graphNeighborNode = getOrAddGraphNodeFromNeoNode(neoNeighborNode, graphModel);
+                        getOrAddGraphEdgeFromNeoRelationship(graphNode, graphNeighborNode, relation, graphModel);
+                        addParentNodes(neoNeighborNode, graphNeighborNode, graphModel);
                     }
 
                     //Fill Attribute Model
@@ -128,7 +131,7 @@ public class PeptideDAOImpl implements PeptideDAO {
                     peptide.setAttributeValue(Peptide.ID, id);
                     peptide.setAttributeValue(Peptide.SEQ, seq);
                     peptide.setAttributeValue(Peptide.LENGHT, seq.length());
-
+                    
                     attrModel.addPeptide(peptide);
                 }
             } finally {
@@ -140,16 +143,30 @@ public class PeptideDAOImpl implements PeptideDAO {
         }
         return attrModel;
     }
-
+    
+    private void addParentNodes(Node neoNode, org.gephi.graph.api.Node graphNode, GraphModel graphModel) {
+        org.gephi.graph.api.Node graphNeighborNode;
+        Node neoNeighborNode;
+        
+        for (Relationship relation : neoNode.getRelationships(StarPepRelationships.is_a, Direction.OUTGOING)) {
+            neoNeighborNode = relation.getEndNode();
+            if (!MetadataDAOImpl.ROOT_METADATA.equals(neoNeighborNode.getProperty(MetadataDAOImpl.PRO_NAME).toString())) {
+                graphNeighborNode = getOrAddGraphNodeFromNeoNode(neoNeighborNode, graphModel);
+                getOrAddGraphEdgeFromNeoRelationship(graphNode, graphNeighborNode, relation, graphModel);
+                addParentNodes(neoNeighborNode, graphNeighborNode, graphModel);
+            }
+        }
+    }
+    
     protected ResourceIterator<Node> getPeptides() {
         return graphDb.findNodes(MyLabel.Peptide);
     }
-
+    
     protected ResourceIterator<Node> getPeptides(final List<Node> metadataNodes, RestrictionLevel restriction) {
         ResourceIterator<Node> nodes = null;
         Evaluator restrictiveEvaluator;
         if (metadataNodes.size() == 1 || restriction == RestrictionLevel.MATCH_ANY) {
-
+            
             restrictiveEvaluator = new Evaluator() {
                 @Override
                 public Evaluation evaluate(Path path) {
@@ -183,21 +200,21 @@ public class PeptideDAOImpl implements PeptideDAO {
             nodes = peptideTraversal.evaluator(restrictiveEvaluator)
                     .traverse(metadataNodes.get(0))
                     .nodes()
-                    .iterator();            
+                    .iterator();
         }
-
+        
         return nodes;
     }
-
-    private ResourceIterator<Node> getMetadata(Node peptideNode, Node[] metadataNodes) {
-        ResourceIterator<Node> nodes = metadataTraversal.evaluator(Evaluators.includeWhereEndNodeIs(metadataNodes))
+    
+    private ResourceIterator<Node> getMetadata(Node peptideNode, Node[] endNodes) {
+        ResourceIterator<Node> nodes = metadataTraversal.evaluator(Evaluators.includeWhereEndNodeIs(endNodes))
                 .traverse(peptideNode)
                 .nodes()
                 .iterator();
-
+        
         return nodes;
     }
-
+    
     protected Iterable<Relationship> getRelationships(Node startNode) {
         Iterable<Relationship> edges = graphDb.traversalDescription()
                 .breadthFirst()
@@ -206,13 +223,13 @@ public class PeptideDAOImpl implements PeptideDAO {
                 .uniqueness(Uniqueness.NODE_PATH)
                 .traverse(startNode)
                 .relationships();
-
+        
         return edges;
     }
-
+    
     protected org.gephi.graph.api.Node getOrAddGraphNodeFromNeoNode(Node neoNode, GraphModel graphModel) {
         Graph mainGraph = graphModel.getGraph();
-        String id = neoNode.hasProperty(PRO_ID) ? neoNode.getProperty(PRO_ID).toString(): String.valueOf(neoNode.getId());
+        String id = neoNode.hasProperty(PRO_ID) ? neoNode.getProperty(PRO_ID).toString() : String.valueOf(neoNode.getId());
         org.gephi.graph.api.Node graphNode = mainGraph.getNode(id);
         if (graphNode == null) {
             GraphFactory factory = graphModel.factory();
@@ -235,12 +252,12 @@ public class PeptideDAOImpl implements PeptideDAO {
             graphNode.setG(ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f);
             graphNode.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
             graphNode.setAlpha(1f);
-
+            
             mainGraph.addNode(graphNode);
         }
         return graphNode;
     }
-
+    
     protected Edge getOrAddGraphEdgeFromNeoRelationship(org.gephi.graph.api.Node startNode, org.gephi.graph.api.Node endNode, Relationship relation, GraphModel graphModel) {
         Graph mainGraph = graphModel.getGraph();
         String id = String.valueOf(relation.getId());
@@ -249,20 +266,22 @@ public class PeptideDAOImpl implements PeptideDAO {
             GraphFactory factory = graphModel.factory();
             String relName = relation.getType().name();
             int relType = graphModel.addEdgeType(relName);
-
+            
             graphEdge = factory.newEdge(id, startNode, endNode, relType, ProjectManager.GRAPH_EDGE_WEIGHT, false);
             graphEdge.setLabel(relName);
-            graphEdge.setAttribute(PRO_XREF, relation.getProperty(PRO_XREF));
+            if (relation.hasProperty(PRO_XREF)) {
+                graphEdge.setAttribute(PRO_XREF, relation.getProperty(PRO_XREF));
+            }
 
             //Set color
             graphEdge.setR(ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f);
             graphEdge.setG(ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f);
             graphEdge.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
             graphEdge.setAlpha(0f);
-
+            
             mainGraph.addEdge(graphEdge);
         }
         return graphEdge;
     }
-
+    
 }

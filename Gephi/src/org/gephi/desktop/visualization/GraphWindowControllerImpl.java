@@ -8,14 +8,15 @@ package org.gephi.desktop.visualization;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.bapedis.core.events.WorkspaceEventListener;
-import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.GraphViz;
+import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
@@ -73,20 +74,20 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
                         graphWindow.requestActive();
                     }
                 });
-            }else{
-                graphWindow.requestActive();               
+            } else {
+                graphWindow.requestActive();
             }
         }
     }
 
     @Override
-    public void selectNode(Node node) {
+    public synchronized void selectNode(Node node) {
         SelectionManager sm = VizController.getInstance().getSelectionManager();
         sm.selectNode(node);
     }
 
     @Override
-    public void centerOnNode(Node node) {
+    public synchronized void centerOnNode(Node node) {
         SelectionManager sm = VizController.getInstance().getSelectionManager();
         sm.centerOnNode(node);
     }
@@ -99,7 +100,7 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
     }
 
     @Override
-    public void selectEdge(Edge edge) {
+    public synchronized void selectEdge(Edge edge) {
         SelectionManager sm = VizController.getInstance().getSelectionManager();
         sm.selectEdge(edge);
     }
@@ -107,92 +108,95 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
         if (oldWs != null) {
-            GraphViz oldModel = pc.getGraphViz(oldWs);
+            GraphVizSetting oldModel = pc.getGraphVizSetting(oldWs);
             if (oldModel != null) {
                 oldModel.removeDisplayedMetadataChangeListener(this);
             }
         }
 
-        GraphViz graphViz = pc.getGraphViz(newWs);
+        GraphVizSetting graphViz = pc.getGraphVizSetting(newWs);
         graphViz.addDisplayedMetadataChangeListener(this);
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(GraphViz.CHANGED_DISPLAYED_METADATA)) {
+        if (evt.getPropertyName().equals(GraphVizSetting.CHANGED_DISPLAYED_METADATA)) {
             if (evt.getNewValue() != null) {
-                addMetadataNodes((AnnotationType) evt.getNewValue());
+                addMetadataNodes((StarPepAnnotationType) evt.getNewValue());
             } else if (evt.getOldValue() != null) {
-                removeMetadataNodes((AnnotationType) evt.getOldValue());
+                removeMetadataNodes((StarPepAnnotationType) evt.getOldValue());
             }
         }
     }
 
-    private void addMetadataNodes(AnnotationType aType) {
-        GraphViz graphViz = pc.getGraphViz();
+    private synchronized void addMetadataNodes(StarPepAnnotationType aType) {
+        GraphVizSetting graphViz = pc.getGraphVizSetting();
         AttributesModel attrModel = pc.getAttributesModel();
         GraphModel graphModel = pc.getGraphModel();
         Graph graph = graphModel.getGraphVisible();
         int relType = graphModel.getEdgeType(aType.getRelationType());
         if (relType != -1) {
-            Set<Node> nodes = new HashSet<>();
-            List<Edge> edges = new LinkedList<>();
+            Set<Node> toAddNodes = new HashSet<>();
+            List<Edge> toAddEdges = new LinkedList<>();
             Node node;
-            Edge edge;
             for (Peptide peptide : attrModel.getPeptides()) {
                 node = peptide.getGraphNode();
                 for (Node neighbor : graphModel.getGraph().getNeighbors(node, relType)) {
-                    nodes.add(neighbor);
-                    edge = graphModel.getGraph().getEdge(node, neighbor, relType);
-                    edges.add(edge);
+                    if (toAddNodes.add(neighbor)) {
+                        toAddEdges.add(graphModel.getGraph().getEdge(node, neighbor, relType));
+                        addParentNodes(neighbor, toAddNodes, toAddEdges, graphModel);
+                    }
                 }
             }
-            graph.addAllNodes(nodes);
-            graph.addAllEdges(edges);
-            if (nodes.size() > 0 || edges.size() > 0) {
+            graph.addAllNodes(toAddNodes);
+            graph.addAllEdges(toAddEdges);
+            if (toAddNodes.size() > 0 || toAddEdges.size() > 0) {
                 graphViz.fireChangedGraphView();
             }
         }
     }
 
-    private void removeMetadataNodes(AnnotationType aType) {
-        GraphViz graphViz = pc.getGraphViz();
+    private synchronized void removeMetadataNodes(StarPepAnnotationType aType) {
+        GraphVizSetting graphViz = pc.getGraphVizSetting();
         AttributesModel attrModel = pc.getAttributesModel();
         GraphModel graphModel = pc.getGraphModel();
         Graph graph = graphModel.getGraphVisible();
         int relType = graphModel.getEdgeType(aType.getRelationType());
         if (relType != -1) {
-            Set<Node> nodes = new HashSet<>();
+            Set<Node> toRemoveNodes = new HashSet<>();
             Node node;
             for (Peptide peptide : attrModel.getPeptides()) {
                 node = peptide.getGraphNode();
                 for (Node neighbor : graph.getNeighbors(node, relType)) {
-                    nodes.add(neighbor);
+                    if (toRemoveNodes.add(neighbor)) {
+                        addParentNodes(neighbor, toRemoveNodes, null, graphModel);                        
+                    }
+
                 }
             }
-            graph.removeAllNodes(nodes);
-            if (nodes.size() > 0) {
+            graph.removeAllNodes(toRemoveNodes);
+            if (toRemoveNodes.size() > 0) {
                 graphViz.fireChangedGraphView();
             }
         }
     }
 
     @Override
-    public void refreshGraphView(List<Node> toAddNodes, List<Node> toRemoveNodes) {
-        GraphViz graphViz = pc.getGraphViz();
+    public synchronized void refreshGraphView(List<Node> toAddNodes, List<Node> toRemoveNodes) {
+        GraphVizSetting graphViz = pc.getGraphVizSetting();
         GraphModel graphModel = pc.getGraphModel();
         Graph graph = graphModel.getGraphVisible();
         boolean modified = false;
 
         graph.writeLock();
         try {
-            if (toAddNodes != null && toAddNodes.size() > 0) {
-                addPeptideNodes(toAddNodes, graphViz, graphModel, graph);
+            if (toRemoveNodes != null && toRemoveNodes.size() > 0) {
+                removePeptideNodes(toRemoveNodes, graphViz, graphModel, graph);
                 modified = true;
             }
 
-            if (toRemoveNodes != null && toRemoveNodes.size() > 0) {
-                removePeptideNodes(toRemoveNodes, graphViz, graphModel, graph);
+            if (toAddNodes != null && toAddNodes.size() > 0) {
+                addPeptideNodes(toAddNodes, graphViz, graphModel, graph);
                 modified = true;
             }
         } finally {
@@ -205,54 +209,66 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
     }
 
     private void addPeptideNodes(List<Node> toAddNodes,
-            GraphViz graphViz, GraphModel graphModel, Graph graph) {
+            GraphVizSetting graphViz, GraphModel graphModel, Graph graph) {
 
-        Set<Node> toAddMetadataNodes = new HashSet<>();
+        Set<Node> metadataNodes = new HashSet<>();
         List<Edge> toAddEdges = new LinkedList<>();
         int relType;
 
         for (Node node : toAddNodes) {
             // Add metada nodes and relationships to list
-            for (AnnotationType aType : AnnotationType.values()) {
+            for (StarPepAnnotationType aType : StarPepAnnotationType.values()) {
                 relType = graphModel.getEdgeType(aType.getRelationType());
                 if (relType != -1 && graphViz.isDisplayedMetadata(aType)) {
                     for (Node neighbor : graphModel.getGraph().getNeighbors(node, relType)) {
-                        toAddMetadataNodes.add(neighbor);
-                        toAddEdges.add(graphModel.getGraph().getEdge(node, neighbor, relType));
-                    }
-                }
-            }
-
-            // Add node
-            graph.addNode(node);
-        }
-
-        graph.addAllNodes(toAddMetadataNodes);
-        graph.addAllEdges(toAddEdges);
-    }
-
-    private void removePeptideNodes(List<Node> toRemoveNodes,
-            GraphViz graphViz, GraphModel graphModel, Graph graph) {
-        int relType;
-        List<Node> singleMetadataNodes = new LinkedList<>();
-
-        for (Node node : toRemoveNodes) {
-            for (AnnotationType aType : AnnotationType.values()) {
-                relType = graphModel.getEdgeType(aType.getRelationType());
-                if (relType != -1 && graphViz.isDisplayedMetadata(aType)) {
-                    for (Node neighbor : graph.getNeighbors(node, relType)) {
-                        if (graph.getDegree(neighbor) == 1) {
-                            singleMetadataNodes.add(neighbor);
+                        if (metadataNodes.add(neighbor)) {
+                            toAddEdges.add(graphModel.getGraph().getEdge(node, neighbor, relType));
+                            addParentNodes(neighbor, metadataNodes, toAddEdges, graphModel);
                         }
                     }
                 }
             }
-
-            //Remove node
-            graph.removeNode(node);
         }
 
-        graph.removeAllNodes(singleMetadataNodes);
+        graph.addAllNodes(toAddNodes);
+        graph.addAllNodes(metadataNodes);
+        graph.addAllEdges(toAddEdges);
+    }
+
+    private void removePeptideNodes(List<Node> peptideNodes,
+            GraphVizSetting graphViz, GraphModel graphModel, Graph graph) {
+        int relType;
+        Set<Node> metadataNodes = new LinkedHashSet<>();
+
+        for (Node node : peptideNodes) {
+            for (StarPepAnnotationType aType : StarPepAnnotationType.values()) {
+                relType = graphModel.getEdgeType(aType.getRelationType());
+                if (relType != -1 && graphViz.isDisplayedMetadata(aType)) {
+                    for (Node neighbor : graph.getNeighbors(node, relType)) {
+                        if (metadataNodes.add(neighbor)) {
+                            addParentNodes(neighbor, metadataNodes, null, graphModel);
+                        }
+                    }
+                }
+            }
+        }
+
+        graph.removeAllNodes(metadataNodes);
+        graph.removeAllNodes(peptideNodes);
+    }
+
+    private void addParentNodes(Node node, Set<Node> metadataNodes, List<Edge> edgeList, GraphModel graphModel) {
+        int relType = graphModel.getEdgeType("is_a");
+        if (relType != -1) {
+            for (Node neighbor : graphModel.getGraph().getNeighbors(node, relType)) {
+                if (metadataNodes.add(neighbor)) {
+                    addParentNodes(neighbor, metadataNodes, edgeList, graphModel);
+                    if (edgeList != null) {
+                        edgeList.add(graphModel.getGraph().getEdge(node, neighbor, relType));
+                    }
+                }
+            }
+        }
     }
 
 }

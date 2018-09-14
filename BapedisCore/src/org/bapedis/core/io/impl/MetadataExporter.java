@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import org.bapedis.core.io.Exporter;
-import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.project.ProjectManager;
@@ -47,7 +47,7 @@ public class MetadataExporter implements Exporter {
             Edge edge;
             String xref;
             for (Peptide pept : attrModel.getPeptides()) {
-                for (AnnotationType aType : AnnotationType.values()) {
+                for (StarPepAnnotationType aType : StarPepAnnotationType.values()) {
                     neighbors = pept.getNeighbors(aType);
                     for (Node neighbor : neighbors) {
                         edge = pept.getEdge(neighbor, aType);

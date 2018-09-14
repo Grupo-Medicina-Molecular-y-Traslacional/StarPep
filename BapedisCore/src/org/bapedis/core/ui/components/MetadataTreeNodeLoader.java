@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
-import org.bapedis.core.model.AnnotationType;
+import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.spi.data.MetadataDAO;
 import org.openide.util.Exceptions;
@@ -22,12 +22,12 @@ import org.openide.util.Lookup;
 public class MetadataTreeNodeLoader extends SwingWorker<Integer, Object> {
 
     public static String FINISH = "finish";
-    private final AnnotationType annotationType;
+    private final StarPepAnnotationType annotationType;
     private final DefaultMutableTreeNode rootNode;
     private final static MetadataDAO metadataDAO = Lookup.getDefault().lookup(MetadataDAO.class);
     private int entriesloaded;
 
-    public MetadataTreeNodeLoader(AnnotationType annotationType) {
+    public MetadataTreeNodeLoader(StarPepAnnotationType annotationType) {
         this.annotationType = annotationType;
         rootNode = new DefaultMutableTreeNode();
         entriesloaded = 0;

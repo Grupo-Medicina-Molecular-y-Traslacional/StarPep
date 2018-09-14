@@ -67,7 +67,7 @@ public class MetadataDAOImpl implements MetadataDAO {
                 Metadata metadata;
                 while (nodes.hasNext()) {
                     node = nodes.next();
-                    metadata = new Metadata(String.valueOf(node.getId()), node.getProperty(PRO_NAME).toString(), type);
+                    metadata = new Metadata(node.getId(), node.getProperty(PRO_NAME).toString(), type);
                     list.add(metadata);
                 }
                 nodes.close();
@@ -89,7 +89,7 @@ public class MetadataDAOImpl implements MetadataDAO {
     protected Metadata getMetadataTree(StarPepAnnotationType type, Metadata parent, Node root) {
         Iterable<Relationship> rels = root.getRelationships(Direction.INCOMING, StarPepRelationships.is_a);
         boolean isLeaf = !rels.iterator().hasNext();
-        Metadata category = new Metadata(parent, String.valueOf(root.getId()), root.getProperty(PRO_NAME).toString(), type, isLeaf);
+        Metadata category = new Metadata(parent, root.getId(), root.getProperty(PRO_NAME).toString(), type, isLeaf);
         for (Relationship rel : rels) {
             Node startNode = rel.getStartNode();
             category.addChild(getMetadataTree(type, category, startNode));

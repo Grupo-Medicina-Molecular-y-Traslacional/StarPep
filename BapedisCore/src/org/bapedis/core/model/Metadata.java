@@ -15,14 +15,14 @@ import org.gephi.graph.api.Node;
  * @author loge
  */
 public class Metadata{
-    protected final String underlyingNodeID;
+    protected final long underlyingNodeID;
     protected Node graphNode;
     protected final Metadata parent;
     protected final String name;
     protected final StarPepAnnotationType annotationType;
     protected final List<Metadata> childs;
 
-    public Metadata(Metadata parent, String underlyingNodeID, String name, StarPepAnnotationType annotationType, boolean isLeaf) {
+    public Metadata(Metadata parent, long underlyingNodeID, String name, StarPepAnnotationType annotationType, boolean isLeaf) {
         this.parent = parent;
         this.underlyingNodeID = underlyingNodeID;
         this.name = name;
@@ -30,7 +30,7 @@ public class Metadata{
         childs = isLeaf ? null: new LinkedList<>();
     }
 
-    public Metadata(String underlyingNodeID, String name, StarPepAnnotationType annotationType) {
+    public Metadata(long underlyingNodeID, String name, StarPepAnnotationType annotationType) {
         this(null, underlyingNodeID, name, annotationType, true);
     }
 
@@ -50,7 +50,7 @@ public class Metadata{
         return childs;
     }
 
-    public String getUnderlyingNodeID() {
+    public long getUnderlyingNodeID() {
         return underlyingNodeID;
     }
 
@@ -65,7 +65,7 @@ public class Metadata{
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Metadata) {
-            return underlyingNodeID.equals(((Metadata) obj).underlyingNodeID);
+            return underlyingNodeID == ((Metadata) obj).underlyingNodeID;
         }
         return false;
     }

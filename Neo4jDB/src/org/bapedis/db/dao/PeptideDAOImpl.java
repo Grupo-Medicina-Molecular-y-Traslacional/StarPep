@@ -98,7 +98,7 @@ public class PeptideDAOImpl implements PeptideDAO {
                 List<Node> metadataNodes = new LinkedList<>();
                 for (Iterator<Metadata> it = queryModel.getMetadataIterator(); it.hasNext();) {
                     Metadata metadata = it.next();
-                    metadataNodes.add(graphDb.getNodeById(Long.valueOf(metadata.getUnderlyingNodeID())));
+                    metadataNodes.add(graphDb.getNodeById(metadata.getUnderlyingNodeID()));
                 }
                 peptideNodes = getPeptides(metadataNodes, queryModel.getRestriction());
             } else {
@@ -227,9 +227,13 @@ public class PeptideDAOImpl implements PeptideDAO {
         return edges;
     }
     
+    private String getPrefixID(Node neoNode){
+        return "m";
+    }
+    
     protected org.gephi.graph.api.Node getOrAddGraphNodeFromNeoNode(Node neoNode, GraphModel graphModel) {
         Graph mainGraph = graphModel.getGraph();
-        String id = neoNode.hasProperty(PRO_ID) ? neoNode.getProperty(PRO_ID).toString() : String.valueOf(neoNode.getId());
+        String id = neoNode.hasProperty(PRO_ID) ? neoNode.getProperty(PRO_ID).toString() : getPrefixID(neoNode) + String.valueOf(neoNode.getId());
         org.gephi.graph.api.Node graphNode = mainGraph.getNode(id);
         if (graphNode == null) {
             GraphFactory factory = graphModel.factory();

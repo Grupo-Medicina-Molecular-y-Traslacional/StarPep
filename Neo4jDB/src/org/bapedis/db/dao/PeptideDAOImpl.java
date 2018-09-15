@@ -47,9 +47,7 @@ public class PeptideDAOImpl implements PeptideDAO {
     protected final GraphDatabaseService graphDb;
     protected final ProjectManager pm;
     
-    private final String PRO_ID = "id";
     private final String PRO_SEQ = "seq";
-    private final String PRO_LENGHT = "length";
     private final String PRO_NAME = "name";
     private final String PRO_XREF = "dbRef";
     
@@ -98,7 +96,7 @@ public class PeptideDAOImpl implements PeptideDAO {
                 List<Node> metadataNodes = new LinkedList<>();
                 for (Iterator<Metadata> it = queryModel.getMetadataIterator(); it.hasNext();) {
                     Metadata metadata = it.next();
-                    metadataNodes.add(graphDb.getNodeById(metadata.getUnderlyingNodeID()));
+                    metadataNodes.add(graphDb.getNodeById(Long.parseLong(metadata.getNodeID())));
                 }
                 peptideNodes = getPeptides(metadataNodes, queryModel.getRestriction());
             } else {
@@ -115,10 +113,10 @@ public class PeptideDAOImpl implements PeptideDAO {
             try {
                 while (peptideNodes.hasNext()) {
                     neoNode = peptideNodes.next();
-                    id = neoNode.getProperty(PRO_ID).toString();
                     seq = neoNode.getProperty(PRO_SEQ).toString();
                     // Fill graph
                     graphNode = getOrAddGraphNodeFromNeoNode(neoNode, graphModel);
+                    id = (String)graphNode.getId();
                     for (Relationship relation : neoNode.getRelationships(Direction.OUTGOING)) {
                         neoNeighborNode = relation.getEndNode();
                         graphNeighborNode = getOrAddGraphNodeFromNeoNode(neoNeighborNode, graphModel);
@@ -128,7 +126,7 @@ public class PeptideDAOImpl implements PeptideDAO {
 
                     //Fill Attribute Model
                     peptide = new Peptide(graphNode, graphModel.getGraph());
-                    peptide.setAttributeValue(Peptide.ID, id);
+                    peptide.setAttributeValue(Peptide.ID, Integer.parseInt(id));
                     peptide.setAttributeValue(Peptide.SEQ, seq);
                     peptide.setAttributeValue(Peptide.LENGHT, seq.length());
                     
@@ -225,15 +223,11 @@ public class PeptideDAOImpl implements PeptideDAO {
                 .relationships();
         
         return edges;
-    }
-    
-    private String getPrefixID(Node neoNode){
-        return "m";
-    }
+    }    
     
     protected org.gephi.graph.api.Node getOrAddGraphNodeFromNeoNode(Node neoNode, GraphModel graphModel) {
         Graph mainGraph = graphModel.getGraph();
-        String id = neoNode.hasProperty(PRO_ID) ? neoNode.getProperty(PRO_ID).toString() : getPrefixID(neoNode) + String.valueOf(neoNode.getId());
+        String id = String.valueOf(neoNode.getId());
         org.gephi.graph.api.Node graphNode = mainGraph.getNode(id);
         if (graphNode == null) {
             GraphFactory factory = graphModel.factory();

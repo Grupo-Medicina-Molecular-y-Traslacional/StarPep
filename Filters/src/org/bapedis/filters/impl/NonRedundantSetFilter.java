@@ -26,7 +26,7 @@ public class NonRedundantSetFilter implements Filter, ActionListener {
 
     private final NonRedundantSetFilterFactory factory;
     protected final SequenceClustering clustering;
-    private final TreeSet<String> accepted;
+    private final TreeSet<Integer> accepted;
 
     public NonRedundantSetFilter(NonRedundantSetFilterFactory factory) {
         this.factory = factory;

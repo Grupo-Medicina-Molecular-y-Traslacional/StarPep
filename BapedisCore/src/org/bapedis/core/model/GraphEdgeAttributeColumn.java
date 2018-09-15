@@ -16,10 +16,18 @@ import org.openide.util.NbBundle;
  * @author loge
  */
 public class GraphEdgeAttributeColumn implements GraphElementDataColumn{
-    public static enum Direction{Source, Targe};
+    public static enum Direction{Source, Target};
     protected final Direction direction;
+    protected final String name;
+    
+    public GraphEdgeAttributeColumn( Direction direction){
+        this((direction == Direction.Source)? NbBundle.getMessage(GraphEdgeAttributeColumn.class, "GraphElement.column.source"):
+                                                NbBundle.getMessage(GraphEdgeAttributeColumn.class, "GraphElement.column.target"),
+                direction);
+    }
 
-    public GraphEdgeAttributeColumn(Direction direction) {
+    public GraphEdgeAttributeColumn(String name, Direction direction) {
+        this.name = name;
         this.direction = direction;
     }
     
@@ -30,8 +38,7 @@ public class GraphEdgeAttributeColumn implements GraphElementDataColumn{
 
     @Override
     public String getColumnName() {
-        return (direction == Direction.Source)? NbBundle.getMessage(GraphEdgeAttributeColumn.class, "GraphElement.column.source"):
-                                                NbBundle.getMessage(GraphEdgeAttributeColumn.class, "GraphElement.column.target");                        
+        return name;                        
     }
 
     @Override

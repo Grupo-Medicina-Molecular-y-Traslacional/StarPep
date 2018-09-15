@@ -12,6 +12,8 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -33,6 +35,7 @@ import javax.swing.table.TableRowSorter;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.GraphEdgeAttributeColumn;
 import org.bapedis.core.model.GraphElementAttributeColumn;
 import org.bapedis.core.model.GraphElementDataColumn;
@@ -41,6 +44,7 @@ import org.bapedis.core.model.MetadataNavigatorModel;
 import org.bapedis.core.model.MetadataNode;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideNode;
+import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.gephi.graph.api.Edge;
@@ -49,6 +53,8 @@ import org.gephi.graph.api.Element;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
+import org.gephi.graph.api.Table;
+import org.gephi.graph.impl.GraphStoreConfiguration;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
@@ -70,7 +76,7 @@ import org.openide.util.lookup.InstanceContent;
  */
 @NavigatorPanel.Registration(mimeType = "peptide/metadata", displayName = "#MetadataNavigator.name")
 public class MetadataNavigator extends JComponent implements
-        WorkspaceEventListener, NavigatorPanelWithToolbar, LookupListener {
+        WorkspaceEventListener, NavigatorPanelWithToolbar, LookupListener, PropertyChangeListener {
 
     protected final InstanceContent content;
     private final DefaultComboBoxModel comboBoxModel;
@@ -84,6 +90,8 @@ public class MetadataNavigator extends JComponent implements
     protected final JLabel metadataSizeLabel;
     private MetadataNavigatorModel navigatorModel;
     protected Lookup.Result<PeptideNode> lkpResult;
+    private final GraphElementDataColumn[] columns;
+    private final RowSorterListener sorterListener;
 
     /**
      * Creates new form LibraryPanel
@@ -106,7 +114,7 @@ public class MetadataNavigator extends JComponent implements
             public void valueChanged(ListSelectionEvent e) {
                 tableValueChanged(e);
             }
-        });        
+        });
 
         scrollPane.setViewportView(table);
 
@@ -139,7 +147,7 @@ public class MetadataNavigator extends JComponent implements
         toolBar = new JToolBar();
         toolBar.setFloatable(false);
         toolBar.add(comboBox);
-        
+
         refreshButton = new JButton(ImageUtilities.loadImageIcon("org/bapedis/core/resources/refresh.png", false));
         refreshButton.addActionListener(new ActionListener() {
             @Override
@@ -152,7 +160,7 @@ public class MetadataNavigator extends JComponent implements
             }
         });
         toolBar.add(refreshButton);
-        
+
         toolBar.addSeparator();
         toolBar.add(findButton);
 
@@ -160,9 +168,25 @@ public class MetadataNavigator extends JComponent implements
         bottomToolbar = new JToolBar();
         bottomToolbar.setFloatable(false);
         metadataSizeLabel = new JLabel();
-        metadataSizeLabel.setIcon(ImageUtilities.loadImageIcon("/org/bapedis/core/resources/rightArrow.png", false));        
+        metadataSizeLabel.setIcon(ImageUtilities.loadImageIcon("/org/bapedis/core/resources/rightArrow.png", false));
         bottomToolbar.add(metadataSizeLabel);
         add(bottomToolbar, BorderLayout.SOUTH);
+
+        GraphModel graphModel = pc.getGraphModel();
+        columns = new GraphElementDataColumn[]{
+            new GraphEdgeAttributeColumn(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.labelColumn.source"),
+            GraphEdgeAttributeColumn.Direction.Source),
+            new GraphElementAttributeColumn(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.labelColumn.relation"),
+            graphModel.getEdgeTable().getColumn("label")),
+            new GraphEdgeAttributeColumn(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.labelColumn.target"),
+            GraphEdgeAttributeColumn.Direction.Target)};
+        
+            sorterListener = new RowSorterListener() {
+                @Override
+                public void sorterChanged(RowSorterEvent e) {
+                    metadataSizeLabel.setText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.metadataSizeLabel.text", table.getRowCount()));
+                }
+            };        
     }
 
     private void comboBoxItemStateChanged(java.awt.event.ItemEvent evt) {
@@ -184,6 +208,7 @@ public class MetadataNavigator extends JComponent implements
 
     private void setBusyLabel(boolean busy) {
         scrollPane.setViewportView(busy ? busyLabel : table);
+        busyLabel.setBusy(busy);
         for (Component c : toolBar.getComponents()) {
             c.setEnabled(!busy);
         }
@@ -225,11 +250,29 @@ public class MetadataNavigator extends JComponent implements
 
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
+        if (oldWs != null) {
+            QueryModel oldQueryModel = pc.getQueryModel(oldWs);
+            oldQueryModel.removePropertyChangeListener(this);
+
+            FilterModel oldFilterModel = pc.getFilterModel(oldWs);
+            oldFilterModel.removePropertyChangeListener(this);
+
+            comboBox.setSelectedIndex(-1);
+        }
+
+        QueryModel queryModel = pc.getQueryModel(newWs);
+        queryModel.addPropertyChangeListener(this);
+
+        FilterModel filterModel = pc.getFilterModel(newWs);
+        filterModel.addPropertyChangeListener(this);
+
         navigatorModel = newWs.getLookup().lookup(MetadataNavigatorModel.class);
         if (navigatorModel == null) {
             navigatorModel = new MetadataNavigatorModel();
             newWs.add(navigatorModel);
         }
+
+        setBusyLabel(queryModel.isRunning() || filterModel.isRunning());
 
         comboBox.setSelectedIndex(navigatorModel.getSelectedIndex());
     }
@@ -255,7 +298,7 @@ public class MetadataNavigator extends JComponent implements
     public void panelActivated(Lookup lkp) {
         lkpResult = Utilities.actionsGlobalContext().lookupResult(PeptideNode.class);
         lkpResult.addLookupListener(this);
-        
+
         pc.addWorkspaceEventListener(this);
         Workspace currentWorkspace = pc.getCurrentWorkspace();
         workspaceChanged(null, currentWorkspace);
@@ -265,6 +308,12 @@ public class MetadataNavigator extends JComponent implements
     public void panelDeactivated() {
         lkpResult.removeLookupListener(this);
         pc.removeWorkspaceEventListener(this);
+
+        QueryModel queryModel = pc.getQueryModel();
+        queryModel.removePropertyChangeListener(this);
+
+        FilterModel filterModel = pc.getFilterModel();
+        filterModel.removePropertyChangeListener(this);
     }
 
     @Override
@@ -287,32 +336,42 @@ public class MetadataNavigator extends JComponent implements
                 Collection<? extends PeptideNode> peptideNodes = lkpResult.allInstances();
                 if (!peptideNodes.isEmpty()) {
                     Peptide peptide = peptideNodes.iterator().next().getPeptide();
-                    sorter.setRowFilter(RowFilter.regexFilter("^" + peptide.getId() + "$", 0));                    
+                    sorter.setRowFilter(RowFilter.regexFilter("^" + String.valueOf(peptide.getId()) + "$", 0));
                 }
+            }
+        }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        AnnotationItem item = (AnnotationItem) comboBox.getSelectedItem();
+        boolean running;
+        if (evt.getSource() instanceof QueryModel) {
+            if (evt.getPropertyName().equals(QueryModel.RUNNING)) {
+                running = ((QueryModel) evt.getSource()).isRunning();
+                if (!running) {
+                    item.reload();
+                }
+                setBusyLabel(running);
+            }
+        } else if (evt.getSource() instanceof FilterModel) {
+            if (evt.getPropertyName().equals(FilterModel.RUNNING)) {
+                running = ((FilterModel) evt.getSource()).isRunning();
+                if (!running) {
+                    item.reload();
+                }
+                setBusyLabel(running);
             }
         }
     }
 
     private class AnnotationItem {
 
-        private final GraphElementDataColumn[] columns;
         private final StarPepAnnotationType annotationType;
-        private final RowSorterListener sorterListener;
         private TableRowSorter sorter;
 
         public AnnotationItem(StarPepAnnotationType annotationType) {
             this.annotationType = annotationType;
-            GraphModel graphModel = pc.getGraphModel();
-            columns = new GraphElementDataColumn[]{new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Source),
-                new GraphElementAttributeColumn(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.labelColumn.name"),
-                graphModel.getEdgeTable().getColumn("label")),
-                new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Targe)};
-            sorterListener = new RowSorterListener() {
-                @Override
-                public void sorterChanged(RowSorterEvent e) {
-                    metadataSizeLabel.setText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.metadataSizeLabel.text", table.getRowCount()));                    
-                }
-            };
         }
 
         public void reload() {
@@ -333,20 +392,22 @@ public class MetadataNavigator extends JComponent implements
             SwingWorker worker = new SwingWorker<Void, Element>() {
                 @Override
                 protected Void doInBackground() throws Exception {
-                    graph.readLock();
-                    try {
-                        EdgeIterable edgeIterable;
-                        Node graphNode;
-                        for (Peptide peptide : peptidesModel.getPeptides()) {
-                            graphNode = peptide.getGraphNode();
-                            edgeIterable = (annotationType == null) ? graph.getEdges(graphNode) : graph.getEdges(graphNode, relType);;
-                            for (Edge edge : edgeIterable) {
-                                publish(edge);
+                    if (peptidesModel != null) {
+                        graph.readLock();
+                        try {
+                            EdgeIterable edgeIterable;
+                            Node graphNode;
+                            for (Peptide peptide : peptidesModel.getPeptides()) {
+                                graphNode = peptide.getGraphNode();
+                                edgeIterable = (annotationType == null) ? graph.getEdges(graphNode) : graph.getEdges(graphNode, relType);;
+                                for (Edge edge : edgeIterable) {
+                                    publish(edge);
+                                }
                             }
-                        }
 
-                    } finally {
-                        graph.readUnlock();
+                        } finally {
+                            graph.readUnlock();
+                        }
                     }
                     return null;
                 }

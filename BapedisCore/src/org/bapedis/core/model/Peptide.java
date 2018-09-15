@@ -28,7 +28,7 @@ import org.openide.util.NbBundle;
  */
 public class Peptide {
 
-    public static final PeptideAttribute ID = new PeptideAttribute("id", NbBundle.getMessage(Peptide.class, "Peptide.attribute.id"), String.class);
+    public static final PeptideAttribute ID = new PeptideAttribute("id", NbBundle.getMessage(Peptide.class, "Peptide.attribute.id"), Integer.class);
     public static final PeptideAttribute SEQ = new PeptideAttribute("seq", NbBundle.getMessage(Peptide.class, "Peptide.attribute.seq"), String.class);
     public static final MolecularDescriptor LENGHT = new MolecularDescriptor("length", NbBundle.getMessage(Peptide.class, "Peptide.attribute.length"), Integer.class);
     public final static String CHANGED_ATTRIBUTE = "changed_attribute";
@@ -38,7 +38,8 @@ public class Peptide {
     protected final Graph graph;
     protected Map<PeptideAttribute, Object> attrsValue;
 
-    protected String id, seq;
+    protected int id;
+    protected String seq;
     protected ProteinSequence biojavaSeq;    
     protected int length;
 
@@ -48,14 +49,14 @@ public class Peptide {
         attrsValue = Collections.synchronizedMap(new LinkedHashMap<>());
         propertyChangeSupport = new PropertyChangeSupport(this);
         
-        id = null;
+        id = -1;
         seq = null;
         length = 0;
     }
 
-    public String getId() {
-        if (id == null){
-            id = (String) attrsValue.get(ID);
+    public int getId() {
+        if (id == -1){
+            id = (int) attrsValue.get(ID);
         }
         return id;
     }

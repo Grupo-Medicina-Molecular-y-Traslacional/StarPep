@@ -67,7 +67,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
         try {
             for (Iterator<Metadata> it = queryModel.getMetadataIterator(); it.hasNext();) {
                 Metadata metadata = it.next();
-                metadata.setGraphNode(graph.getNode(metadata.getUnderlyingNodeID()));
+                metadata.setGraphNode(graph.getNode(metadata.getNodeID()));
             }
         } finally {
             graph.readUnlock();

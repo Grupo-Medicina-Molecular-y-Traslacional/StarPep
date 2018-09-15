@@ -17,13 +17,15 @@ import org.openide.util.NbBundle;
  */
 public class GraphEdgeWrapper extends GraphElementNode {
 
+    protected static final String displayName = NbBundle.getMessage(GraphEdgeWrapper.class, "GraphEdgeWrapper.displayName");
+    
     public GraphEdgeWrapper(Edge edge) {
         super(edge);
     }
 
     @Override
     public String getDisplayName() {
-        return element.getLabel();
+        return displayName;
     }
 
     @Override
@@ -37,7 +39,7 @@ public class GraphEdgeWrapper extends GraphElementNode {
         Sheet.Set set = Sheet.createPropertiesSet();
         sheet.put(set);
         set.setName("primary");
-        set.setDisplayName(NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.relationship"));
+        set.setDisplayName(NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.edge"));
 
         //Source propery
         property = createReadOnlyPropertyField("source", NbBundle.getMessage(GraphElementNode.class, "PropertySet.edge.source"),

@@ -15,23 +15,23 @@ import org.gephi.graph.api.Node;
  * @author loge
  */
 public class Metadata{
-    protected final long underlyingNodeID;
+    protected final String id;
     protected Node graphNode;
     protected final Metadata parent;
     protected final String name;
     protected final StarPepAnnotationType annotationType;
     protected final List<Metadata> childs;
 
-    public Metadata(Metadata parent, long underlyingNodeID, String name, StarPepAnnotationType annotationType, boolean isLeaf) {
+    public Metadata(Metadata parent, String id, String name, StarPepAnnotationType annotationType, boolean isLeaf) {
         this.parent = parent;
-        this.underlyingNodeID = underlyingNodeID;
+        this.id = id;
         this.name = name;
         this.annotationType = annotationType;
         childs = isLeaf ? null: new LinkedList<>();
     }
 
-    public Metadata(long underlyingNodeID, String name, StarPepAnnotationType annotationType) {
-        this(null, underlyingNodeID, name, annotationType, true);
+    public Metadata(String id, String name, StarPepAnnotationType annotationType) {
+        this(null, id, name, annotationType, true);
     }
 
     public String getName() {
@@ -50,8 +50,8 @@ public class Metadata{
         return childs;
     }
 
-    public long getUnderlyingNodeID() {
-        return underlyingNodeID;
+    public String getNodeID() {
+        return id;
     }
 
     public Node getGraphNode() {
@@ -65,7 +65,7 @@ public class Metadata{
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Metadata) {
-            return underlyingNodeID == ((Metadata) obj).underlyingNodeID;
+            return id.equals(((Metadata) obj).id); 
         }
         return false;
     }
@@ -73,7 +73,7 @@ public class Metadata{
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 89 * hash + Objects.hashCode(this.underlyingNodeID);
+        hash = 89 * hash + Objects.hashCode(this.id);
         return hash;
     }
 

@@ -29,6 +29,7 @@ import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.bapedis.core.events.WorkspaceEventListener;
+import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.GraphElementAttributeColumn;
 import org.bapedis.core.model.GraphElementDataColumn;
 import org.bapedis.core.model.GraphEdgeAttributeColumn;
@@ -40,6 +41,7 @@ import org.bapedis.core.model.GraphElementType;
 import org.bapedis.core.model.GraphElementsDataTable;
 import org.bapedis.core.model.GraphNodeWrapper;
 import org.bapedis.core.model.GraphVizSetting;
+import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.actions.CenterNodeOnGraph;
@@ -88,7 +90,7 @@ public class GraphElementNavigator extends JComponent implements
     protected final JLabel nodeSizeLabel, edgeSizeLabel;
     protected GraphElementNavigatorModel navigatorModel;
     private final GraphElementDataColumn sourceColumn = new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Source);
-    private final GraphElementDataColumn targetColumn = new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Targe);
+    private final GraphElementDataColumn targetColumn = new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Target);
     private final GraphElementDataColumn[] edgeColumns = new GraphElementDataColumn[3];
 
     /**
@@ -190,6 +192,7 @@ public class GraphElementNavigator extends JComponent implements
 
     private void setBusyLabel(boolean busy) {
         scrollPane.setViewportView(busy ? busyLabel : table);
+        busyLabel.setBusy(busy);
         for (Component c : toolBar.getComponents()) {
             c.setEnabled(!busy);
         }
@@ -273,7 +276,19 @@ public class GraphElementNavigator extends JComponent implements
             if (oldModel != null) {
                 oldModel.removeGraphViewChangeListener(this);
             }
+            QueryModel oldQueryModel = pc.getQueryModel(oldWs);
+            oldQueryModel.removePropertyChangeListener(this);
+
+            FilterModel oldFilterModel = pc.getFilterModel(oldWs);
+            oldFilterModel.removePropertyChangeListener(this);            
         }
+        
+        QueryModel queryModel = pc.getQueryModel(newWs);
+        queryModel.addPropertyChangeListener(this);
+
+        FilterModel filterModel = pc.getFilterModel(newWs);
+        filterModel.addPropertyChangeListener(this);
+        
 
         GraphVizSetting vizModel = pc.getGraphVizSetting(newWs);
         if (vizModel != null) {
@@ -295,7 +310,10 @@ public class GraphElementNavigator extends JComponent implements
                 edgesBtn.setSelected(true);
                 availableColumnsButton.setEnabled(false);
                 break;
-        }
+        }        
+        
+        setBusyLabel(queryModel.isRunning() || filterModel.isRunning());
+        
         reload();
     }
 
@@ -376,6 +394,14 @@ public class GraphElementNavigator extends JComponent implements
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(GraphVizSetting.CHANGED_GRAPH_VIEW)) {
             reload();
+        } else if (evt.getSource() instanceof QueryModel) {
+            if (evt.getPropertyName().equals(QueryModel.RUNNING)) {
+                setBusyLabel(((QueryModel) evt.getSource()).isRunning());
+            }
+        } else if (evt.getSource() instanceof FilterModel) {
+            if (evt.getPropertyName().equals(FilterModel.RUNNING)) {
+                setBusyLabel(((FilterModel) evt.getSource()).isRunning());
+            }
         }
     }
 
@@ -416,6 +442,13 @@ public class GraphElementNavigator extends JComponent implements
         if (vizModel != null) {
             vizModel.removeGraphViewChangeListener(this);
         }
+        
+        QueryModel queryModel = pc.getQueryModel();
+        queryModel.removePropertyChangeListener(this);
+
+        FilterModel filterModel = pc.getFilterModel();
+        filterModel.removePropertyChangeListener(this);
+        
     }
 
     @Override

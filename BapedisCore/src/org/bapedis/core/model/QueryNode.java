@@ -23,6 +23,7 @@ import org.openide.util.lookup.Lookups;
  */
 public class QueryNode extends AbstractNode {
 
+    protected static final String displayName = NbBundle.getMessage(QueryNode.class, "QueryNode.displayName");
     protected final Metadata metadata;
     protected final QueryModel queryModel;
     protected final Action[] actions;
@@ -43,6 +44,11 @@ public class QueryNode extends AbstractNode {
             setDisplayName(metadata.getName());
         }
     }
+
+    @Override
+    public String getDisplayName() {
+        return displayName; 
+    }        
 
     @Override
     public Action[] getActions(boolean context) {

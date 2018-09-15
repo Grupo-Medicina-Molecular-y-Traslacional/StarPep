@@ -26,7 +26,7 @@ public class SeqAlignmentFilter implements Filter, ActionListener {
 
     private final SeqAlignmentFilterFactory factory;
     private final SequenceSearch searchAlgo;
-    private final TreeSet<String> accepted;
+    private final TreeSet<Integer> accepted;
 
     public SeqAlignmentFilter(SeqAlignmentFilterFactory factory) {
         this.factory = factory;

@@ -33,7 +33,7 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
+public class FilterExecutor extends SwingWorker<TreeSet<Integer>, String> {
 
     protected static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected static final AlgorithmExecutor executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
@@ -91,14 +91,14 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
     }
 
     @Override
-    protected TreeSet<String> doInBackground() throws Exception {
+    protected TreeSet<Integer> doInBackground() throws Exception {
         publish("start");
         pc.reportRunningTask(taskName, workspace);
 
         ticket.start();
         ticket.progress(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.running"));
 
-        TreeSet<String> set = filterModel.isEmpty() ? null : new TreeSet<String>();
+        TreeSet<Integer> set = filterModel.isEmpty() ? null : new TreeSet<Integer>();
 
         List<PeptideNode> peptideNodes = attrModel.getNodeList();
         Peptide[] targets = new Peptide[peptideNodes.size()];
@@ -191,7 +191,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
     @Override
     protected void done() {
         try {
-            TreeSet<String> set = get();
+            TreeSet<Integer> set = get();
             attrModel.setQuickFilter(filterModel.isEmpty() ? null : new QuickFilterImpl(set));
 
 //            attrModel.fireChangedGraphView();
@@ -245,9 +245,9 @@ public class FilterExecutor extends SwingWorker<TreeSet<String>, String> {
 
     private static class QuickFilterImpl implements QuickFilter {
 
-        private final TreeSet<String> set;
+        private final TreeSet<Integer> set;
 
-        public QuickFilterImpl(TreeSet<String> set) {
+        public QuickFilterImpl(TreeSet<Integer> set) {
             this.set = set;
         }
 

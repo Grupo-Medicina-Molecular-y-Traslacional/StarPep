@@ -35,7 +35,7 @@ public class SequenceClustering implements Algorithm {
     private ProgressTicket ticket;
     private Peptide[] peptides;
     private final List<Cluster> clusterList;
-    private final HashMap<String, Cluster> clusterMap;
+    private final HashMap<Integer, Cluster> clusterMap;
     private Workspace workspace;
     private SequenceAlignmentModel alignmentModel;
 

@@ -22,6 +22,7 @@ import org.openide.util.NbBundle;
 public class MetadataNode extends AbstractNode {
 
 //    public static final DataFlavor DATA_FLAVOR = new DataFlavor(MetadataNode.class, "metadataNode");
+    protected static final String displayName = NbBundle.getMessage(MetadataNode.class, "MetadataNode.displayName");
     protected final Edge edge;
 
     public MetadataNode(Edge edge) {
@@ -31,7 +32,7 @@ public class MetadataNode extends AbstractNode {
 
     @Override
     public String getDisplayName() {
-        return super.getDisplayName(); //To change body of generated methods, choose Tools | Templates.
+        return displayName;
     }
 
     @Override
@@ -43,13 +44,13 @@ public class MetadataNode extends AbstractNode {
         Sheet.Set set = Sheet.createPropertiesSet();
         sheet.put(set);
         set.setName("primary");
-        set.setDisplayName(NbBundle.getMessage(MetadataNode.class, "PropertySet.relationship"));
-        
+        set.setDisplayName(NbBundle.getMessage(MetadataNode.class, "PropertySet.edge"));
+
         //Source propery
         property = createReadOnlyPropertyField("source", NbBundle.getMessage(MetadataNode.class, "PropertySet.edge.source"),
                 NbBundle.getMessage(MetadataNode.class, "PropertySet.edge.source.desc", edge.getSource().getLabel()), String.class, edge.getSource().getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
         set.put(property);
-        
+
         // Label property
         property = createReadOnlyPropertyField("label", NbBundle.getMessage(MetadataNode.class, "PropertySet.edge.label"),
                 NbBundle.getMessage(MetadataNode.class, "PropertySet.edge.label.desc"), String.class, edge.getLabel());

@@ -17,15 +17,18 @@ import org.openide.util.NbBundle;
  * @author loge
  */
 public class GraphNodeWrapper extends GraphElementNode {
-
-
+    
+    protected final String displayName;
     public GraphNodeWrapper(Node node) {
         super(node);
+        displayName = node.getLabel().equals("Peptide")?
+                      NbBundle.getMessage(GraphNodeWrapper.class, "GraphNodeWrapper.peptide.displayName"):
+                      NbBundle.getMessage(GraphNodeWrapper.class, "GraphNodeWrapper.metadata.displayName");
     }
 
     @Override
     public String getDisplayName() {
-        return (String) element.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME);
+        return displayName;
     }        
 
     

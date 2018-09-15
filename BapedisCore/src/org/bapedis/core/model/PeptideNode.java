@@ -11,11 +11,7 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import javax.swing.Action;
-import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.actions.SelectNodeOnGraph;
-import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.Node;
-import org.gephi.graph.api.NodeIterable;
 import org.openide.actions.PropertiesAction;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
@@ -33,6 +29,7 @@ import org.openide.util.lookup.Lookups;
  */
 public class PeptideNode extends AbstractNode implements PropertyChangeListener {
 
+    protected static final String displayName = NbBundle.getMessage(PeptideNode.class, "PeptideNode.displayName");
     protected Peptide peptide;
     private final Action[] actions;
     protected Sheet sheet;
@@ -53,8 +50,8 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
     }
 
     @Override
-    public String getDisplayName() {
-        return peptide.getId();
+    public String getDisplayName() {        
+        return displayName;
     }
 
     @Override
@@ -78,7 +75,7 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
         // Primary
         Sheet.Set set = Sheet.createPropertiesSet();
         set.setName("primary");
-        set.setDisplayName(NbBundle.getMessage(PeptideNode.class, "PropertySet.primary"));
+        set.setDisplayName(NbBundle.getMessage(PeptideNode.class, "PropertySet.node"));
         PropertySupport.ReadOnly property;
         // Id property
         property = createPropertyField("id", NbBundle.getMessage(PeptideNode.class, "PropertySet.id"),

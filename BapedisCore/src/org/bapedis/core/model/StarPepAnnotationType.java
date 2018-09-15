@@ -29,7 +29,7 @@ public enum StarPepAnnotationType {
     ORIGIN("produced_by") {
 
         @Override
-        public String getDisplayName() {
+        public String getLabelName() {
             return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.origin");
         }
 
@@ -41,7 +41,7 @@ public enum StarPepAnnotationType {
     TARGET("assessed_against") {
 
         @Override
-        public String getDisplayName() {
+        public String getLabelName() {
             return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.target");
         }
 
@@ -53,7 +53,7 @@ public enum StarPepAnnotationType {
     FUNCTION("related_to") {
 
         @Override
-        public String getDisplayName() {
+        public String getLabelName() {
             return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.function");
         }
 
@@ -65,7 +65,7 @@ public enum StarPepAnnotationType {
     DATABASE("compiled_in") {
 
         @Override
-        public String getDisplayName() {
+        public String getLabelName() {
             return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.database");
         }
 
@@ -91,7 +91,7 @@ public enum StarPepAnnotationType {
     CROSSREF("linked_to") {
 
         @Override
-        public String getDisplayName() {
+        public String getLabelName() {
              return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.crossref");
         }
 
@@ -107,7 +107,7 @@ public enum StarPepAnnotationType {
         this.relType = relType;
     }
     
-    public abstract String getDisplayName();
+    public abstract String getLabelName();
     public abstract String getDescription();
     
     public String getRelationType(){
@@ -116,7 +116,7 @@ public enum StarPepAnnotationType {
 
     @Override
     public String toString() {
-        return getDisplayName();
+        return getLabelName();
     }
     
     

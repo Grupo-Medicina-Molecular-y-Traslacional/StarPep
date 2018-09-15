@@ -60,6 +60,10 @@ public class Peptide {
         }
         return id;
     }
+    
+    public String getName(){
+        return (String)graphNode.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME);
+    }
 
     public String getSequence() {
         if (seq == null){

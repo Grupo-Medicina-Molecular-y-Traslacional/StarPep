@@ -30,7 +30,7 @@ public class AddQuery extends AbstractAction {
     
     public AddQuery(StarPepAnnotationType type) {
         this.type = type;
-        putValue(NAME, NbBundle.getMessage(AddQuery.class, "AddQueryBy.name", type.getDisplayName()));
+        putValue(NAME, NbBundle.getMessage(AddQuery.class, "AddQueryBy.name", type.getLabelName()));
         dialog = new SetupDialog();
         dialogTitle = NbBundle.getMessage(AddFilter.class, "MetadataSelector.title");
     }

@@ -33,6 +33,10 @@ public class Metadata{
     public Metadata(String id, String name, StarPepAnnotationType annotationType) {
         this(null, id, name, annotationType, true);
     }
+    
+    public String getID() {
+        return id;
+    }    
 
     public String getName() {
         return name;
@@ -48,10 +52,6 @@ public class Metadata{
 
     public List<Metadata> getChilds() {
         return childs;
-    }
-
-    public String getNodeID() {
-        return id;
     }
 
     public Node getGraphNode() {

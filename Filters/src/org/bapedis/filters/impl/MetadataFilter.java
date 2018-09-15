@@ -78,7 +78,7 @@ public class MetadataFilter implements Filter {
         
     @Override
     public String getDisplayName() {
-        String text = annotationType.getDisplayName() + " " + operator + " " + value;
+        String text = annotationType.getLabelName()+ " " + operator + " " + value;
         return negative ? "Not (" + text + ")" : text;
     }
 

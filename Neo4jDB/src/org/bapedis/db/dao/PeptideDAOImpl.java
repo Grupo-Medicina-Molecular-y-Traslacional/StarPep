@@ -96,7 +96,7 @@ public class PeptideDAOImpl implements PeptideDAO {
                 List<Node> metadataNodes = new LinkedList<>();
                 for (Iterator<Metadata> it = queryModel.getMetadataIterator(); it.hasNext();) {
                     Metadata metadata = it.next();
-                    metadataNodes.add(graphDb.getNodeById(Long.parseLong(metadata.getNodeID())));
+                    metadataNodes.add(graphDb.getNodeById(Long.parseLong(metadata.getID())));
                 }
                 peptideNodes = getPeptides(metadataNodes, queryModel.getRestriction());
             } else {
@@ -235,7 +235,7 @@ public class PeptideDAOImpl implements PeptideDAO {
             if (neoNode.hasProperty(PRO_NAME)) {
                 graphNode.setAttribute(ProjectManager.NODE_TABLE_PRO_NAME, neoNode.getProperty(PRO_NAME));
             } else {
-                graphNode.setAttribute(ProjectManager.NODE_TABLE_PRO_NAME, id);
+                graphNode.setAttribute(ProjectManager.NODE_TABLE_PRO_NAME, "starPep_" + id);
             }
             String label = neoNode.getLabels().iterator().next().name();
             graphNode.setLabel(label);

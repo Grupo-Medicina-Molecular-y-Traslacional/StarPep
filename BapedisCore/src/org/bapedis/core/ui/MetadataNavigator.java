@@ -53,8 +53,6 @@ import org.gephi.graph.api.Element;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
-import org.gephi.graph.api.Table;
-import org.gephi.graph.impl.GraphStoreConfiguration;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
@@ -336,7 +334,7 @@ public class MetadataNavigator extends JComponent implements
                 Collection<? extends PeptideNode> peptideNodes = lkpResult.allInstances();
                 if (!peptideNodes.isEmpty()) {
                     Peptide peptide = peptideNodes.iterator().next().getPeptide();
-                    sorter.setRowFilter(RowFilter.regexFilter("^" + String.valueOf(peptide.getId()) + "$", 0));
+                    sorter.setRowFilter(RowFilter.regexFilter("^" + peptide.getName() + "$", 0));
                 }
             }
         }
@@ -444,7 +442,7 @@ public class MetadataNavigator extends JComponent implements
         @Override
         public String toString() {
             if (annotationType != null) {
-                return annotationType.getDisplayName();
+                return annotationType.getLabelName();
             }
             return NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.choose.text");
         }

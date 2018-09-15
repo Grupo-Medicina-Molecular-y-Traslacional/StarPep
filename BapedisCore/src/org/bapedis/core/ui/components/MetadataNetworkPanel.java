@@ -110,7 +110,8 @@ public class MetadataNetworkPanel extends JPanel {
 
         public MetadataRadioButton(StarPepAnnotationType aType) {
             this.aType = aType;
-            radioButton = new JRadioButton(aType.getDisplayName());
+            radioButton = new JRadioButton(aType.getLabelName());
+            radioButton.setToolTipText(aType.getDescription());
         }
 
         public JRadioButton getRadioButton() {

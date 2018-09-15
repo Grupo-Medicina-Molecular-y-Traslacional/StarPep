@@ -11,6 +11,7 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import javax.swing.Action;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.actions.SelectNodeOnGraph;
 import org.openide.actions.PropertiesAction;
 import org.openide.nodes.AbstractNode;
@@ -81,6 +82,12 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
         property = createPropertyField("id", NbBundle.getMessage(PeptideNode.class, "PropertySet.id"),
                 NbBundle.getMessage(PeptideNode.class, "PropertySet.id.desc"), String.class, peptide.getId());
         set.put(property);
+        
+        // Name property
+        property = createPropertyField("name", NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.name"), 
+                NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.name.desc"), String.class, peptide.getName());
+        set.put(property);
+        
         // Sequence property
         property = createPropertyField("seq", NbBundle.getMessage(PeptideNode.class, "PropertySet.seq"),
                 NbBundle.getMessage(PeptideNode.class, "PropertySet.seq.desc"), String.class, peptide.getSequence());

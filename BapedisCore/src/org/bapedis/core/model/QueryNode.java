@@ -10,6 +10,7 @@ import javax.swing.Action;
 import org.bapedis.core.ui.actions.RemoveAllFromQueryModel;
 import org.bapedis.core.ui.actions.RemoveFromQueryModel;
 import org.bapedis.core.ui.actions.RemoveOthersFromQueryModel;
+import org.gephi.graph.api.Node;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
@@ -47,6 +48,9 @@ public class QueryNode extends AbstractNode {
 
     @Override
     public String getDisplayName() {
+        if (metadata != null && metadata.getGraphNode() != null){
+            return metadata.getGraphNode().getLabel();
+        }
         return displayName; 
     }        
 
@@ -75,18 +79,27 @@ public class QueryNode extends AbstractNode {
         // Primary set
         set.setName("primary");
         set.setDisplayName(NbBundle.getMessage(MetadataNode.class, "PropertySet.node"));        
-        if (metadata != null) {
-            // Label property
-            PropertySupport.ReadOnly labelProperty;
-            labelProperty = createPropertyField("label", NbBundle.getMessage(MetadataNode.class, "PropertySet.label"),
-                    NbBundle.getMessage(MetadataNode.class, "PropertySet.label.desc"), String.class, metadata.getAnnotationType().getDisplayName());
-            set.put(labelProperty);
-        }
 
+        // ID property
+        if (metadata != null) {            
+            PropertySupport.ReadOnly labelProperty;
+            labelProperty = createPropertyField("id", NbBundle.getMessage(MetadataNode.class, "PropertySet.id"),
+                    NbBundle.getMessage(MetadataNode.class, "PropertySet.id.desc"), String.class, metadata.getID());
+            set.put(labelProperty);
+        }  
+        
         // Name property
         PropertySupport.ReadOnly nameProperty = createPropertyField("name", NbBundle.getMessage(GraphElementNode.class, "PropertySet.name"),
                 NbBundle.getMessage(MetadataNode.class, "PropertySet.name.desc"), String.class, metadata==null? NbBundle.getMessage(QueryNode.class, "QueryNode.rootContext.name"): metadata.getName());
         set.put(nameProperty);
+        
+        // Label property
+        if (metadata != null && metadata.getGraphNode() != null) {            
+            PropertySupport.ReadOnly labelProperty;
+            labelProperty = createPropertyField("label", NbBundle.getMessage(MetadataNode.class, "PropertySet.label"),
+                    NbBundle.getMessage(MetadataNode.class, "PropertySet.label.desc"), String.class, metadata.getGraphNode().getLabel());
+            set.put(labelProperty);
+        }        
 
         sheet.put(set);
         return sheet;

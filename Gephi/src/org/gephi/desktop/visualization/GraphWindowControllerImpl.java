@@ -139,11 +139,14 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
             Set<Node> toAddNodes = new HashSet<>();
             List<Edge> toAddEdges = new LinkedList<>();
             Node node;
+            boolean added;
             for (Peptide peptide : attrModel.getPeptides()) {
                 node = peptide.getGraphNode();
                 for (Node neighbor : graphModel.getGraph().getNeighbors(node, relType)) {
-                    if (toAddNodes.add(neighbor)) {
-                        toAddEdges.add(graphModel.getGraph().getEdge(node, neighbor, relType));
+                    assert neighbor.getLabel().equals(aType.getLabelName());
+                    added = toAddNodes.add(neighbor);
+                    toAddEdges.add(graphModel.getGraph().getEdge(node, neighbor, relType));
+                    if (added) {
                         addParentNodes(neighbor, toAddNodes, toAddEdges, graphModel);
                     }
                 }
@@ -168,10 +171,10 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
             for (Peptide peptide : attrModel.getPeptides()) {
                 node = peptide.getGraphNode();
                 for (Node neighbor : graph.getNeighbors(node, relType)) {
+                    assert neighbor.getLabel().equals(aType.getLabelName());
                     if (toRemoveNodes.add(neighbor)) {
-                        addParentNodes(neighbor, toRemoveNodes, null, graphModel);                        
+                        addParentNodes(neighbor, toRemoveNodes, null, graphModel);
                     }
-
                 }
             }
             graph.removeAllNodes(toRemoveNodes);
@@ -214,15 +217,16 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
         Set<Node> metadataNodes = new HashSet<>();
         List<Edge> toAddEdges = new LinkedList<>();
         int relType;
-
+        boolean added;
         for (Node node : toAddNodes) {
             // Add metada nodes and relationships to list
             for (StarPepAnnotationType aType : StarPepAnnotationType.values()) {
                 relType = graphModel.getEdgeType(aType.getRelationType());
                 if (relType != -1 && graphViz.isDisplayedMetadata(aType)) {
                     for (Node neighbor : graphModel.getGraph().getNeighbors(node, relType)) {
-                        if (metadataNodes.add(neighbor)) {
-                            toAddEdges.add(graphModel.getGraph().getEdge(node, neighbor, relType));
+                        added = metadataNodes.add(neighbor);
+                        toAddEdges.add(graphModel.getGraph().getEdge(node, neighbor, relType));
+                        if (added) {                            
                             addParentNodes(neighbor, metadataNodes, toAddEdges, graphModel);
                         }
                     }

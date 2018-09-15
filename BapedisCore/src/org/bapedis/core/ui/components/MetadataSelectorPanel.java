@@ -82,7 +82,7 @@ public class MetadataSelectorPanel extends javax.swing.JPanel implements Propert
         topToolBar = new JToolBar();
         topToolBar.setFloatable(false);
         topToolBar.addSeparator();        
-        topToolBar.add(new JLabel(annotationType.getDisplayName()));
+        topToolBar.add(new JLabel(annotationType.getLabelName()));
         topToolBar.add(Box.createHorizontalGlue());
         topToolBar.add(findButton);
 

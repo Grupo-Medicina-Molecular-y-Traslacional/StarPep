@@ -18,17 +18,13 @@ import org.openide.util.NbBundle;
  */
 public class GraphNodeWrapper extends GraphElementNode {
     
-    protected final String displayName;
     public GraphNodeWrapper(Node node) {
         super(node);
-        displayName = node.getLabel().equals("Peptide")?
-                      NbBundle.getMessage(GraphNodeWrapper.class, "GraphNodeWrapper.peptide.displayName"):
-                      NbBundle.getMessage(GraphNodeWrapper.class, "GraphNodeWrapper.metadata.displayName");
     }
 
     @Override
     public String getDisplayName() {
-        return displayName;
+        return element.getLabel();
     }        
 
     
@@ -44,6 +40,12 @@ public class GraphNodeWrapper extends GraphElementNode {
         sheet.put(set);
         set.setName("primary");
         set.setDisplayName(NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.node"));
+
+        // ID property
+        name = NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.id");
+        descName = NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.id.desc");
+        property = createReadOnlyPropertyField("id", name, descName, String.class, (String)node.getId());
+        set.put(property);
         
         // Name property
         name = NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.name");

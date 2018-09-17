@@ -56,7 +56,7 @@ import org.gephi.graph.api.Table;
  */
 public class GraphElementAvailableColumnsModel {
 
-    private static final int MAX_AVAILABLE_COLUMNS = 3;
+    private static final int MAX_AVAILABLE_COLUMNS = 5;
     private final Set<GraphElementDataColumn> availableColumns = new LinkedHashSet<>();
     private final Set<GraphElementDataColumn> allKnownColumns = new LinkedHashSet<>();
     public static final String DefaultColumnID = ProjectManager.NODE_TABLE_PRO_NAME;

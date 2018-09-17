@@ -16,6 +16,7 @@ import java.util.Set;
  */
 public class GraphVizSetting {
     public static final String CHANGED_GRAPH_VIEW = "changed_graph_view";
+    public static final String CHANGED_GRAPH_TABLE="changed_graph_table";
     public static final String CHANGED_DISPLAYED_METADATA = "changed_metadata";
 
     protected transient final PropertyChangeSupport propertyChangeSupport;
@@ -64,5 +65,17 @@ public class GraphVizSetting {
     public void fireChangedGraphView() {
         propertyChangeSupport.firePropertyChange(CHANGED_GRAPH_VIEW, null, null);
     }
+    
+    public void addGraphTableChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(CHANGED_GRAPH_TABLE, listener);
+    }
+
+    public void removeGraphTableChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(CHANGED_GRAPH_TABLE, listener);
+    }
+
+    public void fireChangedGraphTable() {
+        propertyChangeSupport.firePropertyChange(CHANGED_GRAPH_TABLE, null, null);
+    }    
     
 }

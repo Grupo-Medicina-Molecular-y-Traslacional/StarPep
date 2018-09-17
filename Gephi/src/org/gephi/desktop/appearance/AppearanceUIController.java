@@ -41,6 +41,8 @@
  */
 package org.gephi.desktop.appearance;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,6 +54,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.bapedis.core.events.WorkspaceEventListener;
+import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.gephi.appearance.api.AppearanceController;
@@ -63,6 +66,7 @@ import org.gephi.appearance.spi.TransformerUI;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.ColumnObserver;
 import org.gephi.graph.api.Graph;
+import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphObserver;
 import org.gephi.graph.api.TableObserver;
 import org.openide.util.Lookup;
@@ -73,7 +77,7 @@ import org.openide.util.lookup.ServiceProvider;
  * @author mbastian
  */
 @ServiceProvider(service = AppearanceUIController.class)
-public class AppearanceUIController implements WorkspaceEventListener {
+public class AppearanceUIController implements WorkspaceEventListener, PropertyChangeListener {
 
     private final ProjectManager pc;
     //Classes
@@ -95,7 +99,7 @@ public class AppearanceUIController implements WorkspaceEventListener {
         appearanceController = Lookup.getDefault().lookup(AppearanceController.class);
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         pc.addWorkspaceEventListener(this);
-        
+
         model = pc.getCurrentWorkspace().getLookup().lookup(AppearanceUIModel.class);
         if (model == null) {
             AppearanceModel appearanceModel = appearanceController.getModel(pc.getCurrentWorkspace());
@@ -139,11 +143,14 @@ public class AppearanceUIController implements WorkspaceEventListener {
                 }
             }
         }
+        
+        GraphVizSetting graphViz = pc.getGraphVizSetting();
+        graphViz.addGraphTableChangeListener(this);        
     }
 
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
-        AppearanceUIModel oldModel = oldWs != null ? oldWs.getLookup().lookup(AppearanceUIModel.class) : null;
+        AppearanceUIModel oldUIModel = oldWs != null ? oldWs.getLookup().lookup(AppearanceUIModel.class) : null;
         model = getModel(newWs);
 
 //        if (tableObserver != null) {
@@ -155,7 +162,17 @@ public class AppearanceUIController implements WorkspaceEventListener {
 //        }
 //        tableObserver = new TableChangeObserver(workspace);
 //        tableObserver.start();
-        firePropertyChangeEvent(AppearanceUIModelEvent.MODEL, oldModel, model);
+        firePropertyChangeEvent(AppearanceUIModelEvent.MODEL, oldUIModel, model);
+
+        if (oldWs != null) {
+            GraphVizSetting oldGVizModel = pc.getGraphVizSetting(oldWs);
+            if (oldGVizModel != null) {
+                oldGVizModel.removeGraphTableChangeListener(this);
+            }
+        }
+
+        GraphVizSetting graphViz = pc.getGraphVizSetting(newWs);
+        graphViz.addGraphTableChangeListener(this);
 
     }
 
@@ -249,6 +266,16 @@ public class AppearanceUIController implements WorkspaceEventListener {
         }
     }
 
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(GraphVizSetting.CHANGED_GRAPH_TABLE)) {
+            Function oldValue = model.getSelectedFunction();
+            model.refreshSelectedFunction();
+            Function newValue = model.getSelectedFunction();
+            firePropertyChangeEvent(AppearanceUIModelEvent.SELECTED_FUNCTION, oldValue, newValue);
+        }
+    }
+
     private class GraphChangeObserver extends TimerTask {
 
         private static final int INTERVAL = 2000;
@@ -303,8 +330,9 @@ public class AppearanceUIController implements WorkspaceEventListener {
 
         public TableChangeObserver(Workspace workspace) {
             timer = new Timer("AppearanceColumnObserver", true);
-            nodeObserver = pm.getGraphModel(workspace).getNodeTable().createTableObserver(false);
-            edgeObserver = pm.getGraphModel(workspace).getEdgeTable().createTableObserver(false);
+            GraphModel graphModel = pm.getGraphModel(workspace);
+            nodeObserver = graphModel.getNodeTable().createTableObserver(false);
+            edgeObserver = graphModel.getEdgeTable().createTableObserver(false);
         }
 
         @Override

@@ -45,14 +45,8 @@ import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.gephi.appearance.api.AppearanceController;
-import org.gephi.appearance.api.Function;
 import org.gephi.appearance.spi.Transformer;
 import org.gephi.appearance.spi.TransformerUI;
-import org.gephi.graph.api.Element;
-import org.gephi.graph.api.ElementIterable;
-import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.Node;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 

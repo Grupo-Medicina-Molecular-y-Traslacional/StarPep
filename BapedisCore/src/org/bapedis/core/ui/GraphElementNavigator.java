@@ -145,6 +145,14 @@ public class GraphElementNavigator extends JComponent implements
         toolBar.add(edgesBtn);
         toolBar.addSeparator();
 
+        JButton findButton = new JButton(table.getActionMap().get("find"));
+        findButton.setText("");
+        findButton.setToolTipText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.findButton.toolTipText"));
+        findButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/search.png", false));
+        findButton.setFocusable(false);
+        toolBar.add(findButton);
+        
+        toolBar.addSeparator();
         availableColumnsButton = new JButton();
         availableColumnsButton.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.availableColumnsButton.text"));
         availableColumnsButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/column.png", false));
@@ -156,15 +164,7 @@ public class GraphElementNavigator extends JComponent implements
                 availableColumnsButtonActionPerformed(evt);
             }
         });
-        toolBar.add(availableColumnsButton);
-
-        toolBar.addSeparator();
-        JButton findButton = new JButton(table.getActionMap().get("find"));
-        findButton.setText("");
-        findButton.setToolTipText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.findButton.toolTipText"));
-        findButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/search.png", false));
-        findButton.setFocusable(false);
-        toolBar.add(findButton);
+        toolBar.add(availableColumnsButton);        
         //----------
 
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
@@ -194,7 +194,7 @@ public class GraphElementNavigator extends JComponent implements
         scrollPane.setViewportView(busy ? busyLabel : table);
         busyLabel.setBusy(busy);
         for (Component c : toolBar.getComponents()) {
-            c.setEnabled(!busy);
+            c.setVisible(!busy);
         }
         bottomToolbar.setVisible(!busy);
     }
@@ -212,7 +212,7 @@ public class GraphElementNavigator extends JComponent implements
         if (navigatorModel.getVisualElement() != GraphElementType.Edge) {
             navigatorModel.setVisualElement(GraphElementType.Edge);
             reload();
-            availableColumnsButton.setEnabled(false);
+            availableColumnsButton.setEnabled(false);            
         }
     }
 

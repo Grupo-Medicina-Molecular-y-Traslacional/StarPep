@@ -16,7 +16,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author beltran, loge
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 1500)
+//@ServiceProvider(service = AlgorithmFactory.class, position = 1500)
 public class TripeptideCompositionFactory implements AlgorithmFactory, MolecularDescriptorTag {
 
     @Override

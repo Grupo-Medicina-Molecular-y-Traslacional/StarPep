@@ -146,7 +146,12 @@ public class MetadataNavigator extends JComponent implements
         toolBar.setFloatable(false);
         toolBar.add(comboBox);
 
+        toolBar.addSeparator();
+        toolBar.add(findButton);
+        
+        toolBar.addSeparator();
         refreshButton = new JButton(ImageUtilities.loadImageIcon("org/bapedis/core/resources/refresh.png", false));
+        refreshButton.setFocusable(false);
         refreshButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -158,9 +163,7 @@ public class MetadataNavigator extends JComponent implements
             }
         });
         toolBar.add(refreshButton);
-
-        toolBar.addSeparator();
-        toolBar.add(findButton);
+        
 
         // Botton toolbar
         bottomToolbar = new JToolBar();

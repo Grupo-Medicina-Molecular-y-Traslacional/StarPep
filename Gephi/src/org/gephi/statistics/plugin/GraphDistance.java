@@ -192,7 +192,14 @@ public class GraphDistance implements Algorithm {
 
             int s_index = indicies.get(s);
 
-            setInitParametetrsForNode(s, P, theta, d, s_index, n);
+            //setInitParametetrsForNode(s, P, theta, d, s_index, n)
+            for (int j = 0; j < n; j++) {
+                P[j] = new LinkedList<>();
+                theta[j] = 0;
+                d[j] = -1;
+            }
+            theta[s_index] = 1;
+            d[s_index] = 0;            
 
             LinkedList<Node> Q = new LinkedList<>();
             Q.addLast(s);
@@ -264,16 +271,6 @@ public class GraphDistance implements Algorithm {
         calculateCorrection(graph, indicies, nodeBetweenness, directed, normalized);
 
         return metrics;
-    }
-
-    private void setInitParametetrsForNode(Node s, LinkedList<Node>[] P, double[] theta, int[] d, int index, int n) {
-        for (int j = 0; j < n; j++) {
-            P[j] = new LinkedList<>();
-            theta[j] = 0;
-            d[j] = -1;
-        }
-        theta[index] = 1;
-        d[index] = 0;
     }
 
     private EdgeIterable getEdgeIter(Graph graph, Node v, boolean directed) {

@@ -92,6 +92,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     private final JColorButton backgroundColorButton = new JColorButton(Color.BLACK);
     private final JXHyperlink configureLink = new JXHyperlink();
     private final JCheckBoxMenuItem autoSelectNeighborItem = new JCheckBoxMenuItem();
+    private final JCheckBoxMenuItem showPeptideLabelsItem = new JCheckBoxMenuItem();
     private final JPopupMenu configurePopup = new JPopupMenu();
     private final JButton configureButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/configure.png", false), configurePopup);
     //Node
@@ -289,8 +290,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             public void actionPerformed(ActionEvent e) {
                 configurePopup.show(configureButton, 0, configureButton.getHeight());
             }
-        });      
-        
+        });
+
         configurePopup.addPopupMenuListener(new PopupMenuListener() {
 
             @Override
@@ -306,8 +307,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
             }
-        });                
-        
+        });
+
         //Configure Button - Auto select neighbor
         autoSelectNeighborItem.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.autoSelectNeigborCheckbox.text"));
         autoSelectNeighborItem.setFocusable(false);
@@ -320,8 +321,21 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             }
         });
         configurePopup.add(autoSelectNeighborItem);
-        
-        topToolbar.add(configureButton);        
+
+        showPeptideLabelsItem.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.showPeptideLabelsCheckbox.text"));
+        showPeptideLabelsItem.setFocusable(false);
+        showPeptideLabelsItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                VizModel vizModel = VizController.getInstance().getVizModel();
+                if (vizModel.getTextModel().isShowPeptideLabels() != showPeptideLabelsItem.isSelected()) {
+                    vizModel.getTextModel().setShowPeptideLabels(showPeptideLabelsItem.isSelected());
+                }
+            }
+        });
+        configurePopup.add(showPeptideLabelsItem);
+        topToolbar.add(configureButton);
     }
 
     private JPopupMenu createPopup() {
@@ -606,6 +620,9 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
         //Auto select neighbor
         autoSelectNeighborItem.setSelected(vizModel.isAutoSelectNeighbor());
+
+        //Show peptide labels
+        showPeptideLabelsItem.setSelected(vizModel.getTextModel().isShowPeptideLabels());
 
         //Show node labels
         showNodeLabelsButton.setSelected(vizModel.getTextModel().isShowNodeLabels());
@@ -938,5 +955,3 @@ class MouseSelectionPopupPanel extends javax.swing.JPanel {
 
     }
 }
-
-

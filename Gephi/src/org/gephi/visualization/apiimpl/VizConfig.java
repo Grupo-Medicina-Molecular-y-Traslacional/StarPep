@@ -56,6 +56,7 @@ public class VizConfig {
     //Const Default Config
     public static final String BACKGROUND_COLOR = "VizConfig.defaultBackgroundColor";
     public static final String NODE_LABELS = "VizConfig.defaultShowNodeLabels";
+    public static final String PEPTIDE_LABELS = "VizConfig.defaultShowPeptideLabels";
     public static final String EDGE_LABELS = "VizConfig.defaultShowEdgeLabels";
     public static final String SHOW_EDGES = "VizConfig.defaultShowEdges";
     public static final String HIGHLIGHT = "VizConfig.defaultLightenNonSelectedAuto";
@@ -108,6 +109,7 @@ public class VizConfig {
     //Default values
     public static final Color DEFAULT_BACKGROUND_COLOR = Color.WHITE;
     public static final boolean DEFAULT_NODE_LABELS = false;
+    public static final boolean DEFAULT_PEPTIDE_LABELS = true;
     public static final boolean DEFAULT_EDGE_LABELS = false;
     public static final boolean DEFAULT_SHOW_EDGES = true;
     public static final boolean DEFAULT_HIGHLIGHT = true;
@@ -163,6 +165,7 @@ public class VizConfig {
     protected float[] defaultCameraTarget = {0f, 0f, 0f};
     protected float[] defaultCameraPosition = {0f, 0f, 5000f};
     protected boolean defaultShowNodeLabels = NbPreferences.forModule(VizConfig.class).getBoolean(NODE_LABELS, DEFAULT_NODE_LABELS);
+    protected boolean defaultShowPeptideLabels = NbPreferences.forModule(VizConfig.class).getBoolean(PEPTIDE_LABELS, DEFAULT_PEPTIDE_LABELS);
     protected boolean defaultShowEdgeLabels = NbPreferences.forModule(VizConfig.class).getBoolean(EDGE_LABELS, DEFAULT_EDGE_LABELS);
     protected boolean defaultShowEdges = NbPreferences.forModule(VizConfig.class).getBoolean(SHOW_EDGES, DEFAULT_SHOW_EDGES);
     protected boolean defaultLightenNonSelectedAuto = NbPreferences.forModule(VizConfig.class).getBoolean(HIGHLIGHT, DEFAULT_HIGHLIGHT);
@@ -302,6 +305,10 @@ public class VizConfig {
     public boolean isDefaultShowNodeLabels() {
         return defaultShowNodeLabels;
     }
+    
+    public boolean isDefaultShowPeptideLabels() {
+        return defaultShowPeptideLabels;
+    }    
 
     public boolean isDefaultUniColorSelected() {
         return defaultUniColorSelected;

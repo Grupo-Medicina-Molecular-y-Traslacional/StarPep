@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import org.bapedis.core.model.StarPepAnnotationType;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
 import org.gephi.visualization.VizController;
@@ -192,14 +193,17 @@ public class CompatibilityEngine extends AbstractEngine {
 
         //Labels
         if (vizModel.getTextModel().isShowNodeLabels() || vizModel.getTextModel().isShowEdgeLabels()) {
-            markTime++;
+            markTime++;            
             if (nodeModeler.isEnabled() && vizModel.getTextModel().isShowNodeLabels()) {
+                boolean showPeptideLabel = vizModel.getTextModel().isShowPeptideLabels();
                 textManager.getNodeRenderer().beginRendering();
                 textManager.defaultNodeColor();
                 if (textManager.isSelectedOnly()) {
                     for (Iterator<NodeModel> itr = octree.getNodeIterator(); itr.hasNext();) {
                         NodeModel obj = itr.next();
-                        if (obj.markTime != markTime) {
+                        Node node = obj.getNode();
+                        if ((showPeptideLabel || !node.getLabel().equals("Peptide"))
+                                && obj.markTime != markTime) {
                             if (obj.isSelected() && obj.isTextVisible()) {
                                 textManager.getNodeRenderer().drawTextNode(obj);
                             }
@@ -209,7 +213,9 @@ public class CompatibilityEngine extends AbstractEngine {
                 } else {
                     for (Iterator<NodeModel> itr = octree.getNodeIterator(); itr.hasNext();) {
                         NodeModel obj = itr.next();
-                        if (obj.markTime != markTime) {
+                        Node node = obj.getNode();
+                        if ((showPeptideLabel || !node.getLabel().equals("Peptide"))
+                                && obj.markTime != markTime) {
                             if (obj.isTextVisible()) {
                                 textManager.getNodeRenderer().drawTextNode(obj);
                             }
@@ -550,7 +556,7 @@ public class CompatibilityEngine extends AbstractEngine {
     public synchronized void resetSelection() {
         resetNodesSelection();
         resetEdgesSelection();
-        
+
         customSelection = false;
         configChanged = true;
         anySelected = false;

@@ -69,6 +69,7 @@ public class TextModelImpl {
     protected SizeMode sizeMode;
     protected boolean selectedOnly;
     protected boolean showNodeLabels;
+    protected boolean showPeptideLabels;
     protected boolean showEdgeLabels;
     protected Font nodeFont;
     protected Font edgeFont;
@@ -87,6 +88,7 @@ public class TextModelImpl {
     private void defaultValues() {
         VizConfig vizConfig = VizController.getInstance().getVizConfig();
         showNodeLabels = vizConfig.isDefaultShowNodeLabels();
+        showPeptideLabels = vizConfig.isDefaultShowPeptideLabels();
         showEdgeLabels = vizConfig.isDefaultShowEdgeLabels();
         nodeFont = vizConfig.getDefaultNodeLabelFont();
         edgeFont = vizConfig.getDefaultEdgeLabelFont();
@@ -138,6 +140,10 @@ public class TextModelImpl {
     public boolean isShowNodeLabels() {
         return showNodeLabels;
     }
+    
+    public boolean isShowPeptideLabels() {
+        return showPeptideLabels;
+    }    
 
     public void setShowEdgeLabels(boolean showEdgeLabels) {
         this.showEdgeLabels = showEdgeLabels;
@@ -148,6 +154,11 @@ public class TextModelImpl {
         this.showNodeLabels = showNodeLabels;
         fireChangeEvent();
     }
+    
+    public void setShowPeptideLabels(boolean showPeptideLabels) {
+        this.showPeptideLabels = showPeptideLabels;
+        fireChangeEvent();
+    }    
 
     public void setEdgeFont(Font edgeFont) {
         this.edgeFont = edgeFont;

@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
 <filesystem>
-    <folder name="Actions">
-        <folder name="Tools">
-            <file name="org-bapedis-core-ui-actions-GephiAction.instance_hidden"/>
-            <file name="org-bapedis-core-ui-actions-NetworkAction.instance"/>
-        </folder>
-    </folder>
     <folder name="Menu">
         <file name="Edit_hidden"/>
         <folder name="File">

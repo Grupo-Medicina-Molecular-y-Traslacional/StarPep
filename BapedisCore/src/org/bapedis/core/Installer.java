@@ -10,11 +10,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
-import org.openide.awt.Toolbar;
-import org.openide.awt.ToolbarPool;
 import org.openide.modules.ModuleInstall;
 import org.openide.util.Lookup;
-import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
 public class Installer extends ModuleInstall implements WorkspaceEventListener, PropertyChangeListener {

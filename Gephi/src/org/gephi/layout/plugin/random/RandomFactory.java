@@ -42,16 +42,14 @@
 package org.gephi.layout.plugin.random;
 
 import org.bapedis.core.spi.alg.Algorithm;
-import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.gephi.layout.plugin.AbstractLayoutFactory;
 import org.openide.util.NbBundle;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Helder Suzuki <heldersuzuki@gephi.org>
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 450)
+//@ServiceProvider(service = AlgorithmFactory.class, position = 450)
 public class RandomFactory extends AbstractLayoutFactory {
 
     @Override

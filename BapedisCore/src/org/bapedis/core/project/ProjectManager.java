@@ -157,19 +157,21 @@ public class ProjectManager implements Lookup.Provider {
     }
 
     public synchronized void clean() {
+        Collection<? extends Workspace> workspaces = lookup.lookupAll(Workspace.class);
+        for (Workspace ws : workspaces) {
+            if (ws.isBusy()) {
+                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(NbBundle.getMessage(ProjectManager.class, "Workspace.busy.info"), NotifyDescriptor.WARNING_MESSAGE));
+                return;
+            }
+        }
         Workspace.resetDefault();
         Workspace defaultWorkspace = Workspace.getDefault();
-        Collection<? extends Workspace> workspaces = lookup.lookupAll(Workspace.class);
         if (!workspaces.contains(defaultWorkspace)) {
             content.add(defaultWorkspace);
         }
         for (Workspace ws : workspaces) {
             if (ws != defaultWorkspace) {
-                if (ws.isBusy()) {
-                    DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(NbBundle.getMessage(ProjectManager.class, "Workspace.busy.info", ws.getName()), NotifyDescriptor.WARNING_MESSAGE));
-                } else {
-                    content.remove(ws);
-                }                                
+                content.remove(ws);
             }
         }
         setCurrentWorkspace(defaultWorkspace);
@@ -255,11 +257,10 @@ public class ProjectManager implements Lookup.Provider {
         }
         return model;
     }
-    
-    public synchronized GraphView getGraphView(){
+
+    public synchronized GraphView getGraphView() {
         return getGraphView(currentWS);
     }
-    
 
     public synchronized GraphView getGraphView(Workspace workspace) {
         GraphView model = workspace.getLookup().lookup(GraphView.class);

@@ -26,6 +26,7 @@ import org.bapedis.core.ui.actions.AddFilter;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.DropDownButtonFactory;
@@ -221,9 +222,11 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
 
     private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
         FilterModel filterModel = pc.getFilterModel();
-        if (filterModel.isRunning()) {
+        if (filterModel.isEmpty()) {
+            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.filterModel.empty"), NotifyDescriptor.WARNING_MESSAGE));
+        } else if (filterModel.isRunning()) {
             stop();
-        } else if (!filterModel.isEmpty()) {
+        } else {
             runFilter();
         }
     }//GEN-LAST:event_runButtonActionPerformed

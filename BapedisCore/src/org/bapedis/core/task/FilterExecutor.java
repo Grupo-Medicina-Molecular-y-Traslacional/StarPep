@@ -144,9 +144,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, String> {
                         set.add(peptide.getId());
                     }
 
-                    if (!graph.hasNode(graphNode.getId())) {
-                        toAddNodes.add(graphNode);
-                    }
+                    toAddNodes.add(graphNode);
                 } else if (graph.hasNode(graphNode.getId())) {
                     toRemoveNodes.add(graphNode);
                 }

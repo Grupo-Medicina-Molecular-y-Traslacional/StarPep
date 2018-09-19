@@ -42,7 +42,9 @@
 package org.gephi.visualization.bridge;
 
 import java.util.Arrays;
+import javax.swing.SwingUtilities;
 import org.bapedis.core.project.ProjectManager;
+import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.ColumnObserver;
 import org.gephi.graph.api.GraphView;
@@ -65,6 +67,7 @@ import org.gephi.visualization.text.TextManager;
 import org.gephi.visualization.text.TextModelImpl;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.windows.TopComponent;
 
 /**
  *
@@ -74,6 +77,7 @@ public class DataBridge implements VizArchitecture {
 
     //Const
     protected static final long ONEOVERPHI = 106039;
+    protected static GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
     //Architecture
     protected AbstractEngine engine;
     protected TextManager textManager;
@@ -164,6 +168,15 @@ public class DataBridge implements VizArchitecture {
         }
 
         if (force || (observer != null && (observer.isNew() || observer.hasGraphChanged())) || hasColumnsChanged()) {
+            final TopComponent tc = graphWC.getGraphWindow();
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    if (tc.isOpened()) {
+                        tc.makeBusy(true);
+                    }
+                }
+            });
             if (observer.isNew()) {
                 observer.hasGraphChanged();
             }
@@ -249,14 +262,22 @@ public class DataBridge implements VizArchitecture {
                     textManager.refreshEdge(graph, model, textModel);
                 }
 //                if (!isView) {
-                    limits.setMaxWeight(maxWeight);
-                    limits.setMinWeight(minWeight);
+                limits.setMaxWeight(maxWeight);
+                limits.setMinWeight(minWeight);
 //                }
             } catch (Throwable e) {
                 //Don't crash the whole visualization if some strange exception occurs
                 Exceptions.printStackTrace(e);
             } finally {
                 graph.readUnlockAll();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (tc.isOpened()) {
+                            tc.makeBusy(false);
+                        }
+                    }
+                });
             }
 
             return true;
@@ -271,19 +292,22 @@ public class DataBridge implements VizArchitecture {
 
     private boolean hasColumnsChanged() {
         if (nodeColumnObservers != null && edgeColumnObservers != null) {
+            boolean refreshed = false;
             Column[] nodeColumns = textModel.getNodeTextColumns();
             int nodeCode = Arrays.hashCode(nodeColumns);
             if (nodeCode != nodeColumnHashCode) {
                 refreshNodeColumns(textModel);
-                return true;
+                refreshed = true;
             }
             Column[] edgeColumns = textModel.getEdgeTextColumns();
             int edgeCode = Arrays.hashCode(edgeColumns);
             if (edgeCode != edgeColumnHashCode) {
                 refreshEdgeColumns(textModel);
+                refreshed = true;
+            }
+            if (refreshed) {
                 return true;
             }
-
             for (ColumnObserver c : nodeColumnObservers) {
                 if (c.hasColumnChanged()) {
                     return true;
@@ -377,13 +401,13 @@ public class DataBridge implements VizArchitecture {
         }
 
         Column[] edgeTextColumns = textModelImpl.getEdgeTextColumns();
-        Column[] edgeColumns = Arrays.copyOf(edgeTextColumns, edgeTextColumns.length + 1);
-        edgeColumns[edgeColumns.length - 1] = graphModel.getEdgeTable().getColumn("weight");//Make sure to always observe weight changes
+//        Column[] edgeColumns = Arrays.copyOf(edgeTextColumns, edgeTextColumns.length + 1);
+//        edgeColumns[edgeColumns.length - 1] = graphModel.getEdgeTable().getColumn("weight");//Make sure to always observe weight changes
 
-        edgeColumnHashCode = Arrays.hashCode(edgeColumns);
-        edgeColumnObservers = new ColumnObserver[edgeColumns.length];
-        for (int i = 0; i < edgeColumns.length; i++) {
-            edgeColumnObservers[i] = edgeColumns[i].createColumnObserver(false);
+        edgeColumnHashCode = Arrays.hashCode(edgeTextColumns);
+        edgeColumnObservers = new ColumnObserver[edgeTextColumns.length];
+        for (int i = 0; i < edgeTextColumns.length; i++) {
+            edgeColumnObservers[i] = edgeTextColumns[i].createColumnObserver(false);
         }
     }
 

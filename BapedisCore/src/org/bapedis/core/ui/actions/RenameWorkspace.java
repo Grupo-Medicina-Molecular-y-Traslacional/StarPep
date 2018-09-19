@@ -1,4 +1,3 @@
-
 package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
@@ -28,16 +27,23 @@ import org.openide.util.NbBundle;
 })
 public class RenameWorkspace implements ActionListener {
 
+    protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-        Workspace workspace = pc.getCurrentWorkspace();
-        String name = workspace.getName();
-        DialogDescriptor.InputLine dd = new DialogDescriptor.InputLine("", NbBundle.getMessage(RenameWorkspace.class, "RenameWorkspace.dialog.title"));
-        dd.setInputText(name);
-        if (DialogDisplayer.getDefault().notify(dd).equals(DialogDescriptor.OK_OPTION) && !dd.getInputText().isEmpty()) {
-            name = dd.getInputText();
-            workspace.setName(name);
+        Workspace currentWS = pc.getCurrentWorkspace();
+        if (currentWS.isBusy()) {
+            DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
+        } else {
+            ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+            Workspace workspace = pc.getCurrentWorkspace();
+            String name = workspace.getName();
+            DialogDescriptor.InputLine dd = new DialogDescriptor.InputLine("", NbBundle.getMessage(RenameWorkspace.class, "RenameWorkspace.dialog.title"));
+            dd.setInputText(name);
+            if (DialogDisplayer.getDefault().notify(dd).equals(DialogDescriptor.OK_OPTION) && !dd.getInputText().isEmpty()) {
+                name = dd.getInputText();
+                workspace.setName(name);
+            }
         }
     }
 

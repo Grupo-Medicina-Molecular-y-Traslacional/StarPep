@@ -51,7 +51,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Mathieu Bastian
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 400)
+//@ServiceProvider(service = AlgorithmFactory.class, position = 400)
 public class OpenOrdLayoutFactory extends AbstractLayoutFactory {
 
     @Override

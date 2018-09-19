@@ -185,9 +185,9 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
     }
 
     @Override
-    public synchronized void refreshGraphView(List<Node> toAddNodes, List<Node> toRemoveNodes) {
-        GraphVizSetting graphViz = pc.getGraphVizSetting();
-        GraphModel graphModel = pc.getGraphModel();
+    public synchronized void refreshGraphView(Workspace workspace, List<Node> toAddNodes, List<Node> toRemoveNodes) {
+        GraphVizSetting graphViz = pc.getGraphVizSetting(workspace);
+        GraphModel graphModel = pc.getGraphModel(workspace);
         Graph graph = graphModel.getGraphVisible();
         boolean modified = false;
 

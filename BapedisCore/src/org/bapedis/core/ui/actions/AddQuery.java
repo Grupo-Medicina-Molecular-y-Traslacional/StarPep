@@ -11,9 +11,11 @@ import javax.swing.AbstractAction;
 import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.QueryModel;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.components.MetadataSelectorPanel;
 import org.bapedis.core.ui.components.SetupDialog;
+import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -27,7 +29,7 @@ public class AddQuery extends AbstractAction {
     private final StarPepAnnotationType type;
     protected final SetupDialog dialog;
     protected final String dialogTitle;
-    
+
     public AddQuery(StarPepAnnotationType type) {
         this.type = type;
         putValue(NAME, NbBundle.getMessage(AddQuery.class, "AddQueryBy.name", type.getLabelName()));
@@ -37,11 +39,16 @@ public class AddQuery extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        MetadataSelectorPanel panel = new MetadataSelectorPanel(type);
-        if (dialog.setup(panel, panel, dialogTitle)) {
-            QueryModel queryModel = pc.getQueryModel();
-            List<Metadata> selectedMetada = panel.getSelectedMetadata();
-            queryModel.addAll(selectedMetada);
+        Workspace currentWS = pc.getCurrentWorkspace();
+        if (currentWS.isBusy()) {
+            DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
+        } else {
+            MetadataSelectorPanel panel = new MetadataSelectorPanel(type);
+            if (dialog.setup(panel, panel, dialogTitle)) {
+                QueryModel queryModel = pc.getQueryModel();
+                List<Metadata> selectedMetada = panel.getSelectedMetadata();
+                queryModel.addAll(selectedMetada);
+            }
         }
     }
 

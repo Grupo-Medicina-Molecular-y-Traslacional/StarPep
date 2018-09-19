@@ -78,9 +78,9 @@ public class BetweenessCentrality extends AbstractCentrality {
 
     @Override
     public void endAlgo() {
-        int n = graph.getNodeCount();
+        int n = nodes.length;
 
-        for (Node s : graph.getNodes()) {
+        for (Node s : nodes) {
             int s_index = (Integer) s.getAttribute(NODE_INDEX);
 
             if (!directed) {
@@ -100,7 +100,7 @@ public class BetweenessCentrality extends AbstractCentrality {
         }
 
         //Save values
-        for (Node s : graph.getNodes()) {
+        for (Node s : nodes) {
             int s_index = (Integer) s.getAttribute(NODE_INDEX);
             s.setAttribute(BETWEENNESS, nodeBetweenness[s_index]);
         }

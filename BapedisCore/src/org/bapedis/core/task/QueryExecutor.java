@@ -84,7 +84,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
         graphModel.setVisibleView(graphView);
         graph = graphModel.getGraph(graphView);
         graph.clear();
-        graphWC.refreshGraphView(toAddNodes, null);
+        graphWC.refreshGraphView(workspace, toAddNodes, null);
 
         return model;
     }

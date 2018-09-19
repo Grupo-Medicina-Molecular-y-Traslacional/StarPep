@@ -18,7 +18,6 @@ import org.gephi.graph.api.EdgeIterable;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
-import org.gephi.graph.api.NodeIterable;
 import org.gephi.graph.api.Table;
 import org.openide.util.Lookup;
 
@@ -32,16 +31,17 @@ public abstract class AbstractCentrality implements Algorithm {
     protected final AlgorithmFactory factory;
     protected GraphModel graphModel;
     protected Graph graph;
+    protected Node[] nodes;
     protected boolean isCanceled;
     protected Workspace workspace;
     protected ProgressTicket progress;
     protected final boolean directed = false;
-    protected final String NODE_INDEX = "nodeIndex";    
+    protected final String NODE_INDEX = "nodeIndex";
 
     public AbstractCentrality(AlgorithmFactory factory) {
         this.factory = factory;
     }
-    
+
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
@@ -49,7 +49,8 @@ public abstract class AbstractCentrality implements Algorithm {
         isCanceled = false;
         graphModel = pc.getGraphModel(workspace);
         graph = graphModel.getGraphVisible();
-
+        nodes = graph.getNodes().toArray();
+        
         //Add index column
         Table table = graphModel.getNodeTable();
         table.addColumn(NODE_INDEX, Integer.class);
@@ -70,15 +71,16 @@ public abstract class AbstractCentrality implements Algorithm {
         graph = null;
         graphModel = null;
         workspace = null;
-        progress = null;        
+        progress = null;
+        nodes = null;
     }
 
     @Override
     public void run() {
+        int index = 0;
         graph.readLock();
-        try {
-            int index = 0;
-            for (Node s : graph.getNodes()) {
+        try {            
+            for (Node s : nodes) {
                 s.setAttribute(NODE_INDEX, index);
                 index++;
             }
@@ -89,20 +91,19 @@ public abstract class AbstractCentrality implements Algorithm {
             int diameter = 0;
             double avgDist = 0;
             int totalPaths = 0;
-            NodeIterable nodesIterable = graph.getNodes();
-            for (Node s : nodesIterable) {
+            double[] theta = new double[n];
+            int[] d = new int[n];
+            LinkedList<Node>[] P = new LinkedList[n];
+            
+            for (Node s : nodes) {
                 if (isCanceled) {
-                    nodesIterable.doBreak();
+                    return;
                 }
                 Stack<Node> S = new Stack<>();
 
-                LinkedList<Node>[] P = new LinkedList[n];
-                double[] theta = new double[n];
-                int[] d = new int[n];
-
                 int s_index = (Integer) s.getAttribute(NODE_INDEX);
 
-                //setInitParametetrsForNode(s, P, theta, d, s_index, n)
+                //Set init parametetrs for nodes
                 for (int j = 0; j < n; j++) {
                     P[j] = new LinkedList<>();
                     theta[j] = 0;
@@ -148,9 +149,7 @@ public abstract class AbstractCentrality implements Algorithm {
                 calculateCentrality(s_index, S, P, d, theta);
                 progress.progress();
             }
-
             avgDist /= totalPaths;//mN * (mN - 1.0f);
-
         } finally {
             graph.readUnlock();
         }
@@ -167,10 +166,10 @@ public abstract class AbstractCentrality implements Algorithm {
         }
         return edgeIter;
     }
-    
+
     @Override
     public AlgorithmFactory getFactory() {
         return factory;
-    }    
+    }
 
 }

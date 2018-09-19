@@ -159,7 +159,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, String> {
         // To refresh graph view  
         ticket.progress(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.refreshingGView"));
         ticket.switchToIndeterminate();
-        graphWC.refreshGraphView(toAddNodes, toRemoveNodes); // TODO: java.lang.IllegalArgumentException: The node is invalid
+        graphWC.refreshGraphView(workspace, toAddNodes, toRemoveNodes); // TODO: java.lang.IllegalArgumentException: The node is invalid
 
         return set;
     }

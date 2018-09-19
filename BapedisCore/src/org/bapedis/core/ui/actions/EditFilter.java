@@ -13,6 +13,7 @@ import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.model.FilterNode;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.filters.FilterSetupUI;
 import org.bapedis.core.ui.FilterExplorerTopComponent;
@@ -61,8 +62,9 @@ public class EditFilter extends GlobalContextSensitiveAction<Filter> {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (pc.getFilterModel().isRunning()) {
-            DialogDisplayer.getDefault().notify(pc.getFilterModel().getOwnerWS().getBusyNotifyDescriptor());
+        Workspace currentWS = pc.getCurrentWorkspace();
+        if (currentWS.isBusy()) {
+            DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
         } else {
             Collection<? extends Filter> context = lkpResult.allInstances();
             if (!context.isEmpty()) {

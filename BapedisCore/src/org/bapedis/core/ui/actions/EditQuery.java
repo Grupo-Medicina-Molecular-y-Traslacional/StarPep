@@ -14,9 +14,11 @@ import static javax.swing.Action.SMALL_ICON;
 import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.QueryModel;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.components.MetadataSelectorPanel;
 import org.bapedis.core.ui.components.SetupDialog;
+import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -65,15 +67,20 @@ public class EditQuery extends GlobalContextSensitiveAction<Metadata> {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Collection<? extends Metadata> context = lkpResult.allInstances();
-        if (!context.isEmpty()) {
-            Metadata metadata = context.iterator().next();
-            StarPepAnnotationType type = metadata.getAnnotationType();
-            MetadataSelectorPanel panel = new MetadataSelectorPanel(type);
-            if (dialog.setup(panel, panel, dialogTitle)) {
-                QueryModel queryModel = pc.getQueryModel();
-                List<Metadata> selectedMetada = panel.getSelectedMetadata();
-                queryModel.addAll(selectedMetada);
+        Workspace currentWS = pc.getCurrentWorkspace();
+        if (currentWS.isBusy()) {
+            DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
+        } else {
+            Collection<? extends Metadata> context = lkpResult.allInstances();
+            if (!context.isEmpty()) {
+                Metadata metadata = context.iterator().next();
+                StarPepAnnotationType type = metadata.getAnnotationType();
+                MetadataSelectorPanel panel = new MetadataSelectorPanel(type);
+                if (dialog.setup(panel, panel, dialogTitle)) {
+                    QueryModel queryModel = pc.getQueryModel();
+                    List<Metadata> selectedMetada = panel.getSelectedMetadata();
+                    queryModel.addAll(selectedMetada);
+                }
             }
         }
     }

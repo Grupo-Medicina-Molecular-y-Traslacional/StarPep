@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import static javax.swing.Action.SMALL_ICON;
 import org.bapedis.core.model.GraphVizSetting;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.ui.components.MetadataNetworkPanel;
@@ -48,22 +49,27 @@ public class ShowMetadataNetwork extends AbstractAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {        
-        GraphVizSetting graphViz = pc.getGraphVizSetting();
-        MetadataNetworkPanel metadataPanel = new MetadataNetworkPanel(graphViz);
-        DialogDescriptor dd = new DialogDescriptor(metadataPanel, NbBundle.getMessage(ShowMetadataNetwork.class, "ShowMetadataNetwork.metadataPanel.title"));
-        dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION});
-        if (DialogDisplayer.getDefault().notify(dd) == DialogDescriptor.OK_OPTION) {
-            for (MetadataNetworkPanel.MetadataRadioButton mrb : metadataPanel.getMetadataOptions()) {
-                if (mrb.getRadioButton().isSelected()) {
-                    graphViz.addDisplayedMetadata(mrb.getAnnotationType());
-                } else {
-                    graphViz.removeDisplayedMetadata(mrb.getAnnotationType());
+    public void actionPerformed(ActionEvent e) {
+        Workspace currentWS = pc.getCurrentWorkspace();
+        if (currentWS.isBusy()) {
+            DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
+        } else {
+            GraphVizSetting graphViz = pc.getGraphVizSetting();
+            MetadataNetworkPanel metadataPanel = new MetadataNetworkPanel(graphViz);
+            DialogDescriptor dd = new DialogDescriptor(metadataPanel, NbBundle.getMessage(ShowMetadataNetwork.class, "ShowMetadataNetwork.metadataPanel.title"));
+            dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION});
+            if (DialogDisplayer.getDefault().notify(dd) == DialogDescriptor.OK_OPTION) {
+                for (MetadataNetworkPanel.MetadataRadioButton mrb : metadataPanel.getMetadataOptions()) {
+                    if (mrb.getRadioButton().isSelected()) {
+                        graphViz.addDisplayedMetadata(mrb.getAnnotationType());
+                    } else {
+                        graphViz.removeDisplayedMetadata(mrb.getAnnotationType());
+                    }
+                }
+                if (graphWC != null) {
+                    graphWC.openGraphWindow();
                 }
             }
-            if (graphWC != null) {
-                graphWC.openGraphWindow();
-            }            
         }
     }
 

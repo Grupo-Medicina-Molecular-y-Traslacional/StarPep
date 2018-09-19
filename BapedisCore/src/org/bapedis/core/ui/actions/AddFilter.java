@@ -11,6 +11,7 @@ import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.bapedis.core.spi.filters.FilterSetupUI;
 import org.bapedis.core.model.FilterModel;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.ui.components.SetupDialog;
 import org.openide.DialogDisplayer;
 import org.openide.util.NbBundle;
@@ -33,10 +34,11 @@ public class AddFilter extends WorkspaceContextSensitiveAction<AttributesModel> 
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        FilterModel filterModel = pc.getFilterModel();
-        if (filterModel.isRunning()) {
-            DialogDisplayer.getDefault().notify(filterModel.getOwnerWS().getBusyNotifyDescriptor());
+        Workspace currentWS = pc.getCurrentWorkspace();
+        if (currentWS.isBusy()) {
+            DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
         } else {
+            FilterModel filterModel = pc.getFilterModel();
             Filter filter = filterFactory.createFilter();
             FilterSetupUI setupUI = filterFactory.getSetupUI();
             if (setupUI == null) {

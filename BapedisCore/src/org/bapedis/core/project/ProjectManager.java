@@ -29,6 +29,8 @@ import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
 import org.gephi.graph.api.Origin;
 import org.gephi.graph.api.Table;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
@@ -163,7 +165,11 @@ public class ProjectManager implements Lookup.Provider {
         }
         for (Workspace ws : workspaces) {
             if (ws != defaultWorkspace) {
-                content.remove(ws);
+                if (ws.isBusy()) {
+                    DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(NbBundle.getMessage(ProjectManager.class, "Workspace.busy.info", ws.getName()), NotifyDescriptor.WARNING_MESSAGE));
+                } else {
+                    content.remove(ws);
+                }                                
             }
         }
         setCurrentWorkspace(defaultWorkspace);

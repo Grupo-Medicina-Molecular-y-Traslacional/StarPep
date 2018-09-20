@@ -33,7 +33,7 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class FilterExecutor extends SwingWorker<TreeSet<Integer>, String> {
+public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Object> {
 
     protected static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected static final AlgorithmExecutor executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
@@ -66,6 +66,10 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, String> {
         taskName = NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.name");
     }
 
+    public FilterModel getFilterModel() {
+        return filterModel;
+    }        
+
     private void runAlgorithm(Algorithm preprocessingAlgo) {
         new Thread(new Runnable() {
             @Override
@@ -92,7 +96,6 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, String> {
 
     @Override
     protected TreeSet<Integer> doInBackground() throws Exception {
-        publish("start");
         pc.reportRunningTask(taskName, workspace);
 
         ticket.start();
@@ -134,6 +137,9 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, String> {
         try {
             for (Peptide peptide : targets) {
                 if (stopRun.get()) {
+                    set = null;
+                    toAddNodes = null;
+                    toRemoveNodes = null;
                     break;
                 }
 
@@ -157,15 +163,9 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, String> {
         // To refresh graph view  
         ticket.progress(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.refreshingGView"));
         ticket.switchToIndeterminate();
-        graphWC.refreshGraphView(workspace, toAddNodes, toRemoveNodes); // TODO: java.lang.IllegalArgumentException: The node is invalid
+        graphWC.refreshGraphView(workspace, toAddNodes, toRemoveNodes);
 
         return set;
-    }
-
-    @Override
-    protected void process(List<String> chunks) {
-        workspace.add(this);
-        filterModel.setRunning(true);
     }
 
     public FilterExecutor(Workspace workspace, FilterModel filterModel, AttributesModel attrModel, Graph graph, ProgressTicket ticket, AtomicBoolean stopRun, String taskName) {
@@ -190,10 +190,10 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, String> {
     protected void done() {
         try {
             TreeSet<Integer> set = get();
-            attrModel.setQuickFilter(filterModel.isEmpty() ? null : new QuickFilterImpl(set));
+            attrModel.setQuickFilter(set == null || filterModel.isEmpty() ? null : new QuickFilterImpl(set));
 
 //            attrModel.fireChangedGraphView();
-            if (filterModel.isEmpty()) {
+            if (attrModel.getQuickFilter() == null) {
                 pc.reportMsg(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.noFilter"), workspace);
             } else {
                 pc.reportMsg(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.output.text", set.size()), workspace);

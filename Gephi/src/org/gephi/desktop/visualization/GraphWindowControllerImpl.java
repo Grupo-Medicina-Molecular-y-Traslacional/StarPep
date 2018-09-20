@@ -72,6 +72,10 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
                     public void run() {
                         graphWindow.open();
                         graphWindow.requestActive();
+                        
+                        // Navigator windows
+                        TopComponent tc = WindowManager.getDefault().findTopComponent("navigatorTC"); //NOI18N
+                        tc.open();                        
                     }
                 });
             } else {
@@ -226,7 +230,7 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
                     for (Node neighbor : graphModel.getGraph().getNeighbors(node, relType)) {
                         added = metadataNodes.add(neighbor);
                         toAddEdges.add(graphModel.getGraph().getEdge(node, neighbor, relType));
-                        if (added) {                            
+                        if (added) {
                             addParentNodes(neighbor, metadataNodes, toAddEdges, graphModel);
                         }
                     }

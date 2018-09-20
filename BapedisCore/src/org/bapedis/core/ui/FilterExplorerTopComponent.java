@@ -282,6 +282,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         }
 
         final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/bapedis/core/resources/add.png", false), popup);
+        dropDownButton.setFocusable(false);
         dropDownButton.setToolTipText(NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.addFilter.tooltiptext"));
         dropDownButton.addActionListener(new ActionListener() {
             @Override
@@ -329,6 +330,9 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
             DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
         } else {
             FilterExecutor worker = new FilterExecutor(currentWS);
+            currentWS.add(worker);
+            FilterModel filterModel = worker.getFilterModel();
+            filterModel.setRunning(true);            
             worker.execute();
         }
     }

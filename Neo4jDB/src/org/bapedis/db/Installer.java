@@ -8,6 +8,7 @@ package org.bapedis.db;
 import java.io.File;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.task.QueryExecutor;
@@ -50,6 +51,8 @@ public class Installer extends ModuleInstall implements WorkspaceEventListener {
         if (newWs.getLookup().lookup(AttributesModel.class) == null) {
             //Load all peptides into the default workspace
             QueryExecutor worker = new QueryExecutor(newWs);
+            QueryModel queryModel = worker.getQueryModel();
+            queryModel.setRunning(true);
             worker.execute();
         }
     }

@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.ui;
 
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -40,6 +41,7 @@ import org.openide.util.NbPreferences;
 import org.openide.util.Utilities;
 import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
+import org.openide.windows.WindowManager;
 
 /**
  * Top component which displays something.
@@ -102,14 +104,15 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
 
         richTooltip = new RichTooltip(Bundle.CTL_QueryExplorerTopComponent(), NbBundle.getMessage(QueryExplorerTopComponent.class, "QueryExplorerTopComponent.info.text"));
     }
-    
+
     private JButton createAddQueryButton() {
         final JPopupMenu popup = new JPopupMenu();
-        for (StarPepAnnotationType type: StarPepAnnotationType.values()) {
+        for (StarPepAnnotationType type : StarPepAnnotationType.values()) {
             popup.add(new AddQuery(type));
         }
 
         final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/bapedis/core/resources/add.png", false), popup);
+        dropDownButton.setFocusable(false);
         dropDownButton.setToolTipText(NbBundle.getMessage(QueryExplorerTopComponent.class, "QueryExplorerTopComponent.addQuery.tooltiptext"));
         dropDownButton.addActionListener(new ActionListener() {
             @Override
@@ -120,7 +123,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
             }
         });
         return dropDownButton;
-    }    
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -295,7 +298,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         restrictiveComboBox.setSelectedItem(newModel.getRestriction());
         explorerMgr.setRootContext(newModel.getRootContext());
         refreshRunningState(newModel.isRunning());
-        newModel.addPropertyChangeListener(this);        
+        newModel.addPropertyChangeListener(this);
     }
 
     @Override
@@ -323,6 +326,9 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
             DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
         } else {
             QueryExecutor worker = new QueryExecutor(currentWS);
+            QueryModel queryModel = worker.getQueryModel();
+            queryModel.setRunning(true);
+            WindowManager.getDefault().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             worker.execute();
         }
     }

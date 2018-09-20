@@ -32,7 +32,7 @@ import org.openide.windows.WindowManager;
  *
  * @author loge
  */
-public class QueryExecutor extends SwingWorker<AttributesModel, String> {
+public class QueryExecutor extends SwingWorker<Void, AttributesModel> {
 
     protected static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected static GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
@@ -54,13 +54,19 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
         taskName = NbBundle.getMessage(QueryExecutor.class, "QueryExecutor.name");
     }
 
+    public QueryModel getQueryModel() {
+        return queryModel;
+    }
+
     @Override
-    protected AttributesModel doInBackground() throws Exception {
-        publish("start");
+    protected Void doInBackground() throws Exception {
         pc.reportRunningTask(taskName, workspace);
 
         PeptideDAO dao = Lookup.getDefault().lookup(PeptideDAO.class);
         AttributesModel model = dao.getPeptides(queryModel, graphModel);
+        //Publish AttributeModel
+        publish(model);
+
         //Set graph node for metadata
         Graph graph = graphModel.getGraph();
         graph.readLock();
@@ -86,27 +92,24 @@ public class QueryExecutor extends SwingWorker<AttributesModel, String> {
         graph.clear();
         graphWC.refreshGraphView(workspace, toAddNodes, null);
 
-        return model;
+        return null;
     }
 
     @Override
-    protected void process(List<String> chunks) {
-        queryModel.setRunning(true);
-        WindowManager.getDefault().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    protected void process(List<AttributesModel> chunks) {
+        AttributesModel attrModel = chunks.get(0);
+        // Set new Model
+        if (oldModel != null) {
+            workspace.remove(oldModel);
+        }
+        workspace.add(attrModel);
+        pc.reportMsg(NbBundle.getMessage(QueryExecutor.class, "QueryExecutor.output.text", attrModel.getNodeList().size()), workspace);
     }
 
     @Override
     protected void done() {
         try {
-            AttributesModel newModel = get();
-            // Set new Model
-            if (oldModel != null) {
-                workspace.remove(oldModel);
-            }
-            workspace.add(newModel);
-
-//            newModel.fireChangedGraphView();
-            pc.reportMsg(NbBundle.getMessage(QueryExecutor.class, "QueryExecutor.output.text", newModel.getNodeList().size()), workspace);
+            get();
         } catch (InterruptedException | ExecutionException ex) {
             Exceptions.printStackTrace(ex);
             pc.reportError(ex.getCause().toString(), workspace);

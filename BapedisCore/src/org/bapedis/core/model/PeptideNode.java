@@ -11,7 +11,6 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import javax.swing.Action;
-import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.actions.SelectNodeOnGraph;
 import org.openide.actions.PropertiesAction;
 import org.openide.nodes.AbstractNode;

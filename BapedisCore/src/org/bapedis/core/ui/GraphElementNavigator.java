@@ -62,11 +62,13 @@ import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
+import org.openide.actions.PropertiesAction;
 import org.openide.awt.MouseUtils;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.actions.SystemAction;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 
@@ -151,7 +153,7 @@ public class GraphElementNavigator extends JComponent implements
         findButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/search.png", false));
         findButton.setFocusable(false);
         toolBar.add(findButton);
-        
+
         toolBar.addSeparator();
         availableColumnsButton = new JButton();
         availableColumnsButton.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.availableColumnsButton.text"));
@@ -164,7 +166,7 @@ public class GraphElementNavigator extends JComponent implements
                 availableColumnsButtonActionPerformed(evt);
             }
         });
-        toolBar.add(availableColumnsButton);        
+        toolBar.add(availableColumnsButton);
         //----------
 
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
@@ -212,7 +214,7 @@ public class GraphElementNavigator extends JComponent implements
         if (navigatorModel.getVisualElement() != GraphElementType.Edge) {
             navigatorModel.setVisualElement(GraphElementType.Edge);
             reload();
-            availableColumnsButton.setEnabled(false);            
+            availableColumnsButton.setEnabled(false);
         }
     }
 
@@ -270,30 +272,26 @@ public class GraphElementNavigator extends JComponent implements
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public void workspaceChanged(Workspace oldWs, Workspace newWs) {
+    public synchronized void workspaceChanged(Workspace oldWs, Workspace newWs) {
         if (oldWs != null) {
-            GraphVizSetting oldModel = pc.getGraphVizSetting(oldWs);
-            if (oldModel != null) {
-                oldModel.removeGraphViewChangeListener(this);
-            }
+            GraphVizSetting oldGraphVizModel = pc.getGraphVizSetting(oldWs);
+            oldGraphVizModel.removeGraphViewChangeListener(this);
+            
             QueryModel oldQueryModel = pc.getQueryModel(oldWs);
             oldQueryModel.removePropertyChangeListener(this);
 
             FilterModel oldFilterModel = pc.getFilterModel(oldWs);
-            oldFilterModel.removePropertyChangeListener(this);            
+            oldFilterModel.removePropertyChangeListener(this);
         }
-        
+
         QueryModel queryModel = pc.getQueryModel(newWs);
         queryModel.addPropertyChangeListener(this);
 
         FilterModel filterModel = pc.getFilterModel(newWs);
         filterModel.addPropertyChangeListener(this);
-        
 
-        GraphVizSetting vizModel = pc.getGraphVizSetting(newWs);
-        if (vizModel != null) {
-            vizModel.addGraphViewChangeListener(this);
-        }
+        GraphVizSetting graphVizModel = pc.getGraphVizSetting(newWs);
+        graphVizModel.addGraphViewChangeListener(this);
 
         navigatorModel = newWs.getLookup().lookup(GraphElementNavigatorModel.class);
         if (navigatorModel == null) {
@@ -310,19 +308,21 @@ public class GraphElementNavigator extends JComponent implements
                 edgesBtn.setSelected(true);
                 availableColumnsButton.setEnabled(false);
                 break;
-        }        
-        
-        setBusyLabel(queryModel.isRunning() || filterModel.isRunning());
-        
-        reload();
+        }
+
+        if (queryModel.isRunning() || filterModel.isRunning()) {
+            setBusyLabel(true);
+        } else {
+            setBusyLabel(false);
+            reload();
+        }
     }
 
     private void reload() {
         setBusyLabel(true);
         GraphModel graphModel = pc.getGraphModel();
-        GraphView view = graphModel.getVisibleView();
-        Table columns = navigatorModel.getVisualElement() == GraphElementType.Node ? graphModel.getNodeTable() : graphModel.getEdgeTable();        
-        final Graph graph = graphModel.getGraph(view);
+        Table columns = navigatorModel.getVisualElement() == GraphElementType.Node ? graphModel.getNodeTable() : graphModel.getEdgeTable();
+        final Graph graph = graphModel.getGraphVisible();
         final GraphElementsDataTable dataModel = navigatorModel.getVisualElement() == GraphElementType.Node ? new GraphElementsDataTable(graph.getNodeCount(), getNodeColumns(columns))
                 : new GraphElementsDataTable(graph.getEdgeCount(), getEdgeColumns(columns));
         table.setModel(dataModel);
@@ -391,7 +391,7 @@ public class GraphElementNavigator extends JComponent implements
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
+    public synchronized void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(GraphVizSetting.CHANGED_GRAPH_VIEW)) {
             reload();
         } else if (evt.getSource() instanceof QueryModel) {
@@ -439,16 +439,14 @@ public class GraphElementNavigator extends JComponent implements
     public void panelDeactivated() {
         pc.removeWorkspaceEventListener(this);
         GraphVizSetting vizModel = pc.getGraphVizSetting();
-        if (vizModel != null) {
-            vizModel.removeGraphViewChangeListener(this);
-        }
-        
+        vizModel.removeGraphViewChangeListener(this);
+
         QueryModel queryModel = pc.getQueryModel();
         queryModel.removePropertyChangeListener(this);
 
         FilterModel filterModel = pc.getFilterModel();
         filterModel.removePropertyChangeListener(this);
-        
+
     }
 
     @Override
@@ -458,13 +456,12 @@ public class GraphElementNavigator extends JComponent implements
 
     class GraphElementPopupAdapter extends MouseUtils.PopupMouseAdapter {
 
-
         public GraphElementPopupAdapter() {
         }
 
         @Override
-        protected void showPopup(MouseEvent me) {
-            int selRow = table.rowAtPoint(me.getPoint());
+        protected void showPopup(MouseEvent evt) {
+            int selRow = table.rowAtPoint(evt.getPoint());
 
             if (selRow != -1) {
                 if (!table.getSelectionModel().isSelectedIndex(selRow)) {
@@ -474,48 +471,58 @@ public class GraphElementNavigator extends JComponent implements
                 int rowIndex = table.getSelectedRow();
                 GraphElementsDataTable dataModel = (GraphElementsDataTable) table.getModel();
                 Element element = dataModel.getElementAtRow(table.convertRowIndexToModel(rowIndex));
-                JPopupMenu contextMenu = new JPopupMenu();
+                JPopupMenu contextMenu = null;
                 if (element instanceof Node) {
+                    contextMenu = new JPopupMenu();
                     Node node = (Node) element;
                     contextMenu.add(new SelectNodeOnGraph(node));
                     contextMenu.add(new CenterNodeOnGraph(node));
+                    contextMenu.add(SystemAction.get(PropertiesAction.class));
                 } else if (element instanceof Edge) {
                     Edge edge = (Edge) element;
-                    // Add select
-                    JMenu selectMenu = new JMenu(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.selectOnGraph.name"));
-
-                    JMenuItem selectEdge = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.name"));
-                    selectEdge.addActionListener(new SelectEdgeOnGraph(edge));
-                    selectMenu.add(selectEdge);
-
-                    JMenuItem selectSource = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.source"));
-                    selectSource.addActionListener(new SelectNodeOnGraph(edge.getSource()));
-                    selectMenu.add(selectSource);
-
-                    JMenuItem selectTarget = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.target"));
-                    selectTarget.addActionListener(new SelectNodeOnGraph(edge.getTarget()));
-                    selectMenu.add(selectTarget);
-                    contextMenu.add(selectMenu);
-                    // Add center
-                    JMenu centerMenu = new JMenu(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.centerOnGraph.name"));
-
-                    JMenuItem centerSource = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.source"));
-                    centerSource.addActionListener(new CenterNodeOnGraph(edge.getSource()));
-                    centerMenu.add(centerSource);
-
-                    JMenuItem centerTarget = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.target"));
-                    centerTarget.addActionListener(new CenterNodeOnGraph(edge.getTarget()));
-                    centerMenu.add(centerTarget);
-
-                    contextMenu.add(centerMenu);
-
+                    contextMenu = createContextMenu(edge);
+                    contextMenu.add(SystemAction.get(PropertiesAction.class));
                 }
-                contextMenu.show(table, me.getX(), me.getY());
+                if (contextMenu != null) {
+                    contextMenu.show(table, evt.getX(), evt.getY());
+                }
             } else {
                 table.getSelectionModel().clearSelection();
             }
-            me.consume();
+            evt.consume();
         }
+    }
 
+    static JPopupMenu createContextMenu(Edge edge) {
+        JPopupMenu contextMenu = new JPopupMenu();
+        // Add select
+        JMenu selectMenu = new JMenu(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.selectOnGraph.name"));
+
+        JMenuItem selectEdge = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.name"));
+        selectEdge.addActionListener(new SelectEdgeOnGraph(edge));
+        selectMenu.add(selectEdge);
+
+        JMenuItem selectSource = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.source"));
+        selectSource.addActionListener(new SelectNodeOnGraph(edge.getSource()));
+        selectMenu.add(selectSource);
+
+        JMenuItem selectTarget = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.target"));
+        selectTarget.addActionListener(new SelectNodeOnGraph(edge.getTarget()));
+        selectMenu.add(selectTarget);
+        contextMenu.add(selectMenu);
+        // Add center
+        JMenu centerMenu = new JMenu(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.centerOnGraph.name"));
+
+        JMenuItem centerSource = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.source"));
+        centerSource.addActionListener(new CenterNodeOnGraph(edge.getSource()));
+        centerMenu.add(centerSource);
+
+        JMenuItem centerTarget = new JMenuItem(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edge.target"));
+        centerTarget.addActionListener(new CenterNodeOnGraph(edge.getTarget()));
+        centerMenu.add(centerTarget);
+
+        contextMenu.add(centerMenu);
+
+        return contextMenu;
     }
 }

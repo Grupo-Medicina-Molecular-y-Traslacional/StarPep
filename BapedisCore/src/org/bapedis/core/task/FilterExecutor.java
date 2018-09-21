@@ -33,7 +33,7 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Object> {
+public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Void> {
 
     protected static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected static final AlgorithmExecutor executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
@@ -188,23 +188,25 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Object> {
 
     @Override
     protected void done() {
+        TreeSet<Integer> set = null;
         try {
-            TreeSet<Integer> set = get();
+            set = get();
+        } catch (InterruptedException | ExecutionException ex) {
+            Exceptions.printStackTrace(ex);
+            pc.reportError(ex.getCause().toString(), workspace);
+        } finally {
+            ticket.finish();
+            filterModel.setRunning(false);
+            
             attrModel.setQuickFilter(set == null || filterModel.isEmpty() ? null : new QuickFilterImpl(set));
 
             if (attrModel.getQuickFilter() == null) {
                 pc.reportMsg(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.noFilter"), workspace);
             } else {
                 pc.reportMsg(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.output.text", set.size()), workspace);
-            }
-        } catch (InterruptedException | ExecutionException ex) {
-            Exceptions.printStackTrace(ex);
-            pc.reportError(ex.getCause().toString(), workspace);
-        } finally {
-            ticket.finish();
-            workspace.remove(this);
-            filterModel.setRunning(false);
+            }            
             pc.getGraphVizSetting().fireChangedGraphView();
+            
             if (pc.getCurrentWorkspace() != workspace) {
                 String txt = NbBundle.getMessage(FilterExecutor.class, "Workspace.notify.finishedTask", taskName);
                 pc.workspaceChangeNotification(txt, workspace);

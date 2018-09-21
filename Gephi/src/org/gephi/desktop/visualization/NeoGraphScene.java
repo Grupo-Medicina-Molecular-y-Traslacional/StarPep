@@ -67,6 +67,7 @@ import org.openide.awt.UndoRedo;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.Lookups;
@@ -95,6 +96,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     private final JCheckBoxMenuItem showPeptideLabelsItem = new JCheckBoxMenuItem();
     private final JPopupMenu configurePopup = new JPopupMenu();
     private final JButton configureButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/configure.png", false), configurePopup);
+    private final JToggleButton extendButton = new JToggleButton();
+
     //Node
     private final JToggleButton showNodeLabelsButton = new JToggleButton();
     private final JButton nodeFontButton = new JButton();
@@ -120,7 +123,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         GraphDrawable drawable = VizController.getInstance().getDrawable();
         graphPanel.add(drawable.getGraphComponent(), BorderLayout.CENTER);
-        graphPanel.add(new BottomPanel(), BorderLayout.PAGE_END);
+        graphPanel.add(extendedBar, BorderLayout.PAGE_START);
+        graphPanel.add(bottomToolbar, BorderLayout.PAGE_END);
         content = new InstanceContent();
         lookup = new ProxyLookup(new AbstractLookup(content), Lookups.singleton(new GraphElementNavigatorLookupHint()));
     }
@@ -238,6 +242,7 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
                     selectionManager.setDraggingMouseSelection();
                     selectionManager.resetSelection();
                     configureLink.setEnabled(true);
+                    extendedBar.unselect();
                 }
             }
         });
@@ -336,6 +341,48 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         });
         configurePopup.add(showPeptideLabelsItem);
         topToolbar.add(configureButton);
+
+        //More/Less button
+        topToolbar.addSeparator();
+        extendButton.setFocusable(false);
+        if (extendButton.isSelected()) {
+            extendButton.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.extendButton.less"));
+            extendButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.extendButton.less.toolTip"));
+            extendButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowUp.png", false)); // NOI18N
+            extendButton.setRolloverIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowUp_rollover.png", false)); // NOI18N            
+        } else {
+            extendButton.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.extendButton.more"));
+            extendButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.extendButton.more.toolTip"));
+            extendButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowDown.png", false)); // NOI18N
+            extendButton.setRolloverIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowDown_rollover.png", false)); // NOI18N
+        }
+        extendButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                refreshExtendedBar();
+                VizModel vizModel = VizController.getInstance().getVizModel();
+                if (vizModel.isMoreOptions() != extendButton.isSelected()) {
+                    vizModel.setMoreOptions(extendButton.isSelected());
+                }
+            }
+        });
+        extendedBar.setVisible(extendButton.isSelected());
+        topToolbar.add(extendButton);
+    }
+
+    private void refreshExtendedBar() {
+        if (extendButton.isSelected()) {
+            extendButton.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.extendButton.less"));
+            extendButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.extendButton.less.toolTip"));
+            extendButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowUp.png", false)); // NOI18N
+            extendButton.setRolloverIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowUp_rollover.png", false)); // NOI18N            
+        } else {
+            extendButton.setText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.extendButton.more"));
+            extendButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.extendButton.more.toolTip"));
+            extendButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowDown.png", false)); // NOI18N
+            extendButton.setRolloverIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowDown_rollover.png", false)); // NOI18N
+        }
+        extendedBar.setVisible(extendButton.isSelected());
     }
 
     private JPopupMenu createPopup() {
@@ -566,37 +613,6 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
             }
         });
         bottomToolbar.add(edgeSizeSlider);
-
-        //Advaced button
-        bottomToolbar.addSeparator();
-
-//        graphPanel.add(extendedBar, BorderLayout.PAGE_START);
-        final JToggleButton extendButton = new JToggleButton();
-        extendButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.extendButton.text"));
-        if (extendButton.isSelected()) {
-            extendButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowDown.png", false)); // NOI18N
-            extendButton.setRolloverIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowDown_rollover.png", false)); // NOI18N
-
-        } else {
-            extendButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowUp.png", false)); // NOI18N
-            extendButton.setRolloverIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowUp_rollover.png", false)); // NOI18N
-        }
-        extendButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (extendButton.isSelected()) {
-                    extendButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowDown.png", false)); // NOI18N
-                    extendButton.setRolloverIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowDown_rollover.png", false)); // NOI18N
-                } else {
-                    extendButton.setIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowUp.png", false)); // NOI18N
-                    extendButton.setRolloverIcon(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/arrowUp_rollover.png", false)); // NOI18N
-                }
-                extendedBar.setVisible(extendButton.isSelected());
-            }
-        });
-        extendedBar.setVisible(extendButton.isSelected());
-        bottomToolbar.add(extendButton);
     }
 
     public void setBusy(boolean busy) {
@@ -620,6 +636,10 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
 
         //Auto select neighbor
         autoSelectNeighborItem.setSelected(vizModel.isAutoSelectNeighbor());
+
+        //More ore Less options
+        extendButton.setSelected(vizModel.isMoreOptions());
+        refreshExtendedBar();
 
         //Show peptide labels
         showPeptideLabelsItem.setSelected(vizModel.getTextModel().isShowPeptideLabels());
@@ -820,16 +840,6 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     @Override
     public VizEvent.Type getType() {
         return VizEvent.Type.NODE_LEFT_CLICK;
-    }
-
-    private class BottomPanel extends JPanel {
-
-        public BottomPanel() {
-            setLayout(new BorderLayout());
-            add(extendedBar, BorderLayout.CENTER);
-            add(bottomToolbar, BorderLayout.SOUTH);
-        }
-
     }
 
 }

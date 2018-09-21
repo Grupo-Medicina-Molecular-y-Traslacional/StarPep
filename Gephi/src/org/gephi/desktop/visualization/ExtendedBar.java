@@ -12,6 +12,8 @@ import org.gephi.ui.utils.UIUtils;
 public class ExtendedBar extends javax.swing.JPanel {
 
     private final DesktopToolController toolController;
+    private final Toolbar toolbar;
+    private final PropertiesBar propertiesBar;
 
     /**
      * Creates new form ExtendedBar
@@ -23,11 +25,16 @@ public class ExtendedBar extends javax.swing.JPanel {
         }
 
         toolController = new DesktopToolController();
-        leftPanel.add(toolController.getToolbar(), BorderLayout.CENTER);
-        rightPanel.add(toolController.getPropertiesBar(), BorderLayout.CENTER);
-        
-//            toolController.unselect();        
+        toolbar = toolController.getToolbar();
+        propertiesBar = toolController.getPropertiesBar();
+        leftPanel.add(toolbar, BorderLayout.CENTER);
+        rightPanel.add(propertiesBar, BorderLayout.CENTER);        
     }
+
+     public void unselect(){
+         toolController.unselect();
+         toolbar.clearSelection();
+     }       
 
     /**
      * This method is called from within the constructor to initialize the form.

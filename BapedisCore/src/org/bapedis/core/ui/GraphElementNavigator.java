@@ -47,12 +47,12 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.actions.CenterNodeOnGraph;
 import org.bapedis.core.ui.actions.SelectEdgeOnGraph;
 import org.bapedis.core.ui.actions.SelectNodeOnGraph;
+import org.bapedis.core.ui.actions.ShowPropertiesAction;
 import org.bapedis.core.ui.components.GraphElementAvailableColumnsPanel;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Element;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.GraphView;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.Table;
 import org.jdesktop.swingx.JXBusyLabel;
@@ -62,13 +62,11 @@ import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
-import org.openide.actions.PropertiesAction;
 import org.openide.awt.MouseUtils;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.actions.SystemAction;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 
@@ -176,16 +174,16 @@ public class GraphElementNavigator extends JComponent implements
         // Botton toolbar
         bottomToolbar = new JToolBar();
         bottomToolbar.setFloatable(false);
-        nodeSizeLabel = new JLabel();
-        edgeSizeLabel = new JLabel();
+        nodeSizeLabel = new JLabel(ImageUtilities.loadImageIcon("/org/bapedis/core/resources/rightArrow.png", false));
+        edgeSizeLabel = new JLabel(ImageUtilities.loadImageIcon("/org/bapedis/core/resources/rightArrow.png", false));
         bottomToolbar.add(nodeSizeLabel);
         bottomToolbar.addSeparator();
         bottomToolbar.add(edgeSizeLabel);
         add(bottomToolbar, BorderLayout.SOUTH);
-        
+
         edgeColumns = new GraphElementDataColumn[]{new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Source),
-                                                     null,
-                                                     new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Target)};
+            null,
+            new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Target)};
     }
 
     private void initToogleButton(JToggleButton btn) {
@@ -278,7 +276,7 @@ public class GraphElementNavigator extends JComponent implements
         if (oldWs != null) {
             GraphVizSetting oldGraphVizModel = pc.getGraphVizSetting(oldWs);
             oldGraphVizModel.removeGraphViewChangeListener(this);
-            
+
             QueryModel oldQueryModel = pc.getQueryModel(oldWs);
             oldQueryModel.removePropertyChangeListener(this);
 
@@ -477,11 +475,11 @@ public class GraphElementNavigator extends JComponent implements
                     Node node = (Node) element;
                     contextMenu.add(new SelectNodeOnGraph(node));
                     contextMenu.add(new CenterNodeOnGraph(node));
-                    contextMenu.add(SystemAction.get(PropertiesAction.class));
+                    contextMenu.add(new ShowPropertiesAction(new GraphNodeWrapper(node)));
                 } else if (element instanceof Edge) {
                     Edge edge = (Edge) element;
                     contextMenu = createContextMenu(edge);
-                    contextMenu.add(SystemAction.get(PropertiesAction.class));
+                    contextMenu.add(new ShowPropertiesAction(new GraphEdgeWrapper(edge)));
                 }
                 if (contextMenu != null) {
                     contextMenu.show(table, evt.getX(), evt.getY());

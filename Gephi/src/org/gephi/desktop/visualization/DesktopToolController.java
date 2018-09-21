@@ -161,7 +161,7 @@ public class DesktopToolController {
         }
     }
 
-    public JComponent getToolbar() {
+    public Toolbar getToolbar() {
 
         //Get tools ui
         HashMap<ToolUI, Tool> toolMap = new HashMap<>();
@@ -242,7 +242,7 @@ public class DesktopToolController {
         return toolbar;
     }
 
-    public JComponent getPropertiesBar() {
+    public PropertiesBar getPropertiesBar() {
         propertiesBar = new PropertiesBar();
         return propertiesBar;
     }
@@ -503,7 +503,6 @@ class PropertiesBar extends JPanel {
 //        c.add(fullScreenButton, BorderLayout.CENTER);
 //        return c;
 //    }
-
     @Override
     public void setEnabled(final boolean enabled) {
         SwingUtilities.invokeLater(new Runnable() {

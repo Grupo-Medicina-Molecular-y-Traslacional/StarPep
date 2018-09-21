@@ -23,7 +23,6 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
@@ -78,7 +77,7 @@ import org.openide.util.lookup.ProxyLookup;
 )
 @TopComponent.Registration(mode = "editor", openAtStartup = true)
 @ActionID(category = "Window", id = "org.bapedis.core.ui.PeptideViewerTopComponent")
-@ActionReference(path = "Menu/Window" , position = 233 )
+@ActionReference(path = "Menu/Window", position = 233)
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_PeptideViewerAction",
         preferredID = "PeptideViewerTopComponent"
@@ -92,7 +91,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         ExplorerManager.Provider, WorkspaceEventListener, LookupListener, PropertyChangeListener {
 
     protected final ProjectManager pc;
-    protected Lookup.Result<AttributesModel> peptideLkpResult;
+    protected Lookup.Result<AttributesModel> attrModelLkpResult;
     protected AttributesModel currentModel;
     protected final ExplorerManager explorerMgr;
     protected final OutlineView view;
@@ -147,28 +146,24 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
         // Left toolbar: Feature Extraction        
 //        leftToolBar.add(createAddMDButton(), 0);
-        
         // Left toolbar: Feature Removing
 //        JButton removeMDButton = new JButton(new FeatureRemovingAction());
 //        removeMDButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.removeMDButton.toolTipText"));
 //        removeMDButton.setIcon(new ImageIcon(getClass().getResource("/org/bapedis/core/resources/delete_md.gif")));
 //        removeMDButton.setFocusable(false);
 //        leftToolBar.add(removeMDButton, 1);
-        
         // Left toolbar: Feature filtering
 //        JButton filterMDButton = new JButton(new FeatureFilteringAction());
 //        filterMDButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.filterMDButton.toolTipText"));
 //        filterMDButton.setIcon(new ImageIcon(getClass().getResource("/org/bapedis/core/resources/filter_md.png")));
 //        filterMDButton.setFocusable(false);
 //        leftToolBar.add(filterMDButton, 2);
-        
         // Left toolbar: Feature explorer
 //        JButton columnsButton = new JButton(new FeatureExplorerAction());
 //        columnsButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.columnsButton.toolTipText"));
 //        columnsButton.setIcon(new ImageIcon(getClass().getResource("/org/bapedis/core/resources/select_md.png")));
 //        columnsButton.setFocusable(false);
 //        leftToolBar.add(columnsButton, 3);
-        
         // Left toolbar: Export button
 //        leftToolBar.add(createExportButton(), 4);
     }
@@ -234,7 +229,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             view.setPropertyColumns(new String[]{});
         }
 
-    }    
+    }
 
     private void populateFilterFields(AttributesModel attrModel) {
         jFieldComboBox.removeAllItems();
@@ -431,9 +426,9 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }
 
     private void removeLookupListener() {
-        if (peptideLkpResult != null) {
-            peptideLkpResult.removeLookupListener(this);
-            peptideLkpResult = null;
+        if (attrModelLkpResult != null) {
+            attrModelLkpResult.removeLookupListener(this);
+            attrModelLkpResult = null;
         }
     }
 
@@ -455,7 +450,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     @Override
     public void componentClosed() {
         removeLookupListener();
-        pc.removeWorkspaceEventListener(this);        
+        pc.removeWorkspaceEventListener(this);
         if (currentModel != null) {
             currentModel.removeQuickFilterChangeListener(this);
         }
@@ -483,6 +478,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             if (oldAttrModel != null) {
                 oldAttrModel.removeQuickFilterChangeListener(this);
             }
+
             QueryModel oldQueryModel = pc.getQueryModel(oldWs);
             oldQueryModel.removePropertyChangeListener(this);
 
@@ -490,8 +486,8 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             oldFilterModel.removePropertyChangeListener(this);
 
         }
-        peptideLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
-        peptideLkpResult.addLookupListener(this);
+        attrModelLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
+        attrModelLkpResult.addLookupListener(this);
 
         QueryModel queryModel = pc.getQueryModel(newWs);
         queryModel.addPropertyChangeListener(this);
@@ -499,29 +495,24 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         FilterModel filterModel = pc.getFilterModel(newWs);
         filterModel.addPropertyChangeListener(this);
 
-        setBusyLabel(queryModel.isRunning() || filterModel.isRunning());
-
-        AttributesModel peptidesModel = pc.getAttributesModel(newWs);
-        setData(peptidesModel);
+        if (queryModel.isRunning() || filterModel.isRunning()) {
+            setBusyLabel(true);
+        } else {
+            AttributesModel peptidesModel = pc.getAttributesModel(newWs);
+            setData(peptidesModel);
+        }
     }
 
     @Override
     public void resultChanged(LookupEvent le) {
-        if (le.getSource().equals(peptideLkpResult)) {
-            Collection<? extends AttributesModel> attrModels = peptideLkpResult.allInstances();
+        if (le.getSource().equals(attrModelLkpResult)) {
+            Collection<? extends AttributesModel> attrModels = attrModelLkpResult.allInstances();
             if (!attrModels.isEmpty()) {
                 if (currentModel != null) {
                     currentModel.removeQuickFilterChangeListener(this);
                     currentModel.removeDisplayColumnChangeListener(this);
                 }
-                final AttributesModel attrModel = attrModels.iterator().next();
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        setData(attrModel);
-                    }
-                });
-
+                setData(attrModels.iterator().next());
             }
         }
     }
@@ -537,15 +528,15 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             currentModel.addDisplayColumnChangeListener(this);
             int fetchedData = currentModel.getNodeList().size();
             jFetchedLabel.setText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jFetchedLabel.text", fetchedData));
-            int filteredData = currentModel.getPeptides().size();            
+            int filteredData = currentModel.getPeptides().size();
             jFilteredLabel.setText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jFilteredLabel.text", filteredData));
             jFilteredLabel.setVisible(fetchedData != filteredData);
-        }else{
+        } else {
             jFetchedLabel.setText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jFetchedLabel.text", 0));
             jFilteredLabel.setText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jFilteredLabel.text", 0));
             jFilteredLabel.setVisible(false);
         }
-        
+
     }
 
     private void setQuickFilter() {

@@ -106,6 +106,7 @@ public class VizConfig {
     public static final String MOUSE_SELECTION_ZOOM_PROPORTIONAL = "VizConfig.mouseSelectionZoomProportionnal";
     public static final String MOUSE_SELECTION_WHILE_DRAGGING = "VizConfig.mouseSelectionUpdateWhileDragging";
     public static final String DISABLE_LOD = "VizConfig.disableLOD";
+    public static final String MORE_OPTIONS = "VizConfig.moreOptions";
     //Default values
     public static final Color DEFAULT_BACKGROUND_COLOR = Color.WHITE;
     public static final boolean DEFAULT_NODE_LABELS = false;
@@ -160,6 +161,7 @@ public class VizConfig {
     public static final boolean DEFAULT_DISABLE_LOD = false;
     public static final boolean DEFAULT_SHOW_HULLS = true;
     public static final float DEFAULT_EDGE_SCALE = 2f;
+    public static final boolean DEFAULT_MORE_OPTIONS = false;
     //Default config - loaded in the VizModel
     protected Color defaultBackgroundColor = ColorUtils.decode(NbPreferences.forModule(VizConfig.class).get(BACKGROUND_COLOR, ColorUtils.encode(DEFAULT_BACKGROUND_COLOR)));
     protected float[] defaultCameraTarget = {0f, 0f, 0f};
@@ -220,7 +222,8 @@ public class VizConfig {
     protected boolean mouseSelectionZoomProportionnal = NbPreferences.forModule(VizConfig.class).getBoolean(MOUSE_SELECTION_ZOOM_PROPORTIONAL, DEFAULT_MOUSE_SELECTION_ZOOM_PROPORTIONAL);
     protected boolean mouseSelectionUpdateWhileDragging = NbPreferences.forModule(VizConfig.class).getBoolean(MOUSE_SELECTION_WHILE_DRAGGING, DEFAULT_MOUSE_SELECTION_WHILE_DRAGGING);
     protected boolean disableLOD = NbPreferences.forModule(VizConfig.class).getBoolean(DISABLE_LOD, DEFAULT_DISABLE_LOD);
-    protected boolean enableAutoSelect = true;      //Overriden in Engine - Temporary used by tools like ShortestPath
+    protected boolean enableAutoSelect = true; //Overriden in Engine - Temporary used by tools like ShortestPath
+    protected boolean defaultMoreOptions = NbPreferences.forModule(VizConfig.class).getBoolean(MORE_OPTIONS, DEFAULT_MORE_OPTIONS);
 
     public int getAntialiasing() {
         return antialiasing;
@@ -249,6 +252,10 @@ public class VizConfig {
     public boolean isDefaultAutoSelectNeighbor() {
         return defaultAutoSelectNeighbor;
     }
+
+    public boolean isDefaultMoreOptions() {
+        return defaultMoreOptions;
+    }        
 
     public Color getDefaultBackgroundColor() {
         return defaultBackgroundColor;
@@ -305,10 +312,10 @@ public class VizConfig {
     public boolean isDefaultShowNodeLabels() {
         return defaultShowNodeLabels;
     }
-    
+
     public boolean isDefaultShowPeptideLabels() {
         return defaultShowPeptideLabels;
-    }    
+    }
 
     public boolean isDefaultUniColorSelected() {
         return defaultUniColorSelected;
@@ -498,4 +505,5 @@ public class VizConfig {
     public float getDefaultEdgeScale() {
         return defaultEdgeScale;
     }
+        
 }

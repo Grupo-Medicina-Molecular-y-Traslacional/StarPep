@@ -321,6 +321,13 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
             runButton.setText(NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.runButton.text"));
             runButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/run.gif", false));
             runButton.setToolTipText(NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.runButton.toolTipText"));
+            
+            //Remove filter excecutor from current workspace
+            Workspace workspace = pc.getCurrentWorkspace();
+            FilterExecutor executor = workspace.getLookup().lookup(FilterExecutor.class);
+            if (executor != null){
+                workspace.remove(executor);
+            }
         }
     }
 
@@ -329,10 +336,13 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         if (currentWS.isBusy()) {
             DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
         } else {
+            //Add filter executor to the current workspace
             FilterExecutor worker = new FilterExecutor(currentWS);
             currentWS.add(worker);
+            
             FilterModel filterModel = worker.getFilterModel();
-            filterModel.setRunning(true);            
+            filterModel.setRunning(true);
+            
             worker.execute();
         }
     }

@@ -84,6 +84,7 @@ public class VizModel {
     protected float[] edgeBothSelectionColor;
     protected boolean adjustByText;
     protected float edgeScale;
+    protected boolean moreOptions;
     //Listener
     protected List<PropertyChangeListener> listeners = new ArrayList<>();
     private boolean defaultModel = false;
@@ -145,6 +146,7 @@ public class VizModel {
         edgeOutSelectionColor = config.getDefaultEdgeOutSelectedColor().getRGBComponents(null);
         edgeBothSelectionColor = config.getDefaultEdgeBothSelectedColor().getRGBComponents(null);
         edgeScale = config.getDefaultEdgeScale();
+        moreOptions = config.isDefaultMoreOptions();
     }
 
     //GETTERS
@@ -199,6 +201,10 @@ public class VizModel {
     public boolean isUniColorSelected() {
         return uniColorSelected;
     }
+
+    public boolean isMoreOptions() {
+        return moreOptions;
+    }        
     
     public VizConfig getConfig() {
         return config;
@@ -295,6 +301,11 @@ public class VizModel {
         this.edgeScale = edgeScale;
         fireProperyChange("edgeScale", null, edgeScale);
     }
+
+    public void setMoreOptions(boolean moreOptions) {
+        this.moreOptions = moreOptions;
+        fireProperyChange("moreOptions", null, moreOptions);
+    }        
     
     public GraphLimits getLimits() {
         return limits;
@@ -305,8 +316,8 @@ public class VizModel {
         return drawable.getCameraVector().length();
     }
     
-    public void setCameraDistance(float distance) {
-    }
+//    public void setCameraDistance(float distance) {
+//    }
 
     //EVENTS
     public void addPropertyChangeListener(PropertyChangeListener listener) {

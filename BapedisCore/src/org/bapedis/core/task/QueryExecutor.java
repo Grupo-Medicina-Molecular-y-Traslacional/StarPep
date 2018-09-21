@@ -32,7 +32,7 @@ import org.openide.windows.WindowManager;
  *
  * @author loge
  */
-public class QueryExecutor extends SwingWorker<Void, AttributesModel> {
+public class QueryExecutor extends SwingWorker<AttributesModel, Void> {
 
     protected static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected static GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
@@ -59,13 +59,11 @@ public class QueryExecutor extends SwingWorker<Void, AttributesModel> {
     }
 
     @Override
-    protected Void doInBackground() throws Exception {
+    protected AttributesModel doInBackground() throws Exception {
         pc.reportRunningTask(taskName, workspace);
 
         PeptideDAO dao = Lookup.getDefault().lookup(PeptideDAO.class);
         AttributesModel model = dao.getPeptides(queryModel, graphModel);
-        //Publish AttributeModel
-        publish(model);
 
         //Set graph node for metadata
         Graph graph = graphModel.getGraph();
@@ -92,29 +90,27 @@ public class QueryExecutor extends SwingWorker<Void, AttributesModel> {
         graph.clear();
         graphWC.refreshGraphView(workspace, toAddNodes, null);
 
-        return null;
-    }
-
-    @Override
-    protected void process(List<AttributesModel> chunks) {
-        AttributesModel attrModel = chunks.get(0);
-        // Set new Model
-        if (oldModel != null) {
-            workspace.remove(oldModel);
-        }
-        workspace.add(attrModel);
-        pc.reportMsg(NbBundle.getMessage(QueryExecutor.class, "QueryExecutor.output.text", attrModel.getNodeList().size()), workspace);
+        return model;
     }
 
     @Override
     protected void done() {
+        AttributesModel attrModel = null;
         try {
-            get();
+            attrModel = get();
+            pc.reportMsg(NbBundle.getMessage(QueryExecutor.class, "QueryExecutor.output.text", attrModel.getNodeList().size()), workspace);
         } catch (InterruptedException | ExecutionException ex) {
             Exceptions.printStackTrace(ex);
             pc.reportError(ex.getCause().toString(), workspace);
         } finally {
             queryModel.setRunning(false);
+            // Set new Model
+            if (oldModel != null) {
+                workspace.remove(oldModel);
+            }
+            if (attrModel != null) {
+                workspace.add(attrModel);
+            }
             pc.getGraphVizSetting().fireChangedGraphView();
             WindowManager.getDefault().getMainWindow().setCursor(Cursor.getDefaultCursor());
             if (pc.getCurrentWorkspace() != workspace) {

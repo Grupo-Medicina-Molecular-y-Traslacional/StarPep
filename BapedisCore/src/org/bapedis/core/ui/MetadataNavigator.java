@@ -40,10 +40,10 @@ import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.GraphEdgeAttributeColumn;
+import org.bapedis.core.model.GraphEdgeWrapper;
 import org.bapedis.core.model.GraphElementAttributeColumn;
 import org.bapedis.core.model.GraphElementDataColumn;
 import org.bapedis.core.model.GraphElementsDataTable;
-import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.MetadataNavigatorModel;
 import org.bapedis.core.model.MetadataNode;
 import org.bapedis.core.model.Peptide;
@@ -52,6 +52,7 @@ import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
+import org.bapedis.core.ui.actions.ShowPropertiesAction;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.EdgeIterable;
 import org.gephi.graph.api.Element;
@@ -66,14 +67,12 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
-import org.openide.actions.PropertiesAction;
 import org.openide.awt.MouseUtils;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
 import org.openide.util.Utilities;
-import org.openide.util.actions.SystemAction;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 
@@ -95,7 +94,9 @@ public class MetadataNavigator extends JComponent implements
     protected final JXTable table;
     protected final JXBusyLabel busyLabel;
     protected final JLabel fetchedSizeLabel, filteredSizeLabel;
-    protected Lookup.Result<PeptideNode> lkpResult;
+    protected Lookup.Result<PeptideNode> peptideLkpResult;
+    protected Lookup.Result<AttributesModel> attrModelLkpResult;
+    protected AttributesModel currentModel;
     private final RowSorterListener sorterListener;
     private final DefaultComboBoxModel comboBoxModel;
     protected final JComboBox comboBox;
@@ -131,7 +132,7 @@ public class MetadataNavigator extends JComponent implements
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         busyLabel.setText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.busyLabel.text"));
-
+        
         findButton = new JButton(table.getActionMap().get("find"));
         findButton.setText("");
         findButton.setToolTipText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.findButton.toolTipText"));
@@ -250,9 +251,12 @@ public class MetadataNavigator extends JComponent implements
 
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
+        removeAttrLookupListener();
         if (oldWs != null) {
-            GraphVizSetting oldGraphVizModel = pc.getGraphVizSetting(oldWs);
-            oldGraphVizModel.removeGraphViewChangeListener(this);
+            AttributesModel oldAttrModel = pc.getAttributesModel(oldWs);
+            if (oldAttrModel != null) {
+                oldAttrModel.removeQuickFilterChangeListener(this);
+            }
 
             QueryModel oldQueryModel = pc.getQueryModel(oldWs);
             oldQueryModel.removePropertyChangeListener(this);
@@ -263,14 +267,19 @@ public class MetadataNavigator extends JComponent implements
             comboBox.setSelectedIndex(-1);
         }
 
+        attrModelLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
+        attrModelLkpResult.addLookupListener(this);
+
         QueryModel queryModel = pc.getQueryModel(newWs);
         queryModel.addPropertyChangeListener(this);
 
         FilterModel filterModel = pc.getFilterModel(newWs);
         filterModel.addPropertyChangeListener(this);
 
-        GraphVizSetting graphVizModel = pc.getGraphVizSetting(newWs);
-        graphVizModel.addGraphViewChangeListener(this);
+        currentModel = pc.getAttributesModel(newWs);
+        if (currentModel != null) {
+            currentModel.addQuickFilterChangeListener(this);
+        }
 
         navigatorModel = newWs.getLookup().lookup(MetadataNavigatorModel.class);
         if (navigatorModel == null) {
@@ -300,8 +309,8 @@ public class MetadataNavigator extends JComponent implements
 
     @Override
     public void panelActivated(Lookup lkp) {
-        lkpResult = Utilities.actionsGlobalContext().lookupResult(PeptideNode.class);
-        lkpResult.addLookupListener(this);
+        peptideLkpResult = Utilities.actionsGlobalContext().lookupResult(PeptideNode.class);
+        peptideLkpResult.addLookupListener(this);
 
         pc.addWorkspaceEventListener(this);
         Workspace currentWorkspace = pc.getCurrentWorkspace();
@@ -310,11 +319,13 @@ public class MetadataNavigator extends JComponent implements
 
     @Override
     public void panelDeactivated() {
-        lkpResult.removeLookupListener(this);
+        peptideLkpResult.removeLookupListener(this);
+        removeAttrLookupListener();
         pc.removeWorkspaceEventListener(this);
 
-        GraphVizSetting vizModel = pc.getGraphVizSetting();
-        vizModel.removeGraphViewChangeListener(this);
+        if (currentModel != null) {
+            currentModel.removeQuickFilterChangeListener(this);
+        }
 
         QueryModel queryModel = pc.getQueryModel();
         queryModel.removePropertyChangeListener(this);
@@ -322,6 +333,13 @@ public class MetadataNavigator extends JComponent implements
         FilterModel filterModel = pc.getFilterModel();
         filterModel.removePropertyChangeListener(this);
 
+    }
+
+    private void removeAttrLookupListener() {
+        if (attrModelLkpResult != null) {
+            attrModelLkpResult.removeLookupListener(this);
+            attrModelLkpResult = null;
+        }
     }
 
     @Override
@@ -354,8 +372,18 @@ public class MetadataNavigator extends JComponent implements
 
     @Override
     public void resultChanged(LookupEvent le) {
-        if (le.getSource().equals(lkpResult)) {
-            Collection<? extends PeptideNode> peptideNodes = lkpResult.allInstances();
+        if (le.getSource().equals(attrModelLkpResult)) {
+            Collection<? extends AttributesModel> attrModels = attrModelLkpResult.allInstances();
+            if (!attrModels.isEmpty()) {
+                if (currentModel != null) {
+                    currentModel.removeQuickFilterChangeListener(this);
+                }
+                currentModel = attrModels.iterator().next();
+                currentModel.addQuickFilterChangeListener(this);
+                reload();
+            }
+        } else if (le.getSource().equals(peptideLkpResult)) {
+            Collection<? extends PeptideNode> peptideNodes = peptideLkpResult.allInstances();
             if (table.getRowSorter() instanceof TableRowSorter) {
                 TableRowSorter sorter = (TableRowSorter) table.getRowSorter();
                 if (!peptideNodes.isEmpty() && sorter != null) {
@@ -368,8 +396,10 @@ public class MetadataNavigator extends JComponent implements
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(GraphVizSetting.CHANGED_GRAPH_VIEW)) {
-            reload();
+        if (evt.getSource().equals(currentModel)) {
+            if (evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
+                reload();
+            }            
         } else if (evt.getSource() instanceof QueryModel) {
             if (evt.getPropertyName().equals(QueryModel.RUNNING)) {
                 setBusyLabel(((QueryModel) evt.getSource()).isRunning());
@@ -381,7 +411,7 @@ public class MetadataNavigator extends JComponent implements
         }
     }
 
-    private void reload() {
+    private void reload() {        
         setBusyLabel(true);
 
         GraphModel graphModel = pc.getGraphModel();
@@ -399,7 +429,7 @@ public class MetadataNavigator extends JComponent implements
         int relType = annotationType == null ? -1 : graphModel.getEdgeType(annotationType.getRelationType());
         int count = relType == -1 ? graph.getEdgeCount() : graph.getEdgeCount(relType);
 
-        final AttributesModel peptidesModel = pc.getAttributesModel();
+        final AttributesModel peptidesModel = currentModel;
 
         Table edgeTable = graphModel.getEdgeTable();
         edgeColumns[1] = new GraphElementAttributeColumn(edgeTable.getColumn("label"));
@@ -473,7 +503,7 @@ public class MetadataNavigator extends JComponent implements
                 GraphElementsDataTable dataModel = (GraphElementsDataTable) table.getModel();
                 Edge edge = (Edge) dataModel.getElementAtRow(table.convertRowIndexToModel(rowIndex));
                 JPopupMenu contextMenu = GraphElementNavigator.createContextMenu(edge);
-                contextMenu.add(SystemAction.get(PropertiesAction.class));
+                contextMenu.add(new ShowPropertiesAction(new GraphEdgeWrapper(edge)));
                 contextMenu.show(table, evt.getX(), evt.getY());
             } else {
                 table.getSelectionModel().clearSelection();

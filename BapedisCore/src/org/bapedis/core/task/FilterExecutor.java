@@ -192,7 +192,6 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Object> {
             TreeSet<Integer> set = get();
             attrModel.setQuickFilter(set == null || filterModel.isEmpty() ? null : new QuickFilterImpl(set));
 
-//            attrModel.fireChangedGraphView();
             if (attrModel.getQuickFilter() == null) {
                 pc.reportMsg(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.noFilter"), workspace);
             } else {
@@ -205,6 +204,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Object> {
             ticket.finish();
             workspace.remove(this);
             filterModel.setRunning(false);
+            pc.getGraphVizSetting().fireChangedGraphView();
             if (pc.getCurrentWorkspace() != workspace) {
                 String txt = NbBundle.getMessage(FilterExecutor.class, "Workspace.notify.finishedTask", taskName);
                 pc.workspaceChangeNotification(txt, workspace);

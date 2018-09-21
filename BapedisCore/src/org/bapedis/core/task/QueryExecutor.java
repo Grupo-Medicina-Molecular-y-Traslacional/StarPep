@@ -115,6 +115,7 @@ public class QueryExecutor extends SwingWorker<Void, AttributesModel> {
             pc.reportError(ex.getCause().toString(), workspace);
         } finally {
             queryModel.setRunning(false);
+            pc.getGraphVizSetting().fireChangedGraphView();
             WindowManager.getDefault().getMainWindow().setCursor(Cursor.getDefaultCursor());
             if (pc.getCurrentWorkspace() != workspace) {
                 String txt = NbBundle.getMessage(QueryExecutor.class, "Workspace.notify.finishedTask", taskName);

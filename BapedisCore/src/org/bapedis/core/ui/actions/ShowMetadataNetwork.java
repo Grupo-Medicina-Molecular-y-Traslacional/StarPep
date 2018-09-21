@@ -59,15 +59,17 @@ public class ShowMetadataNetwork extends AbstractAction {
             DialogDescriptor dd = new DialogDescriptor(metadataPanel, NbBundle.getMessage(ShowMetadataNetwork.class, "ShowMetadataNetwork.metadataPanel.title"));
             dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION});
             if (DialogDisplayer.getDefault().notify(dd) == DialogDescriptor.OK_OPTION) {
-                for (MetadataNetworkPanel.MetadataRadioButton mrb : metadataPanel.getMetadataOptions()) {
-                    if (mrb.getRadioButton().isSelected()) {
-                        graphViz.addDisplayedMetadata(mrb.getAnnotationType());
-                    } else {
-                        graphViz.removeDisplayedMetadata(mrb.getAnnotationType());
-                    }
-                }
-                if (graphWC != null) {
+                try {
                     graphWC.openGraphWindow();
+                    for (MetadataNetworkPanel.MetadataRadioButton mrb : metadataPanel.getMetadataOptions()) {
+                        if (mrb.getRadioButton().isSelected()) {
+                            graphViz.addDisplayedMetadata(mrb.getAnnotationType());
+                        } else {
+                            graphViz.removeDisplayedMetadata(mrb.getAnnotationType());
+                        }
+                    }
+                } finally {
+                    graphViz.fireChangedGraphView();
                 }
             }
         }

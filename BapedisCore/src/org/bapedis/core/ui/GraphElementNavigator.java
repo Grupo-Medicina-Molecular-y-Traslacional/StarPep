@@ -91,9 +91,7 @@ public class GraphElementNavigator extends JComponent implements
     protected final JXTable table;
     protected final JLabel nodeSizeLabel, edgeSizeLabel;
     protected GraphElementNavigatorModel navigatorModel;
-    private final GraphElementDataColumn sourceColumn = new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Source);
-    private final GraphElementDataColumn targetColumn = new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Target);
-    private final GraphElementDataColumn[] edgeColumns = new GraphElementDataColumn[3];
+    private final GraphElementDataColumn[] edgeColumns;
 
     /**
      * Creates new form GraphElementNavigator
@@ -184,6 +182,10 @@ public class GraphElementNavigator extends JComponent implements
         bottomToolbar.addSeparator();
         bottomToolbar.add(edgeSizeLabel);
         add(bottomToolbar, BorderLayout.SOUTH);
+        
+        edgeColumns = new GraphElementDataColumn[]{new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Source),
+                                                     null,
+                                                     new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Target)};
     }
 
     private void initToogleButton(JToggleButton btn) {
@@ -374,13 +376,11 @@ public class GraphElementNavigator extends JComponent implements
     }
 
     private GraphElementDataColumn[] getEdgeColumns(Table table) {
-        edgeColumns[0] = sourceColumn;
 //        if (currentModel != null && currentModel.getMainGView() == AttributesModel.CSN_VIEW) {
 //            edgeColumns[1] = new GraphElementAttributeColumn(table.getColumn(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
 //        } else {
         edgeColumns[1] = new GraphElementAttributeColumn(table.getColumn("label"));
 //        } 
-        edgeColumns[2] = targetColumn;
         return edgeColumns;
     }
 

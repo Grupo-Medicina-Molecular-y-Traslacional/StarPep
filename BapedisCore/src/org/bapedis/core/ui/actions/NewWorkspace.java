@@ -45,7 +45,7 @@ public final class NewWorkspace implements ActionListener {
             ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
             Workspace ws = new Workspace(name);
             pc.add(ws);
-            pc.setCurrentWorkspace(ws);
+            pc.setCurrentWorkspace(ws);                    
         }
     }
 

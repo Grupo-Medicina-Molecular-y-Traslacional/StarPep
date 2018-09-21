@@ -72,10 +72,12 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
                     public void run() {
                         graphWindow.open();
                         graphWindow.requestActive();
-                        
+
                         // Navigator windows
                         TopComponent tc = WindowManager.getDefault().findTopComponent("navigatorTC"); //NOI18N
-                        tc.open();                        
+                        if (tc != null && !tc.isOpened()) {
+                            tc.open();
+                        }
                     }
                 });
             } else {
@@ -134,7 +136,6 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
     }
 
     private synchronized void addMetadataNodes(StarPepAnnotationType aType) {
-        GraphVizSetting graphViz = pc.getGraphVizSetting();
         AttributesModel attrModel = pc.getAttributesModel();
         GraphModel graphModel = pc.getGraphModel();
         Graph graph = graphModel.getGraphVisible();
@@ -157,14 +158,10 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
             }
             graph.addAllNodes(toAddNodes);
             graph.addAllEdges(toAddEdges);
-            if (toAddNodes.size() > 0 || toAddEdges.size() > 0) {
-                graphViz.fireChangedGraphView();
-            }
         }
     }
 
     private synchronized void removeMetadataNodes(StarPepAnnotationType aType) {
-        GraphVizSetting graphViz = pc.getGraphVizSetting();
         AttributesModel attrModel = pc.getAttributesModel();
         GraphModel graphModel = pc.getGraphModel();
         Graph graph = graphModel.getGraphVisible();
@@ -182,9 +179,6 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
                 }
             }
             graph.removeAllNodes(toRemoveNodes);
-            if (toRemoveNodes.size() > 0) {
-                graphViz.fireChangedGraphView();
-            }
         }
     }
 
@@ -193,25 +187,18 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
         GraphVizSetting graphViz = pc.getGraphVizSetting(workspace);
         GraphModel graphModel = pc.getGraphModel(workspace);
         Graph graph = graphModel.getGraphVisible();
-        boolean modified = false;
 
         graph.writeLock();
         try {
             if (toRemoveNodes != null && toRemoveNodes.size() > 0) {
                 removePeptideNodes(toRemoveNodes, graphViz, graphModel, graph);
-                modified = true;
             }
 
             if (toAddNodes != null && toAddNodes.size() > 0) {
                 addPeptideNodes(toAddNodes, graphViz, graphModel, graph);
-                modified = true;
             }
         } finally {
             graph.writeUnlock();
-        }
-
-        if (modified) {
-            graphViz.fireChangedGraphView();
         }
     }
 

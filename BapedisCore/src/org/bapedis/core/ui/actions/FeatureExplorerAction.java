@@ -40,7 +40,7 @@ public final class FeatureExplorerAction extends WorkspaceContextSensitiveAction
     @Override
     public void actionPerformed(ActionEvent e) {
         AttributesModel currentModel = pc.getAttributesModel();
-        DialogDescriptor dd = new DialogDescriptor(new MolecularFeaturesPanel(currentModel), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.MolecularFeaturesPanel.title"));
+        DialogDescriptor dd = new DialogDescriptor(new MolecularFeaturesPanel(currentModel), NbBundle.getMessage(FeatureExplorerAction.class, "MolecularFeaturesPanel.title"));
         dd.setOptions(new Object[]{DialogDescriptor.CLOSED_OPTION});
         DialogDisplayer.getDefault().notify(dd);
     }

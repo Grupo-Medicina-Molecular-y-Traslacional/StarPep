@@ -20,7 +20,6 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingConstants;
 import org.bapedis.core.project.ProjectManager;
@@ -34,7 +33,6 @@ import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.impl.AttributeFilter;
 import org.bapedis.core.spi.filters.impl.FilterHelper;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
-import org.bapedis.core.ui.actions.FeatureExtractionAction;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.netbeans.swing.etable.ETableColumn;
 import org.netbeans.swing.etable.ETableColumnModel;
@@ -143,68 +141,6 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         errorLabel = new JLabel(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.errorLabel.text"), new ImageIcon(ImageUtilities.loadImage("org/bapedis/core/resources/sad.png", true)), JLabel.CENTER);
         errorLabel.setHorizontalAlignment(SwingConstants.CENTER);
         centerPanel.add(errorLabel, "errorCard");
-
-        // Left toolbar: Feature Extraction        
-//        leftToolBar.add(createAddMDButton(), 0);
-        // Left toolbar: Feature Removing
-//        JButton removeMDButton = new JButton(new FeatureRemovingAction());
-//        removeMDButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.removeMDButton.toolTipText"));
-//        removeMDButton.setIcon(new ImageIcon(getClass().getResource("/org/bapedis/core/resources/delete_md.gif")));
-//        removeMDButton.setFocusable(false);
-//        leftToolBar.add(removeMDButton, 1);
-        // Left toolbar: Feature filtering
-//        JButton filterMDButton = new JButton(new FeatureFilteringAction());
-//        filterMDButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.filterMDButton.toolTipText"));
-//        filterMDButton.setIcon(new ImageIcon(getClass().getResource("/org/bapedis/core/resources/filter_md.png")));
-//        filterMDButton.setFocusable(false);
-//        leftToolBar.add(filterMDButton, 2);
-        // Left toolbar: Feature explorer
-//        JButton columnsButton = new JButton(new FeatureExplorerAction());
-//        columnsButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.columnsButton.toolTipText"));
-//        columnsButton.setIcon(new ImageIcon(getClass().getResource("/org/bapedis/core/resources/select_md.png")));
-//        columnsButton.setFocusable(false);
-//        leftToolBar.add(columnsButton, 3);
-        // Left toolbar: Export button
-//        leftToolBar.add(createExportButton(), 4);
-    }
-
-    private JButton createAddMDButton() {
-        FeatureExtractionAction mdAction = new FeatureExtractionAction();
-        JMenu menu = (JMenu) mdAction.getMenuPresenter();
-        final JPopupMenu popup = menu.getPopupMenu();
-
-        final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/bapedis/core/resources/add_md.gif", false), popup);
-        dropDownButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.addMD.tooltiptext"));
-        dropDownButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (dropDownButton.isEnabled()) {
-                    popup.show(dropDownButton, 0, dropDownButton.getHeight());
-                }
-            }
-        });
-        return dropDownButton;
-    }
-
-    private JButton createExportButton() {
-        final JPopupMenu popup = new JPopupMenu();
-
-        List<? extends Action> actions = Utilities.actionsForPath("Actions/ExportPeptides");
-        for (Action action : actions) {
-            popup.add(action);
-        }
-
-        final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/bapedis/core/resources/export.png", false), popup);
-        dropDownButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.export.tooltiptext"));
-        dropDownButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (dropDownButton.isEnabled()) {
-                    popup.show(dropDownButton, 0, dropDownButton.getHeight());
-                }
-            }
-        });
-        return dropDownButton;
     }
 
     private void populateVisibleColumns(AttributesModel attrModel) {
@@ -247,6 +183,27 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             }
         }
     }
+    
+    private JButton createExportButton() {
+        final JPopupMenu popup = new JPopupMenu();
+
+        List<? extends Action> actions = Utilities.actionsForPath("Actions/ExportPeptides");
+        for (Action action : actions) {
+            popup.add(action);
+        }
+
+        final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/bapedis/core/resources/export.png", false), popup);
+        dropDownButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.export.tooltiptext"));
+        dropDownButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (dropDownButton.isEnabled()) {
+                    popup.show(dropDownButton, 0, dropDownButton.getHeight());
+                }
+            }
+        });
+        return dropDownButton;
+    }    
 
     /**
      * This method is called from within the constructor to initialize the form.

@@ -44,7 +44,7 @@ public final class FeatureFilteringAction extends WorkspaceContextSensitiveActio
     public void actionPerformed(ActionEvent e) {
         Workspace currentWS = pc.getCurrentWorkspace();
         FeatureFilterPanel panel = new FeatureFilterPanel(currentWS);
-        DialogDescriptor dd = new DialogDescriptor(panel, NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.FeatureFilterPanel.title"));
+        DialogDescriptor dd = new DialogDescriptor(panel, NbBundle.getMessage(FeatureFilteringAction.class, "FeatureFilterPanel.title"));
         dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION});
         panel.setDialogDescriptor(dd);
         if (DialogDisplayer.getDefault().notify(dd) == DialogDescriptor.OK_OPTION) {

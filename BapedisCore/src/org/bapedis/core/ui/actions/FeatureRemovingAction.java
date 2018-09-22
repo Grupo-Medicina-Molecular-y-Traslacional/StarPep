@@ -42,7 +42,7 @@ public final class FeatureRemovingAction extends WorkspaceContextSensitiveAction
     @Override
     public void actionPerformed(ActionEvent e) {
         Workspace currentWS = pc.getCurrentWorkspace();
-        DialogDescriptor dd = new DialogDescriptor(new RemoveDescriptorPanel(currentWS), NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.RemoveDescriptorPanel.title"));
+        DialogDescriptor dd = new DialogDescriptor(new RemoveDescriptorPanel(currentWS), NbBundle.getMessage(FeatureRemovingAction.class, "RemoveDescriptorPanel.title"));
         dd.setOptions(new Object[]{DialogDescriptor.CLOSED_OPTION});
         DialogDisplayer.getDefault().notify(dd);
     }

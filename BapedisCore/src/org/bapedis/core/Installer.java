@@ -37,6 +37,12 @@ public class Installer extends ModuleInstall implements WorkspaceEventListener, 
                     tc.open();
                     tc.requestActive();
                 }
+
+                // Navigator windows
+                tc = WindowManager.getDefault().findTopComponent("navigatorTC"); //NOI18N
+                if (tc != null && !tc.isOpened()) {
+                    tc.open();
+                }
             }
         });
     }

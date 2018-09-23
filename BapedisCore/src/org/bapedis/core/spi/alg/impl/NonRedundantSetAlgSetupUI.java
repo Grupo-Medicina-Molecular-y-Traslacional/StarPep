@@ -3,30 +3,27 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.filters.impl;
+package org.bapedis.core.spi.alg.impl;
 
 import java.awt.BorderLayout;
-import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
 import org.bapedis.core.model.SequenceAlignmentModel;
-import org.bapedis.core.spi.filters.Filter;
-import org.bapedis.core.spi.filters.FilterSetupUI;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.ui.components.SequenceAlignmentPanel;
-import org.openide.util.Exceptions;
 
 /**
  *
  * @author loge
  */
-public class NonRedundantSetFilterSetupUI extends javax.swing.JPanel implements FilterSetupUI{
+public class NonRedundantSetAlgSetupUI extends javax.swing.JPanel implements AlgorithmSetupUI{
 
-    protected NonRedundantSetFilter filter;
-    protected SequenceAlignmentModel alignmentModel;
+    protected NonRedundantSetAlg nrsAlg;
     
     /**
      * Creates new form NonRedundantSetFilterSetupUI
      */
-    public NonRedundantSetFilterSetupUI() {
+    public NonRedundantSetAlgSetupUI() {
         initComponents();
     }
 
@@ -55,46 +52,21 @@ public class NonRedundantSetFilterSetupUI extends javax.swing.JPanel implements 
         add(centerPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    @Override
-    public JPanel getEditPanel(Filter filter) {
-        this.filter = (NonRedundantSetFilter) filter;
-        try {
-            alignmentModel = (SequenceAlignmentModel) this.filter.getAlignmentModel().clone();
-        } catch (CloneNotSupportedException ex) {
-            Exceptions.printStackTrace(ex);
-        }        
-        centerPanel.removeAll();
-        centerPanel.add(new SequenceAlignmentPanel(alignmentModel), BorderLayout.CENTER);
-        centerPanel.revalidate();
-        centerPanel.repaint();        
-        return this;
-    }
-
-    @Override
-    public boolean isValidState() {
-        return true;
-    }
-
-    @Override
-    public void saveSettings() {
-        filter.setAlignmentModel(alignmentModel);
-    }
-
-    @Override
-    public void cancelSettings() {
-        filter = null;
-    }
-
-    @Override
-    public void addValidStateListener(PropertyChangeListener listener) {
-    }
-
-    @Override
-    public void removeValidStateListener(PropertyChangeListener listener) {        
-    }
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public JPanel getSettingPanel(Algorithm algo) {
+        nrsAlg = (NonRedundantSetAlg)algo;
+        SequenceAlignmentModel alignmentModel = (SequenceAlignmentModel) nrsAlg.getAlignmentModel();
+        
+        centerPanel.removeAll();
+        centerPanel.add(new SequenceAlignmentPanel(alignmentModel), BorderLayout.CENTER);
+        centerPanel.revalidate();
+        centerPanel.repaint();        
+        
+        return this;
+    }
 }

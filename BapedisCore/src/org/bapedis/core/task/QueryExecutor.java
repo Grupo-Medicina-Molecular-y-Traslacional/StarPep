@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.task;
 
-import java.awt.Cursor;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,7 +25,6 @@ import org.gephi.graph.api.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.windows.WindowManager;
 
 /**
  *
@@ -35,7 +33,7 @@ import org.openide.windows.WindowManager;
 public class QueryExecutor extends SwingWorker<AttributesModel, Void> {
 
     protected static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-    protected static GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
+    protected final GraphWindowController graphWC;
     protected final Workspace workspace;
     protected final QueryModel queryModel;
     protected final GraphModel graphModel;
@@ -43,7 +41,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, Void> {
     protected final String taskName;
 
     public QueryExecutor() {
-        this(pc.getCurrentWorkspace());
+        this(pc.getCurrentWorkspace());        
     }
 
     public QueryExecutor(Workspace workspace) {
@@ -52,6 +50,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, Void> {
         graphModel = pc.getGraphModel(workspace);
         oldModel = pc.getAttributesModel(workspace);
         taskName = NbBundle.getMessage(QueryExecutor.class, "QueryExecutor.name");
+        graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
     }
 
     public QueryModel getQueryModel() {
@@ -111,8 +110,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, Void> {
             if (attrModel != null) {
                 workspace.add(attrModel);
             }
-            pc.getGraphVizSetting().fireChangedGraphView();
-            WindowManager.getDefault().getMainWindow().setCursor(Cursor.getDefaultCursor());
+            pc.getGraphVizSetting().fireChangedGraphView();            
             if (pc.getCurrentWorkspace() != workspace) {
                 String txt = NbBundle.getMessage(QueryExecutor.class, "Workspace.notify.finishedTask", taskName);
                 pc.workspaceChangeNotification(txt, workspace);

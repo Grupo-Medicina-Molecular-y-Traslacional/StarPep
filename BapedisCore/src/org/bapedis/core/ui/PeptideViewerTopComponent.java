@@ -183,7 +183,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             }
         }
     }
-    
+
     private JButton createExportButton() {
         final JPopupMenu popup = new JPopupMenu();
 
@@ -203,7 +203,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             }
         });
         return dropDownButton;
-    }    
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -457,6 +457,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         } else {
             AttributesModel peptidesModel = pc.getAttributesModel(newWs);
             setData(peptidesModel);
+            setBusyLabel(false);
         }
     }
 
@@ -493,7 +494,6 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             jFilteredLabel.setText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jFilteredLabel.text", 0));
             jFilteredLabel.setVisible(false);
         }
-
     }
 
     private void setQuickFilter() {

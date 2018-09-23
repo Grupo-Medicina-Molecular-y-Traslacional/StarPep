@@ -37,7 +37,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Void> {
 
     protected static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected static final AlgorithmExecutor executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
-    protected static GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
+    protected GraphWindowController graphWC;
     protected final Workspace workspace;
     protected final FilterModel filterModel;
     protected final AttributesModel attrModel;
@@ -64,6 +64,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Void> {
             }
         });
         taskName = NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.name");
+        graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
     }
 
     public FilterModel getFilterModel() {

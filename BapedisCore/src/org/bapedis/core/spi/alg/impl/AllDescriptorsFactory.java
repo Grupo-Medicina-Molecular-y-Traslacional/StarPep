@@ -18,7 +18,7 @@ import org.openide.util.lookup.ServiceProvider;
  * @author beltran, loge
  */
 @ServiceProvider(service = AlgorithmFactory.class, position = 0)
-public class AllDescriptorsFactory implements AlgorithmFactory, MolecularDescriptorTag, ToolMenuItem {
+public class AllDescriptorsFactory implements MolecularDescriptorTag, ToolMenuItem {
 
     private AllDescriptorsPanel panel;
 

@@ -15,6 +15,7 @@ import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.StarPepAnnotationType;
@@ -272,6 +273,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
     @Override
     public void componentClosed() {
         pc.removeWorkspaceEventListener(this);
+        
         QueryModel model = pc.getQueryModel();
         model.removePropertyChangeListener(this);
     }
@@ -290,15 +292,24 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
 
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
-        if (oldWs != null) {
+        if (oldWs != null) {            
             QueryModel oldModel = pc.getQueryModel(oldWs);
             oldModel.removePropertyChangeListener(this);
         }
+        
         QueryModel newModel = pc.getQueryModel(newWs);
         restrictiveComboBox.setSelectedItem(newModel.getRestriction());
         explorerMgr.setRootContext(newModel.getRootContext());
         refreshRunningState(newModel.isRunning());
         newModel.addPropertyChangeListener(this);
+    }
+
+    private void setBusy(boolean busy) {
+        if (busy) {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        } else {
+           setCursor(Cursor.getDefaultCursor());
+        }
     }
 
     @Override
@@ -328,7 +339,6 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
             QueryExecutor worker = new QueryExecutor(currentWS);
             QueryModel queryModel = worker.getQueryModel();
             queryModel.setRunning(true);
-            WindowManager.getDefault().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             worker.execute();
         }
     }
@@ -336,6 +346,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
     private void refreshRunningState(boolean running) {
         restrictiveComboBox.setEnabled(!running);
         runButton.setEnabled(!running);
+        setBusy(running);
     }
 
     @Override

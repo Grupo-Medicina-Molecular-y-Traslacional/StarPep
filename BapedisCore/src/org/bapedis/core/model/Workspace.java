@@ -23,6 +23,7 @@ import org.openide.util.lookup.InstanceContent;
  */
 public class Workspace implements Lookup.Provider {
     public static final String PRO_NAME = "name";
+    public static final String PRO_BUSY = "busy";
     protected final int id;
     protected String name;
     protected final AtomicBoolean busy;
@@ -86,7 +87,9 @@ public class Workspace implements Lookup.Provider {
     }
 
     public void setBusy(boolean busy) {
+        boolean old = this.busy.get();
         this.busy.set(busy);
+        changeSupport.firePropertyChange(PRO_BUSY, old, busy);
     }        
 
     public NotifyDescriptor getBusyNotifyDescriptor() {

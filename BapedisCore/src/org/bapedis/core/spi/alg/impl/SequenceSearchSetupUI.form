@@ -45,7 +45,7 @@
             <Component class="javax.swing.JLabel" name="jLabel1">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/bapedis/filters/impl/Bundle.properties" key="SeqAlignmentFilterSetupUI.jLabel1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="SequenceSearchSetupUI.jLabel1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Constraints>
@@ -79,7 +79,7 @@
                   <Color blue="0" green="0" red="ff" type="rgb"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/bapedis/filters/impl/Bundle.properties" key="SeqAlignmentFilterSetupUI.jErrorLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="SequenceSearchSetupUI.jErrorLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Constraints>
@@ -91,10 +91,10 @@
             <Component class="javax.swing.JLabel" name="jMRLabel">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/bapedis/filters/impl/Bundle.properties" key="SeqAlignmentFilterSetupUI.jMRLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="SequenceSearchSetupUI.jMRLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/bapedis/filters/impl/Bundle.properties" key="SeqAlignmentFilterSetupUI.jMRLabel.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="org/bapedis/core/spi/alg/impl/Bundle.properties" key="SequenceSearchSetupUI.jMRLabel.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Constraints>
@@ -117,6 +117,9 @@
                   </StringArray>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMRComboBoxActionPerformed"/>
+              </Events>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>

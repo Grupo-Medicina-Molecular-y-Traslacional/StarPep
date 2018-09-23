@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.ui;
 
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -313,6 +314,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         restrictiveComboBox.setEnabled(!running);
         applyCheckBox.setEnabled(!running);
         viewerScrollPane.setEnabled(!running);
+        setBusy(running);
         if (running) {
             runButton.setText(NbBundle.getMessage(FilterExplorerTopComponent.class, "FilterExplorerTopComponent.stopButton.text"));
             runButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/stop.png", false));
@@ -330,6 +332,14 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
             }
         }
     }
+    
+    private void setBusy(boolean busy) {
+        if (busy) {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        } else {
+           setCursor(Cursor.getDefaultCursor());
+        }
+    }    
 
     private void runFilter() {
         Workspace currentWS = pc.getCurrentWorkspace();

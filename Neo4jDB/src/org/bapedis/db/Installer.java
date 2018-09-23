@@ -16,6 +16,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.openide.modules.ModuleInstall;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.windows.WindowManager;
 
 public class Installer extends ModuleInstall implements WorkspaceEventListener {
 
@@ -31,7 +32,7 @@ public class Installer extends ModuleInstall implements WorkspaceEventListener {
 
             pc = Lookup.getDefault().lookup(ProjectManager.class);
             pc.addWorkspaceEventListener(this);
-            workspaceChanged(null, pc.getCurrentWorkspace());
+            workspaceChanged(null, pc.getCurrentWorkspace());           
         } catch (Throwable error) {
             Exceptions.printStackTrace(error);
         }

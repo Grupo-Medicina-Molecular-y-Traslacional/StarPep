@@ -9,10 +9,9 @@ import java.awt.Cursor;
 import org.bapedis.core.project.ProjectManager;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.swing.SwingUtilities;
 import org.bapedis.core.events.WorkspaceEventListener;
-import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.task.QueryExecutor;
 import org.openide.modules.ModuleInstall;
 import org.openide.util.Lookup;
 import org.openide.windows.TopComponent;
@@ -21,7 +20,7 @@ import org.openide.windows.WindowManager;
 public class Installer extends ModuleInstall implements WorkspaceEventListener, PropertyChangeListener {
 
     private ProjectManager pc;
-    private String titleWind;
+    private String title;
 
     @Override
     public void restored() {
@@ -47,32 +46,38 @@ public class Installer extends ModuleInstall implements WorkspaceEventListener, 
         });
     }
 
+    private String getWindowsTitle() {
+        if (title == null) {
+            title = WindowManager.getDefault().getMainWindow().getTitle();
+        }
+        return title;
+    }
+
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
         if (oldWs != null) {
             oldWs.removePropertyChangeListener(this);
         }
         newWs.addPropertyChangeListener(this);
-        setAppName(newWs);
+        setNewWorkspace(newWs);
     }
 
-    private void setAppName(final Workspace workspace) {
+    private void setNewWorkspace(final Workspace workspace) {
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
-
             @Override
             public void run() {
-                if (titleWind == null) {
-                    titleWind = WindowManager.getDefault().getMainWindow().getTitle();
-                }
-                WindowManager.getDefault().getMainWindow().setTitle(titleWind + " - " + workspace.getName());
+                WindowManager.getDefault().getMainWindow().setTitle(getWindowsTitle() + " - " + workspace.getName());
             }
         });
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(Workspace.PRO_NAME)) {
-            setAppName(pc.getCurrentWorkspace());
+        if (evt.getSource() instanceof Workspace) {
+            Workspace workspace = (Workspace) evt.getSource();
+            if (evt.getPropertyName().equals(Workspace.PRO_NAME)) {
+                WindowManager.getDefault().getMainWindow().setTitle(getWindowsTitle() + " - " + workspace.getName());
+            }
         }
     }
 

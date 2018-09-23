@@ -8,6 +8,7 @@ package org.bapedis.core.spi.alg.impl;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.SequenceTag;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -16,8 +17,9 @@ import org.openide.util.lookup.ServiceProvider;
  * @author loge
  */
 @ServiceProvider(service = AlgorithmFactory.class, position = 10)
-public class SequenceSearchFactory implements AlgorithmFactory{
-
+public class SequenceSearchFactory implements SequenceTag{
+    private SequenceSearchSetupUI setupUI = new SequenceSearchSetupUI();
+    
     @Override
     public String getCategory() {
         return null;
@@ -35,7 +37,7 @@ public class SequenceSearchFactory implements AlgorithmFactory{
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        return null;
+        return setupUI;
     }
 
     @Override

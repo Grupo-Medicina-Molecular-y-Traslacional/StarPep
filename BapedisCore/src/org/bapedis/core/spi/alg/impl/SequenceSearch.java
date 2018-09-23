@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.swing.SwingUtilities;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
@@ -35,10 +36,10 @@ public class SequenceSearch implements Algorithm {
 
     private final ProjectManager pc;
     private ProteinSequence query;
-    private Peptide[] targets;
-    private final List<Peptide> resultList;
+    private AttributesModel newModel, oldModel;
+    private Workspace workspace;
     private boolean stopRun;
-    private SequenceAlignmentModel alignmentModel;
+    private final SequenceAlignmentModel alignmentModel;
     private final SequenceSearchFactory factory;
     protected static final int MAX_REJECTS = 16;
     protected int maximumResults;
@@ -47,16 +48,11 @@ public class SequenceSearch implements Algorithm {
         this.factory = factory;
         alignmentModel = new SequenceAlignmentModel();
         pc = Lookup.getDefault().lookup(ProjectManager.class);
-        resultList = new LinkedList<>();
         maximumResults = -1;
     }
 
     public SequenceAlignmentModel getAlignmentModel() {
         return alignmentModel;
-    }
-
-    public void setAlignmentModel(SequenceAlignmentModel alignmentModel) {
-        this.alignmentModel = alignmentModel;
     }
 
     public int getMaximumResults() {
@@ -75,33 +71,33 @@ public class SequenceSearch implements Algorithm {
         this.query = query;
     }
 
-    public Peptide[] getTargets() {
-        return targets;
-    }
-
-    public void setTargets(Peptide[] targets) {
-        this.targets = targets;
-    }
-
-    public List<Peptide> getResultList() {
-        return resultList;
-    }
-
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
-        if (targets == null) {
-            AttributesModel attrModel = pc.getAttributesModel(workspace);
-            if (attrModel != null) {
-                targets = attrModel.getPeptides().toArray(new Peptide[0]);
-            }
-        }
+        this.workspace = workspace;
         stopRun = false;
-        resultList.clear();
+        newModel = null;
+        oldModel = null;
     }
 
     @Override
     public void endAlgo() {
-        targets = null;
+        // Set new Model
+        if (oldModel != null && newModel != null && !stopRun) {
+            final Workspace ws = workspace;
+            final AttributesModel modelToRemove = oldModel;
+            final AttributesModel modelToAdd = newModel;
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    ws.remove(modelToRemove);
+                    ws.add(modelToAdd);
+                }
+            });
+
+        }
+        workspace = null;
+        newModel = null;
+        oldModel = null;
     }
 
     @Override
@@ -122,7 +118,11 @@ public class SequenceSearch implements Algorithm {
 
     @Override
     public void run() {
-        if (targets != null && query != null) {
+        oldModel = pc.getAttributesModel(workspace);
+        if (oldModel != null && query != null) {
+            List<Peptide> resultList = new LinkedList<>();
+
+            Peptide[] targets = oldModel.getPeptides().toArray(new Peptide[0]);
             // Sort by decreasing common words
             Arrays.parallelSort(targets, new CommonKMersComparator(query.getSequenceAsString()));
 
@@ -152,6 +152,11 @@ public class SequenceSearch implements Algorithm {
                 resultList.add(hit.getPeptide());
             }
 
+            //New model
+            newModel = new AttributesModel();
+            for (Peptide peptide : resultList) {
+                newModel.addPeptide(peptide);
+            }
         }
     }
 

@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.ui;
 
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -532,6 +533,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
 
     private void refreshRunning(boolean running) {
         propSheetPanel.setEnabled(!running);
+        setBusy(running);
         if (scrollPane.getViewport().getView() != null) {
             scrollPane.getViewport().getView().setEnabled(!running);
         }
@@ -548,6 +550,14 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             runButton.setToolTipText(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.runButton.tooltip"));
         }
     }
+    
+    private void setBusy(boolean busy) {
+        if (busy) {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        } else {
+           setCursor(Cursor.getDefaultCursor());
+        }
+    }       
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {

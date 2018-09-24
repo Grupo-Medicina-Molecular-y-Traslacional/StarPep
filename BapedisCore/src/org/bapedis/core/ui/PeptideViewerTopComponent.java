@@ -8,19 +8,14 @@ package org.bapedis.core.ui;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import javax.swing.Action;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPopupMenu;
 import javax.swing.SwingConstants;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
@@ -31,6 +26,7 @@ import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.impl.AttributeFilter;
+import org.bapedis.core.spi.filters.impl.AttributeFilterFactory;
 import org.bapedis.core.spi.filters.impl.FilterHelper;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -55,9 +51,7 @@ import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
 import org.jdesktop.swingx.JXBusyLabel;
-import org.openide.awt.DropDownButtonFactory;
 import org.openide.explorer.view.NodePopupFactory;
-import org.openide.util.Utilities;
 import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
 
@@ -184,27 +178,6 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         }
     }
 
-    private JButton createExportButton() {
-        final JPopupMenu popup = new JPopupMenu();
-
-        List<? extends Action> actions = Utilities.actionsForPath("Actions/ExportPeptides");
-        for (Action action : actions) {
-            popup.add(action);
-        }
-
-        final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/bapedis/core/resources/export.png", false), popup);
-        dropDownButton.setToolTipText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.export.tooltiptext"));
-        dropDownButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (dropDownButton.isEnabled()) {
-                    popup.show(dropDownButton, 0, dropDownButton.getHeight());
-                }
-            }
-        });
-        return dropDownButton;
-    }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -323,10 +296,13 @@ public final class PeptideViewerTopComponent extends TopComponent implements
                 tc.open();
                 tc.requestActive();
 
-                Filter filter = new AttributeFilter(attr, operator, jValueTextField.getText());
-                FilterModel filterModel = pc.getFilterModel();
-                filterModel.add(filter);
-                jValueTextField.setText("");
+                AttributeFilterFactory factory = Lookup.getDefault().lookup(AttributeFilterFactory.class);
+                if (factory != null) {
+                    Filter filter = new AttributeFilter(attr, operator, jValueTextField.getText(), factory);
+                    FilterModel filterModel = pc.getFilterModel();
+                    filterModel.add(filter);
+                    jValueTextField.setText("");
+                }
             } else {
                 String errorMsg = NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jValueTextField.badinput", attr.getDisplayName());
                 DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(errorMsg, NotifyDescriptor.ERROR_MESSAGE));
@@ -428,7 +404,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }
 
     @Override
-    public void workspaceChanged(Workspace oldWs, Workspace newWs) {
+    public synchronized void workspaceChanged(Workspace oldWs, Workspace newWs) {
         removeLookupListener();
         if (oldWs != null) {
             AttributesModel oldAttrModel = pc.getAttributesModel(oldWs);
@@ -462,7 +438,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }
 
     @Override
-    public void resultChanged(LookupEvent le) {
+    public synchronized void resultChanged(LookupEvent le) {
         if (le.getSource().equals(attrModelLkpResult)) {
             Collection<? extends AttributesModel> attrModels = attrModelLkpResult.allInstances();
             if (!attrModels.isEmpty()) {
@@ -515,7 +491,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
+    public synchronized void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource().equals(currentModel)) {
             if (evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
                 setQuickFilter();

@@ -7,9 +7,7 @@ package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Iterator;
 import javax.swing.AbstractAction;
-import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.SequenceTag;
 import org.bapedis.core.spi.alg.impl.SequenceSearchFactory;
@@ -36,15 +34,7 @@ public class SequenceAction extends AbstractAction{
     private final ActionListener actionListener;
     
     public SequenceAction() {
-        ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-        AlgorithmFactory seqSearchfactory = null;
-        for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
-            final AlgorithmFactory factory = it.next();
-            if (factory instanceof SequenceSearchFactory){
-                seqSearchfactory = factory;
-            }
-        }       
-        
+        AlgorithmFactory seqSearchfactory = Lookup.getDefault().lookup(SequenceSearchFactory.class);               
         actionListener = seqSearchfactory != null ?ToolAction.createActionListener(seqSearchfactory, SequenceTag.class): null;
     }
 

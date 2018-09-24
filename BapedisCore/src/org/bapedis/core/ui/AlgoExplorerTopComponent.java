@@ -83,7 +83,7 @@ import org.w3c.dom.NodeList;
         //iconBase="SET/PATH/TO/ICON/HERE", 
         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
-@TopComponent.Registration(mode = "explorer", openAtStartup = false, position = 533)
+@TopComponent.Registration(mode = "explorer", openAtStartup = true, position = 533)
 @ActionID(category = "Window", id = "org.bapedis.core.ui.AlgoExplorerTopComponent")
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_AlgoExplorerAction",
@@ -114,6 +114,9 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
         comboBoxModel.addElement(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.defaultText"));
         algoComboBox.setModel(comboBoxModel);
+        
+        //Disable Presets
+        presetsButton.setVisible(false);
     }
 
     private void removeLookupListener() {
@@ -212,7 +215,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         algoToolBar.setOpaque(false);
 
         presetsButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/preset.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(presetsButton, org.openide.util.NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(presetsButton, org.openide.util.NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.text_1")); // NOI18N
         presetsButton.setFocusable(false);
         presetsButton.setIconTextGap(0);
         presetsButton.addActionListener(new java.awt.event.ActionListener() {
@@ -281,53 +284,6 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         }
     }//GEN-LAST:event_resetButtonActionPerformed
 
-    private void presetsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_presetsButtonActionPerformed
-        final AlgorithmModel algoModel = pc.getAlgorithmModel();
-        if (algoModel.getSelectedAlgorithm() != null) {
-            JPopupMenu menu = new JPopupMenu();
-            List<AlgoPresetPersistence.Preset> presets = algoPresetPersistence.getPresets(algoModel.getSelectedAlgorithm());
-            if (presets != null && !presets.isEmpty()) {
-                for (final AlgoPresetPersistence.Preset p : presets) {
-                    JMenuItem item = new JMenuItem(p.toString());
-                    item.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            algoPresetPersistence.loadPreset(p, algoModel.getSelectedAlgorithm());
-                            refreshProperties(algoModel);
-                            StatusDisplayer.getDefault().setStatusText(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.status.loadPreset", algoModel.getSelectedAlgorithm().getFactory().getName(), p.toString()));
-                        }
-                    });
-                    menu.add(item);
-                }
-            } else {
-                menu.add("<html><i>" + NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.nopreset") + "</i></html>");
-            }
-
-            JMenuItem saveItem = new JMenuItem(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.savePreset"));
-            saveItem.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    String lastPresetName = NbPreferences.forModule(AlgoExplorerTopComponent.class).get("AlgoExplorerTopComponent.lastPresetName", "");
-                    NotifyDescriptor.InputLine question = new NotifyDescriptor.InputLine(
-                            NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.savePreset.input"),
-                            NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.savePreset.input.name"));
-                    question.setInputText(lastPresetName);
-                    if (DialogDisplayer.getDefault().notify(question) == NotifyDescriptor.OK_OPTION) {
-                        String input = question.getInputText();
-                        if (input != null && !input.isEmpty()) {
-                            algoPresetPersistence.savePreset(input, algoModel.getSelectedAlgorithm());
-                            StatusDisplayer.getDefault().setStatusText(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.status.savePreset", algoModel.getSelectedAlgorithm().getFactory().getName(), input));
-                            NbPreferences.forModule(AlgoExplorerTopComponent.class).put("AlgoExplorerTopComponent.lastPresetName", input);
-                        }
-                    }
-                }
-            });
-            menu.add(new JSeparator());
-            menu.add(saveItem);
-            menu.show(algoToolBar, 0, -menu.getPreferredSize().height);
-        }
-    }//GEN-LAST:event_presetsButtonActionPerformed
-
     private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
         AlgorithmModel algoModel = pc.getAlgorithmModel();
         Algorithm algo = algoModel.getSelectedAlgorithm();
@@ -381,6 +337,53 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         }
     }//GEN-LAST:event_algoComboBoxActionPerformed
 
+    private void presetsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_presetsButtonActionPerformed
+        final AlgorithmModel algoModel = pc.getAlgorithmModel();
+        if (algoModel.getSelectedAlgorithm() != null) {
+            JPopupMenu menu = new JPopupMenu();
+            List<AlgoPresetPersistence.Preset> presets = algoPresetPersistence.getPresets(algoModel.getSelectedAlgorithm());
+            if (presets != null && !presets.isEmpty()) {
+                for (final AlgoPresetPersistence.Preset p : presets) {
+                    JMenuItem item = new JMenuItem(p.toString());
+                    item.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            algoPresetPersistence.loadPreset(p, algoModel.getSelectedAlgorithm());
+                            refreshProperties(algoModel);
+                            StatusDisplayer.getDefault().setStatusText(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.status.loadPreset", algoModel.getSelectedAlgorithm().getFactory().getName(), p.toString()));
+                        }
+                    });
+                    menu.add(item);
+                }
+            } else {
+                menu.add("<html><i>" + NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.nopreset") + "</i></html>");
+            }
+
+            JMenuItem saveItem = new JMenuItem(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.savePreset"));
+            saveItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String lastPresetName = NbPreferences.forModule(AlgoExplorerTopComponent.class).get("AlgoExplorerTopComponent.lastPresetName", "");
+                    NotifyDescriptor.InputLine question = new NotifyDescriptor.InputLine(
+                        NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.savePreset.input"),
+                        NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.savePreset.input.name"));
+                    question.setInputText(lastPresetName);
+                    if (DialogDisplayer.getDefault().notify(question) == NotifyDescriptor.OK_OPTION) {
+                        String input = question.getInputText();
+                        if (input != null && !input.isEmpty()) {
+                            algoPresetPersistence.savePreset(input, algoModel.getSelectedAlgorithm());
+                            StatusDisplayer.getDefault().setStatusText(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.status.savePreset", algoModel.getSelectedAlgorithm().getFactory().getName(), input));
+                            NbPreferences.forModule(AlgoExplorerTopComponent.class).put("AlgoExplorerTopComponent.lastPresetName", input);
+                        }
+                    }
+                }
+            });
+            menu.add(new JSeparator());
+            menu.add(saveItem);
+            menu.show(algoToolBar, 0, -menu.getPreferredSize().height);
+        }
+    }//GEN-LAST:event_presetsButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> algoComboBox;
     private javax.swing.JToolBar algoToolBar;
@@ -419,7 +422,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     }
 
     @Override
-    public void workspaceChanged(Workspace oldWs, Workspace newWs) {
+    public synchronized void workspaceChanged(Workspace oldWs, Workspace newWs) {
         removeLookupListener();
         Class oldAlgTag = null;
         if (oldWs != null) {
@@ -439,7 +442,6 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         }
         algoModel.addPropertyChangeListener(this);
         if (pc.getAttributesModel() == null) {
-            setDisplayName(Bundle.CTL_AlgoExplorerTopComponent());
             algoComboBox.setEnabled(false);
             setEnableState(false);
         }
@@ -560,7 +562,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     }       
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
+    public synchronized void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof AlgorithmModel) {
             if (evt.getPropertyName().equals(AlgorithmModel.CHANGED_CATEGORY)) {
                 AlgorithmModel algoModel = (AlgorithmModel) evt.getSource();
@@ -589,7 +591,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     }
 
     @Override
-    public void resultChanged(LookupEvent le) {
+    public synchronized void resultChanged(LookupEvent le) {
         if (le.getSource().equals(peptideLkpResult)) {
             Collection<? extends AttributesModel> attrModels = peptideLkpResult.allInstances();
             algoComboBox.setEnabled(!attrModels.isEmpty());

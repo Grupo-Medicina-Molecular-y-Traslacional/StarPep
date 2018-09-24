@@ -27,7 +27,7 @@ public class AlgorithmModel {
     public AlgorithmModel(Workspace owner) {
         this.owner = owner;
         propertyChangeSupport = new PropertyChangeSupport(this);
-        running = new AtomicBoolean(false);
+        running = new AtomicBoolean(false);       
     }
 
     public Workspace getOwnerWS() {

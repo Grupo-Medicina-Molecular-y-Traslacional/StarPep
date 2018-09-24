@@ -50,7 +50,7 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
     }
 
     @Override
-    public String getDisplayName() {        
+    public String getDisplayName() {
         return displayName;
     }
 
@@ -81,36 +81,35 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
         property = createPropertyField("id", NbBundle.getMessage(PeptideNode.class, "PropertySet.id"),
                 NbBundle.getMessage(PeptideNode.class, "PropertySet.id.desc"), String.class, peptide.getId());
         set.put(property);
-        
+
         // Name property
-        property = createPropertyField("name", NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.name"), 
+        property = createPropertyField("name", NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.name"),
                 NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.name.desc"), String.class, peptide.getName());
         set.put(property);
-        
+
         // Sequence property
         property = createPropertyField("seq", NbBundle.getMessage(PeptideNode.class, "PropertySet.seq"),
                 NbBundle.getMessage(PeptideNode.class, "PropertySet.seq.desc"), String.class, peptide.getSequence());
         set.put(property);
         sheet.put(set);
-        
-        // Descriptors
+
+        // Molecular features         
         for (PeptideAttribute attr : peptide.getAttributes()) {
             if (attr instanceof MolecularDescriptor) {
-                setMolecularFeature((MolecularDescriptor)attr);
+                setMolecularFeature((MolecularDescriptor) attr);
             }
-        }        
+        }
 
         return sheet;
     }
 
     private void setMolecularFeature(MolecularDescriptor attr) {
-        String category = attr.getCategory();
-        Sheet.Set set = sheet.get(category);
+        Sheet.Set set = sheet.get("molecularFeatures");
         if (set == null) {
             set = Sheet.createPropertiesSet();
-            set.setName(category);
-//            set.setValue("tabName", NbBundle.getMessage(PeptideNode.class, "PropertySet.md.tabName"));
-            set.setDisplayName(category);
+            set.setName("molecularFeatures");
+            set.setDisplayName(NbBundle.getMessage(PeptideNode.class, "PropertySet.molecularFeatures"));
+//          set.setValue("tabName", NbBundle.getMessage(PeptideNode.class, "PropertySet.molecularFeatures.tabName"));               
             sheet.put(set);
         }
         assert (peptide.getAttributeValue(attr) != null);
@@ -152,12 +151,12 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
                 if (evt.getNewValue() != null) {
                     PeptideAttribute attr = (PeptideAttribute) evt.getNewValue();
                     if (attr instanceof MolecularDescriptor) {
-                        setMolecularFeature((MolecularDescriptor)attr);
+                        setMolecularFeature((MolecularDescriptor) attr);
                     }
                 } else if (evt.getOldValue() != null) {
                     PeptideAttribute attr = (PeptideAttribute) evt.getOldValue();
                     if (attr instanceof MolecularDescriptor) {
-                        String category = ((MolecularDescriptor)attr).getCategory();
+                        String category = ((MolecularDescriptor) attr).getCategory();
                         Sheet.Set set = sheet.get(category);
                         if (set != null) {
                             set.remove(attr.getId());

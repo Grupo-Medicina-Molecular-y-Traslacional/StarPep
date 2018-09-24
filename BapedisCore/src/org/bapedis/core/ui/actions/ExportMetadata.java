@@ -9,8 +9,10 @@ import java.awt.event.ActionEvent;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.io.impl.FileExporterUI;
 import org.bapedis.core.io.impl.MetadataExporter;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.components.SetupDialog;
+import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -34,6 +36,7 @@ import org.openide.util.NbBundle.Messages;
 @Messages("CTL_ExportMetadata=Metadata relationship (CSV format)")
 public final class ExportMetadata extends WorkspaceContextSensitiveAction<AttributesModel> {
 
+    protected final static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected final SetupDialog dialog;
 
     public ExportMetadata() {
@@ -43,15 +46,19 @@ public final class ExportMetadata extends WorkspaceContextSensitiveAction<Attrib
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
-        AttributesModel attrModel = pm.getAttributesModel();
-        FileExporterUI ui = new FileExporterUI("metadata", ".csv");
-        if (dialog.setup(ui, ui, NbBundle.getMessage(ExportMetadata.class, "ExportMetadata.dialogTitle"))) {
-            try {
-                MetadataExporter exporter = new MetadataExporter(attrModel);
-                exporter.exportTo(ui.getSelectedFile());
-            } catch (Exception ex) {
-                Exceptions.printStackTrace(ex);
+        Workspace currentWS = pc.getCurrentWorkspace();
+        if (currentWS.isBusy()) {
+            DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
+        } else {
+            AttributesModel attrModel = pc.getAttributesModel();
+            FileExporterUI ui = new FileExporterUI("metadata", ".csv");
+            if (dialog.setup(ui, ui, NbBundle.getMessage(ExportMetadata.class, "ExportMetadata.dialogTitle"))) {
+                try {
+                    MetadataExporter exporter = new MetadataExporter(attrModel);
+                    exporter.exportTo(ui.getSelectedFile());
+                } catch (Exception ex) {
+                    Exceptions.printStackTrace(ex);
+                }
             }
         }
     }

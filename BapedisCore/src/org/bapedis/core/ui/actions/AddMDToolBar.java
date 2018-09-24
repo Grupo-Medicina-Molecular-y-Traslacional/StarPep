@@ -26,17 +26,17 @@ import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.Presenter;
 
-@ActionID(
-        category = "Tools",
-        id = "org.bapedis.core.ui.actions.AddMDToolBar"
-)
-@ActionRegistration(
-        displayName = "#CTL_AddMD"
-)
-@ActionReferences({
-    @ActionReference(path = "Toolbars/MD", position = 100)
-})
-@NbBundle.Messages("CTL_AddMD=Add molecular descriptors")
+//@ActionID(
+//        category = "Tools",
+//        id = "org.bapedis.core.ui.actions.AddMDToolBar"
+//)
+//@ActionRegistration(
+//        displayName = "#CTL_AddMD"
+//)
+//@ActionReferences({
+//    @ActionReference(path = "Toolbars/MD", position = 100)
+//})
+//@NbBundle.Messages("CTL_AddMD=Add molecular descriptors")
 public class AddMDToolBar extends AbstractAction implements Presenter.Toolbar{
 
     public AddMDToolBar() {

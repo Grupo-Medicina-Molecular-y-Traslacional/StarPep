@@ -33,16 +33,8 @@ public class AttributeFilter implements Filter {
         matchCase = false;
     }
 
-    public AttributeFilter(PeptideAttribute attr, FilterOperator operator, String value) {
-        AttributeFilterFactory foundFactory = null;
-        for (Iterator<? extends FilterFactory> it = Lookup.getDefault().lookup(ProjectManager.class).getFilterFactoryIterator(); it.hasNext(); ) {
-            FilterFactory f = it.next();
-            if (f instanceof AttributeFilterFactory) {
-                foundFactory = (AttributeFilterFactory) f;
-                break;
-            }
-        }
-        this.factory = foundFactory;
+    public AttributeFilter(PeptideAttribute attr, FilterOperator operator, String value, AttributeFilterFactory factory) {
+        this.factory = factory;
         this.attr = attr;
         this.operator = operator;
         this.value = value;

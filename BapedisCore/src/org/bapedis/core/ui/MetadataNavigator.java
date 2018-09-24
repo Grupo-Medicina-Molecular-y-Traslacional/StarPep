@@ -216,7 +216,7 @@ public class MetadataNavigator extends JComponent implements
         bottomPanel.setVisible(!busy);
     }
 
-    private void tableValueChanged(ListSelectionEvent e) {
+    private synchronized void tableValueChanged(ListSelectionEvent e) {
         Collection<? extends MetadataNode> oldNodes = lookup.lookupAll(MetadataNode.class);
         for (MetadataNode node : oldNodes) {
             content.remove(node);
@@ -250,7 +250,7 @@ public class MetadataNavigator extends JComponent implements
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public void workspaceChanged(Workspace oldWs, Workspace newWs) {
+    public synchronized void workspaceChanged(Workspace oldWs, Workspace newWs) {
         removeAttrLookupListener();
         if (oldWs != null) {
             AttributesModel oldAttrModel = pc.getAttributesModel(oldWs);

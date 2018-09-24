@@ -24,11 +24,18 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.data.PeptideDAO;
+import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.task.ProgressTicket;
 import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
 import org.biojava.nbio.core.sequence.ProteinSequence;
+import org.gephi.graph.api.Graph;
+import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.Node;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -39,6 +46,7 @@ public class SequenceSearch implements Algorithm {
     private final ProjectManager pc;
     private ProteinSequence query;
     private AttributesModel attrModel;
+    private List<Node> graphNodes;
     private Workspace workspace;
     private boolean stopRun;
     private final SequenceAlignmentModel alignmentModel;
@@ -46,6 +54,8 @@ public class SequenceSearch implements Algorithm {
     protected static final int MAX_REJECTS = 16;
     protected int maximumResults;
     protected final PeptideDAO dao;
+    protected final GraphWindowController graphWC;
+    protected final NotifyDescriptor emptyQuery;
 
     public SequenceSearch(SequenceSearchFactory factory) {
         this.factory = factory;
@@ -53,6 +63,8 @@ public class SequenceSearch implements Algorithm {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         maximumResults = -1;
         dao = Lookup.getDefault().lookup(PeptideDAO.class);
+        graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
+        emptyQuery = new NotifyDescriptor.Message(NbBundle.getMessage(SequenceSearch.class, "SequenceSearch.emptyQuery.info"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
     public SequenceAlignmentModel getAlignmentModel() {
@@ -80,25 +92,41 @@ public class SequenceSearch implements Algorithm {
         this.workspace = workspace;
         stopRun = false;
         attrModel = null;
+        graphNodes = null;
+        if(query == null){
+            DialogDisplayer.getDefault().notify(emptyQuery);
+            cancel();
+        }        
     }
 
     @Override
     public void endAlgo() {
         // Set new Model
-        if (attrModel != null && !stopRun) {
+        if (attrModel != null && graphNodes != null && !stopRun) {
+            // To refresh graph view
+            GraphModel graphModel = pc.getGraphModel(workspace);
+            Graph graph = graphModel.getGraphVisible();
+            graph.clear();
+            graphWC.refreshGraphView(workspace, graphNodes, null);
+
             final Workspace ws = workspace;
             final AttributesModel modelToRemove = pc.getAttributesModel(workspace);
             final AttributesModel modelToAdd = attrModel;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    ws.remove(modelToRemove);
-                    ws.add(modelToAdd);
+                    try {
+                        //To change attribute model
+                        ws.remove(modelToRemove);
+                        ws.add(modelToAdd);
+                    } finally {
+                        pc.getGraphVizSetting(ws).fireChangedGraphView();
+                    }
                 }
             });
-
         }
         workspace = null;
+        graphNodes = null;
         attrModel = null;
     }
 
@@ -119,47 +147,50 @@ public class SequenceSearch implements Algorithm {
     }
 
     @Override
-    public void run() {        
+    public void run() {
         if (query != null) {
             attrModel = dao.getPeptides(new QueryModel(workspace), pc.getGraphModel(workspace));
-            List<Peptide> resultList = new LinkedList<>();
+            if (!stopRun) {
+                List<Peptide> resultList = new LinkedList<>();
+                Peptide[] targets = attrModel.getPeptides().toArray(new Peptide[0]);
+                
+                // Sort by decreasing common words
+                Arrays.parallelSort(targets, new CommonKMersComparator(query.getSequenceAsString()));
 
-            Peptide[] targets = attrModel.getPeptides().toArray(new Peptide[0]);
-            // Sort by decreasing common words
-            Arrays.parallelSort(targets, new CommonKMersComparator(query.getSequenceAsString()));
-
-            // Assign peptide from targets to result list
-            // Stop if max rejects ocurred
-            float identityScore = alignmentModel.getIndentityScore();
-            float score;
-            int rejections = 0;
-            TreeSet<SequenceHit> hits = new TreeSet<>();
-            for (int i = 0; i < targets.length && !stopRun && rejections < MAX_REJECTS; i++) {
-                try {
-                    score = PairwiseSequenceAlignment.computeSequenceIdentity(query, targets[i].getBiojavaSeq(), alignmentModel);
-                    if (score >= identityScore) {
-                        hits.add(new SequenceHit(targets[i], score));
-                    } else {
-                        rejections++;
+                // Assign peptide from targets to result list
+                // Stop if max rejects ocurred
+                float identityScore = alignmentModel.getIndentityScore();
+                float score;
+                int rejections = 0;
+                TreeSet<SequenceHit> hits = new TreeSet<>();
+                for (int i = 0; i < targets.length && !stopRun && rejections < MAX_REJECTS; i++) {
+                    try {
+                        score = PairwiseSequenceAlignment.computeSequenceIdentity(query, targets[i].getBiojavaSeq(), alignmentModel);
+                        if (score >= identityScore) {
+                            hits.add(new SequenceHit(targets[i], score));
+                        } else {
+                            rejections++;
+                        }
+                    } catch (CompoundNotFoundException ex) {
+                        Exceptions.printStackTrace(ex);
                     }
-                } catch (CompoundNotFoundException ex) {
-                    Exceptions.printStackTrace(ex);
+                }
+
+                SequenceHit hit;
+                for (Iterator<SequenceHit> it = hits.descendingIterator(); it.hasNext()
+                        && (maximumResults == -1 || resultList.size() < maximumResults);) {
+                    hit = it.next();
+                    resultList.add(hit.getPeptide());
+                }
+
+                //New model                  
+                attrModel = new AttributesModel();
+                graphNodes = new LinkedList<>();
+                for (Peptide peptide : resultList) {
+                    attrModel.addPeptide(peptide);
+                    graphNodes.add(peptide.getGraphNode());
                 }
             }
-
-            SequenceHit hit;
-            for (Iterator<SequenceHit> it = hits.descendingIterator(); it.hasNext()
-                    && (maximumResults == -1 || resultList.size() < maximumResults);) {
-                hit = it.next();
-                resultList.add(hit.getPeptide());
-            }
-
-            //New model
-            AttributesModel newModel = new AttributesModel();
-            for (Peptide peptide : resultList) {
-                newModel.addPeptide(peptide);
-            }
-            attrModel = newModel;
         }
     }
 

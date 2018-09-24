@@ -17,6 +17,7 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.ToolMenuItem;
+import static org.bapedis.core.ui.actions.WorkspaceContextSensitiveAction.pc;
 import org.openide.DialogDisplayer;
 import org.openide.util.actions.Presenter;
 import org.openide.windows.TopComponent;
@@ -40,7 +41,7 @@ public class ToolAction extends WorkspaceContextSensitiveAction<AttributesModel>
     }
 
     public static ActionListener createActionListener(AlgorithmFactory factory, Class tagClass) {
-        
+
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -49,33 +50,15 @@ public class ToolAction extends WorkspaceContextSensitiveAction<AttributesModel>
                     DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
                 } else {
                     AlgorithmModel algoModel = pc.getAlgorithmModel();
-                    algoModel.setTagInterface(tagClass);
-
-                    Workspace currentWs = pc.getCurrentWorkspace();
-                    Collection<? extends Algorithm> savedAlgo = currentWs.getLookup().lookupAll(Algorithm.class);
-                    Algorithm algorithm = null;
-                    for (Algorithm algo : savedAlgo) {
-                        if (algo.getFactory() == factory) {
-                            algorithm = algo;
-                            break;
-                        }
-                    }
-                    boolean addToWS = false;
-                    if (algorithm == null) {
-                        algorithm = factory.createAlgorithm();
-                        addToWS = true;
-                    }
-
+                    Algorithm algorithm = pc.getOrCreateAlgorithm(factory);
                     if (algorithm != null) {
-                        if (addToWS) {
-                            currentWs.add(algorithm);
-                        }
+                        algoModel.setTagInterface(tagClass);
                         algoModel.setSelectedAlgorithm(algorithm);
-
-                        TopComponent tc = WindowManager.getDefault().findTopComponent("AlgoExplorerTopComponent");
-                        tc.open();
-                        tc.requestActive();
                     }
+
+                    TopComponent tc = WindowManager.getDefault().findTopComponent("AlgoExplorerTopComponent");
+                    tc.open();
+                    tc.requestActive();
                 }
             }
         };

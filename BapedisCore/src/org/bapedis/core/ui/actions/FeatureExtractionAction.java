@@ -18,17 +18,17 @@ import org.openide.util.ImageUtilities;
  *
  * @author loge
  */
-@ActionID(
-        category = "Tools",
-        id = "org.bapedis.core.ui.actions.FeatureExtraction"
-)
-@ActionRegistration(
-        iconBase = "org/bapedis/core/resources/add_md.gif",
-        displayName = "#CTL_FeatureExtraction"
-)
-@ActionReferences({
-    @ActionReference(path = "Menu/Tools/MolecularDescriptor", position = 20)
-})
+//@ActionID(
+//        category = "Tools",
+//        id = "org.bapedis.core.ui.actions.FeatureExtraction"
+//)
+//@ActionRegistration(
+//        iconBase = "org/bapedis/core/resources/add_md.gif",
+//        displayName = "#CTL_FeatureExtraction"
+//)
+//@ActionReferences({
+//    @ActionReference(path = "Menu/Tools/MolecularDescriptor", position = 20)
+//})
 @NbBundle.Messages("CTL_FeatureExtraction=Extraction")
 public class FeatureExtractionAction extends ToolAction {
     

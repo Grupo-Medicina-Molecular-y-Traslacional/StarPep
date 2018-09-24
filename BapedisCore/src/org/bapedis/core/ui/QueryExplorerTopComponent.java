@@ -289,7 +289,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
     }
 
     @Override
-    public void workspaceChanged(Workspace oldWs, Workspace newWs) {
+    public synchronized void workspaceChanged(Workspace oldWs, Workspace newWs) {
         if (oldWs != null) {            
             QueryModel oldModel = pc.getQueryModel(oldWs);
             oldModel.removePropertyChangeListener(this);
@@ -311,7 +311,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
+    public synchronized void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof QueryModel) {
             QueryModel queryModel = (QueryModel) evt.getSource();
             switch (evt.getPropertyName()) {

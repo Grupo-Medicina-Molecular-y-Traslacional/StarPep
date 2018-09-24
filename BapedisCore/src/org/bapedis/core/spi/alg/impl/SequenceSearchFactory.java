@@ -22,7 +22,7 @@ public class SequenceSearchFactory implements SequenceTag{
     
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(SequenceSearch.class, "SequenceSearch.category");
     }
 
     @Override

@@ -297,7 +297,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     }
 
     @Override
-    public void workspaceChanged(Workspace oldWs, Workspace newWs) {
+    public synchronized void workspaceChanged(Workspace oldWs, Workspace newWs) {
         if (oldWs != null) {
             FilterModel oldModel = pc.getFilterModel(oldWs);
             oldModel.removePropertyChangeListener(this);
@@ -371,7 +371,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
+    public synchronized void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() instanceof FilterModel) {
             FilterModel filterModel = (FilterModel) evt.getSource();
             if (evt.getPropertyName().equals(FilterModel.RUNNING)) {

@@ -230,7 +230,7 @@ public class GraphElementNavigator extends JComponent implements
         }
     }
 
-    private void tableValueChanged(ListSelectionEvent e) {
+    private synchronized void tableValueChanged(ListSelectionEvent e) {
         Collection<? extends GraphElementNode> oldNodes = lookup.lookupAll(GraphElementNode.class);
         for (GraphElementNode node : oldNodes) {
             content.remove(node);

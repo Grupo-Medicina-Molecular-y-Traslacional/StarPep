@@ -122,11 +122,15 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
                 validState = false;
             }
         }
-        if (validState && searchAlg != null) {
-            try {
-                searchAlg.setQuery(new ProteinSequence(jSeqTextArea.getText()));
-            } catch (CompoundNotFoundException ex) {
-                Exceptions.printStackTrace(ex);
+        if (searchAlg != null) {
+            if (validState) {
+                try {
+                    searchAlg.setQuery(new ProteinSequence(jSeqTextArea.getText()));
+                } catch (CompoundNotFoundException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            } else {
+                searchAlg.setQuery(null);
             }
         }
     }

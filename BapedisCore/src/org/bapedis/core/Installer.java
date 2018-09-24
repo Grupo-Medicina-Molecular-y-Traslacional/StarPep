@@ -5,11 +5,9 @@
  */
 package org.bapedis.core;
 
-import java.awt.Cursor;
 import org.bapedis.core.project.ProjectManager;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.SwingUtilities;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
 import org.openide.modules.ModuleInstall;

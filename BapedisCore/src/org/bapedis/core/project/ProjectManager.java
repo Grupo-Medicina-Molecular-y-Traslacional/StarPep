@@ -22,7 +22,10 @@ import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
+import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.SequenceTag;
+import org.bapedis.core.spi.alg.impl.SequenceSearchFactory;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.gephi.graph.api.Configuration;
 import org.gephi.graph.api.GraphModel;
@@ -334,9 +337,43 @@ public class ProjectManager implements Lookup.Provider {
         AlgorithmModel model = workspace.getLookup().lookup(AlgorithmModel.class);
         if (model == null) {
             model = new AlgorithmModel(workspace);
+            //Initialize the default sequence search algorithm
+            AlgorithmFactory seqSearchfactory = Lookup.getDefault().lookup(SequenceSearchFactory.class);
+            if (seqSearchfactory != null) {
+                Algorithm defaultAlgorithm = getOrCreateAlgorithm(seqSearchfactory);
+                if (defaultAlgorithm != null) {
+                    model.setTagInterface(SequenceTag.class);
+                    model.setSelectedAlgorithm(defaultAlgorithm);
+                }
+            }
             workspace.add(model);
         }
         return model;
+    }
+
+    public synchronized Algorithm getOrCreateAlgorithm(AlgorithmFactory factory) {
+        return getOrCreateAlgorithm(currentWS, factory);
+    }
+
+    public synchronized Algorithm getOrCreateAlgorithm(Workspace workspace, AlgorithmFactory factory) {
+        Collection<? extends Algorithm> savedAlgo = workspace.getLookup().lookupAll(Algorithm.class);
+        Algorithm algorithm = null;
+        for (Algorithm algo : savedAlgo) {
+            if (algo.getFactory().equals(factory) ) {
+                algorithm = algo;
+                break;
+            }
+        }
+        boolean addToWS = false;
+        if (algorithm == null) {
+            algorithm = factory.createAlgorithm();
+            addToWS = true;
+        }
+
+        if (algorithm != null && addToWS) {
+            workspace.add(algorithm);
+        }
+        return algorithm;
     }
 
     /**

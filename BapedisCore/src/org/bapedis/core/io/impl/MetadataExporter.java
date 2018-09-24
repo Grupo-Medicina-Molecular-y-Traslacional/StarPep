@@ -52,7 +52,7 @@ public class MetadataExporter implements Exporter {
                     for (Node neighbor : neighbors) {
                         edge = pept.getEdge(neighbor, aType);
                         xref = Arrays.toString((String[]) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_XREF));
-                        pw.format("\"%s\"", pept.getId());
+                        pw.format("\"%s\"", pept.getName());
                         pw.write(separator);
                         pw.format("\"%s\"", edge.getLabel());
                         pw.write(separator);

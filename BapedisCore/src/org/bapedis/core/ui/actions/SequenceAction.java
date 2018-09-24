@@ -5,10 +5,18 @@
  */
 package org.bapedis.core.ui.actions;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Iterator;
+import javax.swing.AbstractAction;
+import org.bapedis.core.project.ProjectManager;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.SequenceTag;
+import org.bapedis.core.spi.alg.impl.SequenceSearchFactory;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
@@ -22,12 +30,30 @@ import org.openide.util.NbBundle;
 @ActionRegistration(
         displayName = "#CTL_Sequence"
 )
-@ActionReference(path = "Menu/Tools", position = 40)
-@NbBundle.Messages("CTL_Sequence=Peptide sequence")
-public class SequenceAction extends ToolAction{
+@ActionReference(path = "Menu/Tools", position = 20)
+@NbBundle.Messages("CTL_Sequence=Sequence search")
+public class SequenceAction extends AbstractAction{
+    private final ActionListener actionListener;
     
     public SequenceAction() {
-        super(NbBundle.getMessage(SequenceAction.class, "CTL_Sequence"), SequenceTag.class);
+        ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+        AlgorithmFactory seqSearchfactory = null;
+        for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
+            final AlgorithmFactory factory = it.next();
+            if (factory instanceof SequenceSearchFactory){
+                seqSearchfactory = factory;
+            }
+        }       
+        
+        actionListener = seqSearchfactory != null ?ToolAction.createActionListener(seqSearchfactory, SequenceTag.class): null;
     }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (actionListener != null){
+            actionListener.actionPerformed(e);
+        }
+    }
+    
     
 }

@@ -15,7 +15,6 @@ import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.StarPepAnnotationType;
@@ -42,7 +41,6 @@ import org.openide.util.NbPreferences;
 import org.openide.util.Utilities;
 import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
-import org.openide.windows.WindowManager;
 
 /**
  * Top component which displays something.
@@ -66,7 +64,7 @@ import org.openide.windows.WindowManager;
 @Messages({
     "CTL_QueryExplorerAction=Peptide querying",
     "CTL_QueryExplorerTopComponent=Query",
-    "HINT_QueryExplorerTopComponent=Database Query window"
+    "HINT_QueryExplorerTopComponent=Peptide querying window"
 })
 public final class QueryExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener, ExplorerManager.Provider {
 

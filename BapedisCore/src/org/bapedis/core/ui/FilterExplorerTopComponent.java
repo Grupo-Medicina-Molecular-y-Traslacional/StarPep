@@ -58,15 +58,15 @@ import org.openide.util.lookup.ProxyLookup;
 )
 @TopComponent.Registration(mode = "explorer", openAtStartup = true, position = 433)
 @ActionID(category = "Window", id = "org.bapedis.core.ui.FilterExplorerTopComponent")
-@ActionReference(path = "Menu/Tools", position = 20)
+@ActionReference(path = "Menu/Tools", position = 30)
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_FilterExplorerAction",
         preferredID = "FilterExplorerTopComponent"
 )
 @Messages({
-    "CTL_FilterExplorerAction=Peptides filtering",
+    "CTL_FilterExplorerAction=Peptide filtering",
     "CTL_FilterExplorerTopComponent=Filter",
-    "HINT_FilterExplorerTopComponent=Peptides Filter window"
+    "HINT_FilterExplorerTopComponent=Peptides filtering window"
 })
 public final class FilterExplorerTopComponent extends TopComponent implements WorkspaceEventListener, PropertyChangeListener, ExplorerManager.Provider {
 

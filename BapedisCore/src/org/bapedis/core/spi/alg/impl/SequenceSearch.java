@@ -17,11 +17,13 @@ import javax.swing.SwingUtilities;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.data.PeptideDAO;
 import org.bapedis.core.task.ProgressTicket;
 import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
 import org.biojava.nbio.core.sequence.ProteinSequence;
@@ -36,19 +38,21 @@ public class SequenceSearch implements Algorithm {
 
     private final ProjectManager pc;
     private ProteinSequence query;
-    private AttributesModel newModel, oldModel;
+    private AttributesModel attrModel;
     private Workspace workspace;
     private boolean stopRun;
     private final SequenceAlignmentModel alignmentModel;
     private final SequenceSearchFactory factory;
     protected static final int MAX_REJECTS = 16;
     protected int maximumResults;
+    protected final PeptideDAO dao;
 
     public SequenceSearch(SequenceSearchFactory factory) {
         this.factory = factory;
         alignmentModel = new SequenceAlignmentModel();
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         maximumResults = -1;
+        dao = Lookup.getDefault().lookup(PeptideDAO.class);
     }
 
     public SequenceAlignmentModel getAlignmentModel() {
@@ -75,17 +79,16 @@ public class SequenceSearch implements Algorithm {
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
         stopRun = false;
-        newModel = null;
-        oldModel = null;
+        attrModel = null;
     }
 
     @Override
     public void endAlgo() {
         // Set new Model
-        if (oldModel != null && newModel != null && !stopRun) {
+        if (attrModel != null && !stopRun) {
             final Workspace ws = workspace;
-            final AttributesModel modelToRemove = oldModel;
-            final AttributesModel modelToAdd = newModel;
+            final AttributesModel modelToRemove = pc.getAttributesModel(workspace);
+            final AttributesModel modelToAdd = attrModel;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -96,8 +99,7 @@ public class SequenceSearch implements Algorithm {
 
         }
         workspace = null;
-        newModel = null;
-        oldModel = null;
+        attrModel = null;
     }
 
     @Override
@@ -117,12 +119,12 @@ public class SequenceSearch implements Algorithm {
     }
 
     @Override
-    public void run() {
-        oldModel = pc.getAttributesModel(workspace);
-        if (oldModel != null && query != null) {
+    public void run() {        
+        if (query != null) {
+            attrModel = dao.getPeptides(new QueryModel(workspace), pc.getGraphModel(workspace));
             List<Peptide> resultList = new LinkedList<>();
 
-            Peptide[] targets = oldModel.getPeptides().toArray(new Peptide[0]);
+            Peptide[] targets = attrModel.getPeptides().toArray(new Peptide[0]);
             // Sort by decreasing common words
             Arrays.parallelSort(targets, new CommonKMersComparator(query.getSequenceAsString()));
 
@@ -153,10 +155,11 @@ public class SequenceSearch implements Algorithm {
             }
 
             //New model
-            newModel = new AttributesModel();
+            AttributesModel newModel = new AttributesModel();
             for (Peptide peptide : resultList) {
                 newModel.addPeptide(peptide);
             }
+            attrModel = newModel;
         }
     }
 

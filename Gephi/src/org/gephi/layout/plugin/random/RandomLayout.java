@@ -58,20 +58,18 @@ import org.openide.util.NbBundle;
 public class RandomLayout extends AbstractLayout {
 
     private Random random;
-    private double size;
     private List<AlgorithmProperty> properties;
 
-    public RandomLayout(AlgorithmFactory layoutBuilder, double size) {
+    public RandomLayout(AlgorithmFactory layoutBuilder) {
         super(layoutBuilder);
-        this.size = size;
-        createProperties();
+//        createProperties();
     }
 
     private void createProperties() {
         properties = new LinkedList<>();
         try {
             properties.add(AlgorithmProperty.createProperty(
-                    this, Double.class,
+                    this, Float.class,
                     NbBundle.getMessage(getClass(), "Random.spaceSize.name"),
                     null,
                     "Random.spaceSize.name",
@@ -93,8 +91,8 @@ public class RandomLayout extends AbstractLayout {
             if (!canLayout()) {
                 return;
             }              
-            n.setX((float) (-size / 2 + size * random.nextDouble()));
-            n.setY((float) (-size / 2 + size * random.nextDouble()));
+            n.setX((float) ((0.01 + Math.random()) * 1000) - 500);
+            n.setY((float) ((0.01 + Math.random()) * 1000) - 500);
         }
         setConverged(true);
     }
@@ -106,14 +104,7 @@ public class RandomLayout extends AbstractLayout {
 
     @Override
     public AlgorithmProperty[] getProperties() {
-        return properties.toArray(new AlgorithmProperty[0]);
+        return null;
     }
 
-    public void setSize(Double size) {
-        this.size = size;
-    }
-
-    public Double getSize() {
-        return size;
-    }
 }

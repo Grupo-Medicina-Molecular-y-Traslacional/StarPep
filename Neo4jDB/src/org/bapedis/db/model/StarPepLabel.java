@@ -11,7 +11,7 @@ import org.neo4j.graphdb.Label;
  *
  * @author loge
  */
-public enum MyLabel implements Label {
+public enum StarPepLabel implements Label {
     Peptide,
     Function,
 //    Name,

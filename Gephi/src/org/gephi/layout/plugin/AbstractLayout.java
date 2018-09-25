@@ -107,7 +107,7 @@ public abstract class AbstractLayout implements Algorithm {
     @Override
     public final void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.progressTicket = progressTicket;
-        graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel(workspace);        
+        graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel(workspace);
         graph = graphModel.getGraphVisible();
         graph.readLock();
         try {
@@ -138,14 +138,16 @@ public abstract class AbstractLayout implements Algorithm {
 
     @Override
     public final void endAlgo() {
-        graph.readLock();
-        try {
-            endLayout();
-            for (Node n : graph.getNodes()) {
-                n.setLayoutData(null);
+        if (graph != null) {
+            graph.readLock();
+            try {
+                endLayout();
+                for (Node n : graph.getNodes()) {
+                    n.setLayoutData(null);
+                }
+            } finally {
+                graph.readUnlockAll();
             }
-        } finally {
-            graph.readUnlockAll();
         }
         graph = null;
         graphModel = null;
@@ -173,10 +175,11 @@ public abstract class AbstractLayout implements Algorithm {
 
     public boolean isConverged() {
         return converged;
-    }    
+    }
 
     /**
-     * See https://github.com/gephi/gephi/issues/603 Nodes position to NaN on applied layout
+     * See https://github.com/gephi/gephi/issues/603 Nodes position to NaN on
+     * applied layout
      *
      * @param graphModel
      */
@@ -197,5 +200,5 @@ public abstract class AbstractLayout implements Algorithm {
             node.setY((float) ((0.01 + Math.random()) * 1000) - 500);
         }
     }
-    
+
 }

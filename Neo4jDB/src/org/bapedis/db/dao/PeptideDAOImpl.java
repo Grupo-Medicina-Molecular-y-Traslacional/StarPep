@@ -16,7 +16,7 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.RestrictionLevel;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.db.Neo4jDB;
-import org.bapedis.db.model.MyLabel;
+import org.bapedis.db.model.StarPepLabel;
 import org.bapedis.db.model.StarPepRelationships;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
@@ -138,7 +138,7 @@ public class PeptideDAOImpl implements PeptideDAO {
     }
 
     protected ResourceIterator<Node> getPeptides() {
-        return graphDb.findNodes(MyLabel.Peptide);
+        return graphDb.findNodes(StarPepLabel.Peptide);
     }
 
     protected ResourceIterator<Node> getPeptides(final List<Node> metadataNodes, RestrictionLevel restriction) {
@@ -149,7 +149,7 @@ public class PeptideDAOImpl implements PeptideDAO {
             restrictiveEvaluator = new Evaluator() {
                 @Override
                 public Evaluation evaluate(Path path) {
-                    boolean accepted = path.endNode().hasLabel(MyLabel.Peptide);
+                    boolean accepted = path.endNode().hasLabel(StarPepLabel.Peptide);
                     return accepted ? Evaluation.INCLUDE_AND_PRUNE : Evaluation.EXCLUDE_AND_CONTINUE;
                 }
             };
@@ -163,7 +163,7 @@ public class PeptideDAOImpl implements PeptideDAO {
             restrictiveEvaluator = new Evaluator() {
                 @Override
                 public Evaluation evaluate(Path path) {
-                    if (path.endNode().hasLabel(MyLabel.Peptide)) {
+                    if (path.endNode().hasLabel(StarPepLabel.Peptide)) {
                         metadataList.clear();
                         try (ResourceIterator<Node> nodes = getMetadata(path.endNode(), endNodes)) {
                             while (nodes.hasNext()) {
@@ -213,14 +213,16 @@ public class PeptideDAOImpl implements PeptideDAO {
         if (graphNode == null) {
             GraphFactory factory = graphModel.factory();
             graphNode = factory.newNode(id);
-            if (neoNode.hasProperty(PRO_NAME)) {
-                graphNode.setAttribute(ProjectManager.NODE_TABLE_PRO_NAME, neoNode.getProperty(PRO_NAME));
-            } else {
-                graphNode.setAttribute(ProjectManager.NODE_TABLE_PRO_NAME, "starPep_" + id);
-            }
+            
             String label = neoNode.getLabels().iterator().next().name();
             graphNode.setLabel(label);
             graphNode.setSize(ProjectManager.GRAPH_NODE_SIZE);
+            
+            if (neoNode.hasProperty(PRO_NAME)) {
+                graphNode.setAttribute(ProjectManager.NODE_TABLE_PRO_NAME, neoNode.getProperty(PRO_NAME));
+            } else if (label.equals("Peptide")) {
+                graphNode.setAttribute(ProjectManager.NODE_TABLE_PRO_NAME, "starPep_" + String.format("%05d", Integer.parseInt(id)));
+            }
 
             //Set random position
             graphNode.setX((float) ((0.01 + Math.random()) * 1000) - 500);

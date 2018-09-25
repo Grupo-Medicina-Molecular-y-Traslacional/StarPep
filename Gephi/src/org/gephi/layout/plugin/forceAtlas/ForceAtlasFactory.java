@@ -44,6 +44,7 @@ package org.gephi.layout.plugin.forceAtlas;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.gephi.layout.plugin.AbstractLayoutFactory;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *

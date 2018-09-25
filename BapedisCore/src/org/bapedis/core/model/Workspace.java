@@ -77,9 +77,10 @@ public class Workspace implements Lookup.Provider {
         return name;
     }
 
-    public void setName(String name) {
-        changeSupport.firePropertyChange(PRO_NAME, this.name, name);
+    public void setName(String name) {   
+        String oldName = this.name;
         this.name = name;
+        changeSupport.firePropertyChange(PRO_NAME, oldName, name);
     }
 
     public boolean isBusy() {

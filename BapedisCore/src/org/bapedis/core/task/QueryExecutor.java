@@ -64,18 +64,6 @@ public class QueryExecutor extends SwingWorker<AttributesModel, Void> {
         PeptideDAO dao = Lookup.getDefault().lookup(PeptideDAO.class);
         AttributesModel model = dao.getPeptides(queryModel, graphModel);
 
-        //Set graph node for metadata
-        Graph graph = graphModel.getGraph();
-        graph.readLock();
-        try {
-            for (Iterator<Metadata> it = queryModel.getMetadataIterator(); it.hasNext();) {
-                Metadata metadata = it.next();
-                metadata.setGraphNode(graph.getNode(metadata.getID()));
-            }
-        } finally {
-            graph.readUnlock();
-        }
-
         //Create graph node list
         List<Node> toAddNodes = new LinkedList<>();
         for (Peptide peptide : model.getPeptides()) {
@@ -85,7 +73,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, Void> {
         // To refresh graph view
         GraphView graphView = pc.getGraphView(workspace);
         graphModel.setVisibleView(graphView);
-        graph = graphModel.getGraph(graphView);
+        Graph graph = graphModel.getGraph(graphView);
         graph.clear();
         graphWC.refreshGraphView(workspace, toAddNodes, null);
 

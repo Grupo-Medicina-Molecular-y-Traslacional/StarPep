@@ -333,6 +333,7 @@ public class MetadataNavigator extends JComponent implements
         FilterModel filterModel = pc.getFilterModel();
         filterModel.removePropertyChangeListener(this);
 
+        comboBox.setSelectedIndex(-1);
     }
 
     private void removeAttrLookupListener() {

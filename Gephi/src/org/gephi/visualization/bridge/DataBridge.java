@@ -41,9 +41,9 @@
  */
 package org.gephi.visualization.bridge;
 
+import java.awt.Cursor;
 import java.util.Arrays;
 import javax.swing.SwingUtilities;
-import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Column;
@@ -73,6 +73,7 @@ import org.openide.windows.TopComponent;
 /**
  *
  * @author Mathieu Bastian
+ * @modified by Loge
  */
 public class DataBridge implements VizArchitecture {
 
@@ -141,8 +142,15 @@ public class DataBridge implements VizArchitecture {
     }
 
     public synchronized boolean updateWorld() {
-
         boolean visibleViewChanged = false;
+
+        if (graph == null) {
+            graphModel = pc.getGraphModel();
+            graph = graphModel.getGraphVisible();
+            observer = pc.getGraphObserver();
+            force = true;
+        }
+
         graph.readLock();
         try {
             visibleViewChanged = (observer != null && (observer.isNew() || observer.hasGraphChanged())) || hasColumnsChanged();
@@ -158,6 +166,7 @@ public class DataBridge implements VizArchitecture {
                 public void run() {
                     if (tc.isOpened()) {
                         tc.makeBusy(true);
+                        tc.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     }
                 }
             });
@@ -249,6 +258,7 @@ public class DataBridge implements VizArchitecture {
                     public void run() {
                         if (tc.isOpened()) {
                             tc.makeBusy(false);
+                            tc.setCursor(Cursor.getDefaultCursor());
                         }
                     }
                 });

@@ -12,6 +12,7 @@ import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Edge;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.windows.TopComponent;
 
 /**
  *
@@ -23,17 +24,18 @@ public class SelectEdgeOnGraph extends AbstractAction {
 
     public SelectEdgeOnGraph(Edge edge) {
         this.edge = edge;
-        putValue(NAME, NbBundle.getMessage(SelectEdgeOnGraph.class, "SelectOnGraph.name"));        
+        putValue(NAME, NbBundle.getMessage(SelectEdgeOnGraph.class, "SelectOnGraph.name"));
     }
-    
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
-        if (graphWC != null){
-            graphWC.openGraphWindow();
-            graphWC.selectEdge(edge);
+        if (graphWC != null) {
+            TopComponent tc = graphWC.getGraphWindow();
+            if (tc.isOpened()) {
+                graphWC.selectEdge(edge);
+            }
         }
     }
-    
+
 }

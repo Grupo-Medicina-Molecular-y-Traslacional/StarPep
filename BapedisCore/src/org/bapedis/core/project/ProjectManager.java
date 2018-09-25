@@ -417,6 +417,11 @@ public class ProjectManager implements Lookup.Provider {
                     setCurrentWorkspace(next);
                 }
             }
+            //Destroy graph observer
+            GraphObserver observer = getGraphObserver(workspace);
+            if(observer != null && !observer.isDestroyed()){
+                observer.destroy();
+            }
         }
         content.remove(instance);
     }

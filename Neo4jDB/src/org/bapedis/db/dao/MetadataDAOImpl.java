@@ -18,7 +18,7 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.openide.util.lookup.ServiceProvider;
 import org.bapedis.core.spi.data.MetadataDAO;
-import org.bapedis.db.model.MyLabel;
+import org.bapedis.db.model.StarPepLabel;
 import org.bapedis.db.model.StarPepRelationships;
 import org.neo4j.graphdb.ResourceIterator;
 
@@ -43,17 +43,17 @@ public class MetadataDAOImpl implements MetadataDAO {
 //            case NAME:
 //                return getMetadata(type, MyLabel.Name);
             case ORIGIN:
-                return getMetadataTree(type, MyLabel.Origin);
+                return getMetadataTree(type, StarPepLabel.Origin);
             case TARGET:
-                return getMetadataTree(type, MyLabel.Target);
+                return getMetadataTree(type, StarPepLabel.Target);
             case FUNCTION:
-                return getMetadataTree(type, MyLabel.Function);
+                return getMetadataTree(type, StarPepLabel.Function);
             case DATABASE:
-                return getMetadata(type, MyLabel.Database);
+                return getMetadata(type, StarPepLabel.Database);
 //            case LITERATURE:
 //                return getMetadata(type, MyLabel.Literature);
             case CROSSREF:
-                return getMetadata(type, MyLabel.CrossRef);
+                return getMetadata(type, StarPepLabel.CrossRef);
         }
         return null;
     }

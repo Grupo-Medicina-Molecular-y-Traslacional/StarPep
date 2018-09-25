@@ -114,9 +114,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
         comboBoxModel.addElement(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.defaultText"));
         algoComboBox.setModel(comboBoxModel);
-        
-        //Disable Presets
-        presetsButton.setVisible(false);
+
     }
 
     private void removeLookupListener() {
@@ -365,8 +363,8 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 public void actionPerformed(ActionEvent e) {
                     String lastPresetName = NbPreferences.forModule(AlgoExplorerTopComponent.class).get("AlgoExplorerTopComponent.lastPresetName", "");
                     NotifyDescriptor.InputLine question = new NotifyDescriptor.InputLine(
-                        NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.savePreset.input"),
-                        NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.savePreset.input.name"));
+                            NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.savePreset.input"),
+                            NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.presetsButton.savePreset.input.name"));
                     question.setInputText(lastPresetName);
                     if (DialogDisplayer.getDefault().notify(question) == NotifyDescriptor.OK_OPTION) {
                         String input = question.getInputText();
@@ -460,7 +458,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 AlgorithmFactory factory = algoModel.getSelectedAlgorithm().getFactory();
                 if (factory.getCategory() != null) {
                     displayName = factory.getCategory();
-                } else{
+                } else {
                     displayName = factory.getName();
                 }
             }
@@ -502,6 +500,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             if (selectedAlgorithm.getFactory().getSetupUI() != null) {
                 JPanel settingPanel = selectedAlgorithm.getFactory().getSetupUI().getSettingPanel(selectedAlgorithm);
                 propSheetPanel.setVisible(false);
+                presetsButton.setVisible(false);
                 scrollPane.setViewportView(settingPanel);
                 scrollPane.setVisible(true);
             } else {
@@ -509,6 +508,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 scrollPane.setVisible(false);
                 ((PropertySheetPanel) propSheetPanel).getPropertySheet().setNodes(new Node[]{new AlgorithmNode(selectedAlgorithm)});
                 propSheetPanel.setVisible(true);
+                presetsButton.setVisible(true);
             }
 
             DefaultComboBoxModel comboBoxModel = (DefaultComboBoxModel) algoComboBox.getModel();
@@ -552,14 +552,14 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             runButton.setToolTipText(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.runButton.tooltip"));
         }
     }
-    
+
     private void setBusy(boolean busy) {
         if (busy) {
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         } else {
-           setCursor(Cursor.getDefaultCursor());
+            setCursor(Cursor.getDefaultCursor());
         }
-    }       
+    }
 
     @Override
     public synchronized void propertyChange(PropertyChangeEvent evt) {

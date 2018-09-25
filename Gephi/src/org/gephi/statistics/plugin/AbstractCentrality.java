@@ -151,7 +151,7 @@ public abstract class AbstractCentrality implements Algorithm {
             }
             avgDist /= totalPaths;//mN * (mN - 1.0f);
         } finally {
-            graph.readUnlock();
+            graph.readUnlockAll();
         }
     }
 

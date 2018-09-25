@@ -43,6 +43,7 @@ package org.gephi.visualization.bridge;
 
 import java.util.Arrays;
 import javax.swing.SwingUtilities;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Column;
@@ -78,6 +79,7 @@ public class DataBridge implements VizArchitecture {
     //Const
     protected static final long ONEOVERPHI = 106039;
     protected static GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
+    protected static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     //Architecture
     protected AbstractEngine engine;
     protected TextManager textManager;
@@ -97,6 +99,8 @@ public class DataBridge implements VizArchitecture {
     //Data
     protected NodeModel[] nodes;
     protected EdgeModel[] edges;
+
+    private boolean force;
 
     @Override
     public void initArchitecture() {
@@ -137,37 +141,17 @@ public class DataBridge implements VizArchitecture {
     }
 
     public synchronized boolean updateWorld() {
-        boolean force = false;
 
         boolean visibleViewChanged = false;
-        if (graphModel != null) {
-            graphModel.getGraph().readLock();
-            try {
-                visibleViewChanged = graph.getView() != graphModel.getVisibleView();
-            } finally {
-                graphModel.getGraph().readUnlockAll();
-            }
+        graph.readLock();
+        try {
+            visibleViewChanged = (observer != null && (observer.isNew() || observer.hasGraphChanged())) || hasColumnsChanged();
+        } finally {
+            graph.readUnlockAll();
         }
 
-        if (visibleViewChanged || (observer != null && observer.isDestroyed())) {
-            if (observer != null && !observer.isDestroyed()) {
-                observer.destroy();
-            }
-
-            observer = null;
-
-            graphModel.getGraph().writeLock();
-            try {
-                graph = graphModel.getGraphVisible();
-                observer = graphModel.createGraphObserver(graph, false);
-                force = true;
-            } finally {
-                graphModel.getGraph().writeUnlock();
-                graphModel.getGraph().readUnlockAll();
-            }
-        }
-
-        if (force || (observer != null && (observer.isNew() || observer.hasGraphChanged())) || hasColumnsChanged()) {
+        if (force || visibleViewChanged) {
+            force = false;
             final TopComponent tc = graphWC.getGraphWindow();
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -184,12 +168,6 @@ public class DataBridge implements VizArchitecture {
             EdgeModeler edgeModeler = engine.getEdgeModeler();
             Octree octree = engine.getOctree();
 
-            //Stats
-            int removedNodes = 0;
-            int addedNodes = 0;
-            int removedEdges = 0;
-            int addedEdges = 0;
-
             graph.readLock();
             try {
                 GraphView graphView = graph.getView();
@@ -200,7 +178,6 @@ public class DataBridge implements VizArchitecture {
                         //Removed
                         octree.removeNode(node);
                         nodes[i] = null;
-                        removedNodes++;
                     }
                 }
                 for (Node node : graph.getNodes()) {
@@ -211,7 +188,6 @@ public class DataBridge implements VizArchitecture {
                         model = nodeModeler.initModel(node);
                         octree.addNode(model);
                         nodes[id] = model;
-                        addedNodes++;
                     } else {
                         model = nodes[id];
                     }
@@ -232,7 +208,6 @@ public class DataBridge implements VizArchitecture {
                             targetModel.removeEdge(edge);
                         }
                         edges[i] = null;
-                        removedEdges++;
                     }
                 }
                 float minWeight = Float.MAX_VALUE;
@@ -250,7 +225,6 @@ public class DataBridge implements VizArchitecture {
                             targetModel.addEdge(model);
                         }
                         edges[id] = model;
-                        addedEdges++;
                     } else {
                         model = edges[id];
                     }
@@ -323,25 +297,12 @@ public class DataBridge implements VizArchitecture {
     }
 
     public synchronized void reset() {
-        graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();
-        if (graphModel != null) {
-            graph = graphModel.getGraphVisible();
-            graph.writeLock();
-        }
+        graphModel = pc.getGraphModel();
+        graph = graphModel.getGraphVisible();
+        observer = pc.getGraphObserver();
+        force = true;
 
-        try {
-            if (observer != null && (graphModel == null || observer.getGraph() != graph)) {
-                if (!observer.isDestroyed()) {
-                    observer.destroy();
-                }
-                observer = null;
-            }
-        } finally {
-            if (graphModel != null) {
-                graph.writeUnlock();
-                graph.readUnlockAll();
-            }
-        }
+        assert observer != null && observer.getGraph() == graph;
 
         if (nodeColumnObservers != null) {
             for (ColumnObserver c : nodeColumnObservers) {
@@ -365,12 +326,10 @@ public class DataBridge implements VizArchitecture {
         if (!octree.isEmpty()) {
             octree.clear();
         }
-        if (graphModel != null) {
-            observer = graphModel.createGraphObserver(graph, false);
-            textModel = VizController.getInstance().getVizModel().getTextModel();
-            refreshNodeColumns(textModel);
-            refreshEdgeColumns(textModel);
-        }
+
+        textModel = VizController.getInstance().getVizModel().getTextModel();
+        refreshNodeColumns(textModel);
+        refreshEdgeColumns(textModel);
     }
 
     private void refreshNodeColumns(TextModelImpl textModelImpl) {

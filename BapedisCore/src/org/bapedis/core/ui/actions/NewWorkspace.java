@@ -32,7 +32,10 @@ import org.openide.util.NbBundle;
 })
 public final class NewWorkspace implements ActionListener {
 
+    private final ProjectManager pc;
+
     public NewWorkspace() {
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
     }
 
     @Override
@@ -42,10 +45,9 @@ public final class NewWorkspace implements ActionListener {
         dd.setInputText(name);
         if (DialogDisplayer.getDefault().notify(dd).equals(DialogDescriptor.OK_OPTION) && !dd.getInputText().isEmpty()) {
             name = dd.getInputText();
-            ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
             Workspace ws = new Workspace(name);
             pc.add(ws);
-            pc.setCurrentWorkspace(ws);                    
+            pc.setCurrentWorkspace(ws);
         }
     }
 

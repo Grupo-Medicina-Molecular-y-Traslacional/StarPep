@@ -28,7 +28,9 @@ import org.bapedis.core.spi.alg.SequenceTag;
 import org.bapedis.core.spi.alg.impl.SequenceSearchFactory;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.gephi.graph.api.Configuration;
+import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.GraphObserver;
 import org.gephi.graph.api.GraphView;
 import org.gephi.graph.api.Origin;
 import org.gephi.graph.api.Table;
@@ -266,13 +268,26 @@ public class ProjectManager implements Lookup.Provider {
     }
 
     public synchronized GraphView getGraphView(Workspace workspace) {
-        GraphView model = workspace.getLookup().lookup(GraphView.class);
-        if (model == null) {
+        GraphView graphView = workspace.getLookup().lookup(GraphView.class);
+        if (graphView == null) {
             GraphModel graphModel = getGraphModel(workspace);
-            model = graphModel.createView();
-            workspace.add(model);
+            graphView = graphModel.createView();
+            workspace.add(graphView);
+
+            //Create graph observer
+            Graph graph = graphModel.getGraph(graphView);
+            GraphObserver observer = graphModel.createGraphObserver(graph, false);
+            workspace.add(observer);
         }
-        return model;
+        return graphView;
+    }
+    
+    public synchronized GraphObserver getGraphObserver(){
+        return getGraphObserver(currentWS);
+    }
+    
+    public synchronized GraphObserver getGraphObserver(Workspace workspace){
+        return workspace.getLookup().lookup(GraphObserver.class);
     }
 
     public synchronized GraphVizSetting getGraphVizSetting() {
@@ -359,7 +374,7 @@ public class ProjectManager implements Lookup.Provider {
         Collection<? extends Algorithm> savedAlgo = workspace.getLookup().lookupAll(Algorithm.class);
         Algorithm algorithm = null;
         for (Algorithm algo : savedAlgo) {
-            if (algo.getFactory().equals(factory) ) {
+            if (algo.getFactory().equals(factory)) {
                 algorithm = algo;
                 break;
             }

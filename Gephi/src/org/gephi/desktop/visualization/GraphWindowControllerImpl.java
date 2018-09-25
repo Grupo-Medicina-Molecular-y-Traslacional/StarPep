@@ -24,6 +24,7 @@ import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.GraphObserver;
 import org.gephi.graph.api.Node;
 import org.gephi.visualization.VizController;
 import org.gephi.visualization.api.selection.SelectionManager;
@@ -70,7 +71,9 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        graphWindow.open();
+                        if (!graphWindow.isOpened()) {
+                            graphWindow.open();
+                        }
                         graphWindow.requestActive();
 
                         // Navigator windows
@@ -139,6 +142,7 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
         AttributesModel attrModel = pc.getAttributesModel();
         GraphModel graphModel = pc.getGraphModel();
         Graph graph = graphModel.getGraphVisible();
+
         int relType = graphModel.getEdgeType(aType.getRelationType());
         if (relType != -1) {
             Set<Node> toAddNodes = new HashSet<>();
@@ -159,12 +163,14 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
             graph.addAllNodes(toAddNodes);
             graph.addAllEdges(toAddEdges);
         }
+
     }
 
     private synchronized void removeMetadataNodes(StarPepAnnotationType aType) {
         AttributesModel attrModel = pc.getAttributesModel();
         GraphModel graphModel = pc.getGraphModel();
         Graph graph = graphModel.getGraphVisible();
+
         int relType = graphModel.getEdgeType(aType.getRelationType());
         if (relType != -1) {
             Set<Node> toRemoveNodes = new HashSet<>();
@@ -199,6 +205,7 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
             }
         } finally {
             graph.writeUnlock();
+            graph.readUnlockAll();
         }
     }
 

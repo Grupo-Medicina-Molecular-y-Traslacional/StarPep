@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.GraphVizSetting;
+import org.bapedis.core.model.Workspace;
 import org.openide.util.NbBundle;
 
 /**
@@ -27,9 +28,11 @@ public class MetadataNetworkPanel extends JPanel {
     private final JLabel metadataInfoLabel;
     private final JPanel centerPanel;
     private final ButtonGroup group;
+    private final Workspace workspace;
 
-    public MetadataNetworkPanel(GraphVizSetting graphViz) {
+    public MetadataNetworkPanel(GraphVizSetting graphViz, Workspace workspace) {
         super(new GridBagLayout());
+        this.workspace = workspace;
         setMinimumSize(new Dimension(440, 220));
         setPreferredSize(new Dimension(440, 220));
 
@@ -65,15 +68,21 @@ public class MetadataNetworkPanel extends JPanel {
         MetadataRadioButton mrb = new MetadataRadioButton(); // Default option     
         metadataOptions[0] = mrb;
         addOption(mrb, 0);
-        JRadioButton rb;
-        rb = mrb.getRadioButton();
-        rb.setSelected(true);
+        JRadioButton rb, none;
+        none = mrb.getRadioButton();
+        none.setSelected(true);        
         for (int i = 0; i < arr.length; i++) {
             mrb = new MetadataRadioButton(arr[i]);
             metadataOptions[i + 1] = mrb;
             addOption(mrb, i + 1);
             rb = mrb.getRadioButton();
             rb.setSelected(graphViz.isDisplayedMetadata(arr[i]));
+            if (workspace.isBusy()) {
+                rb.setEnabled(rb.isSelected());
+            }
+        }
+        if(workspace.isBusy()){
+            none.setEnabled(none.isSelected());
         }
     }
 

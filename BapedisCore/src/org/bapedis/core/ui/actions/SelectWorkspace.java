@@ -28,6 +28,7 @@ import javax.swing.event.PopupMenuListener;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
+import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -57,7 +58,7 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
     protected JPopupMenu popup;
     protected JMenu menu;
     protected ButtonGroup popupGroup;
-//    protected ButtonGroup menuGroup;
+    protected ButtonGroup menuGroup;
     protected HashMap<Integer, JCheckBoxMenuItem> popupMap;
     protected HashMap<Integer, JCheckBoxMenuItem> menuMap;
     protected ProjectManager pc;
@@ -72,7 +73,7 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
         popupGroup = new ButtonGroup();
         popupMap = new HashMap<>();
         menu = new JMenu(NbBundle.getMessage(SelectWorkspace.class, "CTL_SelectWorkspace"));
-//        menuGroup = new ButtonGroup();
+        menuGroup = new ButtonGroup();
         menuMap = new HashMap<>();
         populateMenuItems();
         pc.getCurrentWorkspace().addPropertyChangeListener(this);
@@ -87,7 +88,17 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
         item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                pc.setCurrentWorkspace(ws);
+//                Workspace currentWS = pc.getCurrentWorkspace();
+//                if (currentWS.isBusy()) {
+//                    DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
+//                    Workspace ws = pc.getCurrentWorkspace();
+//                    JCheckBoxMenuItem item = popupMap.get(ws.getId());
+//                    item.setSelected(true);
+//                    item = menuMap.get(ws.getId());
+//                    item.setSelected(true);
+//                } else {
+                    pc.setCurrentWorkspace(ws);
+//                }
             }
         });
         if (ws.equals(pc.getCurrentWorkspace())) {
@@ -153,7 +164,7 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
             popupMap.put(ws.getId(), item);
             item = createJMenuItem(ws);
             menu.add(item);
-//            menuGroup.add(item);
+            menuGroup.add(item);
             menuMap.put(ws.getId(), item);
         }
     }
@@ -164,7 +175,7 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
         popup.removeAll();
         menu.removeAll();
         popupGroup = new ButtonGroup();
-//        menuGroup = new ButtonGroup();
+        menuGroup = new ButtonGroup();
         popupMap.clear();
         menuMap.clear();
         populateMenuItems();
@@ -173,9 +184,10 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         String propertyName = evt.getPropertyName();
+        JCheckBoxMenuItem item;
         if (propertyName.equals(Workspace.PRO_NAME)) {
             Workspace ws = (Workspace) evt.getSource();
-            JCheckBoxMenuItem item = popupMap.get(ws.getId());
+            item = popupMap.get(ws.getId());
             item.setText(evt.getNewValue().toString());
             item = menuMap.get(ws.getId());
             item.setText(evt.getNewValue().toString());

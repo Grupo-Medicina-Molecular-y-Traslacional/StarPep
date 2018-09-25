@@ -104,7 +104,8 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
     }
 
     private void setMolecularFeature(MolecularDescriptor attr) {
-        Sheet.Set set = sheet.get("molecularFeatures");
+        Sheet.Set set = sheet.get("primary");
+//        Sheet.Set set = sheet.get("molecularFeatures");
         if (set == null) {
             set = Sheet.createPropertiesSet();
             set.setName("molecularFeatures");

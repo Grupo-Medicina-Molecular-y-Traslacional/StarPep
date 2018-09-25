@@ -104,8 +104,6 @@ public class PeptideDAOImpl implements PeptideDAO {
             }
 
             // Write lock
-            graphModel.getGraph().writeLock();
-
             Peptide peptide;
             org.gephi.graph.api.Node graphNode, graphNeighborNode;
             String id, seq;
@@ -131,9 +129,7 @@ public class PeptideDAOImpl implements PeptideDAO {
 
                     attrModel.addPeptide(peptide);
                 }
-            } finally {
-                //Write unlock
-                graphModel.getGraph().writeUnlock();
+            } finally {                
                 peptideNodes.close();
                 tx.success();
             }

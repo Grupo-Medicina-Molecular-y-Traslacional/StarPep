@@ -14,13 +14,15 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.task.QueryExecutor;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.openide.modules.ModuleInstall;
+import org.openide.modules.Places;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 public class Installer extends ModuleInstall implements WorkspaceEventListener {
 
     private ProjectManager pc;
-    private static final File DB_DIR = new File(System.getProperty("netbeans.user"));
+//    private static final File DB_DIR = new File(System.getProperty("netbeans.user"));
+    private static final File DB_DIR = Places.getCacheDirectory();
 
     @Override
     public void restored() {

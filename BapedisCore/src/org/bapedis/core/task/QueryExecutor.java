@@ -99,7 +99,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, Void> {
             pc.getGraphVizSetting().fireChangedGraphView();            
             if (pc.getCurrentWorkspace() != workspace) {
                 String txt = NbBundle.getMessage(QueryExecutor.class, "Workspace.notify.finishedTask", taskName);
-                pc.workspaceChangeNotification(txt, workspace);
+                pc.notifyWorkspaceChange(txt, workspace);
             }
             pc.reportFinishedTask(taskName, workspace);
         }

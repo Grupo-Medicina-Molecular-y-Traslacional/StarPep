@@ -40,6 +40,7 @@ import org.openide.awt.NotificationDisplayer;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ServiceProvider;
@@ -54,7 +55,9 @@ import org.openide.windows.WindowManager;
  */
 @ServiceProvider(service = ProjectManager.class)
 public class ProjectManager implements Lookup.Provider {
-
+    public static final int LARGE_NETWORK=10000;
+    private static final String NOTIFY_LARGE_NETWORK_KEY = "notifyLargeNetworkKey";
+    
     protected String name;
     protected File folder;
     protected Lookup lookup;
@@ -182,7 +185,7 @@ public class ProjectManager implements Lookup.Provider {
         setCurrentWorkspace(defaultWorkspace);
     }
 
-    public synchronized void workspaceChangeNotification(String text, Workspace ws) {
+    public synchronized void notifyWorkspaceChange(String text, Workspace ws) {
         String reason = NbBundle.getMessage(ProjectManager.class, "ChangeWorkspace.notification.reason", ws.getName(), text);
         String action = NbBundle.getMessage(ProjectManager.class, "ChangeWorkspace.notification.action");
         NotificationDisplayer.getDefault().notify(reason, ImageUtilities.loadImageIcon("org/bapedis/core/resources/balloon.png", true), action, new ActionListener() {
@@ -192,6 +195,20 @@ public class ProjectManager implements Lookup.Provider {
             }
         });
     }
+    
+    public synchronized void notifyLargeNetworkWarning(String algorithmName) {
+        boolean flag = NbPreferences.forModule(ProjectManager.class).getBoolean(NOTIFY_LARGE_NETWORK_KEY, true);
+        if (flag) {
+            String reason = NbBundle.getMessage(ProjectManager.class, "LargeNetwork.notification.reason", algorithmName);
+            String action = NbBundle.getMessage(ProjectManager.class, "LargeNetwork.notification.action");
+            NotificationDisplayer.getDefault().notify(reason, ImageUtilities.loadImageIcon("org/bapedis/core/resources/balloon.png", true), action, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    NbPreferences.forModule(ProjectManager.class).putBoolean(NOTIFY_LARGE_NETWORK_KEY, false);
+                }
+            });
+        }
+    }    
 
     public synchronized void reportRunningTask(String taskName, Workspace workspace) {
         InputOutput io = IOProvider.getDefault().getIO(workspace.getName(), false);

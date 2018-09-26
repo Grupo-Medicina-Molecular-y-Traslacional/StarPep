@@ -49,6 +49,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.project.ProjectManager;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
 import org.gephi.layout.plugin.AbstractLayout;
@@ -131,7 +132,7 @@ public class ForceAtlas2 extends AbstractLayout {
 
     @Override
     public void runLayout() {
-        if (nodes.length > LARGE_NETWORK) {
+        if (nodes.length > ProjectManager.LARGE_NETWORK) {
             notifyLargeNetworkWarning();
         }
         // Initialise layout data

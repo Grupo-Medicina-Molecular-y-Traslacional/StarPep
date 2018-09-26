@@ -51,8 +51,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.Workspace;
@@ -63,12 +61,6 @@ import org.gephi.appearance.api.Function;
 import org.gephi.appearance.spi.Transformer;
 import org.gephi.appearance.spi.TransformerCategory;
 import org.gephi.appearance.spi.TransformerUI;
-import org.gephi.graph.api.Column;
-import org.gephi.graph.api.ColumnObserver;
-import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.GraphObserver;
-import org.gephi.graph.api.TableObserver;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -91,9 +83,6 @@ public class AppearanceUIController implements WorkspaceEventListener, PropertyC
     private final Set<AppearanceUIModelListener> listeners;
     //Model
     private AppearanceUIModel model;
-    //Observer
-//    private TableChangeObserver tableObserver;
-//    private GraphChangeObserver graphObserver;
 
     public AppearanceUIController() {
         appearanceController = Lookup.getDefault().lookup(AppearanceController.class);
@@ -105,8 +94,6 @@ public class AppearanceUIController implements WorkspaceEventListener, PropertyC
             AppearanceModel appearanceModel = appearanceController.getModel(pc.getCurrentWorkspace());
             model = new AppearanceUIModel(this, appearanceModel);
             pc.getCurrentWorkspace().add(model);
-//                tableObserver = new TableChangeObserver(pc.getCurrentWorkspace());
-//                tableObserver.start();
         }
 
         listeners = Collections.synchronizedSet(new HashSet<AppearanceUIModelListener>());
@@ -276,91 +263,91 @@ public class AppearanceUIController implements WorkspaceEventListener, PropertyC
         }
     }
 
-    private class GraphChangeObserver extends TimerTask {
-
-        private static final int INTERVAL = 2000;
-        private final Timer timer;
-        private final ColumnObserver columnObserver;
-        private final GraphObserver graphObserver;
-
-        public GraphChangeObserver(Graph graph, Column column) {
-            timer = new Timer("GraphChangeObserver", true);
-            graphObserver = graph.getModel().createGraphObserver(graph, false);
-            columnObserver = column != null ? column.createColumnObserver(false) : null;
-        }
-
-        @Override
-        public void run() {
-            boolean graphChanged = graphObserver.hasGraphChanged();
-            boolean columnChanged = columnObserver != null ? columnObserver.hasColumnChanged() : false;
-            if (graphChanged || columnChanged) {
-                Function oldValue = model.getSelectedFunction();
-                model.refreshSelectedFunction();
-                Function newValue = model.getSelectedFunction();
-                firePropertyChangeEvent(AppearanceUIModelEvent.SELECTED_FUNCTION, oldValue, newValue);
-            }
-        }
-
-        public void start() {
-            timer.schedule(this, INTERVAL, INTERVAL);
-        }
-
-        public void stop() {
-            timer.cancel();
-        }
-
-        public void destroy() {
-            stop();
-            if (!graphObserver.isDestroyed()) {
-                graphObserver.destroy();
-            }
-            if (columnObserver != null && !columnObserver.isDestroyed()) {
-                columnObserver.destroy();
-            }
-        }
-    }
-
-    private class TableChangeObserver extends TimerTask {
-
-        private final ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
-        private static final int INTERVAL = 500;
-        private final Timer timer;
-        private final TableObserver nodeObserver;
-        private final TableObserver edgeObserver;
-
-        public TableChangeObserver(Workspace workspace) {
-            timer = new Timer("AppearanceColumnObserver", true);
-            GraphModel graphModel = pm.getGraphModel(workspace);
-            nodeObserver = graphModel.getNodeTable().createTableObserver(false);
-            edgeObserver = graphModel.getEdgeTable().createTableObserver(false);
-        }
-
-        @Override
-        public void run() {
-            if (nodeObserver.hasTableChanged() || edgeObserver.hasTableChanged()) {
-                Function oldValue = model.getSelectedFunction();
-                model.refreshSelectedFunction();
-                Function newValue = model.getSelectedFunction();
-                firePropertyChangeEvent(AppearanceUIModelEvent.SELECTED_FUNCTION, oldValue, newValue);
-            }
-        }
-
-        public void start() {
-            timer.schedule(this, INTERVAL, INTERVAL);
-        }
-
-        public void stop() {
-            timer.cancel();
-        }
-
-        public void destroy() {
-            stop();
-            if (!nodeObserver.isDestroyed()) {
-                nodeObserver.destroy();
-            }
-            if (!edgeObserver.isDestroyed()) {
-                edgeObserver.destroy();
-            }
-        }
-    }
+//    private class GraphChangeObserver extends TimerTask {
+//
+//        private static final int INTERVAL = 2000;
+//        private final Timer timer;
+//        private final ColumnObserver columnObserver;
+//        private final GraphObserver graphObserver;
+//
+//        public GraphChangeObserver(Graph graph, Column column) {
+//            timer = new Timer("GraphChangeObserver", true);
+//            graphObserver = graph.getModel().createGraphObserver(graph, false);
+//            columnObserver = column != null ? column.createColumnObserver(false) : null;
+//        }
+//
+//        @Override
+//        public void run() {
+//            boolean graphChanged = graphObserver.hasGraphChanged();
+//            boolean columnChanged = columnObserver != null ? columnObserver.hasColumnChanged() : false;
+//            if (graphChanged || columnChanged) {
+//                Function oldValue = model.getSelectedFunction();
+//                model.refreshSelectedFunction();
+//                Function newValue = model.getSelectedFunction();
+//                firePropertyChangeEvent(AppearanceUIModelEvent.SELECTED_FUNCTION, oldValue, newValue);
+//            }
+//        }
+//
+//        public void start() {
+//            timer.schedule(this, INTERVAL, INTERVAL);
+//        }
+//
+//        public void stop() {
+//            timer.cancel();
+//        }
+//
+//        public void destroy() {
+//            stop();
+//            if (!graphObserver.isDestroyed()) {
+//                graphObserver.destroy();
+//            }
+//            if (columnObserver != null && !columnObserver.isDestroyed()) {
+//                columnObserver.destroy();
+//            }
+//        }
+//    }
+//
+//    private class TableChangeObserver extends TimerTask {
+//
+//        private final ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
+//        private static final int INTERVAL = 500;
+//        private final Timer timer;
+//        private final TableObserver nodeObserver;
+//        private final TableObserver edgeObserver;
+//
+//        public TableChangeObserver(Workspace workspace) {
+//            timer = new Timer("AppearanceColumnObserver", true);
+//            GraphModel graphModel = pm.getGraphModel(workspace);
+//            nodeObserver = graphModel.getNodeTable().createTableObserver(false);
+//            edgeObserver = graphModel.getEdgeTable().createTableObserver(false);
+//        }
+//
+//        @Override
+//        public void run() {
+//            if (nodeObserver.hasTableChanged() || edgeObserver.hasTableChanged()) {
+//                Function oldValue = model.getSelectedFunction();
+//                model.refreshSelectedFunction();
+//                Function newValue = model.getSelectedFunction();
+//                firePropertyChangeEvent(AppearanceUIModelEvent.SELECTED_FUNCTION, oldValue, newValue);
+//            }
+//        }
+//
+//        public void start() {
+//            timer.schedule(this, INTERVAL, INTERVAL);
+//        }
+//
+//        public void stop() {
+//            timer.cancel();
+//        }
+//
+//        public void destroy() {
+//            stop();
+//            if (!nodeObserver.isDestroyed()) {
+//                nodeObserver.destroy();
+//            }
+//            if (!edgeObserver.isDestroyed()) {
+//                edgeObserver.destroy();
+//            }
+//        }
+//    }
 }

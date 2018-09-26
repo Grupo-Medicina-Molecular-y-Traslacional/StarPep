@@ -210,7 +210,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Void> {
             
             if (pc.getCurrentWorkspace() != workspace) {
                 String txt = NbBundle.getMessage(FilterExecutor.class, "Workspace.notify.finishedTask", taskName);
-                pc.workspaceChangeNotification(txt, workspace);
+                pc.notifyWorkspaceChange(txt, workspace);
             }
             pc.reportFinishedTask(taskName, workspace);
         }

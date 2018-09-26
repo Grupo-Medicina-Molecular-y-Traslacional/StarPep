@@ -267,7 +267,7 @@ public final class AlgorithmExecutor {
                     algoModel.setRunning(false);
                     if (pc.getCurrentWorkspace() != workspace) {
                         String txt = NbBundle.getMessage(AlgorithmExecutor.class, "Workspace.notify.finishedTask", algo.getFactory().getName());
-                        pc.workspaceChangeNotification(txt, workspace);
+                        pc.notifyWorkspaceChange(txt, workspace);
                     }
                 }
             }

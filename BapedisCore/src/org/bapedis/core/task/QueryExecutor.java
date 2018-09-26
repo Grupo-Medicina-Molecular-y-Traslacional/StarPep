@@ -5,13 +5,11 @@
  */
 package org.bapedis.core.task;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;

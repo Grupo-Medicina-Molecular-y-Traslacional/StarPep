@@ -201,12 +201,12 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
         GraphModel graphModel = pc.getGraphModel(workspace);
         Graph graph = graphModel.getGraphVisible();
 
-        if ((toRemoveNodes != null && toRemoveNodes.size() > 0)
-                || (toAddNodes != null && toAddNodes.size() > 0)) {
-            setBusy();
-        }
         graph.writeLock();
         try {
+            if ((toRemoveNodes != null && toRemoveNodes.size() > 0)
+                    || (toAddNodes != null && toAddNodes.size() > 0)) {
+                setBusy();
+            }
             if (toRemoveNodes != null && toRemoveNodes.size() > 0) {
                 removePeptideNodes(toRemoveNodes, graphViz, graphModel, graph);
             }

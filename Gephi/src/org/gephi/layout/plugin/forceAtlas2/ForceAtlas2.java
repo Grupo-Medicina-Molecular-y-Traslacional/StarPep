@@ -131,6 +131,9 @@ public class ForceAtlas2 extends AbstractLayout {
 
     @Override
     public void runLayout() {
+        if (nodes.length > LARGE_NETWORK) {
+            notifyLargeNetworkWarning();
+        }
         // Initialise layout data
         for (Node n : nodes) {
             if (!canLayout()) {

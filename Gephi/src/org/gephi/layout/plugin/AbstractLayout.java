@@ -41,6 +41,8 @@
  */
 package org.gephi.layout.plugin;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
@@ -50,7 +52,11 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.NodeIterable;
+import org.openide.awt.NotificationDisplayer;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 
 /**
  * Base class for layout algorithms.
@@ -59,6 +65,8 @@ import org.openide.util.Lookup;
  */
 public abstract class AbstractLayout implements Algorithm {
 
+    private static final String NOTIFY_KEY = "notifyKey";
+    protected static final int LARGE_NETWORK=10000;
     private final AlgorithmFactory layoutBuilder;
     protected GraphModel graphModel;
     protected Graph graph;
@@ -198,6 +206,20 @@ public abstract class AbstractLayout implements Algorithm {
         for (Node node : nodesIterable) {
             node.setX((float) ((0.01 + Math.random()) * 1000) - 500);
             node.setY((float) ((0.01 + Math.random()) * 1000) - 500);
+        }
+    }
+
+    protected void notifyLargeNetworkWarning() {
+        boolean flag = NbPreferences.forModule(AbstractLayout.class).getBoolean(NOTIFY_KEY, true);
+        if (flag) {
+            String reason = NbBundle.getMessage(AbstractLayout.class, "Layout.notification.reason");
+            String action = NbBundle.getMessage(AbstractLayout.class, "Layout.notification.action");
+            NotificationDisplayer.getDefault().notify(reason, ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/balloon.png", true), action, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    NbPreferences.forModule(AbstractLayout.class).putBoolean(NOTIFY_KEY, false);
+                }
+            });
         }
     }
 

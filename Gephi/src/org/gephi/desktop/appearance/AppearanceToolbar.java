@@ -42,6 +42,7 @@
 package org.gephi.desktop.appearance;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -51,27 +52,19 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javafx.scene.control.ComboBox;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 import org.gephi.appearance.spi.TransformerCategory;
 import org.gephi.appearance.spi.TransformerUI;
-import org.openide.awt.DropDownButtonFactory;
-import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
 /**
@@ -115,7 +108,7 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
             refreshSelectedElementClass((String) pce.getNewValue());
         } else if (pce.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_CATEGORY)) {
             refreshSelectedCategory((TransformerCategory) pce.getNewValue());
-        } 
+        }
     }
 
     private void setup(final AppearanceUIModel model) {
@@ -157,7 +150,6 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
         });
     }
 
-
     private class AbstractToolbar extends JToolBar {
 
         public AbstractToolbar() {
@@ -181,32 +173,33 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
     }
 
     public class CategoryToolbar extends AbstractToolbar {
+
         private final List<ButtonGroup> buttonGroups = new ArrayList<>();
         private final List<ActionListener> actionListener = new LinkedList<>();
         private final JComboBox<MyComboBoxItem> elementComboBox;
-        
+
         public CategoryToolbar() {
             //Init components
             elementComboBox = new JComboBox<>();
-            DefaultComboBoxModel<MyComboBoxItem> comboBoxModel = (DefaultComboBoxModel)elementComboBox.getModel();
+            DefaultComboBoxModel<MyComboBoxItem> comboBoxModel = (DefaultComboBoxModel) elementComboBox.getModel();
             MyComboBoxItem item;
             String elmtTitle;
             for (final String elmtType : AppearanceUIController.ELEMENT_CLASSES) {
                 elmtTitle = NbBundle.getMessage(AppearanceToolbar.class, "AppearanceToolbar." + elmtType + ".label");
                 item = new MyComboBoxItem(elmtType, elmtTitle);
-                comboBoxModel.addElement(item);                               
+                comboBoxModel.addElement(item);
             }
-            
+
             elementComboBox.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (elementComboBox.getSelectedItem() instanceof MyComboBoxItem){
-                        MyComboBoxItem item = (MyComboBoxItem)elementComboBox.getSelectedItem();
+                    if (elementComboBox.getSelectedItem() instanceof MyComboBoxItem) {
+                        MyComboBoxItem item = (MyComboBoxItem) elementComboBox.getSelectedItem();
                         controller.setSelectedElementClass(item.getElmtType());
                     }
                 }
             });
-            
+            elementComboBox.setPreferredSize(new Dimension(90, 27));
             add(elementComboBox);
             addSeparator();
         }
@@ -240,7 +233,7 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 controller.setSelectedCategory(c);
-                                for(ActionListener action: actionListener){
+                                for (ActionListener action : actionListener) {
                                     action.actionPerformed(e);
                                 }
                             }
@@ -276,26 +269,26 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
 
         protected void refreshSelectedElmntGroup() {
             String selected = model == null ? null : model.getSelectedElementClass();
-            DefaultComboBoxModel<MyComboBoxItem> comboBoxModel = (DefaultComboBoxModel)elementComboBox.getModel();
+            DefaultComboBoxModel<MyComboBoxItem> comboBoxModel = (DefaultComboBoxModel) elementComboBox.getModel();
             MyComboBoxItem item = null;
-            for(int i=0; i<comboBoxModel.getSize(); i++){
+            for (int i = 0; i < comboBoxModel.getSize(); i++) {
                 item = comboBoxModel.getElementAt(i);
-                if (item.getElmtType().equals(selected)){
+                if (item.getElmtType().equals(selected)) {
                     comboBoxModel.setSelectedItem(item);
                 }
-            }            
+            }
         }
-        
-        public void addActionListener(ActionListener listener){
+
+        public void addActionListener(ActionListener listener) {
             actionListener.add(listener);
         }
-        
-        public void removeActionListener(ActionListener listener){
+
+        public void removeActionListener(ActionListener listener) {
             actionListener.remove(listener);
         }
-        
-        
+
         private class MyComboBoxItem {
+
             private final String elmtType;
             private final String elmtTitle;
 
@@ -310,13 +303,13 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
 
             public String getElmtTitle() {
                 return elmtTitle;
-            }        
+            }
 
             @Override
             public String toString() {
                 return elmtTitle;
             }
-                        
+
         }
 
     }
@@ -404,5 +397,4 @@ public class AppearanceToolbar implements AppearanceUIModelListener {
         }
     }
 
-   
 }

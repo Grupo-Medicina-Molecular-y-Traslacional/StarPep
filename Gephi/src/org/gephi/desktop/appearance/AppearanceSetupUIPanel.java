@@ -159,7 +159,7 @@ public class AppearanceSetupUIPanel extends javax.swing.JPanel implements Algori
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         add(attributePanel, gridBagConstraints);
 
         centerPanel.setLayout(new java.awt.BorderLayout());

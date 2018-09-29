@@ -59,7 +59,7 @@ public class MetadataTreeNodeLoader extends SwingWorker<Integer, Object> {
             count += createNode(m, rootNode);
             m.setGraphNode(graph.getNode(m.getID()));
         }
-
+        sort(rootNode);
         return count;
     }
 
@@ -96,10 +96,10 @@ public class MetadataTreeNodeLoader extends SwingWorker<Integer, Object> {
         if (metadata.hasChilds()) {
             for (Metadata m : metadata.getChilds()) {
                 count += createNode(m, node);
+                sort(node);
                 m.setGraphNode(graph.getNode(m.getID()));
             }
-        }
-        sort(parentNode);
+        }        
         return count;
     }
 

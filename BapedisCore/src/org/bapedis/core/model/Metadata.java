@@ -53,6 +53,10 @@ public class Metadata{
     public List<Metadata> getChilds() {
         return childs;
     }
+    
+    public int getChildCount(){
+        return childs == null?0:childs.size();
+    }
 
     public Node getGraphNode() {
         return graphNode;

@@ -8,6 +8,8 @@ package org.bapedis.core.ui.components;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
@@ -53,7 +55,6 @@ public class MetadataTreeNodeLoader extends SwingWorker<Integer, Object> {
     @Override
     protected Integer doInBackground() throws Exception {
         int count = 0;
-
         List<Metadata> allMetadata = metadataDAO.getMetadata(annotationType);
         for (Metadata m : allMetadata) {
             count += createNode(m, rootNode);
@@ -90,7 +91,7 @@ public class MetadataTreeNodeLoader extends SwingWorker<Integer, Object> {
     }
 
     private int createNode(Metadata metadata, DefaultMutableTreeNode parentNode) {
-        int count = 1;
+        int count = 1; 
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(metadata);
         parentNode.add(node);
         if (metadata.hasChilds()) {

@@ -504,7 +504,7 @@ public class MetadataNavigator extends JComponent implements
                 GraphElementsDataTable dataModel = (GraphElementsDataTable) table.getModel();
                 Edge edge = (Edge) dataModel.getElementAtRow(table.convertRowIndexToModel(rowIndex));
                 JPopupMenu contextMenu = GraphElementNavigator.createContextMenu(edge);
-                contextMenu.add(new ShowPropertiesAction(new GraphEdgeWrapper(edge)));
+                contextMenu.add(new ShowPropertiesAction(new MetadataNode(edge)));
                 contextMenu.show(table, evt.getX(), evt.getY());
             } else {
                 table.getSelectionModel().clearSelection();

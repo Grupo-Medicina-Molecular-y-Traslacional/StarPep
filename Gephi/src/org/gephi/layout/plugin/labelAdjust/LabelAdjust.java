@@ -107,10 +107,7 @@ public class LabelAdjust extends AbstractLayout {
     }
 
     @Override
-    public void initLayout() {
-        if (nodes.length > ProjectManager.LARGE_NETWORK) {
-            notifyLargeNetworkWarning();
-        }        
+    public void initLayout() {       
         nodes = graph.getNodes().toArray();
         for (Node n : nodes) {
             n.setLayoutData(new LabelAdjustLayoutData());
@@ -123,6 +120,9 @@ public class LabelAdjust extends AbstractLayout {
 
     @Override
     public void runLayout() {
+        if (nodes.length > ProjectManager.LARGE_NETWORK) {
+            notifyLargeNetworkWarning();
+        }         
         //Reset Layout Data
         for (Node n : nodes) {
             if (!canLayout()) {

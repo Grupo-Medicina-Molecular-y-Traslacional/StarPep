@@ -94,12 +94,14 @@ public class NoverlapLayout extends AbstractLayout {
     public void initLayout() {
         nodes = graph.getNodes().toArray();
     }
+    
+    @Override
+    protected boolean isHeavy() {
+        return true; 
+    }    
 
     @Override
-    public void runLayout() {
-        if (nodes.length > ProjectManager.LARGE_NETWORK) {
-            notifyLargeNetworkWarning();
-        }        
+    public void runLayout() {        
         boolean converged = true;
 
         //Reset Layout Data

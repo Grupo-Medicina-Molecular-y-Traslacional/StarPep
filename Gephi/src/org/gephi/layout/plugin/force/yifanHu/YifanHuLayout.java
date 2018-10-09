@@ -171,7 +171,7 @@ public class YifanHuLayout extends AbstractLayout {
             Exceptions.printStackTrace(e);
         }
 
-    }
+    } 
 
     protected void postAlgo() {
         updateStep();
@@ -250,12 +250,14 @@ public class YifanHuLayout extends AbstractLayout {
         edgeForce = null;
         barnes = null;
     }
+    
+    @Override
+    protected boolean isHeavy() {
+        return true; 
+    }    
 
     @Override
-    public void runLayout() {
-        if (nodes.length > ProjectManager.LARGE_NETWORK) {
-            notifyLargeNetworkWarning();
-        }        
+    public void runLayout() {       
         for (Node n : nodes) {
             if (!canLayout()){
                 return;

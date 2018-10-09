@@ -129,12 +129,14 @@ public class ForceAtlas2 extends AbstractLayout {
         pool = Executors.newFixedThreadPool(threadCount);
         currentThreadCount = threadCount;
     }
+    
+    @Override
+    protected boolean isHeavy() {
+        return true; 
+    }    
 
     @Override
     public void runLayout() {
-        if (nodes.length > ProjectManager.LARGE_NETWORK) {
-            notifyLargeNetworkWarning();
-        }
         // Initialise layout data
         for (Node n : nodes) {
             if (!canLayout()) {

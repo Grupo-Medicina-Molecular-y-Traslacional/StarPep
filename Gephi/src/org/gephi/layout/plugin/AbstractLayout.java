@@ -87,6 +87,10 @@ public abstract class AbstractLayout implements Algorithm {
     public AlgorithmFactory getFactory() {
         return layoutBuilder;
     }
+    
+    protected boolean isHeavy(){
+        return false;
+    }
 
     /**
      * Called to initialize the layout (prepare to run).
@@ -121,6 +125,9 @@ public abstract class AbstractLayout implements Algorithm {
 
     @Override
     public final void run() {
+        if (isHeavy() && graph.getNodeCount() > ProjectManager.LARGE_NETWORK) {
+            notifyLargeNetworkWarning();
+        }         
         long i = 0;
         while (canLayout()) {
             graph.readLock();
@@ -201,7 +208,7 @@ public abstract class AbstractLayout implements Algorithm {
         }
     }
 
-    protected void notifyLargeNetworkWarning() {
+    private void notifyLargeNetworkWarning() {
         Lookup.getDefault().lookup(ProjectManager.class).notifyLargeNetworkWarning(layoutBuilder.getName());
     }
 

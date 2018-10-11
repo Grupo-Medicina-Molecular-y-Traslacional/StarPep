@@ -11,7 +11,7 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public enum StarPepAnnotationType { 
+public enum StarPepAnnotationType {
     /*
     NAME("named") {
 
@@ -25,7 +25,31 @@ public enum StarPepAnnotationType {
             return NbBundle.getMessage(AnnotationType.class, "AnnotationType.name.desc");
         }
     },
-    */
+     */
+    DATABASE("compiled_in") {
+
+        @Override
+        public String getLabelName() {
+            return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.database");
+        }
+
+        @Override
+        public String getDescription() {
+            return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.database.desc");
+        }
+    },
+    FUNCTION("related_to") {
+
+        @Override
+        public String getLabelName() {
+            return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.function");
+        }
+
+        @Override
+        public String getDescription() {
+            return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.function.desc");
+        }
+    },
     ORIGIN("produced_by") {
 
         @Override
@@ -50,30 +74,18 @@ public enum StarPepAnnotationType {
             return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.target.desc");
         }
     },
-    FUNCTION("related_to") {
+    CROSSREF("linked_to") {
 
         @Override
         public String getLabelName() {
-            return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.function");
+            return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.crossref");
         }
 
         @Override
         public String getDescription() {
-            return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.function.desc");
+            return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.crossref.desc");
         }
-    },
-    DATABASE("compiled_in") {
-
-        @Override
-        public String getLabelName() {
-            return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.database");
-        }
-
-        @Override
-        public String getDescription() {
-            return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.database.desc");
-        }
-    },
+    }
     /*
     LITERATURE("referenced_by") {
 
@@ -87,30 +99,20 @@ public enum StarPepAnnotationType {
             return NbBundle.getMessage(AnnotationType.class, "AnnotationType.literature.desc");
         }
     }
-    */
-    CROSSREF("linked_to") {
+     */    
+    ;
 
-        @Override
-        public String getLabelName() {
-             return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.crossref");
-        }
-
-        @Override
-        public String getDescription() {
-            return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.crossref.desc");
-        }
-    };
-    
     private final String relType;
 
     private StarPepAnnotationType(String relType) {
         this.relType = relType;
     }
-    
+
     public abstract String getLabelName();
+
     public abstract String getDescription();
-    
-    public String getRelationType(){
+
+    public String getRelationType() {
         return relType;
     }
 
@@ -118,6 +120,5 @@ public enum StarPepAnnotationType {
     public String toString() {
         return getLabelName();
     }
-    
-    
+
 }

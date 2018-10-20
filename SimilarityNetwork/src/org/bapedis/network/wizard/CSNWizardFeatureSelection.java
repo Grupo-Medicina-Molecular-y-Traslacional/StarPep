@@ -7,7 +7,7 @@ package org.bapedis.network.wizard;
 
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
-import org.bapedis.core.spi.alg.impl.FeatureFiltering;
+import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
 import org.bapedis.network.impl.CSNAlgorithm;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
@@ -33,7 +33,7 @@ public class CSNWizardFeatureSelection implements WizardDescriptor.Panel<WizardD
     @Override
     public CSNVisualFeatureSelection getComponent() {
         if (component == null) {
-            FeatureFiltering algo = csnAlgo.getFeatureSelectionAlgo();
+            FeatureSEFiltering algo = csnAlgo.getFeatureSelectionAlgo();
             JPanel settingPanel = algo.getFactory().getSetupUI().getSettingPanel(algo);
             component = new CSNVisualFeatureSelection(csnAlgo.getMdOptionModel(), settingPanel);
         }

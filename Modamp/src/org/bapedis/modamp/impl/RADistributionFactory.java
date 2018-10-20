@@ -8,16 +8,16 @@ package org.bapedis.modamp.impl;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.MolecularDescriptorTag;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+import org.bapedis.core.spi.alg.FeatureExtractionTag;
 
 /**
  *
  * @author beltran, loge
  */
-//@ServiceProvider(service = AlgorithmFactory.class, position = 1300)
-public class RADistributionFactory implements AlgorithmFactory, MolecularDescriptorTag{
+@ServiceProvider(service = AlgorithmFactory.class, position = 1300)
+public class RADistributionFactory implements AlgorithmFactory, FeatureExtractionTag{
 
     @Override
     public String getCategory() {

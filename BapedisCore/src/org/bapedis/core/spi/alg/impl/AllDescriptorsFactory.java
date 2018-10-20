@@ -8,17 +8,17 @@ package org.bapedis.core.spi.alg.impl;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.MolecularDescriptorTag;
 import org.bapedis.core.spi.alg.ToolMenuItem;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+import org.bapedis.core.spi.alg.FeatureExtractionTag;
 
 /**
  *
  * @author beltran, loge
  */
 @ServiceProvider(service = AlgorithmFactory.class, position = 0)
-public class AllDescriptorsFactory implements MolecularDescriptorTag, ToolMenuItem {
+public class AllDescriptorsFactory implements FeatureExtractionTag, ToolMenuItem {
 
     private AllDescriptorsPanel panel;
 

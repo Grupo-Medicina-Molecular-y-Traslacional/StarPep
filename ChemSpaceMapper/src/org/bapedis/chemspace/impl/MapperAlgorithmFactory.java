@@ -15,7 +15,7 @@ import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.spi.alg.ChemSpaceTag;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
-import org.bapedis.core.spi.alg.impl.FeatureFiltering;
+import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
@@ -86,7 +86,7 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
         if (ffOption != null) {
             csMapper.setFFOption(ffOption);
             if (ffOption == FeatureFilteringOption.YES) {
-                FeatureFiltering alg = (FeatureFiltering) wiz.getProperty(FeatureFiltering.class.getName());
+                FeatureSEFiltering alg = (FeatureSEFiltering) wiz.getProperty(FeatureSEFiltering.class.getName());
                 csMapper.setFeatureFilteringAlg(alg);
             }
         }

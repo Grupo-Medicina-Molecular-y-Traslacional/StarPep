@@ -9,6 +9,6 @@ package org.bapedis.core.spi.alg;
  *
  * @author loge
  */
-public interface MolecularDescriptorTag extends AlgorithmFactory{
+public interface FeatureExtractionTag extends AlgorithmFactory{
     // Tag Interface
 }

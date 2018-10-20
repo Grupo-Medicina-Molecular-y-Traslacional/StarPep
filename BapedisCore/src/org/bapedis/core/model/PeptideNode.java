@@ -104,8 +104,8 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
     }
 
     private void setMolecularFeature(MolecularDescriptor attr) {
-        Sheet.Set set = sheet.get("primary");
-//        Sheet.Set set = sheet.get("molecularFeatures");
+//        Sheet.Set set = sheet.get("primary");
+        Sheet.Set set = sheet.get("molecularFeatures");
         if (set == null) {
             set = Sheet.createPropertiesSet();
             set.setName("molecularFeatures");
@@ -114,7 +114,7 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
             sheet.put(set);
         }
         assert (peptide.getAttributeValue(attr) != null);
-        PropertySupport.ReadOnly property = createPropertyField(attr.getId(), attr.getDisplayName(), attr.getDisplayName(), attr.getType(), peptide.getAttributeValue(attr));
+        PropertySupport.ReadOnly property = createPropertyField(attr.getId(), attr.getDisplayName(), attr.getCategory(), attr.getType(), peptide.getAttributeValue(attr));
         set.put(property);
     }
 

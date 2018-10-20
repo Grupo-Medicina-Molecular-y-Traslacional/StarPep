@@ -20,8 +20,8 @@ import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
-import org.bapedis.core.spi.alg.impl.FeatureFiltering;
-import org.bapedis.core.spi.alg.impl.FeatureFilteringFactory;
+import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
+import org.bapedis.core.spi.alg.impl.FeatureSEFilteringFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -50,7 +50,7 @@ public class MapperAlgorithm implements Algorithm {
 
     // Algorithms    
     private AllDescriptors featureExtractionAlg;
-    private FeatureFiltering featureFilteringAlg;
+    private FeatureSEFiltering featureFilteringAlg;
     private TwoDEmbedder twoDEmbedderAlg;
     private CSNEmbedder csnEmbedderAlg;
     private SSNEmbedder ssnEmbedderAlg;
@@ -73,7 +73,7 @@ public class MapperAlgorithm implements Algorithm {
 
         // Algorithms
         featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
-        featureFilteringAlg = (FeatureFiltering) new FeatureFilteringFactory().createAlgorithm();        
+        featureFilteringAlg = (FeatureSEFiltering) new FeatureSEFilteringFactory().createAlgorithm();        
         twoDEmbedderAlg = (TwoDEmbedder) new TwoDEmbedderFactory().createAlgorithm();
         csnEmbedderAlg = (CSNEmbedder) new CSNEmbedderFactory().createAlgorithm();
         ssnEmbedderAlg = (SSNEmbedder) new SSNEmbedderFactory().createAlgorithm();
@@ -200,11 +200,11 @@ public class MapperAlgorithm implements Algorithm {
         return featureExtractionAlg;
     }
 
-    public void setFeatureFilteringAlg(FeatureFiltering alg) {
+    public void setFeatureFilteringAlg(FeatureSEFiltering alg) {
         this.featureFilteringAlg = alg;
     }
 
-    public FeatureFiltering getFeatureFilteringAlg() {
+    public FeatureSEFiltering getFeatureFilteringAlg() {
         return featureFilteringAlg;
     }
 

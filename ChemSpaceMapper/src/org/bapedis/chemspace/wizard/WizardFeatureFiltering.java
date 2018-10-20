@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.model.FeatureFilteringOption;
-import org.bapedis.core.spi.alg.impl.FeatureFiltering;
+import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
@@ -18,7 +18,7 @@ public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDesc
         WizardDescriptor.FinishablePanel<WizardDescriptor>{
 
     private final MapperAlgorithm csMapper;
-    private FeatureFiltering alg;
+    private FeatureSEFiltering alg;
 
     public WizardFeatureFiltering(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
@@ -38,7 +38,7 @@ public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDesc
     public VisualFeatureFiltering getComponent() {
         if (component == null) {
             try {
-                alg = (FeatureFiltering) csMapper.getFeatureFilteringAlg().clone();
+                alg = (FeatureSEFiltering) csMapper.getFeatureFilteringAlg().clone();
                 JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
                 component = new VisualFeatureFiltering(settingPanel);
             } catch (CloneNotSupportedException ex) {
@@ -83,7 +83,7 @@ public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDesc
         FeatureFilteringOption ffOption = getComponent().getFFOption();
         wiz.putProperty(FeatureFilteringOption.class.getName(), ffOption);
         if (ffOption == FeatureFilteringOption.YES) {
-            wiz.putProperty(FeatureFiltering.class.getName(), alg);
+            wiz.putProperty(FeatureSEFiltering.class.getName(), alg);
         }
     }
 

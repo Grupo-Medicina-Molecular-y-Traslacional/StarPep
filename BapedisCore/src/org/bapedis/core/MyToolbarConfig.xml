@@ -5,7 +5,7 @@
    <Row>
       <Toolbar name="File" visible="true"/>
       <Toolbar name="Workspace" visible="true"/>
-      <Toolbar name="MD" visible="false"/>       
+      <Toolbar name="MD" visible="true"/>       
       <Toolbar name="Clipboard" visible="false"/>
       <Toolbar name="UndoRedo" visible="false"/>
       <Toolbar name="Memory" visible="true" />

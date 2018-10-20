@@ -22,7 +22,7 @@ import org.bapedis.core.spi.alg.NetworkTag;
 @ActionRegistration(
         displayName = "#CTL_Network"
 )
-@ActionReference(path = "Menu/Tools", position = 100)
+@ActionReference(path = "Menu/Tools", position = 60)
 @NbBundle.Messages("CTL_Network=Network")
 public class NetworkAction extends ToolAction {
     

@@ -24,8 +24,8 @@ import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
-import org.bapedis.core.spi.alg.impl.FeatureFiltering;
-import org.bapedis.core.spi.alg.impl.FeatureFilteringFactory;
+import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
+import org.bapedis.core.spi.alg.impl.FeatureSEFilteringFactory;
 import org.bapedis.core.spi.alg.impl.SequenceClustering;
 import org.bapedis.core.spi.alg.impl.SequenceClusteringFactory;
 import org.bapedis.core.task.ProgressTicket;
@@ -61,7 +61,7 @@ public class CSNAlgorithm implements Algorithm {
     private final SequenceClustering clusteringAlgo;
     private final WizardOptionModel optionModel;
     private final AllDescriptors descriptorAlgo;
-    private final FeatureFiltering featureSelectionAlgo;
+    private final FeatureSEFiltering featureSelectionAlgo;
     private SimilarityMeasure simMeasure;
     private int cutoffValue;
     private SimilarityMatrix similarityMatrix;
@@ -85,7 +85,7 @@ public class CSNAlgorithm implements Algorithm {
         clusteringAlgo = (SequenceClustering) new SequenceClusteringFactory().createAlgorithm();
         optionModel = new WizardOptionModel();
         descriptorAlgo = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
-        featureSelectionAlgo = (FeatureFiltering) new FeatureFilteringFactory().createAlgorithm();
+        featureSelectionAlgo = (FeatureSEFiltering) new FeatureSEFilteringFactory().createAlgorithm();
         cutoffValue = SIMILARITY_DEFAULT_VALUE;
 
         emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithm.class, "ChemicalSpaceNetwork.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
@@ -106,7 +106,7 @@ public class CSNAlgorithm implements Algorithm {
         return descriptorAlgo;
     }
 
-    public FeatureFiltering getFeatureSelectionAlgo() {
+    public FeatureSEFiltering getFeatureSelectionAlgo() {
         return featureSelectionAlgo;
     }
 

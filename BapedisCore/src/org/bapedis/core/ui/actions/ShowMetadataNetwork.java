@@ -31,7 +31,7 @@ import org.openide.util.NbBundle;
         displayName = "#CTL_ShowMetadataNetwork"
 )
 @ActionReferences({
-    @ActionReference(path = "Toolbars/Network", position = 100)
+    @ActionReference(path = "Toolbars/Network", position = 10)
 })
 @NbBundle.Messages("CTL_ShowMetadataNetwork=Metadata network")
 public class ShowMetadataNetwork extends AbstractAction {

@@ -31,31 +31,26 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class FeatureFiltering implements Algorithm, Cloneable {
+public class FeatureSEFiltering implements Algorithm, Cloneable {
 
     protected final ProjectManager pc;
-    protected final FeatureFilteringFactory factory;
+    protected final FeatureSEFilteringFactory factory;
 
     //Entropy cutoff for reference: 
-    public static final int[] ENTROPY_CUTOFF_REFS = new int[]{10, 25, 50};
-    public static final int ENTROPY_CUTOFF_MIN = 10;
-    public static final int ENTROPY_CUTOFF_MAX = 50;
-    public static final int ENTROPY_DEFAULT_VALUE = 20;
-    public static final int ENTROPY_MAJORTICKSPACING = 15;
-    public static final int ENTROPY_MINORTICKSPACING = 5;
+    public static final int RANKING_SELECT_ALL = 0;
+    public static final int RANKING_SELECT_TOP = 1;
+    public static final int RANKING_REMOVE_BOTTOM = 2;
+    public static final int RANKING_MEAN_STD = 3;    
+    public static final int RANKING_DEFAULT_TOP = 50;
+    public static final int RANKING_DEFAULT_BOTTOM = 50;
+    public static final int RANKING_DEFAULT_OPTION = 0;    
 
+    private static final String NONE="None";
     private static final String PEARSON = "Pearson";
     private static final String SPEARMAN = "Spearman";
-    public static final String[] CORRELATION_METHODS = new String[]{PEARSON, SPEARMAN};
-    public static final int CORRELATION_DEFAULT_INDEX = 0;
-
-    //Correlation cutoff for references: 
-    public static final int[] CORRELATION_CUTOFF_REFS = new int[]{50, 70, 100};
-    public static final int CORRELATION_CUTOFF_MIN = 50;
-    public static final int CORRELATION_CUTOFF_MAX = 100;
-    public static final int CORRELATION_DEFAULT_VALUE = 95;
-    public static final int CORRELATION_MAJORTICKSPACING = 10;
-    public static final int CORRELATION_MINORTICKSPACING = 5;
+    public static final String[] CORRELATION_METHODS = new String[]{NONE,PEARSON, SPEARMAN};
+    public static final int CORRELATION_DEFAULT_INDEX = 2;
+    public static final float CORRELATION_DEFAULT_VALUE = 0.9f;
 
     //To initialize
     protected Workspace workspace;
@@ -68,14 +63,19 @@ public class FeatureFiltering implements Algorithm, Cloneable {
     protected transient final PropertyChangeSupport propertyChangeSupport;
 
     private boolean removeUseless, removeRedundant;
-    private int entropyCutoff, correlationIndex, correlationCutoff;
+    private int correlationIndex;
+    private float correlationCutoff;
+    private int rankingOption, top, bottom;
     private NotifyDescriptor emptyMDs;
 
-    public FeatureFiltering(FeatureFilteringFactory factory) {
+    public FeatureSEFiltering(FeatureSEFilteringFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         this.factory = factory;
 
-        entropyCutoff = ENTROPY_DEFAULT_VALUE;
+        rankingOption = RANKING_DEFAULT_OPTION;
+        top = RANKING_DEFAULT_TOP;
+        bottom = RANKING_DEFAULT_BOTTOM;
+
         correlationIndex = CORRELATION_DEFAULT_INDEX;
         correlationCutoff = CORRELATION_DEFAULT_VALUE;
         removeUseless = true;
@@ -84,7 +84,7 @@ public class FeatureFiltering implements Algorithm, Cloneable {
         running = false;
         propertyChangeSupport = new PropertyChangeSupport(this);
 
-        emptyMDs = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureFiltering.class, "FeatureFiltering.emptyMDs.info"), NotifyDescriptor.ERROR_MESSAGE);
+        emptyMDs = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureSEFiltering.class, "FeatureFiltering.emptyMDs.info"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
     public boolean isRemoveUseless() {
@@ -103,18 +103,15 @@ public class FeatureFiltering implements Algorithm, Cloneable {
         this.removeRedundant = removeRedundant;
     }
 
-    public int getEntropyCutoff() {
-        return entropyCutoff;
+    public int getEntropyOption() {
+        return rankingOption;
     }
 
-    public void setEntropyCutoff(int entropyCutoff) {
-        if (entropyCutoff < ENTROPY_CUTOFF_MIN || entropyCutoff > ENTROPY_CUTOFF_MAX) {
-            throw new IllegalArgumentException("Invalid value for entropy cutoff. It should be between " + ENTROPY_CUTOFF_MIN + " and " + ENTROPY_CUTOFF_MAX);
-        }
-        this.entropyCutoff = entropyCutoff;
+    public void setEntropyOption(int entropyOption) {
+        this.rankingOption = entropyOption;
     }
 
-    public int getCorrelationCutoff() {
+    public float getCorrelationCutoff() {
         return correlationCutoff;
     }
 
@@ -130,8 +127,8 @@ public class FeatureFiltering implements Algorithm, Cloneable {
     }
 
     public void setCorrelationCutoff(int correlationCutoff) {
-        if (correlationCutoff < CORRELATION_CUTOFF_MIN || correlationCutoff > CORRELATION_CUTOFF_MAX) {
-            throw new IllegalArgumentException("Invalid value for correlation cutoff. It should be between " + CORRELATION_CUTOFF_MIN + " and " + CORRELATION_CUTOFF_MAX);
+        if (correlationCutoff < 0 || correlationCutoff > 1) {
+            throw new IllegalArgumentException("Invalid value for correlation cutoff. It should be between 0 and 1");
         }
         this.correlationCutoff = correlationCutoff;
     }
@@ -197,6 +194,7 @@ public class FeatureFiltering implements Algorithm, Cloneable {
         }
 
         try {
+            //Load all descriptors
             List<MolecularDescriptor> allFeatures = new LinkedList<>();
 
             for (String key : attrModel.getMolecularDescriptorKeys()) {
@@ -213,40 +211,31 @@ public class FeatureFiltering implements Algorithm, Cloneable {
                 return;
             }
 
-            //---------------Remove Useless--------------
+            //Computing shannon entropy            
             List<Peptide> peptides = attrModel.getPeptides();
-            String state1 = NbBundle.getMessage(FeatureFiltering.class, "FeatureFiltering.task.removeUseless");
+            String state1 = NbBundle.getMessage(FeatureSEFiltering.class, "FeatureSEFiltering.task.ranking");
             pc.reportMsg(state1 + "\n", workspace);
             ticket.progress(state1);
-            ticket.switchToDeterminate(allFeatures.size());
+            int workUnits = allFeatures.size();
+            ticket.switchToDeterminate(workUnits);
 
             Bin[] bins = new Bin[peptides.size()];
             double maxScore = Math.log(peptides.size());
-            double threshold = getEntropyCutoff() * maxScore / 100;
             double score;
 
             pc.reportMsg("Entropy max score: " + maxScore, workspace);
-            pc.reportMsg("Entropy cutoff value: " + threshold + "\n", workspace);
-            LinkedList<MolecularDescriptor> toRemove = new LinkedList<>();
+
             for (MolecularDescriptor descriptor : allFeatures) {
                 if (!stopRun) {
                     descriptor.resetSummaryStats(peptides);
                     fillBins(descriptor, peptides, bins);
                     score = calculateEntropy(bins);
                     descriptor.setScore(score);
-                    if (score < threshold) {
-                        toRemove.add(descriptor);
-                        attrModel.deleteAttribute(descriptor);
-                        pc.reportMsg("Removed: " + descriptor.getDisplayName() + " - score: " + score, workspace);
-                    }
                     ticket.progress();
                 }
             }
-            allFeatures.removeAll(toRemove);
-            int uselessRemovedSize = toRemove.size();
-            pc.reportMsg("Useless features removed: " + uselessRemovedSize + "\n", workspace);
 
-            pc.reportMsg("Top 5", workspace);
+            // Ranking all features
             MolecularDescriptor[] rankedFeatures = allFeatures.toArray(new MolecularDescriptor[0]);
             Arrays.parallelSort(rankedFeatures, new Comparator<MolecularDescriptor>() {
                 @Override
@@ -260,28 +249,22 @@ public class FeatureFiltering implements Algorithm, Cloneable {
                     return 0;
                 }
             });
-            for (int i = 0; i < rankedFeatures.length && i < 5; i++) {
-                pc.reportMsg(rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
-            }
-            pc.reportMsg("...", workspace);
-            pc.reportMsg("Bottom 3", workspace);
-            for (int i = Math.max(rankedFeatures.length - 3, 0); i < rankedFeatures.length; i++) {
-                pc.reportMsg(rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
-            }
+
+            //Remove features...
+            LinkedList<MolecularDescriptor> toRemove = new LinkedList<>();
 
             //---------------Remove Redundant--------------
             int redundantRemoveSize = 0;
             if (isRemoveRedundant()) {
-                toRemove.clear();
-                int workUnits = rankedFeatures.length + (rankedFeatures.length * (rankedFeatures.length - 1)) / 2;
+                workUnits += (rankedFeatures.length * (rankedFeatures.length - 1)) / 2;
                 ticket.switchToDeterminate(workUnits);
 
-                String state2 = NbBundle.getMessage(FeatureFiltering.class, "FeatureFiltering.task.removeRedundant");
+                String state2 = NbBundle.getMessage(FeatureSEFiltering.class, "FeatureSEFiltering.task.removeRedundant");
                 ticket.progress(state2);
                 pc.reportMsg("\n", workspace);
                 pc.reportMsg(state2 + "\n", workspace);
 
-                threshold = getCorrelationCutoff() / 100.;
+                float threshold = getCorrelationCutoff();
                 pc.reportMsg("Correlation cutoff value: " + threshold + "\n", workspace);
 
                 pc.reportMsg("Calculating descriptor matrix", workspace);
@@ -335,22 +318,72 @@ public class FeatureFiltering implements Algorithm, Cloneable {
                     }
                 }
 
+                allFeatures.removeAll(toRemove);
                 redundantRemoveSize = toRemove.size();
                 pc.reportMsg("Redundant features removed: " + redundantRemoveSize, workspace);
             }
+
+            
+            //---------------Remove Useless--------------              
+            int uselessRemovedSize = 0;
+            if (rankingOption != RANKING_SELECT_ALL) {
+                toRemove.clear();
+                workUnits += rankedFeatures.length;
+                ticket.switchToDeterminate(workUnits);
+
+                String state3 = NbBundle.getMessage(FeatureSEFiltering.class, "FeatureSEFiltering.task.filtering");
+                ticket.progress(state3);
+                pc.reportMsg("\n", workspace);
+                pc.reportMsg(state3 + "\n", workspace);                
+                
+                if (rankingOption == RANKING_SELECT_TOP) {
+                    int count = 0;
+                    for (int i = 0; i < rankedFeatures.length; i++) {
+                        if (rankedFeatures[i] != null) {
+                            if (count < top) {
+                                count++;
+                            } else {
+                                toRemove.add(rankedFeatures[i]);
+                                attrModel.deleteAttribute(rankedFeatures[i]);
+                                pc.reportMsg("Removed: " + rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+                            }
+                        }
+                    }
+                }
+
+                allFeatures.removeAll(toRemove);
+                uselessRemovedSize = toRemove.size();
+                pc.reportMsg("Useless features removed: " + uselessRemovedSize + "\n", workspace);
+            }
+
+            pc.reportMsg("Top 5", workspace);
+            for (int i = 0; i < rankedFeatures.length && i < 5; i++) {
+                if (rankedFeatures[i] != null) {
+                    pc.reportMsg(rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+                }
+            }
+            pc.reportMsg("...", workspace);
+            pc.reportMsg("Bottom 3", workspace);
+            for (int i = Math.max(rankedFeatures.length - 3, 0); i < rankedFeatures.length; i++) {
+                if (rankedFeatures[i] != null) {
+                    pc.reportMsg(rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+                }
+            }
+            
             pc.reportMsg("\nTotal of removed features: " + (uselessRemovedSize + redundantRemoveSize), workspace);
+            pc.reportMsg("\nTotal of remaining features: " + allFeatures.size(), workspace);
         } catch (MolecularDescriptorNotFoundException ex) {
             NotifyDescriptor errorND = ex.getErrorND();
             DialogDisplayer.getDefault().notify(errorND);
             pc.reportError(ex.getMessage(), workspace);
         }
     }
-    
+
     @Override
     public Object clone() throws CloneNotSupportedException {
-        FeatureFiltering copy = (FeatureFiltering)super.clone(); //To change body of generated methods, choose Tools | Templates.
+        FeatureSEFiltering copy = (FeatureSEFiltering) super.clone(); //To change body of generated methods, choose Tools | Templates.
         return copy;
-    }    
+    }
 
     private void fillBins(MolecularDescriptor descriptor, List<Peptide> peptides, Bin[] bins) throws MolecularDescriptorNotFoundException {
         Bin bin;
@@ -663,5 +696,5 @@ class CorrelationPair implements Comparable<CorrelationPair> {
     @Override
     public int compareTo(CorrelationPair other) {
         return Double.compare(val, other.val);
-    }            
+    }
 }

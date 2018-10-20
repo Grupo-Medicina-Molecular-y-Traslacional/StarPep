@@ -15,7 +15,6 @@ import static javax.swing.Action.SMALL_ICON;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.ChemSpaceTag;
-import org.bapedis.core.spi.ui.GraphWindowController;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
@@ -27,28 +26,27 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-//@ActionID(
-//        category = "Tools",
-//        id = "org.bapedis.core.ui.actions.ChemicalSpaceAction"
-//)
-//@ActionRegistration(
-//        iconBase = "org/bapedis/core/resources/chemSpaceNet.png",
-//        displayName = "#CTL_ChemicalSpaceAction"
-//)
-//@ActionReference(path = "Toolbars/Network", position = 120)
-//@NbBundle.Messages({"CTL_ChemicalSpaceAction=Chemical Space Network"})
+@ActionID(
+        category = "Tools",
+        id = "org.bapedis.core.ui.actions.ChemicalSpaceAction"
+)
+@ActionRegistration(
+        iconBase = "org/bapedis/core/resources/chemSpaceNet.png",
+        displayName = "#CTL_ChemicalSpaceAction"
+)
+@ActionReference(path = "Toolbars/Network", position = 20)
+@NbBundle.Messages({"CTL_ChemicalSpaceAction=Chemical Space Network"})
 public class ChemicalSpaceAction extends AbstractAction {
 
-    private final GraphWindowController graphWC;
     private final ProjectManager pc;
     private final ActionListener actionListener;
 
     public ChemicalSpaceAction() {
-        graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
         pc = Lookup.getDefault().lookup(ProjectManager.class);
-        putValue(NAME, NbBundle.getMessage(ChemicalSpaceAction.class, "ChemicalSpaceAction.name"));
-        putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/core/resources/chemSpaceNet.png", false));
-        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ChemicalSpaceAction.class, "ChemicalSpaceAction.desc"));
+        
+//        putValue(NAME, NbBundle.getMessage(ChemicalSpaceAction.class, "ChemicalSpaceAction.name"));
+//        putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/core/resources/chemSpaceNet.png", false));
+//        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ChemicalSpaceAction.class, "ChemicalSpaceAction.desc"));
         
         AlgorithmFactory chemSpaceFactory = null;
         for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {

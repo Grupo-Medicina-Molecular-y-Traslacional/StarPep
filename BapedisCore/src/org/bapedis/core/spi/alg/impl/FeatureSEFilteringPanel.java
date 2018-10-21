@@ -5,14 +5,22 @@
  */
 package org.bapedis.core.spi.alg.impl;
 
+import java.awt.BorderLayout;
+import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -21,34 +29,148 @@ import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 public class FeatureSEFilteringPanel extends javax.swing.JPanel implements AlgorithmSetupUI, PropertyChangeListener {
 
     private FeatureSEFiltering algorithm;
+    private final NotifyDescriptor errorND;
 
     public FeatureSEFilteringPanel() {
         initComponents();
+
+        errorND = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.errorND"), NotifyDescriptor.ERROR_MESSAGE);
 
         //Configure correlation methods
         DefaultComboBoxModel model = new DefaultComboBoxModel();
         for (String method : FeatureSEFiltering.CORRELATION_METHODS) {
             model.addElement(method);
         }
+
         redundantComboBox.setModel(model);
         redundantComboBox.setSelectedIndex(FeatureSEFiltering.CORRELATION_DEFAULT_INDEX);
+
+        //Create document listeners
+        DocumentListener topRankDocListener = new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateTopRank();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateTopRank();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
+            }
+        };
+
+        DocumentListener thresholdDocListener = new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateSEThreshold();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateSEThreshold();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
+            }
+        };
+
+        DocumentListener corrDocListener = new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateCorr();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateCorr();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
+            }
+        };
+
+        jTF_top.getDocument().addDocumentListener(topRankDocListener);
+        jTF_threshold.getDocument().addDocumentListener(thresholdDocListener);
+        jTF_corr.getDocument().addDocumentListener(corrDocListener);
     }
-    
+
+    private void updateTopRank() {
+        try {
+            if (!jTF_top.getText().isEmpty()) {
+                int topRank = Integer.parseInt(jTF_top.getText());
+                if (algorithm.getTopRank() != topRank) {
+                    algorithm.setTopRank(topRank);
+                }
+            } else {
+                algorithm.setTopRank(-1);
+            }
+        } catch (NumberFormatException ex) {
+            DialogDisplayer.getDefault().notify(errorND);
+            algorithm.setTopRank(-1);
+        }
+    }
+
+    private void updateSEThreshold() {
+        try {
+            if (!jTF_threshold.getText().isEmpty()) {
+                float threshold = Float.parseFloat(jTF_threshold.getText());
+                if (algorithm.getThreshold() != threshold) {
+                    algorithm.setThreshold(threshold);
+                }
+            } else {
+                algorithm.setThreshold(-1);
+            }
+        } catch (NumberFormatException ex) {
+            DialogDisplayer.getDefault().notify(errorND);
+            algorithm.setThreshold(-1);
+        }
+    }
+
+    private void updateCorr() {
+        try {
+            if (!jTF_corr.getText().isEmpty()) {
+                float corr = Float.parseFloat(jTF_corr.getText());
+                algorithm.setCorrelationCutoff(corr);
+            } else {
+                algorithm.setCorrelationCutoff(-1);
+            }
+        } catch (NumberFormatException ex) {
+            DialogDisplayer.getDefault().notify(errorND);
+            algorithm.setCorrelationCutoff(-1);
+        }
+    }
+
     private void refreshState() {
         boolean running = algorithm != null && algorithm.isRunning();
         boolean enabled = !running && isEnabled();
+
         jResetButton.setEnabled(enabled);
 
         jRB_selectAll.setEnabled(enabled);
+
         jRB_selectTop.setEnabled(enabled);
-        jRB_remove.setEnabled(enabled);
+        jTF_top.setEnabled(enabled && jRB_selectTop.isSelected());
+
+        jRB_threshold.setEnabled(enabled);
+        jTF_threshold.setEnabled(enabled && jRB_threshold.isSelected());
+        infoSEThreshold.setEnabled(enabled && jRB_threshold.isSelected());
+
         jRB_mean.setEnabled(enabled);
-        jTF_top.setEnabled(enabled);
-        jTF_bottom.setEnabled(enabled);
 
         redundantComboBox.setEnabled(enabled);
-        jLabelThreshodl.setEnabled(enabled);
-        jTF_corr.setEnabled(enabled);
+        jLabelThreshodl.setEnabled(enabled && redundantComboBox.getSelectedItem() != FeatureSEFiltering.CORRELATION_NONE);
+        jTF_corr.setEnabled(enabled && redundantComboBox.getSelectedItem() != FeatureSEFiltering.CORRELATION_NONE);
     }
 
     @Override
@@ -72,9 +194,9 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         rankingOutputPanel = new javax.swing.JPanel();
         jRB_selectAll = new javax.swing.JRadioButton();
         jRB_selectTop = new javax.swing.JRadioButton();
-        jRB_remove = new javax.swing.JRadioButton();
+        jRB_threshold = new javax.swing.JRadioButton();
         jTF_top = new javax.swing.JTextField();
-        jTF_bottom = new javax.swing.JTextField();
+        jTF_threshold = new javax.swing.JTextField();
         jRB_mean = new javax.swing.JRadioButton();
         infoSEThreshold = new javax.swing.JLabel();
         redundancyPanel = new javax.swing.JPanel();
@@ -108,6 +230,11 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
 
         buttonGroup1.add(jRB_selectAll);
         org.openide.awt.Mnemonics.setLocalizedText(jRB_selectAll, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jRB_selectAll.text")); // NOI18N
+        jRB_selectAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRB_selectAllActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -119,6 +246,16 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
 
         buttonGroup1.add(jRB_selectTop);
         org.openide.awt.Mnemonics.setLocalizedText(jRB_selectTop, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jRB_selectTop.text")); // NOI18N
+        jRB_selectTop.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jRB_selectTopStateChanged(evt);
+            }
+        });
+        jRB_selectTop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRB_selectTopActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -126,17 +263,28 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         rankingOutputPanel.add(jRB_selectTop, gridBagConstraints);
 
-        buttonGroup1.add(jRB_remove);
-        org.openide.awt.Mnemonics.setLocalizedText(jRB_remove, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jRB_remove.text")); // NOI18N
-        jRB_remove.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jRB_remove.toolTipText")); // NOI18N
+        buttonGroup1.add(jRB_threshold);
+        org.openide.awt.Mnemonics.setLocalizedText(jRB_threshold, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jRB_threshold.text")); // NOI18N
+        jRB_threshold.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jRB_threshold.toolTipText")); // NOI18N
+        jRB_threshold.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jRB_thresholdStateChanged(evt);
+            }
+        });
+        jRB_threshold.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRB_thresholdActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
-        rankingOutputPanel.add(jRB_remove, gridBagConstraints);
+        rankingOutputPanel.add(jRB_threshold, gridBagConstraints);
 
         jTF_top.setText(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jTF_top.text")); // NOI18N
+        jTF_top.setEnabled(false);
         jTF_top.setPreferredSize(new java.awt.Dimension(90, 27));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -145,17 +293,23 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         rankingOutputPanel.add(jTF_top, gridBagConstraints);
 
-        jTF_bottom.setText(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jTF_bottom.text")); // NOI18N
-        jTF_bottom.setPreferredSize(new java.awt.Dimension(90, 27));
+        jTF_threshold.setText(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jTF_threshold.text")); // NOI18N
+        jTF_threshold.setEnabled(false);
+        jTF_threshold.setPreferredSize(new java.awt.Dimension(90, 27));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-        rankingOutputPanel.add(jTF_bottom, gridBagConstraints);
+        rankingOutputPanel.add(jTF_threshold, gridBagConstraints);
 
         buttonGroup1.add(jRB_mean);
         org.openide.awt.Mnemonics.setLocalizedText(jRB_mean, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jRB_mean.text")); // NOI18N
+        jRB_mean.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRB_meanActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -165,6 +319,8 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
 
         infoSEThreshold.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(infoSEThreshold, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.infoSEThreshold.text")); // NOI18N
+        infoSEThreshold.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.infoSEThreshold.toolTipText")); // NOI18N
+        infoSEThreshold.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
@@ -175,6 +331,11 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         redundancyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.redundancyPanel.border.title"))); // NOI18N
         redundancyPanel.setLayout(new java.awt.GridBagLayout());
 
+        redundantComboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                redundantComboBoxItemStateChanged(evt);
+            }
+        });
         redundantComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 redundantComboBoxActionPerformed(evt);
@@ -188,6 +349,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         redundancyPanel.add(redundantComboBox, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabelThreshodl, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jLabelThreshodl.text")); // NOI18N
+        jLabelThreshodl.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -196,6 +358,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         redundancyPanel.add(jLabelThreshodl, gridBagConstraints);
 
         jTF_corr.setText(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jTF_corr.text")); // NOI18N
+        jTF_corr.setEnabled(false);
         jTF_corr.setPreferredSize(new java.awt.Dimension(90, 27));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -220,6 +383,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         add(rankingOutputPanel, gridBagConstraints);
 
         histogramPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.histogramPanel.border.title"))); // NOI18N
+        histogramPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -231,12 +395,18 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
     }// </editor-fold>//GEN-END:initComponents
 
     private void jResetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jResetButtonActionPerformed
+        algorithm.reset();
         setOption(FeatureSEFiltering.RANKING_DEFAULT_OPTION);
-        
-        
+
         redundantComboBox.setSelectedIndex(FeatureSEFiltering.CORRELATION_DEFAULT_INDEX);
-        jTF_corr.setText(String.valueOf(FeatureSEFiltering.CORRELATION_DEFAULT_VALUE));
-        
+        float val = algorithm.getCorrelationCutoff();
+        if (val > 0) {
+            jTF_corr.setText(String.valueOf(val));
+        } else {
+            jTF_corr.setText("");
+        }
+
+
     }//GEN-LAST:event_jResetButtonActionPerformed
 
     private void redundantComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_redundantComboBoxActionPerformed
@@ -245,25 +415,58 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         }
     }//GEN-LAST:event_redundantComboBoxActionPerformed
 
+    private void jRB_thresholdStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jRB_thresholdStateChanged
+        jTF_threshold.setEnabled(jRB_threshold.isSelected());
+        infoSEThreshold.setEnabled(jRB_threshold.isSelected());
+    }//GEN-LAST:event_jRB_thresholdStateChanged
+
+    private void jRB_selectTopStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jRB_selectTopStateChanged
+        jTF_top.setEnabled(jRB_selectTop.isSelected());
+    }//GEN-LAST:event_jRB_selectTopStateChanged
+
+    private void redundantComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_redundantComboBoxItemStateChanged
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            boolean enable = redundantComboBox.getSelectedItem() != FeatureSEFiltering.CORRELATION_NONE;
+            jTF_corr.setEnabled(enable);
+            jLabelThreshodl.setEnabled(enable);
+        }
+    }//GEN-LAST:event_redundantComboBoxItemStateChanged
+
+    private void jRB_selectAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRB_selectAllActionPerformed
+        algorithm.setRankingOption(FeatureSEFiltering.RANKING_SELECT_ALL);
+    }//GEN-LAST:event_jRB_selectAllActionPerformed
+
+    private void jRB_selectTopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRB_selectTopActionPerformed
+        algorithm.setRankingOption(FeatureSEFiltering.RANKING_SELECT_TOP);
+    }//GEN-LAST:event_jRB_selectTopActionPerformed
+
+    private void jRB_thresholdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRB_thresholdActionPerformed
+        algorithm.setRankingOption(FeatureSEFiltering.RANKING_ENTROPY_THRESHOLD);
+    }//GEN-LAST:event_jRB_thresholdActionPerformed
+
+    private void jRB_meanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRB_meanActionPerformed
+        algorithm.setRankingOption(FeatureSEFiltering.RANKING_MEAN_STD);
+    }//GEN-LAST:event_jRB_meanActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel histogramPanel;
     private javax.swing.JLabel infoSEThreshold;
     private javax.swing.JLabel jLabelThreshodl;
     private javax.swing.JRadioButton jRB_mean;
-    private javax.swing.JRadioButton jRB_remove;
     private javax.swing.JRadioButton jRB_selectAll;
     private javax.swing.JRadioButton jRB_selectTop;
+    private javax.swing.JRadioButton jRB_threshold;
     private javax.swing.JButton jResetButton;
-    private javax.swing.JTextField jTF_bottom;
     private javax.swing.JTextField jTF_corr;
+    private javax.swing.JTextField jTF_threshold;
     private javax.swing.JTextField jTF_top;
     private javax.swing.JPanel rankingOutputPanel;
     private javax.swing.JPanel redundancyPanel;
     private javax.swing.JComboBox<String> redundantComboBox;
     // End of variables declaration//GEN-END:variables
 
-    private void setOption(int option){
+    private void setOption(int option) {
         switch (option) {
             case FeatureSEFiltering.RANKING_SELECT_ALL:
                 jRB_selectAll.setSelected(true);
@@ -271,24 +474,42 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
             case FeatureSEFiltering.RANKING_SELECT_TOP:
                 jRB_selectTop.setSelected(true);
                 break;
-            case FeatureSEFiltering.RANKING_REMOVE_BOTTOM:
-                jRB_remove.setSelected(true);
+            case FeatureSEFiltering.RANKING_ENTROPY_THRESHOLD:
+                jRB_threshold.setSelected(true);
                 break;
             case FeatureSEFiltering.RANKING_MEAN_STD:
                 jRB_mean.setSelected(true);
                 break;
-        }        
+        }
+
+        if (algorithm.getTopRank() > 0) {
+            jTF_top.setText(String.valueOf(algorithm.getTopRank()));
+        } else {
+            jTF_top.setText("");
+        }
+
+        if (algorithm.getThreshold() > 0) {
+            jTF_threshold.setText(String.valueOf(algorithm.getThreshold()));
+        } else {
+            jTF_threshold.setText("");
+        }
     }
-    
+
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         this.algorithm = (FeatureSEFiltering) algo;
-        setOption(algorithm.getEntropyOption());
+
+        setOption(algorithm.getRankingOption());
 
         redundantComboBox.setSelectedIndex(this.algorithm.getCorrelationIndex());
 
         float val = this.algorithm.getCorrelationCutoff();
-        jTF_corr.setText(String.valueOf(val));
+
+        if (val > 0) {
+            jTF_corr.setText(String.valueOf(val));
+        } else {
+            jTF_corr.setText("");
+        }
 
         addAncestorListener(new AncestorListener() {
             @Override
@@ -308,13 +529,31 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
 
         refreshState();
 
+        algorithm.setWidth(histogramPanel.getWidth());
+        algorithm.setHeight(histogramPanel.getHeight());
+
         return this;
+    }
+
+    private void setupHistogram(boolean running) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                histogramPanel.removeAll();
+                if (!running && algorithm.getHistogramPanel() != null) {
+                    histogramPanel.add(algorithm.getHistogramPanel(), BorderLayout.CENTER);
+                }
+                histogramPanel.revalidate();
+                histogramPanel.repaint();
+            }
+        });
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource().equals(algorithm) && evt.getPropertyName().equals(FeatureSEFiltering.RUNNING)) {
             refreshState();
+            setupHistogram(algorithm.isRunning());
         }
     }
 

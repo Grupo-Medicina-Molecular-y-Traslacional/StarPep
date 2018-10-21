@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.spi.alg.impl;
 
+import java.awt.Dimension;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Arrays;
@@ -15,6 +16,8 @@ import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
+import static org.bapedis.core.model.MolecularDescriptor.mean;
+import static org.bapedis.core.model.MolecularDescriptor.varp;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
@@ -22,6 +25,12 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.statistics.HistogramDataset;
+import org.jfree.data.statistics.HistogramType;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
@@ -35,20 +44,20 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
 
     protected final ProjectManager pc;
     protected final FeatureSEFilteringFactory factory;
+    private final NotifyDescriptor errorND;
 
     //Entropy cutoff for reference: 
     public static final int RANKING_SELECT_ALL = 0;
     public static final int RANKING_SELECT_TOP = 1;
-    public static final int RANKING_REMOVE_BOTTOM = 2;
-    public static final int RANKING_MEAN_STD = 3;    
+    public static final int RANKING_ENTROPY_THRESHOLD = 2;
+    public static final int RANKING_MEAN_STD = 3;
+    public static final int RANKING_DEFAULT_OPTION = 0;
     public static final int RANKING_DEFAULT_TOP = 50;
-    public static final int RANKING_DEFAULT_BOTTOM = 50;
-    public static final int RANKING_DEFAULT_OPTION = 0;    
 
-    private static final String NONE="None";
-    private static final String PEARSON = "Pearson";
-    private static final String SPEARMAN = "Spearman";
-    public static final String[] CORRELATION_METHODS = new String[]{NONE,PEARSON, SPEARMAN};
+    public static final String CORRELATION_NONE = "None";
+    public static final String CORRELATION_PEARSON = "Pearson";
+    public static final String CORRELATION_SPEARMAN = "Spearman";
+    public static final String[] CORRELATION_METHODS = new String[]{CORRELATION_NONE, CORRELATION_PEARSON, CORRELATION_SPEARMAN};
     public static final int CORRELATION_DEFAULT_INDEX = 2;
     public static final float CORRELATION_DEFAULT_VALUE = 0.9f;
 
@@ -62,24 +71,27 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     protected boolean running;
     protected transient final PropertyChangeSupport propertyChangeSupport;
 
-    private boolean removeUseless, removeRedundant;
     private int correlationIndex;
     private float correlationCutoff;
-    private int rankingOption, top, bottom;
+    private int rankingOption, topRank;
+    private float threshold;
     private NotifyDescriptor emptyMDs;
+
+    private int width, height;
+    private ChartPanel histogramPanel;
 
     public FeatureSEFiltering(FeatureSEFilteringFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         this.factory = factory;
 
+        errorND = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureSEFiltering.class, "FeatureSEFiltering.errorND"), NotifyDescriptor.ERROR_MESSAGE);
+
         rankingOption = RANKING_DEFAULT_OPTION;
-        top = RANKING_DEFAULT_TOP;
-        bottom = RANKING_DEFAULT_BOTTOM;
+        topRank = RANKING_DEFAULT_TOP;
+        threshold = -1;
 
         correlationIndex = CORRELATION_DEFAULT_INDEX;
         correlationCutoff = CORRELATION_DEFAULT_VALUE;
-        removeUseless = true;
-        removeRedundant = false;
 
         running = false;
         propertyChangeSupport = new PropertyChangeSupport(this);
@@ -87,28 +99,77 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         emptyMDs = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureSEFiltering.class, "FeatureFiltering.emptyMDs.info"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
-    public boolean isRemoveUseless() {
-        return removeUseless;
+    public void reset() {
+        rankingOption = RANKING_DEFAULT_OPTION;
+        topRank = RANKING_DEFAULT_TOP;
+        threshold = -1;
+
+        correlationIndex = CORRELATION_DEFAULT_INDEX;
+        correlationCutoff = CORRELATION_DEFAULT_VALUE;
     }
 
-    public void setRemoveUseless(boolean removeUseless) {
-        this.removeUseless = removeUseless;
+    private boolean isValid() {
+        boolean isValid;
+        switch (rankingOption) {
+            case RANKING_SELECT_TOP:
+                isValid = topRank > 0;
+                break;
+            case RANKING_ENTROPY_THRESHOLD:
+                isValid = threshold > 0;
+                break;
+            default:
+                isValid = true;
+
+        }
+
+        if (!CORRELATION_METHODS[correlationIndex].equals(CORRELATION_NONE)) {
+            isValid = isValid && correlationCutoff >= 0 && correlationCutoff <= 1;
+        }
+        return isValid;
     }
 
-    public boolean isRemoveRedundant() {
-        return removeRedundant;
+    public ChartPanel getHistogramPanel() {
+        return histogramPanel;
     }
 
-    public void setRemoveRedundant(boolean removeRedundant) {
-        this.removeRedundant = removeRedundant;
+    public int getHeight() {
+        return height;
     }
 
-    public int getEntropyOption() {
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getRankingOption() {
         return rankingOption;
     }
 
-    public void setEntropyOption(int entropyOption) {
-        this.rankingOption = entropyOption;
+    public void setRankingOption(int rankingOption) {
+        this.rankingOption = rankingOption;
+    }
+
+    public int getTopRank() {
+        return topRank;
+    }
+
+    public void setTopRank(int topRank) {
+        this.topRank = topRank;
+    }
+
+    public float getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(float threshold) {
+        this.threshold = threshold;
     }
 
     public float getCorrelationCutoff() {
@@ -120,16 +181,10 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     }
 
     public void setCorrelationIndex(int correlationIndex) {
-        if (correlationIndex < 0 || correlationIndex >= CORRELATION_METHODS.length) {
-            throw new IllegalArgumentException("Invalid value for correlation index. It should be between " + 0 + " and " + (CORRELATION_METHODS.length - 1));
-        }
         this.correlationIndex = correlationIndex;
     }
 
-    public void setCorrelationCutoff(int correlationCutoff) {
-        if (correlationCutoff < 0 || correlationCutoff > 1) {
-            throw new IllegalArgumentException("Invalid value for correlation cutoff. It should be between 0 and 1");
-        }
+    public void setCorrelationCutoff(float correlationCutoff) {
         this.correlationCutoff = correlationCutoff;
     }
 
@@ -140,9 +195,6 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     public void setRunning(boolean running) {
         boolean oldValue = this.running;
         this.running = running;
-        if (workspace != null) {
-            workspace.setBusy(running);
-        }
         propertyChangeSupport.firePropertyChange(RUNNING, oldValue, running);
     }
 
@@ -160,6 +212,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         ticket = progressTicket;
         attrModel = pc.getAttributesModel(workspace);
         stopRun = false;
+        histogramPanel = null;
         setRunning(true);
     }
 
@@ -189,7 +242,8 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
 
     @Override
     public void run() {
-        if (!isRemoveUseless()) {
+        if (!isValid()) {
+            DialogDisplayer.getDefault().notify(errorND);
             return;
         }
 
@@ -249,13 +303,14 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                     return 0;
                 }
             });
+            allFeatures = null;
 
             //Remove features...
             LinkedList<MolecularDescriptor> toRemove = new LinkedList<>();
 
             //---------------Remove Redundant--------------
             int redundantRemoveSize = 0;
-            if (isRemoveRedundant()) {
+            if (!CORRELATION_METHODS[correlationIndex].equals(CORRELATION_NONE)) {
                 workUnits += (rankedFeatures.length * (rankedFeatures.length - 1)) / 2;
                 ticket.switchToDeterminate(workUnits);
 
@@ -264,14 +319,13 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                 pc.reportMsg("\n", workspace);
                 pc.reportMsg(state2 + "\n", workspace);
 
-                float threshold = getCorrelationCutoff();
-                pc.reportMsg("Correlation cutoff value: " + threshold + "\n", workspace);
+                pc.reportMsg("Correlation cutoff value: " + correlationCutoff + "\n", workspace);
 
                 pc.reportMsg("Calculating descriptor matrix", workspace);
                 double[][] descriptorMatrix = new double[rankedFeatures.length][];
                 double[] column;
                 int pos;
-                if (CORRELATION_METHODS[correlationIndex].equals(PEARSON)) {
+                if (CORRELATION_METHODS[correlationIndex].equals(CORRELATION_PEARSON)) {
                     for (int i = 0; i < rankedFeatures.length && !stopRun; i++) {
                         column = new double[peptides.size()];
                         pos = 0;
@@ -281,7 +335,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                         descriptorMatrix[i] = column;
                         ticket.progress();
                     }
-                } else if (CORRELATION_METHODS[correlationIndex].equals(SPEARMAN)) {
+                } else if (CORRELATION_METHODS[correlationIndex].equals(CORRELATION_SPEARMAN)) {
                     column = new double[peptides.size()]; // Temporal column
                     for (int i = 0; i < rankedFeatures.length && !stopRun; i++) {
                         pos = 0;
@@ -302,7 +356,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                             if (rankedFeatures[j] != null) {
                                 rank2 = descriptorMatrix[j];
                                 score = calculatePearsonCorrelation(rank1, rank2);
-                                if (Math.abs(score) >= threshold) {
+                                if (Math.abs(score) >= correlationCutoff) {
                                     attrModel.deleteAttribute(rankedFeatures[j]);
                                     pc.reportMsg("Removed: " + rankedFeatures[j].getDisplayName() + " - " + String.format("corr(%s) = %f", rankedFeatures[i].getDisplayName(), score), workspace);
                                     toRemove.add(rankedFeatures[j]);
@@ -318,13 +372,12 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                     }
                 }
 
-                allFeatures.removeAll(toRemove);
                 redundantRemoveSize = toRemove.size();
                 pc.reportMsg("Redundant features removed: " + redundantRemoveSize, workspace);
             }
 
-            
-            //---------------Remove Useless--------------              
+            //---------------Remove Useless--------------  
+            double[] data = null;
             int uselessRemovedSize = 0;
             if (rankingOption != RANKING_SELECT_ALL) {
                 toRemove.clear();
@@ -334,24 +387,53 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                 String state3 = NbBundle.getMessage(FeatureSEFiltering.class, "FeatureSEFiltering.task.filtering");
                 ticket.progress(state3);
                 pc.reportMsg("\n", workspace);
-                pc.reportMsg(state3 + "\n", workspace);                
-                
-                if (rankingOption == RANKING_SELECT_TOP) {
-                    int count = 0;
-                    for (int i = 0; i < rankedFeatures.length; i++) {
-                        if (rankedFeatures[i] != null) {
-                            if (count < top) {
-                                count++;
-                            } else {
-                                toRemove.add(rankedFeatures[i]);
-                                attrModel.deleteAttribute(rankedFeatures[i]);
-                                pc.reportMsg("Removed: " + rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+                pc.reportMsg(state3 + "\n", workspace);
+
+                switch (rankingOption) {
+                    case RANKING_SELECT_TOP:
+                        int count = 0;
+                        for (int i = 0; i < rankedFeatures.length; i++) {
+                            if (rankedFeatures[i] != null) {
+                                if (count < topRank) {
+                                    count++;
+                                } else {
+                                    toRemove.add(rankedFeatures[i]);
+                                    attrModel.deleteAttribute(rankedFeatures[i]);
+                                    pc.reportMsg("Removed: " + rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+                                }
                             }
                         }
-                    }
+                        break;
+                    case RANKING_ENTROPY_THRESHOLD:
+                        for (int i = 0; i < rankedFeatures.length; i++) {
+                            if (rankedFeatures[i] != null) {
+                                if (rankedFeatures[i].getScore() < threshold) {
+                                    toRemove.add(rankedFeatures[i]);
+                                    attrModel.deleteAttribute(rankedFeatures[i]);
+                                    pc.reportMsg("Removed: " + rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+                                }
+                            }
+                        }
+                        break;
+                    case RANKING_MEAN_STD:
+                        data = getData(rankedFeatures);
+                        double mean = MolecularDescriptor.mean(data);
+                        double var = MolecularDescriptor.varp(data, mean);
+                        double std = Math.sqrt(var);
+                        for (int i = 0; i < rankedFeatures.length; i++) {
+                            if (rankedFeatures[i] != null) {
+                                if (Math.abs(mean - rankedFeatures[i].getScore()) > std) {
+                                    toRemove.add(rankedFeatures[i]);
+                                    attrModel.deleteAttribute(rankedFeatures[i]);
+                                    pc.reportMsg("Removed: " + rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+                                }
+                            }
+                        }
+                        break;
+                    default:
+                        break;
                 }
 
-                allFeatures.removeAll(toRemove);
                 uselessRemovedSize = toRemove.size();
                 pc.reportMsg("Useless features removed: " + uselessRemovedSize + "\n", workspace);
             }
@@ -369,14 +451,63 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                     pc.reportMsg(rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
                 }
             }
-            
+
+            if (data == null) {
+                data = getData(rankedFeatures);
+            }
+            histogramPanel = createChartPanel(data);
+
             pc.reportMsg("\nTotal of removed features: " + (uselessRemovedSize + redundantRemoveSize), workspace);
-            pc.reportMsg("\nTotal of remaining features: " + allFeatures.size(), workspace);
+            pc.reportMsg("\nTotal of remaining features: " + data.length, workspace);
         } catch (MolecularDescriptorNotFoundException ex) {
             NotifyDescriptor errorND = ex.getErrorND();
             DialogDisplayer.getDefault().notify(errorND);
             pc.reportError(ex.getMessage(), workspace);
         }
+    }
+
+    private double[] getData(MolecularDescriptor[] rankedFeatures) {
+        int count = 0;
+        for (int i = 0; i < rankedFeatures.length; i++) {
+            if (rankedFeatures[i] != null) {
+                count++;
+            }
+        }
+
+        double[] data = new double[count];
+        count = 0;
+        for (int i = 0; i < rankedFeatures.length; i++) {
+            if (rankedFeatures[i] != null) {
+                data[count++] = rankedFeatures[i].getScore();
+            }
+        }
+        return data;
+    }
+
+    private ChartPanel createChartPanel(double[] data) {
+        double min = MolecularDescriptor.min(data);
+        double max = MolecularDescriptor.max(data);
+
+        HistogramDataset dataset = new HistogramDataset();
+        dataset.setType(HistogramType.FREQUENCY);
+        dataset.addSeries("Histogram", data, 50, min, max);
+
+        JFreeChart chart = ChartFactory.createHistogram(
+                "", // chart title
+                "", // domain axis label
+                "Frequency", // range axis label
+                dataset, // data
+                PlotOrientation.HORIZONTAL.VERTICAL, // orientation
+                false, // include legend
+                false, // tooltips?
+                false // URLs?
+        );
+
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setPreferredSize(new Dimension(width, height));
+        chartPanel.setMinimumSize(new Dimension(width, height));
+
+        return chartPanel;
     }
 
     @Override

@@ -377,7 +377,6 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
             }
 
             //---------------Remove Useless--------------  
-            double[] data = null;
             int uselessRemovedSize = 0;
             if (rankingOption != RANKING_SELECT_ALL) {
                 toRemove.clear();
@@ -400,6 +399,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                                     toRemove.add(rankedFeatures[i]);
                                     attrModel.deleteAttribute(rankedFeatures[i]);
                                     pc.reportMsg("Removed: " + rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+                                    rankedFeatures[i] = null;
                                 }
                             }
                         }
@@ -411,12 +411,13 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                                     toRemove.add(rankedFeatures[i]);
                                     attrModel.deleteAttribute(rankedFeatures[i]);
                                     pc.reportMsg("Removed: " + rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+                                    rankedFeatures[i] = null;
                                 }
                             }
                         }
                         break;
                     case RANKING_MEAN_STD:
-                        data = getData(rankedFeatures);
+                        double[] data = getData(rankedFeatures);
                         double mean = MolecularDescriptor.mean(data);
                         double var = MolecularDescriptor.varp(data, mean);
                         double std = Math.sqrt(var);
@@ -426,6 +427,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                                     toRemove.add(rankedFeatures[i]);
                                     attrModel.deleteAttribute(rankedFeatures[i]);
                                     pc.reportMsg("Removed: " + rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+                                    rankedFeatures[i] = null;
                                 }
                             }
                         }
@@ -452,9 +454,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                 }
             }
 
-            if (data == null) {
-                data = getData(rankedFeatures);
-            }
+            double[] data = getData(rankedFeatures);
             histogramPanel = createChartPanel(data);
 
             pc.reportMsg("\nTotal of removed features: " + (uselessRemovedSize + redundantRemoveSize), workspace);

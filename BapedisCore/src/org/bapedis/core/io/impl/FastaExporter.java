@@ -33,22 +33,10 @@ public class FastaExporter implements Exporter {
     @Override
     public void exportTo(File file) throws Exception {
         List<ProteinSequence> sequences = new LinkedList<>();
-        StringBuilder header;
         ProteinSequence seq;
-        NodeIterable neighbors;
-        Edge edge;
         for (Peptide pept : attrModel.getPeptides()) {
-            header = new StringBuilder(pept.getId());
-            neighbors = pept.getNeighbors(StarPepAnnotationType.DATABASE);
-            for (Node neighbor : neighbors){
-                edge = pept.getEdge(neighbor, StarPepAnnotationType.DATABASE);
-                for(String db: (String[]) edge.getAttribute("dbRef")){
-                    header.append("|");
-                    header.append(db);
-                }
-            }
             seq = new ProteinSequence(pept.getSequence());
-            seq.setOriginalHeader(header.toString());
+            seq.setOriginalHeader(pept.getName());
             sequences.add(seq);
         }
         FastaWriterHelper.writeProteinSequence(file, sequences);

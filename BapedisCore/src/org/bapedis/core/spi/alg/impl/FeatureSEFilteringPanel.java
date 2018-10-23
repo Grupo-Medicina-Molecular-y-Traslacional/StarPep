@@ -166,8 +166,6 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         jTF_threshold.setEnabled(enabled && jRB_threshold.isSelected());
         infoSEThreshold.setEnabled(enabled && jRB_threshold.isSelected());
 
-        jRB_mean.setEnabled(enabled);
-
         redundantComboBox.setEnabled(enabled);
         jLabelThreshodl.setEnabled(enabled && redundantComboBox.getSelectedItem() != FeatureSEFiltering.CORRELATION_NONE);
         jTF_corr.setEnabled(enabled && redundantComboBox.getSelectedItem() != FeatureSEFiltering.CORRELATION_NONE);
@@ -197,7 +195,6 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         jRB_threshold = new javax.swing.JRadioButton();
         jTF_top = new javax.swing.JTextField();
         jTF_threshold = new javax.swing.JTextField();
-        jRB_mean = new javax.swing.JRadioButton();
         infoSEThreshold = new javax.swing.JLabel();
         redundancyPanel = new javax.swing.JPanel();
         redundantComboBox = new javax.swing.JComboBox<>();
@@ -285,6 +282,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
 
         jTF_top.setText(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jTF_top.text")); // NOI18N
         jTF_top.setEnabled(false);
+        jTF_top.setMinimumSize(new java.awt.Dimension(90, 27));
         jTF_top.setPreferredSize(new java.awt.Dimension(90, 27));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -295,6 +293,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
 
         jTF_threshold.setText(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jTF_threshold.text")); // NOI18N
         jTF_threshold.setEnabled(false);
+        jTF_threshold.setMinimumSize(new java.awt.Dimension(90, 27));
         jTF_threshold.setPreferredSize(new java.awt.Dimension(90, 27));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -302,20 +301,6 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         rankingOutputPanel.add(jTF_threshold, gridBagConstraints);
-
-        buttonGroup1.add(jRB_mean);
-        org.openide.awt.Mnemonics.setLocalizedText(jRB_mean, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jRB_mean.text")); // NOI18N
-        jRB_mean.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRB_meanActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
-        rankingOutputPanel.add(jRB_mean, gridBagConstraints);
 
         infoSEThreshold.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(infoSEThreshold, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.infoSEThreshold.text")); // NOI18N
@@ -444,16 +429,11 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         algorithm.setRankingOption(FeatureSEFiltering.RANKING_ENTROPY_THRESHOLD);
     }//GEN-LAST:event_jRB_thresholdActionPerformed
 
-    private void jRB_meanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRB_meanActionPerformed
-        algorithm.setRankingOption(FeatureSEFiltering.RANKING_MEAN_STD);
-    }//GEN-LAST:event_jRB_meanActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel histogramPanel;
     private javax.swing.JLabel infoSEThreshold;
     private javax.swing.JLabel jLabelThreshodl;
-    private javax.swing.JRadioButton jRB_mean;
     private javax.swing.JRadioButton jRB_selectAll;
     private javax.swing.JRadioButton jRB_selectTop;
     private javax.swing.JRadioButton jRB_threshold;
@@ -476,9 +456,6 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
                 break;
             case FeatureSEFiltering.RANKING_ENTROPY_THRESHOLD:
                 jRB_threshold.setSelected(true);
-                break;
-            case FeatureSEFiltering.RANKING_MEAN_STD:
-                jRB_mean.setSelected(true);
                 break;
         }
 

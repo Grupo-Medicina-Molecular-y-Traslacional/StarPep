@@ -16,8 +16,6 @@ import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
-import static org.bapedis.core.model.MolecularDescriptor.mean;
-import static org.bapedis.core.model.MolecularDescriptor.varp;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
@@ -50,7 +48,6 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     public static final int RANKING_SELECT_ALL = 0;
     public static final int RANKING_SELECT_TOP = 1;
     public static final int RANKING_ENTROPY_THRESHOLD = 2;
-    public static final int RANKING_MEAN_STD = 3;
     public static final int RANKING_DEFAULT_OPTION = 0;
     public static final int RANKING_DEFAULT_TOP = 50;
 
@@ -408,22 +405,6 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                         for (int i = 0; i < rankedFeatures.length; i++) {
                             if (rankedFeatures[i] != null) {
                                 if (rankedFeatures[i].getScore() < threshold) {
-                                    toRemove.add(rankedFeatures[i]);
-                                    attrModel.deleteAttribute(rankedFeatures[i]);
-                                    pc.reportMsg("Removed: " + rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
-                                    rankedFeatures[i] = null;
-                                }
-                            }
-                        }
-                        break;
-                    case RANKING_MEAN_STD:
-                        double[] data = getData(rankedFeatures);
-                        double mean = MolecularDescriptor.mean(data);
-                        double var = MolecularDescriptor.varp(data, mean);
-                        double std = Math.sqrt(var);
-                        for (int i = 0; i < rankedFeatures.length; i++) {
-                            if (rankedFeatures[i] != null) {
-                                if (Math.abs(mean - rankedFeatures[i].getScore()) > std) {
                                     toRemove.add(rankedFeatures[i]);
                                     attrModel.deleteAttribute(rankedFeatures[i]);
                                     pc.reportMsg("Removed: " + rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);

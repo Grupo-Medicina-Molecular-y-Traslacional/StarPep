@@ -44,9 +44,9 @@ public class ChemicalSpaceAction extends AbstractAction {
     public ChemicalSpaceAction() {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         
-//        putValue(NAME, NbBundle.getMessage(ChemicalSpaceAction.class, "ChemicalSpaceAction.name"));
-//        putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/core/resources/chemSpaceNet.png", false));
-//        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ChemicalSpaceAction.class, "ChemicalSpaceAction.desc"));
+        putValue(NAME, NbBundle.getMessage(ChemicalSpaceAction.class, "ChemicalSpaceAction.name"));
+        putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/core/resources/chemSpaceNet.png", false));
+        putValue(SHORT_DESCRIPTION, NbBundle.getMessage(ChemicalSpaceAction.class, "ChemicalSpaceAction.desc"));
         
         AlgorithmFactory chemSpaceFactory = null;
         for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {

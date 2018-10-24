@@ -20,18 +20,18 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 
-//@ActionID(
-//        category = "File",
-//        id = "org.bapedis.core.ui.actions.ExportMD"
-//)
-//@ActionRegistration(
-//        displayName = "#CTL_ExportMD"
-//)
-//@ActionReferences({
-//    @ActionReference(path = "Actions/ExportPeptides", position = 200),
-//    @ActionReference(path = "Menu/File/ExportData", position = 200)
-//})
-//@Messages("CTL_ExportMD=Molecular descriptors (CSV format)")
+@ActionID(
+        category = "File",
+        id = "org.bapedis.core.ui.actions.ExportMD"
+)
+@ActionRegistration(
+        displayName = "#CTL_ExportMD"
+)
+@ActionReferences({
+    @ActionReference(path = "Actions/ExportPeptides", position = 200),
+    @ActionReference(path = "Menu/File/ExportData", position = 200)
+})
+@Messages("CTL_ExportMD=Molecular descriptors (CSV format)")
 public final class ExportMD extends WorkspaceContextSensitiveAction<AttributesModel> {
 
     protected final SetupDialog dialog;

@@ -72,7 +72,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     private float correlationCutoff;
     private int rankingOption, topRank;
     private float threshold;
-    private NotifyDescriptor emptyMDs;
+    private final NotifyDescriptor emptyMDs;
 
     private int width, height;
     private ChartPanel histogramPanel;

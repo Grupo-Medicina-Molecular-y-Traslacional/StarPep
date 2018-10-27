@@ -79,10 +79,10 @@ public class ProjectManager implements Lookup.Provider {
 
     public static final String NODE_TABLE_PRO_NAME = "name";
     public static final String NODE_TABLE_PRO_NAME_TITLE = NbBundle.getMessage(ProjectManager.class, "NodeTable.column.name.title");
-    public static final String NODE_TABLE_PRO_CLUSTER = "cluster";
-    public static final String NODE_TABLE_PRO_CLUSTER_TITLE = NbBundle.getMessage(ProjectManager.class, "NodeTable.column.cluster.title");
+
     public static final String EDGE_TABLE_PRO_XREF = "dbRef";
     public static final String EDGE_TABLE_PRO_XREF_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.xref.title");
+
     public static final String EDGE_TABLE_PRO_SIMILARITY = "similarity";
     public static final String EDGE_TABLE_PRO_SIMILARITY_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.similarity.title");
 
@@ -327,10 +327,6 @@ public class ProjectManager implements Lookup.Provider {
         Table nodeTable = graphModel.getNodeTable();
         if (!nodeTable.hasColumn(NODE_TABLE_PRO_NAME)) {
             nodeTable.addColumn(NODE_TABLE_PRO_NAME, NODE_TABLE_PRO_NAME_TITLE, String.class, Origin.DATA, "", false);
-        }
-
-        if (!nodeTable.hasColumn(NODE_TABLE_PRO_CLUSTER)) {
-            nodeTable.addColumn(NODE_TABLE_PRO_CLUSTER, NODE_TABLE_PRO_CLUSTER_TITLE, Integer.class, Origin.DATA, null, false);
         }
 
         Table edgeTable = graphModel.getEdgeTable();

@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import javax.swing.AbstractButton;
 import javax.swing.AbstractCellEditor;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -99,11 +100,8 @@ public class PartitionColorTransformerPanel extends javax.swing.JPanel {
         if (UIUtils.isAquaLookAndFeel()) {
             backPanel.setBackground(UIManager.getColor("NbExplorerView.background"));
         }
-    }
-
-    public JButton getPaletteButton() {
-        return palettePopupButton;
-    }
+        jToolBar1.add(palettePopupButton);
+    }    
 
     public void setup(PartitionFunction function) {
         this.function = function;
@@ -406,6 +404,8 @@ public class PartitionColorTransformerPanel extends javax.swing.JPanel {
         centerScrollPane = new javax.swing.JScrollPane();
         backPanel = new javax.swing.JPanel();
         table = new javax.swing.JTable();
+        jToolBar1 = new javax.swing.JToolBar();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
 
         setOpaque(false);
         setLayout(new java.awt.GridBagLayout());
@@ -442,16 +442,30 @@ public class PartitionColorTransformerPanel extends javax.swing.JPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(4, 10, 0, 0);
         add(centerScrollPane, gridBagConstraints);
+
+        jToolBar1.setFloatable(false);
+        jToolBar1.setRollover(true);
+        jToolBar1.add(jSeparator1);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+        add(jToolBar1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel backPanel;
     private javax.swing.JScrollPane centerScrollPane;
+    private javax.swing.JToolBar.Separator jSeparator1;
+    private javax.swing.JToolBar jToolBar1;
     private javax.swing.JTable table;
     // End of variables declaration//GEN-END:variables
 }

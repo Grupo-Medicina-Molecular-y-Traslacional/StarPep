@@ -94,10 +94,7 @@ public class PartitionElementColorTransformerUI implements TransformerUI {
 
     @Override
     public synchronized AbstractButton[] getControlButton() {
-        if (panel == null) {
-            panel = new PartitionColorTransformerPanel();
-        }
-        return new AbstractButton[]{panel.getPaletteButton()};
+        return null;
     }
 
     @Override

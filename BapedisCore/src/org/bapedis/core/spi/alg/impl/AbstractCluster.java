@@ -10,13 +10,16 @@ import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Cluster;
+import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
+import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
+import org.gephi.graph.api.Table;
 import org.openide.util.Lookup;
 
 /**
@@ -25,6 +28,7 @@ import org.openide.util.Lookup;
  */
 public abstract class AbstractCluster implements Algorithm {
 
+    public static final String CLUSTER_COLUMN = "cluster";
     protected final AlgorithmFactory factory;
     protected boolean stopRun;
     protected ProgressTicket ticket;
@@ -32,6 +36,8 @@ public abstract class AbstractCluster implements Algorithm {
     protected Workspace workspace;
     protected final List<Cluster> clusterList;
     protected final ProjectManager pc;
+    private GraphVizSetting graphViz;
+    protected GraphModel graphModel;
 
     public AbstractCluster(AlgorithmFactory factory) {
         this.factory = factory;
@@ -63,6 +69,8 @@ public abstract class AbstractCluster implements Algorithm {
         stopRun = false;
         ticket = progressTicket;
         clusterList.clear();
+        graphModel = pc.getGraphModel(workspace);
+        graphViz = pc.getGraphVizSetting(workspace);
     }
 
     @Override
@@ -70,6 +78,8 @@ public abstract class AbstractCluster implements Algorithm {
         workspace = null;
         peptides = null;
         ticket = null;
+        graphModel = null;
+        graphViz = null;
     }
 
     @Override
@@ -92,14 +102,27 @@ public abstract class AbstractCluster implements Algorithm {
     public void run() {
         if (peptides != null) {
             cluterize();
+
+            //Add cluster column
+            boolean fireEvent = false;
+            Table nodeTable = graphModel.getNodeTable();
+            if (!nodeTable.hasColumn(CLUSTER_COLUMN)) {
+                nodeTable.addColumn(CLUSTER_COLUMN, "Cluster", Integer.class, null);
+                fireEvent = true;
+            }
+
             Node node;
-            for(Cluster c: clusterList){
+            for (Cluster c : clusterList) {
                 node = c.getCentroid().getGraphNode();
-                node.setAttribute(ProjectManager.NODE_TABLE_PRO_CLUSTER, c.getId());
-                for(Peptide p: c.getMembers()){
+                node.setAttribute(CLUSTER_COLUMN, c.getId());
+                for (Peptide p : c.getMembers()) {
                     node = p.getGraphNode();
-                    node.setAttribute(ProjectManager.NODE_TABLE_PRO_CLUSTER, c.getId());
+                    node.setAttribute(CLUSTER_COLUMN, c.getId());
                 }
+            }
+
+            if (fireEvent) {
+                graphViz.fireChangedGraphTable();
             }
         }
     }

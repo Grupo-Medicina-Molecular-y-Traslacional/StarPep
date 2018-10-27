@@ -29,6 +29,9 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
@@ -61,6 +64,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     //To initialize
     protected Workspace workspace;
     private AttributesModel attrModel;
+    private List<Peptide> peptides;
     protected boolean stopRun;
     ProgressTicket ticket;
 
@@ -75,7 +79,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     private final NotifyDescriptor emptyMDs;
 
     private int width, height;
-    private ChartPanel histogramPanel;
+    private ChartPanel shannonEntropyPanel;
 
     public FeatureSEFiltering(FeatureSEFilteringFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
@@ -125,8 +129,8 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         return isValid;
     }
 
-    public ChartPanel getHistogramPanel() {
-        return histogramPanel;
+    public ChartPanel getShannonEntropyPanel() {
+        return shannonEntropyPanel;
     }
 
     public int getHeight() {
@@ -208,8 +212,9 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         this.workspace = workspace;
         ticket = progressTicket;
         attrModel = pc.getAttributesModel(workspace);
+        peptides = attrModel.getPeptides();
         stopRun = false;
-        histogramPanel = null;
+        shannonEntropyPanel = null;
         setRunning(true);
     }
 
@@ -218,6 +223,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         setRunning(false);
         workspace = null;
         attrModel = null;
+        peptides = null;
         ticket = null;
     }
 
@@ -245,7 +251,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         }
 
         try {
-            //Load all descriptors
+            //----------Load all descriptors
             List<MolecularDescriptor> allFeatures = new LinkedList<>();
 
             for (String key : attrModel.getMolecularDescriptorKeys()) {
@@ -262,8 +268,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                 return;
             }
 
-            //Computing shannon entropy            
-            List<Peptide> peptides = attrModel.getPeptides();
+            //----------Computing shannon entropy                        
             String state1 = NbBundle.getMessage(FeatureSEFiltering.class, "FeatureSEFiltering.task.ranking");
             pc.reportMsg(state1 + "\n", workspace);
             ticket.progress(state1);
@@ -286,7 +291,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                 }
             }
 
-            // Ranking all features
+            //----------Ranking all features
             MolecularDescriptor[] rankedFeatures = allFeatures.toArray(new MolecularDescriptor[0]);
             Arrays.parallelSort(rankedFeatures, new Comparator<MolecularDescriptor>() {
                 @Override
@@ -302,125 +307,80 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
             });
             allFeatures = null;
 
-            //Remove features...
-            LinkedList<MolecularDescriptor> toRemove = new LinkedList<>();
+            //-----------Filtering features...                        
+            double[][] descriptorMatrix = new double[rankedFeatures.length][];
+            int count = 0;
+            int removed = 0;
+            workUnits += rankedFeatures.length;
+            ticket.switchToDeterminate(workUnits);
 
-            //---------------Remove Redundant--------------
-            int redundantRemoveSize = 0;
-            if (!CORRELATION_METHODS[correlationIndex].equals(CORRELATION_NONE)) {
-                workUnits += (rankedFeatures.length * (rankedFeatures.length - 1)) / 2;
-                ticket.switchToDeterminate(workUnits);
+//          workUnits += (rankedFeatures.length * (rankedFeatures.length - 1)) / 2;
+//          ticket.switchToDeterminate(workUnits);
+            String state2 = NbBundle.getMessage(FeatureSEFiltering.class, "FeatureSEFiltering.task.filtering");
+            ticket.progress(state2);
+            pc.reportMsg("\n", workspace);
+            pc.reportMsg(state2 + "\n", workspace);
 
-                String state2 = NbBundle.getMessage(FeatureSEFiltering.class, "FeatureSEFiltering.task.removeRedundant");
-                ticket.progress(state2);
-                pc.reportMsg("\n", workspace);
-                pc.reportMsg(state2 + "\n", workspace);
+            pc.reportMsg("Correlation method: " + CORRELATION_METHODS[correlationIndex], workspace);
+            pc.reportMsg("Correlation cutoff value: " + correlationCutoff + "\n", workspace);
 
-                pc.reportMsg("Correlation cutoff value: " + correlationCutoff + "\n", workspace);
-
-                pc.reportMsg("Calculating descriptor matrix", workspace);
-                double[][] descriptorMatrix = new double[rankedFeatures.length][];
-                double[] column;
-                int pos;
-                if (CORRELATION_METHODS[correlationIndex].equals(CORRELATION_PEARSON)) {
+            switch (rankingOption) {
+                case RANKING_SELECT_ALL:
+                    pc.reportMsg("Ranking output: select all \n", workspace);
                     for (int i = 0; i < rankedFeatures.length && !stopRun; i++) {
-                        column = new double[peptides.size()];
-                        pos = 0;
-                        for (Peptide peptide : peptides) {
-                            column[pos++] = MolecularDescriptor.getDoubleValue(peptide, rankedFeatures[i]);
+                        if (rankedFeatures[i] != null) {
+                            count++;
+                            if (!CORRELATION_METHODS[correlationIndex].equals(CORRELATION_NONE)) {
+                                removed += removeCorrelated(descriptorMatrix, i, rankedFeatures);
+                            }
                         }
-                        descriptorMatrix[i] = column;
                         ticket.progress();
                     }
-                } else if (CORRELATION_METHODS[correlationIndex].equals(CORRELATION_SPEARMAN)) {
-                    column = new double[peptides.size()]; // Temporal column
+                    break;
+                case RANKING_SELECT_TOP:
+                    pc.reportMsg("Ranking output: select top " + topRank + "\n", workspace);
                     for (int i = 0; i < rankedFeatures.length && !stopRun; i++) {
-                        pos = 0;
-                        for (Peptide peptide : peptides) {
-                            column[pos++] = MolecularDescriptor.getDoubleValue(peptide, rankedFeatures[i]);
+                        if (rankedFeatures[i] != null) {
+                            if (count < topRank) {
+                                count++;
+                                if (!CORRELATION_METHODS[correlationIndex].equals(CORRELATION_NONE)) {
+                                    removed += removeCorrelated(descriptorMatrix, i, rankedFeatures);
+                                }
+                            } else {
+                                removed++;
+                                attrModel.deleteAttribute(rankedFeatures[i]);
+                                pc.reportMsg("Removed: " + rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+                                rankedFeatures[i] = null;
+                            }
                         }
-                        descriptorMatrix[i] = rank(column);
                         ticket.progress();
                     }
-                }
-
-                pc.reportMsg("Calculating correlation: " + CORRELATION_METHODS[correlationIndex], workspace);
-                double[] rank1, rank2;
-                for (int i = 0; i < rankedFeatures.length - 1 && !stopRun; i++) {
-                    if (rankedFeatures[i] != null) {
-                        rank1 = descriptorMatrix[i];
-                        for (int j = i + 1; j < rankedFeatures.length && !stopRun; j++) {
-                            if (rankedFeatures[j] != null) {
-                                rank2 = descriptorMatrix[j];
-                                score = calculatePearsonCorrelation(rank1, rank2);
-                                if (Math.abs(score) >= correlationCutoff) {
-                                    attrModel.deleteAttribute(rankedFeatures[j]);
-                                    pc.reportMsg("Removed: " + rankedFeatures[j].getDisplayName() + " - " + String.format("corr(%s) = %f", rankedFeatures[i].getDisplayName(), score), workspace);
-                                    toRemove.add(rankedFeatures[j]);
-                                    rankedFeatures[j] = null;
-                                    descriptorMatrix[j] = null;
-                                }
+                    break;
+                case RANKING_ENTROPY_THRESHOLD:
+                    pc.reportMsg("Ranking output: shannon entropy >= " + threshold + "\n", workspace);
+                    for (int i = 0; i < rankedFeatures.length && !stopRun; i++) {
+                        if (rankedFeatures[i] != null) {
+                            if (rankedFeatures[i].getScore() < threshold) {
+                                removed++;
+                                attrModel.deleteAttribute(rankedFeatures[i]);
+                                pc.reportMsg("Removed: " + rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+                                rankedFeatures[i] = null;
                             }
-                            ticket.progress();
                         }
-                    } else {
-                        //Report progress of units
-                        ticket.progress(rankedFeatures.length - (i + 1));
                     }
-                }
-
-                redundantRemoveSize = toRemove.size();
-                pc.reportMsg("Redundant features removed: " + redundantRemoveSize, workspace);
-            }
-
-            //---------------Remove Useless--------------  
-            int uselessRemovedSize = 0;
-            if (rankingOption != RANKING_SELECT_ALL) {
-                toRemove.clear();
-                workUnits += rankedFeatures.length;
-                ticket.switchToDeterminate(workUnits);
-
-                String state3 = NbBundle.getMessage(FeatureSEFiltering.class, "FeatureSEFiltering.task.filtering");
-                ticket.progress(state3);
-                pc.reportMsg("\n", workspace);
-                pc.reportMsg(state3 + "\n", workspace);
-
-                switch (rankingOption) {
-                    case RANKING_SELECT_TOP:
-                        int count = 0;
-                        for (int i = 0; i < rankedFeatures.length; i++) {
-                            if (rankedFeatures[i] != null) {
-                                if (count < topRank) {
-                                    count++;
-                                } else {
-                                    toRemove.add(rankedFeatures[i]);
-                                    attrModel.deleteAttribute(rankedFeatures[i]);
-                                    pc.reportMsg("Removed: " + rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
-                                    rankedFeatures[i] = null;
-                                }
+                    for (int i = 0; i < rankedFeatures.length && !stopRun; i++) {
+                        if (rankedFeatures[i] != null) {
+                            count++;
+                            if (!CORRELATION_METHODS[correlationIndex].equals(CORRELATION_NONE)) {
+                                removed += removeCorrelated(descriptorMatrix, i, rankedFeatures);
                             }
                         }
-                        break;
-                    case RANKING_ENTROPY_THRESHOLD:
-                        for (int i = 0; i < rankedFeatures.length; i++) {
-                            if (rankedFeatures[i] != null) {
-                                if (rankedFeatures[i].getScore() < threshold) {
-                                    toRemove.add(rankedFeatures[i]);
-                                    attrModel.deleteAttribute(rankedFeatures[i]);
-                                    pc.reportMsg("Removed: " + rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
-                                    rankedFeatures[i] = null;
-                                }
-                            }
-                        }
-                        break;
-                    default:
-                        break;
-                }
-
-                uselessRemovedSize = toRemove.size();
-                pc.reportMsg("Useless features removed: " + uselessRemovedSize + "\n", workspace);
+                        ticket.progress();
+                    }
+                    break;
             }
 
+            //Print top 5 bottom 3
             pc.reportMsg("Top 5", workspace);
             for (int i = 0; i < rankedFeatures.length && i < 5; i++) {
                 if (rankedFeatures[i] != null) {
@@ -435,16 +395,62 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                 }
             }
 
-            double[] data = getData(rankedFeatures);
-            histogramPanel = createChartPanel(data);
+            shannonEntropyPanel = createChartPanel(rankedFeatures);
 
-            pc.reportMsg("\nTotal of removed features: " + (uselessRemovedSize + redundantRemoveSize), workspace);
-            pc.reportMsg("\nTotal of remaining features: " + data.length, workspace);
+            pc.reportMsg("\nTotal of removed features: " + removed, workspace);
+            pc.reportMsg("\nTotal of remaining features: " + count, workspace);
         } catch (MolecularDescriptorNotFoundException ex) {
             NotifyDescriptor errorND = ex.getErrorND();
             DialogDisplayer.getDefault().notify(errorND);
             pc.reportError(ex.getMessage(), workspace);
         }
+    }
+
+    private int removeCorrelated(double[][] descriptorMatrix, int beginIndex, MolecularDescriptor[] rankedFeatures) throws MolecularDescriptorNotFoundException {
+        if (descriptorMatrix[beginIndex] == null) {
+            descriptorMatrix[beginIndex] = computeColumn(beginIndex, rankedFeatures);
+        }
+        double[] column1 = descriptorMatrix[beginIndex];
+        double[] column2;
+        double score;
+        int removed = 0;
+        for (int j = beginIndex + 1; j < rankedFeatures.length && !stopRun; j++) {
+            if (rankedFeatures[j] != null) {
+                if (descriptorMatrix[j] == null) {
+                    descriptorMatrix[j] = computeColumn(j, rankedFeatures);
+                }
+                column2 = descriptorMatrix[j];
+                score = calculatePearsonCorrelation(column1, column2);
+                if (Math.abs(score) >= correlationCutoff) {
+                    attrModel.deleteAttribute(rankedFeatures[j]);
+                    pc.reportMsg("Removed: " + rankedFeatures[j].getDisplayName() + " - " + String.format("corr(%s) = %f", rankedFeatures[beginIndex].getDisplayName(), score), workspace);
+                    removed++;
+                    rankedFeatures[j] = null;
+                    descriptorMatrix[j] = null;
+                }
+            }
+        }
+        return removed;
+    }
+
+    private double[] computeColumn(int index, MolecularDescriptor[] rankedFeatures) throws MolecularDescriptorNotFoundException {
+        double[] column = null;
+        if (!CORRELATION_METHODS[correlationIndex].equals(CORRELATION_NONE)) {
+            int pos = 0;
+            if (CORRELATION_METHODS[correlationIndex].equals(CORRELATION_PEARSON)) {
+                column = new double[peptides.size()];
+                for (Peptide peptide : peptides) {
+                    column[pos++] = MolecularDescriptor.getDoubleValue(peptide, rankedFeatures[index]);
+                }
+            } else if (CORRELATION_METHODS[correlationIndex].equals(CORRELATION_SPEARMAN)) {
+                column = new double[peptides.size()]; // Temporal column
+                for (Peptide peptide : peptides) {
+                    column[pos++] = MolecularDescriptor.getDoubleValue(peptide, rankedFeatures[index]);
+                }
+                column = rank(column);
+            }
+        }
+        return column;
     }
 
     private double[] getData(MolecularDescriptor[] rankedFeatures) {
@@ -465,18 +471,30 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         return data;
     }
 
-    private ChartPanel createChartPanel(double[] data) {
+    private ChartPanel createChartPanel(MolecularDescriptor[] rankedFeatures) {
+        double[] data = getData(rankedFeatures);
         double min = MolecularDescriptor.min(data);
         double max = MolecularDescriptor.max(data);
 
-        HistogramDataset dataset = new HistogramDataset();
-        dataset.setType(HistogramType.FREQUENCY);
-        dataset.addSeries("Histogram", data, 50, min, max);
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        XYSeries serie = new XYSeries("SE");
 
-        JFreeChart chart = ChartFactory.createHistogram(
+        int y;
+        for (double x = min; x <= max; x += 0.1) {
+            y = 0;
+            for (int i = 0; i < data.length; i++) {
+                if (data[i] >= x) {
+                    y++;
+                }
+            }
+            serie.add(x, y);
+        }
+        dataset.addSeries(serie);
+
+        JFreeChart chart = ChartFactory.createXYLineChart(
                 "", // chart title
-                "", // domain axis label
-                "Frequency", // range axis label
+                "SE value", // domain axis label
+                "No. of variables", // range axis label
                 dataset, // data
                 PlotOrientation.HORIZONTAL.VERTICAL, // orientation
                 false, // include legend

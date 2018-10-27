@@ -7,45 +7,28 @@ package org.bapedis.core.spi.alg.impl;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import org.bapedis.core.model.AlgorithmProperty;
-import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.project.ProjectManager;
-import org.bapedis.core.spi.alg.Algorithm;
-import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
 import org.openide.util.Exceptions;
-import org.openide.util.Lookup;
 
 /**
  *
  * @author loge
  */
-public class SequenceClustering implements Algorithm {
+public class SequenceClustering extends AbstractCluster {
 
-    private final ProjectManager pc;
-    private final SequenceClusteringFactory factory;
-    private boolean stopRun;
-    private ProgressTicket ticket;
-    private Peptide[] peptides;
-    private final List<Cluster> clusterList;
     private final HashMap<Integer, Cluster> clusterMap;
-    private Workspace workspace;
     private SequenceAlignmentModel alignmentModel;
 
     protected static final int MAX_REJECTS = 8;
 
     public SequenceClustering(SequenceClusteringFactory factory) {
-        this.factory = factory;
-        pc = Lookup.getDefault().lookup(ProjectManager.class);
+        super(factory);
         alignmentModel = new SequenceAlignmentModel();
-        clusterList = new LinkedList<>();
         clusterMap = new HashMap<>();
     }
 
@@ -57,67 +40,29 @@ public class SequenceClustering implements Algorithm {
         this.alignmentModel = alignmentModel;
     }
 
-    public Peptide[] getPeptides() {
-        return peptides;
-    }
-
-    public void setPeptides(Peptide[] peptides) {
-        this.peptides = peptides;
-    }
-
-    public List<Cluster> getClusterList() {
-        return clusterList;
-    }
-
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
-        this.workspace = workspace;
-        if (peptides == null) {
-            AttributesModel attrModel = pc.getAttributesModel(workspace);
-            if (attrModel != null) {
-                peptides = attrModel.getPeptides().toArray(new Peptide[0]);
-            }
-        }
-        stopRun = false;
-        ticket = progressTicket;
-        clusterList.clear();
+        super.initAlgo(workspace, progressTicket);
         clusterMap.clear();
     }
 
     @Override
     public void endAlgo() {
-        workspace = null;
-        peptides = null;
-        ticket = null;
+        super.endAlgo();
         clusterMap.clear();
     }
 
     @Override
-    public boolean cancel() {
-        stopRun = true;
-        return true;
-    }
-
-    @Override
-    public AlgorithmProperty[] getProperties() {
-        return null;
-    }
-
-    @Override
-    public AlgorithmFactory getFactory() {
-        return factory;
-    }
-
-    @Override
-    public void run() {
-        if (peptides != null && alignmentModel != null) {
+    protected void cluterize() {
+        if (alignmentModel != null) {
             ticket.switchToDeterminate(peptides.length);
 
             // Sort by decreasing sequence length
             Arrays.parallelSort(peptides, new SeqLengthComparator());
 
+            int id=1;
             //Add first cluster
-            Cluster cluster = new Cluster(peptides[0]);
+            Cluster cluster = new Cluster(id++, peptides[0]);
             clusterList.add(cluster);
             clusterMap.put(peptides[0].getId(), cluster);
             Peptide[] centroids = new Peptide[]{peptides[0]};
@@ -153,21 +98,22 @@ public class SequenceClustering implements Algorithm {
                 }
 
                 if (isRepresentative) {
-                    cluster = new Cluster(query);
+                    cluster = new Cluster(id++, query);
                     clusterList.add(cluster);
                     clusterMap.put(query.getId(), cluster);
                     // Increase centroids array
                     centroids = new Peptide[centroids.length + 1];
-                    int pos=0;
-                    for(Cluster c: clusterList){
+                    int pos = 0;
+                    for (Cluster c : clusterList) {
                         centroids[pos++] = c.getCentroid();
                     }
                 }
 
                 ticket.progress();
             }
-            
+
             pc.reportMsg("Number of clusters: " + clusterList.size(), workspace);
         }
     }
+
 }

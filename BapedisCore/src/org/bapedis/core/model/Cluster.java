@@ -13,14 +13,20 @@ import java.util.List;
  * @author Loge
  */
 public class Cluster {
+    protected final int id;
     protected final Peptide centroid;
     protected final List<Peptide> members;
 
-    public Cluster(Peptide centroid) {
+    public Cluster(int id, Peptide centroid) {
+        this.id = id;
         this.centroid = centroid;
         members = new LinkedList<>();
     }
-    
+
+    public int getId() {
+        return id;
+    }
+        
     public void addMember(Peptide peptide){
         members.add(peptide);
     }

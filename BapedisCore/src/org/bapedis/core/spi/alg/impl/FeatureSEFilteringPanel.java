@@ -104,6 +104,10 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         jTF_threshold.getDocument().addDocumentListener(thresholdDocListener);
         jTF_corr.getDocument().addDocumentListener(corrDocListener);
     }
+    
+    public void setShannonDistributionPanel(boolean visible){
+        shannonEntropyPanel.setVisible(visible);
+    }
 
     private void updateTopRank() {
         try {
@@ -119,7 +123,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
             DialogDisplayer.getDefault().notify(errorND);
             algorithm.setTopRank(-1);
         }
-    }
+    }        
 
     private void updateSEThreshold() {
         try {
@@ -200,7 +204,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         redundantComboBox = new javax.swing.JComboBox<>();
         jLabelThreshodl = new javax.swing.JLabel();
         jTF_corr = new javax.swing.JTextField();
-        histogramPanel = new javax.swing.JPanel();
+        shannonEntropyPanel = new javax.swing.JPanel();
 
         setMinimumSize(new java.awt.Dimension(440, 380));
         setPreferredSize(new java.awt.Dimension(440, 280));
@@ -344,6 +348,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
 
         jTF_corr.setText(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jTF_corr.text")); // NOI18N
         jTF_corr.setEnabled(false);
+        jTF_corr.setMinimumSize(new java.awt.Dimension(90, 27));
         jTF_corr.setPreferredSize(new java.awt.Dimension(90, 27));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -367,8 +372,8 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.weightx = 1.0;
         add(rankingOutputPanel, gridBagConstraints);
 
-        histogramPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.histogramPanel.border.title"))); // NOI18N
-        histogramPanel.setLayout(new java.awt.BorderLayout());
+        shannonEntropyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.shannonEntropyPanel.border.title"))); // NOI18N
+        shannonEntropyPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -376,7 +381,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(histogramPanel, gridBagConstraints);
+        add(shannonEntropyPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jResetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jResetButtonActionPerformed
@@ -431,7 +436,6 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JPanel histogramPanel;
     private javax.swing.JLabel infoSEThreshold;
     private javax.swing.JLabel jLabelThreshodl;
     private javax.swing.JRadioButton jRB_selectAll;
@@ -444,6 +448,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
     private javax.swing.JPanel rankingOutputPanel;
     private javax.swing.JPanel redundancyPanel;
     private javax.swing.JComboBox<String> redundantComboBox;
+    private javax.swing.JPanel shannonEntropyPanel;
     // End of variables declaration//GEN-END:variables
 
     private void setOption(int option) {
@@ -506,8 +511,8 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
 
         refreshState();
 
-        algorithm.setWidth(histogramPanel.getWidth());
-        algorithm.setHeight(histogramPanel.getHeight());
+        algorithm.setWidth(shannonEntropyPanel.getWidth());
+        algorithm.setHeight(shannonEntropyPanel.getHeight());
 
         return this;
     }
@@ -516,12 +521,12 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                histogramPanel.removeAll();
-                if (!running && algorithm.getHistogramPanel() != null) {
-                    histogramPanel.add(algorithm.getHistogramPanel(), BorderLayout.CENTER);
+                shannonEntropyPanel.removeAll();
+                if (!running && algorithm.getShannonEntropyPanel()!= null) {
+                    shannonEntropyPanel.add(algorithm.getShannonEntropyPanel(), BorderLayout.CENTER);
                 }
-                histogramPanel.revalidate();
-                histogramPanel.repaint();
+                shannonEntropyPanel.revalidate();
+                shannonEntropyPanel.repaint();
             }
         });
     }

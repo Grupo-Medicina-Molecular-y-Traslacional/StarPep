@@ -55,9 +55,10 @@ import org.openide.windows.WindowManager;
  */
 @ServiceProvider(service = ProjectManager.class)
 public class ProjectManager implements Lookup.Provider {
-    public static final int LARGE_NETWORK=1000;
+
+    public static final int LARGE_NETWORK = 1000;
     private static final String NOTIFY_LARGE_NETWORK_KEY = "notifyLargeNetworkKey";
-    
+
     protected String name;
     protected File folder;
     protected Lookup lookup;
@@ -78,6 +79,8 @@ public class ProjectManager implements Lookup.Provider {
 
     public static final String NODE_TABLE_PRO_NAME = "name";
     public static final String NODE_TABLE_PRO_NAME_TITLE = NbBundle.getMessage(ProjectManager.class, "NodeTable.column.name.title");
+    public static final String NODE_TABLE_PRO_CLUSTER = "cluster";
+    public static final String NODE_TABLE_PRO_CLUSTER_TITLE = NbBundle.getMessage(ProjectManager.class, "NodeTable.column.cluster.title");
     public static final String EDGE_TABLE_PRO_XREF = "dbRef";
     public static final String EDGE_TABLE_PRO_XREF_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.xref.title");
     public static final String EDGE_TABLE_PRO_SIMILARITY = "similarity";
@@ -195,7 +198,7 @@ public class ProjectManager implements Lookup.Provider {
             }
         });
     }
-    
+
     public synchronized void notifyLargeNetworkWarning(String algorithmName) {
         boolean flag = NbPreferences.forModule(ProjectManager.class).getBoolean(NOTIFY_LARGE_NETWORK_KEY, true);
         if (flag) {
@@ -208,7 +211,7 @@ public class ProjectManager implements Lookup.Provider {
                 }
             });
         }
-    }    
+    }
 
     public synchronized void reportRunningTask(String taskName, Workspace workspace) {
         InputOutput io = IOProvider.getDefault().getIO(workspace.getName(), false);
@@ -298,12 +301,12 @@ public class ProjectManager implements Lookup.Provider {
         }
         return graphView;
     }
-    
-    public synchronized GraphObserver getGraphObserver(){
+
+    public synchronized GraphObserver getGraphObserver() {
         return getGraphObserver(currentWS);
     }
-    
-    public synchronized GraphObserver getGraphObserver(Workspace workspace){
+
+    public synchronized GraphObserver getGraphObserver(Workspace workspace) {
         return workspace.getLookup().lookup(GraphObserver.class);
     }
 
@@ -324,6 +327,10 @@ public class ProjectManager implements Lookup.Provider {
         Table nodeTable = graphModel.getNodeTable();
         if (!nodeTable.hasColumn(NODE_TABLE_PRO_NAME)) {
             nodeTable.addColumn(NODE_TABLE_PRO_NAME, NODE_TABLE_PRO_NAME_TITLE, String.class, Origin.DATA, "", false);
+        }
+
+        if (!nodeTable.hasColumn(NODE_TABLE_PRO_CLUSTER)) {
+            nodeTable.addColumn(NODE_TABLE_PRO_CLUSTER, NODE_TABLE_PRO_CLUSTER_TITLE, Integer.class, Origin.DATA, null, false);
         }
 
         Table edgeTable = graphModel.getEdgeTable();
@@ -436,7 +443,7 @@ public class ProjectManager implements Lookup.Provider {
             }
             //Destroy graph observer
             GraphObserver observer = getGraphObserver(workspace);
-            if(observer != null && !observer.isDestroyed()){
+            if (observer != null && !observer.isDestroyed()) {
                 observer.destroy();
             }
         }

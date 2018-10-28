@@ -58,6 +58,8 @@ import org.gephi.ui.components.gradientslider.GradientSlider;
 import org.gephi.ui.components.gradientslider.MultiThumbSlider;
 import org.gephi.utils.PaletteUtils;
 import org.gephi.utils.PaletteUtils.Palette;
+import org.jdesktop.swingx.JXHyperlink;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
 /**
@@ -68,6 +70,7 @@ public class RankingColorTransformerPanel extends javax.swing.JPanel {
     private RankingElementColorTransformer colorTransformer;
     private GradientSlider gradientSlider;
     private final RecentPalettes recentPalettes;
+    private final JXHyperlink colorSwatch;
 
     public RankingColorTransformerPanel() {
         initComponents();
@@ -95,15 +98,23 @@ public class RankingColorTransformerPanel extends javax.swing.JPanel {
             }
         });
         gradientPanel.add(gradientSlider, BorderLayout.CENTER);
-
-        //Color Swatch
-        colorSwatchButton.addActionListener(new ActionListener() {
+  
+        //Color Swatch               
+        colorSwatch = new JXHyperlink();
+        colorSwatch.setIcon(ImageUtilities.loadImageIcon("/org/gephi/ui/appearance/plugin/resources/chain.png", false));
+        colorSwatch.setText(NbBundle.getMessage(RankingColorTransformerPanel.class, "RankingColorTransformerPanel.colorSwatch.text"));
+        colorSwatch.setToolTipText(NbBundle.getMessage(RankingColorTransformerPanel.class, "RankingColorTransformerPanel.colorSwatch.toolTipText"));
+        colorSwatch.setClickedColor(new Color(0, 51, 255));
+        colorSwatch.setFocusPainted(false);
+        colorSwatch.setFocusable(false);
+        colorSwatch.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent ae) {
+            public void actionPerformed(ActionEvent e) {
                 JPopupMenu popupMenu = getPalettePopupMenu();
                 popupMenu.show(colorSwatchToolbar, -popupMenu.getPreferredSize().width, 0);
             }
-        });
+        });         
+        colorSwatchToolbar.add(colorSwatch);
     }
 
     public void setup(RankingFunction function) {
@@ -225,7 +236,6 @@ public class RankingColorTransformerPanel extends javax.swing.JPanel {
         gradientPanel = new javax.swing.JPanel();
         colorSwatchToolbar = new javax.swing.JToolBar();
         jSeparator1 = new javax.swing.JToolBar.Separator();
-        colorSwatchButton = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(0, 0));
         setPreferredSize(new java.awt.Dimension(225, 114));
@@ -256,15 +266,6 @@ public class RankingColorTransformerPanel extends javax.swing.JPanel {
         colorSwatchToolbar.setOpaque(false);
         colorSwatchToolbar.add(jSeparator1);
 
-        colorSwatchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/gephi/ui/appearance/plugin/resources/chain.png"))); // NOI18N
-        colorSwatchButton.setText(org.openide.util.NbBundle.getMessage(RankingColorTransformerPanel.class, "RankingColorTransformerPanel.colorSwatchButton.text")); // NOI18N
-        colorSwatchButton.setToolTipText(org.openide.util.NbBundle.getMessage(RankingColorTransformerPanel.class, "RankingColorTransformerPanel.colorSwatchButton.toolTipText")); // NOI18N
-        colorSwatchButton.setFocusable(false);
-        colorSwatchButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        colorSwatchButton.setIconTextGap(0);
-        colorSwatchButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        colorSwatchToolbar.add(colorSwatchButton);
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -274,7 +275,6 @@ public class RankingColorTransformerPanel extends javax.swing.JPanel {
         add(colorSwatchToolbar, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton colorSwatchButton;
     private javax.swing.JToolBar colorSwatchToolbar;
     private javax.swing.JPanel gradientPanel;
     private javax.swing.JToolBar.Separator jSeparator1;

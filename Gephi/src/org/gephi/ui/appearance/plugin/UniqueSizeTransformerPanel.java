@@ -41,12 +41,18 @@
  */
 package org.gephi.ui.appearance.plugin;
 
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.gephi.appearance.api.SimpleFunction;
 import org.gephi.appearance.plugin.AbstractUniqueSizeTransformer;
 import org.gephi.appearance.plugin.UniqueLabelSizeTransformer;
 import org.gephi.appearance.plugin.UniqueNodeSizeTransformer;
+import org.jdesktop.swingx.JXHyperlink;
+import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -55,6 +61,7 @@ import org.gephi.appearance.plugin.UniqueNodeSizeTransformer;
 public class UniqueSizeTransformerPanel extends javax.swing.JPanel {
 
     private AbstractUniqueSizeTransformer transformer;
+    private final JXHyperlink resetSize;
 
     public UniqueSizeTransformerPanel() {
         initComponents();
@@ -65,6 +72,25 @@ public class UniqueSizeTransformerPanel extends javax.swing.JPanel {
                 transformer.setSize((Float) sizeSpinner.getValue());
             }
         });
+
+        resetSize = new JXHyperlink();
+        resetSize.setIcon(ImageUtilities.loadImageIcon("/org/gephi/ui/appearance/plugin/resources/chain.png", false));
+        resetSize.setText(NbBundle.getMessage(UniqueSizeTransformerPanel.class, "UniqueSizeTransformerPanel.resetSize.text"));
+        resetSize.setToolTipText(NbBundle.getMessage(UniqueSizeTransformerPanel.class, "UniqueSizeTransformerPanel.resetSize.toolTipText"));
+        resetSize.setClickedColor(new Color(0, 51, 255));
+        resetSize.setFocusPainted(false);
+        resetSize.setFocusable(false);
+        resetSize.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (transformer instanceof UniqueLabelSizeTransformer) {
+                    sizeSpinner.setValue(1f);
+                } else if (transformer instanceof UniqueNodeSizeTransformer) {
+                    sizeSpinner.setValue(10f);
+                }
+            }
+        });
+        jToolBar1.add(resetSize);
     }
 
     public void setup(SimpleFunction function) {
@@ -86,7 +112,6 @@ public class UniqueSizeTransformerPanel extends javax.swing.JPanel {
         sizeSpinner = new javax.swing.JSpinner();
         jToolBar1 = new javax.swing.JToolBar();
         jSeparator1 = new javax.swing.JToolBar.Separator();
-        jButtonReset = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -113,19 +138,6 @@ public class UniqueSizeTransformerPanel extends javax.swing.JPanel {
         jToolBar1.setRollover(true);
         jToolBar1.add(jSeparator1);
 
-        jButtonReset.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/gephi/ui/appearance/plugin/resources/chain.png"))); // NOI18N
-        jButtonReset.setText(org.openide.util.NbBundle.getMessage(UniqueSizeTransformerPanel.class, "UniqueSizeTransformerPanel.jButtonReset.text")); // NOI18N
-        jButtonReset.setToolTipText(org.openide.util.NbBundle.getMessage(UniqueSizeTransformerPanel.class, "UniqueSizeTransformerPanel.jButtonReset.toolTipText")); // NOI18N
-        jButtonReset.setFocusable(false);
-        jButtonReset.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButtonReset.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButtonReset.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonResetActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(jButtonReset);
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -135,16 +147,7 @@ public class UniqueSizeTransformerPanel extends javax.swing.JPanel {
         add(jToolBar1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButtonResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResetActionPerformed
-        if (transformer instanceof UniqueLabelSizeTransformer){
-            sizeSpinner.setValue(1f);
-        } else if (transformer instanceof UniqueNodeSizeTransformer){
-            sizeSpinner.setValue(10f);
-        }
-    }//GEN-LAST:event_jButtonResetActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButtonReset;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar jToolBar1;

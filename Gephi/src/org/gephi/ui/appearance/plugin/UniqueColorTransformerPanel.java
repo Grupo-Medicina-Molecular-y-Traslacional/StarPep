@@ -42,24 +42,30 @@
 package org.gephi.ui.appearance.plugin;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import net.java.dev.colorchooser.ColorChooser;
 import org.gephi.appearance.api.SimpleFunction;
 import org.gephi.appearance.plugin.AbstractUniqueColorTransformer;
+import org.jdesktop.swingx.JXHyperlink;
+import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author mbastian
  */
 public class UniqueColorTransformerPanel extends javax.swing.JPanel {
-
+    
     private AbstractUniqueColorTransformer transformer;
     private Color defaultColor;
-
+    private final JXHyperlink resetColor;
+    
     public UniqueColorTransformerPanel() {
         initComponents();
-
+        
         colorChooser.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -71,19 +77,35 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
                 }
             }
         });
+        
+        resetColor = new JXHyperlink();
+        resetColor.setIcon(ImageUtilities.loadImageIcon("/org/gephi/ui/appearance/plugin/resources/chain.png", false));
+        resetColor.setText(NbBundle.getMessage(UniqueColorTransformerPanel.class, "UniqueColorTransformerPanel.resetButton.text"));
+        resetColor.setToolTipText(NbBundle.getMessage(UniqueColorTransformerPanel.class, "UniqueColorTransformerPanel.resetButton.toolTipText"));
+        resetColor.setClickedColor(new Color(0, 51, 255));
+        resetColor.setFocusPainted(false);
+        resetColor.setFocusable(false);
+        resetColor.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                colorChooser.setColor(defaultColor);
+                colorLabel.setText(getHex(defaultColor));
+            }
+        });
+        colorToolbar.add(resetColor);
     }
-
+    
     public void setup(SimpleFunction function) {
         transformer = (AbstractUniqueColorTransformer) function.getTransformer();
         
         colorChooser.setColor(transformer.getColor());
         colorLabel.setText(getHex(transformer.getColor()));
         
-        if (defaultColor == null){
+        if (defaultColor == null) {
             defaultColor = transformer.getColor();
         }
     }
-
+    
     private String getHex(Color color) {
         return "#" + String.format("%06x", color.getRGB() & 0x00FFFFFF);
     }
@@ -102,7 +124,6 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
         labelColor = new javax.swing.JLabel();
         colorToolbar = new javax.swing.JToolBar();
         jSeparator1 = new javax.swing.JToolBar.Separator();
-        jButtonReset = new javax.swing.JButton();
         colorChooser = new net.java.dev.colorchooser.ColorChooser();
 
         setLayout(new java.awt.GridBagLayout());
@@ -129,19 +150,6 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
         colorToolbar.setRollover(true);
         colorToolbar.setOpaque(false);
         colorToolbar.add(jSeparator1);
-
-        jButtonReset.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/gephi/ui/appearance/plugin/resources/chain.png"))); // NOI18N
-        jButtonReset.setText(org.openide.util.NbBundle.getMessage(UniqueColorTransformerPanel.class, "UniqueColorTransformerPanel.jButtonReset.text")); // NOI18N
-        jButtonReset.setToolTipText(org.openide.util.NbBundle.getMessage(UniqueColorTransformerPanel.class, "UniqueColorTransformerPanel.jButtonReset.toolTipText")); // NOI18N
-        jButtonReset.setFocusable(false);
-        jButtonReset.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButtonReset.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButtonReset.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonResetActionPerformed(evt);
-            }
-        });
-        colorToolbar.add(jButtonReset);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -175,16 +183,10 @@ public class UniqueColorTransformerPanel extends javax.swing.JPanel {
         add(colorChooser, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButtonResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResetActionPerformed
-        colorChooser.setColor(defaultColor);
-        colorLabel.setText(getHex(defaultColor));
-    }//GEN-LAST:event_jButtonResetActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private net.java.dev.colorchooser.ColorChooser colorChooser;
     private javax.swing.JLabel colorLabel;
     private javax.swing.JToolBar colorToolbar;
-    private javax.swing.JButton jButtonReset;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JLabel labelColor;
     // End of variables declaration//GEN-END:variables

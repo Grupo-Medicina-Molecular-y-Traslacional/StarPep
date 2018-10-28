@@ -81,6 +81,7 @@ import org.jdesktop.swingx.JXHyperlink;
 import org.jdesktop.swingx.JXTitledSeparator;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
 /**
@@ -295,6 +296,7 @@ public class PartitionColorTransformerPanel extends javax.swing.JPanel {
         private final PaletteManager paletteManager;
 
         public PalettePopupButton() {
+            setIcon(ImageUtilities.loadImageIcon("/org/gephi/ui/appearance/plugin/resources/chain.png", false));
             setText(NbBundle.getMessage(PartitionColorTransformerPanel.class, "PartitionColorTransformerPanel.paletteButton"));
             setClickedColor(new Color(0, 51, 255));
             setFocusPainted(false);

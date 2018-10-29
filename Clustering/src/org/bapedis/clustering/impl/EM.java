@@ -5,23 +5,21 @@
  */
 package org.bapedis.clustering.impl;
 
-import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
-import weka.clusterers.SimpleKMeans;
 
 /**
  *
  * @author loge
  */
-public class KMeans extends WekaClusterer<SimpleKMeans> {
+public class EM extends WekaClusterer<weka.clusterers.EM> {
     
-    public KMeans(AlgorithmFactory factory) {
-        super(new SimpleKMeans(), factory);
+    public EM(AlgorithmFactory factory) {
+        super(new weka.clusterers.EM(), factory);
     }
 
     @Override
-    public AlgorithmProperty[] getProperties() {
-        return null;
-    }        
+    protected void cluterize() {
+        
+    }
     
 }

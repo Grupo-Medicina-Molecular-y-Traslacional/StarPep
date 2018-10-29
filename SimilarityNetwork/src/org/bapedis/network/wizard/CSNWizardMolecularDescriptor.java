@@ -102,7 +102,7 @@ public class CSNWizardMolecularDescriptor implements WizardDescriptor.Validating
     @Override
     public void validate() throws WizardValidationException {
         if (getComponent().getSelectedOption() == WizardOptionModel.MolecularDescriptorOption.AVAILABLE &&
-            getAvailableFeatureSize() < CSNAlgorithm.MIN_AVAILABLE_FEATURES){
+            getAvailableFeatureSize() < ProjectManager.MIN_AVAILABLE_FEATURES){
             isValid = false;
             throw new WizardValidationException(null, NbBundle.getMessage(CSNWizardMolecularDescriptor.class, "CSNWizardMolecularDescriptor.invalidOption.text"), null);            
         }

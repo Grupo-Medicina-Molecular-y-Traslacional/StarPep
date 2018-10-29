@@ -56,6 +56,7 @@ import org.openide.windows.WindowManager;
 @ServiceProvider(service = ProjectManager.class)
 public class ProjectManager implements Lookup.Provider {
 
+    public static final int MIN_AVAILABLE_FEATURES = 2;
     public static final int LARGE_NETWORK = 1000;
     private static final String NOTIFY_LARGE_NETWORK_KEY = "notifyLargeNetworkKey";
 

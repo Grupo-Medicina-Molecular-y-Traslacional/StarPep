@@ -10,12 +10,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.io.impl.MyArffWritable;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.MolecularDescriptor;
+import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.impl.AbstractCluster;
 import org.bapedis.core.util.ArffWriter;
@@ -31,7 +33,30 @@ import weka.core.Instances;
  *
  * @author loge
  */
-public class WekaClusterer<T extends Clusterer> extends AbstractCluster {
+public abstract class WekaClusterer<T extends Clusterer> extends AbstractCluster {
+
+    static protected final String PRO_CATEGORY = "Properties";
+
+    static public final String CLUSTER_DISTANCE = "-A";
+    static public final String CLUSTER_DISTANCE_MANHATTAN = "weka.core.ManhattanDistance -R first-last";
+    static public final String CLUSTER_DISTANCE_EUCLIDEAN = "weka.core.EuclideanDistance -R first-last";
+    static public final String CLUSTER_DISTANCE_CHEBYSHEV = "weka.core.ChebyshevDistance -R first-last";
+
+    static public final String CLUSTER_LINK_TYPE = "-L";
+    static public final String CLUSTER_LINK_WARD = "WARD";
+    static public final String CLUSTER_LINK_MEAN = "MEAN";
+    static public final String CLUSTER_LINK_SINGLE = "SINGLE";
+    static public final String CLUSTER_LINK_AVERAGE = "AVERAGE";
+    static public final String CLUSTER_LINK_COMPLETE = "COMPLETE";
+    static public final String CLUSTER_LINK_CENTROID = "CENTROID";
+
+    static public final String CLUSTER_SEED = "-S";
+    static public final String CLUSTER_NUMBER = "-N";
+    static public final String CLUSTER_STD_DEV = "-M";
+    static public final String CLUSTER_ITERATION = "-I";
+    static public final String CLUSTER_DISPLAY_MODEL_IN_OLD_FORMAT = "-O";
+    static public final String CLUSTER_DNOT_REPLACE_MISS_VALUES = "-M";
+    static public final String CLUSTER_DIST_BRANCH_LENGTH = "-B";
 
     protected final T clusterer;
     private final NotifyDescriptor emptyMDs;
@@ -47,60 +72,113 @@ public class WekaClusterer<T extends Clusterer> extends AbstractCluster {
         AttributesModel attrModel = pc.getAttributesModel(workspace);
         BufferedReader reader = null;
         try {
-            //----------Load all descriptors
-            List<MolecularDescriptor> allFeatures = new LinkedList<>();
+            // Configure a cluster instance
+            try {
+                configureClusterer();
+            } catch (Exception ex) {
+                NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
+                DialogDisplayer.getDefault().notify(nd);
+                cancel();
+            }
 
-            for (String key : attrModel.getMolecularDescriptorKeys()) {
-                for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
-                    allFeatures.add(attr);
+            // Load all descriptors
+            List<MolecularDescriptor> allFeatures = new LinkedList<>();
+            if (!stopRun) {
+
+                for (String key : attrModel.getMolecularDescriptorKeys()) {
+                    for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
+                        allFeatures.add(attr);
+                    }
+                }
+
+                if (allFeatures.size() <= 1) {
+                    DialogDisplayer.getDefault().notify(emptyMDs);
+                    pc.reportError("There is not enough molecular descriptors", workspace);
+                    cancel();
                 }
             }
 
-            if (allFeatures.isEmpty()) {
-//                DialogDisplayer.getDefault().notify(emptyMDs);
-                pc.reportError("There is not calculated molecular descriptors", workspace);
-                return;
-            }
-
+            // Preprocessing of moleculas features
             MolecularDescriptor[] features = allFeatures.toArray(new MolecularDescriptor[0]);
-
-            //----Load instances
-            ArffWriter.DEBUG = true;
-            MyArffWritable writable = new MyArffWritable(peptides, features);
-            writable.setOutputOption(MyArffWritable.OUTPUT_OPTION.MIN_MAX);
-            File f = ArffWriter.writeToArffFile(writable);
-            reader = new BufferedReader(new FileReader(f));
-            Instances data = new Instances(reader);
-
-            //Clustering dataset
-            ClusterEvaluation eval = new ClusterEvaluation();
-//            TaskProvider.debug("Building clusterer");
-            clusterer.buildClusterer(data);
-            eval.setClusterer(clusterer);
-//            TaskProvider.debug("Clustering dataset");
-            eval.evaluateClusterer(data);
-//            Settings.LOGGER.info("# of clusters: " + eval.getNumClusters());
-
-            List<Integer[]> clusterAssignements = new ArrayList<Integer[]>();
-            for (int j = 0; j < eval.getClusterAssignments().length; j++) {
-                clusterAssignements.add(new Integer[]{(int) eval.getClusterAssignments()[j]});
+            if (!stopRun) {
+                pc.reportMsg("Preprocessing of moleculas features: calculating max, min, mean and std.\n", workspace);
+                ticket.progress("Preprocessing");
+                for (MolecularDescriptor md : features) {
+                    md.resetSummaryStats(peptides);
+                }
             }
-            
-            
 
+            // Load instances
+            Instances data = null;
+            if (!stopRun) {
+                ArffWriter.DEBUG = true;
+                MyArffWritable writable = new MyArffWritable(peptides, features);
+                writable.setOutputOption(MyArffWritable.OUTPUT_OPTION.MIN_MAX);
+                File f = ArffWriter.writeToArffFile(writable);
+                reader = new BufferedReader(new FileReader(f));
+                data = new Instances(reader);
+            }
+
+            // Clustering dataset 
+            if (!stopRun && data != null) {
+                ticket.progress("Building clusterer");
+                pc.reportMsg("Building clusterer\n", workspace);
+                clusterer.buildClusterer(data);
+            }
+
+            // Create cluster evaluation
+            ClusterEvaluation eval = new ClusterEvaluation();
+            if (!stopRun && data != null) {
+                eval.setClusterer(clusterer);
+            }
+
+            if (!stopRun && data != null) {
+                ticket.progress("Clustering dataset");
+                pc.reportMsg("Clustering dataset\n", workspace);
+                eval.evaluateClusterer(data);
+                pc.reportMsg("No. of clusters: " + eval.getNumClusters() + "\n", workspace);
+            }
+
+            // Populate cluster list
+            if (data != null) {
+                int clusterID;
+                Cluster cluster;
+                HashMap<Integer, Cluster> clusterMap = new HashMap<>();
+                for (int j = 0; j < eval.getClusterAssignments().length; j++) {
+                    clusterID = (int) eval.getClusterAssignments()[j];
+                    if (clusterMap.containsKey(clusterID)) {
+                        cluster = clusterMap.get(clusterID);
+                    } else {
+                        cluster = new Cluster(clusterID);
+                        clusterMap.put(clusterID, cluster);
+                    }
+                    cluster.addMember(peptides[j]);
+                }
+            }
+        } catch (MolecularDescriptorNotFoundException ex) {
+            DialogDisplayer.getDefault().notify(ex.getErrorND());
+            pc.reportError(ex.getMessage(), workspace);
+            cancel();
         } catch (FileNotFoundException ex) {
             Exceptions.printStackTrace(ex);
+            cancel();
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
+            cancel();
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
+            cancel();
         } finally {
             try {
-                reader.close();
+                if (reader != null) {
+                    reader.close();
+                }
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }
         }
     }
+
+    protected abstract void configureClusterer() throws Exception;
 
 }

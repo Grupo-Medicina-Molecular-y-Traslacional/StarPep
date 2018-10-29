@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.model;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -34,6 +35,10 @@ public class MolecularDescriptor extends PeptideAttribute {
 
     public String getCategory() {
         return category;
+    }
+    
+    public void resetSummaryStats(Peptide[] peptides) throws MolecularDescriptorNotFoundException{
+        resetSummaryStats(Arrays.asList(peptides));
     }
 
     public void resetSummaryStats(List<Peptide> peptides) throws MolecularDescriptorNotFoundException {

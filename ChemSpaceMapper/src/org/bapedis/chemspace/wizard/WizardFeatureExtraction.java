@@ -117,7 +117,7 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
     @Override
     public void validate() throws WizardValidationException {
         if (component.getFEOption() == FeatureExtractionOption.AVAILABLE
-                && getAvailableFeatureSize() < MapperAlgorithm.MIN_AVAILABLE_FEATURES) {
+                && getAvailableFeatureSize() < ProjectManager.MIN_AVAILABLE_FEATURES) {
             isValid = false;
             throw new WizardValidationException(null, NbBundle.getMessage(WizardFeatureExtraction.class, "WizardFeatureExtraction.invalidOption.text"), null);
         } else if (component.getFEOption() == FeatureExtractionOption.NEW) {

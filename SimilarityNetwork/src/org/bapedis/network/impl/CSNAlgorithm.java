@@ -71,7 +71,6 @@ public class CSNAlgorithm implements Algorithm {
     protected final PropertyChangeSupport propertyChangeSupport;
 
     protected final NotifyDescriptor emptyKeys, notEnoughFeatures;
-    public static final int MIN_AVAILABLE_FEATURES = 2;
 
     protected Workspace workspace;
     protected AttributesModel attrModel;
@@ -89,7 +88,7 @@ public class CSNAlgorithm implements Algorithm {
         cutoffValue = SIMILARITY_DEFAULT_VALUE;
 
         emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithm.class, "ChemicalSpaceNetwork.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
-        notEnoughFeatures = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithm.class, "ChemicalSpaceNetwork.features.notEnough", MIN_AVAILABLE_FEATURES), NotifyDescriptor.ERROR_MESSAGE);
+        notEnoughFeatures = new NotifyDescriptor.Message(NbBundle.getMessage(CSNAlgorithm.class, "ChemicalSpaceNetwork.features.notEnough", ProjectManager.MIN_AVAILABLE_FEATURES), NotifyDescriptor.ERROR_MESSAGE);
         propertyChangeSupport = new PropertyChangeSupport(this);
         running = false;
     }
@@ -311,7 +310,7 @@ public class CSNAlgorithm implements Algorithm {
 
     private void preprocessing(List<MolecularDescriptor> featureList, Peptide[] peptides) {
         // Check feature list size
-        if (featureList.size() < MIN_AVAILABLE_FEATURES) {
+        if (featureList.size() < ProjectManager.MIN_AVAILABLE_FEATURES) {
             DialogDisplayer.getDefault().notify(notEnoughFeatures);
             pc.reportError("There is not enough number of available molecular features", workspace);
             cancel();
@@ -325,7 +324,7 @@ public class CSNAlgorithm implements Algorithm {
 
             // Preprocessing of feature list. Compute max, min, mean and std
             for (MolecularDescriptor attr : featureList) {
-                attr.resetSummaryStats(Arrays.asList(peptides));
+                attr.resetSummaryStats(peptides);
             }
 
             // Validate molecular features

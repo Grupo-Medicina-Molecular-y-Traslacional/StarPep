@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.model;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,14 +18,22 @@ public class Cluster {
     protected final Peptide centroid;
     protected final List<Peptide> members;
 
+    public Cluster(int id){
+        this(id, null);
+    }
+    
     public Cluster(int id, Peptide centroid) {
         this.id = id;
         this.centroid = centroid;
         members = new LinkedList<>();
-    }
+    }        
 
     public int getId() {
         return id;
+    }
+    
+    public int getSize(){
+        return members.size() + (centroid != null?1:0);
     }
         
     public void addMember(Peptide peptide){
@@ -36,7 +45,7 @@ public class Cluster {
     }
 
     public List<Peptide> getMembers() {
-        return members;
+        return Collections.unmodifiableList(members);
     }
         
 }

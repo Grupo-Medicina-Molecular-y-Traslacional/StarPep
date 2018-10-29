@@ -32,7 +32,6 @@ import org.openide.util.NbBundle;
  */
 public class MapperAlgorithm implements Algorithm {
 
-    public static final int MIN_AVAILABLE_FEATURES = 2;
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     public static final String RUNNING = "running";
 

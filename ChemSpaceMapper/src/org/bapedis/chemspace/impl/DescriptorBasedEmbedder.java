@@ -13,6 +13,7 @@ import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -24,7 +25,6 @@ import org.openide.util.NbBundle;
  */
 public abstract class DescriptorBasedEmbedder extends AbstractEmbedder {
 
-    public static final int MIN_AVAILABLE_FEATURES = 2;
     protected final NotifyDescriptor notEnoughFeatures;
 
     public DescriptorBasedEmbedder(AlgorithmFactory factory) {
@@ -34,7 +34,7 @@ public abstract class DescriptorBasedEmbedder extends AbstractEmbedder {
 
     private void preprocessing(List<MolecularDescriptor> features, List<Peptide> peptides) {
         // Check feature list size
-        if (features.size() < MIN_AVAILABLE_FEATURES) {
+        if (features.size() < ProjectManager.MIN_AVAILABLE_FEATURES) {
             DialogDisplayer.getDefault().notify(notEnoughFeatures);
             pc.reportError(NbBundle.getMessage(AbstractEmbedder.class, "DescriptorBasedEmbedder.features.notEnough"), workspace);
             cancel();

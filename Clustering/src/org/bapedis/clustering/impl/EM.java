@@ -21,5 +21,10 @@ public class EM extends WekaClusterer<weka.clusterers.EM> {
     protected void cluterize() {
         
     }
+
+    @Override
+    protected void configureClusterer() {
+        
+    }
     
 }

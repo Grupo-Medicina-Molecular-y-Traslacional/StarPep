@@ -6,17 +6,17 @@
 package org.bapedis.clustering.impl;
 
 import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.spi.alg.ClusteringTag;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
-import weka.clusterers.SimpleKMeans;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author loge
  */
-
+@ServiceProvider(service = AlgorithmFactory.class, position = 20)
 public class kMeansFactory implements ClusteringTag{
     
     @Override

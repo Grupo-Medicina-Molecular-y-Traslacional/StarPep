@@ -140,7 +140,7 @@ public abstract class WekaClusterer<T extends Clusterer> extends AbstractCluster
             }
 
             // Populate cluster list
-            if (data != null) {
+            if (!stopRun && data != null) {
                 int clusterID;
                 Cluster cluster;
                 HashMap<Integer, Cluster> clusterMap = new HashMap<>();
@@ -151,6 +151,7 @@ public abstract class WekaClusterer<T extends Clusterer> extends AbstractCluster
                     } else {
                         cluster = new Cluster(clusterID);
                         clusterMap.put(clusterID, cluster);
+                        clusterList.add(cluster);
                     }
                     cluster.addMember(peptides[j]);
                 }

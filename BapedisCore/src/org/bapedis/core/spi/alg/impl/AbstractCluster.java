@@ -113,8 +113,6 @@ public abstract class AbstractCluster implements Algorithm {
 
             Node node;
             for (Cluster c : clusterList) {
-                node = c.getCentroid().getGraphNode();
-                node.setAttribute(CLUSTER_COLUMN, c.getId());
                 for (Peptide p : c.getMembers()) {
                     node = p.getGraphNode();
                     node.setAttribute(CLUSTER_COLUMN, c.getId());

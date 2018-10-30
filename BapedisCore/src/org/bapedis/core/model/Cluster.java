@@ -15,22 +15,25 @@ import java.util.List;
  */
 public class Cluster {
     protected final int id;
-    protected final Peptide centroid;
+    protected Peptide centroid;
     protected final List<Peptide> members;
 
     public Cluster(int id){
-        this(id, null);
-    }
-    
-    public Cluster(int id, Peptide centroid) {
         this.id = id;
-        this.centroid = centroid;
         members = new LinkedList<>();
-    }        
+    }           
 
     public int getId() {
         return id;
     }
+
+    public Peptide getCentroid() {
+        return centroid;
+    }
+
+    public void setCentroid(Peptide centroid) {
+        this.centroid = centroid;
+    }        
     
     public int getSize(){
         return members.size() + (centroid != null?1:0);
@@ -38,10 +41,6 @@ public class Cluster {
         
     public void addMember(Peptide peptide){
         members.add(peptide);
-    }
-
-    public Peptide getCentroid() {
-        return centroid;
     }
 
     public List<Peptide> getMembers() {

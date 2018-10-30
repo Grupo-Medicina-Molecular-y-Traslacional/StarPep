@@ -62,7 +62,9 @@ public class SequenceClustering extends AbstractCluster {
 
             int id=1;
             //Add first cluster
-            Cluster cluster = new Cluster(id++, peptides[0]);
+            Cluster cluster = new Cluster(id++);            
+            cluster.addMember(peptides[0]);
+            cluster.setCentroid(peptides[0]);
             clusterList.add(cluster);
             clusterMap.put(peptides[0].getId(), cluster);
             Peptide[] centroids = new Peptide[]{peptides[0]};
@@ -98,7 +100,9 @@ public class SequenceClustering extends AbstractCluster {
                 }
 
                 if (isRepresentative) {
-                    cluster = new Cluster(id++, query);
+                    cluster = new Cluster(id++);
+                    cluster.addMember(query);
+                    cluster.setCentroid(query);
                     clusterList.add(cluster);
                     clusterMap.put(query.getId(), cluster);
                     // Increase centroids array

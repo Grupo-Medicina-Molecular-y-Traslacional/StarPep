@@ -10,13 +10,13 @@ import javax.swing.JPanel;
 import org.bapedis.chemspace.model.FeatureFilteringOption;
 import org.openide.util.NbBundle;
 
-public final class VisualFeatureFiltering extends JPanel {
+public final class VisualFeatureSelection extends JPanel {
 
     static final String CHANGED_OPTION = "filtering_changed";
     private final JPanel settingPanel;
     private FeatureFilteringOption ffOption;
 
-    public VisualFeatureFiltering(JPanel settingPanel) {
+    public VisualFeatureSelection(JPanel settingPanel) {
         initComponents();
         this.settingPanel = settingPanel;
         bottomPanel.add(settingPanel, BorderLayout.CENTER);
@@ -41,7 +41,7 @@ public final class VisualFeatureFiltering extends JPanel {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(VisualFeatureFiltering.class, "FeatureFiltering.name");
+        return NbBundle.getMessage(VisualFeatureSelection.class, "FeatureSelection.name");
     }
 
     /**
@@ -74,7 +74,7 @@ public final class VisualFeatureFiltering extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(bottomPanel, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(VisualFeatureFiltering.class, "VisualFeatureFiltering.jQuestionLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(VisualFeatureSelection.class, "VisualFeatureSelection.jQuestionLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -83,7 +83,7 @@ public final class VisualFeatureFiltering extends JPanel {
         add(jQuestionLabel, gridBagConstraints);
 
         buttonGroup1.add(jOption2);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(VisualFeatureFiltering.class, "VisualFeatureFiltering.jOption2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(VisualFeatureSelection.class, "VisualFeatureSelection.jOption2.text")); // NOI18N
         jOption2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOption2ActionPerformed(evt);
@@ -97,7 +97,7 @@ public final class VisualFeatureFiltering extends JPanel {
         add(jOption2, gridBagConstraints);
 
         buttonGroup1.add(jOption1);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(VisualFeatureFiltering.class, "VisualFeatureFiltering.jOption1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(VisualFeatureSelection.class, "VisualFeatureSelection.jOption1.text")); // NOI18N
         jOption1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOption1ActionPerformed(evt);

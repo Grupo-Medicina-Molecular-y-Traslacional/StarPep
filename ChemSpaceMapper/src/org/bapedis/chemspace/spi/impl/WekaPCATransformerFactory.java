@@ -18,6 +18,8 @@ import org.bapedis.chemspace.spi.TwoDTransformerSetupUI;
 @ServiceProvider(service = TwoDTransformerFactory.class)
 public class WekaPCATransformerFactory implements TwoDTransformerFactory{
 
+    private final WekaPCATransformerPanel setupPanel = new WekaPCATransformerPanel();
+    
     @Override
     public String getName() {
         return NbBundle.getMessage(WekaPCATransformer.class, "WekaPCATransformer.name");
@@ -30,7 +32,7 @@ public class WekaPCATransformerFactory implements TwoDTransformerFactory{
 
     @Override
     public TwoDTransformerSetupUI getSetupUI() {
-        return null;
+        return setupPanel;
     }
 
     @Override

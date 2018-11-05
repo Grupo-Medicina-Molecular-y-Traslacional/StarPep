@@ -6,25 +6,35 @@
 package org.bapedis.chemspace.impl;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Hashtable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JLabel;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import org.bapedis.chemspace.model.JQuickHistogram;
 import org.bapedis.chemspace.model.SimilarityMatrix;
+import org.bapedis.core.project.ProjectManager;
+import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
+import org.gephi.graph.api.GraphModel;
+import org.openide.util.Cancellable;
+import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author loge
  */
-public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements PropertyChangeListener {
+public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeListener {
 
     protected MapperAlgorithm csMapper;
     protected NetworkEmbedder netEmbedder;
@@ -38,7 +48,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
         UIManager.put("Slider.paintValue", false);
     }
 
-    public ChemSpaceNetworkPanel() {
+    public NetworkPanel() {
         initComponents();
 
         Hashtable<Integer, JLabel> thresholdLabelTable = new Hashtable<>();
@@ -54,14 +64,14 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
             @Override
             public void ancestorAdded(AncestorEvent event) {
                 if (csMapper != null) {
-                    csMapper.addRunningListener(ChemSpaceNetworkPanel.this);
+                    csMapper.addRunningListener(NetworkPanel.this);
                 }
             }
 
             @Override
             public void ancestorRemoved(AncestorEvent event) {
                 if (csMapper != null) {
-                    csMapper.removeRunningListener(ChemSpaceNetworkPanel.this);
+                    csMapper.removeRunningListener(NetworkPanel.this);
                 }
             }
 
@@ -108,7 +118,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
 
     private void resetTooltip(JQuickHistogram histogram) {
         richTooltip = new RichTooltip();
-        richTooltip.setTitle(NbBundle.getMessage(ChemSpaceNetworkPanel.class, "ChemSpaceNetworkPanel.histoInfo.title"));
+        richTooltip.setTitle(NbBundle.getMessage(NetworkPanel.class, "ChemSpaceNetworkPanel.histoInfo.title"));
         richTooltip.addDescriptionSection("Number of values: " + ((histogram != null) ? histogram.countValues() : "NaN"));
         richTooltip.addDescriptionSection("Average: " + (histogram != null && histogram.countValues() > 0 ? formatter.format(histogram.getAverage()) : "NaN"));
         richTooltip.addDescriptionSection("Min: " + (histogram != null && histogram.countValues() > 0 ? formatter.format(histogram.getMinValue()) : "NaN"));
@@ -121,6 +131,11 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
         jLessCutoffButton.setEnabled(!running);
         jMoreCutoffButton.setEnabled(!running);
         cutoffSlider.setEnabled(!running);
+        if (running) {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        } else {
+            setCursor(Cursor.getDefaultCursor());
+        }
     }
 
     private void changeThreshold(float value) {
@@ -140,7 +155,6 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jApplyButton = new javax.swing.JButton();
         thresholdPanel = new javax.swing.JPanel();
         jCutoffCurrentLabel = new javax.swing.JLabel();
         jCutoffCurrentValue = new javax.swing.JLabel();
@@ -152,29 +166,15 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
         jMoreCutoffButton = new javax.swing.JButton();
         histoInfoLabel = new javax.swing.JLabel();
         histogramPanel = new javax.swing.JPanel();
+        upperPanel = new javax.swing.JPanel();
+        jApplyButton = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
-        jApplyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/apply.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jApplyButton, org.openide.util.NbBundle.getMessage(ChemSpaceNetworkPanel.class, "ChemSpaceNetworkPanel.jApplyButton.text")); // NOI18N
-        jApplyButton.setToolTipText(org.openide.util.NbBundle.getMessage(ChemSpaceNetworkPanel.class, "ChemSpaceNetworkPanel.jApplyButton.toolTipText")); // NOI18N
-        jApplyButton.setEnabled(false);
-        jApplyButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jApplyButtonActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
-        add(jApplyButton, gridBagConstraints);
-
-        thresholdPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ChemSpaceNetworkPanel.class, "ChemSpaceNetworkPanel.thresholdPanel.border.title"))); // NOI18N
+        thresholdPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.thresholdPanel.border.title"))); // NOI18N
         thresholdPanel.setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(jCutoffCurrentLabel, org.openide.util.NbBundle.getMessage(ChemSpaceNetworkPanel.class, "ChemSpaceNetworkPanel.jCutoffCurrentLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jCutoffCurrentLabel, org.openide.util.NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.jCutoffCurrentLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -182,7 +182,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         thresholdPanel.add(jCutoffCurrentLabel, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jCutoffCurrentValue, org.openide.util.NbBundle.getMessage(ChemSpaceNetworkPanel.class, "ChemSpaceNetworkPanel.jCutoffCurrentValue.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jCutoffCurrentValue, org.openide.util.NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.jCutoffCurrentValue.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -191,7 +191,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         thresholdPanel.add(jCutoffCurrentValue, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jCutoffNewLabel, org.openide.util.NbBundle.getMessage(ChemSpaceNetworkPanel.class, "ChemSpaceNetworkPanel.jCutoffNewLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jCutoffNewLabel, org.openide.util.NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.jCutoffNewLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -199,7 +199,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         thresholdPanel.add(jCutoffNewLabel, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jCutoffNewValue, org.openide.util.NbBundle.getMessage(ChemSpaceNetworkPanel.class, "ChemSpaceNetworkPanel.jCutoffNewValue.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jCutoffNewValue, org.openide.util.NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.jCutoffNewValue.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
@@ -213,7 +213,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
         jCutoffToolBar.setPreferredSize(new java.awt.Dimension(420, 90));
 
         jLessCutoffButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/less.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLessCutoffButton, org.openide.util.NbBundle.getMessage(ChemSpaceNetworkPanel.class, "ChemSpaceNetworkPanel.jLessCutoffButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLessCutoffButton, org.openide.util.NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.jLessCutoffButton.text")); // NOI18N
         jLessCutoffButton.setFocusable(false);
         jLessCutoffButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jLessCutoffButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -229,7 +229,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
         cutoffSlider.setMinorTickSpacing(5);
         cutoffSlider.setPaintLabels(true);
         cutoffSlider.setPaintTicks(true);
-        cutoffSlider.setToolTipText(org.openide.util.NbBundle.getMessage(ChemSpaceNetworkPanel.class, "ChemSpaceNetworkPanel.cutoffSlider.toolTipText")); // NOI18N
+        cutoffSlider.setToolTipText(org.openide.util.NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.cutoffSlider.toolTipText")); // NOI18N
         cutoffSlider.setValue(70);
         cutoffSlider.setMinimumSize(new java.awt.Dimension(360, 80));
         cutoffSlider.setPreferredSize(new java.awt.Dimension(360, 80));
@@ -241,7 +241,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
         jCutoffToolBar.add(cutoffSlider);
 
         jMoreCutoffButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/more.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jMoreCutoffButton, org.openide.util.NbBundle.getMessage(ChemSpaceNetworkPanel.class, "ChemSpaceNetworkPanel.jMoreCutoffButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jMoreCutoffButton, org.openide.util.NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.jMoreCutoffButton.text")); // NOI18N
         jMoreCutoffButton.setFocusable(false);
         jMoreCutoffButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jMoreCutoffButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -276,7 +276,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         thresholdPanel.add(histoInfoLabel, gridBagConstraints);
 
-        histogramPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ChemSpaceNetworkPanel.class, "ChemSpaceNetworkPanel.histogramPanel.border.title"))); // NOI18N
+        histogramPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.histogramPanel.border.title"))); // NOI18N
         histogramPanel.setMinimumSize(new java.awt.Dimension(0, 180));
         histogramPanel.setOpaque(false);
         histogramPanel.setPreferredSize(new java.awt.Dimension(0, 180));
@@ -299,6 +299,26 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 5, 5);
         add(thresholdPanel, gridBagConstraints);
+
+        upperPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jApplyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/apply.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jApplyButton, org.openide.util.NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.jApplyButton.text")); // NOI18N
+        jApplyButton.setToolTipText(org.openide.util.NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.jApplyButton.toolTipText")); // NOI18N
+        jApplyButton.setEnabled(false);
+        jApplyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jApplyButtonActionPerformed(evt);
+            }
+        });
+        upperPanel.add(jApplyButton);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        add(upperPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jApplyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jApplyButtonActionPerformed
@@ -368,6 +388,7 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
     private javax.swing.JButton jLessCutoffButton;
     private javax.swing.JButton jMoreCutoffButton;
     private javax.swing.JPanel thresholdPanel;
+    private javax.swing.JPanel upperPanel;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -383,4 +404,85 @@ public class ChemSpaceNetworkPanel extends javax.swing.JPanel implements Propert
             }
         }
     }
+}
+
+class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
+
+    protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+    static final String CHANGED_THRESHOLD = "changed_threshold";
+    private final NetworkEmbedder embedder;
+    private final AtomicBoolean stopRun;
+    private final ProgressTicket ticket;
+
+    public NetworkThresholdUpdater(NetworkEmbedder embedder) {
+        this.embedder = embedder;
+        stopRun = new AtomicBoolean(false);
+        ticket = new ProgressTicket(NbBundle.getMessage(NetworkThresholdUpdater.class, "NetworkThresholdUpdater.task.name"), new Cancellable() {
+            @Override
+            public boolean cancel() {
+                stopRun.set(true);
+                return true;
+            }
+        });
+    }
+
+    @Override
+    protected Void doInBackground() throws Exception {
+        ticket.start();
+        GraphModel graphModel = pc.getGraphModel();
+        embedder.updateNetwork(graphModel, ticket, stopRun);
+
+//            if (newThreshold < oldThreshold) { // to add edges 
+//            Edge graphEdge;
+//            String id;
+//            Peptide[] peptides = matrix.getPeptides();
+//            for (int i = 0; i < peptides.length - 1 && !stopRun.get(); i++) {
+//                for (int j = i + 1; j < peptides.length && !stopRun.get(); j++) {
+//                    score = matrix.getValue(peptides[i], peptides[j]);
+//                    if (score != null && score >= newThreshold && score < oldThreshold) {
+//                        if (graph.contains(peptides[i].getGraphNode()) && graph.contains(peptides[j].getGraphNode())) {
+//                            id = String.format("%s-%s", peptides[i].getId(), peptides[j].getId());
+//                            graphEdge = mainGraph.getEdge(id);
+//                            if (graphEdge == null) {
+//                                graphEdge = NetworkEmbedder.createGraphEdge(graphModel, id, peptides[i].getGraphNode(), peptides[j].getGraphNode(), score);
+//                            }
+//                            graph.writeLock();
+//                            try {
+//                                graph.addEdge(graphEdge);
+//                            } finally {
+//                                graph.writeUnlock();
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        } else if (newThreshold > oldThreshold) { // to remove edges
+//            graph.writeLock();
+//            try {
+//                for (Edge edge : graph.getEdges()) {
+//                    score = (Float) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
+//                    if (score < newThreshold) {
+//                        graph.removeEdge(edge);
+//                    }
+//                }
+//            } finally {
+//                graph.writeUnlock();
+//            }
+//        }
+        return null;
+    }
+
+    @Override
+    protected void done() {
+        try {
+            get();
+        } catch (InterruptedException | ExecutionException ex) {
+            Exceptions.printStackTrace(ex);
+        } finally {
+            firePropertyChange(CHANGED_THRESHOLD, null, embedder.getSimilarityThreshold());
+            pc.getGraphVizSetting().fireChangedGraphView();
+            ticket.finish();
+        }
+    }
+
 }

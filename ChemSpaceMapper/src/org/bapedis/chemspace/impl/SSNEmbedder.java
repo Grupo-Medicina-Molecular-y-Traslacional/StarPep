@@ -30,15 +30,13 @@ public class SSNEmbedder extends AbstractEmbedder implements NetworkEmbedder {
     private SimilarityMatrix similarityMatrix;
     private float similarityThreshold;
     private NetworkType networkType;
-    private CompressedModel compressedModel;
 
     public SSNEmbedder(AlgorithmFactory factory) {
         super(factory);
         alignmentModel = new SequenceAlignmentModel();
         similarityMeasure = (AlignmentBasedSimilarity) new AlignmentBasedSimilarityFactory().createAlgorithm();
         similarityThreshold = 0.7f;
-        networkType = NetworkType.NONE;
-        compressedModel = new CompressedModel();
+        networkType = NetworkType.FULL;
     }
 
     @Override
@@ -66,7 +64,7 @@ public class SSNEmbedder extends AbstractEmbedder implements NetworkEmbedder {
             task.join();
             similarityMatrix = task.getSimilarityMatrix();
 
-            runEmbed(graphModel, ticket, atomicRun);
+            updateNetwork(graphModel, ticket, atomicRun);
         }
     } 
 
@@ -113,16 +111,6 @@ public class SSNEmbedder extends AbstractEmbedder implements NetworkEmbedder {
     @Override
     public NetworkType getNetworkType() {
         return networkType;
-    }
-
-    @Override
-    public CompressedModel getCompressedModel() {
-        return compressedModel;
-    }
-
-    @Override
-    public void setCompressedModel(CompressedModel compressedModel) {
-        this.compressedModel = compressedModel;
     }
 
     @Override

@@ -6,16 +6,13 @@
 package org.bapedis.chemspace.impl;
 
 import java.awt.CardLayout;
-import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXHyperlink;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
@@ -29,34 +26,28 @@ import org.openide.util.NbBundle;
 public class MapperAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSetupUI, PropertyChangeListener {
 
     protected final JXHyperlink openWizardLink;
-    protected final JXBusyLabel busyLabel;
     protected MapperAlgorithm csMapper;
-    protected final NDChemSpacePanel nDPanel;
-    protected final ChemSpaceNetworkPanel csnPanel;
-    protected final ChemSpaceNetworkPanel ssnPanel;    
+    protected final TwoDChemSpacePanel twoDPanel;
+    protected final NetworkPanel csnPanel;
+    protected final NetworkPanel ssnPanel;    
 
     /**
      * Creates new form MapperAlgorithmPanel
      */
     public MapperAlgorithmPanel() {
         initComponents();
-
+        
         openWizardLink = new JXHyperlink();
         configureOpenWizardLink();
         topRightPanel.add(openWizardLink);
-
-        busyLabel = new JXBusyLabel(new Dimension(20, 20));
-        busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        busyLabel.setText(NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.busyLabel.text"));
-        centerPanel.add(busyLabel, "busy");
         
-        nDPanel = new NDChemSpacePanel();
-        centerPanel.add(nDPanel, "nDChemSpace");
+        twoDPanel = new TwoDChemSpacePanel();
+        centerPanel.add(twoDPanel, "2DChemSpace");
 
-        csnPanel = new ChemSpaceNetworkPanel();
+        csnPanel = new NetworkPanel();
         centerPanel.add(csnPanel, "chemSpaceNetwork");   
         
-        ssnPanel = new ChemSpaceNetworkPanel();
+        ssnPanel = new NetworkPanel();
         centerPanel.add(ssnPanel, "seqSimilarityNetwork");
         
         addAncestorListener(new AncestorListener() {
@@ -104,10 +95,10 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         CardLayout centerCL = (CardLayout) centerPanel.getLayout();
         CardLayout topLeftCl = (CardLayout) topLeftPanel.getLayout();
         switch (csMapper.getChemSpaceOption()) {
-            case N_DIMENSIONAL_SPACE:
-                nDPanel.setUp(csMapper);
-                topLeftCl.show(topLeftPanel, "nDChemSpace");
-                centerCL.show(centerPanel, "nDChemSpace");
+            case TwoD_SPACE:
+                twoDPanel.setUp(csMapper);
+                topLeftCl.show(topLeftPanel, "2DChemSpace");
+                centerCL.show(centerPanel, "2DChemSpace");
                 break;
             case CHEM_SPACE_NETWORK:
                 csnPanel.setUp(csMapper);
@@ -131,14 +122,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     }
 
 
-    public void setBusy(boolean busy) {
-        busyLabel.setBusy(busy);
-        if (busy) {
-            CardLayout centerCL = (CardLayout) centerPanel.getLayout();
-            centerCL.show(centerPanel, "busy");
-        } else {
-            refreshChemSpaceOption();
-        }
+    public void setBusy(boolean busy) {        
         openWizardLink.setEnabled(!busy);
         topLeftPanel.setEnabled(!busy);
         topRightPanel.setEnabled(!busy);
@@ -159,7 +143,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         java.awt.GridBagConstraints gridBagConstraints;
 
         topLeftPanel = new javax.swing.JPanel();
-        nDLabel = new javax.swing.JLabel();
+        twoDLabel = new javax.swing.JLabel();
         csnLabel = new javax.swing.JLabel();
         ssnLabel = new javax.swing.JLabel();
         topRightPanel = new javax.swing.JPanel();
@@ -169,10 +153,10 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
         topLeftPanel.setLayout(new java.awt.CardLayout());
 
-        nDLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(nDLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.nDLabel.text")); // NOI18N
-        nDLabel.setToolTipText(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.nDLabel.toolTipText")); // NOI18N
-        topLeftPanel.add(nDLabel, "nDChemSpace");
+        twoDLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(twoDLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.twoDLabel.text")); // NOI18N
+        twoDLabel.setToolTipText(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.twoDLabel.toolTipText")); // NOI18N
+        topLeftPanel.add(twoDLabel, "2DChemSpace");
 
         csnLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(csnLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.csnLabel.text")); // NOI18N
@@ -217,10 +201,10 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
     private javax.swing.JLabel csnLabel;
-    private javax.swing.JLabel nDLabel;
     private javax.swing.JLabel ssnLabel;
     private javax.swing.JPanel topLeftPanel;
     private javax.swing.JPanel topRightPanel;
+    private javax.swing.JLabel twoDLabel;
     // End of variables declaration//GEN-END:variables
 
     @Override

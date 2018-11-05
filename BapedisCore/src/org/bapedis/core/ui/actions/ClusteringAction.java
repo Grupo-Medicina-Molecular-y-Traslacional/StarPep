@@ -23,7 +23,7 @@ import org.openide.util.NbBundle;
         displayName = "#CTL_Clustering"
 )
 @ActionReference(path = "Menu/Tools", position = 70)
-@NbBundle.Messages("CTL_Clustering=Clusterize")
+@NbBundle.Messages("CTL_Clustering=Clustering")
 public class ClusteringAction extends ToolAction {
     
     public ClusteringAction() {

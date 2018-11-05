@@ -10,17 +10,18 @@ import javax.swing.event.ChangeListener;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.model.FeatureFilteringOption;
 import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
+import org.bapedis.core.spi.alg.impl.FeatureSEFilteringPanel;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 
-public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDescriptor>,
+public class WizardFeatureSelection implements WizardDescriptor.Panel<WizardDescriptor>,
         WizardDescriptor.FinishablePanel<WizardDescriptor>{
 
     private final MapperAlgorithm csMapper;
     private FeatureSEFiltering alg;
 
-    public WizardFeatureFiltering(MapperAlgorithm csMapper) {
+    public WizardFeatureSelection(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
     }
 
@@ -28,19 +29,20 @@ public class WizardFeatureFiltering implements WizardDescriptor.Panel<WizardDesc
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private VisualFeatureFiltering component;
+    private VisualFeatureSelection component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public VisualFeatureFiltering getComponent() {
+    public VisualFeatureSelection getComponent() {
         if (component == null) {
             try {
                 alg = (FeatureSEFiltering) csMapper.getFeatureFilteringAlg().clone();
                 JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
-                component = new VisualFeatureFiltering(settingPanel);
+                ((FeatureSEFilteringPanel)settingPanel).setShannonDistributionPanel(false);
+                component = new VisualFeatureSelection(settingPanel);
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
                 alg = null;

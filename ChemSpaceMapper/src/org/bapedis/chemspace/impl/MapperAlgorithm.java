@@ -13,6 +13,7 @@ import org.bapedis.chemspace.model.FeatureFilteringOption;
 import org.bapedis.chemspace.model.FeatureWeightingOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.ChemSpaceOption;
+import org.bapedis.chemspace.model.Representation;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
@@ -42,6 +43,7 @@ public class MapperAlgorithm implements Algorithm {
     protected boolean stopRun, running;
 
     //Mapping Options
+    protected Representation representation;
     protected ChemSpaceOption csOption;
     protected FeatureExtractionOption feOption;
     protected FeatureFilteringOption ffOption;
@@ -65,6 +67,7 @@ public class MapperAlgorithm implements Algorithm {
         running = false;
 
         //Mapping Options        
+        representation = Representation.NONE;
         csOption = ChemSpaceOption.NONE;
         feOption = FeatureExtractionOption.NEW;
         ffOption = FeatureFilteringOption.YES;
@@ -92,7 +95,8 @@ public class MapperAlgorithm implements Algorithm {
         algorithms.clear();
         
         switch (csOption) {
-            case N_DIMENSIONAL_SPACE:
+            case TwoD_SPACE:
+            case ThreeD_SPACE:
             case CHEM_SPACE_NETWORK:
                 // Feature Extraction
                 if (feOption == FeatureExtractionOption.NEW) {
@@ -105,7 +109,7 @@ public class MapperAlgorithm implements Algorithm {
                 }
                 // Chemical Space Embedder
                 DescriptorBasedEmbedder embedder = null;
-                if (csOption == ChemSpaceOption.N_DIMENSIONAL_SPACE) {
+                if (csOption == ChemSpaceOption.TwoD_SPACE) {
                     embedder = twoDEmbedderAlg;
                 } else if (csOption == ChemSpaceOption.CHEM_SPACE_NETWORK) {
                     embedder = csnEmbedderAlg;
@@ -158,6 +162,14 @@ public class MapperAlgorithm implements Algorithm {
         }
         return stopRun;
     }
+
+    public Representation getRepresentation() {
+        return representation;
+    }
+
+    public void setRepresentation(Representation representation) {
+        this.representation = representation;
+    }        
 
     public ChemSpaceOption getChemSpaceOption() {
         return csOption;

@@ -23,7 +23,7 @@ public class SequenceClusteringFactory implements ClusteringTag {
     
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(SequenceClustering.class, "SequenceClustering.category");
     }
 
     @Override

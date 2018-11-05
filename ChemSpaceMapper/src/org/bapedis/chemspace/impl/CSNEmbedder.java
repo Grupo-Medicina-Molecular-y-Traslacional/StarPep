@@ -6,7 +6,6 @@
 package org.bapedis.chemspace.impl;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.bapedis.chemspace.model.CompressedModel;
 import org.bapedis.chemspace.model.NetworkType;
 import org.bapedis.chemspace.model.SimilarityMatrix;
 import org.bapedis.chemspace.spi.SimilarityMeasure;
@@ -29,14 +28,12 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
     private SimilarityMatrix similarityMatrix;
     private float similarityThreshold;
     private NetworkType networkType;
-    private CompressedModel compressedModel;
 
     public CSNEmbedder(CSNEmbedderFactory factory) {
         super(factory);
         simMeasure = new TanimotoCoefficientFactory().createAlgorithm();
         similarityThreshold = 0.7f;
-        networkType = NetworkType.NONE;
-        compressedModel = new CompressedModel();
+        networkType = NetworkType.FULL;
     }
 
     public SimilarityMeasure getSimMeasure() {
@@ -70,17 +67,7 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
     @Override
     public void setNetworkType(NetworkType networkType) {
         this.networkType = networkType;
-    }        
-
-    @Override
-    public CompressedModel getCompressedModel() {
-        return compressedModel;
-    }
-
-    @Override
-    public void setCompressedModel(CompressedModel compressedModel) {
-        this.compressedModel = compressedModel;
-    }        
+    }              
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
@@ -105,7 +92,7 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
         task.join();
         similarityMatrix = task.getSimilarityMatrix(); 
         
-        runEmbed(graphModel, ticket, atomicRun);
+        updateNetwork(graphModel, ticket, atomicRun);
     }     
     
                
@@ -123,7 +110,7 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
     @Override
     public Object clone() throws CloneNotSupportedException {
         CSNEmbedder copy = (CSNEmbedder) super.clone(); //To change body of generated methods, choose Tools | Templates.
-        copy.compressedModel = (CompressedModel)compressedModel.clone();
+//        copy.compressedModel = (CompressedModel)compressedModel.clone();
         return copy;
     }
         

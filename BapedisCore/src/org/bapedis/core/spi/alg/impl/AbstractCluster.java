@@ -90,7 +90,7 @@ public abstract class AbstractCluster implements Algorithm {
     @Override
     public boolean cancel() {
         stopRun = true;
-        return true;
+        return false;
     }
 
     @Override

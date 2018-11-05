@@ -86,7 +86,7 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
         this.model = wiz;
         alg = (CSNEmbedder) wiz.getProperty(AbstractEmbedder.class.getName());
         if (alg.getSimMeasure() != null) {
-            getComponent().setFactory(alg.getSimMeasure().getFactory());
+            getComponent().setSimilarityMeasure(alg.getSimMeasure());
         }
     }
 

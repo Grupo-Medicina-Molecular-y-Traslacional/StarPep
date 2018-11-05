@@ -6,6 +6,7 @@
 package org.bapedis.chemspace.spi.impl;
 
 import org.bapedis.chemspace.spi.SimilarityMeasure;
+import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
@@ -57,6 +58,6 @@ public class TanimotoCoefficient implements SimilarityMeasure {
                 return attr.getNormalizedMinMaxValue(peptide);
         }
         throw new IllegalArgumentException("Unknown value for normalization index: " + normalizationIndex);
-    }    
+    }     
     
 }

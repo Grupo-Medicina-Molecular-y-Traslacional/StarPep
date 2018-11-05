@@ -6,20 +6,23 @@
 package org.bapedis.clustering.impl;
 
 import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.spi.alg.ClusteringTag;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author loge
  */
+@ServiceProvider(service = AlgorithmFactory.class, position = 30)
 public class EMFactory implements ClusteringTag {
 
     
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(EM.class, "EM.category");
     }
 
     @Override

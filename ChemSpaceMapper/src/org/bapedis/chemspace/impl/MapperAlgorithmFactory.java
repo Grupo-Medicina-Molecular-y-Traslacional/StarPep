@@ -9,6 +9,7 @@ import java.text.MessageFormat;
 import org.bapedis.chemspace.model.ChemSpaceOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.FeatureFilteringOption;
+import org.bapedis.chemspace.model.Representation;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
@@ -68,6 +69,9 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
 
     public static void setUp(MapperAlgorithm csMapper, WizardDescriptor wiz) {
         // Chemical Space Option
+        Representation representation = (Representation) wiz.getProperty(Representation.class.getName());
+        csMapper.setRepresentation(representation);
+        
         ChemSpaceOption csOption = (ChemSpaceOption) wiz.getProperty(ChemSpaceOption.class.getName());
         csMapper.setChemSpaceOption(csOption);
 
@@ -93,7 +97,7 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
 
         //Chemical Space Embbeder Options
         switch (csOption) {
-            case N_DIMENSIONAL_SPACE:
+            case TwoD_SPACE:
                 TwoDEmbedder embedder = (TwoDEmbedder) wiz.getProperty(AbstractEmbedder.class.getName());
                 if (embedder != null) {
                     csMapper.setTwoDEmbedderAlg(embedder);
@@ -123,7 +127,7 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
         // Open wizard
         WizardDescriptor wiz = new WizardDescriptor(iterator);
         iterator.initialize(wiz);
-        iterator.setChemSpaceOption(csMapper.getChemSpaceOption());
+        iterator.setChemSpaceOption(csMapper.getRepresentation(), csMapper.getChemSpaceOption());
 
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wiz.setTitleFormat(new MessageFormat("{0}"));

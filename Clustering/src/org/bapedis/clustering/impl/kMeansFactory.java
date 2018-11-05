@@ -21,7 +21,7 @@ public class kMeansFactory implements ClusteringTag{
     
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(KMeans.class, "KMeans.category");
     }
 
     @Override

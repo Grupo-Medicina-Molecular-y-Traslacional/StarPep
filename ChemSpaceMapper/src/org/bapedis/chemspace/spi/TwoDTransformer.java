@@ -5,7 +5,7 @@
  */
 package org.bapedis.chemspace.spi;
 
-import javax.vecmath.Vector2f;
+import org.bapedis.chemspace.model.TwoDSpace;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 
@@ -15,7 +15,7 @@ import org.bapedis.core.model.Peptide;
  */
 public interface TwoDTransformer {
    
-   public TwoDTransformerFactory getFactory();
-   
-   public Vector2f[] transform(Peptide[] peptides, MolecularDescriptor[] features);
+   TwoDTransformerFactory getFactory();
+         
+    TwoDSpace transform(Peptide[] peptides, MolecularDescriptor[] features);
 }

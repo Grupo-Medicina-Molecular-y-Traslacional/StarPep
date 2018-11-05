@@ -8,7 +8,7 @@ package org.bapedis.chemspace.spi.impl;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import javax.vecmath.Vector2f;
+import org.bapedis.chemspace.model.TwoDSpace;
 import org.bapedis.core.io.impl.MyArffWritable;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
@@ -23,22 +23,24 @@ import org.bapedis.chemspace.spi.TwoDTransformer;
  *
  * @author loge
  */
-public class WekaPCATransformer implements TwoDTransformer {
+public class WekaPCATransformer implements TwoDTransformer {    
     private final WekaPCATransformerFactory factory;
-    private PrincipalComponents pca = new PrincipalComponents();
+    private final PrincipalComponents pca;
+    private double varianceCovered;
 
     public WekaPCATransformer(WekaPCATransformerFactory factory) {
         this.factory = factory;
-    }
+        pca = new PrincipalComponents();
+        varianceCovered = 0.8;
+    }   
 
     @Override
     public WekaPCATransformerFactory getFactory() {
         return factory;
     }
-    
+
     @Override
-    public Vector2f[] transform(Peptide[] peptides, MolecularDescriptor[] features) {
-        Vector2f[] positions = null;
+    public TwoDSpace transform(Peptide[] peptides, MolecularDescriptor[] features) {
         try {
             ArffWriter.DEBUG = true;
             MyArffWritable writable = new MyArffWritable(peptides, features);
@@ -47,29 +49,36 @@ public class WekaPCATransformer implements TwoDTransformer {
             BufferedReader reader = new BufferedReader(new FileReader(f));
             Instances data = new Instances(reader);
             pca.setCenterData(true);
+            pca.setVarianceCovered(varianceCovered);
             pca.buildEvaluator(data);
             Instances resultData = pca.transformedData(data);
+
+            String[] axisLabels = new String[resultData.numAttributes()];
+            for(int i=0; i< axisLabels.length; i++){
+                axisLabels[i] = "PCA" + (i+1);
+            }
             
-            positions = new Vector2f[peptides.length];
+            float[][] coordinates = new float[peptides.length][resultData.numAttributes()];
             Instance in;
             for (int i = 0; i < resultData.numInstances(); i++) {
                 in = resultData.instance(i);
-                float x = (float) in.value(0);
-                float y = 0;
-                if (resultData.numAttributes() > 1) {
-                    y = (float) in.value(1);
+                for(int j=0; j<resultData.numAttributes(); j++){
+                    coordinates[i][j] = (float)in.value(j);
                 }
-//                float z = 0;
-//                if (resultData.numAttributes() > 2) {
-//                    z = (float) in.value(2);
-//                }
-                positions[i] = new Vector2f(x, y);
             }
-
+            return new TwoDSpace(peptides, axisLabels, coordinates);
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }
-        return positions;
+        return null;
     }
 
+    public double getVarianceCovered() {
+        return varianceCovered;
+    }
+
+    public void setVarianceCovered(double varianceCovered) {
+        this.varianceCovered = varianceCovered;
+    }
+    
 }

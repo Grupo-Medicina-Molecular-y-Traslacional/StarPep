@@ -17,8 +17,7 @@ import org.bapedis.chemspace.impl.NetworkEmbedder;
 import org.bapedis.chemspace.impl.SSNEmbedder;
 import org.bapedis.chemspace.impl.TwoDEmbedder;
 import org.bapedis.chemspace.model.ChemSpaceOption;
-import org.bapedis.chemspace.model.CompressedModel;
-import org.bapedis.chemspace.model.NetworkType;
+import org.bapedis.chemspace.model.Representation;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.Exceptions;
@@ -31,13 +30,13 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
     private CSNEmbedder csnEmbedder;
     private TwoDEmbedder twoDEmbedder;
     private SSNEmbedder ssnEmbedder;
-    private boolean isValid;
+    private boolean valid;
     private final EventListenerList listeners;
     private WizardDescriptor model;
 
     public WizardRepresentation(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
-        isValid = csMapper.getChemSpaceOption() != ChemSpaceOption.NONE;
+        valid = check(csMapper.getRepresentation(), csMapper.getChemSpaceOption());
         listeners = new EventListenerList();
     }
 
@@ -79,7 +78,7 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
     @Override
     public boolean isValid() {
         // If it is always OK to press Next or Finish, then:
-        return isValid;
+        return valid;
         // If it depends on some condition (form filled out...) and
         // this condition changes (last form field filled in...) then
         // use ChangeSupport to implement add/removeChangeListener below.
@@ -101,6 +100,13 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
         // use wiz.getProperty to retrieve previous panel state
         this.model = wiz;
 
+        // Setting fore representation
+        Representation representation = (Representation) wiz.getProperty(Representation.class.getName());
+        if (representation == null) {
+            representation = csMapper.getRepresentation();
+        }
+        getComponent().setRepresentation(representation);
+
         //Setting for Chemspace Option
         ChemSpaceOption csOption = (ChemSpaceOption) wiz.getProperty(ChemSpaceOption.class.getName());
         if (csOption == null) {
@@ -116,39 +122,33 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
                 break;
             case SEQ_SIMILARITY_NETWORK:
                 netEmbedder = ssnEmbedder;
-                break;                
+                break;
         }
         if (netEmbedder != null) {
             component.setNetworkType(netEmbedder.getNetworkType());
-            CompressedModel compressedModel = netEmbedder.getCompressedModel();
-            component.setCompressedStrategyIndex(compressedModel.getStrategyIndex());
-            component.setCompressedMaxSuperNodes(compressedModel.getMaxSuperNodes());
         }
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
+        Representation representation = component.getRepresentation();
+        wiz.putProperty(Representation.class.getName(), representation);
+                
         ChemSpaceOption csOption = component.getChemSpaceOption();
         wiz.putProperty(ChemSpaceOption.class.getName(), csOption);
-        CompressedModel compressedModel;
+        
         switch (csOption) {
-            case N_DIMENSIONAL_SPACE:
+            case TwoD_SPACE:
                 wiz.putProperty(AbstractEmbedder.class.getName(), twoDEmbedder);
-                break;            
+                break;
             case CHEM_SPACE_NETWORK:
                 csnEmbedder.setNetworkType(component.getNetworkType());
-                compressedModel = csnEmbedder.getCompressedModel();
-                compressedModel.setStrategyIndex(component.getCompressedStrategyIndex());
-                compressedModel.setMaxSuperNodes(component.getCompressedMaxSuperNodes());
                 wiz.putProperty(AbstractEmbedder.class.getName(), csnEmbedder);
                 break;
             case SEQ_SIMILARITY_NETWORK:
                 ssnEmbedder.setNetworkType(component.getNetworkType());
-                compressedModel = ssnEmbedder.getCompressedModel();
-                compressedModel.setStrategyIndex(component.getCompressedStrategyIndex());
-                compressedModel.setMaxSuperNodes(component.getCompressedMaxSuperNodes());
-                wiz.putProperty(AbstractEmbedder.class.getName(), ssnEmbedder);     
+                wiz.putProperty(AbstractEmbedder.class.getName(), ssnEmbedder);
                 break;
             case NONE:
                 wiz.putProperty(AbstractEmbedder.class.getName(), null);
@@ -156,48 +156,39 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
         }
     }
 
+    private boolean check(Representation representation, ChemSpaceOption csSpaceoption) {
+        switch (representation) {
+            case COORDINATE_BASED:
+                switch (csSpaceoption) {
+                    case TwoD_SPACE:
+                    case ThreeD_SPACE:
+                        return true;
+                    default:
+                        return false;
+                }
+            case COORDINATE_FREE:
+                switch (csSpaceoption) {
+                    case CHEM_SPACE_NETWORK:
+                    case SEQ_SIMILARITY_NETWORK:
+                        return true;
+                    default:
+                        return false;
+                }
+            case NONE:
+                return false;
+        }
+        return false;
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        boolean oldState = isValid;
-        if (evt.getPropertyName().equals(VisualRepresentation.CHANGED_CHEM_SPACE)) {
+        boolean oldState = valid;
+        if (evt.getPropertyName().equals(VisualRepresentation.CHANGED_REPRESENTATION)
+                || evt.getPropertyName().equals(VisualRepresentation.CHANGED_CHEM_SPACE)) {
             model.getNotificationLineSupport().setWarningMessage(null);
-            ChemSpaceOption csOption = (ChemSpaceOption) evt.getNewValue();
-            switch (csOption) {
-                case N_DIMENSIONAL_SPACE:
-                    isValid = true;
-                    break;
-                case CHEM_SPACE_NETWORK:
-                case SEQ_SIMILARITY_NETWORK:                    
-                    NetworkType networkType = component.getNetworkType();
-                    if (networkType == NetworkType.FULL) {
-                        model.getNotificationLineSupport().setWarningMessage(NbBundle.getMessage(WizardRepresentation.class, "VisualRepresentation.FNWaring.text"));
-                    } else if (networkType == NetworkType.NONE){
-                        NetworkEmbedder embedder = (csOption == ChemSpaceOption.CHEM_SPACE_NETWORK) ? csnEmbedder : ssnEmbedder;
-                        component.setNetworkType(embedder.getNetworkType());
-                    }                    
-                    isValid = true;
-                    break;
-                case NONE:
-                    isValid = false;
-                    break;
-                default:
-                    isValid = false;
-                    break;
-            }
-        } else if (evt.getPropertyName().equals(VisualRepresentation.CHANGED_NETWORK_TYPE)) {
-            switch ((NetworkType) evt.getNewValue()) {
-                case FULL:
-                    ChemSpaceOption csOption = component.getChemSpaceOption();
-                    if (csOption == ChemSpaceOption.CHEM_SPACE_NETWORK
-                            || csOption == ChemSpaceOption.SEQ_SIMILARITY_NETWORK) {
-                        model.getNotificationLineSupport().setWarningMessage(NbBundle.getMessage(WizardRepresentation.class, "VisualRepresentation.FNWaring.text"));
-                    }
-                    break;
-                default:
-                    model.getNotificationLineSupport().setWarningMessage(null);
-            }
+            valid = check(component.getRepresentation(), component.getChemSpaceOption());
         }
-        if (oldState != isValid) {
+        if (oldState != valid) {
             ChangeEvent srcEvt = new ChangeEvent(evt);
             for (ChangeListener listener : listeners.getListeners(ChangeListener.class)) {
                 listener.stateChanged(srcEvt);
@@ -207,16 +198,25 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
 
     @Override
     public void validate() throws WizardValidationException {
-        switch (component.getChemSpaceOption()) {            
-            case CHEM_SPACE_NETWORK:
-            case SEQ_SIMILARITY_NETWORK:
-                switch (component.getNetworkType()) {
-                    case NONE:
+        switch (component.getRepresentation()) {
+            case COORDINATE_BASED:
+                switch (component.getChemSpaceOption()) {
+                    case TwoD_SPACE:                        
+                    case ThreeD_SPACE:
+                        return;
+                    default:
                         throw new WizardValidationException(component, NbBundle.getMessage(WizardFeatureExtraction.class, "VisualRepresentation.invalidNetwork.text"), null);
                 }
-                break;
+            case COORDINATE_FREE:
+                switch (component.getChemSpaceOption()) {
+                    case CHEM_SPACE_NETWORK:
+                    case SEQ_SIMILARITY_NETWORK:
+                        return;
+                    default:
+                        throw new WizardValidationException(component, NbBundle.getMessage(WizardFeatureExtraction.class, "VisualRepresentation.invalidNetwork.text"), null);
+                }
             case NONE:
-                throw new WizardValidationException(component, NbBundle.getMessage(WizardFeatureExtraction.class, "VisualRepresentation.invalidOption.text"), null);
+                throw new WizardValidationException(component, NbBundle.getMessage(WizardFeatureExtraction.class, "VisualRepresentation.invalidNetwork.text"), null);
         }
     }
 

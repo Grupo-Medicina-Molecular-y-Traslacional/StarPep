@@ -7,6 +7,7 @@ package org.bapedis.chemspace.spi.impl;
 
 import org.bapedis.chemspace.spi.SimilarityMeasure;
 import org.bapedis.chemspace.spi.SimilarityMeasureFactory;
+import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.SequenceAlignmentModel;

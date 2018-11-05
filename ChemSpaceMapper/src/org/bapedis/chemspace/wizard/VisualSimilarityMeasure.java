@@ -7,6 +7,7 @@ package org.bapedis.chemspace.wizard;
 
 import java.awt.Component;
 import java.util.Collection;
+import java.util.HashMap;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JTree;
@@ -14,6 +15,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import org.bapedis.chemspace.spi.SimilarityMeasure;
 import org.bapedis.chemspace.spi.SimilarityMeasureFactory;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
@@ -24,6 +26,7 @@ public final class VisualSimilarityMeasure extends JPanel {
     public static final String NETWORK_FACTORY = "network_factory";
     private final DefaultMutableTreeNode treeNode;
     private SimilarityMeasureFactory factory;
+    private final HashMap<String,SimilarityMeasure> map;
 
     public VisualSimilarityMeasure() {
         initComponents();
@@ -32,13 +35,16 @@ public final class VisualSimilarityMeasure extends JPanel {
         jTree1.setModel(new DefaultTreeModel(treeNode));
         jTree1.setRootVisible(true);
         jTree1.setCellRenderer(new SimilarityFactoryNodeRenderer());
+        map = new HashMap<>();
     }
 
     public SimilarityMeasureFactory getSimilarityMeasureFactory() {
         return factory;
     }   
     
-    public void setFactory(SimilarityMeasureFactory factory){
+    public void setSimilarityMeasure(SimilarityMeasure measure){
+        factory = measure.getFactory();
+        map.put(factory.getName(), measure);
         SimilarityFactoryTreeNode factoryNode;
         for(int i=0; i< treeNode.getChildCount(); i++){
             factoryNode = (SimilarityFactoryTreeNode)treeNode.getChildAt(i);
@@ -69,15 +75,28 @@ public final class VisualSimilarityMeasure extends JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        jInfoLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
-        jInfoLabel = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
         setPreferredSize(new java.awt.Dimension(500, 460));
         setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualSimilarityMeasure.class, "VisualSimilarityMeasure.jInfoLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(jInfoLabel, gridBagConstraints);
+
+        jScrollPane1.setMinimumSize(new java.awt.Dimension(180, 23));
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(180, 322));
 
         jTree1.setRootVisible(false);
         jTree1.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
@@ -91,7 +110,6 @@ public final class VisualSimilarityMeasure extends JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jScrollPane1, gridBagConstraints);
@@ -104,22 +122,21 @@ public final class VisualSimilarityMeasure extends JPanel {
         jScrollPane2.setViewportView(jTextArea1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(jScrollPane2, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(jScrollPane2, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualSimilarityMeasure.class, "VisualSimilarityMeasure.jInfoLabel.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-        add(jInfoLabel, gridBagConstraints);
+        add(jScrollPane3, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
@@ -128,10 +145,25 @@ public final class VisualSimilarityMeasure extends JPanel {
         if (newPath != null && newPath.getLastPathComponent() instanceof SimilarityFactoryTreeNode) {
             SimilarityFactoryTreeNode newNode = (SimilarityFactoryTreeNode) newPath.getLastPathComponent();
             factory = newNode.getFactory();
-            jTextArea1.setText(factory.getDescription());            
+            jTextArea1.setText(factory.getDescription());  
+            SimilarityMeasure measure;
+            if (!map.containsKey(factory.getName())) {
+                measure = factory.createAlgorithm();
+                map.put(factory.getName(), measure);
+            } else {
+                measure = map.get(factory.getName());
+            }
+            if (factory.getSetupUI() != null) {
+                JPanel panel = factory.getSetupUI().getSettingPanel(measure);
+                jScrollPane3.setViewportView(panel);
+            } else {
+                jScrollPane3.setViewportView(null);
+            }
+            
         } else {
             factory = null;
             jTextArea1.setText("");
+            jScrollPane3.setViewportView(null);
         }
         firePropertyChange(NETWORK_FACTORY, null, factory);
     }//GEN-LAST:event_jTree1ValueChanged
@@ -140,6 +172,7 @@ public final class VisualSimilarityMeasure extends JPanel {
     private javax.swing.JLabel jInfoLabel;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables

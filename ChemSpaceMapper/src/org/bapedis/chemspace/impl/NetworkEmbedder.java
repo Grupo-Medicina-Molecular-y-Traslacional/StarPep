@@ -11,7 +11,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.bapedis.chemspace.model.Batch;
 import org.bapedis.chemspace.model.BiGraph;
-import org.bapedis.chemspace.model.CompressedModel;
 import org.bapedis.chemspace.model.NetworkType;
 import org.bapedis.chemspace.model.SimilarityMatrix;
 import org.bapedis.chemspace.model.Vertex;
@@ -39,19 +38,15 @@ public interface NetworkEmbedder {
 
     public NetworkType getNetworkType();
 
-    public CompressedModel getCompressedModel();
-
-    public void setCompressedModel(CompressedModel compressedModel);
-
     public SimilarityMatrix getSimilarityMatrix();
 
-    public default void runEmbed(GraphModel graphModel, ProgressTicket ticket, AtomicBoolean stopRun) {
+    public default void updateNetwork(GraphModel graphModel, ProgressTicket ticket, AtomicBoolean stopRun) {
         switch (getNetworkType()) {
             case FULL:
                 createFullNetwork(graphModel, ticket, stopRun);
                 break;
-            case COMPRESSED:
-                createCompressedNetwork(graphModel, ticket, stopRun);
+            case HSP:
+                createHSPNetwork(graphModel, ticket, stopRun);
                 break;
         }
     }
@@ -83,7 +78,7 @@ public interface NetworkEmbedder {
         }
     }
 
-    default public void createCompressedNetwork(GraphModel graphModel, ProgressTicket ticket, AtomicBoolean stopRun) {
+    default public void createHSPNetwork(GraphModel graphModel, ProgressTicket ticket, AtomicBoolean stopRun) {
         Graph mainGraph = graphModel.getGraph();
         Graph graph = graphModel.getGraphVisible();
         graph.clear();
@@ -91,7 +86,6 @@ public interface NetworkEmbedder {
         float similarityThreshold = getSimilarityThreshold();
         SimilarityMatrix simMatrix = getSimilarityMatrix();
         Peptide[] peptides = getSimilarityMatrix().getPeptides();
-        CompressedModel compressedModel = getCompressedModel();
 
         Vertex[] vertices = new Vertex[peptides.length];
         //Create vertices
@@ -100,20 +94,13 @@ public interface NetworkEmbedder {
             vertices[i].setVertexIndex(i);
         }
 
-        ticket.switchToDeterminate(compressedModel.getMaxSuperNodes());
+////        ticket.switchToDeterminate(compressedModel.getMaxSuperNodes());
 
         BiGraph bigraph = new BiGraph(vertices, simMatrix, similarityThreshold);
-        int cacheSize = (int) Math.ceil((double) peptides.length / compressedModel.getMaxSuperNodes());
+//        int cacheSize = (int) Math.ceil((double) peptides.length / compressedModel.getMaxSuperNodes());
         int level = 64;
         BasePartition partition = null;
-        switch (compressedModel.getStrategyIndex()) {
-            case CompressedModel.MIN_CUT_PARTITION:
-                partition = new MinCutPartition(bigraph, level, ticket, stopRun);
-                break;
-            case CompressedModel.RANDOM_PARTITION:
-                partition = new RandomPartition(bigraph, level, ticket, stopRun);
-                break;
-        }
+
 
         fjPool.invoke(partition);
         Batch[] batches = partition.join();

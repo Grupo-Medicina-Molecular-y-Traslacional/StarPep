@@ -13,6 +13,7 @@ import javax.swing.event.EventListenerList;
 import org.bapedis.chemspace.impl.AbstractEmbedder;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.impl.TwoDEmbedder;
+import org.bapedis.chemspace.spi.TwoDTransformer;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
@@ -86,7 +87,7 @@ public class WizardTwoDTransformer implements WizardDescriptor.ValidatingPanel<W
         this.model = wiz;
         alg = (TwoDEmbedder) wiz.getProperty(AbstractEmbedder.class.getName());
         if (alg.getTransformer() != null) {
-            getComponent().setFactory(alg.getTransformer().getFactory());
+            getComponent().setTransformer(alg.getTransformer());
         }
 
     }
@@ -96,7 +97,8 @@ public class WizardTwoDTransformer implements WizardDescriptor.ValidatingPanel<W
         // use wiz.putProperty to remember current panel state
         TwoDTransformerFactory factory = component.getThreeDTransformerFactory();
         if (factory != null) {
-            alg.setTransformer(factory.createAlgorithm());
+            TwoDTransformer transformer = component.getMap().get(factory.getName());
+            alg.setTransformer(transformer);
         }
     }
 

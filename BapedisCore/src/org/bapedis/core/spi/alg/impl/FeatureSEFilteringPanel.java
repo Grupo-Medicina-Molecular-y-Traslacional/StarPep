@@ -9,6 +9,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -46,7 +47,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         redundantComboBox.setSelectedIndex(FeatureSEFiltering.CORRELATION_DEFAULT_INDEX);
 
         //Create document listeners
-        DocumentListener topRankDocListener = new DocumentListener() {
+        jTF_top.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -62,9 +63,9 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
             public void changedUpdate(DocumentEvent e) {
 
             }
-        };
-
-        DocumentListener thresholdDocListener = new DocumentListener() {
+        });
+        
+        jTF_threshold.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -80,9 +81,9 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
             public void changedUpdate(DocumentEvent e) {
 
             }
-        };
-
-        DocumentListener corrDocListener = new DocumentListener() {
+        });
+        
+        jTF_corr.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -98,15 +99,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
             public void changedUpdate(DocumentEvent e) {
 
             }
-        };
-
-        jTF_top.getDocument().addDocumentListener(topRankDocListener);
-        jTF_threshold.getDocument().addDocumentListener(thresholdDocListener);
-        jTF_corr.getDocument().addDocumentListener(corrDocListener);
-    }
-    
-    public void setShannonDistributionPanel(boolean visible){
-        shannonEntropyPanel.setVisible(visible);
+        });
     }
 
     private void updateTopRank() {
@@ -123,7 +116,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
             DialogDisplayer.getDefault().notify(errorND);
             algorithm.setTopRank(-1);
         }
-    }        
+    }
 
     private void updateSEThreshold() {
         try {
@@ -160,7 +153,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         boolean enabled = !running && isEnabled();
 
         jResetButton.setEnabled(enabled);
-
+        rankingOutputPanel.setEnabled(enabled);
         jRB_selectAll.setEnabled(enabled);
 
         jRB_selectTop.setEnabled(enabled);
@@ -170,6 +163,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         jTF_threshold.setEnabled(enabled && jRB_threshold.isSelected());
         infoSEThreshold.setEnabled(enabled && jRB_threshold.isSelected());
 
+        redundancyPanel.setEnabled(enabled);
         redundantComboBox.setEnabled(enabled);
         jLabelThreshodl.setEnabled(enabled && redundantComboBox.getSelectedItem() != FeatureSEFiltering.CORRELATION_NONE);
         jTF_corr.setEnabled(enabled && redundantComboBox.getSelectedItem() != FeatureSEFiltering.CORRELATION_NONE);
@@ -372,7 +366,6 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.weightx = 1.0;
         add(rankingOutputPanel, gridBagConstraints);
 
-        shannonEntropyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.shannonEntropyPanel.border.title"))); // NOI18N
         shannonEntropyPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -517,25 +510,22 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         return this;
     }
 
-    private void setupHistogram(boolean running) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                shannonEntropyPanel.removeAll();
-                if (!running && algorithm.getShannonEntropyPanel()!= null) {
-                    shannonEntropyPanel.add(algorithm.getShannonEntropyPanel(), BorderLayout.CENTER);
-                }
-                shannonEntropyPanel.revalidate();
-                shannonEntropyPanel.repaint();
-            }
-        });
+    public void setShannonDistributionPanel(boolean running) {
+        shannonEntropyPanel.removeAll();
+        shannonEntropyPanel.setBorder(null);
+        if (!running && algorithm.getShannonEntropyPanel() != null) {
+            shannonEntropyPanel.add(algorithm.getShannonEntropyPanel(), BorderLayout.CENTER);
+            shannonEntropyPanel.setBorder(BorderFactory.createTitledBorder(NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.shannonEntropyPanel.borderTitle")));
+        }
+        shannonEntropyPanel.revalidate();
+        shannonEntropyPanel.repaint();
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource().equals(algorithm) && evt.getPropertyName().equals(FeatureSEFiltering.RUNNING)) {
             refreshState();
-            setupHistogram(algorithm.isRunning());
+            setShannonDistributionPanel(algorithm.isRunning());
         }
     }
 

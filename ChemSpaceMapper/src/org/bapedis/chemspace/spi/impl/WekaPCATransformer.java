@@ -23,7 +23,8 @@ import org.bapedis.chemspace.spi.TwoDTransformer;
  *
  * @author loge
  */
-public class WekaPCATransformer implements TwoDTransformer {    
+public class WekaPCATransformer implements TwoDTransformer {
+
     private final WekaPCATransformerFactory factory;
     private final PrincipalComponents pca;
     private double varianceCovered;
@@ -32,7 +33,7 @@ public class WekaPCATransformer implements TwoDTransformer {
         this.factory = factory;
         pca = new PrincipalComponents();
         varianceCovered = 0.8;
-    }   
+    }
 
     @Override
     public WekaPCATransformerFactory getFactory() {
@@ -51,20 +52,28 @@ public class WekaPCATransformer implements TwoDTransformer {
             pca.setCenterData(true);
             pca.setVarianceCovered(varianceCovered);
             pca.buildEvaluator(data);
-            Instances resultData = pca.transformedData(data);            
+            Instances resultData = pca.transformedData(data);
 
             String[] axisLabels = new String[resultData.numAttributes()];
-            for(int i=0; i< axisLabels.length; i++){
-                axisLabels[i] = "PCA" + (i+1);
-                System.out.println(pca.getEigenValues()[i]);
-            }
             
+            double[] eigenValues = pca.getEigenValues();
+            double sum = 0.0;
+            for (int i = 0; i < eigenValues.length; i++) {
+                sum += eigenValues[i];
+            }
+            double varExp;
+            for (int i = 0; i < axisLabels.length; i++) {
+                axisLabels[i] = "PCA" + (i + 1);
+                varExp = (eigenValues[i] / sum)*100;
+                System.out.println(varExp);
+            }
+
             float[][] coordinates = new float[peptides.length][resultData.numAttributes()];
             Instance in;
             for (int i = 0; i < resultData.numInstances(); i++) {
                 in = resultData.instance(i);
-                for(int j=0; j<resultData.numAttributes(); j++){
-                    coordinates[i][j] = (float)in.value(j);
+                for (int j = 0; j < resultData.numAttributes(); j++) {
+                    coordinates[i][j] = (float) in.value(j);
                 }
             }
             return new TwoDSpace(peptides, axisLabels, coordinates);
@@ -81,5 +90,5 @@ public class WekaPCATransformer implements TwoDTransformer {
     public void setVarianceCovered(double varianceCovered) {
         this.varianceCovered = varianceCovered;
     }
-    
+
 }

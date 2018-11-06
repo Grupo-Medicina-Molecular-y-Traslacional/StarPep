@@ -56,16 +56,16 @@ public class WekaPCATransformer implements TwoDTransformer {
 
             String[] axisLabels = new String[resultData.numAttributes()];
             
-            double[] eigenValues = pca.getEigenValues();
-            double sum = 0.0;
-            for (int i = 0; i < eigenValues.length; i++) {
-                sum += eigenValues[i];
-            }
-            double varExp;
+//            double[] eigenValues = pca.getEigenValues();
+//            double sum = 0.0;
+//            for (int i = 0; i < eigenValues.length; i++) {
+//                sum += eigenValues[i];
+//            }
+//            double varExp;
             for (int i = 0; i < axisLabels.length; i++) {
                 axisLabels[i] = "PCA" + (i + 1);
-                varExp = (eigenValues[i] / sum)*100;
-                System.out.println(varExp);
+//                varExp = (eigenValues[i] / sum)*100;
+//                System.out.println(varExp);
             }
 
             float[][] coordinates = new float[peptides.length][resultData.numAttributes()];

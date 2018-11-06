@@ -51,11 +51,12 @@ public class WekaPCATransformer implements TwoDTransformer {
             pca.setCenterData(true);
             pca.setVarianceCovered(varianceCovered);
             pca.buildEvaluator(data);
-            Instances resultData = pca.transformedData(data);
+            Instances resultData = pca.transformedData(data);            
 
             String[] axisLabels = new String[resultData.numAttributes()];
             for(int i=0; i< axisLabels.length; i++){
                 axisLabels[i] = "PCA" + (i+1);
+                System.out.println(pca.getEigenValues()[i]);
             }
             
             float[][] coordinates = new float[peptides.length][resultData.numAttributes()];

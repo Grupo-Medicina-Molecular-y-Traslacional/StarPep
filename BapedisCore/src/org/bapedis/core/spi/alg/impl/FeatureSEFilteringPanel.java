@@ -12,7 +12,6 @@ import java.beans.PropertyChangeListener;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
@@ -388,7 +387,6 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         } else {
             jTF_corr.setText("");
         }
-
 
     }//GEN-LAST:event_jResetButtonActionPerformed
 

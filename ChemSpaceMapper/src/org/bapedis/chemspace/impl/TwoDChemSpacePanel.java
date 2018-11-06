@@ -11,6 +11,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
@@ -36,6 +37,7 @@ public class TwoDChemSpacePanel extends javax.swing.JPanel implements PropertyCh
     protected MapperAlgorithm csMapper;
     protected TwoDEmbedder twoDEmbedder;
     protected final JXBusyLabel busyLabel;
+    protected final DefaultComboBoxModel<String> modelX, modelY;
 
     /**
      * Creates new form NDChemSpacePanel
@@ -67,6 +69,12 @@ public class TwoDChemSpacePanel extends javax.swing.JPanel implements PropertyCh
             public void ancestorMoved(AncestorEvent event) {
             }
         });
+
+        modelX = new DefaultComboBoxModel<>();
+        modelY = new DefaultComboBoxModel<>();
+
+        jXComboBox.setModel(modelX);
+        jYComboBox.setModel(modelY);
     }
 
     public void setUp(MapperAlgorithm csMapper) {
@@ -88,18 +96,24 @@ public class TwoDChemSpacePanel extends javax.swing.JPanel implements PropertyCh
     }
 
     private void setupScatterPlot(boolean running) {
-        settingPanel.removeAll();
+        scatterPanel.removeAll();
+        scatterPanel.setBorder(null);
+        TwoDSpace twoSpace = twoDEmbedder.getTwoDSpace();
+        if (!running && twoSpace != null && twoSpace.getScatterPlot() != null) {
+            scatterPanel.setBorder(BorderFactory.createTitledBorder(NbBundle.getMessage(TwoDChemSpacePanel.class, "TwoDChemSpacePanel.scatterPanel.borderTitle")));
+            scatterPanel.add(twoSpace.getScatterPlot());
+        } 
+        scatterPanel.revalidate();
+        scatterPanel.repaint();
     }
 
     private void setupAxis(boolean running) {
         if (running) {
-            jXComboBox.removeAll();
-            jYComboBox.removeAll();
+            modelX.removeAllElements();
+            modelY.removeAllElements();
         } else {
             TwoDSpace twoDSpace = twoDEmbedder.getTwoDSpace();
 
-            DefaultComboBoxModel<String> modelX = new DefaultComboBoxModel<>();
-            DefaultComboBoxModel<String> modelY = new DefaultComboBoxModel<>();
             String[] axisLabels = twoDSpace.getAxisLabels();
             for (String axis : axisLabels) {
                 modelX.addElement(axis);
@@ -107,9 +121,6 @@ public class TwoDChemSpacePanel extends javax.swing.JPanel implements PropertyCh
             }
             modelX.setSelectedItem(axisLabels[twoDSpace.getxAxis()]);
             modelY.setSelectedItem(axisLabels[twoDSpace.getyAxis()]);
-
-            jXComboBox.setModel(modelX);
-            jYComboBox.setModel(modelY);
         }
     }
 
@@ -226,7 +237,8 @@ public class TwoDChemSpacePanel extends javax.swing.JPanel implements PropertyCh
             twoD.setyAxis(jYComboBox.getSelectedIndex());
 
             setRunning(true);
-            GraphNodePositionUpdater updater = new GraphNodePositionUpdater();                        
+            setupScatterPlot(true);
+            GraphNodePositionUpdater updater = new GraphNodePositionUpdater();
             updater.execute();
         }
     }//GEN-LAST:event_jApplyButtonActionPerformed
@@ -257,6 +269,7 @@ public class TwoDChemSpacePanel extends javax.swing.JPanel implements PropertyCh
             if (evt.getSource().equals(csMapper)) {
                 if (evt.getPropertyName().equals(MapperAlgorithm.RUNNING)) {
                     setupAxis(csMapper.isRunning());
+                    setupScatterPlot(csMapper.isRunning());
                 }
             }
         }
@@ -294,6 +307,7 @@ public class TwoDChemSpacePanel extends javax.swing.JPanel implements PropertyCh
                 Exceptions.printStackTrace(ex);
             } finally {
                 setRunning(false);
+                setupScatterPlot(false);
                 ticket.finish();
             }
         }

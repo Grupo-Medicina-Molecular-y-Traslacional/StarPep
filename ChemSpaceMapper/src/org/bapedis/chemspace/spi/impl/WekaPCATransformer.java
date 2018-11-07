@@ -8,6 +8,9 @@ package org.bapedis.chemspace.spi.impl;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Arrays;
 import org.bapedis.chemspace.model.TwoDSpace;
 import org.bapedis.core.io.impl.MyArffWritable;
 import org.bapedis.core.model.MolecularDescriptor;
@@ -18,6 +21,7 @@ import weka.attributeSelection.PrincipalComponents;
 import weka.core.Instance;
 import weka.core.Instances;
 import org.bapedis.chemspace.spi.TwoDTransformer;
+import weka.core.Utils;
 
 /**
  *
@@ -28,11 +32,15 @@ public class WekaPCATransformer implements TwoDTransformer {
     private final WekaPCATransformerFactory factory;
     private final PrincipalComponents pca;
     private double varianceCovered;
+    protected DecimalFormat df;
 
     public WekaPCATransformer(WekaPCATransformerFactory factory) {
         this.factory = factory;
         pca = new PrincipalComponents();
         varianceCovered = 0.8;
+        DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
+        symbols.setDecimalSeparator('.');
+        df = new DecimalFormat("0.00", symbols);        
     }
 
     @Override
@@ -54,25 +62,24 @@ public class WekaPCATransformer implements TwoDTransformer {
             pca.buildEvaluator(data);
             Instances resultData = pca.transformedData(data);
 
+            //The Kaiser criterion. We can retain only factors with eigenvalues greater than 1
+            double[] eigenValues = pca.getEigenValues(); 
+            double sumOfEigenValues = Utils.sum(eigenValues);
+
             String[] axisLabels = new String[resultData.numAttributes()];
-            
-//            double[] eigenValues = pca.getEigenValues();
-//            double sum = 0.0;
-//            for (int i = 0; i < eigenValues.length; i++) {
-//                sum += eigenValues[i];
-//            }
-//            double varExp;
+
+            int index = eigenValues.length - 1;
+            double varExp;
             for (int i = 0; i < axisLabels.length; i++) {
-                axisLabels[i] = "PCA" + (i + 1);
-//                varExp = (eigenValues[i] / sum)*100;
-//                System.out.println(varExp);
+                varExp = (eigenValues[index--] / sumOfEigenValues) * 100;
+                axisLabels[i] = "PCA" + (i + 1) + " (" + df.format(varExp) + "%)";                
             }
 
-            float[][] coordinates = new float[peptides.length][resultData.numAttributes()];
+            float[][] coordinates = new float[peptides.length][axisLabels.length];
             Instance in;
             for (int i = 0; i < resultData.numInstances(); i++) {
                 in = resultData.instance(i);
-                for (int j = 0; j < resultData.numAttributes(); j++) {
+                for (int j = 0; j < axisLabels.length; j++) {
                     coordinates[i][j] = (float) in.value(j);
                 }
             }

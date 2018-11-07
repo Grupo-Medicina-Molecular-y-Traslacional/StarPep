@@ -7,6 +7,7 @@ package org.bapedis.chemspace.spi;
 
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.Workspace;
 
 /**
  *
@@ -15,8 +16,8 @@ import org.bapedis.core.model.Peptide;
 public interface SimilarityMeasure {
 
     SimilarityMeasureFactory getFactory();
-        
-    void setMolecularFeatures(MolecularDescriptor[] features);
+            
+    void setMolecularFeatures(Workspace workspace, MolecularDescriptor[] features);
     
     float computeSimilarity(Peptide peptide1, Peptide peptide2) throws Exception;
     

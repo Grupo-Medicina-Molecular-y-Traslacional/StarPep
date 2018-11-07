@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.Arrays;
 import org.bapedis.chemspace.model.TwoDSpace;
 import org.bapedis.core.io.impl.MyArffWritable;
 import org.bapedis.core.model.MolecularDescriptor;
@@ -21,6 +20,9 @@ import weka.attributeSelection.PrincipalComponents;
 import weka.core.Instance;
 import weka.core.Instances;
 import org.bapedis.chemspace.spi.TwoDTransformer;
+import org.bapedis.core.model.Workspace;
+import org.bapedis.core.project.ProjectManager;
+import org.openide.util.Lookup;
 import weka.core.Utils;
 
 /**
@@ -29,6 +31,7 @@ import weka.core.Utils;
  */
 public class WekaPCATransformer implements TwoDTransformer {
 
+    private static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private final WekaPCATransformerFactory factory;
     private final PrincipalComponents pca;
     private double varianceCovered;
@@ -40,7 +43,7 @@ public class WekaPCATransformer implements TwoDTransformer {
         varianceCovered = 0.8;
         DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
         symbols.setDecimalSeparator('.');
-        df = new DecimalFormat("0.00", symbols);        
+        df = new DecimalFormat("0.00", symbols);
     }
 
     @Override
@@ -49,7 +52,7 @@ public class WekaPCATransformer implements TwoDTransformer {
     }
 
     @Override
-    public TwoDSpace transform(Peptide[] peptides, MolecularDescriptor[] features) {
+    public TwoDSpace transform(Workspace workspace, Peptide[] peptides, MolecularDescriptor[] features) {
         try {
             ArffWriter.DEBUG = true;
             MyArffWritable writable = new MyArffWritable(peptides, features);
@@ -63,16 +66,25 @@ public class WekaPCATransformer implements TwoDTransformer {
             Instances resultData = pca.transformedData(data);
 
             //The Kaiser criterion. We can retain only factors with eigenvalues greater than 1
-            double[] eigenValues = pca.getEigenValues(); 
+            double[] eigenValues = pca.getEigenValues();
             double sumOfEigenValues = Utils.sum(eigenValues);
 
             String[] axisLabels = new String[resultData.numAttributes()];
 
             int index = eigenValues.length - 1;
             double varExp;
+            double cumulativeEigen = 0;
+            double cumulativeVar = 0;
+            pc.reportMsg("Sum of eigenvalues: " + sumOfEigenValues, workspace);
+            pc.reportMsg("Factor, Eigenvalue, Explained variance, Cumulative eigenvalue, Cumulative variance", workspace);
             for (int i = 0; i < axisLabels.length; i++) {
-                varExp = (eigenValues[index--] / sumOfEigenValues) * 100;
-                axisLabels[i] = "PCA" + (i + 1) + " (" + df.format(varExp) + "%)";                
+                axisLabels[i] = "PCA" + (i + 1);
+                varExp = (eigenValues[index] / sumOfEigenValues) * 100;
+                cumulativeEigen += eigenValues[index];
+                cumulativeVar += varExp;
+                pc.reportMsg((i + 1) + ", " + df.format(eigenValues[index]) + ", " + df.format(varExp) + "%"
+                             + ", " + df.format(cumulativeEigen) + ", " + df.format(cumulativeVar) + "%", workspace);
+                index--;
             }
 
             float[][] coordinates = new float[peptides.length][axisLabels.length];

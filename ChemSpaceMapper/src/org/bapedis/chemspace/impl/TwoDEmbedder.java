@@ -52,7 +52,7 @@ public class TwoDEmbedder extends DescriptorBasedEmbedder {
 
     @Override
     protected void embed(Peptide[] peptides, MolecularDescriptor[] features) {
-        twoDSpace = transformer.transform(peptides, features);
+        twoDSpace = transformer.transform(workspace, peptides, features);
         updateGraphNodePositions(graphModel, ticket, new AtomicBoolean(stopRun));
     }
     
@@ -68,8 +68,6 @@ public class TwoDEmbedder extends DescriptorBasedEmbedder {
             for (int i = 0; i < positions.length && !atomicBoolean.get(); i++) {
                 p = positions[i];
                 node = peptides[i].getGraphNode();
-//                node.setX(p.getX());
-//                node.setY(p.getY());
                 node.setX((float) ((0.01 + p.getX()) * 1000) - 500);
                 node.setY((float) ((0.01 + p.getY()) * 1000) - 500);
                 node.setZ(0); // 2D  

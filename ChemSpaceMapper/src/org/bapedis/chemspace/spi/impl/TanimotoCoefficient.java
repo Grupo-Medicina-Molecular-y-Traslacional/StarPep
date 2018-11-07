@@ -10,6 +10,7 @@ import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.Workspace;
 
 /**
  *
@@ -30,7 +31,7 @@ public class TanimotoCoefficient implements SimilarityMeasure {
     }   
     
     @Override
-    public void setMolecularFeatures(MolecularDescriptor[] features) {
+    public void setMolecularFeatures(Workspace workspace, MolecularDescriptor[] features) {
         this.features = features;
     }
     

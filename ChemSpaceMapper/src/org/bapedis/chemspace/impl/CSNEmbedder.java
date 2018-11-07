@@ -79,7 +79,7 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
     @Override
     protected void embed(Peptide[] peptides, MolecularDescriptor[] features) {
         //Set features to similarity measure
-        simMeasure.setMolecularFeatures(features);
+        simMeasure.setMolecularFeatures(workspace, features);
 
         // Setup Similarity Matrix Builder
         SimilarityMatrixBuilder task = new SimilarityMatrixBuilder(peptides);

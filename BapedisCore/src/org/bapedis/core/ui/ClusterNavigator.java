@@ -12,6 +12,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
@@ -32,7 +34,9 @@ import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.ClusterNavigatorModel;
+import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.PeptideNode;
+import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.components.DescriptorSelectionPanel;
@@ -57,7 +61,7 @@ import org.openide.util.lookup.InstanceContent;
  */
 @NavigatorPanel.Registration(mimeType = "peptide/clustering", displayName = "#ClusterNavigator.name")
 public class ClusterNavigator extends JComponent implements
-        WorkspaceEventListener, NavigatorPanelWithToolbar, LookupListener {
+        WorkspaceEventListener, NavigatorPanelWithToolbar, LookupListener, PropertyChangeListener {
 
     protected final InstanceContent content;
     protected final ProjectManager pc;
@@ -194,6 +198,18 @@ public class ClusterNavigator extends JComponent implements
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
         removeAttrLookupListener();
+        if (oldWs != null) {
+            AttributesModel oldAttrModel = pc.getAttributesModel(oldWs);
+            if (oldAttrModel != null) {
+                oldAttrModel.removeQuickFilterChangeListener(this);
+            }
+
+            QueryModel oldQueryModel = pc.getQueryModel(oldWs);
+            oldQueryModel.removePropertyChangeListener(this);
+
+            FilterModel oldFilterModel = pc.getFilterModel(oldWs);
+            oldFilterModel.removePropertyChangeListener(this);
+        }        
         
         attrModelLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
         attrModelLkpResult.addLookupListener(this);
@@ -271,6 +287,11 @@ public class ClusterNavigator extends JComponent implements
         } else if (le.getSource().equals(peptideLkpResult)) {
 
         }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        
     }
 
     class ClusterPopupAdapter extends MouseUtils.PopupMouseAdapter {

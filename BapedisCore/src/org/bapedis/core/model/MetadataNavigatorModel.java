@@ -12,14 +12,9 @@ package org.bapedis.core.model;
 public class MetadataNavigatorModel {
 
     private int selectedIndex;
-    private final boolean[] showAll;
 
     public MetadataNavigatorModel() {
         selectedIndex = 0;
-        showAll = new boolean[StarPepAnnotationType.values().length];
-        for (int i = 0; i < showAll.length; i++) {
-            showAll[i] = true;
-        }
     }
 
     public int getSelectedIndex() {
@@ -30,11 +25,4 @@ public class MetadataNavigatorModel {
         this.selectedIndex = selectedIndex;
     }
     
-    public boolean isShowAll(int index){
-        return showAll[index];
-    }
-
-    public void setShowAll(int index, boolean value){
-        showAll[index] = value;
-    }
 }

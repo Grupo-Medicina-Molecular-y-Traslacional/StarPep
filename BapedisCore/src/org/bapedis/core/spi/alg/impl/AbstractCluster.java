@@ -10,6 +10,7 @@ import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Cluster;
+import org.bapedis.core.model.ClusterNavigatorModel;
 import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
@@ -118,6 +119,13 @@ public abstract class AbstractCluster implements Algorithm {
                     node.setAttribute(CLUSTER_COLUMN, c.getId());
                 }
             }
+            
+            ClusterNavigatorModel navModel = workspace.getLookup().lookup(ClusterNavigatorModel.class);
+            if (navModel != null){
+                workspace.remove(navModel);
+            }
+            navModel = new ClusterNavigatorModel(clusterList);
+            workspace.add(navModel);
 
             if (fireEvent) {
                 graphViz.fireChangedGraphTable();

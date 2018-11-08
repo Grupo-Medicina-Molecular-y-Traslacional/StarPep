@@ -40,7 +40,6 @@ import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.GraphEdgeAttributeColumn;
-import org.bapedis.core.model.GraphEdgeWrapper;
 import org.bapedis.core.model.GraphElementAttributeColumn;
 import org.bapedis.core.model.GraphElementDataColumn;
 import org.bapedis.core.model.GraphElementsDataTable;
@@ -281,11 +280,7 @@ public class MetadataNavigator extends JComponent implements
             currentModel.addQuickFilterChangeListener(this);
         }
 
-        navigatorModel = newWs.getLookup().lookup(MetadataNavigatorModel.class);
-        if (navigatorModel == null) {
-            navigatorModel = new MetadataNavigatorModel();
-            newWs.add(navigatorModel);
-        }
+        navigatorModel = pc.getMetadataNavModel(newWs);
 
         comboBox.setSelectedIndex(navigatorModel.getSelectedIndex());
     }

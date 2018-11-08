@@ -293,11 +293,7 @@ public class GraphElementNavigator extends JComponent implements
         GraphVizSetting graphVizModel = pc.getGraphVizSetting(newWs);
         graphVizModel.addGraphViewChangeListener(this);
 
-        navigatorModel = newWs.getLookup().lookup(GraphElementNavigatorModel.class);
-        if (navigatorModel == null) {
-            navigatorModel = new GraphElementNavigatorModel();
-            newWs.add(navigatorModel);
-        }
+        navigatorModel = pc.getGraphElementNavModel(newWs);
 
         switch (navigatorModel.getVisualElement()) {
             case Node:

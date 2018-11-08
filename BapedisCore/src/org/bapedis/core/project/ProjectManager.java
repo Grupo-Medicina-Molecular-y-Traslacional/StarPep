@@ -19,7 +19,9 @@ import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AlgorithmModel;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FilterModel;
+import org.bapedis.core.model.GraphElementNavigatorModel;
 import org.bapedis.core.model.GraphVizSetting;
+import org.bapedis.core.model.MetadataNavigatorModel;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.alg.Algorithm;
@@ -323,6 +325,32 @@ public class ProjectManager implements Lookup.Provider {
         }
         return model;
     }
+    
+    public synchronized MetadataNavigatorModel getMetadataNavModel(){
+        return getMetadataNavModel(currentWS);
+    }
+    
+    public synchronized MetadataNavigatorModel getMetadataNavModel(Workspace workspace){
+        MetadataNavigatorModel model = workspace.getLookup().lookup(MetadataNavigatorModel.class);
+        if (model == null) {
+            model = new MetadataNavigatorModel();
+            workspace.add(model);
+        }  
+        return model;
+    }
+    
+    public synchronized GraphElementNavigatorModel getGraphElementNavModel(){
+        return getGraphElementNavModel(currentWS);
+    }
+    
+    public synchronized GraphElementNavigatorModel getGraphElementNavModel(Workspace workspace){
+        GraphElementNavigatorModel model = workspace.getLookup().lookup(GraphElementNavigatorModel.class);
+        if (model == null) {
+            model = new GraphElementNavigatorModel();
+            workspace.add(model);
+        }  
+        return model;
+    }    
 
     protected void createColumns(GraphModel graphModel) {
         Table nodeTable = graphModel.getNodeTable();

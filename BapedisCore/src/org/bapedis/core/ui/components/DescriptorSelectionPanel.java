@@ -34,6 +34,9 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
     protected final AttributesModel attrModel;
     private final MyTableModel tableModel;
     protected JXTable table;
+    protected static String[] columnNames = {"", NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.table.columnName.first"),
+            NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.table.columnName.second")};
+    
 
     public DescriptorSelectionPanel(final AttributesModel attrModel) {
         this(attrModel, Color.BLUE);
@@ -102,9 +105,6 @@ public class DescriptorSelectionPanel extends javax.swing.JPanel implements Prop
     }
 
     private MyTableModel createTableModel() {
-        String[] columnNames = {"", NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.table.columnName.first"),
-            NbBundle.getMessage(DescriptorSelectionPanel.class, "DescriptorSelectionPanel.table.columnName.second")};
-
         Set<String> keys = attrModel.getMolecularDescriptorKeys();
         ArrayList<Object[]> data = new ArrayList(keys.size());
         Object[] dataRow;

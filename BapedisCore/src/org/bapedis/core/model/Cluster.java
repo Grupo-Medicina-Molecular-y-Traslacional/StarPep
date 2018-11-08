@@ -15,11 +15,13 @@ import java.util.List;
  */
 public class Cluster {
     protected final int id;
+    protected final int n;
     protected Peptide centroid;
     protected final List<Peptide> members;
 
-    public Cluster(int id){
+    public Cluster(int id, int n){
         this.id = id;
+        this.n = n;
         members = new LinkedList<>();
     }           
 
@@ -36,7 +38,7 @@ public class Cluster {
     }        
     
     public int getSize(){
-        return members.size() + (centroid != null?1:0);
+        return members.size();
     }
         
     public void addMember(Peptide peptide){
@@ -45,6 +47,10 @@ public class Cluster {
 
     public List<Peptide> getMembers() {
         return Collections.unmodifiableList(members);
+    }
+    
+    public double getPercentageComp(){
+        return members.size()*100/(double)n;
     }
         
 }

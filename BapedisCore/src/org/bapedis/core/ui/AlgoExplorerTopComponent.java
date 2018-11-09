@@ -57,6 +57,7 @@ import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionID;
 import org.openide.awt.StatusDisplayer;
+import org.openide.explorer.ExplorerUtils;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.filesystems.FileUtil;
@@ -67,6 +68,8 @@ import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
+import org.openide.util.lookup.Lookups;
+import org.openide.util.lookup.ProxyLookup;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -115,6 +118,9 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         comboBoxModel.addElement(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.defaultText"));
         algoComboBox.setModel(comboBoxModel);
 
+        associateLookup(new ProxyLookup(Lookups.singleton(new MetadataNavigatorLookupHint()), 
+                Lookups.singleton(new GraphElementNavigatorLookupHint()),
+                Lookups.singleton(new ClusterNavigatorLookupHint())));        
     }
 
     private void removeLookupListener() {

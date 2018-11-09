@@ -86,7 +86,9 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         scrollPane.setViewportView(view);
 
         associateLookup(new ProxyLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()),
-                Lookups.singleton(new MetadataNavigatorLookupHint()), Lookups.singleton(new GraphElementNavigatorLookupHint())));
+                Lookups.singleton(new MetadataNavigatorLookupHint()), 
+                Lookups.singleton(new GraphElementNavigatorLookupHint()),
+                Lookups.singleton(new ClusterNavigatorLookupHint())));
 
         applyCheckBox.setSelected(NbPreferences.forModule(QueryModel.class).getBoolean(AUTO_APPLY, true));
 

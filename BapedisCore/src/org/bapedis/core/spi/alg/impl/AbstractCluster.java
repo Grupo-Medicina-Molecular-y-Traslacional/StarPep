@@ -5,7 +5,8 @@
  */
 package org.bapedis.core.spi.alg.impl;
 
-import java.util.LinkedList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
@@ -13,6 +14,7 @@ import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.ClusterNavigatorModel;
 import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
@@ -29,20 +31,21 @@ import org.openide.util.Lookup;
  */
 public abstract class AbstractCluster implements Algorithm {
 
+    protected static PeptideAttribute CLUSTER_ATTR = new PeptideAttribute("cluster", "Cluster", Integer.class);
     public static final String CLUSTER_COLUMN = "cluster";
     protected final AlgorithmFactory factory;
     protected boolean stopRun;
     protected ProgressTicket ticket;
     protected Peptide[] peptides;
     protected Workspace workspace;
-    protected final List<Cluster> clusterList;
+    protected Cluster[] clusters;
     protected final ProjectManager pc;
     private GraphVizSetting graphViz;
     protected GraphModel graphModel;
+    protected ClusterNavigatorModel navModel;
 
     public AbstractCluster(AlgorithmFactory factory) {
         this.factory = factory;
-        clusterList = new LinkedList<>();
         pc = Lookup.getDefault().lookup(ProjectManager.class);
     }
 
@@ -54,8 +57,8 @@ public abstract class AbstractCluster implements Algorithm {
         this.peptides = peptides;
     }
 
-    public List<Cluster> getClusterList() {
-        return clusterList;
+    public Cluster[] getClusters() {
+        return clusters;
     }
 
     @Override
@@ -69,13 +72,17 @@ public abstract class AbstractCluster implements Algorithm {
         }
         stopRun = false;
         ticket = progressTicket;
-        clusterList.clear();
+        clusters = null;
         graphModel = pc.getGraphModel(workspace);
         graphViz = pc.getGraphVizSetting(workspace);
+        navModel = pc.getClusterNavModel(workspace);
+        navModel.setRunning(true);
     }
 
     @Override
     public void endAlgo() {
+        navModel.setRunning(false);
+        navModel = null;
         workspace = null;
         peptides = null;
         ticket = null;
@@ -102,37 +109,49 @@ public abstract class AbstractCluster implements Algorithm {
     @Override
     public void run() {
         if (peptides != null) {
-            cluterize();
-
-            //Add cluster column
-            boolean fireEvent = false;
-            Table nodeTable = graphModel.getNodeTable();
-            if (!nodeTable.hasColumn(CLUSTER_COLUMN)) {
-                nodeTable.addColumn(CLUSTER_COLUMN, "Cluster", Integer.class, null);
-                fireEvent = true;
-            }
-
-            Node node;
-            for (Cluster c : clusterList) {
-                for (Peptide p : c.getMembers()) {
-                    node = p.getGraphNode();
-                    node.setAttribute(CLUSTER_COLUMN, c.getId());
+            List<Cluster> clusterList = cluterize();
+            if (clusterList != null) {
+                int index = 0;
+                clusters = new Cluster[clusterList.size()];
+                for (Cluster c : clusterList) {
+                    clusters[index++] = c;
                 }
-            }
-            
-            ClusterNavigatorModel navModel = workspace.getLookup().lookup(ClusterNavigatorModel.class);
-            if (navModel != null){
-                workspace.remove(navModel);
-            }
-            navModel = new ClusterNavigatorModel(clusterList);
-            workspace.add(navModel);
+                Arrays.sort(clusters, new Comparator<Cluster>() {
+                    @Override
+                    public int compare(Cluster o1, Cluster o2) {
+                        double p1 = o1.getPercentageComp();
+                        double p2 = o2.getPercentageComp();
+                        return p1 > p2 ? -1 : p1 < p2 ? 1 : 0;
+                    }
 
-            if (fireEvent) {
-                graphViz.fireChangedGraphTable();
+                });
+
+                //Add cluster column
+                boolean fireEvent = false;
+                Table nodeTable = graphModel.getNodeTable();
+                if (!nodeTable.hasColumn(CLUSTER_COLUMN)) {
+                    nodeTable.addColumn(CLUSTER_COLUMN, "Cluster", Integer.class, null);
+                    fireEvent = true;
+                }
+
+                Node node;
+                for (Cluster c : clusterList) {
+                    for (Peptide p : c.getMembers()) {
+                        p.setAttributeValue(CLUSTER_ATTR, c.getId());
+                        node = p.getGraphNode();
+                        node.setAttribute(CLUSTER_COLUMN, c.getId());                        
+                    }
+                }
+
+                navModel.setClusters(clusters);
+
+                if (fireEvent) {
+                    graphViz.fireChangedGraphTable();
+                }
             }
         }
     }
 
-    protected abstract void cluterize();
+    protected abstract List<Cluster> cluterize();
 
 }

@@ -18,6 +18,7 @@ import java.util.List;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AlgorithmModel;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.ClusterNavigatorModel;
 import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.GraphElementNavigatorModel;
 import org.bapedis.core.model.GraphVizSetting;
@@ -350,7 +351,20 @@ public class ProjectManager implements Lookup.Provider {
             workspace.add(model);
         }  
         return model;
-    }    
+    } 
+    
+    public synchronized ClusterNavigatorModel getClusterNavModel(){
+        return getClusterNavModel(currentWS);
+    }
+    
+    public synchronized ClusterNavigatorModel getClusterNavModel(Workspace workspace){
+        ClusterNavigatorModel model = workspace.getLookup().lookup(ClusterNavigatorModel.class);
+        if (model == null) {
+            model = new ClusterNavigatorModel();
+            workspace.add(model);
+        }  
+        return model;
+    }      
 
     protected void createColumns(GraphModel graphModel) {
         Table nodeTable = graphModel.getNodeTable();

@@ -105,7 +105,8 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         scrollPane.setViewportView(view);
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         associateLookup(new ProxyLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()),
-                Lookups.singleton(new MetadataNavigatorLookupHint())));
+                Lookups.singleton(new MetadataNavigatorLookupHint()),
+                Lookups.singleton(new ClusterNavigatorLookupHint())));
 
         //Outline configuration
         final Outline outline = view.getOutline();

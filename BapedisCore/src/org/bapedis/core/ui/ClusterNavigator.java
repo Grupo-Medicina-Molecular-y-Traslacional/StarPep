@@ -7,6 +7,7 @@ package org.bapedis.core.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -15,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -22,6 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -35,6 +38,7 @@ import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.ClusterNavigatorModel;
 import org.bapedis.core.model.FilterModel;
+import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideNode;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
@@ -74,12 +78,12 @@ public class ClusterNavigator extends JComponent implements
     protected final JXBusyLabel busyLabel;
     protected final JPanel bottomPanel;
     protected final JLabel clusterSizeLabel, filteredSizeLabel;
-    protected ClusterNavigatorModel currentModel;
+    protected AttributesModel currentAttrModel;
+    protected ClusterNavigatorModel currentNavModel;
     private final RowSorterListener sorterListener;
-    private static final    String[] columnNames = {NbBundle.getMessage(DescriptorSelectionPanel.class, "ClusterNavigator.table.columnName.first"), 
-                                                    NbBundle.getMessage(DescriptorSelectionPanel.class, "ClusterNavigator.table.columnName.second"),
-                                                    NbBundle.getMessage(DescriptorSelectionPanel.class, "ClusterNavigator.table.columnName.three")};
-
+    private static final String[] columnNames = {NbBundle.getMessage(ClusterNavigator.class, "ClusterNavigator.table.columnName.first"),
+        NbBundle.getMessage(ClusterNavigator.class, "ClusterNavigator.table.columnName.second"),
+        NbBundle.getMessage(ClusterNavigator.class, "ClusterNavigator.table.columnName.three")};
 
     public ClusterNavigator() {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
@@ -184,8 +188,8 @@ public class ClusterNavigator extends JComponent implements
 
         scrollPane = new javax.swing.JScrollPane();
 
-        setLayout(new java.awt.GridBagLayout());
-        add(scrollPane, new java.awt.GridBagConstraints());
+        setLayout(new java.awt.BorderLayout());
+        add(scrollPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     private void removeAttrLookupListener() {
@@ -209,10 +213,28 @@ public class ClusterNavigator extends JComponent implements
 
             FilterModel oldFilterModel = pc.getFilterModel(oldWs);
             oldFilterModel.removePropertyChangeListener(this);
-        }        
-        
+            
+            currentNavModel.removePropertyChangeListener(this);
+        }
+
         attrModelLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
         attrModelLkpResult.addLookupListener(this);
+
+        QueryModel queryModel = pc.getQueryModel(newWs);
+        queryModel.addPropertyChangeListener(this);
+
+        FilterModel filterModel = pc.getFilterModel(newWs);
+        filterModel.addPropertyChangeListener(this);
+
+        currentAttrModel = pc.getAttributesModel(newWs);
+        if (currentAttrModel != null) {
+            currentAttrModel.addQuickFilterChangeListener(this);
+        }
+        
+        currentNavModel = pc.getClusterNavModel(newWs);
+        currentNavModel.addPropertyChangeListener(this);
+                
+        reload();
     }
 
     @Override
@@ -252,6 +274,18 @@ public class ClusterNavigator extends JComponent implements
         peptideLkpResult.removeLookupListener(this);
         removeAttrLookupListener();
         pc.removeWorkspaceEventListener(this);
+        
+        if (currentAttrModel != null) {
+            currentAttrModel.removeQuickFilterChangeListener(this);
+        }
+
+        QueryModel queryModel = pc.getQueryModel();
+        queryModel.removePropertyChangeListener(this);
+
+        FilterModel filterModel = pc.getFilterModel();
+        filterModel.removePropertyChangeListener(this);     
+        
+        currentNavModel.removePropertyChangeListener(this);
     }
 
     @Override
@@ -259,39 +293,83 @@ public class ClusterNavigator extends JComponent implements
         return lookup;
     }
 
-    private void reload() {        
-        List<Cluster> clusterList = currentModel.getClusterList();
-        
-        ArrayList<Object[]> data = new ArrayList(clusterList.size());
-        Object[] dataRow;
-        for (Cluster cluster : clusterList) {
-            dataRow = new Object[3];
-            dataRow[0] = cluster.getId();
-            dataRow[1] = cluster.getSize();
-            dataRow[2] = cluster.getPercentageComp();
-            data.add(dataRow);
+    private void reload() {
+        Cluster[] clusters = currentNavModel.getClusters();
+
+        ArrayList<Object[]> data = new ArrayList(clusters != null ? clusters.length : 0);
+        if (clusters != null) {
+            Object[] dataRow;
+            for (Cluster cluster : clusters) {
+                dataRow = new Object[3];
+                dataRow[0] = cluster.getId();
+                dataRow[1] = cluster.getSize();
+                dataRow[2] = cluster.getPercentageComp();
+                data.add(dataRow);
+            }
         }
 
         TableModel dataModel = new MyTableModel(columnNames, data);
         table.setModel(dataModel);
-        
+
         TableRowSorter sorter = new TableRowSorter(dataModel);
         sorter.addRowSorterListener(sorterListener);
-        table.setRowSorter(sorter);        
+        table.setRowSorter(sorter);
     }
 
     @Override
     public void resultChanged(LookupEvent le) {
         if (le.getSource().equals(attrModelLkpResult)) {
-
+            Collection<? extends AttributesModel> attrModels = attrModelLkpResult.allInstances();
+            if (!attrModels.isEmpty()) {
+                if (currentAttrModel != null) {
+                    currentAttrModel.removeQuickFilterChangeListener(this);
+                }
+                currentAttrModel = attrModels.iterator().next();
+                currentAttrModel.addQuickFilterChangeListener(this);
+                reload();
+            }
         } else if (le.getSource().equals(peptideLkpResult)) {
-
+            Collection<? extends PeptideNode> peptideNodes = peptideLkpResult.allInstances();
+            if (table.getRowSorter() instanceof TableRowSorter) {
+                TableRowSorter sorter = (TableRowSorter) table.getRowSorter();
+                if (!peptideNodes.isEmpty() && sorter != null) {
+                    Peptide peptide = peptideNodes.iterator().next().getPeptide();
+//                    sorter.setRowFilter(RowFilter.regexFilter("^" + peptide.getName() + "$", 0));
+                }
+            }
         }
     }
+    
+    private void setBusyLabel(boolean busy) {
+        scrollPane.setViewportView(busy ? busyLabel : table);
+        busyLabel.setBusy(busy);
+        for (Component c : toolBar.getComponents()) {
+            c.setEnabled(!busy);
+        }
+        bottomPanel.setVisible(!busy);
+    }    
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        
+        if (evt.getSource().equals(currentAttrModel)) {
+            if (evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
+                reload();
+            }            
+        } else if (evt.getSource() instanceof QueryModel) {
+            if (evt.getPropertyName().equals(QueryModel.RUNNING)) {
+                setBusyLabel(((QueryModel) evt.getSource()).isRunning());
+            }
+        } else if (evt.getSource() instanceof FilterModel) {
+            if (evt.getPropertyName().equals(FilterModel.RUNNING)) {
+                setBusyLabel(((FilterModel) evt.getSource()).isRunning());
+            }
+        } else if (evt.getSource() instanceof ClusterNavigatorModel){
+            if (evt.getPropertyName().equals(ClusterNavigatorModel.RUNNING)){
+                setBusyLabel(((ClusterNavigatorModel) evt.getSource()).isRunning());
+            } else if (evt.getPropertyName().equals(ClusterNavigatorModel.CHANGED_CLUSTER)){
+                reload();
+            }
+        }
     }
 
     class ClusterPopupAdapter extends MouseUtils.PopupMouseAdapter {

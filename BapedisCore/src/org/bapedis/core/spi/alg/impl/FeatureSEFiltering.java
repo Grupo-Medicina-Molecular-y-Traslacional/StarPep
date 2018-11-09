@@ -48,7 +48,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     public static final int RANKING_SELECT_ALL = 0;
     public static final int RANKING_SELECT_TOP = 1;
     public static final int RANKING_ENTROPY_THRESHOLD = 2;
-    public static final int RANKING_DEFAULT_OPTION = 0;
+    public static final int RANKING_DEFAULT_OPTION = 1;
     public static final int RANKING_DEFAULT_TOP = 50;
 
     public static final String CORRELATION_NONE = "None";

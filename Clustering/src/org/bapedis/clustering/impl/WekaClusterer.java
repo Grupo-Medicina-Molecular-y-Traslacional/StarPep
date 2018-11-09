@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import org.bapedis.core.io.impl.MyArffWritable;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Cluster;
@@ -68,10 +70,11 @@ public abstract class WekaClusterer<T extends Clusterer> extends AbstractCluster
     }
 
     @Override
-    protected void cluterize() {
-        AttributesModel attrModel = pc.getAttributesModel(workspace);
+    protected List<Cluster> cluterize() {
         BufferedReader reader = null;
         try {
+            List<Cluster> clusterList = new LinkedList<>();
+            AttributesModel attrModel = pc.getAttributesModel(workspace);
             // Configure a cluster instance
             try {
                 configureClusterer();
@@ -143,7 +146,7 @@ public abstract class WekaClusterer<T extends Clusterer> extends AbstractCluster
             if (!stopRun && data != null) {
                 int clusterID;
                 Cluster cluster;
-                HashMap<Integer, Cluster> clusterMap = new HashMap<>();
+                TreeMap<Integer, Cluster> clusterMap = new TreeMap<>();
                 for (int j = 0; j < eval.getClusterAssignments().length; j++) {
                     clusterID = (int) eval.getClusterAssignments()[j];
                     if (clusterMap.containsKey(clusterID)) {
@@ -151,11 +154,15 @@ public abstract class WekaClusterer<T extends Clusterer> extends AbstractCluster
                     } else {
                         cluster = new Cluster(clusterID, peptides.length);
                         clusterMap.put(clusterID, cluster);
-                        clusterList.add(cluster);
                     }
                     cluster.addMember(peptides[j]);
                 }
+                for (Map.Entry<Integer, Cluster> entry : clusterMap.entrySet()) {
+                    clusterList.add(entry.getValue());
+                }
             }
+            
+            return clusterList;
         } catch (MolecularDescriptorNotFoundException ex) {
             DialogDisplayer.getDefault().notify(ex.getErrorND());
             pc.reportError(ex.getMessage(), workspace);
@@ -178,6 +185,7 @@ public abstract class WekaClusterer<T extends Clusterer> extends AbstractCluster
                 Exceptions.printStackTrace(ex);
             }
         }
+        return null;
     }
 
     protected abstract void configureClusterer() throws Exception;

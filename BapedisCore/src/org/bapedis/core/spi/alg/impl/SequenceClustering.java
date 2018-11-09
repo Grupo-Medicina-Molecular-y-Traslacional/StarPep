@@ -7,6 +7,8 @@ package org.bapedis.core.spi.alg.impl;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.SequenceAlignmentModel;
@@ -53,7 +55,8 @@ public class SequenceClustering extends AbstractCluster {
     }
 
     @Override
-    protected void cluterize() {
+    protected List<Cluster> cluterize() {
+        List<Cluster> clusterList = new LinkedList<>();
         if (alignmentModel != null) {
             ticket.switchToDeterminate(peptides.length);
 
@@ -61,7 +64,7 @@ public class SequenceClustering extends AbstractCluster {
             Arrays.parallelSort(peptides, new SeqLengthComparator());
 
             int id=1;
-            //Add first cluster
+            //Add first cluster            
             Cluster cluster = new Cluster(id++, peptides.length);            
             cluster.addMember(peptides[0]);
             cluster.setCentroid(peptides[0]);
@@ -118,6 +121,7 @@ public class SequenceClustering extends AbstractCluster {
 
             pc.reportMsg("Number of clusters: " + clusterList.size(), workspace);
         }
+        return clusterList;
     }
 
 }

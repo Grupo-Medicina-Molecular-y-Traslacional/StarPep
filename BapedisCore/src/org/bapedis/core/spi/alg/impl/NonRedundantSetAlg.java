@@ -93,7 +93,7 @@ public class NonRedundantSetAlg implements Algorithm {
         return factory;
     }
     
-    private List<Cluster> clusterize() {
+    private Cluster[] clusterize() {
         String msg = NbBundle.getMessage(NonRedundantSetAlg.class, "NonRedundantSetAlg.task.clusterize");
         pc.reportMsg(msg, workspace);
         ticket.progress(msg);
@@ -101,7 +101,7 @@ public class NonRedundantSetAlg implements Algorithm {
         clusteringAlg.initAlgo(workspace, ticket);
         clusteringAlg.run();
         clusteringAlg.endAlgo();
-        return clusteringAlg.getClusterList();
+        return clusteringAlg.getClusters();
     }
     
     @Override
@@ -112,9 +112,9 @@ public class NonRedundantSetAlg implements Algorithm {
             clusteringAlg.setPeptides(targets);
             
             TreeSet<Integer> accepted = new TreeSet<>();
-            List<Cluster> clusterList = clusterize();
+            Cluster[] clusters = clusterize();
             
-            for (Cluster cluster : clusterList) {
+            for (Cluster cluster : clusters) {
                 accepted.add(cluster.getCentroid().getId());
             }
 

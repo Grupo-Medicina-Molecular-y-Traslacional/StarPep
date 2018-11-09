@@ -311,7 +311,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         rankingOutputPanel.add(infoSEThreshold, gridBagConstraints);
 
         redundancyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.redundancyPanel.border.title"))); // NOI18N
-        redundancyPanel.setLayout(new java.awt.GridBagLayout());
+        redundancyPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         redundantComboBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -323,32 +323,17 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
                 redundantComboBoxActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        redundancyPanel.add(redundantComboBox, gridBagConstraints);
+        redundancyPanel.add(redundantComboBox);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabelThreshodl, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jLabelThreshodl.text")); // NOI18N
         jLabelThreshodl.setEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        redundancyPanel.add(jLabelThreshodl, gridBagConstraints);
+        redundancyPanel.add(jLabelThreshodl);
 
         jTF_corr.setText(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jTF_corr.text")); // NOI18N
         jTF_corr.setEnabled(false);
         jTF_corr.setMinimumSize(new java.awt.Dimension(90, 27));
         jTF_corr.setPreferredSize(new java.awt.Dimension(90, 27));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        redundancyPanel.add(jTF_corr, gridBagConstraints);
+        redundancyPanel.add(jTF_corr);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

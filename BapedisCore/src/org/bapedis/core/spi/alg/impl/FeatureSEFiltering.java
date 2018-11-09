@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
@@ -379,19 +380,30 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
 
             //Print top 5 bottom 3
             pc.reportMsg("Top 5", workspace);
-            for (int i = 0; i < rankedFeatures.length && i < 5; i++) {
+            int top5 = 0;
+            for (int i = 0; i < rankedFeatures.length && top5 < 5; i++) {
                 if (rankedFeatures[i] != null) {
                     pc.reportMsg(rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+                    top5++;
                 }
             }
             pc.reportMsg("...", workspace);
             pc.reportMsg("Bottom 3", workspace);
-            for (int i = Math.max(rankedFeatures.length - 3, 0); i < rankedFeatures.length; i++) {
+            Stack<MolecularDescriptor> stack = new Stack<>();
+            int bottom3 = 0;
+            for (int i = rankedFeatures.length - 1; i >= 0 && bottom3 < 3; i--) {
                 if (rankedFeatures[i] != null) {
-                    pc.reportMsg(rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+                    stack.push(rankedFeatures[i]);
+                    bottom3++;
                 }
             }
+            MolecularDescriptor descriptor;
+            while (!stack.isEmpty()) {
+                descriptor = stack.pop();
+                pc.reportMsg(descriptor.getDisplayName() + " - score: " + descriptor.getScore(), workspace);
+            }
 
+            //Create chart panel
             shannonEntropyPanel = createChartPanel(rankedFeatures);
 
             pc.reportMsg("\nTotal of removed features: " + removed, workspace);

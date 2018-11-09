@@ -28,8 +28,8 @@ import org.openide.util.NbBundle;
  */
 public class Peptide {
 
-    public static final PeptideAttribute ID = new PeptideAttribute("id", NbBundle.getMessage(Peptide.class, "Peptide.attribute.id"), Integer.class);
-    public static final PeptideAttribute SEQ = new PeptideAttribute("seq", NbBundle.getMessage(Peptide.class, "Peptide.attribute.seq"), String.class);
+    public static final PeptideAttribute ID = new PeptideAttribute("id", NbBundle.getMessage(Peptide.class, "Peptide.attribute.id"), Integer.class, true);
+    public static final PeptideAttribute SEQ = new PeptideAttribute("seq", NbBundle.getMessage(Peptide.class, "Peptide.attribute.seq"), String.class, true);
     public static final MolecularDescriptor LENGHT = new MolecularDescriptor("length", NbBundle.getMessage(Peptide.class, "Peptide.attribute.length"), Integer.class);
     public final static String CHANGED_ATTRIBUTE = "changed_attribute";
     protected final PropertyChangeSupport propertyChangeSupport;

@@ -93,29 +93,67 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
         set.put(property);
         sheet.put(set);
 
-        // Molecular features         
+        // Features         
         for (PeptideAttribute attr : peptide.getAttributes()) {
             if (attr instanceof MolecularDescriptor) {
                 setMolecularFeature((MolecularDescriptor) attr);
+            } else if (attr.isVisible() && attr != Peptide.ID && attr != Peptide.SEQ){
+                setOtherFeatures(attr);
             }
         }
-
+        
         return sheet;
     }
 
     private void setMolecularFeature(MolecularDescriptor attr) {
-//        Sheet.Set set = sheet.get("primary");
         Sheet.Set set = sheet.get("molecularFeatures");
         if (set == null) {
             set = Sheet.createPropertiesSet();
             set.setName("molecularFeatures");
             set.setDisplayName(NbBundle.getMessage(PeptideNode.class, "PropertySet.molecularFeatures"));
-//          set.setValue("tabName", NbBundle.getMessage(PeptideNode.class, "PropertySet.molecularFeatures.tabName"));               
             sheet.put(set);
         }
         assert (peptide.getAttributeValue(attr) != null);
         PropertySupport.ReadOnly property = createPropertyField(attr.getId(), attr.getDisplayName(), attr.getCategory(), attr.getType(), peptide.getAttributeValue(attr));
         set.put(property);
+    }
+
+    private void removeMolecularFeatures(MolecularDescriptor attr) {
+        Sheet.Set set = sheet.get("molecularFeatures");
+        if (set != null) {
+            set.remove(attr.getId());
+            if (set.getProperties().length == 0) {
+                sheet.remove("molecularFeatures");
+            }
+        }
+    }
+
+    private void setOtherFeatures(PeptideAttribute attr) {
+        if (attr.isVisible()) {
+            Sheet.Set set = sheet.get("otherFeatures");
+            if (set == null) {
+                set = Sheet.createPropertiesSet();
+                set.setName("otherFeatures");
+                set.setDisplayName(NbBundle.getMessage(PeptideNode.class, "PropertySet.otherFeatures"));
+                set.setValue("tabName", NbBundle.getMessage(PeptideNode.class, "PropertySet.otherFeatures.tabName"));
+                sheet.put(set);
+            }
+            assert (peptide.getAttributeValue(attr) != null);
+            PropertySupport.ReadOnly property = createPropertyField(attr.getId(), attr.getDisplayName(), attr.getDisplayName(), attr.getType(), peptide.getAttributeValue(attr));
+            set.put(property);
+        }
+    }
+
+    private void removeOtherFeatures(PeptideAttribute attr) {
+        if (attr.isVisible()) {
+            Sheet.Set set = sheet.get("otherFeatures");
+            if (set != null) {
+                set.remove(attr.getId());
+                if (set.getProperties().length == 0) {
+                    sheet.remove("otherFeatures");
+                }
+            }
+        }
     }
 
     private PropertySupport.ReadOnly createPropertyField(String name, String displayName, String description, Class type, final Object value) {
@@ -153,18 +191,15 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
                     PeptideAttribute attr = (PeptideAttribute) evt.getNewValue();
                     if (attr instanceof MolecularDescriptor) {
                         setMolecularFeature((MolecularDescriptor) attr);
+                    } else {
+                        setOtherFeatures(attr);
                     }
                 } else if (evt.getOldValue() != null) {
                     PeptideAttribute attr = (PeptideAttribute) evt.getOldValue();
                     if (attr instanceof MolecularDescriptor) {
-                        String category = ((MolecularDescriptor) attr).getCategory();
-                        Sheet.Set set = sheet.get(category);
-                        if (set != null) {
-                            set.remove(attr.getId());
-                            if (set.getProperties().length == 0) {
-                                sheet.remove(category);
-                            }
-                        }
+                        removeMolecularFeatures(((MolecularDescriptor) attr));
+                    } else {
+                        removeOtherFeatures(attr);
                     }
                 }
             }

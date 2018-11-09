@@ -19,7 +19,7 @@ public class SimilarityMatrix implements Serializable {
 
     protected final Peptide[] peptides;
     protected final JQuickHistogram histogram;
-    protected static PeptideAttribute INDEX_ATTR = new PeptideAttribute("indexAttr", "indexAttr", Integer.class);
+    protected static PeptideAttribute INDEX_ATTR = new PeptideAttribute("indexAttr", "indexAttr", Integer.class, false);
     protected Float[] data;
 
     public SimilarityMatrix(Peptide[] peptides) {

@@ -17,15 +17,20 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.RowSorterEvent;
@@ -37,19 +42,21 @@ import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.ClusterNavigatorModel;
+import org.bapedis.core.model.ClusterNode;
 import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideNode;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
-import org.bapedis.core.ui.components.DescriptorSelectionPanel;
+import org.bapedis.core.spi.alg.impl.AbstractCluster;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
 import org.openide.awt.MouseUtils;
+import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
@@ -165,16 +172,16 @@ public class ClusterNavigator extends JComponent implements
     }
 
     private synchronized void tableValueChanged(ListSelectionEvent e) {
-//        Collection<? extends MetadataNode> oldNodes = lookup.lookupAll(MetadataNode.class);
-//        for (MetadataNode node : oldNodes) {
-//            content.remove(node);
-//        }
-//        int rowIndex = table.getSelectedRow();
-//        if (rowIndex != -1) {
-//            GraphElementsDataTable dataModel = (GraphElementsDataTable) table.getModel();
-//            Edge edge = (Edge) dataModel.getElementAtRow(table.convertRowIndexToModel(rowIndex));
-//            content.add(new MetadataNode(edge));
-//        }
+        Collection<? extends ClusterNode> oldNodes = lookup.lookupAll(ClusterNode.class);
+        for (ClusterNode node : oldNodes) {
+            content.remove(node);
+        }
+        int rowIndex = table.getSelectedRow();
+        if (rowIndex != -1) {
+            MyTableModel dataModel = (MyTableModel) table.getModel();
+            Cluster cluster = dataModel.getClusterAtRow(table.convertRowIndexToModel(rowIndex));
+            content.add(new ClusterNode(cluster));
+        }
     }
 
     /**
@@ -213,7 +220,7 @@ public class ClusterNavigator extends JComponent implements
 
             FilterModel oldFilterModel = pc.getFilterModel(oldWs);
             oldFilterModel.removePropertyChangeListener(this);
-            
+
             currentNavModel.removePropertyChangeListener(this);
         }
 
@@ -230,10 +237,10 @@ public class ClusterNavigator extends JComponent implements
         if (currentAttrModel != null) {
             currentAttrModel.addQuickFilterChangeListener(this);
         }
-        
+
         currentNavModel = pc.getClusterNavModel(newWs);
         currentNavModel.addPropertyChangeListener(this);
-                
+
         reload();
     }
 
@@ -274,7 +281,7 @@ public class ClusterNavigator extends JComponent implements
         peptideLkpResult.removeLookupListener(this);
         removeAttrLookupListener();
         pc.removeWorkspaceEventListener(this);
-        
+
         if (currentAttrModel != null) {
             currentAttrModel.removeQuickFilterChangeListener(this);
         }
@@ -283,8 +290,8 @@ public class ClusterNavigator extends JComponent implements
         queryModel.removePropertyChangeListener(this);
 
         FilterModel filterModel = pc.getFilterModel();
-        filterModel.removePropertyChangeListener(this);     
-        
+        filterModel.removePropertyChangeListener(this);
+
         currentNavModel.removePropertyChangeListener(this);
     }
 
@@ -295,25 +302,55 @@ public class ClusterNavigator extends JComponent implements
 
     private void reload() {
         Cluster[] clusters = currentNavModel.getClusters();
-
-        ArrayList<Object[]> data = new ArrayList(clusters != null ? clusters.length : 0);
         if (clusters != null) {
-            Object[] dataRow;
-            for (Cluster cluster : clusters) {
-                dataRow = new Object[3];
-                dataRow[0] = cluster.getId();
-                dataRow[1] = cluster.getSize();
-                dataRow[2] = cluster.getPercentageComp();
-                data.add(dataRow);
-            }
+            List<Peptide> peptides = currentAttrModel.getPeptides();
+            setBusyLabel(true);
+            SwingWorker worker = new SwingWorker<TableModel, Void>() {
+                @Override
+                protected TableModel doInBackground() throws Exception {
+                    TreeSet<Integer> set = new TreeSet<>();
+                    for (Peptide p : peptides) {
+                        set.add(p.getId());
+                    }
+
+                    List<Cluster> clusterList = new LinkedList<>();
+                    boolean flag;
+                    for (Cluster c : clusters) {
+                        flag = false;
+                        for (Peptide p : c.getMembers()) {
+                            if (set.contains(p.getId())) {
+                                flag = true;
+                                break;
+                            }
+                        }
+                        if (flag) {
+                            clusterList.add(c);
+                        }
+                    }
+
+                    TableModel dataModel = new MyTableModel(columnNames, clusterList.toArray(new Cluster[0]));
+                    return dataModel;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        TableModel dataModel = get();
+                        table.setModel(dataModel);
+
+                        TableRowSorter sorter = new TableRowSorter(dataModel);
+                        sorter.addRowSorterListener(sorterListener);
+                        table.setRowSorter(sorter);
+                    } catch (InterruptedException | ExecutionException ex) {
+                        Exceptions.printStackTrace(ex);
+                    } finally {
+                        setBusyLabel(false);
+                    }
+                }
+
+            };
+            worker.execute();
         }
-
-        TableModel dataModel = new MyTableModel(columnNames, data);
-        table.setModel(dataModel);
-
-        TableRowSorter sorter = new TableRowSorter(dataModel);
-        sorter.addRowSorterListener(sorterListener);
-        table.setRowSorter(sorter);
     }
 
     @Override
@@ -334,12 +371,15 @@ public class ClusterNavigator extends JComponent implements
                 TableRowSorter sorter = (TableRowSorter) table.getRowSorter();
                 if (!peptideNodes.isEmpty() && sorter != null) {
                     Peptide peptide = peptideNodes.iterator().next().getPeptide();
-//                    sorter.setRowFilter(RowFilter.regexFilter("^" + peptide.getName() + "$", 0));
+                    if (peptide.hasAttribute(AbstractCluster.CLUSTER_ATTR)) {
+                        Integer clusterID = (Integer)peptide.getAttributeValue(AbstractCluster.CLUSTER_ATTR);
+                        sorter.setRowFilter(RowFilter.regexFilter("^" + clusterID + "$", 0));
+                    }
                 }
             }
         }
     }
-    
+
     private void setBusyLabel(boolean busy) {
         scrollPane.setViewportView(busy ? busyLabel : table);
         busyLabel.setBusy(busy);
@@ -347,14 +387,14 @@ public class ClusterNavigator extends JComponent implements
             c.setEnabled(!busy);
         }
         bottomPanel.setVisible(!busy);
-    }    
+    }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource().equals(currentAttrModel)) {
             if (evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
                 reload();
-            }            
+            }
         } else if (evt.getSource() instanceof QueryModel) {
             if (evt.getPropertyName().equals(QueryModel.RUNNING)) {
                 setBusyLabel(((QueryModel) evt.getSource()).isRunning());
@@ -363,10 +403,10 @@ public class ClusterNavigator extends JComponent implements
             if (evt.getPropertyName().equals(FilterModel.RUNNING)) {
                 setBusyLabel(((FilterModel) evt.getSource()).isRunning());
             }
-        } else if (evt.getSource() instanceof ClusterNavigatorModel){
-            if (evt.getPropertyName().equals(ClusterNavigatorModel.RUNNING)){
+        } else if (evt.getSource() instanceof ClusterNavigatorModel) {
+            if (evt.getPropertyName().equals(ClusterNavigatorModel.RUNNING)) {
                 setBusyLabel(((ClusterNavigatorModel) evt.getSource()).isRunning());
-            } else if (evt.getPropertyName().equals(ClusterNavigatorModel.CHANGED_CLUSTER)){
+            } else if (evt.getPropertyName().equals(ClusterNavigatorModel.CHANGED_CLUSTER)) {
                 reload();
             }
         }
@@ -387,10 +427,10 @@ public class ClusterNavigator extends JComponent implements
                     table.getSelectionModel().setSelectionInterval(selRow, selRow);
                 }
                 int rowIndex = table.getSelectedRow();
-//                GraphElementsDataTable dataModel = (GraphElementsDataTable) table.getModel();
-//                Edge edge = (Edge) dataModel.getElementAtRow(table.convertRowIndexToModel(rowIndex));
-//                JPopupMenu contextMenu = GraphElementNavigator.createContextMenu(edge);
-//                contextMenu.add(new ShowPropertiesAction(new MetadataNode(edge)));
+                MyTableModel dataModel = (MyTableModel) table.getModel();
+                Cluster cluster = (Cluster) dataModel.getClusterAtRow(table.convertRowIndexToModel(rowIndex));
+                JPopupMenu contextMenu = new JPopupMenu();
+//                contextMenu.add(new ShowPropertiesAction(new ClusterNode(cluster)));
 //                contextMenu.show(table, evt.getX(), evt.getY());
             } else {
                 table.getSelectionModel().clearSelection();
@@ -406,9 +446,9 @@ public class ClusterNavigator extends JComponent implements
     private static class MyTableModel extends AbstractTableModel {
 
         private final String[] columnNames;
-        private final ArrayList<Object[]> data;
+        private final Cluster[] data;
 
-        public MyTableModel(String[] columnNames, ArrayList<Object[]> data) {
+        public MyTableModel(String[] columnNames, Cluster[] data) {
             this.columnNames = columnNames;
             this.data = data;
         }
@@ -420,7 +460,7 @@ public class ClusterNavigator extends JComponent implements
 
         @Override
         public int getRowCount() {
-            return data.size();
+            return data.length;
         }
 
         @Override
@@ -430,7 +470,15 @@ public class ClusterNavigator extends JComponent implements
 
         @Override
         public Object getValueAt(int row, int col) {
-            return data.get(row)[col];
+            switch (col) {
+                case 0:
+                    return data[row].getId();
+                case 1:
+                    return data[row].getSize();
+                case 2:
+                    return data[row].getPercentageComp();
+            }
+            return null;
         }
 
         @Override
@@ -452,9 +500,12 @@ public class ClusterNavigator extends JComponent implements
         }
 
         @Override
-        public void setValueAt(Object value, int row, int col) {
-            data.get(row)[col] = value;
-            fireTableCellUpdated(row, col);
+        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            throw new UnsupportedOperationException("Not supported");
+        }
+
+        public Cluster getClusterAtRow(int row) {
+            return data[row];
         }
     }
 }

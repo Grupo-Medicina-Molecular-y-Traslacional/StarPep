@@ -24,7 +24,7 @@ public class MolecularDescriptor extends PeptideAttribute {
     }
 
     public MolecularDescriptor(String id, String displayName, Class<?> type, String category) {
-        super(id, displayName, type);
+        super(id, displayName, type, true);
         this.category = category;
         min = Double.NaN;
         max = Double.NaN;

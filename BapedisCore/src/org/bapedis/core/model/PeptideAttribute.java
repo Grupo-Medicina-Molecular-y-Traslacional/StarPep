@@ -17,13 +17,19 @@ public class PeptideAttribute {
     protected String id;
     protected String displayName;
     protected Class<?> type;
-    protected Double defaultValue;
+    protected boolean visible;    
+    protected Object defaultValue;
 
-    public PeptideAttribute(String id, String displayName, Class<?> type) {
+    public PeptideAttribute(String id, String displayName, Class<?> type, boolean visible) {
+        this(id, displayName, type, visible, null);
+    }    
+    
+    public PeptideAttribute(String id, String displayName, Class<?> type, boolean visible, Object defaultValue){
         this.id = id;
         this.displayName = displayName;
         this.type = type;
-        defaultValue = null;
+        this.defaultValue = defaultValue;
+        this.visible = visible;        
     }
 
     public String getId() {
@@ -38,11 +44,15 @@ public class PeptideAttribute {
         return type;
     }  
 
-    public Double getDefaultValue() {
+    public boolean isVisible() {
+        return visible;
+    }        
+
+    public Object getDefaultValue() {
         return defaultValue;
     }
 
-    public void setDefaultValue(Double defaultValue) {
+    public void setDefaultValue(Object defaultValue) {
         this.defaultValue = defaultValue;
     }        
 

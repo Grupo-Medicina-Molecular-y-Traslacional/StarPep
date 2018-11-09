@@ -31,11 +31,12 @@ import org.openide.util.Lookup;
  */
 public abstract class AbstractCluster implements Algorithm {
 
-    protected static PeptideAttribute CLUSTER_ATTR = new PeptideAttribute("cluster", "Cluster", Integer.class);
+    public static PeptideAttribute CLUSTER_ATTR = new PeptideAttribute("cluster", "Cluster", Integer.class, true, -1);
     public static final String CLUSTER_COLUMN = "cluster";
     protected final AlgorithmFactory factory;
     protected boolean stopRun;
     protected ProgressTicket ticket;
+    protected AttributesModel attrModel;
     protected Peptide[] peptides;
     protected Workspace workspace;
     protected Cluster[] clusters;
@@ -65,9 +66,10 @@ public abstract class AbstractCluster implements Algorithm {
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
         if (peptides == null) {
-            AttributesModel attrModel = pc.getAttributesModel(workspace);
+            attrModel = pc.getAttributesModel(workspace);
             if (attrModel != null) {
                 peptides = attrModel.getPeptides().toArray(new Peptide[0]);
+                attrModel.removeDisplayedColumn(CLUSTER_ATTR);
             }
         }
         stopRun = false;
@@ -81,7 +83,11 @@ public abstract class AbstractCluster implements Algorithm {
 
     @Override
     public void endAlgo() {
+        if (attrModel != null) {
+            attrModel.addDisplayedColumn(CLUSTER_ATTR);
+        }
         navModel.setRunning(false);
+        attrModel = null;
         navModel = null;
         workspace = null;
         peptides = null;
@@ -139,7 +145,7 @@ public abstract class AbstractCluster implements Algorithm {
                     for (Peptide p : c.getMembers()) {
                         p.setAttributeValue(CLUSTER_ATTR, c.getId());
                         node = p.getGraphNode();
-                        node.setAttribute(CLUSTER_COLUMN, c.getId());                        
+                        node.setAttribute(CLUSTER_COLUMN, c.getId());
                     }
                 }
 

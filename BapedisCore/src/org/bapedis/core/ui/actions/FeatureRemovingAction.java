@@ -15,21 +15,23 @@ import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 
-//@ActionID(
-//        category = "Tools",
-//        id = "org.bapedis.core.ui.actions.FeatureRemoving"
-//)
-//@ActionRegistration(
-//        iconBase = "org/bapedis/core/resources/delete_md.gif",
-//        displayName = "#CTL_FeatureRemoving"
-//)
-//@ActionReference(path = "Menu/Tools/Feature", position = 250)
-//@Messages("CTL_FeatureRemoving=Removing")
+@ActionID(
+        category = "Tools",
+        id = "org.bapedis.core.ui.actions.FeatureRemoving"
+)
+@ActionRegistration(
+        iconBase = "org/bapedis/core/resources/delete_md.gif",
+        displayName = "#CTL_FeatureRemoving"
+)
+@ActionReferences({@ActionReference(path = "Menu/Tools/MolecularDescriptor", position = 40),
+                   @ActionReference(path = "Toolbars/MD", position = 40) })
+@Messages("CTL_FeatureRemoving=Removing")
 public final class FeatureRemovingAction extends WorkspaceContextSensitiveAction<AttributesModel> {
 
     protected final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);

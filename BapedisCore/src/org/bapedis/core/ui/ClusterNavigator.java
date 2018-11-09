@@ -15,7 +15,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -336,13 +335,10 @@ public class ClusterNavigator extends JComponent implements
                 protected void done() {
                     try {
                         TableModel dataModel = get();
-                        table.setModel(dataModel);
-
-                        TableRowSorter sorter = new TableRowSorter(dataModel);
-                        sorter.addRowSorterListener(sorterListener);
-                        table.setRowSorter(sorter);
+                        setDataModel(dataModel);
                     } catch (InterruptedException | ExecutionException ex) {
                         Exceptions.printStackTrace(ex);
+                        setDataModel(new MyTableModel(columnNames, new Cluster[0]));
                     } finally {
                         setBusyLabel(false);
                     }
@@ -350,7 +346,17 @@ public class ClusterNavigator extends JComponent implements
 
             };
             worker.execute();
+        } else {
+            setDataModel(new MyTableModel(columnNames, new Cluster[0]));
         }
+    }
+
+    private void setDataModel(TableModel dataModel) {
+        table.setModel(dataModel);
+
+        TableRowSorter sorter = new TableRowSorter(dataModel);
+        sorter.addRowSorterListener(sorterListener);
+        table.setRowSorter(sorter);
     }
 
     @Override
@@ -372,7 +378,7 @@ public class ClusterNavigator extends JComponent implements
                 if (!peptideNodes.isEmpty() && sorter != null) {
                     Peptide peptide = peptideNodes.iterator().next().getPeptide();
                     if (peptide.hasAttribute(AbstractCluster.CLUSTER_ATTR)) {
-                        Integer clusterID = (Integer)peptide.getAttributeValue(AbstractCluster.CLUSTER_ATTR);
+                        Integer clusterID = (Integer) peptide.getAttributeValue(AbstractCluster.CLUSTER_ATTR);
                         sorter.setRowFilter(RowFilter.regexFilter("^" + clusterID + "$", 0));
                     }
                 }

@@ -83,7 +83,7 @@ public abstract class AbstractCluster implements Algorithm {
 
     @Override
     public void endAlgo() {
-        if (attrModel != null) {
+        if (attrModel != null && !stopRun) {
             attrModel.addDisplayedColumn(CLUSTER_ATTR);
         }
         navModel.setRunning(false);

@@ -74,7 +74,6 @@ public class AppearanceUIModel {
 
     protected final AppearanceUIController controller;
     protected final AppearanceModel appearanceModel;
-    protected final ProjectManager pm;
     protected final Map<String, Map<TransformerCategory, TransformerUI>> selectedTransformerUI;
     protected final Map<String, Map<TransformerUI, Function>> selectedFunction;
     protected final Map<String, TransformerCategory> selectedCategory;
@@ -84,7 +83,6 @@ public class AppearanceUIModel {
     public AppearanceUIModel(AppearanceUIController controller, AppearanceModel model) {
         this.controller = controller;
         this.appearanceModel = model;
-        this.pm = Lookup.getDefault().lookup(ProjectManager.class);
 
         //Init maps
         selectedCategory = new HashMap<>();
@@ -100,9 +98,8 @@ public class AppearanceUIModel {
     }
 
     private void initSelectedTransformerUIs(String elementClass) {
-        Graph graph = pm.getGraphModel(appearanceModel.getWorkspace()).getGraph();
         Map<TransformerCategory, TransformerUI> newMap = new HashMap<>();
-        for (Function func : elementClass.equals(AppearanceUIController.NODE_ELEMENT) ? appearanceModel.getNodeFunctions(graph) : appearanceModel.getEdgeFunctions(graph)) {
+        for (Function func : elementClass.equals(AppearanceUIController.NODE_ELEMENT) ? appearanceModel.getNodeFunctions() : appearanceModel.getEdgeFunctions()) {
             TransformerUI ui = func.getUI();
             if (ui != null) {
                 TransformerCategory cat = ui.getCategory();
@@ -127,8 +124,7 @@ public class AppearanceUIModel {
 
     private void refreshSelectedFunctions(String elementClass) {
         Set<Function> functionSet = new HashSet<>();
-        Graph graph = pm.getGraphModel(appearanceModel.getWorkspace()).getGraph();
-        for (Function func : elementClass.equals(AppearanceUIController.NODE_ELEMENT) ? appearanceModel.getNodeFunctions(graph) : appearanceModel.getEdgeFunctions(graph)) {
+        for (Function func : elementClass.equals(AppearanceUIController.NODE_ELEMENT) ? appearanceModel.getNodeFunctions() : appearanceModel.getEdgeFunctions()) {
             TransformerUI ui = func.getUI();
             if (ui != null) {
                 functionSet.add(func);
@@ -145,12 +141,11 @@ public class AppearanceUIModel {
         }
     }
 
-    public synchronized Function replaceSelectedFunction() {
-        Graph graph = pm.getGraphModel(appearanceModel.getWorkspace()).getGraph();
+    private synchronized Function replaceSelectedFunction() {
         Function sFunction = getSelectedFunction();
         if (sFunction instanceof AttributeFunction) {
             AttributeFunction af = (AttributeFunction) sFunction;
-            for (Function func : getSelectedElementClass().equals(AppearanceUIController.NODE_ELEMENT) ? appearanceModel.getNodeFunctions(graph) : appearanceModel.getEdgeFunctions(graph)) {
+            for (Function func : getSelectedElementClass().equals(AppearanceUIController.NODE_ELEMENT) ? appearanceModel.getNodeFunctions() : appearanceModel.getEdgeFunctions()) {
                 if (func instanceof AttributeFunction) {
                     if (af.getColumn().equals(((AttributeFunction) func).getColumn())
                             && sFunction.getUI().getCategory().equals(func.getUI().getCategory())) {
@@ -163,10 +158,9 @@ public class AppearanceUIModel {
     }
 
     public synchronized boolean refreshSelectedFunction() {
-        Graph graph = pm.getGraphModel(appearanceModel.getWorkspace()).getGraph();
         Function sFunction = getSelectedFunction();
         if (sFunction != null && sFunction.isAttribute()) {
-            for (Function func : getSelectedElementClass().equals(AppearanceUIController.NODE_ELEMENT) ? appearanceModel.getNodeFunctions(graph) : appearanceModel.getEdgeFunctions(graph)) {
+            for (Function func : getSelectedElementClass().equals(AppearanceUIController.NODE_ELEMENT) ? appearanceModel.getNodeFunctions() : appearanceModel.getEdgeFunctions()) {
                 if (func.equals(sFunction)) {
                     return false;
                 }
@@ -174,12 +168,6 @@ public class AppearanceUIModel {
             }
         }
         return true;
-    }
-
-    public void select() {
-    }
-
-    public void unselect() {
     }
 
     public boolean isLocalScale() {
@@ -246,9 +234,8 @@ public class AppearanceUIModel {
     }
 
     public Collection<Function> getFunctions() {
-        Graph graph = pm.getGraphModel(appearanceModel.getWorkspace()).getGraph();
         List<Function> functions = new ArrayList<>();
-        for (Function func : selectedElementClass.equalsIgnoreCase(AppearanceUIController.NODE_ELEMENT) ? appearanceModel.getNodeFunctions(graph) : appearanceModel.getEdgeFunctions(graph)) {
+        for (Function func : selectedElementClass.equalsIgnoreCase(AppearanceUIController.NODE_ELEMENT) ? appearanceModel.getNodeFunctions() : appearanceModel.getEdgeFunctions()) {
             TransformerUI ui = func.getUI();
             if (ui != null && ui.getDisplayName().equals(getSelectedTransformerUI().getDisplayName())) {
                 if (ui.getCategory().equals(selectedCategory.get(selectedElementClass))) {

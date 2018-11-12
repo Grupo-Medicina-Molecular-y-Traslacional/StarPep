@@ -70,6 +70,7 @@ import org.gephi.graph.api.ElementIterable;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphObserver;
+import org.gephi.graph.api.GraphView;
 import org.gephi.graph.api.Index;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.Table;
@@ -92,24 +93,24 @@ public class AppearanceModelImpl implements AppearanceModel {
     private final List<Transformer> edgeTransformers;
     // Transformer UIS
     private final Map<Class, TransformerUI> transformerUIs;
-    //Functions
-    private final Object functionLock;
-    //
-    private final FunctionsModel functionsMain;
-    private final Map<Graph, FunctionsModel> functions = new HashMap<>();
 
-    public AppearanceModelImpl(Workspace workspace) {
+    //Functions
+    private final FunctionsModel functions;
+
+    public AppearanceModelImpl(Workspace workspace, GraphView graphView) {
         this.workspace = workspace;
-        this.graphModel = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel(workspace);
+        this.graphModel = graphView.getGraphModel();
         this.defaultInterpolator = Interpolator.LINEAR;
-        this.functionLock = new Object();
-        this.transformerUIs = initTransformerUIs();
+
+        // Transformers
         this.nodeTransformers = initNodeTransformers();
         this.edgeTransformers = initEdgeTransformers();
 
+        // Transformer UIS
+        this.transformerUIs = initTransformerUIs();
+
         //Functions
-        functionsMain = new FunctionsModel(graphModel.getGraph());
-        refreshFunctions(graphModel.getGraph());
+        functions = new FunctionsModel(graphModel.getGraph(graphView));
     }
 
     @Override
@@ -123,18 +124,18 @@ public class AppearanceModelImpl implements AppearanceModel {
     }
 
     @Override
-    public Function[] getNodeFunctions(Graph graph) {
-        return refreshFunctions(graph).getNodeFunctions();
+    public Function[] getNodeFunctions() {
+        return functions.getNodeFunctions();
     }
 
     @Override
-    public Function[] getEdgeFunctions(Graph graph) {
-        return refreshFunctions(graph).getEdgeFunctions();
+    public Function[] getEdgeFunctions() {
+        return functions.getEdgeFunctions();
     }
 
     @Override
-    public Function getNodeFunction(Graph graph, Column column, Class<? extends Transformer> transformer) {
-        for (Function f : refreshFunctions(graph).getNodeFunctions()) {
+    public Function getNodeFunction(Column column, Class<? extends Transformer> transformer) {
+        for (Function f : functions.getNodeFunctions()) {
             if (f.isAttribute() && f.getTransformer().getClass().equals(transformer)
                     && ((AttributeFunction) f).getColumn().equals(column)) {
                 return f;
@@ -144,8 +145,8 @@ public class AppearanceModelImpl implements AppearanceModel {
     }
 
     @Override
-    public Function getEdgeFunction(Graph graph, Column column, Class<? extends Transformer> transformer) {
-        for (Function f : refreshFunctions(graph).getEdgeFunctions()) {
+    public Function getEdgeFunction(Column column, Class<? extends Transformer> transformer) {
+        for (Function f : functions.getEdgeFunctions()) {
             if (f.isAttribute() && f.getTransformer().getClass().equals(transformer)
                     && ((AttributeFunction) f).getColumn().equals(column)) {
                 return f;
@@ -155,9 +156,9 @@ public class AppearanceModelImpl implements AppearanceModel {
     }
 
     @Override
-    public Function getNodeFunction(Graph graph, AppearanceModel.GraphFunction graphFunction, Class<? extends Transformer> transformer) {
+    public Function getNodeFunction(AppearanceModel.GraphFunction graphFunction, Class<? extends Transformer> transformer) {
         String id = getNodeId(transformer, graphFunction);
-        for (Function f : refreshFunctions(graph).getNodeFunctions()) {
+        for (Function f : functions.getNodeFunctions()) {
             if (((FunctionImpl) f).getId().equals(id) && f.getTransformer().getClass().equals(transformer)) {
                 return f;
             }
@@ -166,9 +167,9 @@ public class AppearanceModelImpl implements AppearanceModel {
     }
 
     @Override
-    public Function getEdgeFunction(Graph graph, AppearanceModel.GraphFunction graphFunction, Class<? extends Transformer> transformer) {
+    public Function getEdgeFunction(AppearanceModel.GraphFunction graphFunction, Class<? extends Transformer> transformer) {
         String id = getEdgeId(transformer, graphFunction);
-        for (Function f : refreshFunctions(graph).getEdgeFunctions()) {
+        for (Function f : functions.getEdgeFunctions()) {
             if (((FunctionImpl) f).getId().equals(id) && f.getTransformer().getClass().equals(transformer)) {
                 return f;
             }
@@ -177,63 +178,39 @@ public class AppearanceModelImpl implements AppearanceModel {
     }
 
     @Override
-    public Partition getNodePartition(Graph graph, Column column) {
-        synchronized (functionLock) {
-            refreshFunctions(graph);
-            FunctionsModel m;
-            if (graph.getView().isMainView()) {
-                m = functionsMain;
-            } else {
-                m = functions.get(graph);
-            }
-            if (m != null) {
-                return m.nodeFunctionsModel.getPartition(column);
-            }
-            return null;
-        }
+    public synchronized Partition getNodePartition(Column column) {
+        return functions.nodeFunctionsModel.getPartition(column);
     }
 
     @Override
-    public Partition getEdgePartition(Graph graph, Column column) {
-        synchronized (functionLock) {
-            refreshFunctions(graph);
-            FunctionsModel m;
-            if (graph.getView().isMainView()) {
-                m = functionsMain;
-            } else {
-                m = functions.get(graph);
-            }
-            if (m != null) {
-                return m.edgeFunctionsModel.getPartition(column);
-            }
-            return null;
-        }
+    public Partition getEdgePartition(Column column) {
+        return functions.edgeFunctionsModel.getPartition(column);
     }
 
-    private FunctionsModel refreshFunctions(Graph graph) {
-        synchronized (functionLock) {
-            FunctionsModel m;
-            if (graph.getView().isMainView()) {
-                m = functionsMain;
-            } else {
-                m = functions.get(graph);
-                if (m == null) {
-                    m = new FunctionsModel(graph);
-                    functions.put(graph, m);
-                }
-            }
-
-            //Check and detroy old
-            for (Iterator<Map.Entry<Graph, FunctionsModel>> it = functions.entrySet().iterator();
-                    it.hasNext();) {
-                Map.Entry<Graph, FunctionsModel> entry = it.next();
-                if (entry.getKey().getView().isDestroyed()) {
-                    it.remove();
-                }
-            }
-            return m;
-        }
-    }
+//    private FunctionsModel refreshFunctions(Graph graph) {
+//        synchronized (functionLock) {
+//            FunctionsModel m;
+//            if (graph.getView().isMainView()) {
+//                m = functionsMain;
+//            } else {
+//                m = functions.get(graph);
+//                if (m == null) {
+//                    m = new FunctionsModel(graph);
+//                    functions.put(graph, m);
+//                }
+//            }
+//
+//            //Check and detroy old
+//            for (Iterator<Map.Entry<Graph, FunctionsModel>> it = functions.entrySet().iterator();
+//                    it.hasNext();) {
+//                Map.Entry<Graph, FunctionsModel> entry = it.next();
+//                if (entry.getKey().getView().isDestroyed()) {
+//                    it.remove();
+//                }
+//            }
+//            return m;
+//        }
+//    }
 
     private class NodeFunctionsModel extends ElementFunctionsModel<Node> {
 

@@ -56,17 +56,17 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service = AppearanceController.class)
 public class AppearanceControllerImpl implements AppearanceController, WorkspaceEventListener {
-
+    private final ProjectManager pc;
     private AppearanceModelImpl model;
 
     public AppearanceControllerImpl() {
-        ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+        pc = Lookup.getDefault().lookup(ProjectManager.class);
         pc.addWorkspaceEventListener(this);
         
         if (pc.getCurrentWorkspace() != null) {
             model = pc.getCurrentWorkspace().getLookup().lookup(AppearanceModelImpl.class);
             if (model == null) {
-                model = new AppearanceModelImpl(pc.getCurrentWorkspace());
+                model = new AppearanceModelImpl(pc.getCurrentWorkspace(), pc.getGraphView());
                 pc.getCurrentWorkspace().add(model);
             }
         }
@@ -86,7 +86,7 @@ public class AppearanceControllerImpl implements AppearanceController, Workspace
     public AppearanceModelImpl getModel(Workspace workspace) {
         AppearanceModelImpl m = workspace.getLookup().lookup(AppearanceModelImpl.class);
         if (m == null) {
-            m = new AppearanceModelImpl(workspace);
+            m = new AppearanceModelImpl(workspace, pc.getGraphView(workspace));
             workspace.add(m);
         }
         return m;

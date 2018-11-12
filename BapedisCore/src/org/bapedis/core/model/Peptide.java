@@ -26,7 +26,7 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class Peptide {
+ public class Peptide {
 
     public static final PeptideAttribute ID = new PeptideAttribute("id", NbBundle.getMessage(Peptide.class, "Peptide.attribute.id"), Integer.class, true);
     public static final PeptideAttribute SEQ = new PeptideAttribute("seq", NbBundle.getMessage(Peptide.class, "Peptide.attribute.seq"), String.class, true);

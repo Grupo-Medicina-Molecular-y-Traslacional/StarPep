@@ -14,11 +14,11 @@ import java.util.Objects;
  */
 public class PeptideAttribute {
 
-    protected String id;
-    protected String displayName;
-    protected Class<?> type;
-    protected boolean visible;    
-    protected Object defaultValue;
+    protected final String id;
+    protected final String displayName;
+    protected final Class<?> type;
+    protected final boolean visible;    
+    protected final Object defaultValue;
 
     public PeptideAttribute(String id, String displayName, Class<?> type, boolean visible) {
         this(id, displayName, type, visible, null);
@@ -50,11 +50,7 @@ public class PeptideAttribute {
 
     public Object getDefaultValue() {
         return defaultValue;
-    }
-
-    public void setDefaultValue(Object defaultValue) {
-        this.defaultValue = defaultValue;
-    }        
+    }     
 
     @Override
     public boolean equals(Object obj) {

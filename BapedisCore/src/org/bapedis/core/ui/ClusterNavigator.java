@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -49,6 +50,8 @@ import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.impl.AbstractCluster;
+import org.bapedis.core.ui.actions.RemoveCluster;
+import org.bapedis.core.ui.actions.RemoveOtherClusters;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
@@ -98,7 +101,7 @@ public class ClusterNavigator extends JComponent implements
         lookup = new AbstractLookup(content);
 
         table = new JXTable();
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setGridColor(Color.LIGHT_GRAY);
         table.setHighlighters(HighlighterFactory.createAlternateStriping());
         table.setColumnControlVisible(false);
@@ -143,6 +146,12 @@ public class ClusterNavigator extends JComponent implements
         toolBar.add(refreshButton);
 
         toolBar.addSeparator();
+        List<? extends Action> actions = Utilities.actionsForPath("Actions/EditCluster");
+        for (Action action : actions) {
+            toolBar.add(action);
+        }
+
+        toolBar.addSeparator();
         toolBar.add(findButton);
 
         // Botton toolbar
@@ -171,15 +180,23 @@ public class ClusterNavigator extends JComponent implements
     }
 
     private synchronized void tableValueChanged(ListSelectionEvent e) {
-        Collection<? extends ClusterNode> oldNodes = lookup.lookupAll(ClusterNode.class);
-        for (ClusterNode node : oldNodes) {
-            content.remove(node);
-        }
-        int rowIndex = table.getSelectedRow();
-        if (rowIndex != -1) {
-            MyTableModel dataModel = (MyTableModel) table.getModel();
-            Cluster cluster = dataModel.getClusterAtRow(table.convertRowIndexToModel(rowIndex));
-            content.add(new ClusterNode(cluster));
+        ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+        if (lsm.isSelectionEmpty()) {
+            Collection<? extends ClusterNode> oldNodes = lookup.lookupAll(ClusterNode.class);
+            for (ClusterNode node : oldNodes) {
+                content.remove(node);
+            }
+        } else if (!e.getValueIsAdjusting()) {
+            // Find out which indexes are selected.
+            int minIndex = lsm.getMinSelectionIndex();
+            int maxIndex = lsm.getMaxSelectionIndex();
+            for (int i = minIndex; i <= maxIndex; i++) {
+                if (lsm.isSelectedIndex(i)) {
+                    MyTableModel dataModel = (MyTableModel) table.getModel();
+                    Cluster cluster = dataModel.getClusterAtRow(table.convertRowIndexToModel(i));
+                    content.add(new ClusterNode(cluster));
+                }
+            }
         }
     }
 
@@ -432,12 +449,10 @@ public class ClusterNavigator extends JComponent implements
                     table.getSelectionModel().clearSelection();
                     table.getSelectionModel().setSelectionInterval(selRow, selRow);
                 }
-                int rowIndex = table.getSelectedRow();
-                MyTableModel dataModel = (MyTableModel) table.getModel();
-                Cluster cluster = (Cluster) dataModel.getClusterAtRow(table.convertRowIndexToModel(rowIndex));
                 JPopupMenu contextMenu = new JPopupMenu();
-//                contextMenu.add(new ShowPropertiesAction(new ClusterNode(cluster)));
-//                contextMenu.show(table, evt.getX(), evt.getY());
+                contextMenu.add(new RemoveCluster());
+                contextMenu.add(new RemoveOtherClusters());
+                contextMenu.show(table, evt.getX(), evt.getY());
             } else {
                 table.getSelectionModel().clearSelection();
             }

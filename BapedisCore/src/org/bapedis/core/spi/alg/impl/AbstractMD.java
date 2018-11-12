@@ -57,8 +57,7 @@ public abstract class AbstractMD implements Algorithm {
         synchronized (map) {
             MolecularDescriptor attr = map.get(id);
             if (attr == null) {
-                attr = new MolecularDescriptor(id, displayName, type, factory.getName());
-                attr.setDefaultValue(defaultValue);
+                attr = new MolecularDescriptor(id, displayName, type, factory.getName(), defaultValue);
                 map.put(id, attr);
                 propertyChangeSupport.firePropertyChange(MD_ADDED, null, attr);
             }

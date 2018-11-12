@@ -79,8 +79,8 @@ public class WekaPCATransformerPanel extends javax.swing.JPanel implements TwoDT
         add(jLabel1);
 
         jTextField1.setText(org.openide.util.NbBundle.getMessage(WekaPCATransformerPanel.class, "WekaPCATransformerPanel.jTextField1.text")); // NOI18N
-        jTextField1.setMinimumSize(new java.awt.Dimension(90, 20));
-        jTextField1.setPreferredSize(new java.awt.Dimension(90, 20));
+        jTextField1.setMinimumSize(new java.awt.Dimension(90, 27));
+        jTextField1.setPreferredSize(new java.awt.Dimension(90, 27));
         add(jTextField1);
     }// </editor-fold>//GEN-END:initComponents
 

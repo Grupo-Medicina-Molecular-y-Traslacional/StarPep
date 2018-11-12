@@ -15,10 +15,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.event.SwingPropertyChangeSupport;
+import org.bapedis.core.project.ProjectManager;
 import org.netbeans.swing.etable.QuickFilter;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Index;
 import org.openide.nodes.Node;
+import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 
 /**
  * A class that represents an attribute-based data model for peptides.
@@ -27,6 +30,7 @@ import org.openide.nodes.Node;
  */
 public class AttributesModel {
 
+    protected final Map<Integer, Peptide> peptideMap;
     protected final Map<String, List<MolecularDescriptor>> mdMap;
     protected final Set<PeptideAttribute> displayedColumnsModel;
     private static final int MAX_AVAILABLE_COLUMNS = 6;
@@ -39,16 +43,19 @@ public class AttributesModel {
     public static final String DISPLAY_ATTR_REMOVED = "display_attribute_remove";
     public static final String MD_ATTR_ADDED = "md_attribute_add";
     public static final String MD_ATTR_REMOVED = "md_attribute_remove";
-        
+
+    protected final AttributeModelBridgeImpl bridge;
     protected transient final SwingPropertyChangeSupport propertyChangeSupport;
-    protected Node rootNode;    
+    protected Node rootNode;
 
     public AttributesModel() {
+        peptideMap = new LinkedHashMap<>();
         mdMap = new LinkedHashMap<>();
         nodeList = new LinkedList<>();
         container = new PeptideNodeContainer();
         rootNode = new AbstractNode(container);
         propertyChangeSupport = new SwingPropertyChangeSupport(this, true);
+        bridge = new AttributeModelBridgeImpl();
 
         displayedColumnsModel = new LinkedHashSet<>();
         displayedColumnsModel.add(Peptide.ID);
@@ -57,8 +64,8 @@ public class AttributesModel {
 
         List<MolecularDescriptor> list = new LinkedList<>();
         list.add(Peptide.LENGHT);
-        mdMap.put(Peptide.LENGHT.getCategory(), list);        
-    }       
+        mdMap.put(Peptide.LENGHT.getCategory(), list);
+    }
 
     public PeptideAttribute[] getDisplayedColumns() {
         return displayedColumnsModel.toArray(new PeptideAttribute[0]);
@@ -77,7 +84,7 @@ public class AttributesModel {
     }
 
     public boolean removeDisplayedColumn(PeptideAttribute attr) {
-        if (displayedColumnsModel.remove(attr)) {            
+        if (displayedColumnsModel.remove(attr)) {
             propertyChangeSupport.firePropertyChange(DISPLAY_ATTR_REMOVED, attr, null);
             return true;
         }
@@ -97,9 +104,9 @@ public class AttributesModel {
     }
 
     public void addMolecularDescriptors(String category, List<MolecularDescriptor> features) {
-        if (mdMap.containsKey(category)){
-            for(MolecularDescriptor oldAttr: mdMap.get(category)){
-                if(!features.contains(oldAttr)){
+        if (mdMap.containsKey(category)) {
+            for (MolecularDescriptor oldAttr : mdMap.get(category)) {
+                if (!features.contains(oldAttr)) {
                     delete(oldAttr);
                 }
             }
@@ -110,20 +117,20 @@ public class AttributesModel {
 
     public void deleteAllMolecularDescriptors(String category) {
         if (!category.equals(MolecularDescriptor.DEFAULT_CATEGORY)) {
-            for(PeptideAttribute attr: mdMap.remove(category)){
+            for (PeptideAttribute attr : mdMap.remove(category)) {
                 delete(attr);
             }
             propertyChangeSupport.firePropertyChange(MD_ATTR_REMOVED, category, null);
         }
     }
-    
-    public void deleteAttribute(MolecularDescriptor attr){
+
+    public void deleteAttribute(MolecularDescriptor attr) {
         String category = attr.getCategory();
-        if (mdMap.containsKey(category)){
+        if (mdMap.containsKey(category)) {
             List<MolecularDescriptor> list = mdMap.get(category);
             delete(attr);
             list.remove(attr);
-        }else{
+        } else {
             throw new IllegalArgumentException("Unknown molecular descriptor category: " + category);
         }
     }
@@ -134,7 +141,7 @@ public class AttributesModel {
         }
         removeDisplayedColumn(attr);
     }
-    
+
     public synchronized List<Peptide> getPeptides() {
         if (filteredPept != null) {
             return filteredPept;
@@ -151,7 +158,11 @@ public class AttributesModel {
         return peptides;
     }
 
-    public void refresh() {
+    public AttributeModelBridge getBridge() {
+        return bridge;
+    }
+
+    public void refresh(int a) {
         container.refreshNodes();
     }
 
@@ -165,6 +176,7 @@ public class AttributesModel {
 
     public void addPeptide(Peptide peptide) {
         nodeList.add(new PeptideNode(peptide));
+        peptideMap.put(peptide.getId(), peptide);
     }
 
     public QuickFilter getQuickFilter() {
@@ -223,4 +235,45 @@ public class AttributesModel {
 
     }
 
+    private class AttributeModelBridgeImpl implements AttributeModelBridge {
+
+        @Override
+        public void copyTo(AttributesModel attrModel, List<Integer> peptideIDs) {
+            attrModel.mdMap.putAll(mdMap);
+            attrModel.displayedColumnsModel.addAll(displayedColumnsModel);
+            for (Integer id : peptideIDs) {
+                attrModel.addPeptide(peptideMap.get(id));
+            }
+        }
+
+        private void copyMdMapTo(AttributesModel attrModel) throws CloneNotSupportedException {
+            String key;
+            List<MolecularDescriptor> currentValue;
+            List<MolecularDescriptor> newValue;
+            for (Map.Entry<String, List<MolecularDescriptor>> entry : mdMap.entrySet()) {
+                key = entry.getKey();
+                currentValue = entry.getValue();
+                newValue = new LinkedList<>();
+                for (MolecularDescriptor md : currentValue) {
+                    newValue.add((MolecularDescriptor) md.clone());
+                }
+                attrModel.mdMap.put(key, newValue);
+            }
+        }
+
+        @Override
+        public void copyTo(Workspace workspace, List<Integer> peptideIDs) {
+            AttributesModel attrModel = Lookup.getDefault().lookup(ProjectManager.class).getAttributesModel(workspace);
+            try {
+                copyMdMapTo(attrModel);
+                attrModel.displayedColumnsModel.addAll(displayedColumnsModel);
+                for (Integer id : peptideIDs) {
+                    attrModel.addPeptide(peptideMap.get(id));
+                }
+            } catch (CloneNotSupportedException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
+
+    }
 }

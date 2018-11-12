@@ -6,7 +6,6 @@
 package org.bapedis.chemspace.spi.impl;
 
 import org.bapedis.chemspace.spi.SimilarityMeasure;
-import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;

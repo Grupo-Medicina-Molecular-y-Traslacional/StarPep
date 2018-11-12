@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author loge
  */
-public class MolecularDescriptor extends PeptideAttribute {
+public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
 
     public static final String DEFAULT_CATEGORY = "Default";
     protected final String category;
@@ -20,11 +20,15 @@ public class MolecularDescriptor extends PeptideAttribute {
     protected double score;
 
     public MolecularDescriptor(String id, String displayName, Class<?> type) {
-        this(id, displayName, type, DEFAULT_CATEGORY);
+        this(id, displayName, type, DEFAULT_CATEGORY, null);
     }
-
+    
     public MolecularDescriptor(String id, String displayName, Class<?> type, String category) {
-        super(id, displayName, type, true);
+        this(id, displayName, type, category, null);
+    }    
+
+    public MolecularDescriptor(String id, String displayName, Class<?> type, String category, Object defaulValue) {
+        super(id, displayName, type, true, defaulValue);
         this.category = category;
         min = Double.NaN;
         max = Double.NaN;
@@ -163,4 +167,10 @@ public class MolecularDescriptor extends PeptideAttribute {
         }
         return sum / data.length;
     }
+    
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        MolecularDescriptor copyObject = (MolecularDescriptor)super.clone();
+        return copyObject;        
+    }    
 }

@@ -41,6 +41,7 @@ import org.bapedis.core.model.FilterModel;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
+import org.bapedis.core.ui.ClusterNavigatorLookupHint;
 import org.bapedis.core.ui.GraphElementNavigatorLookupHint;
 import org.gephi.graph.api.Node;
 import org.gephi.ui.components.JColorBlackWhiteSwitcher;
@@ -67,7 +68,6 @@ import org.openide.awt.UndoRedo;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.NbPreferences;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.Lookups;
@@ -126,7 +126,9 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         graphPanel.add(extendedBar, BorderLayout.PAGE_START);
         graphPanel.add(bottomToolbar, BorderLayout.PAGE_END);
         content = new InstanceContent();
-        lookup = new ProxyLookup(new AbstractLookup(content), Lookups.singleton(new GraphElementNavigatorLookupHint()));
+        lookup = new ProxyLookup(new AbstractLookup(content),
+                Lookups.singleton(new GraphElementNavigatorLookupHint()),
+                Lookups.singleton(new ClusterNavigatorLookupHint()));
     }
 
     private void initComponents() {

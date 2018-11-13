@@ -96,6 +96,7 @@ public abstract class FunctionImpl implements Function {
         if (isSimple()) {
             ((SimpleTransformer) transformer).transform(element);
         } else if (isRanking()) {
+//            ranking.refresh();
             Number val = ranking.getValue(element, graph);
             if (val == null) {
                 Logger.getLogger("").log(Level.WARNING, "The element with id ''{0}'' has a null value for ranking. Using 0 instead", element.getId());
@@ -103,6 +104,7 @@ public abstract class FunctionImpl implements Function {
             }
             ((RankingTransformer) transformer).transform(element, ranking, interpolator, val);
         } else if (isPartition()) {
+//            partition.refresh();
             Object val = partition.getValue(element, graph);
             ((PartitionTransformer) transformer).transform(element, partition, val);
         }

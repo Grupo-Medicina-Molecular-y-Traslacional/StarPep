@@ -52,7 +52,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.bapedis.core.project.ProjectManager;
 import org.gephi.appearance.api.AppearanceModel;
 import org.gephi.appearance.api.AttributeFunction;
 import org.gephi.appearance.api.Function;
@@ -62,9 +61,7 @@ import org.gephi.appearance.spi.Transformer;
 import org.gephi.appearance.spi.TransformerCategory;
 import org.gephi.appearance.spi.TransformerUI;
 import static org.gephi.desktop.appearance.AppearanceUIController.ELEMENT_CLASSES;
-import org.gephi.graph.api.Graph;
 import org.gephi.ui.appearance.plugin.category.DefaultCategory;
-import org.openide.util.Lookup;
 
 /**
  *

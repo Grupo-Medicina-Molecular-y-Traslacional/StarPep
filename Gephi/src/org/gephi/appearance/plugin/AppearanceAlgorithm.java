@@ -13,6 +13,10 @@ import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.gephi.appearance.api.AppearanceController;
 import org.gephi.appearance.api.Function;
+import org.gephi.appearance.api.Partition;
+import org.gephi.appearance.api.PartitionFunction;
+import org.gephi.appearance.api.Ranking;
+import org.gephi.appearance.api.RankingFunction;
 import org.gephi.desktop.appearance.AppearanceUIModel;
 import org.gephi.graph.api.Element;
 import org.gephi.graph.api.ElementIterable;
@@ -84,6 +88,22 @@ public class AppearanceAlgorithm implements Algorithm {
     public void run() {
         if (selectedFunction != null) {
             Graph graph = graphModel.getGraphVisible();
+            //Refresh ranking and partition
+            Ranking ranking = null;
+            Partition partition = null;
+            if (selectedFunction instanceof RankingFunction) {
+                ranking = ((RankingFunction) selectedFunction).getRanking();
+            }
+            if (selectedFunction instanceof PartitionFunction) {
+                partition = ((PartitionFunction) selectedFunction).getPartition();
+            }
+            if (ranking != null) {
+                ranking.refresh();
+            }
+            if (partition != null) {
+                partition.refresh();
+            }
+
             ElementIterable<? extends Element> iterable;
             int taskSize = 0;
             if (selectedFunction.getElementClass().equals(Node.class)) {

@@ -66,7 +66,7 @@ public class EdgeWeightRankingImpl extends RankingImpl {
     }
 
     @Override
-    protected void refresh() {
+    public void refresh() {
         if (graph.getEdgeCount() > 0) {
             double minV = Double.MAX_VALUE;
             double maxV = Double.MIN_VALUE;

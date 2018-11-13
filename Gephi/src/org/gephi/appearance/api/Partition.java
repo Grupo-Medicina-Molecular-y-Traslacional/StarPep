@@ -61,6 +61,12 @@ import org.gephi.graph.api.Graph;
 public interface Partition {
 
     /**
+     * Update the minimum and maximum value in this ranking.
+     *
+     */    
+    public void refresh();
+    
+    /**
      * Returns the collection of values this partition represents. Each value
      * has at least one element.
      *

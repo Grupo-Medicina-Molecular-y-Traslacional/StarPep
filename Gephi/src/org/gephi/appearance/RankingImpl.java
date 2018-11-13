@@ -56,7 +56,6 @@ public abstract class RankingImpl implements Ranking {
     protected RankingImpl() {
     }
 
-    protected abstract void refresh();
 
     @Override
     public Number getMinValue() {

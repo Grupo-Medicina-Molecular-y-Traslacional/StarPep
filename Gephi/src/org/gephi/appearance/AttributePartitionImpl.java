@@ -82,7 +82,7 @@ public class AttributePartitionImpl extends PartitionImpl {
     }
 
     @Override
-    protected void refresh() {
+    public void refresh() {
         if (graph != null) {
             parts.clear();
             elements = 0;

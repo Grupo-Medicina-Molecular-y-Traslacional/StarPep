@@ -41,70 +41,81 @@
  */
 package org.gephi.appearance;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import org.gephi.graph.api.Column;
-import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Element;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.Node;
 
 /**
  *
  * @author mbastian
  */
-public class EdgeTypePartitionImpl extends PartitionImpl {
+public class NodeTypePartitionImpl extends PartitionImpl {
 
     protected final Graph graph;
     protected final GraphModel model;
+    protected final Map<Object, Integer> map;
+    protected int elements;
 
-    public EdgeTypePartitionImpl(Graph graph) {
+    public NodeTypePartitionImpl(Graph graph) {
         super();
         this.graph = graph;
         this.model = graph.getModel();
+        this.map = new HashMap<>();
     }
 
     @Override
-    protected void refresh() {
+    public void refresh() {
+        if (graph != null) {
+            map.clear();
+            elements = 0;
+            String label;
+            for (Node node : graph.getNodes()) {
+                label = node.getLabel();
+                Integer count = map.get(label);
+                if (count == null) {
+                    count = 0;
+                }
+                map.put(label, ++count);
+                elements++;
+            }
+        }
     }
 
     @Override
     public Collection getValues() {
-        Object[] labels = model.getEdgeTypeLabels();
-        ArrayList<Object> col = new ArrayList<>(labels.length);
-        for (Object l : labels) {
-            if (!(l == null && graph.getEdgeCount(0) == 0)) {
-                col.add(l);
-            }
-        }
-        return col;
+        return map.keySet();
     }
 
     @Override
     public Object getValue(Element element, Graph gr) {
-        return ((Edge) element).getTypeLabel();
+        return ((Node) element).getLabel();
     }
 
     @Override
     public int getElementCount() {
-        return graph.getEdgeCount();
+        return elements;
     }
 
     @Override
     public int count(Object value) {
-        return graph.getEdgeCount(model.getEdgeType(value));
+        Integer c = map.get(value);
+        return c != null ? c : 0;
     }
 
     @Override
     public float percentage(Object value) {
-        int count = count(value);
-        return (float) count / graph.getEdgeCount();
+        Integer c = map.get(value);
+        return 100f * (c != null ? c.floatValue() / elements : 0f);
     }
 
     @Override
     public int size() {
-        int size = model.getEdgeTypeCount();
-        return graph.getEdgeCount(0) == 0 ? size - 1 : size;
+        return map.size();
     }
 
     @Override

@@ -32,7 +32,7 @@ public class AttributeRankingImpl extends RankingImpl {
     }
 
     @Override
-    protected void refresh() {
+    public void refresh() {
         if (index != null && index.isSortable(column)) {
             min = index.getMinValue(column);
             max = index.getMaxValue(column);

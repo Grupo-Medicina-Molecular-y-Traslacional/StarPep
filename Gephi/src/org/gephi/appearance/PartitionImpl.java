@@ -85,8 +85,6 @@ public abstract class PartitionImpl implements Partition {
         }
     }
 
-    protected abstract void refresh();
-
     @Override
     public Collection getSortedValues() {
         List values = new ArrayList(getValues());

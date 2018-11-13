@@ -60,8 +60,9 @@ public interface AppearanceModel {
         NODE_DEGREE("degree"),
         NODE_INDEGREE("indegree"),
         NODE_OUTDEGREE("outdegree"),
-        EDGE_WEIGHT("weight"),
-        EDGE_TYPE("type");
+        NODE_TYPE("type"),
+        EDGE_WEIGHT("weight");
+        
 
         private final String id;
 

@@ -65,7 +65,7 @@ public class OutDegreeRankingImpl extends RankingImpl {
     }
 
     @Override
-    protected void refresh() {
+    public void refresh() {
         if (graph.getNodeCount() > 0) {
             int minV = Integer.MAX_VALUE;
             int maxV = Integer.MIN_VALUE;

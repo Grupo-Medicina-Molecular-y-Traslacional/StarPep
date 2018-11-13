@@ -53,6 +53,12 @@ import org.gephi.graph.api.Graph;
 public interface Ranking {
 
     /**
+     * Update the minimum and maximum value in this ranking.
+     *
+     */    
+    public void refresh();
+    
+    /**
      * Returns the minimum value in this ranking.
      *
      * @return minimum value

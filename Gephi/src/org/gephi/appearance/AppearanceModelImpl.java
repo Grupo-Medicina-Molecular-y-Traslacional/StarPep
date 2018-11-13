@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -211,7 +212,6 @@ public class AppearanceModelImpl implements AppearanceModel {
 //            return m;
 //        }
 //    }
-
     private class NodeFunctionsModel extends ElementFunctionsModel<Node> {
 
         public NodeFunctionsModel(Graph graph) {
@@ -265,14 +265,15 @@ public class AppearanceModelImpl implements AppearanceModel {
             }
 
             // Degree functions
-            for (Transformer t : getRankingTransformers()) {
+            RankingImpl degreeRanking = rankings.get(getIdStr(AppearanceModel.GraphFunction.NODE_DEGREE.getId()));
+            degreeRanking.refresh();
+            for (Transformer t : rankingTransformers) {
                 String degreeId = getId(t, AppearanceModel.GraphFunction.NODE_DEGREE.getId());
-                RankingImpl degreeRanking = rankings.get(getIdStr(AppearanceModel.GraphFunction.NODE_DEGREE.getId()));
+
                 if (!graphFunctions.containsKey(degreeId)) {
                     String name = NbBundle.getMessage(AppearanceModelImpl.class, "NodeGraphFunction.Degree.name");
                     graphFunctions.put(degreeId, new GraphFunctionImpl(degreeId, name, Node.class, graph, t, getTransformerUI(t), degreeRanking, defaultInterpolator));
                 }
-                degreeRanking.refresh();
 
                 String indegreeId = getId(t, AppearanceModel.GraphFunction.NODE_INDEGREE.getId());
                 String outdegreeId = getId(t, AppearanceModel.GraphFunction.NODE_OUTDEGREE.getId());
@@ -346,7 +347,7 @@ public class AppearanceModelImpl implements AppearanceModel {
             }
 
             // Weight function
-            for (Transformer t : getRankingTransformers()) {
+            for (Transformer t : rankingTransformers) {
                 String weightId = getId(t, AppearanceModel.GraphFunction.EDGE_WEIGHT.getId());
                 RankingImpl ranking = rankings.get(getIdStr(AppearanceModel.GraphFunction.EDGE_WEIGHT.getId()));
                 if (!graphFunctions.containsKey(weightId)) {
@@ -357,7 +358,7 @@ public class AppearanceModelImpl implements AppearanceModel {
             }
 
             // Type Function
-            for (Transformer t : getPartitionTransformers()) {
+            for (Transformer t : partitionTransformers) {
                 String typeId = getId(t, AppearanceModel.GraphFunction.EDGE_TYPE.getId());
                 PartitionImpl partition = partitions.get(getIdStr(AppearanceModel.GraphFunction.EDGE_TYPE.getId()));
                 if (partition != null) {
@@ -395,7 +396,7 @@ public class AppearanceModelImpl implements AppearanceModel {
 
         private List<Function> getFunctions(ElementFunctionsModel model) {
             model.refreshFunctions();
-            List<Function> functions = new ArrayList<>();
+            List<Function> functions = new LinkedList<>();
             functions.addAll(model.simpleFunctions.values());
             functions.addAll(model.graphFunctions.values());
             functions.addAll(model.attributeFunctions.values());
@@ -413,6 +414,8 @@ public class AppearanceModelImpl implements AppearanceModel {
         protected final Map<String, AttributeFunctionImpl> attributeFunctions;
         protected final Map<String, PartitionImpl> partitions;
         protected final Map<String, RankingImpl> rankings;
+        protected final List<RankingTransformer> rankingTransformers;
+        protected final List<PartitionTransformer> partitionTransformers;
 
         protected ElementFunctionsModel(Graph graph) {
             this.graph = graph;
@@ -426,6 +429,10 @@ public class AppearanceModelImpl implements AppearanceModel {
 
             // Init simple
             initSimpleFunctions();
+
+            //Init transformers
+            rankingTransformers = initRankingTransformers();
+            partitionTransformers = initPartitionTransformers();
         }
 
         public abstract Iterable<T> getElements();
@@ -529,10 +536,10 @@ public class AppearanceModelImpl implements AppearanceModel {
             }
 
             //Ranking functions
-            for (Transformer t : getRankingTransformers()) {
-                for (Column col : toRefreshColumns) {
-                    RankingImpl ranking = rankings.get(getIdCol(col));
-                    if (ranking != null) {
+            for (Column col : toRefreshColumns) {
+                RankingImpl ranking = rankings.get(getIdCol(col));
+                if (ranking != null) {
+                    for (Transformer t : rankingTransformers) {
                         String id = getId(t, col);
                         if (!attributeFunctions.containsKey(id)) {
                             attributeFunctions.put(id, new AttributeFunctionImpl(id, graph, col, t, getTransformerUI(t), ranking, defaultInterpolator));
@@ -542,10 +549,10 @@ public class AppearanceModelImpl implements AppearanceModel {
             }
 
             //Partition functions
-            for (Transformer t : getPartitionTransformers()) {
-                for (Column col : toRefreshColumns) {
-                    PartitionImpl partition = partitions.get(getIdCol(col));
-                    if (partition != null) {
+            for (Column col : toRefreshColumns) {
+                PartitionImpl partition = partitions.get(getIdCol(col));
+                if (partition != null) {
+                    for (Transformer t : partitionTransformers) {
                         String id = getId(t, col);
                         if (!attributeFunctions.containsKey(id)) {
                             attributeFunctions.put(id, new AttributeFunctionImpl(id, graph, col, t, getTransformerUI(t), partition));
@@ -568,21 +575,21 @@ public class AppearanceModelImpl implements AppearanceModel {
             return transformerUIs.get(transformer.getClass());
         }
 
-        protected List<Transformer> getRankingTransformers() {
-            List<Transformer> res = new ArrayList<>();
+        private List<RankingTransformer> initRankingTransformers() {
+            List<RankingTransformer> res = new LinkedList<>();
             for (Transformer t : getTransformers()) {
                 if (t instanceof RankingTransformer) {
-                    res.add(t);
+                    res.add((RankingTransformer) t);
                 }
             }
             return res;
         }
 
-        protected List<Transformer> getPartitionTransformers() {
-            List<Transformer> res = new ArrayList<>();
+        private List<PartitionTransformer> initPartitionTransformers() {
+            List<PartitionTransformer> res = new LinkedList<>();
             for (Transformer t : getTransformers()) {
                 if (t instanceof PartitionTransformer) {
-                    res.add(t);
+                    res.add((PartitionTransformer) t);
                 }
             }
             return res;

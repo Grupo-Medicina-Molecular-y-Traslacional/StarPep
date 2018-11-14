@@ -92,20 +92,18 @@ public abstract class FunctionImpl implements Function {
     }
 
     @Override
-    public void transform(Element element, Graph graph) {
+    public void transform(Element element) {
         if (isSimple()) {
             ((SimpleTransformer) transformer).transform(element);
         } else if (isRanking()) {
-//            ranking.refresh();
-            Number val = ranking.getValue(element, graph);
+            Number val = ranking.getValue(element);
             if (val == null) {
                 Logger.getLogger("").log(Level.WARNING, "The element with id ''{0}'' has a null value for ranking. Using 0 instead", element.getId());
                 val = 0;
             }
             ((RankingTransformer) transformer).transform(element, ranking, interpolator, val);
         } else if (isPartition()) {
-//            partition.refresh();
-            Object val = partition.getValue(element, graph);
+            Object val = partition.getValue(element);
             ((PartitionTransformer) transformer).transform(element, partition, val);
         }
     }

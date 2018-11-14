@@ -43,7 +43,6 @@ package org.gephi.appearance;
 
 import org.gephi.graph.api.DirectedGraph;
 import org.gephi.graph.api.Element;
-import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 
 /**
@@ -60,8 +59,8 @@ public class OutDegreeRankingImpl extends RankingImpl {
     }
 
     @Override
-    public Number getValue(Element element, Graph gr) {
-        return ((DirectedGraph)gr).getOutDegree((Node) element);
+    public Number getValue(Element element) {
+        return graph.getOutDegree((Node) element);
     }
 
     @Override

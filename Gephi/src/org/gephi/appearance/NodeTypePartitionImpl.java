@@ -71,6 +71,7 @@ public class NodeTypePartitionImpl extends PartitionImpl {
     @Override
     public void refresh() {
         if (graph != null) {
+            colorMap.clear();
             map.clear();
             elements = 0;
             String label;
@@ -92,7 +93,7 @@ public class NodeTypePartitionImpl extends PartitionImpl {
     }
 
     @Override
-    public Object getValue(Element element, Graph gr) {
+    public Object getValue(Element element) {
         return ((Node) element).getLabel();
     }
 

@@ -159,4 +159,9 @@ public interface AppearanceModel {
      * @return edge function or null if not found
      */
     public Function getEdgeFunction(GraphFunction graphFunction, Class<? extends Transformer> transformer);
+    
+    /**
+     * Refresh functions.
+     */
+    public void refreshFunctions();
 }

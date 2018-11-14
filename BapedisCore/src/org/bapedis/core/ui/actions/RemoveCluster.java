@@ -20,7 +20,6 @@ import org.bapedis.core.model.ClusterNavigatorModel;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
-import org.bapedis.core.spi.alg.impl.AbstractCluster;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Node;
 import org.openide.awt.ActionID;
@@ -115,7 +114,7 @@ public class RemoveCluster extends GlobalContextSensitiveAction<Cluster> {
                     } catch (InterruptedException | ExecutionException ex) {
                         Exceptions.printStackTrace(ex);
                     }finally{
-                        pc.getGraphVizSetting(workspace).fireChangedGraphTable();
+                        pc.getGraphVizSetting(workspace).fireChangedGraphView();
                     }
                 }
             };

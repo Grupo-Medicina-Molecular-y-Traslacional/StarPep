@@ -132,7 +132,7 @@ public class AppearanceUIController implements WorkspaceEventListener, PropertyC
         }
         
         GraphVizSetting graphViz = pc.getGraphVizSetting();
-        graphViz.addGraphTableChangeListener(this);        
+        graphViz.addGraphViewChangeListener(this);        
     }
 
     @Override
@@ -154,12 +154,12 @@ public class AppearanceUIController implements WorkspaceEventListener, PropertyC
         if (oldWs != null) {
             GraphVizSetting oldGVizModel = pc.getGraphVizSetting(oldWs);
             if (oldGVizModel != null) {
-                oldGVizModel.removeGraphTableChangeListener(this);
+                oldGVizModel.removeGraphViewChangeListener(this);
             }
         }
 
         GraphVizSetting graphViz = pc.getGraphVizSetting(newWs);
-        graphViz.addGraphTableChangeListener(this);
+        graphViz.addGraphViewChangeListener(this);
 
     }
 
@@ -255,11 +255,9 @@ public class AppearanceUIController implements WorkspaceEventListener, PropertyC
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(GraphVizSetting.CHANGED_GRAPH_TABLE)) {
-            Function oldValue = model.getSelectedFunction();
-            model.refreshSelectedFunction();
-            Function newValue = model.getSelectedFunction();
-            firePropertyChangeEvent(AppearanceUIModelEvent.SELECTED_FUNCTION, oldValue, newValue);
+        if (evt.getPropertyName().equals(GraphVizSetting.CHANGED_GRAPH_VIEW)) {
+            model.refreshFunctions();            
+            firePropertyChangeEvent(AppearanceUIModelEvent.REFRESHED_FUNCTIONS, null, model.getSelectedFunction());
         }
     }
 

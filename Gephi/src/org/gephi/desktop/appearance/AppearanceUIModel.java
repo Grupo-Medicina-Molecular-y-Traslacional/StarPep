@@ -138,33 +138,8 @@ public class AppearanceUIModel {
         }
     }
 
-    private synchronized Function replaceSelectedFunction() {
-        Function sFunction = getSelectedFunction();
-        if (sFunction instanceof AttributeFunction) {
-            AttributeFunction af = (AttributeFunction) sFunction;
-            for (Function func : getSelectedElementClass().equals(AppearanceUIController.NODE_ELEMENT) ? appearanceModel.getNodeFunctions() : appearanceModel.getEdgeFunctions()) {
-                if (func instanceof AttributeFunction) {
-                    if (af.getColumn().equals(((AttributeFunction) func).getColumn())
-                            && sFunction.getUI().getCategory().equals(func.getUI().getCategory())) {
-                        return func;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    public synchronized boolean refreshSelectedFunction() {
-        Function sFunction = getSelectedFunction();
-        if (sFunction != null && sFunction.isAttribute()) {
-            for (Function func : getSelectedElementClass().equals(AppearanceUIController.NODE_ELEMENT) ? appearanceModel.getNodeFunctions() : appearanceModel.getEdgeFunctions()) {
-                if (func.equals(sFunction)) {
-                    return false;
-                }
-
-            }
-        }
-        return true;
+    public synchronized void refreshFunctions() {
+        appearanceModel.refreshFunctions();
     }
 
     public boolean isLocalScale() {

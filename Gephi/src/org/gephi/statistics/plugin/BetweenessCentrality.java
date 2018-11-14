@@ -109,7 +109,7 @@ public class BetweenessCentrality extends AbstractCentrality {
         nodeBetweenness = null;
 
         if (fireEvent) {
-            graphViz.fireChangedGraphTable();
+            graphViz.fireChangedGraphView();
         }
         graphViz = null;
     }

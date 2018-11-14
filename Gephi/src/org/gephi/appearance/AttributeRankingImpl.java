@@ -88,9 +88,9 @@ public class AttributeRankingImpl extends RankingImpl {
     }
 
     @Override
-    public Number getValue(Element element, Graph gr) {
+    public Number getValue(Element element) {
         if (graph != null) {
-            return (Number) element.getAttribute(column, gr.getView());
+            return (Number) element.getAttribute(column, graph.getView());
         }
         return (Number) element.getAttribute(column);
     }

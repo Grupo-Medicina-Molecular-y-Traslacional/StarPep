@@ -60,9 +60,8 @@ public interface Function {
      * Transforms the given element.
      *
      * @param element element to transform
-     * @param graph the graph this element belongs to
      */
-    public void transform(Element element, Graph graph);
+    public void transform(Element element);
 
     /**
      * Returns the transformer associated with this function.

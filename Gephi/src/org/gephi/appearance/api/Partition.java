@@ -101,10 +101,9 @@ public interface Partition {
      * Returns the element's value for this partition.
      *
      * @param element element to get the value for
-     * @param graph graph this element belongs to
      * @return the value for this partition
      */
-    public Object getValue(Element element, Graph graph);
+    public Object getValue(Element element);
 
     /**
      * Returns the color for the given value.

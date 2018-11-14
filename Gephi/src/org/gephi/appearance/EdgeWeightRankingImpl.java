@@ -61,8 +61,8 @@ public class EdgeWeightRankingImpl extends RankingImpl {
     }
 
     @Override
-    public Number getValue(Element element, Graph gr) {
-        return ((Edge) element).getWeight(gr.getView());
+    public Number getValue(Element element) {
+        return ((Edge) element).getWeight(graph.getView());
     }
 
     @Override

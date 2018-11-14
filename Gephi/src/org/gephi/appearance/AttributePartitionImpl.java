@@ -65,12 +65,12 @@ public class AttributePartitionImpl extends PartitionImpl {
     protected final Map<Object, Integer> parts;
     protected int elements;
 
-    public AttributePartitionImpl(Column column, Index index) {
+    public AttributePartitionImpl(Column column, Graph graph, Index index) {
         super();
         this.column = column;
         this.index = index;
-        this.graph = null;
-        this.parts = null;
+        this.graph = graph;
+        this.parts = new HashMap<>();
     }
 
     public AttributePartitionImpl(Column column, Graph graph) {
@@ -84,36 +84,53 @@ public class AttributePartitionImpl extends PartitionImpl {
     @Override
     public void refresh() {
         if (graph != null) {
+            colorMap.clear();
             parts.clear();
             elements = 0;
             ElementIterable<? extends Element> iterable = AttributeUtils.isNodeColumn(column) ? graph.getNodes() : graph.getEdges();
-            for (Element el : iterable) {
-                TimeMap val = (TimeMap) el.getAttribute(column);
-                if (val != null) {
-                    Object[] va = val.toValuesArray();
-                    for (Object v : va) {
-                        Integer count = parts.get(v);
-                        if (count == null) {
-                            count = 0;
+            if (column.isDynamic()) {
+                for (Element el : iterable) {
+                    TimeMap val = (TimeMap) el.getAttribute(column);
+                    if (val != null) {
+                        Object[] va = val.toValuesArray();
+                        for (Object v : va) {
+                            Integer count = parts.get(v);
+                            if (count == null) {
+                                count = 0;
+                            }
+                            parts.put(v, ++count);
+                            elements++;
                         }
-                        parts.put(v, ++count);
-                        elements++;
                     }
+                }
+            } else {
+                Object val;
+                for (Element el : iterable) {
+                    val = el.getAttribute(column);
+                    Integer count = parts.get(val);
+                    if (count == null) {
+                        count = 0;
+                    }
+                    parts.put(val, ++count);
+                    elements++;
                 }
             }
         }
     }
 
     @Override
-    public Object getValue(Element element, Graph gr) {
+    public Object getValue(Element element) {
         if (graph != null) {
-            TimeMap val = (TimeMap) element.getAttribute(column);
-            if (val != null) {
-                return val.get(gr.getView().getTimeInterval(), Estimator.FIRST);
+            if (column.isDynamic()) {
+                TimeMap val = (TimeMap) element.getAttribute(column);
+                if (val != null) {
+                    return val.get(graph.getView().getTimeInterval(), Estimator.FIRST);
+                }
+                return null;
             }
-            return null;
+            return element.getAttribute(column);
         }
-        return element.getAttribute(column);
+        return null;
     }
 
     @Override

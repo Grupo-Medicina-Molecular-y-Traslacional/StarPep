@@ -152,7 +152,7 @@ public abstract class AbstractCluster implements Algorithm {
                 navModel.setClusters(clusters);
 
                 if (fireEvent) {
-                    graphViz.fireChangedGraphTable();
+                    graphViz.fireChangedGraphView();
                 }
             }
         }

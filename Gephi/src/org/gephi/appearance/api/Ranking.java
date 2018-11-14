@@ -76,10 +76,9 @@ public interface Ranking {
      * Returns the element's value for this ranking.
      *
      * @param element element to get the value for
-     * @param graph graph this element belongs to
      * @return the value for this ranking
      */
-    public Number getValue(Element element, Graph graph);
+    public Number getValue(Element element);
 
     /**
      * Normalizes the given value with the interpolator.

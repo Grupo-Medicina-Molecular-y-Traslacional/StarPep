@@ -300,7 +300,8 @@ public class AppearanceSetupUIPanel extends javax.swing.JPanel implements Algori
         } else if (evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_ELEMENT_CLASS)
                 || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_CATEGORY)
                 || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_TRANSFORMER_UI)
-                || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_FUNCTION)) {
+                || evt.getPropertyName().equals(AppearanceUIModelEvent.SELECTED_FUNCTION)
+                || evt.getPropertyName().equals(AppearanceUIModelEvent.REFRESHED_FUNCTIONS)){
             refreshCenterPanel();
             refreshCombo();
             refreshControls();

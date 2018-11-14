@@ -66,7 +66,7 @@ public class AppearanceControllerImpl implements AppearanceController, Workspace
         if (pc.getCurrentWorkspace() != null) {
             model = pc.getCurrentWorkspace().getLookup().lookup(AppearanceModelImpl.class);
             if (model == null) {
-                model = new AppearanceModelImpl(pc.getCurrentWorkspace(), pc.getGraphView());
+                model = new AppearanceModelImpl(pc.getCurrentWorkspace());
                 pc.getCurrentWorkspace().add(model);
             }
         }
@@ -86,7 +86,7 @@ public class AppearanceControllerImpl implements AppearanceController, Workspace
     public AppearanceModelImpl getModel(Workspace workspace) {
         AppearanceModelImpl m = workspace.getLookup().lookup(AppearanceModelImpl.class);
         if (m == null) {
-            m = new AppearanceModelImpl(workspace, pc.getGraphView(workspace));
+            m = new AppearanceModelImpl(workspace);
             workspace.add(m);
         }
         return m;

@@ -310,7 +310,7 @@ public class DataBridge implements VizArchitecture {
 
     public synchronized void reset() {
         graphModel = pc.getGraphModel();
-        graph = graphModel.getGraphVisible();
+        graph = pc.getGraphVisible();
         observer = pc.getGraphObserver();
         force = true;
 

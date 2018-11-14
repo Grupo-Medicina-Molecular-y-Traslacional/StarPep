@@ -42,26 +42,33 @@ Portions Copyrighted 2011 Gephi Consortium.
 package org.gephi.desktop.appearance;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.gephi.appearance.api.Function;
 import org.gephi.appearance.api.Interpolator;
 import org.gephi.appearance.api.RankingFunction;
+import org.gephi.appearance.plugin.AppearanceAlgorithm;
 import org.gephi.appearance.spi.TransformerUI;
 import org.gephi.ui.components.splineeditor.SplineEditor;
 import org.gephi.ui.utils.UIUtils;
+import org.jdesktop.swingx.JXBusyLabel;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -69,14 +76,16 @@ import org.openide.util.NbBundle;
  *
  * @author Mathieu Bastian
  */
-public class AppearanceSetupUIPanel extends javax.swing.JPanel implements AlgorithmSetupUI, AppearanceUIModelListener {
+public class AppearanceSetupUIPanel extends javax.swing.JPanel implements AlgorithmSetupUI, AppearanceUIModelListener, PropertyChangeListener {
 
     private transient final AppearanceToolbar toolbar;
     private transient final AppearanceUIController controller;
     private transient AppearanceUIModel model;
     private transient ItemListener attributeListener;
     private final transient SplineEditor splineEditor;
+    protected final JXBusyLabel busyLabel;
     private final String NO_SELECTION = NbBundle.getMessage(AppearanceSetupUIPanel.class, "AppearanceSetupUIPanel.choose.text");
+    private AppearanceAlgorithm algorithm;
 
     /**
      * Creates new form VizExtendedBar
@@ -84,7 +93,7 @@ public class AppearanceSetupUIPanel extends javax.swing.JPanel implements Algori
     public AppearanceSetupUIPanel() {
         controller = Lookup.getDefault().lookup(AppearanceUIController.class);
         toolbar = new AppearanceToolbar(controller);
-        
+
         model = controller.getModel();
         controller.addPropertyChangeListener(this);
 
@@ -93,7 +102,7 @@ public class AppearanceSetupUIPanel extends javax.swing.JPanel implements Algori
             setBackground(UIManager.getColor("NbExplorerView.background"));
         }
 
-        categoryPanel.add(toolbar.getCategoryToolbar(), BorderLayout.CENTER);        
+        categoryPanel.add(toolbar.getCategoryToolbar(), BorderLayout.CENTER);
         transformerPanel.add(toolbar.getTransformerToolbar(), BorderLayout.CENTER);
         splineEditor = new SplineEditor();
         splineEditor.setModal(true);
@@ -101,18 +110,44 @@ public class AppearanceSetupUIPanel extends javax.swing.JPanel implements Algori
         splineEditor.setControl1(new Point2D.Float(0, 0));
         splineEditor.setControl2(new Point2D.Float(1, 1));
         refreshModel(model);
+
+        busyLabel = new JXBusyLabel(new Dimension(20, 20));
+        busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        busyLabel.setText(NbBundle.getMessage(AppearanceSetupUIPanel.class, "AppearanceSetupUIPanel.busyLabel.text"));
+
+        addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent event) {
+                if (algorithm != null) {
+                    algorithm.addRunningListener(AppearanceSetupUIPanel.this);
+                }
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+                if (algorithm != null) {
+                    algorithm.removeRunningListener(AppearanceSetupUIPanel.this);
+                }
+            }
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) {
+            }
+        });
     }
 
-//    private void categoryActionPerformed(ActionEvent e) {
-//        TransformerCategory c = model.getSelectedCategory();
-//        String elementLabel = NbBundle.getMessage(ExtendedBar.class, "ExtendedBar." + model.getSelectedElementClass() + ".label");
-//        dd.setTitle(elementLabel + ": " + c.getDisplayName());
-//        if (DialogDisplayer.getDefault().notify(dd).equals(NotifyDescriptor.OK_OPTION)) {
-//            controller.getAppearanceController().transform(model.getSelectedFunction());
-//        }
-//    }  
-    
-    
+    private void setBusy(boolean running) {
+        busyLabel.setBusy(running);
+        if (running) {
+            centerPanel.removeAll();
+            centerPanel.add(busyLabel, BorderLayout.CENTER);
+            centerPanel.revalidate();
+            centerPanel.repaint();
+        } else {
+            refreshCenterPanel();
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -269,6 +304,9 @@ public class AppearanceSetupUIPanel extends javax.swing.JPanel implements Algori
             refreshCenterPanel();
             refreshCombo();
             refreshControls();
+        } else if (algorithm != null && evt.getSource().equals(algorithm)
+                && evt.getPropertyName().equals(AppearanceAlgorithm.RUNNING)) {
+            setBusy((boolean) evt.getNewValue());
         }
     }
 
@@ -399,6 +437,8 @@ public class AppearanceSetupUIPanel extends javax.swing.JPanel implements Algori
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
+        this.algorithm = (AppearanceAlgorithm) algo;
         return this;
     }
+
 }

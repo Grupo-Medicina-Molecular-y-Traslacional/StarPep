@@ -287,23 +287,24 @@ public class ProjectManager implements Lookup.Provider {
         return model;
     }
 
-    public synchronized GraphView getGraphView() {
-        return getGraphView(currentWS);
+    public synchronized Graph getGraphVisible() {
+        return getGraphVisible(currentWS);
     }
 
-    public synchronized GraphView getGraphView(Workspace workspace) {
-        GraphView graphView = workspace.getLookup().lookup(GraphView.class);
-        if (graphView == null) {
+    public synchronized Graph getGraphVisible(Workspace workspace) {
+        Graph graph = workspace.getLookup().lookup(Graph.class);
+        if (graph == null) {
             GraphModel graphModel = getGraphModel(workspace);
-            graphView = graphModel.createView();
-            workspace.add(graphView);
+            GraphView graphView = graphModel.createView();
+            graphModel.setVisibleView(graphView);
+            graph = graphModel.getGraphVisible();
+            workspace.add(graph);
 
-            //Create graph observer
-            Graph graph = graphModel.getGraph(graphView);
+            //Create graph observer                        
             GraphObserver observer = graphModel.createGraphObserver(graph, false);
             workspace.add(observer);
         }
-        return graphView;
+        return graph;
     }
 
     public synchronized GraphObserver getGraphObserver() {

@@ -69,9 +69,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, Void> {
         }
 
         // To refresh graph view
-        GraphView graphView = pc.getGraphView(workspace);
-        graphModel.setVisibleView(graphView);
-        Graph graph = graphModel.getGraph(graphView);
+        Graph graph = pc.getGraphVisible(workspace);
         graph.clear();
         graphWC.refreshGraphView(workspace, toAddNodes, null);
 

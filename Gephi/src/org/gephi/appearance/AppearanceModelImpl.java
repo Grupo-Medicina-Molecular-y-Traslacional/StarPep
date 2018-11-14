@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.bapedis.core.model.Workspace;
+import org.bapedis.core.project.ProjectManager;
 import org.gephi.appearance.api.AppearanceModel;
 import org.gephi.appearance.api.AttributeFunction;
 import org.gephi.appearance.api.Function;
@@ -84,6 +85,7 @@ import org.openide.util.NbBundle;
  */
 public class AppearanceModelImpl implements AppearanceModel {
 
+    private static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private final Workspace workspace;
     private final GraphModel graphModel;
     private final Interpolator defaultInterpolator;
@@ -97,9 +99,9 @@ public class AppearanceModelImpl implements AppearanceModel {
     //Functions
     private final FunctionsModel functions;
 
-    public AppearanceModelImpl(Workspace workspace, GraphView graphView) {
+    public AppearanceModelImpl(Workspace workspace) {
         this.workspace = workspace;
-        this.graphModel = graphView.getGraphModel();
+        this.graphModel = pc.getGraphModel(workspace);
         this.defaultInterpolator = Interpolator.LINEAR;
 
         // Transformers
@@ -110,7 +112,7 @@ public class AppearanceModelImpl implements AppearanceModel {
         this.transformerUIs = initTransformerUIs();
 
         //Functions
-        functions = new FunctionsModel(graphModel.getGraph(graphView));
+        functions = new FunctionsModel();
         functions.refreshFunctions();
     }
 
@@ -371,13 +373,13 @@ public class AppearanceModelImpl implements AppearanceModel {
     private class FunctionsModel {
 
         protected final Graph graph;
-        protected final GraphObserver graphObserver;
+        private final GraphObserver graphObserver;
         protected final NodeFunctionsModel nodeFunctionsModel;
         protected final EdgeFunctionsModel edgeFunctionsModel;
 
-        public FunctionsModel(Graph graph) {
-            this.graph = graph;
-            graphObserver = graph.getModel().createGraphObserver(graph, false);
+        public FunctionsModel() {
+            this.graph = pc.getGraphVisible(workspace);
+            graphObserver = pc.getGraphObserver(workspace);
             nodeFunctionsModel = new NodeFunctionsModel(graph);
             edgeFunctionsModel = new EdgeFunctionsModel(graph);
         }

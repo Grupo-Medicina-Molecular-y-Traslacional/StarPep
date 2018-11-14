@@ -7,10 +7,8 @@ package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
@@ -40,7 +38,7 @@ public class LoadHSP extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         GraphModel graphModel = pc.getGraphModel();
-        Graph graph = graphModel.getGraph(pc.getGraphView());
+        Graph graph = pc.getGraphVisible();
         Node node1, node2;
         Edge edge;
         JFileChooser chooser = new JFileChooser();

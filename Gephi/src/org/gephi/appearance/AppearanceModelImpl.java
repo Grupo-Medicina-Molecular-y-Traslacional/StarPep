@@ -88,7 +88,7 @@ public class AppearanceModelImpl implements AppearanceModel {
     private final Workspace workspace;
     private final GraphModel graphModel;
     private final Interpolator defaultInterpolator;
-    private boolean localScale = false;
+    private boolean localScale = true;
     // Transformers
     private final List<Transformer> nodeTransformers;
     private final List<Transformer> edgeTransformers;
@@ -523,7 +523,7 @@ public class AppearanceModelImpl implements AppearanceModel {
                 if (ranking == null && partition == null) {
                     if (isPartition(graph, column)) {
                         if (column.isIndexed()) {
-                            partition = new AttributePartitionImpl(column, graph, getIndex(false));
+                            partition = new AttributePartitionImpl(column, graph, getIndex(localScale));
                         } else {
                             partition = new AttributePartitionImpl(column, graph);
                         }

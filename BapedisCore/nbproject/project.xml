@@ -188,6 +188,7 @@
             </module-dependencies>
             <public-packages>
                 <package>org.bapedis.core</package>
+                <package>org.bapedis.core.bridge</package>
                 <package>org.bapedis.core.events</package>
                 <package>org.bapedis.core.io</package>
                 <package>org.bapedis.core.io.impl</package>

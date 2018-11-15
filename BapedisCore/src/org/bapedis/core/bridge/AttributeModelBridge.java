@@ -3,9 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.model;
+package org.bapedis.core.bridge;
 
 import java.util.List;
+import org.bapedis.core.model.AttributesModel;
 
 /**
  *
@@ -13,5 +14,4 @@ import java.util.List;
  */
 public interface AttributeModelBridge {
     void copyTo(AttributesModel attrModel, List<Integer> peptideIDs);
-    void copyTo(Workspace workspace, List<Integer> peptideIDs);
 }

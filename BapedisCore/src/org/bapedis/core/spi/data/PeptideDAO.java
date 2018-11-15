@@ -15,5 +15,5 @@ import org.gephi.graph.api.GraphModel;
  */
 public interface PeptideDAO {
     
-    AttributesModel getPeptides(QueryModel queryModel, GraphModel graphModel);
+    AttributesModel getPeptides(QueryModel queryModel, GraphModel graphModel, AttributesModel oldModel);
 }

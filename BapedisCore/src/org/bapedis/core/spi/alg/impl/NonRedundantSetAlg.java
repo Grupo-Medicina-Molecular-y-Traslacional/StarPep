@@ -119,7 +119,8 @@ public class NonRedundantSetAlg implements Algorithm {
             }
 
             //New model
-            newModel = new AttributesModel();
+            newModel = new AttributesModel(workspace);
+            oldModel.getBridge().copyTo(newModel, null);
             for (Peptide peptide : targets) {
                 if (accepted.contains(peptide.getId())) {
                     newModel.addPeptide(peptide);

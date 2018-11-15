@@ -18,7 +18,6 @@ import org.bapedis.core.spi.data.PeptideDAO;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.GraphView;
 import org.gephi.graph.api.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
@@ -60,7 +59,7 @@ public class QueryExecutor extends SwingWorker<AttributesModel, Void> {
         pc.reportRunningTask(taskName, workspace);
 
         PeptideDAO dao = Lookup.getDefault().lookup(PeptideDAO.class);
-        AttributesModel model = dao.getPeptides(queryModel, graphModel);
+        AttributesModel model = dao.getPeptides(queryModel, graphModel, oldModel);
 
         //Create graph node list
         List<Node> toAddNodes = new LinkedList<>();

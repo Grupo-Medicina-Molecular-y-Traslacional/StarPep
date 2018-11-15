@@ -45,7 +45,7 @@ public class SequenceSearch implements Algorithm {
 
     private final ProjectManager pc;
     private ProteinSequence query;
-    private AttributesModel attrModel;
+    private AttributesModel newAttrModel;
     private List<Node> graphNodes;
     private Workspace workspace;
     private boolean stopRun;
@@ -91,7 +91,7 @@ public class SequenceSearch implements Algorithm {
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
         stopRun = false;
-        attrModel = null;
+        newAttrModel = null;
         graphNodes = null;
         if(query == null){
             DialogDisplayer.getDefault().notify(emptyQuery);
@@ -102,7 +102,7 @@ public class SequenceSearch implements Algorithm {
     @Override
     public void endAlgo() {
         // Set new Model
-        if (attrModel != null && graphNodes != null && !stopRun) {
+        if (newAttrModel != null && graphNodes != null && !stopRun) {
             // To refresh graph view
             GraphModel graphModel = pc.getGraphModel(workspace);
             Graph graph = graphModel.getGraphVisible();
@@ -111,7 +111,7 @@ public class SequenceSearch implements Algorithm {
 
             final Workspace ws = workspace;
             final AttributesModel modelToRemove = pc.getAttributesModel(workspace);
-            final AttributesModel modelToAdd = attrModel;
+            final AttributesModel modelToAdd = newAttrModel;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -127,7 +127,7 @@ public class SequenceSearch implements Algorithm {
         }
         workspace = null;
         graphNodes = null;
-        attrModel = null;
+        newAttrModel = null;
     }
 
     @Override
@@ -149,10 +149,10 @@ public class SequenceSearch implements Algorithm {
     @Override
     public void run() {
         if (query != null) {
-            attrModel = dao.getPeptides(new QueryModel(workspace), pc.getGraphModel(workspace));
+            AttributesModel tmpAttrModel = dao.getPeptides(new QueryModel(workspace), pc.getGraphModel(workspace), pc.getAttributesModel(workspace));
             if (!stopRun) {
                 List<Peptide> resultList = new LinkedList<>();
-                Peptide[] targets = attrModel.getPeptides().toArray(new Peptide[0]);
+                Peptide[] targets = tmpAttrModel.getPeptides().toArray(new Peptide[0]);
                 
                 // Sort by decreasing common words
                 Arrays.parallelSort(targets, new CommonKMersComparator(query.getSequenceAsString()));
@@ -183,11 +183,13 @@ public class SequenceSearch implements Algorithm {
                     resultList.add(hit.getPeptide());
                 }
 
-                //New model                  
-                attrModel = new AttributesModel();
+                //New model                 
+                newAttrModel = new AttributesModel(workspace);
+                tmpAttrModel.getBridge().copyTo(newAttrModel, null);
+                
                 graphNodes = new LinkedList<>();
                 for (Peptide peptide : resultList) {
-                    attrModel.addPeptide(peptide);
+                    newAttrModel.addPeptide(peptide);
                     graphNodes.add(peptide.getGraphNode());
                 }
             }

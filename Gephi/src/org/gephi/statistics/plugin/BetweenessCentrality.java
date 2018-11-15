@@ -24,6 +24,7 @@ import org.openide.util.NbBundle;
 public class BetweenessCentrality extends AbstractCentrality {
 
     public static final String BETWEENNESS = "betweenesscentrality";
+    private static final Double defaultValue = new Double(0);
     private AlgorithmProperty[] property;
     private boolean normalized;
     private double[] nodeBetweenness;
@@ -99,6 +100,11 @@ public class BetweenessCentrality extends AbstractCentrality {
             fireEvent = true;
         }
 
+        //Set default values
+        for(Node node: graphModel.getGraph().getNodes()){
+            node.setAttribute(BETWEENNESS, defaultValue);
+        }
+        
         //Save values
         for (Node s : nodes) {
             int s_index = (Integer) s.getAttribute(NODE_INDEX);

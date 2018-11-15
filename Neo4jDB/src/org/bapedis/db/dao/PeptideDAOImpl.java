@@ -8,6 +8,7 @@ package org.bapedis.db.dao;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Metadata;
 import org.bapedis.core.model.QueryModel;
@@ -86,8 +87,13 @@ public class PeptideDAOImpl implements PeptideDAO {
     }
 
     @Override
-    public AttributesModel getPeptides(QueryModel queryModel, GraphModel graphModel) {
-        AttributesModel attrModel = new AttributesModel();
+    public AttributesModel getPeptides(QueryModel queryModel, GraphModel graphModel, AttributesModel oldModel) {
+        AttributesModel attrModel = new AttributesModel(queryModel.getOwnerWS());
+        Map<Integer, Peptide> peptideMap = null;
+        if (oldModel != null) {
+            oldModel.getBridge().copyTo(attrModel, null);
+            peptideMap = oldModel.getPeptideMap();
+        }
 
         try (Transaction tx = graphDb.beginTx()) {
             // Get peptides
@@ -106,7 +112,8 @@ public class PeptideDAOImpl implements PeptideDAO {
             // Write lock
             Peptide peptide;
             org.gephi.graph.api.Node graphNode, graphNeighborNode;
-            String id, seq;
+            Integer id;
+            String seq;
             Node neoNode, neoNeighborNode;
             try {
                 while (peptideNodes.hasNext()) {
@@ -114,7 +121,7 @@ public class PeptideDAOImpl implements PeptideDAO {
                     seq = neoNode.getProperty(PRO_SEQ).toString();
                     // Fill graph
                     graphNode = getOrAddGraphNodeFromNeoNode(neoNode, graphModel);
-                    id = (String) graphNode.getId();
+                    id = new Integer((String) graphNode.getId());
                     for (Relationship relation : neoNode.getRelationships(Direction.OUTGOING)) {
                         neoNeighborNode = relation.getEndNode();
                         graphNeighborNode = getOrAddGraphNodeFromNeoNode(neoNeighborNode, graphModel);
@@ -122,14 +129,18 @@ public class PeptideDAOImpl implements PeptideDAO {
                     }
 
                     //Fill Attribute Model
-                    peptide = new Peptide(graphNode, graphModel.getGraph());
-                    peptide.setAttributeValue(Peptide.ID, Integer.parseInt(id));
-                    peptide.setAttributeValue(Peptide.SEQ, seq);
-                    peptide.setAttributeValue(Peptide.LENGHT, seq.length());
-
+                    if (peptideMap != null && peptideMap.containsKey(id)) {
+                        peptide = peptideMap.get(id);
+                    } else {
+                        //Create new peptide
+                        peptide = new Peptide(graphNode, graphModel.getGraph());
+                        peptide.setAttributeValue(Peptide.ID, id);
+                        peptide.setAttributeValue(Peptide.SEQ, seq);
+                        peptide.setAttributeValue(Peptide.LENGHT, seq.length());
+                    }
                     attrModel.addPeptide(peptide);
                 }
-            } finally {                
+            } finally {
                 peptideNodes.close();
                 tx.success();
             }
@@ -213,11 +224,11 @@ public class PeptideDAOImpl implements PeptideDAO {
         if (graphNode == null) {
             GraphFactory factory = graphModel.factory();
             graphNode = factory.newNode(id);
-            
+
             String label = neoNode.getLabels().iterator().next().name();
             graphNode.setLabel(label);
             graphNode.setSize(ProjectManager.GRAPH_NODE_SIZE);
-            
+
             if (neoNode.hasProperty(PRO_NAME)) {
                 graphNode.setAttribute(ProjectManager.NODE_TABLE_PRO_NAME, neoNode.getProperty(PRO_NAME));
             } else if (label.equals("Peptide")) {

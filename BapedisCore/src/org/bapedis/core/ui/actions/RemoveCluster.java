@@ -98,7 +98,7 @@ public class RemoveCluster extends GlobalContextSensitiveAction<Cluster> {
                             }
                         }
                     }
-                    AttributesModel newAttrModel = new AttributesModel();
+                    AttributesModel newAttrModel = new AttributesModel(workspace);
                     oldAttrModel.getBridge().copyTo(newAttrModel, peptideIDs);
                     graphWC.refreshGraphView(workspace, toAddNodes, toRemoveNodes);
                     return newAttrModel;

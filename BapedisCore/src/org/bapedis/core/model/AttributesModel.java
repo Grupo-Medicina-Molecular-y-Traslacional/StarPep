@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.model;
 
+import org.bapedis.core.bridge.AttributeModelBridge;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,11 +30,12 @@ import org.openide.util.Lookup;
  * @author loge
  */
 public class AttributesModel {
-
+    
+    protected final Workspace workspace;
     protected final Map<Integer, Peptide> peptideMap;
     protected final Map<String, List<MolecularDescriptor>> mdMap;
     protected final Set<PeptideAttribute> displayedColumnsModel;
-    private static final int MAX_AVAILABLE_COLUMNS = 6;
+    private static final int MAX_DISPLAYED_COLUMNS = 6;
     protected List<PeptideNode> nodeList;
     private final PeptideNodeContainer container;
     private List<Peptide> filteredPept;
@@ -43,12 +45,13 @@ public class AttributesModel {
     public static final String DISPLAY_ATTR_REMOVED = "display_attribute_remove";
     public static final String MD_ATTR_ADDED = "md_attribute_add";
     public static final String MD_ATTR_REMOVED = "md_attribute_remove";
-
+    
     protected final AttributeModelBridgeImpl bridge;
     protected transient final SwingPropertyChangeSupport propertyChangeSupport;
     protected Node rootNode;
-
-    public AttributesModel() {
+    
+    public AttributesModel(Workspace workspace) {
+        this.workspace = workspace;
         peptideMap = new LinkedHashMap<>();
         mdMap = new LinkedHashMap<>();
         nodeList = new LinkedList<>();
@@ -56,25 +59,33 @@ public class AttributesModel {
         rootNode = new AbstractNode(container);
         propertyChangeSupport = new SwingPropertyChangeSupport(this, true);
         bridge = new AttributeModelBridgeImpl();
-
+        
         displayedColumnsModel = new LinkedHashSet<>();
         displayedColumnsModel.add(Peptide.ID);
         displayedColumnsModel.add(Peptide.SEQ);
         displayedColumnsModel.add(Peptide.LENGHT);
-
+        
         List<MolecularDescriptor> list = new LinkedList<>();
         list.add(Peptide.LENGHT);
         mdMap.put(Peptide.LENGHT.getCategory(), list);
     }
+    
+    public Workspace getOwnerWS() {
+        return workspace;
+    }
 
+    public Map<Integer, Peptide> getPeptideMap() {
+        return peptideMap;
+    }        
+    
     public PeptideAttribute[] getDisplayedColumns() {
         return displayedColumnsModel.toArray(new PeptideAttribute[0]);
     }
-
+    
     public boolean canAddDisplayColumn() {
-        return displayedColumnsModel.size() < MAX_AVAILABLE_COLUMNS;
+        return displayedColumnsModel.size() < MAX_DISPLAYED_COLUMNS;
     }
-
+    
     public boolean addDisplayedColumn(PeptideAttribute attr) {
         if (canAddDisplayColumn() && displayedColumnsModel.add(attr)) {
             propertyChangeSupport.firePropertyChange(DISPLAY_ATTR_ADDED, null, attr);
@@ -82,7 +93,7 @@ public class AttributesModel {
         }
         return false;
     }
-
+    
     public boolean removeDisplayedColumn(PeptideAttribute attr) {
         if (displayedColumnsModel.remove(attr)) {
             propertyChangeSupport.firePropertyChange(DISPLAY_ATTR_REMOVED, attr, null);
@@ -90,19 +101,19 @@ public class AttributesModel {
         }
         return false;
     }
-
+    
     public Set<String> getMolecularDescriptorKeys() {
         return mdMap.keySet();
     }
-
+    
     public List<MolecularDescriptor> getMolecularDescriptors(String category) {
         return Collections.unmodifiableList(mdMap.get(category));
     }
-
+    
     public boolean hasMolecularDescriptors(String category) {
         return mdMap.containsKey(category);
     }
-
+    
     public void addMolecularDescriptors(String category, List<MolecularDescriptor> features) {
         if (mdMap.containsKey(category)) {
             for (MolecularDescriptor oldAttr : mdMap.get(category)) {
@@ -114,7 +125,7 @@ public class AttributesModel {
         mdMap.put(category, features);
         propertyChangeSupport.firePropertyChange(MD_ATTR_ADDED, null, category);
     }
-
+    
     public void deleteAllMolecularDescriptors(String category) {
         if (!category.equals(MolecularDescriptor.DEFAULT_CATEGORY)) {
             for (PeptideAttribute attr : mdMap.remove(category)) {
@@ -123,7 +134,7 @@ public class AttributesModel {
             propertyChangeSupport.firePropertyChange(MD_ATTR_REMOVED, category, null);
         }
     }
-
+    
     public void deleteAttribute(MolecularDescriptor attr) {
         String category = attr.getCategory();
         if (mdMap.containsKey(category)) {
@@ -134,14 +145,14 @@ public class AttributesModel {
             throw new IllegalArgumentException("Unknown molecular descriptor category: " + category);
         }
     }
-
+    
     private void delete(PeptideAttribute attr) {
         for (PeptideNode pNode : nodeList) {
             pNode.getPeptide().deleteAttribute(attr);
         }
         removeDisplayedColumn(attr);
     }
-
+    
     public synchronized List<Peptide> getPeptides() {
         if (filteredPept != null) {
             return filteredPept;
@@ -157,69 +168,69 @@ public class AttributesModel {
         filteredPept = Collections.unmodifiableList(peptides);
         return peptides;
     }
-
+    
     public AttributeModelBridge getBridge() {
         return bridge;
     }
-
+    
     public void refresh(int a) {
         container.refreshNodes();
     }
-
+    
     public Node getRootNode() {
         return rootNode;
     }
-
+    
     public List<PeptideNode> getNodeList() {
         return Collections.unmodifiableList(nodeList);
     }
-
+    
     public void addPeptide(Peptide peptide) {
         nodeList.add(new PeptideNode(peptide));
         peptideMap.put(peptide.getId(), peptide);
     }
-
+    
     public QuickFilter getQuickFilter() {
         return quickFilter;
     }
-
+    
     public void setQuickFilter(QuickFilter quickFilter) {
         QuickFilter oldFilter = this.quickFilter;
         this.quickFilter = quickFilter;
         filteredPept = null;
         propertyChangeSupport.firePropertyChange(CHANGED_FILTER, oldFilter, quickFilter);
     }
-
+    
     public void addQuickFilterChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(CHANGED_FILTER, listener);
     }
-
+    
     public void removeQuickFilterChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(CHANGED_FILTER, listener);
     }
-
+    
     public void addDisplayColumnChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(DISPLAY_ATTR_ADDED, listener);
         propertyChangeSupport.addPropertyChangeListener(DISPLAY_ATTR_REMOVED, listener);
     }
-
+    
     public void removeDisplayColumnChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(DISPLAY_ATTR_ADDED, listener);
         propertyChangeSupport.removePropertyChangeListener(DISPLAY_ATTR_REMOVED, listener);
     }
-
+    
     public void addMolecularDescriptorChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(MD_ATTR_ADDED, listener);
         propertyChangeSupport.addPropertyChangeListener(MD_ATTR_REMOVED, listener);
     }
-
+    
     public void removeMolecularDescriptorChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(MD_ATTR_ADDED, listener);
         propertyChangeSupport.removePropertyChangeListener(MD_ATTR_REMOVED, listener);
     }
-
+    
     private class PeptideNodeContainer extends Index.ArrayChildren {
-
+        
         @Override
         protected List<Node> initCollection() {
             List<Node> nodes = new ArrayList<>(nodeList.size());
@@ -228,24 +239,42 @@ public class AttributesModel {
             }
             return nodes;
         }
-
+        
         public void refreshNodes() {
             refresh();
         }
-
+        
     }
-
+    
     private class AttributeModelBridgeImpl implements AttributeModelBridge {
-
+        
         @Override
         public void copyTo(AttributesModel attrModel, List<Integer> peptideIDs) {
-            attrModel.mdMap.putAll(mdMap);
-            attrModel.displayedColumnsModel.addAll(displayedColumnsModel);
-            for (Integer id : peptideIDs) {
-                attrModel.addPeptide(peptideMap.get(id));
+            if (workspace.equals(attrModel.workspace)) {
+                interCopy(attrModel, peptideIDs);
+            } else {
+                intraCopy(attrModel, peptideIDs);
             }
         }
-
+        
+        private void interCopy(AttributesModel attrModel, List<Integer> peptideIDs) {
+            attrModel.mdMap.putAll(mdMap);
+            attrModel.displayedColumnsModel.addAll(displayedColumnsModel);
+            
+            if (peptideIDs != null) {
+                for (Integer id : peptideIDs) {
+                    if (!peptideMap.containsKey(id)){
+                        throw new IllegalArgumentException("Invalid peptide id: " + id);
+                    }
+                    attrModel.addPeptide(peptideMap.get(id));
+                }
+            }
+        }
+        
+        private void intraCopy(AttributesModel attrModel, List<Integer> peptideIDs) {
+            
+        }
+        
         private void copyMdMapTo(AttributesModel attrModel) throws CloneNotSupportedException {
             String key;
             List<MolecularDescriptor> currentValue;
@@ -260,9 +289,8 @@ public class AttributesModel {
                 attrModel.mdMap.put(key, newValue);
             }
         }
-
-        @Override
-        public void copyTo(Workspace workspace, List<Integer> peptideIDs) {
+        
+        private void copyTo(Workspace workspace, List<Integer> peptideIDs) {
             AttributesModel attrModel = Lookup.getDefault().lookup(ProjectManager.class).getAttributesModel(workspace);
             try {
                 copyMdMapTo(attrModel);
@@ -274,6 +302,6 @@ public class AttributesModel {
                 Exceptions.printStackTrace(ex);
             }
         }
-
+        
     }
 }

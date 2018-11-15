@@ -85,7 +85,42 @@ public abstract class AbstractCluster implements Algorithm {
     public void endAlgo() {
         if (attrModel != null && !stopRun) {
             attrModel.addDisplayedColumn(CLUSTER_ATTR);
+
+            //Add cluster column
+            boolean fireEvent = false;
+            Table nodeTable = graphModel.getNodeTable();
+            if (!nodeTable.hasColumn(CLUSTER_COLUMN)) {
+                nodeTable.addColumn(CLUSTER_COLUMN, "Cluster", Integer.class, null);
+                fireEvent = true;
+            }
+
+            //Set default values            
+            for (Node node : graphModel.getGraph().getNodes()) {
+                node.setAttribute(CLUSTER_COLUMN, CLUSTER_ATTR.getDefaultValue());
+            }
+            for (Peptide peptide : attrModel.getPeptideMap().values()) {
+                peptide.setAttributeValue(CLUSTER_ATTR, CLUSTER_ATTR.getDefaultValue());
+            }
+
+            //Set cluster values    
+            if (clusters != null) {
+                Node node;
+                for (Cluster c : clusters) {
+                    for (Peptide p : c.getMembers()) {
+                        p.setAttributeValue(CLUSTER_ATTR, c.getId());
+                        node = p.getGraphNode();
+                        node.setAttribute(CLUSTER_COLUMN, c.getId());
+                    }
+                }
+            }
+
+            navModel.setClusters(clusters);
+
+            if (fireEvent) {
+                graphViz.fireChangedGraphView();
+            }
         }
+
         navModel.setRunning(false);
         attrModel = null;
         navModel = null;
@@ -116,12 +151,14 @@ public abstract class AbstractCluster implements Algorithm {
     public void run() {
         if (peptides != null) {
             List<Cluster> clusterList = cluterize();
+
             if (clusterList != null) {
                 int index = 0;
                 clusters = new Cluster[clusterList.size()];
                 for (Cluster c : clusterList) {
                     clusters[index++] = c;
                 }
+
                 Arrays.sort(clusters, new Comparator<Cluster>() {
                     @Override
                     public int compare(Cluster o1, Cluster o2) {
@@ -131,29 +168,6 @@ public abstract class AbstractCluster implements Algorithm {
                     }
 
                 });
-
-                //Add cluster column
-                boolean fireEvent = false;
-                Table nodeTable = graphModel.getNodeTable();
-                if (!nodeTable.hasColumn(CLUSTER_COLUMN)) {
-                    nodeTable.addColumn(CLUSTER_COLUMN, "Cluster", Integer.class, null);
-                    fireEvent = true;
-                }
-
-                Node node;
-                for (Cluster c : clusterList) {
-                    for (Peptide p : c.getMembers()) {
-                        p.setAttributeValue(CLUSTER_ATTR, c.getId());
-                        node = p.getGraphNode();
-                        node.setAttribute(CLUSTER_COLUMN, c.getId());
-                    }
-                }
-
-                navModel.setClusters(clusters);
-
-                if (fireEvent) {
-                    graphViz.fireChangedGraphView();
-                }
             }
         }
     }

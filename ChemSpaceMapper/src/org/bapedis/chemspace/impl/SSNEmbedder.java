@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.bapedis.chemspace.model.CompressedModel;
 import org.bapedis.chemspace.model.NetworkType;
-import org.bapedis.chemspace.model.SimilarityMatrix;
+import org.bapedis.core.model.SimilarityMatrix;
 import org.bapedis.chemspace.spi.impl.AlignmentBasedSimilarity;
 import org.bapedis.chemspace.spi.impl.AlignmentBasedSimilarityFactory;
 import org.bapedis.core.model.Peptide;

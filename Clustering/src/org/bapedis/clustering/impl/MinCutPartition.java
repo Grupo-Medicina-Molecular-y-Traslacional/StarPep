@@ -3,17 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.impl;
+package org.bapedis.clustering.impl;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.bapedis.chemspace.model.Batch;
-import org.bapedis.chemspace.model.BiGraph;
-import org.bapedis.chemspace.model.Partition;
-import org.bapedis.chemspace.model.Vertex;
-import org.bapedis.chemspace.util.Bucket;
+import org.bapedis.clustering.model.BiGraph;
+import org.bapedis.clustering.model.Partition;
+import org.bapedis.clustering.model.Vertex;
+import org.bapedis.clustering.model.Bucket;
+import org.bapedis.core.model.Cluster;
 import org.bapedis.core.task.ProgressTicket;
 
 /**
@@ -33,7 +32,7 @@ public class MinCutPartition extends BasePartition {
     }
 
     @Override
-    protected Batch[] compute() {
+    protected Cluster[] compute() {
         if (!stopRun.get() && bigraph.size() > MIN_SIZE && level > 0 ) {
             findGraphPartition();
             MinCutPartition left = new MinCutPartition(bigraph.getLeftGraph(), level -1, ticket, stopRun);

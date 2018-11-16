@@ -3,14 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.impl;
+package org.bapedis.clustering.impl;
 
-import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.bapedis.chemspace.model.Batch;
-import org.bapedis.chemspace.model.BiGraph;
-import org.bapedis.chemspace.model.Partition;
-import org.bapedis.chemspace.model.Vertex;
+import org.bapedis.clustering.model.BiGraph;
+import org.bapedis.clustering.model.Partition;
+import org.bapedis.core.model.Cluster;
 import org.bapedis.core.task.ProgressTicket;
 
 /**
@@ -24,7 +22,7 @@ public class RandomPartition extends BasePartition {
     }
 
     @Override
-    protected Batch[] compute() {
+    protected Cluster[] compute() {
         if (!stopRun.get() && bigraph.size() > MIN_SIZE  && level > 0) {
             Partition p = bigraph.getPartition();
             p.initializePartition();

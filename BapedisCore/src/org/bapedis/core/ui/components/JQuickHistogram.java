@@ -39,7 +39,7 @@ Contributor(s):
 
 Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.bapedis.chemspace.model;
+package org.bapedis.core.ui.components;
 
 import java.awt.Dimension;
 import java.text.DecimalFormat;

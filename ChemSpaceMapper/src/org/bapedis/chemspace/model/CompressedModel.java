@@ -9,7 +9,7 @@ package org.bapedis.chemspace.model;
  *
  * @author loge
  */
-public class CompressedModel implements Cloneable{
+ public class CompressedModel implements Cloneable{
     public static final int MIN_CUT_PARTITION=0;
     public static final int RANDOM_PARTITION=1;
     

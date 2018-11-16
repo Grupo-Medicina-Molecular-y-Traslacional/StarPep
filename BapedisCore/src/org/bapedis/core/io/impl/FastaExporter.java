@@ -8,15 +8,18 @@ package org.bapedis.core.io.impl;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import javax.swing.SwingWorker;
 import org.bapedis.core.io.Exporter;
-import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.task.ProgressTicket;
 import org.biojava.nbio.core.sequence.ProteinSequence;
 import org.biojava.nbio.core.sequence.io.FastaWriterHelper;
-import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.Node;
-import org.gephi.graph.api.NodeIterable;
+import org.openide.util.Cancellable;
+import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -32,14 +35,44 @@ public class FastaExporter implements Exporter {
 
     @Override
     public void exportTo(File file) throws Exception {
-        List<ProteinSequence> sequences = new LinkedList<>();
-        ProteinSequence seq;
-        for (Peptide pept : attrModel.getPeptides()) {
-            seq = new ProteinSequence(pept.getSequence());
-            seq.setOriginalHeader(pept.getName());
-            sequences.add(seq);
-        }
-        FastaWriterHelper.writeProteinSequence(file, sequences);
+        SwingWorker sw = new SwingWorker() {
+            private final AtomicBoolean stopRun = new AtomicBoolean(false);
+            private final ProgressTicket ticket = new ProgressTicket(NbBundle.getMessage(FastaExporter.class, "FastaExporter.task.name"), new Cancellable() {
+                @Override
+                public boolean cancel() {
+                    stopRun.set(true);
+                    return true;
+                }
+            });
+
+            @Override
+            protected Object doInBackground() throws Exception {
+                ticket.start();
+                List<ProteinSequence> sequences = new LinkedList<>();
+                ProteinSequence seq;
+                for (Peptide pept : attrModel.getPeptides()) {
+                    seq = new ProteinSequence(pept.getSequence());
+                    seq.setOriginalHeader(pept.getName());
+                    sequences.add(seq);
+                }
+                if (!stopRun.get()) {
+                    FastaWriterHelper.writeProteinSequence(file, sequences);
+                }                
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    get();
+                } catch (InterruptedException | ExecutionException ex) {
+                    Exceptions.printStackTrace(ex);
+                } finally {
+                    ticket.finish();
+                }
+            }
+        };
+        sw.execute();
     }
 
 }

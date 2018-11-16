@@ -156,14 +156,15 @@ public abstract class AbstractCluster implements Algorithm {
                 int index = 0;
                 clusters = new Cluster[clusterList.size()];
                 for (Cluster c : clusterList) {
-                    clusters[index++] = c;
+                    c.setPercentage(c.getSize()*100/(double)peptides.length);
+                    clusters[index++] = c;                    
                 }
 
                 Arrays.sort(clusters, new Comparator<Cluster>() {
                     @Override
                     public int compare(Cluster o1, Cluster o2) {
-                        double p1 = o1.getPercentageComp();
-                        double p2 = o2.getPercentageComp();
+                        double p1 = o1.getPercentage();
+                        double p2 = o2.getPercentage();
                         return p1 > p2 ? -1 : p1 < p2 ? 1 : 0;
                     }
 

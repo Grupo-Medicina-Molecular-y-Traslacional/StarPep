@@ -3,23 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.impl;
+package org.bapedis.clustering.impl;
 
 import java.util.Iterator;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.bapedis.chemspace.model.Batch;
-import org.bapedis.chemspace.model.BiGraph;
-import org.bapedis.chemspace.model.Vertex;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.bapedis.clustering.model.BiGraph;
+import org.bapedis.clustering.model.Vertex;
+import org.bapedis.core.model.Cluster;
 import org.bapedis.core.task.ProgressTicket;
 
 /**
  *
  * @author loge
  */
-public abstract class BasePartition extends RecursiveTask<Batch[]> {
+public abstract class BasePartition extends RecursiveTask<Cluster[]> {
 
-    public static final int MIN_SIZE=10;
+    protected static final AtomicInteger counter = new AtomicInteger(1);
+    public static final int MIN_SIZE = 10;
     protected final ProgressTicket ticket;
     protected final AtomicBoolean stopRun;
 
@@ -33,22 +35,22 @@ public abstract class BasePartition extends RecursiveTask<Batch[]> {
         this.stopRun = stopRun;
     }
 
-    protected Batch[] union(Batch[] leftBatches, Batch[] righBatchs) {
-        Batch[] batches = new Batch[leftBatches.length + righBatchs.length];
+    protected Cluster[] union(Cluster[] leftBatches, Cluster[] righBatchs) {
+        Cluster[] batches = new Cluster[leftBatches.length + righBatchs.length];
         System.arraycopy(leftBatches, 0, batches, 0, leftBatches.length);
         System.arraycopy(righBatchs, 0, batches, leftBatches.length, righBatchs.length);
 
         return batches;
     }
 
-    protected Batch[] computeDirectly() {
-        Batch batch = new Batch(bigraph.size());
+    protected Cluster[] computeDirectly() {
+        Cluster batch = new Cluster(counter.getAndIncrement());
         Vertex u;
         for (Iterator<Vertex> it = bigraph.getAllVertices(); it.hasNext();) {
             u = it.next();
-            batch.addPeptide(u.getPeptide());
+            batch.addMember(u.getPeptide());
         }
         ticket.progress();
-        return new Batch[]{batch};
+        return new Cluster[]{batch};
     }
 }

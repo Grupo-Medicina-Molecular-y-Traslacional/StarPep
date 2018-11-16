@@ -7,7 +7,7 @@ package org.bapedis.chemspace.impl;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
-import org.bapedis.chemspace.model.SimilarityMatrix;
+import org.bapedis.core.model.SimilarityMatrix;
 import org.bapedis.chemspace.spi.SimilarityMeasure;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;

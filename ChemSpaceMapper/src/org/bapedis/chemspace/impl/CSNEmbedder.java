@@ -7,7 +7,7 @@ package org.bapedis.chemspace.impl;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.bapedis.chemspace.model.NetworkType;
-import org.bapedis.chemspace.model.SimilarityMatrix;
+import org.bapedis.core.model.SimilarityMatrix;
 import org.bapedis.chemspace.spi.SimilarityMeasure;
 import org.bapedis.chemspace.spi.impl.TanimotoCoefficientFactory;
 import org.bapedis.core.model.MolecularDescriptor;

@@ -3,14 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.util;
+package org.bapedis.clustering.model;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import org.bapedis.chemspace.model.BiGraph;
-import org.bapedis.chemspace.model.Partition;
-import org.bapedis.chemspace.model.Vertex;
 
 /**
  *

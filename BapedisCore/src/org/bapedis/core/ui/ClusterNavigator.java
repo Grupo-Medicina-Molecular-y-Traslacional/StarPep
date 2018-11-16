@@ -497,7 +497,7 @@ public class ClusterNavigator extends JComponent implements
                 case 1:
                     return data[row].getSize();
                 case 2:
-                    return data[row].getPercentageComp();
+                    return data[row].getPercentage();
             }
             return null;
         }

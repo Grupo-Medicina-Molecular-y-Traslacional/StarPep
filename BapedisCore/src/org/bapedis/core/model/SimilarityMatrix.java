@@ -2,14 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.model;
+package org.bapedis.core.model;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideAttribute;
+import org.bapedis.core.ui.components.JQuickHistogram;
 
 /**
  *

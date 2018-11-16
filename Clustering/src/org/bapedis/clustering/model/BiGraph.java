@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.model;
+package org.bapedis.clustering.model;
 
 import java.util.Iterator;
+import org.gephi.graph.api.Edge;
+import org.gephi.graph.api.Graph;
 
 /**
  *
@@ -14,19 +16,17 @@ import java.util.Iterator;
 public class BiGraph {
 
     private final Vertex[] vertices;
-    private final SimilarityMatrix simMatrix;
-    protected final double threshold;
+    private final Graph graph;
     private final Partition partition;
     private final int maxDegree;
 
-    public BiGraph(Vertex[] vertices, SimilarityMatrix simMatrix, double threshold) {
-        this(vertices, new Partition(0, vertices.length - 1), simMatrix, threshold);
+    public BiGraph(Vertex[] vertices, Graph graph) {
+        this(vertices, new Partition(0, vertices.length - 1), graph);
     }
 
-    private BiGraph(Vertex[] vertices, Partition partition, SimilarityMatrix simMatrix, double threshold) {
+    private BiGraph(Vertex[] vertices, Partition partition, Graph graph) {
         this.vertices = vertices;
-        this.simMatrix = simMatrix;
-        this.threshold = threshold;
+        this.graph = graph;
         this.partition = partition;
         maxDegree = calculateMaxDegree();
     }
@@ -39,21 +39,17 @@ public class BiGraph {
         }
     }
 
-    public SimilarityMatrix getSimilarityMatrix() {
-        return simMatrix;
-    }
-
-    public double getThreshold() {
-        return threshold;
-    }
+    public Graph getGraph() {
+        return graph;
+    }    
 
     public Partition getPartition() {
         return partition;
     }
 
     public boolean isNeighbour(Vertex vertex1, Vertex vertex2) {
-        Float value = simMatrix.getValue(vertex1.getPeptide(), vertex2.getPeptide());
-        return !vertex1.equals(vertex2) && value != null && value >= threshold;
+        Edge edge = graph.getEdge(vertex1.getPeptide().getGraphNode(), vertex2.getPeptide().getGraphNode());
+        return !vertex1.equals(vertex2) && edge != null;
     }
 
     public int getMaxDegree() {
@@ -80,7 +76,7 @@ public class BiGraph {
     }
 
     public BiGraph getLeftGraph() {
-        return new BiGraph(vertices, partition.getLeftPartition(), simMatrix, threshold);
+        return new BiGraph(vertices, partition.getLeftPartition(), graph);
     }
 
     public void rearrange() {
@@ -117,7 +113,7 @@ public class BiGraph {
     }
 
     public BiGraph getRightGraph() {
-        return new BiGraph(vertices, partition.getRightPartition(), simMatrix, threshold);
+        return new BiGraph(vertices, partition.getRightPartition(), graph);
     }
 
     public int size() {

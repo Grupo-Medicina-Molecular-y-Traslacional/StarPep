@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.model;
+package org.bapedis.clustering.model;
 
 import org.bapedis.core.model.Peptide;
 

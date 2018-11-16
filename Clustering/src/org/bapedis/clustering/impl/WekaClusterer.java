@@ -151,7 +151,7 @@ public abstract class WekaClusterer<T extends Clusterer> extends AbstractCluster
                     if (clusterMap.containsKey(clusterID)) {
                         cluster = clusterMap.get(clusterID);
                     } else {
-                        cluster = new Cluster(clusterID, peptides.length);
+                        cluster = new Cluster(clusterID);
                         clusterMap.put(clusterID, cluster);
                     }
                     cluster.addMember(peptides[j]);

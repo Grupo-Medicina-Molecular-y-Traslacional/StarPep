@@ -9,16 +9,14 @@ import java.util.List;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.util.ArffWritable;
+import org.bapedis.core.io.OUTPUT_OPTION;
 
 /**
  *
  * @author loge
  */
 public class MyArffWritable implements ArffWritable {
-
-    public enum OUTPUT_OPTION {
-        NORMAL, Z_SCORE, MIN_MAX
-    }
+    
     private final Peptide[] peptides;
     private final MolecularDescriptor[] features;
     private OUTPUT_OPTION output;

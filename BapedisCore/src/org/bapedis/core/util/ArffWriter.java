@@ -22,7 +22,7 @@ public class ArffWriter {
     public static boolean DEBUG = false;
 
     public static File writeToArffFile(ArffWritable data) throws Exception {
-        File f = createTempFile();
+        File f = OSUtil.createTempFile("weka-", "-arff");
         writeToArffFile(f, data);
         return f;
     }
@@ -153,9 +153,5 @@ public class ArffWriter {
         return s;
     }
 
-    private static File createTempFile() throws IOException {
-        File tempFile = File.createTempFile("weka-", "-arff");
-        tempFile.deleteOnExit();
-        return tempFile;
-    }
+
 }

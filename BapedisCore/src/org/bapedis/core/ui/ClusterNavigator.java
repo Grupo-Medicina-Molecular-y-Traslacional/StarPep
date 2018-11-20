@@ -184,21 +184,24 @@ public class ClusterNavigator extends JComponent implements
     }
 
     private synchronized void tableValueChanged(ListSelectionEvent e) {
-        ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-        if (lsm.isSelectionEmpty()) {
+        if (!e.getValueIsAdjusting()) {
+            ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+
             Collection<? extends ClusterNode> oldNodes = lookup.lookupAll(ClusterNode.class);
             for (ClusterNode node : oldNodes) {
                 content.remove(node);
             }
-        } else if (!e.getValueIsAdjusting()) {
-            // Find out which indexes are selected.
-            int minIndex = lsm.getMinSelectionIndex();
-            int maxIndex = lsm.getMaxSelectionIndex();
-            for (int i = minIndex; i <= maxIndex; i++) {
-                if (lsm.isSelectedIndex(i)) {
-                    MyTableModel dataModel = (MyTableModel) table.getModel();
-                    Cluster cluster = dataModel.getClusterAtRow(table.convertRowIndexToModel(i));
-                    content.add(new ClusterNode(cluster));
+
+            if (!lsm.isSelectionEmpty()) {
+                // Find out which indexes are selected.
+                int minIndex = lsm.getMinSelectionIndex();
+                int maxIndex = lsm.getMaxSelectionIndex();
+                for (int i = minIndex; i <= maxIndex; i++) {
+                    if (lsm.isSelectedIndex(i)) {
+                        MyTableModel dataModel = (MyTableModel) table.getModel();
+                        Cluster cluster = dataModel.getClusterAtRow(table.convertRowIndexToModel(i));
+                        content.add(new ClusterNode(cluster));
+                    }
                 }
             }
         }
@@ -455,17 +458,17 @@ public class ClusterNavigator extends JComponent implements
                 JPopupMenu contextMenu = new JPopupMenu();
                 contextMenu.add(new RemoveCluster());
                 contextMenu.add(new RemoveOtherClusters());
-                
-                JMenuItem subMenu = new JMenu(NbBundle.getMessage(ClusterNavigator.class, "ClusterNavigator.copyCluster.name"));                
+
+                JMenuItem subMenu = new JMenu(NbBundle.getMessage(ClusterNavigator.class, "ClusterNavigator.copyCluster.name"));
                 subMenu.add(new JMenuItem(new CopyClusterToWorkspace(null)));
                 Workspace currWs = pc.getCurrentWorkspace();
                 Workspace otherWs;
-                for (Iterator<? extends Workspace> it = pc.getWorkspaceIterator(); it.hasNext();){
+                for (Iterator<? extends Workspace> it = pc.getWorkspaceIterator(); it.hasNext();) {
                     otherWs = it.next();
-                    if (currWs != otherWs){
+                    if (currWs != otherWs) {
                         subMenu.add(new JMenuItem(new CopyClusterToWorkspace(otherWs)));
                     }
-                }     
+                }
                 contextMenu.add(subMenu);
                 contextMenu.show(table, evt.getX(), evt.getY());
             } else {

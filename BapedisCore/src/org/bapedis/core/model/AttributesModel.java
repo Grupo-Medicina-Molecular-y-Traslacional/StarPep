@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.swing.JOptionPane;
 import javax.swing.event.SwingPropertyChangeSupport;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
@@ -28,7 +27,6 @@ import org.openide.nodes.Index;
 import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
-import org.openide.util.NbBundle;
 
 /**
  * A class that represents an attribute-based data model for peptides.
@@ -284,7 +282,6 @@ public class AttributesModel {
             try {
                 copyMdMapTo(attrModel);
                 copyDisplayedColumnsTo(attrModel);
-//                copyGraphNodesTo(attrModel);
                 copyDataTo(attrModel, peptideIDs);
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
@@ -312,29 +309,26 @@ public class AttributesModel {
             }
         }
 
-        private void copyGraphNodesTo(AttributesModel attrModel) {
+        private void copyGraphTo(GraphModel targetGraphModel) {
             GraphModel currentGraphModel = pc.getGraphModel(workspace);
-            org.gephi.graph.api.Node[] nodes = currentGraphModel.getGraph().getNodes().toArray();
-
-            Workspace targetWorkspace = attrModel.getOwnerWS();
-            GraphModel targetGraphModel = pc.getGraphModel(targetWorkspace);
-
             currentGraphModel.getGraph().readLock();
             try {
+                org.gephi.graph.api.Node[] nodes = currentGraphModel.getGraph().getNodes().toArray();
                 targetGraphModel.bridge().copyNodes(nodes);
-                Graph targetGraph = targetGraphModel.getGraph();
-
-                Graph visibleCurrentGraph = currentGraphModel.getGraphVisible();
-                List<Edge> edgesToRemove = new LinkedList<>();
-                for (Edge edge : targetGraph.getEdges()) {
-                    if (!visibleCurrentGraph.hasEdge(edge.getId())) {
-                        edgesToRemove.add(edge);
-                    }
-                }
-
-                if (!edgesToRemove.isEmpty()) {
-                    targetGraph.removeAllEdges(edgesToRemove);
-                }
+                
+//                Graph targetGraph = targetGraphModel.getGraph();
+//                Graph visibleCurrentGraph = currentGraphModel.getGraphVisible();
+//                
+//                List<Edge> edgesToRemove = new LinkedList<>();
+//                for (Edge edge : targetGraph.getEdges()) {
+//                    if (!visibleCurrentGraph.hasEdge(edge.getId())) {
+//                        edgesToRemove.add(edge);
+//                    }
+//                }
+//
+//                if (!edgesToRemove.isEmpty()) {
+//                    targetGraph.removeAllEdges(edgesToRemove);
+//                }
 
             } finally {
                 currentGraphModel.getGraph().readUnlockAll();
@@ -349,21 +343,11 @@ public class AttributesModel {
             org.gephi.graph.api.Node currentNode, targetNode;
 
             if (peptideIDs != null) {
-                //Copy nodes
-                List<org.gephi.graph.api.Node> toAddNodes = new LinkedList<>();
-                for (Integer id : peptideIDs) {
-                    if (!peptideMap.containsKey(id)) {
-                        throw new IllegalArgumentException("Invalid peptide id: " + id);
-                    }
-                    if (!attrModel.peptideMap.containsKey(id)) {
-                        currentNode = peptideMap.get(id).getGraphNode();
-                        toAddNodes.add(currentNode);
-                    }
-                }
-                targetGraphModel.bridge().copyNodes(toAddNodes.toArray(new org.gephi.graph.api.Node[0]));
-
+                //Copy graph                                
+                copyGraphTo(targetGraphModel);
+                               
                 //Copy peptides
-                toAddNodes.clear();
+                List<org.gephi.graph.api.Node> toAddNodes = new LinkedList<>();
                 Map<PeptideAttribute, Object> currAttrsValue, targetAttrsValue;
                 for (Integer id : peptideIDs) {
                     if (!peptideMap.containsKey(id)) {
@@ -372,9 +356,10 @@ public class AttributesModel {
 
                     if (!attrModel.peptideMap.containsKey(id)) {
                         currentPeptide = peptideMap.get(id);
+                        currentNode = currentPeptide.getGraphNode();
                         currAttrsValue = currentPeptide.attrsValue;
 
-                        targetNode = targetGraphModel.getGraph().getNode(currentPeptide.getGraphNode().getId());
+                        targetNode = targetGraphModel.getGraph().getNode(currentNode.getId());
                         targetPeptide = new Peptide(targetNode, targetGraphModel.getGraph());
                         targetAttrsValue = targetPeptide.attrsValue;
 
@@ -386,6 +371,8 @@ public class AttributesModel {
 
                         attrModel.addPeptide(targetPeptide);
                         toAddNodes.add(targetNode);
+                    } else{
+                        throw new IllegalArgumentException("Duplicated peptide id: " + id);
                     }
                     attrModel.filteredPept = null;
                 }

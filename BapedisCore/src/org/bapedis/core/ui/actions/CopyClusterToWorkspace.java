@@ -23,6 +23,7 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -52,7 +53,7 @@ public class CopyClusterToWorkspace extends GlobalContextSensitiveAction<Cluster
         this.workspace = workspace;
         String name;
         if (workspace == null) {
-            name = NbBundle.getMessage(CopyClusterToWorkspace.class, "CTL_NewWorkspace.name");
+            name = NbBundle.getMessage(CopyClusterToWorkspace.class, "CopyClusterToWorkspace.newWorkspace.name");
         } else {
             name = workspace.getName();
         }
@@ -67,8 +68,8 @@ public class CopyClusterToWorkspace extends GlobalContextSensitiveAction<Cluster
         AttributesModel currAttrModel = pc.getAttributesModel();
         ClusterNavigatorModel currNavModel = pc.getClusterNavModel();
 
-        List<Cluster> clusterList = new LinkedList<>();
-        List<Integer> peptideIDs = new LinkedList<>();
+        final List<Cluster> clusterList = new LinkedList<>();
+        final List<Integer> peptideIDs = new LinkedList<>();
 
         Collection<? extends Cluster> context = lkpResult.allInstances();
         if (!context.isEmpty()) {
@@ -93,17 +94,42 @@ public class CopyClusterToWorkspace extends GlobalContextSensitiveAction<Cluster
                     }
                     AttributesModel newAttrModel;
                     if (workspace != null || ((workspace = createWorkspace()) != null)) {
+                        if(workspace.isBusy()){
+                            throw new MyException(NbBundle.getMessage(CopyClusterToWorkspace.class, "CopyClusterToWorkspace.error.busyWorkspace", workspace.getName()));
+                        }
+                        
                         newAttrModel = pc.getAttributesModel(workspace);
                         if (newAttrModel == null) {
                             newAttrModel = new AttributesModel(workspace);
                             workspace.add(newAttrModel);
                         }
-                        currAttrModel.getBridge().copyTo(newAttrModel, peptideIDs);
-
-                        //Copy clusters
+                        //Validate
                         Map<Integer, Peptide> map = newAttrModel.getPeptideMap();
                         ClusterNavigatorModel navModel = pc.getClusterNavModel(workspace);
                         Cluster[] oldClusters = navModel.getClusters();
+                        //Check duplicated clusters
+                        if (oldClusters != null) {
+                            for (Cluster c1 : clusterList) {
+                                for (Cluster c2 : oldClusters) {
+                                    if (c1.getId() == c2.getId()) {
+                                        throw new MyException(NbBundle.getMessage(CopyClusterToWorkspace.class, "CopyClusterToWorkspace.error.duplicatedCluster", c1.getId(), workspace.getName()));
+                                    }
+                                }
+                            }
+                        }
+                        //Check duplited peptide
+                        if (map.size() > 0) {
+                            for (Integer id : peptideIDs) {
+                                if (map.containsKey(id)) {
+                                    throw new MyException(NbBundle.getMessage(CopyClusterToWorkspace.class, "CopyClusterToWorkspace.error.duplicatedPeptide", id, workspace.getName()));
+                                }
+                            }
+                        }
+
+                        //Copy peptides and graph
+                        currAttrModel.getBridge().copyTo(newAttrModel, peptideIDs);
+
+                        //Copy clusters                        
                         if (oldClusters != null) {
                             for (Cluster cluster : oldClusters) {
                                 clusterList.add(cluster);
@@ -130,13 +156,16 @@ public class CopyClusterToWorkspace extends GlobalContextSensitiveAction<Cluster
                         if (workspace != null && newClusters != null) {
                             ClusterNavigatorModel navModel = pc.getClusterNavModel(workspace);
                             navModel.setClusters(newClusters);
+                            
+                            pc.setCurrentWorkspace(workspace);
+                            pc.getGraphVizSetting(workspace).fireChangedGraphView();                            
                         }
                     } catch (InterruptedException | ExecutionException ex) {
-                        Exceptions.printStackTrace(ex);
-                    } finally {
-                        if (workspace != null) {
-                            pc.setCurrentWorkspace(workspace);
-                            pc.getGraphVizSetting(workspace).fireChangedGraphView();
+                        if (ex.getCause() instanceof MyException) {
+                            NotifyDescriptor errorND = new NotifyDescriptor.Message(((MyException)ex.getCause()).getErrorMsg(), NotifyDescriptor.ERROR_MESSAGE);
+                            DialogDisplayer.getDefault().notify(errorND);
+                        } else {
+                            Exceptions.printStackTrace(ex);
                         }
                     }
                 }
@@ -156,6 +185,19 @@ public class CopyClusterToWorkspace extends GlobalContextSensitiveAction<Cluster
             return ws;
         }
         return null;
+    }
+
+    private class MyException extends RuntimeException {
+
+        private final String errorMsg;
+
+        MyException(String errorMsg) {
+            this.errorMsg = errorMsg;
+        }
+
+        public String getErrorMsg(){
+            return errorMsg;
+        }
     }
 
 }

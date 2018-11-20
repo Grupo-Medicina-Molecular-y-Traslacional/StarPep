@@ -20,6 +20,7 @@ import weka.attributeSelection.PrincipalComponents;
 import weka.core.Instance;
 import weka.core.Instances;
 import org.bapedis.chemspace.spi.TwoDTransformer;
+import org.bapedis.core.io.OUTPUT_OPTION;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.openide.util.Lookup;
@@ -56,7 +57,7 @@ public class WekaPCATransformer implements TwoDTransformer {
         try {
             ArffWriter.DEBUG = true;
             MyArffWritable writable = new MyArffWritable(peptides, features);
-            writable.setOutputOption(MyArffWritable.OUTPUT_OPTION.Z_SCORE);
+            writable.setOutputOption(OUTPUT_OPTION.MIN_MAX);
             File f = ArffWriter.writeToArffFile(writable);
             BufferedReader reader = new BufferedReader(new FileReader(f));
             Instances data = new Instances(reader);

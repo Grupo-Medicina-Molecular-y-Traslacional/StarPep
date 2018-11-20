@@ -16,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
@@ -24,6 +25,8 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
@@ -50,6 +53,7 @@ import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.impl.AbstractCluster;
+import org.bapedis.core.ui.actions.CopyClusterToWorkspace;
 import org.bapedis.core.ui.actions.RemoveCluster;
 import org.bapedis.core.ui.actions.RemoveOtherClusters;
 import org.jdesktop.swingx.JXBusyLabel;
@@ -317,8 +321,7 @@ public class ClusterNavigator extends JComponent implements
     }
 
     private void reload() {
-        Cluster[] clusters = currentNavModel.getClusters();
-        if (clusters != null) {
+        if (currentNavModel.getClusters() != null) {
             List<Peptide> peptides = currentAttrModel.getPeptides();
             setBusyLabel(true);
             SwingWorker worker = new SwingWorker<TableModel, Void>() {
@@ -331,7 +334,7 @@ public class ClusterNavigator extends JComponent implements
 
                     List<Cluster> clusterList = new LinkedList<>();
                     boolean flag;
-                    for (Cluster c : clusters) {
+                    for (Cluster c : currentNavModel.getClusters()) {
                         flag = false;
                         for (Peptide p : c.getMembers()) {
                             if (set.contains(p.getId())) {
@@ -452,6 +455,18 @@ public class ClusterNavigator extends JComponent implements
                 JPopupMenu contextMenu = new JPopupMenu();
                 contextMenu.add(new RemoveCluster());
                 contextMenu.add(new RemoveOtherClusters());
+                
+                JMenuItem subMenu = new JMenu(NbBundle.getMessage(ClusterNavigator.class, "ClusterNavigator.copyCluster.name"));                
+                subMenu.add(new JMenuItem(new CopyClusterToWorkspace(null)));
+                Workspace currWs = pc.getCurrentWorkspace();
+                Workspace otherWs;
+                for (Iterator<? extends Workspace> it = pc.getWorkspaceIterator(); it.hasNext();){
+                    otherWs = it.next();
+                    if (currWs != otherWs){
+                        subMenu.add(new JMenuItem(new CopyClusterToWorkspace(otherWs)));
+                    }
+                }     
+                contextMenu.add(subMenu);
                 contextMenu.show(table, evt.getX(), evt.getY());
             } else {
                 table.getSelectionModel().clearSelection();

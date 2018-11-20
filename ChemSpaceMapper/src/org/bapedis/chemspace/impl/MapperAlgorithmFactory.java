@@ -115,7 +115,7 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
                     csMapper.setSSNEmbedderAlg(ssnEmbedder);
                 }
                 break;
-            case NONE:
+            default:
                 throw new RuntimeException("Internal error: Chemical Space Embedder is null");
         }
     }

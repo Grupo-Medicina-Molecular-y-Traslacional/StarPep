@@ -9,6 +9,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedList;
 import java.util.List;
+import javax.swing.SwingUtilities;
 import org.bapedis.chemspace.model.FeatureFilteringOption;
 import org.bapedis.chemspace.model.FeatureWeightingOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
@@ -23,6 +24,7 @@ import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
 import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
 import org.bapedis.core.spi.alg.impl.FeatureSEFilteringFactory;
+import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -67,8 +69,8 @@ public class MapperAlgorithm implements Algorithm {
         running = false;
 
         //Mapping Options        
-        representation = Representation.NONE;
-        csOption = ChemSpaceOption.NONE;
+        representation = Representation.COORDINATE_BASED;
+        csOption = ChemSpaceOption.TwoD_SPACE;
         feOption = FeatureExtractionOption.NEW;
         ffOption = FeatureFilteringOption.YES;
         fwOption = FeatureWeightingOption.NO;
@@ -119,7 +121,7 @@ public class MapperAlgorithm implements Algorithm {
             case SEQ_SIMILARITY_NETWORK:
                 algorithms.add(ssnEmbedderAlg);
                 break;
-            case NONE:
+            default:
                 throw new RuntimeException("Internal error: Chemical Space Embedder is null");
         }
 
@@ -147,6 +149,15 @@ public class MapperAlgorithm implements Algorithm {
 
     @Override
     public void endAlgo() {
+        if (!stopRun){
+           GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
+            SwingUtilities.invokeLater(new Runnable() {
+               @Override
+               public void run() {
+                   graphWC.openGraphWindow();
+               }
+           });           
+        }
         workspace = null;
         progressTicket = null;
 

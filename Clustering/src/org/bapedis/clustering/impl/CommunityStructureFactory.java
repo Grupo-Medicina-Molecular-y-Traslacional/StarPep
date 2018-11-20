@@ -16,7 +16,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author loge
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 50)
+//@ServiceProvider(service = AlgorithmFactory.class, position = 50)
 public class CommunityStructureFactory implements ClusteringTag{
 
     CommunityStructureSetupUI setupUI = new CommunityStructureSetupUI();

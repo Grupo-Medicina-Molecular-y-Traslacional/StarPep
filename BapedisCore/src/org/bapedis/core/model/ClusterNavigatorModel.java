@@ -7,6 +7,8 @@ package org.bapedis.core.model;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -14,6 +16,7 @@ import java.util.List;
  * @author loge
  */
 public class ClusterNavigatorModel {
+
     public static final String RUNNING = "running";
     public static final String CHANGED_CLUSTER = "changed";
     protected boolean running;
@@ -33,7 +36,16 @@ public class ClusterNavigatorModel {
     public Cluster[] getClusters() {
         return clusters;
     }
-    
+
+    public boolean contains(Cluster cluster) {
+        for (Cluster c : clusters) {
+            if (c.getId() == cluster.id) {
+                return true;
+            }
+        }
+        return false;
+    }  
+
     public boolean isRunning() {
         return running;
     }
@@ -42,13 +54,13 @@ public class ClusterNavigatorModel {
         boolean oldValue = this.running;
         this.running = running;
         propertyChangeSupport.firePropertyChange(RUNNING, oldValue, running);
-    }    
-        
+    }
+
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
-    }    
+    }
 }

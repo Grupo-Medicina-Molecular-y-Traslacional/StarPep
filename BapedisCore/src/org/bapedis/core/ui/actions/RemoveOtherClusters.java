@@ -23,7 +23,6 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Node;
 import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.Exceptions;
@@ -64,7 +63,6 @@ public class RemoveOtherClusters extends GlobalContextSensitiveAction<Cluster> {
         Workspace workspace = pc.getCurrentWorkspace();
         AttributesModel oldAttrModel = pc.getAttributesModel();
         ClusterNavigatorModel navModel = pc.getClusterNavModel();
-        Cluster[] clusters = navModel.getClusters();
         
         List<Node> toAddNodes = new LinkedList<>();
         List<Node> toRemoveNodes = new LinkedList<>();        
@@ -76,22 +74,22 @@ public class RemoveOtherClusters extends GlobalContextSensitiveAction<Cluster> {
                 @Override
                 protected AttributesModel doInBackground() throws Exception {
                     boolean in;
-                    for (int i = 0; i < clusters.length; i++) {
+                    for (Cluster cluster: navModel.getClusters()) {
                         in = false;
                         for (Cluster c : context) {
-                            if (clusters[i].getId() == c.getId()) {
+                            if (cluster.getId() == c.getId()) {
                                 in = true;
                                 break;
                             }
                         }
                         if (in) {
-                            clusterList.add(clusters[i]);
-                            for (Peptide peptide : clusters[i].getMembers()) {
+                            clusterList.add(cluster);
+                            for (Peptide peptide : cluster.getMembers()) {
                                 peptideIDs.add(peptide.getId());
                                 toAddNodes.add(peptide.getGraphNode());
                             }
                         } else {
-                            for (Peptide peptide : clusters[i].getMembers()) {
+                            for (Peptide peptide : cluster.getMembers()) {
                                 toRemoveNodes.add(peptide.getGraphNode());
                             }
                         }

@@ -65,8 +65,8 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
         }
         
         // Chem Space Option
-        representation = Representation.NONE;
-        csOption = ChemSpaceOption.NONE;
+        representation = Representation.COORDINATE_BASED;
+        csOption = ChemSpaceOption.TwoD_SPACE;
 
         //Default Panels
         defaultPanels = new WizardDescriptor.Panel[]{
@@ -153,7 +153,7 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
                         steps = defaultSteps;
                 }
                 break;
-            case NONE:
+            default:
                 currentPanels = defaultPanels;
                 steps = defaultSteps;
                 break;

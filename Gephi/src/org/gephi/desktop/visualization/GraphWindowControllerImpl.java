@@ -199,7 +199,7 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
     public synchronized void refreshGraphView(Workspace workspace, List<Node> toAddNodes, List<Node> toRemoveNodes) {
         GraphVizSetting graphViz = pc.getGraphVizSetting(workspace);
         GraphModel graphModel = pc.getGraphModel(workspace);
-        Graph graph = graphModel.getGraphVisible();
+        Graph graph = pc.getGraphVisible(workspace);
 
         graph.writeLock();
         try {

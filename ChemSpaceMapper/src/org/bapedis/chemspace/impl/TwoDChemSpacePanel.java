@@ -82,6 +82,16 @@ public class TwoDChemSpacePanel extends javax.swing.JPanel implements PropertyCh
         twoDEmbedder = csMapper.getTwoDEmbedderAlg();
     }
 
+    @Override
+    public void setEnabled(boolean enabled) {
+        settingPanel.setEnabled(enabled);
+        jLabel1.setEnabled(enabled);
+        jLabel2.setEnabled(enabled);
+        jXComboBox.setEnabled(enabled);
+        jYComboBox.setEnabled(enabled);
+        scatterPanel.setEnabled(enabled);
+    }
+
     private void setRunning(boolean running) {
         busyLabel.setBusy(running);
         busyLabel.setVisible(running);
@@ -102,7 +112,7 @@ public class TwoDChemSpacePanel extends javax.swing.JPanel implements PropertyCh
         if (!running && twoSpace != null && twoSpace.getScatterPlot() != null) {
             scatterPanel.setBorder(BorderFactory.createTitledBorder(NbBundle.getMessage(TwoDChemSpacePanel.class, "TwoDChemSpacePanel.scatterPanel.borderTitle")));
             scatterPanel.add(twoSpace.getScatterPlot());
-        } 
+        }
         scatterPanel.revalidate();
         scatterPanel.repaint();
     }
@@ -114,13 +124,15 @@ public class TwoDChemSpacePanel extends javax.swing.JPanel implements PropertyCh
         } else {
             TwoDSpace twoDSpace = twoDEmbedder.getTwoDSpace();
 
-            String[] axisLabels = twoDSpace.getAxisLabels();
-            for (String axis : axisLabels) {
-                modelX.addElement(axis);
-                modelY.addElement(axis);
+            if (twoDSpace != null) {
+                String[] axisLabels = twoDSpace.getAxisLabels();
+                for (String axis : axisLabels) {
+                    modelX.addElement(axis);
+                    modelY.addElement(axis);
+                }
+                modelX.setSelectedItem(axisLabels[twoDSpace.getxAxis()]);
+                modelY.setSelectedItem(axisLabels[twoDSpace.getyAxis()]);
             }
-            modelX.setSelectedItem(axisLabels[twoDSpace.getxAxis()]);
-            modelY.setSelectedItem(axisLabels[twoDSpace.getyAxis()]);
         }
     }
 

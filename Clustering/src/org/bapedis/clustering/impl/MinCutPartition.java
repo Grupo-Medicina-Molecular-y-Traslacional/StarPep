@@ -21,11 +21,10 @@ import org.bapedis.core.task.ProgressTicket;
  */
 public class MinCutPartition extends BasePartition {
 
-    public static final int K_MOVES = 100;
+    public static final int K_MOVES = -1;
     private Boolean[] bestPartition;
     private int bestCost;
     private boolean currentSide;
-
 
     public MinCutPartition(BiGraph bigraph, int level, ProgressTicket ticket, AtomicBoolean stopRun) {
         super(bigraph, level, ticket, stopRun);
@@ -33,10 +32,10 @@ public class MinCutPartition extends BasePartition {
 
     @Override
     protected Cluster[] compute() {
-        if (!stopRun.get() && bigraph.size() > MIN_SIZE && level > 0 ) {
+        if (!stopRun.get() && bigraph.size() > MIN_SIZE && level > 0) {
             findGraphPartition();
-            MinCutPartition left = new MinCutPartition(bigraph.getLeftGraph(), level -1, ticket, stopRun);
-            MinCutPartition right = new MinCutPartition(bigraph.getRightGraph(), level -1, ticket, stopRun);
+            MinCutPartition left = new MinCutPartition(bigraph.getLeftGraph(), level - 1, ticket, stopRun);
+            MinCutPartition right = new MinCutPartition(bigraph.getRightGraph(), level - 1, ticket, stopRun);
             right.fork();
             return union(left.compute(), right.join());
         }
@@ -71,7 +70,7 @@ public class MinCutPartition extends BasePartition {
         }
 
         int iterations = 0;
-        while (iterations < 10 && doMoves(bigraph,leftBucket, rightBucket)) {
+        while (iterations < 10 && doMoves(bigraph, leftBucket, rightBucket)) {
             iterations++;
         }
 
@@ -90,8 +89,9 @@ public class MinCutPartition extends BasePartition {
         graph.freeLockedVertices();
 
         //The first k moves
-        int cost;
-        for (int i = 0; i < Math.min(K_MOVES, graph.size()); i++) {
+        int cost, n;
+        n = K_MOVES > 0 ? Math.min(K_MOVES, graph.size()) : graph.size();
+        for (int i = 0; i < n; i++) {
             doMove(graph, leftBucket, rightBucket);
             cost = getCost(graph);
             if (cost < bestCost) {

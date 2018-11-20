@@ -28,22 +28,12 @@ import org.openide.util.NbBundle;
 @ActionRegistration(
         displayName = "#CTL_Sequence"
 )
-@ActionReference(path = "Menu/Tools", position = 20)
-@NbBundle.Messages("CTL_Sequence=Sequence search")
-public class SequenceAction extends AbstractAction{
-    private final ActionListener actionListener;
+@ActionReference(path = "Menu/Tools", position = 30)
+@NbBundle.Messages("CTL_Sequence=Sequence")
+public class SequenceAction extends ToolAction{
     
     public SequenceAction() {
-        AlgorithmFactory seqSearchfactory = Lookup.getDefault().lookup(SequenceSearchFactory.class);               
-        actionListener = seqSearchfactory != null ?ToolAction.createActionListener(seqSearchfactory, SequenceTag.class): null;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (actionListener != null){
-            actionListener.actionPerformed(e);
-        }
-    }
-    
-    
+        super(NbBundle.getMessage(SequenceAction.class, "CTL_Sequence"),
+                SequenceTag.class);           
+    }        
 }

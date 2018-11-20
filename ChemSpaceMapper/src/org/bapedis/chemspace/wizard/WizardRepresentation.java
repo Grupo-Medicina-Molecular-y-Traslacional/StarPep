@@ -150,7 +150,7 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
                 ssnEmbedder.setNetworkType(component.getNetworkType());
                 wiz.putProperty(AbstractEmbedder.class.getName(), ssnEmbedder);
                 break;
-            case NONE:
+            default:
                 wiz.putProperty(AbstractEmbedder.class.getName(), null);
                 break;
         }
@@ -174,8 +174,6 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
                     default:
                         return false;
                 }
-            case NONE:
-                return false;
         }
         return false;
     }
@@ -215,14 +213,18 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
                     default:
                         throw new WizardValidationException(component, NbBundle.getMessage(WizardFeatureExtraction.class, "VisualRepresentation.invalidNetwork.text"), null);
                 }
-            case NONE:
+            default:
                 throw new WizardValidationException(component, NbBundle.getMessage(WizardFeatureExtraction.class, "VisualRepresentation.invalidNetwork.text"), null);
         }
     }
 
     @Override
     public boolean isFinishPanel() {
-        return component.getChemSpaceOption() != ChemSpaceOption.NONE;
+        ChemSpaceOption csOption = component.getChemSpaceOption();
+        Representation rep = component.getRepresentation();
+        return (rep == Representation.COORDINATE_BASED && (csOption == ChemSpaceOption.TwoD_SPACE)) ||
+               (rep == Representation.COORDINATE_FREE && (csOption == ChemSpaceOption.CHEM_SPACE_NETWORK || 
+                                                          csOption == ChemSpaceOption.SEQ_SIMILARITY_NETWORK));
     }
 
 }

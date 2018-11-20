@@ -91,7 +91,7 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
         property = createPropertyField("seq", NbBundle.getMessage(PeptideNode.class, "PropertySet.seq"),
                 NbBundle.getMessage(PeptideNode.class, "PropertySet.seq.desc"), String.class, peptide.getSequence());
         set.put(property);
-        sheet.put(set);
+        sheet.put(set);        
 
         // Features         
         for (PeptideAttribute attr : peptide.getAttributes()) {

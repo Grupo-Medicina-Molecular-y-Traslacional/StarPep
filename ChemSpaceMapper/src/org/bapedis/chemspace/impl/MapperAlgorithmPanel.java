@@ -124,8 +124,23 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
     public void setBusy(boolean busy) {        
         openWizardLink.setEnabled(!busy);
+        switch (csMapper.getChemSpaceOption()) {
+            case TwoD_SPACE:
+                twoDLabel.setEnabled(!busy);
+                twoDPanel.setEnabled(!busy);
+                break;
+            case CHEM_SPACE_NETWORK:
+                csnLabel.setEnabled(!busy);
+                csnPanel.setEnabled(!busy);
+                break;
+            case SEQ_SIMILARITY_NETWORK:
+                ssnLabel.setEnabled(!busy);
+                ssnPanel.setEnabled(!busy);
+                break;
+        }        
         topLeftPanel.setEnabled(!busy);
         topRightPanel.setEnabled(!busy);
+        centerPanel.setEnabled(!busy);
     }
 
     public MapperAlgorithm getCheSMapper() {

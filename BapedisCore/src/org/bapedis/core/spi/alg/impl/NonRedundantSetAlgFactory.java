@@ -16,7 +16,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author loge
  */
-//@ServiceProvider(service = AlgorithmFactory.class, position = 20)
+@ServiceProvider(service = AlgorithmFactory.class, position = 20)
 public class NonRedundantSetAlgFactory implements SequenceTag {
 
     private final NonRedundantSetAlgSetupUI setupUI = new NonRedundantSetAlgSetupUI();

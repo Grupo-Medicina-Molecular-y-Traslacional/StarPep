@@ -35,7 +35,7 @@ import org.openide.util.NbBundle;
  * @author loge
  */
 public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeListener {
-
+    
     protected MapperAlgorithm csMapper;
     protected NetworkEmbedder netEmbedder;
     private RichTooltip richTooltip;
@@ -47,10 +47,10 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
     static {
         UIManager.put("Slider.paintValue", false);
     }
-
+    
     public NetworkPanel() {
         initComponents();
-
+        
         Hashtable<Integer, JLabel> thresholdLabelTable = new Hashtable<>();
         thresholdLabelTable.put(50, new JLabel("0.5"));
         thresholdLabelTable.put(60, new JLabel("0.6"));
@@ -59,7 +59,7 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
         thresholdLabelTable.put(90, new JLabel("0.9"));
         thresholdLabelTable.put(100, new JLabel("1"));
         cutoffSlider.setLabelTable(thresholdLabelTable);
-
+        
         addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
@@ -67,24 +67,24 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
                     csMapper.addRunningListener(NetworkPanel.this);
                 }
             }
-
+            
             @Override
             public void ancestorRemoved(AncestorEvent event) {
                 if (csMapper != null) {
                     csMapper.removeRunningListener(NetworkPanel.this);
                 }
             }
-
+            
             @Override
             public void ancestorMoved(AncestorEvent event) {
             }
         });
-
+        
         DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
         symbols.setDecimalSeparator('.');
         formatter = new DecimalFormat("0.00", symbols);
     }
-
+    
     public void setUp(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
         switch (csMapper.getChemSpaceOption()) {
@@ -102,7 +102,22 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
         jCutoffNewValue.setVisible(false);
         setupHistogram(csMapper.isRunning());
     }
-
+    
+    @Override
+    public void setEnabled(boolean enabled) {
+        jCutoffCurrentLabel.setEnabled(enabled);
+        jCutoffCurrentValue.setEnabled(enabled);
+        jCutoffNewLabel.setEnabled(enabled);
+        jCutoffNewValue.setEnabled(enabled);
+        jCutoffToolBar.setEnabled(enabled);
+        jLessCutoffButton.setEnabled(enabled);
+        jMoreCutoffButton.setEnabled(enabled);
+        thresholdPanel.setEnabled(enabled);
+        histogramPanel.setEnabled(enabled);
+        histoInfoLabel.setEnabled(enabled);
+        cutoffSlider.setEnabled(enabled);
+    }    
+    
     private void setupHistogram(boolean running) {
         histogramPanel.removeAll();
         SimilarityMatrix matrix = netEmbedder.getSimilarityMatrix();
@@ -115,7 +130,7 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
         histogramPanel.repaint();
         resetTooltip(histogram);
     }
-
+    
     private void resetTooltip(JQuickHistogram histogram) {
         richTooltip = new RichTooltip();
         richTooltip.setTitle(NbBundle.getMessage(NetworkPanel.class, "ChemSpaceNetworkPanel.histoInfo.title"));
@@ -124,7 +139,7 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
         richTooltip.addDescriptionSection("Min: " + (histogram != null && histogram.countValues() > 0 ? formatter.format(histogram.getMinValue()) : "NaN"));
         richTooltip.addDescriptionSection("Max: " + (histogram != null && histogram.countValues() > 0 ? formatter.format(histogram.getMaxValue()) : "NaN"));
     }
-
+    
     private void setRunning(boolean running) {
         jApplyButton.setEnabled(!running);
         jCutoffToolBar.setEnabled(!running);
@@ -137,7 +152,7 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
             setCursor(Cursor.getDefaultCursor());
         }
     }
-
+    
     private void changeThreshold(float value) {
         jCutoffCurrentValue.setText(formatter.format(value));
         jCutoffNewLabel.setVisible(false);
@@ -407,13 +422,13 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
 }
 
 class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
-
+    
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     static final String CHANGED_THRESHOLD = "changed_threshold";
     private final NetworkEmbedder embedder;
     private final AtomicBoolean stopRun;
     private final ProgressTicket ticket;
-
+    
     public NetworkThresholdUpdater(NetworkEmbedder embedder) {
         this.embedder = embedder;
         stopRun = new AtomicBoolean(false);
@@ -425,7 +440,7 @@ class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
             }
         });
     }
-
+    
     @Override
     protected Void doInBackground() throws Exception {
         ticket.start();
@@ -471,7 +486,7 @@ class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
 //        }
         return null;
     }
-
+    
     @Override
     protected void done() {
         try {
@@ -484,5 +499,5 @@ class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
             ticket.finish();
         }
     }
-
+    
 }

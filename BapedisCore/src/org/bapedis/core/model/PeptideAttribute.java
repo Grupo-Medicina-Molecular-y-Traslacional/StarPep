@@ -12,7 +12,7 @@ import java.util.Objects;
  *
  * @author loge
  */
-public class PeptideAttribute {
+public class PeptideAttribute implements Cloneable{
 
     protected final String id;
     protected final String displayName;
@@ -72,5 +72,11 @@ public class PeptideAttribute {
     public String toString() {
         return displayName; //To change body of generated methods, choose Tools | Templates.
     }
+    
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        PeptideAttribute copyObject = (PeptideAttribute)super.clone();
+        return copyObject;        
+    }       
 
 }

@@ -23,10 +23,12 @@ public class CommunityStructure extends AbstractCluster {
 
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
     private int level;
+    private final AtomicBoolean atomicRun;
 
     public CommunityStructure(AlgorithmFactory factory) {
         super(factory);
         level = 3;
+        atomicRun = new AtomicBoolean();
     }
 
     public int getLevel() {
@@ -50,7 +52,8 @@ public class CommunityStructure extends AbstractCluster {
         ticket.switchToDeterminate((int) Math.pow(2, level));
         BiGraph bigraph = new BiGraph(vertices, pc.getGraphVisible());
 
-        BasePartition partition = new MinCutPartition(bigraph, level, ticket, new AtomicBoolean(stopRun));
+        atomicRun.set(stopRun);
+        BasePartition partition = new MinCutPartition(bigraph, level, ticket, atomicRun);
 
         fjPool.invoke(partition);
         Cluster[] batches = partition.join();
@@ -59,5 +62,14 @@ public class CommunityStructure extends AbstractCluster {
         }
         return clusterList;
     }
+
+    @Override
+    public boolean cancel() {
+        super.cancel(); 
+        atomicRun.set(stopRun);
+        return stopRun;
+    }
+    
+    
 
 }

@@ -10,5 +10,5 @@ package org.bapedis.chemspace.model;
  * @author loge
  */
 public enum Representation {
-    NONE, COORDINATE_BASED, COORDINATE_FREE
+    COORDINATE_BASED, COORDINATE_FREE
 }

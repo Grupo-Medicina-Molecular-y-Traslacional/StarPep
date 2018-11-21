@@ -5,23 +5,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.util.logging.Logger;
 
 public class ExternalTool
 {
-	private Logger logger;
 
-	public ExternalTool(Logger logger)
-	{
-		this.logger = logger;
-	}
+	public ExternalTool(){
 
-	private void println(String msg)
-	{
-		if (logger != null)
-			logger.info(msg);
-		else
-			System.out.println(msg);
 	}
 
 	public String get(final String processName, String[] command)

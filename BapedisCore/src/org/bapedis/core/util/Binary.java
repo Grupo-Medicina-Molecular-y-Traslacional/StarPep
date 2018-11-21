@@ -11,15 +11,14 @@ public class Binary
 	private String command;
 	private String envName;
 	private String commandLocation;
-	private String description;
 
 	private List<PropertyChangeListener> listeners = new ArrayList<PropertyChangeListener>();
 
-	public Binary(String command, String envName, String description)
+	public Binary(String command, String envName)
 	{
 		this.command = command;
 		this.envName = envName;
-		this.description = description;
+                commandLocation = null;
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener l)
@@ -85,11 +84,6 @@ public class Binary
 			return command + ".exe";
 		else
 			return command;
-	}
-
-	public String getDescription()
-	{
-		return description;
 	}
 
 }

@@ -9,14 +9,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 import org.bapedis.core.io.OUTPUT_OPTION;
 import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.MolecularDescriptor;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.task.ProgressTicket;
+import org.bapedis.core.util.BinaryLocator;
 import org.bapedis.core.util.ExternalTool;
 import org.bapedis.core.util.OSUtil;
-import org.bapedis.core.util.RScriptUtil;
 import org.bapedis.core.util.RUtil;
 import org.openide.util.Exceptions;
 
@@ -26,8 +27,32 @@ import org.openide.util.Exceptions;
  */
 public abstract class RClusterer extends BaseClusterer {
 
+    public static String TOO_FEW_UNIQUE_DATA_POINTS = "Too few unique data points, add features or decrease number of clusters.";
+    protected Process p;
+
     public RClusterer(AlgorithmFactory factory) {
         super(factory);
+    }
+
+    @Override
+    public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
+        super.initAlgo(workspace, progressTicket);
+        p = null;
+    }
+
+    @Override
+    public boolean cancel() {
+        super.cancel();
+        if (p != null) {
+            p.destroy();
+        }
+        return stopRun;
+    }
+
+    @Override
+    public void endAlgo() {
+        super.endAlgo();
+        p = null;
     }
 
     protected abstract String getRScriptCode();
@@ -42,12 +67,31 @@ public abstract class RClusterer extends BaseClusterer {
             OSUtil.writeStringToFile(rScript.getAbsolutePath(), getRScriptCode());
             File dataFile = RUtil.writeToTable(peptides, features, OUTPUT_OPTION.MIN_MAX);
 
-//            String errorOut = run(
-//                    getShortName(),
-//                    new String[]{BinHandler.RSCRIPT_BINARY.getLocation(), FileUtil.getAbsolutePathEscaped(rScript),
-//                        FileUtil.getAbsolutePathEscaped(new File(featureTableFile)),
-//                        FileUtil.getAbsolutePathEscaped(tmp)});
+            if (RUtil.RSCRIPT_BINARY.getLocation() == null) {
+                BinaryLocator.locate(RUtil.RSCRIPT_BINARY);
+            }
 
+            if (RUtil.RSCRIPT_BINARY.getLocation() != null) {
+                String errorOut = run(
+                        factory.getName(),
+                        new String[]{RUtil.RSCRIPT_BINARY.getLocation(),
+                            OSUtil.getAbsolutePathEscaped(rScript),
+                            OSUtil.getAbsolutePathEscaped(dataFile),
+                            OSUtil.getAbsolutePathEscaped(tmp)});
+
+                if (tmp.exists()) {
+                    List<Integer[]> cluster = RUtil.readCluster(tmp.getAbsolutePath());
+                    if (cluster.size() != peptides.length) {
+                        if (errorOut.contains(TOO_FEW_UNIQUE_DATA_POINTS)) {
+                            throw new MyClusterException(TOO_FEW_UNIQUE_DATA_POINTS);
+                        }
+                        // else: unknown exception
+                        throw new MyClusterException(errorOut);
+                    }
+                    
+                    return clusterList;
+                }
+            }
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         } catch (Exception ex) {
@@ -56,40 +100,24 @@ public abstract class RClusterer extends BaseClusterer {
         return null;
     }
 
-    public static String run(String processName, String cmd[], File stdOutFile, String env[]) {
+    public String run(String processName, String cmd[]) {
 //        TaskProvider.debug("Run " + processName);
-        ExternalTool ext = new ExternalTool(Logger.getLogger(RClusterer.class.getName())) {
-            protected void stdout(String s) {
-//                TaskProvider.verbose(s);
-//                Settings.LOGGER.info(s);
-            }
-
-            protected void stderr(String s) {
-//                TaskProvider.verbose(s);
-//                Settings.LOGGER.warn(s);
-            }
-        };
-        Process p = ext.run(processName, cmd, stdOutFile, stdOutFile != null, env);
-        while (true) {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-//                Settings.LOGGER.error(e);
-            }
-            // check if this process should be aborted (via abort dialog)
-//            if (!TaskProvider.isRunning()) {
-//                p.destroy();
-//                break;
-//            }
-            // hack to determine if process has finished
-            try {
-//                Settings.LOGGER.debug("Exit value: " + p.exitValue());
-                break;
-            } catch (IllegalThreadStateException e) {
-                // this exception is thrown if the process has not finished
-            }
-        }
+        System.out.println("Runing " + processName);
+        ExternalTool ext = new ExternalTool();
+        p = ext.run(processName, cmd, null, true);
         return ext.getErrorOut();
+    }
+    
+    class MyClusterException extends RuntimeException{
+        private final String msg;
+
+        public MyClusterException(String msg) {
+            this.msg = msg;
+        }
+
+        public String getErrorMsg() {
+            return msg;
+        }                
     }
 
 }

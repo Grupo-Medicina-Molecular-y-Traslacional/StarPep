@@ -53,11 +53,6 @@ public class ExternalTool
 		return run(processName, command, stdOutfile, wait, env, null);
 	}
 
-	protected void stdout(String s)
-	{
-		pc.reportMsg(s, workspace);
-	}
-
 	protected void stderr(String s)
 	{
 		pc.reportError(s, workspace);
@@ -107,8 +102,8 @@ public class ExternalTool
 							if (s != null)
 								if (tmpStdOutfile != null)
 									print.println(s);
-								else
-									stdout(s);
+//								else
+//									stdout(s);
 							else
 								break;
 						}

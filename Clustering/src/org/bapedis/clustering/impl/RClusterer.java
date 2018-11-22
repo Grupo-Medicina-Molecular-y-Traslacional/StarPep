@@ -6,12 +6,12 @@
 package org.bapedis.clustering.impl;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.bapedis.core.io.OUTPUT_OPTION;
+import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Workspace;
@@ -25,6 +25,7 @@ import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 
 /**
  *
@@ -32,12 +33,38 @@ import org.openide.util.NbBundle;
  */
 public abstract class RClusterer extends BaseClusterer {
 
+    static final String RSCRIPT_PATH = "rscript_path";
     static protected final String PRO_CATEGORY = "Properties";
     public static String TOO_FEW_UNIQUE_DATA_POINTS = "Too few unique data points, add features or decrease number of clusters.";
     protected Process p;
+    protected String rScriptPath;
+    protected final List<AlgorithmProperty> properties;
 
     public RClusterer(AlgorithmFactory factory) {
         super(factory);
+        rScriptPath = RUtil.RSCRIPT_BINARY.getLocation() != null ? RUtil.RSCRIPT_BINARY.getLocation() : "";
+        properties = new LinkedList<>();
+    }
+
+    protected void populateProperties() {
+        try {
+            properties.add(AlgorithmProperty.createProperty(this, String.class, NbBundle.getMessage(RClusterer.class, "RClusterer.path.name"), PRO_CATEGORY, NbBundle.getMessage(RClusterer.class, "RClusterer.path.desc"), "getrScriptPath", "setrScriptPath"));
+        } catch (NoSuchMethodException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }
+
+    public String getrScriptPath() {
+        return rScriptPath;
+    }
+
+    public void setrScriptPath(String rScriptPath) {
+        this.rScriptPath = rScriptPath;
+    }
+
+    @Override
+    public AlgorithmProperty[] getProperties() {
+        return properties.toArray(new AlgorithmProperty[0]);
     }
 
     @Override
@@ -63,16 +90,24 @@ public abstract class RClusterer extends BaseClusterer {
 
     protected abstract String getRScriptCode();
 
+    protected abstract void validateClusterer() throws MyClusterException;
+
     @Override
     protected List<Cluster> cluterize(MolecularDescriptor[] features) {
         try {
-            List<Cluster> clusterList = new LinkedList<>();
-
-            // Configure a cluster instance
+            // Validate 
             try {
+                if (!rScriptPath.equals(RUtil.RSCRIPT_BINARY.getLocation())) {
+                    RUtil.RSCRIPT_BINARY.setLocation(rScriptPath);
+                }
+                if (RUtil.RSCRIPT_BINARY.isFound()) {
+                    NbPreferences.forModule(RClusterer.class).put(RClusterer.RSCRIPT_PATH, rScriptPath);
+                } else {
+                    throw new MyClusterException(NbBundle.getMessage(RClusterer.class, "RClusterer.rscript.notFound"));
+                }
                 validateClusterer();
-            } catch (Exception ex) {
-                NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
+            } catch (MyClusterException ex) {
+                NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getErrorMsg(), NotifyDescriptor.ERROR_MESSAGE);
                 DialogDisplayer.getDefault().notify(nd);
                 cancel();
             }
@@ -83,7 +118,7 @@ public abstract class RClusterer extends BaseClusterer {
                 OSUtil.writeStringToFile(rScript.getAbsolutePath(), getRScriptCode());
                 File dataFile = RUtil.writeToCSV(peptides, features, OUTPUT_OPTION.MIN_MAX);
 
-                if (RUtil.RSCRIPT_BINARY.getLocation() == null) {
+                if (!RUtil.RSCRIPT_BINARY.isFound()) {
                     BinaryLocator.locate(RUtil.RSCRIPT_BINARY);
                 }
 
@@ -97,6 +132,7 @@ public abstract class RClusterer extends BaseClusterer {
                                     OSUtil.getAbsolutePathEscaped(tmp)});
 
                         if (tmp.exists()) {
+                            List<Cluster> clusterList = new LinkedList<>();
                             List<Integer[]> assignments = RUtil.readCluster(tmp.getAbsolutePath());
                             if (assignments.size() != peptides.length) {
                                 if (errorOut.contains(TOO_FEW_UNIQUE_DATA_POINTS)) {
@@ -127,8 +163,6 @@ public abstract class RClusterer extends BaseClusterer {
                             return clusterList;
                         }
                     }
-                } else {
-                    throw new MyClusterException(NbBundle.getMessage(RClusterer.class, "RClusterer.r.norFound"));
                 }
             }
         } catch (MyClusterException ex) {
@@ -141,8 +175,6 @@ public abstract class RClusterer extends BaseClusterer {
         return null;
     }
 
-    protected abstract void validateClusterer() throws Exception;
-
     protected String run(String processName, String cmd[]) {
         pc.reportMsg("Runing " + processName, workspace);
         ExternalTool ext = new ExternalTool(workspace);
@@ -152,14 +184,14 @@ public abstract class RClusterer extends BaseClusterer {
 
     class MyClusterException extends RuntimeException {
 
-        private final String msg;
+        private final String errorMsg;
 
         public MyClusterException(String msg) {
-            this.msg = msg;
+            this.errorMsg = msg;
         }
 
         public String getErrorMsg() {
-            return msg;
+            return errorMsg;
         }
     }
 

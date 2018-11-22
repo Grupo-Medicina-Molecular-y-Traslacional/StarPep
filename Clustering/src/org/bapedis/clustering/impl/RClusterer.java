@@ -98,6 +98,9 @@ public abstract class RClusterer extends BaseClusterer {
             // Validate 
             try {
                 if (!rScriptPath.equals(RUtil.RSCRIPT_BINARY.getLocation())) {
+//                    if(OSUtil.isWindows() && !rScriptPath.endsWith(".exe")){
+//                        rScriptPath = rScriptPath + ".exe";
+//                    }
                     RUtil.RSCRIPT_BINARY.setLocation(rScriptPath);
                 }
                 if (RUtil.RSCRIPT_BINARY.isFound()) {

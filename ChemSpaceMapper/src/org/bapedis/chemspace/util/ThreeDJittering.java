@@ -108,7 +108,7 @@ public class ThreeDJittering {
                 reduceStepWidth += 1000;
                 steps = Math.max(3, steps - 1);
                 this.stepWidth = minDist / (float) steps;
-                System.out.println("jitter-iteration: " + i + " reducing step-width to " + steps);
+//                System.out.println("jitter-iteration: " + i + " reducing step-width to " + steps);
             }
         }
     }

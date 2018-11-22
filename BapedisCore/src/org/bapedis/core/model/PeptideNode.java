@@ -168,11 +168,7 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
         if (value.getClass().isArray()) {
             if (value instanceof String[]) {
                 strValue = Arrays.toString((String[]) value);
-//            strValue = strValue.substring(1, strValue.length() - 1);
             }
-//            else{
-//                System.out.println(value.getClass());
-//            }
         } else {
             strValue = value.toString();
         }

@@ -13,7 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
@@ -41,20 +41,19 @@ public class RUtil {
                 "library(\"" + pack + "\")\n";
     }
 
-    public static File writeToTable(Peptide[] peptides, MolecularDescriptor[] features, OUTPUT_OPTION output) throws IOException, Exception {
-        File f = OSUtil.createTempFile("peptide-", "-features");
+    public static File writeToCSV(Peptide[] peptides, MolecularDescriptor[] features, OUTPUT_OPTION output) throws IOException, Exception {
+        File f = OSUtil.createTempFile("peptide-", "-features.csv");
         // if (f.exists())
         // throw new IllegalStateException("file " + f.getAbsolutePath() +
         // " already exists");
         try (BufferedWriter bf = new BufferedWriter(new FileWriter(f))) {
-            for (MolecularDescriptor md : features) {
-                bf.write("\"" + md.getDisplayName() + "\" ");
+            for (int i = 0; i < features.length; i++) {
+                bf.write(String.format("\"%s\"",features[i].getDisplayName()) + ((i == features.length - 1) ? "" : ","));
             }
             bf.write("\n");
             for (int i = 0; i < peptides.length; i++) {
-//                bf.write("\"" + (i + 1) + "\" ");
-                for (MolecularDescriptor md : features) {
-                    bf.write(getAttributeValue(peptides[i], md, output) + " ");
+                for (int j = 0; j < features.length; j++) {
+                    bf.write(String.format("\"%s\"", getAttributeValue(peptides[i], features[j], output)) + ((j == features.length - 1) ? "" : ","));                    
                 }
                 bf.write("\n");
             }
@@ -77,15 +76,13 @@ public class RUtil {
         if (!f.exists()) {
             throw new IllegalStateException("matrix file not found: " + f.getAbsolutePath());
         }
-        List<Integer[]> l = new ArrayList<Integer[]>();
+        List<Integer[]> list = new LinkedList<Integer[]>();
         try {
             BufferedReader bf = new BufferedReader(new FileReader(f));
             String line;
             boolean firstline = true;
             while ((line = bf.readLine()) != null) {
-                // System.out.println(line);
                 String s[] = line.split(" ");
-                // System.out.println(ArrayUtil.toString(s));
 
                 if (firstline) {
                     firstline = false;
@@ -107,7 +104,7 @@ public class RUtil {
                             }
                         }
                     }
-                    l.add(c);
+                    list.add(c);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -116,7 +113,7 @@ public class RUtil {
             e.printStackTrace();
         }
 
-        return l;
+        return list;
 
     }
 }

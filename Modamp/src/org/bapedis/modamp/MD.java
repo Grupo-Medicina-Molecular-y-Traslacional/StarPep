@@ -177,7 +177,6 @@ public class MD {
         while (true) {
             z = netCharge(seq, pH, pKscale); //pkA_EMBOSS()
             if (pH >= 14) {
-                System.out.println("Error");
                 break;
             }
             if (z < 0) {
@@ -318,11 +317,9 @@ public class MD {
                 double hv = hydrophobicityScale.getOrDefault(subseq.subSequence(j, j + 1), 0.0);
                 sumHmSin += hv * Math.sin(Math.toRadians(angle * (j + i + 1)));
                 sumHmCos += hv * Math.cos(Math.toRadians(angle * (j + i + 1)));
-                //System.out.println("C="+sumHmCos + "\n" + "S="+sumHmSin);
             }
             
             hM = Math.sqrt(Math.pow(sumHmSin, 2) + Math.pow(sumHmCos, 2)) / window;
-            //System.out.println(subseq + "\t" + hM );
 
             if (hM > hMMax) {
                 hMMax = hM;
@@ -394,7 +391,7 @@ public class MD {
         for (int i = 0; i < (seq.length() - window + 1); i++) {
             String subseq = seq.substring(i, window + i);
             h = gravy(subseq, hydrophobicityScale);
-            // System.out.println(subseq + "\t" + h);
+            
             if (h > hmax) {
                 hmax = h;
             }

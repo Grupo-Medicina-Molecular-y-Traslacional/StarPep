@@ -8,32 +8,35 @@ package org.bapedis.clustering.impl;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import weka.clusterers.HierarchicalClusterer;
+import org.bapedis.core.spi.alg.ClusteringTag;
+import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author loge
  */
-public class HierarchicalRClustererFactory implements AlgorithmFactory {
+@ServiceProvider(service = AlgorithmFactory.class, position = 50)
+public class HierarchicalRClustererFactory implements ClusteringTag {
 
     @Override
     public String getCategory() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return NbBundle.getMessage(HierarchicalRClustererFactory.class, "HierarchicalRClustererFactory.category");
     }
 
     @Override
     public String getName() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return NbBundle.getMessage(HierarchicalRClustererFactory.class, "HierarchicalRClustererFactory.name");
     }
 
     @Override
     public String getDescription() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return NbBundle.getMessage(HierarchicalRClustererFactory.class, "HierarchicalRClustererFactory.desc");
     }
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return null;
     }
 
     @Override

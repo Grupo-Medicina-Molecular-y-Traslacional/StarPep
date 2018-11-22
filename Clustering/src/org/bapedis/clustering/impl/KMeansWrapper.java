@@ -98,19 +98,19 @@ public class KMeansWrapper extends WekaClusterer<CascadeSimpleKMeans> {
     @Override
     protected void configureClusterer() throws Exception {
         if (minNumClusters < 2) {
-            throw new IllegalArgumentException(NbBundle.getMessage(KMeansWrapper.class, "WekaClusterer.arg.errorMsg", NbBundle.getMessage(KMeans.class, "KMeansWrapper.minNumClusters.name")));
+            throw new IllegalArgumentException(NbBundle.getMessage(KMeansWrapper.class, "Clusterer.arg.errorMsg", NbBundle.getMessage(KMeans.class, "KMeansWrapper.minNumClusters.name")));
         }
 
         if (maxNumClusters <= minNumClusters) {
-            throw new IllegalArgumentException(NbBundle.getMessage(KMeansWrapper.class, "WekaClusterer.arg.errorMsg", NbBundle.getMessage(KMeans.class, "KMeansWrapper.maxNumClusters.name")));
+            throw new IllegalArgumentException(NbBundle.getMessage(KMeansWrapper.class, "Clusterer.arg.errorMsg", NbBundle.getMessage(KMeans.class, "KMeansWrapper.maxNumClusters.name")));
         }
 
         if (maxIter < 1) {
-            throw new IllegalArgumentException(NbBundle.getMessage(KMeans.class, "WekaClusterer.arg.errorMsg", NbBundle.getMessage(KMeans.class, "KMeans.maxIter.name")));
+            throw new IllegalArgumentException(NbBundle.getMessage(KMeans.class, "Clusterer.arg.errorMsg", NbBundle.getMessage(KMeans.class, "KMeans.maxIter.name")));
         }
 
         if (distanceFunction != 1 && distanceFunction != 2 && distanceFunction != 3) {
-            String msg = NbBundle.getMessage(KMeansWrapper.class, "WekaClusterer.arg.errorMsg", NbBundle.getMessage(KMeansWrapper.class, "KMeansWrapper.distanceFunction.name"))
+            String msg = NbBundle.getMessage(KMeansWrapper.class, "Clusterer.arg.errorMsg", NbBundle.getMessage(KMeansWrapper.class, "KMeansWrapper.distanceFunction.name"))
                     + "\n"
                     + NbBundle.getMessage(KMeansWrapper.class, "KMeansWrapper.distanceFunction.desc");
             throw new IllegalArgumentException(msg);

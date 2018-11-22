@@ -52,7 +52,7 @@ public class EM extends WekaClusterer<weka.clusterers.EM> {
     @Override
     protected void configureClusterer() throws Exception {
         if (maxIter < 1) {
-            throw new IllegalArgumentException(NbBundle.getMessage(KMeans.class, "WekaClusterer.arg.errorMsg", NbBundle.getMessage(KMeans.class, "EM.maxIter.name")));
+            throw new IllegalArgumentException(NbBundle.getMessage(KMeans.class, "Clusterer.arg.errorMsg", NbBundle.getMessage(KMeans.class, "EM.maxIter.name")));
         }      
         
         clusterer.setMaxIterations(maxIter);

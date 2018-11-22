@@ -77,15 +77,15 @@ public class KMeans extends WekaClusterer<SimpleKMeans> {
     @Override
     protected void configureClusterer() throws Exception {
         if (n < 2) {
-            throw new IllegalArgumentException(NbBundle.getMessage(KMeans.class, "WekaClusterer.arg.errorMsg", NbBundle.getMessage(KMeans.class, "KMeans.N.name")));
+            throw new IllegalArgumentException(NbBundle.getMessage(KMeans.class, "Clusterer.arg.errorMsg", NbBundle.getMessage(KMeans.class, "KMeans.N.name")));
         }
 
         if (maxIter < 1) {
-            throw new IllegalArgumentException(NbBundle.getMessage(KMeans.class, "WekaClusterer.arg.errorMsg", NbBundle.getMessage(KMeans.class, "KMeans.maxIter.name")));
+            throw new IllegalArgumentException(NbBundle.getMessage(KMeans.class, "Clusterer.arg.errorMsg", NbBundle.getMessage(KMeans.class, "KMeans.maxIter.name")));
         }
 
         if (distanceFunction != 1 && distanceFunction != 2 && distanceFunction != 3) {
-            String msg = NbBundle.getMessage(KMeans.class, "WekaClusterer.arg.errorMsg", NbBundle.getMessage(KMeans.class, "KMeans.distanceFunction.name"))
+            String msg = NbBundle.getMessage(KMeans.class, "Clusterer.arg.errorMsg", NbBundle.getMessage(KMeans.class, "KMeans.distanceFunction.name"))
                     + "\n"
                     + NbBundle.getMessage(KMeans.class, "KMeans.distanceFunction.desc");
             throw new IllegalArgumentException(msg);

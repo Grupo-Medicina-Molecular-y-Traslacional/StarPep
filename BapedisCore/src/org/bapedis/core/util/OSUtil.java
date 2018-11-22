@@ -26,10 +26,6 @@ public class OSUtil {
         return OS.contains("nix") || OS.contains("nux");
     }
 
-    public static void main(String[] args) {
-        System.out.println(OS);
-    }
-
     /**
      * replace a backslash in windows with a double-backslash
      *
@@ -107,7 +103,7 @@ public class OSUtil {
                 String line;
                 String cmd[] = new String[]{"cmd", "/c", "MOVE", "/Y", source.getAbsolutePath(),
                     dest.getAbsolutePath()};
-                System.out.println(cmd);
+                
                 Process p = Runtime.getRuntime().exec(cmd);
                 BufferedReader input = new BufferedReader(
                         new InputStreamReader(p.getInputStream()));

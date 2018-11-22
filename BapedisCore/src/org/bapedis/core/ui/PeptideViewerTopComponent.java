@@ -503,7 +503,6 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             } else if (evt.getPropertyName().equals(AttributesModel.DISPLAY_ATTR_REMOVED)) {
                 PeptideAttribute attr = (PeptideAttribute) evt.getOldValue();
                 jFieldComboBox.removeItem(attr);
-                System.out.println("DispatchThread: " + EventQueue.isDispatchThread());
                 view.removePropertyColumn(attr.getId());
             }
         } else if (evt.getSource() instanceof QueryModel) {

@@ -5,12 +5,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import org.bapedis.core.model.Workspace;
+import org.bapedis.core.project.ProjectManager;
+import org.openide.util.Lookup;
 
 public class ExternalTool
 {
-
-	public ExternalTool(){
-
+        private static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+        private final Workspace workspace;
+        
+	public ExternalTool(Workspace workspace){
+            this.workspace = workspace;
 	}
 
 	public String get(final String processName, String[] command)
@@ -50,12 +55,12 @@ public class ExternalTool
 
 	protected void stdout(String s)
 	{
-		System.out.println(s);
+		pc.reportMsg(s, workspace);
 	}
 
 	protected void stderr(String s)
 	{
-		System.err.println(s);
+		pc.reportError(s, workspace);
 	}
 
 	StringBuffer errorOut = new StringBuffer();

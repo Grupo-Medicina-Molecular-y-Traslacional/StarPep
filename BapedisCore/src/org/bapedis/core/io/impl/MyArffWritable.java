@@ -9,7 +9,7 @@ import java.util.List;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.util.ArffWritable;
-import org.bapedis.core.io.OUTPUT_OPTION;
+import org.bapedis.core.io.MD_OUTPUT_OPTION;
 
 /**
  *
@@ -19,23 +19,17 @@ public class MyArffWritable implements ArffWritable {
     
     private final Peptide[] peptides;
     private final MolecularDescriptor[] features;
-    private OUTPUT_OPTION output;
+    private final MD_OUTPUT_OPTION output;
 
-    public MyArffWritable(Peptide[] peptides, MolecularDescriptor[] features) {
+    public MyArffWritable(Peptide[] peptides, MolecularDescriptor[] features, MD_OUTPUT_OPTION output) {
         this.peptides = peptides;
         this.features = features;
-        output = OUTPUT_OPTION.NORMAL;
-    }
-
-    public OUTPUT_OPTION getOutputOption() {
-        return output;
-    }
-
-    public void setOutputOption(OUTPUT_OPTION output) {
         this.output = output;
     }
-    
-    
+
+    public MD_OUTPUT_OPTION getOutputOption() {
+        return output;
+    }
 
     @Override
     public List<String> getAdditionalInfo() {
@@ -72,12 +66,14 @@ public class MyArffWritable implements ArffWritable {
         MolecularDescriptor attr = features[attribute];
         Peptide peptide = peptides[instance];
         switch (output) {
+            case None:
+                return Double.toString(attr.getDoubleValue(peptide));            
             case Z_SCORE:
-                 return String.valueOf(attr.getNormalizedZscoreValue(peptide));
+                 return Double.toString(attr.getNormalizedZscoreValue(peptide));
             case MIN_MAX:
-                return String.valueOf(attr.getNormalizedMinMaxValue(peptide));
+                return Double.toString(attr.getNormalizedMinMaxValue(peptide));
         }
-        return peptide.getAttributeValue(attr).toString();
+        return "";
     }
 
     @Override

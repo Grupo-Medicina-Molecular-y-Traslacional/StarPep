@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.bapedis.core.io.OUTPUT_OPTION;
+import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.MolecularDescriptor;
@@ -31,7 +31,7 @@ import org.openide.util.NbPreferences;
  *
  * @author loge
  */
-public abstract class RClusterer extends BaseClusterer {
+public abstract class RClusterer extends FeatureBasedClustering {
 
     static final String RSCRIPT_PATH = "rscript_path";
     static protected final String PRO_CATEGORY = "Properties";
@@ -124,7 +124,7 @@ public abstract class RClusterer extends BaseClusterer {
                 File tmp = OSUtil.createTempFile("rscript-", "-cluster");
                 File rScript = OSUtil.createTempFile("rscript", "-R");
                 OSUtil.writeStringToFile(rScript.getAbsolutePath(), getRScriptCode());
-                File dataFile = RUtil.writeToCSV(peptides, features, OUTPUT_OPTION.MIN_MAX);
+                File dataFile = RUtil.writeToCSV(peptides, features, MD_OUTPUT_OPTION.MIN_MAX);
 
                 if (!RUtil.RSCRIPT_BINARY.isFound()) {
                     BinaryLocator.locate(RUtil.RSCRIPT_BINARY);

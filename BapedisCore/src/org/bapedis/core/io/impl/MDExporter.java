@@ -13,10 +13,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.SwingWorker;
 import org.bapedis.core.io.Exporter;
+import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
+import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.task.ProgressTicket;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
@@ -29,9 +33,19 @@ public class MDExporter implements Exporter {
 
     protected final AttributesModel attrModel;
     protected final char separator = ',';
+    protected MD_OUTPUT_OPTION output;
 
     public MDExporter(AttributesModel attrModel) {
         this.attrModel = attrModel;
+        this.output = MD_OUTPUT_OPTION.None;
+    }
+
+    public MD_OUTPUT_OPTION getOutput() {
+        return output;
+    }
+
+    public void setOutput(MD_OUTPUT_OPTION output) {
+        this.output = output;
     }
 
     @Override
@@ -48,10 +62,22 @@ public class MDExporter implements Exporter {
 
             @Override
             protected Object doInBackground() throws Exception {
-                ticket.start();                
+                ticket.start();
+
+                List<Peptide> peptides = attrModel.getPeptides();
+                Set<String> keys = attrModel.getMolecularDescriptorKeys();
+
+                if (output != MD_OUTPUT_OPTION.None) {
+                    for (String key : keys) {
+                        for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
+                            attr.resetSummaryStats(peptides);
+                        }
+                    }
+                }
+
                 PrintWriter pw = new PrintWriter(file);
                 try {
-                    Set<String> keys = attrModel.getMolecularDescriptorKeys();
+
                     //Write header            
                     pw.format("\"%s\"", Peptide.ID.getDisplayName());
                     for (String key : keys) {
@@ -61,19 +87,21 @@ public class MDExporter implements Exporter {
                         }
                     }
                     pw.println();
-                    // Write data
-                    List<Peptide> peptides = attrModel.getPeptides();
+
+                    // Write data                    
                     ticket.switchToDeterminate(peptides.size());
                     for (Peptide pept : peptides) {
-                        if(stopRun.get()){
+                        if (stopRun.get()) {
                             break;
                         }
+                        //Writed ID
                         pw.format("\"%s\"", pept.getId());
+
+                        //Write features
                         for (String key : keys) {
                             for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
-                                Object val = pept.getAttributeValue(attr);
                                 pw.write(separator);
-                                pw.format("\"%s\"", val != null ? val.toString() : "");
+                                pw.format("\"%s\"", getAttributeValue(pept, attr, output));
                             }
                         }
                         pw.println();
@@ -86,12 +114,29 @@ public class MDExporter implements Exporter {
                 return null;
             }
 
+            private String getAttributeValue(Peptide peptide, MolecularDescriptor attr, MD_OUTPUT_OPTION output) throws MolecularDescriptorNotFoundException {
+                switch (output) {
+                    case None:
+                        return Double.toString(attr.getDoubleValue(peptide));
+                    case Z_SCORE:
+                        return Double.toString(attr.getNormalizedZscoreValue(peptide));
+                    case MIN_MAX:
+                        return Double.toString(attr.getNormalizedMinMaxValue(peptide));
+                }
+                return "";
+            }
+
             @Override
             protected void done() {
                 try {
                     get();
                 } catch (InterruptedException | ExecutionException ex) {
-                    Exceptions.printStackTrace(ex);
+                    if (ex.getCause() instanceof MolecularDescriptorNotFoundException) {
+                        NotifyDescriptor errorND = ((MolecularDescriptorNotFoundException) ex.getCause()).getErrorND();
+                        DialogDisplayer.getDefault().notify(errorND);
+                    } else {
+                        Exceptions.printStackTrace(ex);
+                    }
                 } finally {
                     ticket.finish();
                 }

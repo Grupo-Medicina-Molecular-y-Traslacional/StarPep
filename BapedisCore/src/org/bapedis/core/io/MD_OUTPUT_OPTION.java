@@ -9,6 +9,6 @@ package org.bapedis.core.io;
  *
  * @author loge
  */
-public enum OUTPUT_OPTION {
-     NORMAL, Z_SCORE, MIN_MAX
+public enum MD_OUTPUT_OPTION {
+     None, Z_SCORE, MIN_MAX
 }

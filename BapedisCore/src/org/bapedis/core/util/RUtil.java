@@ -6,7 +6,7 @@
 package org.bapedis.core.util;
 
 import java.io.BufferedReader;
-import org.bapedis.core.io.OUTPUT_OPTION;
+import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,19 +41,19 @@ public class RUtil {
                 "library(\"" + pack + "\")\n";
     }
 
-    public static File writeToCSV(Peptide[] peptides, MolecularDescriptor[] features, OUTPUT_OPTION output) throws IOException, Exception {
+    public static File writeToCSV(Peptide[] peptides, MolecularDescriptor[] features, MD_OUTPUT_OPTION output) throws IOException, Exception {
         File f = OSUtil.createTempFile("peptide-", "-features.csv");
         // if (f.exists())
         // throw new IllegalStateException("file " + f.getAbsolutePath() +
         // " already exists");
         try (BufferedWriter bf = new BufferedWriter(new FileWriter(f))) {
             for (int i = 0; i < features.length; i++) {
-                bf.write(String.format("\"%s\"",features[i].getDisplayName()) + ((i == features.length - 1) ? "" : ","));
+                bf.write(String.format("\"%s\"", features[i].getDisplayName()) + ((i == features.length - 1) ? "" : ","));
             }
             bf.write("\n");
             for (int i = 0; i < peptides.length; i++) {
                 for (int j = 0; j < features.length; j++) {
-                    bf.write(String.format("\"%s\"", getAttributeValue(peptides[i], features[j], output)) + ((j == features.length - 1) ? "" : ","));                    
+                    bf.write(String.format("\"%s\"", getAttributeValue(peptides[i], features[j], output)) + ((j == features.length - 1) ? "" : ","));
                 }
                 bf.write("\n");
             }
@@ -61,14 +61,16 @@ public class RUtil {
         return f;
     }
 
-    private static String getAttributeValue(Peptide peptide, MolecularDescriptor attr, OUTPUT_OPTION output) throws Exception {
+    private static String getAttributeValue(Peptide peptide, MolecularDescriptor attr, MD_OUTPUT_OPTION output) throws Exception {
         switch (output) {
+            case None:
+                return Double.toString(attr.getDoubleValue(peptide));
             case Z_SCORE:
-                return String.valueOf(attr.getNormalizedZscoreValue(peptide));
+                return Double.toString(attr.getNormalizedZscoreValue(peptide));
             case MIN_MAX:
-                return String.valueOf(attr.getNormalizedMinMaxValue(peptide));
+                return Double.toString(attr.getNormalizedMinMaxValue(peptide));
         }
-        return peptide.getAttributeValue(attr).toString();
+        return "";
     }
 
     public static List<Integer[]> readCluster(String matrixFile) {

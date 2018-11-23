@@ -5,11 +5,13 @@
  */
 package org.bapedis.clustering.impl;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
+import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.impl.AbstractCluster;
 import org.openide.DialogDisplayer;
@@ -21,13 +23,13 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public abstract class BaseClusterer extends AbstractCluster {
+public abstract class FeatureBasedClustering extends AbstractCluster {
 
     private final NotifyDescriptor emptyMDs;
 
-    public BaseClusterer(AlgorithmFactory factory) {
+    public FeatureBasedClustering(AlgorithmFactory factory) {
         super(factory);
-        emptyMDs = new NotifyDescriptor.Message(NbBundle.getMessage(BaseClusterer.class, "BaseClusterer.emptyMDs"), NotifyDescriptor.ERROR_MESSAGE);
+        emptyMDs = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureBasedClustering.class, "FeatureBasedClustering.emptyMDs"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
     @Override
@@ -55,8 +57,9 @@ public abstract class BaseClusterer extends AbstractCluster {
             if (!stopRun) {
                 pc.reportMsg("Preprocessing of moleculas features: calculating max, min, mean and std.\n", workspace);
                 ticket.progress("Preprocessing");
+                List<Peptide> peptideList = Arrays.asList(peptides);
                 for (MolecularDescriptor md : features) {
-                    md.resetSummaryStats(peptides);
+                    md.resetSummaryStats(peptideList);
                 }
             }
 

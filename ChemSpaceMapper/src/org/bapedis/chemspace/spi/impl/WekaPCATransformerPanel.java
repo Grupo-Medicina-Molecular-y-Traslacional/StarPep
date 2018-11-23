@@ -10,6 +10,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.bapedis.chemspace.spi.TwoDTransformer;
 import org.bapedis.chemspace.spi.TwoDTransformerSetupUI;
+import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
@@ -18,18 +19,19 @@ import org.openide.util.NbBundle;
  *
  * @author Home
  */
-public class WekaPCATransformerPanel extends javax.swing.JPanel implements TwoDTransformerSetupUI{
+public class WekaPCATransformerPanel extends javax.swing.JPanel implements TwoDTransformerSetupUI {
 
     private WekaPCATransformer pcaTransformer;
     private final NotifyDescriptor errorND;
+
     /**
      * Creates new form WekaPCATransformerPanel
      */
     public WekaPCATransformerPanel() {
         initComponents();
         errorND = new NotifyDescriptor.Message(NbBundle.getMessage(WekaPCATransformerPanel.class, "WekaPCATransformerPanel.errorND"), NotifyDescriptor.ERROR_MESSAGE);
-        
-        jTextField1.getDocument().addDocumentListener(new DocumentListener() {
+
+        jVarianceCovered.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -45,21 +47,21 @@ public class WekaPCATransformerPanel extends javax.swing.JPanel implements TwoDT
             public void changedUpdate(DocumentEvent e) {
 
             }
-        });        
+        });
     }
-    
+
     private void updateVarianceCovered() {
         try {
-            if (!jTextField1.getText().isEmpty()) {
-                double varianceCovered = Double.parseDouble(jTextField1.getText());
+            if (!jVarianceCovered.getText().isEmpty()) {
+                double varianceCovered = Double.parseDouble(jVarianceCovered.getText());
                 if (pcaTransformer != null && pcaTransformer.getVarianceCovered() != varianceCovered) {
                     pcaTransformer.setVarianceCovered(varianceCovered);
                 }
-            } 
+            }
         } catch (NumberFormatException ex) {
             DialogDisplayer.getDefault().notify(errorND);
         }
-    }    
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -69,31 +71,131 @@ public class WekaPCATransformerPanel extends javax.swing.JPanel implements TwoDT
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        jVarianceCovered = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jOptionZscore = new javax.swing.JRadioButton();
+        jLabel3 = new javax.swing.JLabel();
+        jOptionMinMax = new javax.swing.JRadioButton();
+        extLabel = new javax.swing.JLabel();
 
-        setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(WekaPCATransformerPanel.class, "WekaPCATransformerPanel.jLabel1.text")); // NOI18N
-        add(jLabel1);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(jLabel1, gridBagConstraints);
 
-        jTextField1.setText(org.openide.util.NbBundle.getMessage(WekaPCATransformerPanel.class, "WekaPCATransformerPanel.jTextField1.text")); // NOI18N
-        jTextField1.setMinimumSize(new java.awt.Dimension(90, 27));
-        jTextField1.setPreferredSize(new java.awt.Dimension(90, 27));
-        add(jTextField1);
+        jVarianceCovered.setText(org.openide.util.NbBundle.getMessage(WekaPCATransformerPanel.class, "WekaPCATransformerPanel.jVarianceCovered.text")); // NOI18N
+        jVarianceCovered.setMinimumSize(new java.awt.Dimension(90, 27));
+        jVarianceCovered.setPreferredSize(new java.awt.Dimension(90, 27));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(jVarianceCovered, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(WekaPCATransformerPanel.class, "WekaPCATransformerPanel.jLabel2.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(jLabel2, gridBagConstraints);
+
+        buttonGroup1.add(jOptionZscore);
+        org.openide.awt.Mnemonics.setLocalizedText(jOptionZscore, org.openide.util.NbBundle.getMessage(WekaPCATransformerPanel.class, "WekaPCATransformerPanel.jOptionZscore.text")); // NOI18N
+        jOptionZscore.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOptionZscoreActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(jOptionZscore, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(WekaPCATransformerPanel.class, "WekaPCATransformerPanel.jLabel3.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(jLabel3, gridBagConstraints);
+
+        buttonGroup1.add(jOptionMinMax);
+        org.openide.awt.Mnemonics.setLocalizedText(jOptionMinMax, org.openide.util.NbBundle.getMessage(WekaPCATransformerPanel.class, "WekaPCATransformerPanel.jOptionMinMax.text")); // NOI18N
+        jOptionMinMax.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOptionMinMaxActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(jOptionMinMax, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(extLabel, org.openide.util.NbBundle.getMessage(WekaPCATransformerPanel.class, "WekaPCATransformerPanel.extLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(extLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jOptionMinMaxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOptionMinMaxActionPerformed
+        if (pcaTransformer != null) {
+            pcaTransformer.setOutputOption(MD_OUTPUT_OPTION.MIN_MAX);
+        }
+    }//GEN-LAST:event_jOptionMinMaxActionPerformed
+
+    private void jOptionZscoreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOptionZscoreActionPerformed
+        if (pcaTransformer != null) {
+            pcaTransformer.setOutputOption(MD_OUTPUT_OPTION.Z_SCORE);
+        }
+    }//GEN-LAST:event_jOptionZscoreActionPerformed
 
     @Override
     public JPanel getSettingPanel(TwoDTransformer transformer) {
         this.pcaTransformer = (WekaPCATransformer) transformer;
-        jTextField1.setText(String.valueOf(pcaTransformer.getVarianceCovered()));
+        jVarianceCovered.setText(String.valueOf(pcaTransformer.getVarianceCovered()));
+        switch (pcaTransformer.getOutputOption()) {
+            case Z_SCORE:
+                jOptionZscore.setSelected(true);
+                break;
+            case MIN_MAX:
+                jOptionMinMax.setSelected(true);
+                break;
+            default:
+                jOptionZscore.setSelected(false);
+                jOptionMinMax.setSelected(false);
+                break;
+        }
         return this;
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JLabel extLabel;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JRadioButton jOptionMinMax;
+    private javax.swing.JRadioButton jOptionZscore;
+    private javax.swing.JTextField jVarianceCovered;
     // End of variables declaration//GEN-END:variables
 }

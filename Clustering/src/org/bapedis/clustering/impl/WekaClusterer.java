@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.bapedis.core.io.OUTPUT_OPTION;
+import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.core.io.impl.MyArffWritable;
 import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.MolecularDescriptor;
@@ -31,7 +31,7 @@ import weka.core.Instances;
  *
  * @author loge
  */
-public abstract class WekaClusterer<T extends Clusterer> extends BaseClusterer {
+public abstract class WekaClusterer<T extends Clusterer> extends FeatureBasedClustering {
 
     static protected final String PRO_CATEGORY = "Properties";
 
@@ -81,8 +81,7 @@ public abstract class WekaClusterer<T extends Clusterer> extends BaseClusterer {
             Instances data = null;
             if (!stopRun) {
                 ArffWriter.DEBUG = true;
-                MyArffWritable writable = new MyArffWritable(peptides, features);
-                writable.setOutputOption(OUTPUT_OPTION.MIN_MAX);
+                MyArffWritable writable = new MyArffWritable(peptides, features, MD_OUTPUT_OPTION.MIN_MAX);
                 File f = ArffWriter.writeToArffFile(writable);
                 reader = new BufferedReader(new FileReader(f));
                 data = new Instances(reader);

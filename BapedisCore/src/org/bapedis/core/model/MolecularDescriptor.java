@@ -39,11 +39,7 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
 
     public String getCategory() {
         return category;
-    }
-    
-    public void resetSummaryStats(Peptide[] peptides) throws MolecularDescriptorNotFoundException{
-        resetSummaryStats(Arrays.asList(peptides));
-    }
+    }    
 
     public void resetSummaryStats(List<Peptide> peptides) throws MolecularDescriptorNotFoundException {
         double[] data = new double[peptides.size()];
@@ -100,6 +96,10 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
        } 
        double val = getDoubleValue(peptide, this);
        return (val - mean) / std;
+    }
+    
+    public double getDoubleValue(Peptide peptide) throws MolecularDescriptorNotFoundException{
+        return getDoubleValue(peptide, this);
     }
 
     public static double getDoubleValue(Peptide pept, MolecularDescriptor attribute) throws MolecularDescriptorNotFoundException {

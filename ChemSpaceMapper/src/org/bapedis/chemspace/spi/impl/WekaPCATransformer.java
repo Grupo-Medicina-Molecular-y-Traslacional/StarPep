@@ -20,7 +20,7 @@ import weka.attributeSelection.PrincipalComponents;
 import weka.core.Instance;
 import weka.core.Instances;
 import org.bapedis.chemspace.spi.TwoDTransformer;
-import org.bapedis.core.io.OUTPUT_OPTION;
+import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.openide.util.Lookup;
@@ -36,6 +36,7 @@ public class WekaPCATransformer implements TwoDTransformer {
     private final WekaPCATransformerFactory factory;
     private final PrincipalComponents pca;
     private double varianceCovered;
+    private MD_OUTPUT_OPTION outputOption;
     protected DecimalFormat df;
 
     public WekaPCATransformer(WekaPCATransformerFactory factory) {
@@ -45,6 +46,7 @@ public class WekaPCATransformer implements TwoDTransformer {
         DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
         symbols.setDecimalSeparator('.');
         df = new DecimalFormat("0.00", symbols);
+        outputOption = MD_OUTPUT_OPTION.Z_SCORE;
     }
 
     @Override
@@ -56,8 +58,7 @@ public class WekaPCATransformer implements TwoDTransformer {
     public TwoDSpace transform(Workspace workspace, Peptide[] peptides, MolecularDescriptor[] features) {
         try {
             ArffWriter.DEBUG = true;
-            MyArffWritable writable = new MyArffWritable(peptides, features);
-            writable.setOutputOption(OUTPUT_OPTION.MIN_MAX);
+            MyArffWritable writable = new MyArffWritable(peptides, features, outputOption);
             File f = ArffWriter.writeToArffFile(writable);
             BufferedReader reader = new BufferedReader(new FileReader(f));
             Instances data = new Instances(reader);
@@ -110,5 +111,13 @@ public class WekaPCATransformer implements TwoDTransformer {
     public void setVarianceCovered(double varianceCovered) {
         this.varianceCovered = varianceCovered;
     }
+
+    public MD_OUTPUT_OPTION getOutputOption() {
+        return outputOption;
+    }
+
+    public void setOutputOption(MD_OUTPUT_OPTION outputOption) {
+        this.outputOption = outputOption;
+    }        
 
 }

@@ -46,7 +46,6 @@ import org.openide.util.NbBundle;
 @ActionReferences({
     @ActionReference(path = "Actions/EditQuery", position = 100)
 })
-@NbBundle.Messages("CTL_EditQuery=Edit metadata query")
 public class EditQuery extends GlobalContextSensitiveAction<Metadata> {
 
     protected final ProjectManager pc;

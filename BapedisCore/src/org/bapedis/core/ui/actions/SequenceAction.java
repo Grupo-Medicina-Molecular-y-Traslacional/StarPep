@@ -29,7 +29,6 @@ import org.openide.util.NbBundle;
         displayName = "#CTL_Sequence"
 )
 @ActionReference(path = "Menu/Tools", position = 30)
-@NbBundle.Messages("CTL_Sequence=Sequence")
 public class SequenceAction extends ToolAction{
     
     public SequenceAction() {

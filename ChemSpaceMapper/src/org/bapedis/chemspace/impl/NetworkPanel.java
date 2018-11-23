@@ -14,6 +14,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.Hashtable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
@@ -120,11 +121,13 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
     
     private void setupHistogram(boolean running) {
         histogramPanel.removeAll();
+        histogramPanel.setBorder(null);
         SimilarityMatrix matrix = netEmbedder.getSimilarityMatrix();
         JQuickHistogram histogram = null;
         if (!running && matrix != null) {
             histogram = matrix.getHistogram();
             histogramPanel.add(histogram.createChartPanel(), BorderLayout.CENTER);
+            histogramPanel.setBorder(BorderFactory.createTitledBorder(NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.histogramPanel.borderTitle")));
         }
         histogramPanel.revalidate();
         histogramPanel.repaint();
@@ -291,7 +294,6 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         thresholdPanel.add(histoInfoLabel, gridBagConstraints);
 
-        histogramPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.histogramPanel.border.title"))); // NOI18N
         histogramPanel.setMinimumSize(new java.awt.Dimension(0, 180));
         histogramPanel.setOpaque(false);
         histogramPanel.setPreferredSize(new java.awt.Dimension(0, 180));

@@ -20,15 +20,15 @@ import org.openide.util.NbBundle;
         id = "org.bapedis.core.ui.actions.ClusteringAction"
 )
 @ActionRegistration(
-        displayName = "#CTL_Clustering"
+        displayName = "#CTL_Clustering",
+        lazy=false
 )
 @ActionReference(path = "Menu/Tools", position = 70)
-@NbBundle.Messages("CTL_Clustering=Clustering")
 public class ClusteringAction extends ToolAction {
     
     public ClusteringAction() {
-        super(NbBundle.getMessage(NetworkAction.class, "CTL_Clustering"),
-                ClusteringTag.class);        
+        super( NbBundle.getMessage(NetworkAction.class, "CTL_Clustering"),
+                ClusteringTag.class);    
     }   
     
 }

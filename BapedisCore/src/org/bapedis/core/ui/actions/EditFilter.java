@@ -45,7 +45,6 @@ import org.openide.windows.WindowManager;
 @ActionReferences({
     @ActionReference(path = "Actions/EditFilter", position = 100)
 })
-@NbBundle.Messages("CTL_EditFilter=Edit filter")
 public class EditFilter extends GlobalContextSensitiveAction<Filter> {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);

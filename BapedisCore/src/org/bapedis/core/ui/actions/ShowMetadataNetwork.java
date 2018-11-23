@@ -33,7 +33,6 @@ import org.openide.util.NbBundle;
 @ActionReferences({
     @ActionReference(path = "Toolbars/Network", position = 10)
 })
-@NbBundle.Messages("CTL_ShowMetadataNetwork=Metadata network")
 public class ShowMetadataNetwork extends AbstractAction {
 
     private final GraphWindowController graphWC;

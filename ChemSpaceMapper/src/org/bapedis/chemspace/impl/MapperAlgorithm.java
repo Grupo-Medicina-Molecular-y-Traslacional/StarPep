@@ -14,7 +14,6 @@ import org.bapedis.chemspace.model.FeatureFilteringOption;
 import org.bapedis.chemspace.model.FeatureWeightingOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.ChemSpaceOption;
-import org.bapedis.chemspace.model.Representation;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
@@ -45,7 +44,6 @@ public class MapperAlgorithm implements Algorithm {
     protected boolean stopRun, running;
 
     //Mapping Options
-    protected Representation representation;
     protected ChemSpaceOption csOption;
     protected FeatureExtractionOption feOption;
     protected FeatureFilteringOption ffOption;
@@ -69,7 +67,6 @@ public class MapperAlgorithm implements Algorithm {
         running = false;
 
         //Mapping Options        
-        representation = Representation.COORDINATE_BASED;
         csOption = ChemSpaceOption.TwoD_SPACE;
         feOption = FeatureExtractionOption.NEW;
         ffOption = FeatureFilteringOption.YES;
@@ -172,14 +169,6 @@ public class MapperAlgorithm implements Algorithm {
             return currentAlg.cancel();
         }
         return stopRun;
-    }
-
-    public Representation getRepresentation() {
-        return representation;
-    }
-
-    public void setRepresentation(Representation representation) {
-        this.representation = representation;
     }        
 
     public ChemSpaceOption getChemSpaceOption() {

@@ -45,7 +45,6 @@ import org.openide.util.NbBundle;
 @ActionReferences({
 //    @ActionReference(path = "Actions/EditCluster", position = 200)
 })
-@NbBundle.Messages("CTL_RemoveOtherCluster=Remove other clusters")
 public class RemoveOtherClusters extends GlobalContextSensitiveAction<Cluster> {
     protected static final GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);

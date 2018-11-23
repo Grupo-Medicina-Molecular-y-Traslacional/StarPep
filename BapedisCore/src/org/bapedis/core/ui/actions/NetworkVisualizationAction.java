@@ -29,7 +29,6 @@ import org.openide.util.NbBundle;
 @ActionReferences({
     @ActionReference(path = "Menu/Window", position = 243)
 })
-@NbBundle.Messages("CTL_NetworkVisualization=Network visualization")
 public class NetworkVisualizationAction extends AbstractAction {
 
     private final GraphWindowController graphWC;

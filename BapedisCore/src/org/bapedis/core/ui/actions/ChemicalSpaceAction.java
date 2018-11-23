@@ -35,7 +35,6 @@ import org.openide.util.NbBundle;
         displayName = "#CTL_ChemicalSpaceAction"
 )
 @ActionReference(path = "Toolbars/Network", position = 20)
-@NbBundle.Messages({"CTL_ChemicalSpaceAction=Chemical Space Network"})
 public class ChemicalSpaceAction extends AbstractAction {
 
     private final ProjectManager pc;

@@ -23,7 +23,6 @@ import org.openide.util.NbBundle.Messages;
 @ActionReferences({
     @ActionReference(path = "Menu/Tools/MolecularDescriptor", position = 20)
 })
-@Messages("CTL_FeatureSelection=Selection")
 public final class FeatureSelectionAction extends ToolAction {
 
 

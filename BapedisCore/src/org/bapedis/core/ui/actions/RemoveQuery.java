@@ -35,7 +35,6 @@ import org.openide.util.NbBundle;
 @ActionReferences({
     @ActionReference(path = "Actions/EditQuery", position = 200)
 })
-@NbBundle.Messages("CTL_RemoveQuery=Remove metadata from query")
 public class RemoveQuery extends GlobalContextSensitiveAction<Metadata> {
 
     protected final ProjectManager pc;

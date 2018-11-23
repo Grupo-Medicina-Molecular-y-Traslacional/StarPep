@@ -35,7 +35,6 @@ import org.openide.util.NbBundle;
 @ActionReferences({
     @ActionReference(path = "Actions/EditFilter", position = 200)
 })
-@NbBundle.Messages("CTL_RemoveFilter=Remove filter")
 public class RemoveFilter extends GlobalContextSensitiveAction<Filter> {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);

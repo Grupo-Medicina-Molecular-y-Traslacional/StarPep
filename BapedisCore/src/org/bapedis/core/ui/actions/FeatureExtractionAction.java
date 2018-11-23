@@ -24,12 +24,12 @@ import org.bapedis.core.spi.alg.FeatureExtractionTag;
 )
 @ActionRegistration(
         iconBase = "org/bapedis/core/resources/add_md.gif",
-        displayName = "#CTL_FeatureExtraction"
+        displayName = "#CTL_FeatureExtraction",
+        lazy=false
 )
 @ActionReferences({
     @ActionReference(path = "Menu/Tools/MolecularDescriptor", position = 10)
 })
-@NbBundle.Messages("CTL_FeatureExtraction=Extraction")
 public class FeatureExtractionAction extends ToolAction {
     
     public FeatureExtractionAction() {

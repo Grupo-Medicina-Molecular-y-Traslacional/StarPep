@@ -5,9 +5,6 @@
  */
 package org.bapedis.chemspace.wizard;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 import org.bapedis.chemspace.impl.AbstractEmbedder;
@@ -17,26 +14,20 @@ import org.bapedis.chemspace.impl.NetworkEmbedder;
 import org.bapedis.chemspace.impl.SSNEmbedder;
 import org.bapedis.chemspace.impl.TwoDEmbedder;
 import org.bapedis.chemspace.model.ChemSpaceOption;
-import org.bapedis.chemspace.model.Representation;
 import org.openide.WizardDescriptor;
-import org.openide.WizardValidationException;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
-import org.openide.util.NbBundle;
 
-public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<WizardDescriptor>, WizardDescriptor.FinishablePanel<WizardDescriptor>, PropertyChangeListener {
+public class WizardRepresentation implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
     private final MapperAlgorithm csMapper;
     private CSNEmbedder csnEmbedder;
     private TwoDEmbedder twoDEmbedder;
     private SSNEmbedder ssnEmbedder;
-    private boolean valid;
     private final EventListenerList listeners;
-    private WizardDescriptor model;
 
     public WizardRepresentation(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
-        valid = check(csMapper.getRepresentation(), csMapper.getChemSpaceOption());
         listeners = new EventListenerList();
     }
 
@@ -55,7 +46,6 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
         if (component == null) {
             try {
                 component = new VisualRepresentation();
-                component.addPropertyChangeListener(this);
 
                 twoDEmbedder = (TwoDEmbedder) csMapper.getTwoDEmbedderAlg().clone();
                 csnEmbedder = (CSNEmbedder) csMapper.getCSNEmbedderAlg().clone();
@@ -78,7 +68,7 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
     @Override
     public boolean isValid() {
         // If it is always OK to press Next or Finish, then:
-        return valid;
+        return true;
         // If it depends on some condition (form filled out...) and
         // this condition changes (last form field filled in...) then
         // use ChangeSupport to implement add/removeChangeListener below.
@@ -98,14 +88,6 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
-        this.model = wiz;
-
-        // Setting fore representation
-        Representation representation = (Representation) wiz.getProperty(Representation.class.getName());
-        if (representation == null) {
-            representation = csMapper.getRepresentation();
-        }
-        getComponent().setRepresentation(representation);
 
         //Setting for Chemspace Option
         ChemSpaceOption csOption = (ChemSpaceOption) wiz.getProperty(ChemSpaceOption.class.getName());
@@ -131,10 +113,7 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
-        // use wiz.putProperty to remember current panel state
-        Representation representation = component.getRepresentation();
-        wiz.putProperty(Representation.class.getName(), representation);
-                
+        // use wiz.putProperty to remember current panel state                
         ChemSpaceOption csOption = component.getChemSpaceOption();
         wiz.putProperty(ChemSpaceOption.class.getName(), csOption);
         
@@ -142,6 +121,8 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
             case TwoD_SPACE:
                 wiz.putProperty(AbstractEmbedder.class.getName(), twoDEmbedder);
                 break;
+            case ThreeD_SPACE:
+                throw new UnsupportedOperationException("3D is not supported yet)");
             case CHEM_SPACE_NETWORK:
                 csnEmbedder.setNetworkType(component.getNetworkType());
                 wiz.putProperty(AbstractEmbedder.class.getName(), csnEmbedder);
@@ -156,75 +137,9 @@ public class WizardRepresentation implements WizardDescriptor.ValidatingPanel<Wi
         }
     }
 
-    private boolean check(Representation representation, ChemSpaceOption csSpaceoption) {
-        switch (representation) {
-            case COORDINATE_BASED:
-                switch (csSpaceoption) {
-                    case TwoD_SPACE:
-                    case ThreeD_SPACE:
-                        return true;
-                    default:
-                        return false;
-                }
-            case COORDINATE_FREE:
-                switch (csSpaceoption) {
-                    case CHEM_SPACE_NETWORK:
-                    case SEQ_SIMILARITY_NETWORK:
-                        return true;
-                    default:
-                        return false;
-                }
-        }
-        return false;
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        boolean oldState = valid;
-        if (evt.getPropertyName().equals(VisualRepresentation.CHANGED_REPRESENTATION)
-                || evt.getPropertyName().equals(VisualRepresentation.CHANGED_CHEM_SPACE)) {
-            model.getNotificationLineSupport().setWarningMessage(null);
-            valid = check(component.getRepresentation(), component.getChemSpaceOption());
-        }
-        if (oldState != valid) {
-            ChangeEvent srcEvt = new ChangeEvent(evt);
-            for (ChangeListener listener : listeners.getListeners(ChangeListener.class)) {
-                listener.stateChanged(srcEvt);
-            }
-        }
-    }
-
-    @Override
-    public void validate() throws WizardValidationException {
-        switch (component.getRepresentation()) {
-            case COORDINATE_BASED:
-                switch (component.getChemSpaceOption()) {
-                    case TwoD_SPACE:                        
-                    case ThreeD_SPACE:
-                        return;
-                    default:
-                        throw new WizardValidationException(component, NbBundle.getMessage(WizardFeatureExtraction.class, "VisualRepresentation.invalidNetwork.text"), null);
-                }
-            case COORDINATE_FREE:
-                switch (component.getChemSpaceOption()) {
-                    case CHEM_SPACE_NETWORK:
-                    case SEQ_SIMILARITY_NETWORK:
-                        return;
-                    default:
-                        throw new WizardValidationException(component, NbBundle.getMessage(WizardFeatureExtraction.class, "VisualRepresentation.invalidNetwork.text"), null);
-                }
-            default:
-                throw new WizardValidationException(component, NbBundle.getMessage(WizardFeatureExtraction.class, "VisualRepresentation.invalidNetwork.text"), null);
-        }
-    }
-
     @Override
     public boolean isFinishPanel() {
-        ChemSpaceOption csOption = component.getChemSpaceOption();
-        Representation rep = component.getRepresentation();
-        return (rep == Representation.COORDINATE_BASED && (csOption == ChemSpaceOption.TwoD_SPACE)) ||
-               (rep == Representation.COORDINATE_FREE && (csOption == ChemSpaceOption.CHEM_SPACE_NETWORK || 
-                                                          csOption == ChemSpaceOption.SEQ_SIMILARITY_NETWORK));
+        return true;
     }
 
 }

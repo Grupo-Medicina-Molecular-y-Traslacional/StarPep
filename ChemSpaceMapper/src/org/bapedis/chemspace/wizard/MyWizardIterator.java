@@ -15,7 +15,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.model.ChemSpaceOption;
-import org.bapedis.chemspace.model.Representation;
 import org.openide.WizardDescriptor;
 
 /**
@@ -30,7 +29,6 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
     private final String[] defaultSteps, twoDSteps, csnSteps, ssnSteps;
     private WizardDescriptor wizardDesc;
     private int index;
-    private Representation representation;
     private ChemSpaceOption csOption;
 
     public MyWizardIterator(MapperAlgorithm csMapper) {
@@ -63,9 +61,8 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
                 jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, true);
             }
         }
-        
+
         // Chem Space Option
-        representation = Representation.COORDINATE_BASED;
         csOption = ChemSpaceOption.TwoD_SPACE;
 
         //Default Panels
@@ -119,44 +116,28 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
 
     public void initialize(WizardDescriptor wizardDesc) {
         this.wizardDesc = wizardDesc;
-        setChemSpaceOption(representation, csOption);
+        setChemSpaceOption(csOption);
     }
 
-    public void setChemSpaceOption(Representation representation, ChemSpaceOption csOption) {
-        this.representation = representation;
+    public void setChemSpaceOption(ChemSpaceOption csOption) {
         this.csOption = csOption;
         String[] steps = null;
-        switch (representation) {
-            case COORDINATE_BASED:
-                switch (csOption) {
-                    case TwoD_SPACE:
-                        currentPanels = twoDPanels;
-                        steps = twoDSteps;
-                        break;
-                    default:
-                        currentPanels = defaultPanels;
-                        steps = defaultSteps;
-                }
+        switch (csOption) {
+            case TwoD_SPACE:
+                currentPanels = twoDPanels;
+                steps = twoDSteps;
                 break;
-            case COORDINATE_FREE:
-                switch (csOption) {
-                    case CHEM_SPACE_NETWORK:
-                        currentPanels = csnPanels;
-                        steps = csnSteps;
-                        break;
-                    case SEQ_SIMILARITY_NETWORK:
-                        currentPanels = ssnPanels;
-                        steps = ssnSteps;
-                        break;
-                    default:
-                        currentPanels = defaultPanels;
-                        steps = defaultSteps;
-                }
+            case CHEM_SPACE_NETWORK:
+                currentPanels = csnPanels;
+                steps = csnSteps;
+                break;
+            case SEQ_SIMILARITY_NETWORK:
+                currentPanels = ssnPanels;
+                steps = ssnSteps;
                 break;
             default:
                 currentPanels = defaultPanels;
                 steps = defaultSteps;
-                break;
         }
         if (steps != null) {
             wizardDesc.putProperty(WizardDescriptor.PROP_CONTENT_DATA, steps);
@@ -216,18 +197,9 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(VisualRepresentation.CHANGED_REPRESENTATION)) {
-            Representation oldRep = this.representation;
-            setChemSpaceOption((Representation) evt.getNewValue(), csOption);
-            if (oldRep != this.representation) {
-                ChangeEvent srcEvt = new ChangeEvent(evt);
-                for (ChangeListener listener : listeners.getListeners(ChangeListener.class)) {
-                    listener.stateChanged(srcEvt);
-                }
-            }
-        } else if (evt.getPropertyName().equals(VisualRepresentation.CHANGED_CHEM_SPACE)) {
+        if (evt.getPropertyName().equals(VisualRepresentation.CHANGED_CHEM_SPACE)) {
             ChemSpaceOption oldOption = this.csOption;
-            setChemSpaceOption(representation, (ChemSpaceOption) evt.getNewValue());
+            setChemSpaceOption((ChemSpaceOption) evt.getNewValue());
             if (oldOption != this.csOption) {
                 ChangeEvent srcEvt = new ChangeEvent(evt);
                 for (ChangeListener listener : listeners.getListeners(ChangeListener.class)) {

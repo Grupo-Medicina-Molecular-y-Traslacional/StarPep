@@ -36,7 +36,6 @@ import org.openide.util.actions.Presenter;
 @ActionReferences({
     @ActionReference(path = "Toolbars/MD", position = 10)
 })
-@NbBundle.Messages("CTL_AddMD=Add molecular descriptors")
 public class AddMDToolBar extends AbstractAction implements Presenter.Toolbar{
 
     public AddMDToolBar() {

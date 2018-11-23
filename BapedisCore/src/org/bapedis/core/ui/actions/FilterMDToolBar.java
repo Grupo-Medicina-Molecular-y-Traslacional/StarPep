@@ -31,7 +31,6 @@ import org.openide.util.NbBundle;
 @ActionReferences({    
     @ActionReference(path = "Toolbars/MD", position = 20)
 })
-@NbBundle.Messages("CTL_FilterMD=Feature filtering")
 public class FilterMDToolBar extends AbstractAction {
     private final ProjectManager pc;
     private final ActionListener actionListener;

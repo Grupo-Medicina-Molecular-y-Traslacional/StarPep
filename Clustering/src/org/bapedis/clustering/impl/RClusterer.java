@@ -98,13 +98,18 @@ public abstract class RClusterer extends BaseClusterer {
             // Validate 
             try {
                 if (!rScriptPath.equals(RUtil.RSCRIPT_BINARY.getLocation())) {
-//                    if(OSUtil.isWindows() && !rScriptPath.endsWith(".exe")){
-//                        rScriptPath = rScriptPath + ".exe";
-//                    }
-                    RUtil.RSCRIPT_BINARY.setLocation(rScriptPath);
+                    if (new File(rScriptPath).isDirectory()) {
+                        RUtil.RSCRIPT_BINARY.setParent(rScriptPath);
+                    } else {
+                        if (OSUtil.isWindows() && !rScriptPath.endsWith(".exe")) {
+                            RUtil.RSCRIPT_BINARY.setLocation(rScriptPath + ".exe"); ;
+                        } else{
+                            RUtil.RSCRIPT_BINARY.setLocation(rScriptPath);
+                        }
+                    }                    
                 }
                 if (RUtil.RSCRIPT_BINARY.isFound()) {
-                    NbPreferences.forModule(RClusterer.class).put(RClusterer.RSCRIPT_PATH, rScriptPath);
+                    NbPreferences.forModule(RClusterer.class).put(RClusterer.RSCRIPT_PATH, RUtil.RSCRIPT_BINARY.getLocation());
                 } else {
                     throw new MyClusterException(NbBundle.getMessage(RClusterer.class, "RClusterer.rscript.notFound"));
                 }

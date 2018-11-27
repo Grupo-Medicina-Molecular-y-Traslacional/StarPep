@@ -281,7 +281,7 @@ public class ProjectManager implements Lookup.Provider {
         if (model == null) {
             Configuration config = new Configuration();
             model = GraphModel.Factory.newInstance();
-            createColumns(model);
+            createDefaultColumns(model);
             workspace.add(model);
         }
         return model;
@@ -367,7 +367,7 @@ public class ProjectManager implements Lookup.Provider {
         return model;
     }      
 
-    protected void createColumns(GraphModel graphModel) {
+    protected void createDefaultColumns(GraphModel graphModel) {
         Table nodeTable = graphModel.getNodeTable();
         if (!nodeTable.hasColumn(NODE_TABLE_PRO_NAME)) {
             nodeTable.addColumn(NODE_TABLE_PRO_NAME, NODE_TABLE_PRO_NAME_TITLE, String.class, Origin.DATA, "", false);

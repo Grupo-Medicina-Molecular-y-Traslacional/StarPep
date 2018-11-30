@@ -36,17 +36,15 @@ public class WekaPCATransformer implements TwoDTransformer {
     private final WekaPCATransformerFactory factory;
     private final PrincipalComponents pca;
     private double varianceCovered;
-    private MD_OUTPUT_OPTION outputOption;
     protected DecimalFormat df;
 
     public WekaPCATransformer(WekaPCATransformerFactory factory) {
         this.factory = factory;
         pca = new PrincipalComponents();
-        varianceCovered = 0.8;
+        varianceCovered = 0.7;
         DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
         symbols.setDecimalSeparator('.');
         df = new DecimalFormat("0.00", symbols);
-        outputOption = MD_OUTPUT_OPTION.Z_SCORE;
     }
 
     @Override
@@ -58,11 +56,11 @@ public class WekaPCATransformer implements TwoDTransformer {
     public TwoDSpace transform(Workspace workspace, Peptide[] peptides, MolecularDescriptor[] features) {
         try {
             ArffWriter.DEBUG = true;
-            MyArffWritable writable = new MyArffWritable(peptides, features, outputOption);
+            MyArffWritable writable = new MyArffWritable(peptides, features, MD_OUTPUT_OPTION.None);
             File f = ArffWriter.writeToArffFile(writable);
             BufferedReader reader = new BufferedReader(new FileReader(f));
             Instances data = new Instances(reader);
-            pca.setCenterData(true);
+            pca.setCenterData(false);
             pca.setVarianceCovered(varianceCovered);
             pca.buildEvaluator(data);
             Instances resultData = pca.transformedData(data);
@@ -77,14 +75,16 @@ public class WekaPCATransformer implements TwoDTransformer {
             double varExp;
             double cumulativeEigen = 0;
             double cumulativeVar = 0;
+            String variance;
             pc.reportMsg("Sum of eigenvalues: " + sumOfEigenValues, workspace);
             pc.reportMsg("Factor, Eigenvalue, Explained variance, Cumulative eigenvalue, Cumulative variance", workspace);
-            for (int i = 0; i < axisLabels.length; i++) {
-                axisLabels[i] = "PCA" + (i + 1);
+            for (int i = 0; i < axisLabels.length; i++) {                
                 varExp = (eigenValues[index] / sumOfEigenValues) * 100;
                 cumulativeEigen += eigenValues[index];
                 cumulativeVar += varExp;
-                pc.reportMsg((i + 1) + ", " + df.format(eigenValues[index]) + ", " + df.format(varExp) + "%"
+                variance = df.format(varExp);
+                axisLabels[i] = String.format("PCA %d (%s%% explained var.)", (i + 1), variance);
+                pc.reportMsg((i + 1) + ", " + df.format(eigenValues[index]) + ", " + variance + "%"
                              + ", " + df.format(cumulativeEigen) + ", " + df.format(cumulativeVar) + "%", workspace);
                 index--;
             }
@@ -110,14 +110,5 @@ public class WekaPCATransformer implements TwoDTransformer {
 
     public void setVarianceCovered(double varianceCovered) {
         this.varianceCovered = varianceCovered;
-    }
-
-    public MD_OUTPUT_OPTION getOutputOption() {
-        return outputOption;
-    }
-
-    public void setOutputOption(MD_OUTPUT_OPTION outputOption) {
-        this.outputOption = outputOption;
-    }        
-
+    }    
 }

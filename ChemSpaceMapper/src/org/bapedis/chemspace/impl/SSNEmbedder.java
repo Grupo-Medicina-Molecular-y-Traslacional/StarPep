@@ -7,7 +7,6 @@ package org.bapedis.chemspace.impl;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.bapedis.chemspace.model.CompressedModel;
 import org.bapedis.chemspace.model.NetworkType;
 import org.bapedis.core.model.SimilarityMatrix;
 import org.bapedis.chemspace.spi.impl.AlignmentBasedSimilarity;

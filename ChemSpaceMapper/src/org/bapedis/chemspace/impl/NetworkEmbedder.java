@@ -5,6 +5,8 @@
  */
 package org.bapedis.chemspace.impl;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.bapedis.chemspace.model.NetworkType;
@@ -74,7 +76,63 @@ public interface NetworkEmbedder {
     }
 
     default public void createHSPNetwork(GraphModel graphModel, ProgressTicket ticket, AtomicBoolean stopRun) {
-        
+        NetworkEmbedder.clearSimilarityEdges(graphModel);
+        Graph graph = graphModel.getGraphVisible();
+//        float similarityThreshold = getSimilarityThreshold();
+        SimilarityMatrix simMatrix = getSimilarityMatrix();
+        Peptide[] peptides = simMatrix.getPeptides();
+
+        Node node1, node2;
+        Edge graphEdge;
+        Float score;
+        CandidatePeptide[] candidates = new CandidatePeptide[peptides.length];
+        Peptide closestPeptide;
+        double dist;
+        int cursor;
+        for (int i = 0; i < peptides.length; i++) {
+            node1 = peptides[i].getGraphNode();
+            for (int j = 0; j < peptides.length; j++) {
+                if (i != j) {
+                    score = simMatrix.getValue(peptides[i], peptides[j]);
+                    dist = score == null ? Double.MAX_VALUE : 1 - score;
+                } else {
+                    dist = 0;
+                }
+                candidates[j] = new CandidatePeptide(dist, peptides[j]);
+            }
+
+            Arrays.parallelSort(candidates);
+            cursor = 0;
+            while (cursor < candidates.length) {
+                if (candidates[cursor] != null && candidates[cursor].getDistance() > 0 && candidates[cursor].getDistance() < Double.MAX_VALUE) {
+                    //Create edge to the closest peptide
+                    closestPeptide = candidates[cursor].getPeptide();
+                    node2 = closestPeptide.getGraphNode();
+                    if (graph.contains(node1) && graph.contains(node2)
+                            && graph.getEdge(node1, node2) == null && graph.getEdge(node2, node1) == null) {
+                        score = simMatrix.getValue(peptides[i], closestPeptide);
+                        graphEdge = NetworkEmbedder.createSimilarityEdge(graphModel, node1, node2, score);
+                        graph.writeLock();
+                        try {
+                            graph.addEdge(graphEdge);
+                        } finally {
+                            graph.writeUnlock();
+                        }
+                    }
+                    // ignore elements in the forbidden area
+                    for (int k = cursor + 1; k < candidates.length; k++) {
+                        if (candidates[k] != null && candidates[k].getDistance() > 0 && candidates[k].getDistance() < Double.MAX_VALUE) {
+                            score = simMatrix.getValue(candidates[k].getPeptide(), closestPeptide);
+                            if (score != null && score > simMatrix.getValue(candidates[k].getPeptide(), peptides[i])) {
+                                candidates[k] = null;
+                            }
+                        }
+                    }
+                }
+                cursor++;
+            }
+            ticket.progress();
+        }
     }
 
     public static void clearSimilarityEdges(GraphModel graphModel) {
@@ -116,5 +174,35 @@ public interface NetworkEmbedder {
         }
 
         return graphEdge;
+    }
+}
+
+class CandidatePeptide implements Comparable<CandidatePeptide> {
+
+    private final double distance;
+    private final Peptide peptide;
+
+    public CandidatePeptide(double distance, Peptide peptide) {
+        this.distance = distance;
+        this.peptide = peptide;
+    }
+
+    public Peptide getPeptide() {
+        return peptide;
+    }
+
+    public double getDistance() {
+        return distance;
+    }
+
+    @Override
+    public int compareTo(CandidatePeptide o) {
+        if (distance < o.distance) {
+            return -1;
+        }
+        if (distance > o.distance) {
+            return 1;
+        }
+        return 0;
     }
 }

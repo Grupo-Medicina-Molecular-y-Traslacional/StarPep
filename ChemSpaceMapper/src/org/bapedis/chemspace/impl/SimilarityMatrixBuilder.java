@@ -21,7 +21,7 @@ import org.openide.DialogDisplayer;
 class SimilarityMatrixBuilder extends RecursiveAction {
 
     private static final int SEQUENTIAL_THRESHOLD = 10;
-    private static float MIN_VALUE = 0.3f;
+    private static float MIN_VALUE = 0.7f;
     private Peptide[] peptides;
     private ProgressTicket progressTicket;
     private SimilarityMeasure similarityMeasure;

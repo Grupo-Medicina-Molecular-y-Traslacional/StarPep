@@ -78,28 +78,4 @@ public class TwoDEmbedder extends DescriptorBasedEmbedder {
         }
     }    
 
-//    public static Vector2f[] jittering(TwoDSpace twoDSpace) {
-//        Vector2f[] positions = twoDSpace.getPositions();
-//        Vector2f[] v = VectorUtil.arrayCopy(positions);
-//
-//        JitterModel jitterModel = twoDSpace.getJitterModel();
-//        if (jitterModel.getMinDistances() == null) {
-//            TwoDNNComputer nn = new TwoDNNComputer(positions);
-//            nn.computeNaive();
-//            float dist = nn.getMinMinDist();
-//            float add = (nn.getMaxMinDist() - nn.getMinMinDist()) * 0.5f;
-//            Double log[] = ArrayUtil.logBinning(JitterModel.STEPS, 1.2);
-//
-//            float minDistances[] = new float[JitterModel.STEPS + 1];
-//            for (int j = 1; j <= JitterModel.STEPS; j++) {
-//                minDistances[j] = dist + add * log[j].floatValue();
-//            }
-//            jitterModel.setMinDistances(minDistances);
-//        }
-//        TwoDJittering j = new TwoDJittering(v, jitterModel.getMinDistance(), new Random());
-//        j.jitter();
-//        VectorUtil.normalize(v);
-//        return v;
-//    }
-
 }

@@ -2,7 +2,6 @@ package org.bapedis.chemspace.util;
 
 import java.util.Random;
 import javax.vecmath.Vector2f;
-import org.bapedis.chemspace.model.JitterModel;
 
 /*
 * jittering in ches-mapper has fixed number of steps
@@ -19,7 +18,7 @@ public class TwoDJittering {
     Random r;
     Vector2f dirs[];
     
-    int steps = JitterModel.STEPS;
+    int steps = 10;
     TwoDNNComputer nn;
 
     public TwoDJittering(Vector2f[] v, float minDist, Random r) {

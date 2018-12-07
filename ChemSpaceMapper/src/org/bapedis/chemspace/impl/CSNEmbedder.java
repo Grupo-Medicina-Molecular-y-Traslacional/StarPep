@@ -110,7 +110,6 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
     @Override
     public Object clone() throws CloneNotSupportedException {
         CSNEmbedder copy = (CSNEmbedder) super.clone(); //To change body of generated methods, choose Tools | Templates.
-//        copy.compressedModel = (CompressedModel)compressedModel.clone();
         return copy;
     }
         

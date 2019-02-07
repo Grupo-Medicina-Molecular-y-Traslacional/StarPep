@@ -5,59 +5,93 @@
  */
 package org.bapedis.core.io.impl;
 
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
+import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
-import org.bapedis.core.io.MD_OUTPUT_OPTION;
+import javax.swing.JRadioButton;
+import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.components.ValidationSupportUI;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 /**
  *
- * @author loge
+ * @author cicese
  */
-public class MDExporterPanel extends javax.swing.JPanel implements ValidationSupportUI {
+public class MetadataExporterPanel extends javax.swing.JPanel implements ValidationSupportUI {
+
     protected JFileChooser chooser;
     protected static File parentDirectory;
     protected File selectedFile;
     protected boolean validState;
     protected final PropertyChangeSupport changeSupport;
-    
+    private MetadataRadioButton[] metadataOptions;
+    private final ButtonGroup group;
+
     /**
-     * Creates new form MDExporterPanel
+     * Creates new form MetadataExporterPanel
+     *
+     * @param graphViz
      */
-    public MDExporterPanel() {
+    public MetadataExporterPanel() {
         initComponents();
         chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         validState = false;
-        changeSupport = new PropertyChangeSupport(this);        
+        changeSupport = new PropertyChangeSupport(this);
+        group = new ButtonGroup();
+        initMetadataOptions();
     }
-    
-    public void setup(MDExporter exporter){
-        switch(exporter.getOutput()){
-            case None:
-                jOptionNone.setSelected(true);
-                break;
-            case Z_SCORE:
-                jOptionZscore.setSelected(true);
-                break;
-            case MIN_MAX:
-                jOptionMinMax.setSelected(true);
-                break;
+
+    private void initMetadataOptions() {
+        StarPepAnnotationType[] arr = StarPepAnnotationType.values();
+        metadataOptions = new MetadataRadioButton[arr.length + 1];
+        MetadataRadioButton mrb = new MetadataRadioButton(); // Default option 
+        metadataOptions[0] = mrb;
+        addOption(mrb, 0);
+        for (int i = 0; i < arr.length; i++) {
+            mrb = new MetadataRadioButton(arr[i]);
+            metadataOptions[i + 1] = mrb;
+            addOption(mrb, i + 1);
         }
     }
-    
-    public void unsetup(MDExporter exporterMD){
-        if (jOptionNone.isSelected()){
-            exporterMD.setOutput(MD_OUTPUT_OPTION.None);
-        } else if (jOptionZscore.isSelected()){
-            exporterMD.setOutput(MD_OUTPUT_OPTION.Z_SCORE);
-        } else if (jOptionMinMax.isSelected()){
-            exporterMD.setOutput(MD_OUTPUT_OPTION.MIN_MAX);
+
+    private void addOption(MetadataRadioButton mrb, int i) {
+        JRadioButton rb;
+        GridBagConstraints gridBagConstraints;
+        rb = mrb.getRadioButton();
+        rb.setFocusable(false);
+        group.add(rb);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = i + 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(2, 5, 0, 0);
+        optionPanel.add(rb, gridBagConstraints);
+    }
+
+    public void setup(MetadataExporter exporter) {
+        StarPepAnnotationType annotationType = exporter.getSelectedAnnotationType();
+        for (int i = 0; i < metadataOptions.length; i++) {
+            if (metadataOptions[i].getAnnotationType() == annotationType) {
+                metadataOptions[i].getRadioButton().setSelected(true);
+            }
+        }
+    }
+
+    public void unsetup(MetadataExporter exporter) {
+        for (int i = 0; i < metadataOptions.length; i++) {
+            if (metadataOptions[i].getRadioButton().isSelected()) {
+                exporter.setSelectedAnnotationType(metadataOptions[i].getAnnotationType());
+            }
         }
     }
 
@@ -71,47 +105,17 @@ public class MDExporterPanel extends javax.swing.JPanel implements ValidationSup
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
-        jOptionNone = new javax.swing.JRadioButton();
-        jOptionZscore = new javax.swing.JRadioButton();
-        jOptionMinMax = new javax.swing.JRadioButton();
         fileLabel = new javax.swing.JLabel();
         fileTextField = new javax.swing.JTextField();
         browseButton = new javax.swing.JButton();
         labelExport = new javax.swing.JLabel();
-        extLabel = new javax.swing.JLabel();
+        optionPanel = new javax.swing.JPanel();
 
-        setMinimumSize(new java.awt.Dimension(496, 118));
-        setPreferredSize(new java.awt.Dimension(496, 118));
+        setMinimumSize(new java.awt.Dimension(496, 236));
+        setPreferredSize(new java.awt.Dimension(496, 236));
         setLayout(new java.awt.GridBagLayout());
 
-        buttonGroup1.add(jOptionNone);
-        org.openide.awt.Mnemonics.setLocalizedText(jOptionNone, org.openide.util.NbBundle.getMessage(MDExporterPanel.class, "MDExporterPanel.jOptionNone.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        add(jOptionNone, gridBagConstraints);
-
-        buttonGroup1.add(jOptionZscore);
-        org.openide.awt.Mnemonics.setLocalizedText(jOptionZscore, org.openide.util.NbBundle.getMessage(MDExporterPanel.class, "MDExporterPanel.jOptionZscore.text")); // NOI18N
-        jOptionZscore.setToolTipText(org.openide.util.NbBundle.getMessage(MDExporterPanel.class, "MDExporterPanel.jOptionZscore.toolTipText")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        add(jOptionZscore, gridBagConstraints);
-
-        buttonGroup1.add(jOptionMinMax);
-        org.openide.awt.Mnemonics.setLocalizedText(jOptionMinMax, org.openide.util.NbBundle.getMessage(MDExporterPanel.class, "MDExporterPanel.jOptionMinMax.text")); // NOI18N
-        jOptionMinMax.setToolTipText(org.openide.util.NbBundle.getMessage(MDExporterPanel.class, "MDExporterPanel.jOptionMinMax.toolTipText")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        add(jOptionMinMax, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(fileLabel, org.openide.util.NbBundle.getMessage(MDExporterPanel.class, "MDExporterPanel.fileLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(fileLabel, org.openide.util.NbBundle.getMessage(MetadataExporterPanel.class, "MetadataExporterPanel.fileLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -119,30 +123,30 @@ public class MDExporterPanel extends javax.swing.JPanel implements ValidationSup
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(fileLabel, gridBagConstraints);
 
-        fileTextField.setText(org.openide.util.NbBundle.getMessage(MDExporterPanel.class, "MDExporterPanel.fileTextField.text")); // NOI18N
+        fileTextField.setText(org.openide.util.NbBundle.getMessage(MetadataExporterPanel.class, "MetadataExporterPanel.fileTextField.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(fileTextField, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(browseButton, org.openide.util.NbBundle.getMessage(MDExporterPanel.class, "MDExporterPanel.browseButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(browseButton, org.openide.util.NbBundle.getMessage(MetadataExporterPanel.class, "MetadataExporterPanel.browseButton.text")); // NOI18N
         browseButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 browseButtonActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 2);
         add(browseButton, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(labelExport, org.openide.util.NbBundle.getMessage(MDExporterPanel.class, "MDExporterPanel.labelExport.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(labelExport, org.openide.util.NbBundle.getMessage(MetadataExporterPanel.class, "MetadataExporterPanel.labelExport.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -150,14 +154,16 @@ public class MDExporterPanel extends javax.swing.JPanel implements ValidationSup
         gridBagConstraints.insets = new java.awt.Insets(3, 5, 0, 5);
         add(labelExport, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(extLabel, org.openide.util.NbBundle.getMessage(MDExporterPanel.class, "MDExporterPanel.extLabel.text")); // NOI18N
+        optionPanel.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        add(extLabel, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(3, 0, 5, 5);
+        add(optionPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
@@ -166,8 +172,8 @@ public class MDExporterPanel extends javax.swing.JPanel implements ValidationSup
         }
         ProjectManager pm = Lookup.getDefault().lookup(ProjectManager.class);
         Workspace workspace = pm.getCurrentWorkspace();
-        chooser.setSelectedFile(new File(parentDirectory, workspace.getName() + "_mds.csv"));
-        int returnVal = chooser.showSaveDialog(MDExporterPanel.this);
+        chooser.setSelectedFile(new File(parentDirectory, workspace.getName() + "_metadata.csv"));
+        int returnVal = chooser.showSaveDialog(MetadataExporterPanel.this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             fileTextField.setText(chooser.getSelectedFile().getAbsolutePath());
             boolean oldValidState = validState;
@@ -175,24 +181,20 @@ public class MDExporterPanel extends javax.swing.JPanel implements ValidationSup
             changeSupport.firePropertyChange(VALID_STATE, oldValidState, validState);
         }
     }//GEN-LAST:event_browseButtonActionPerformed
-
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseButton;
-    private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JLabel extLabel;
     private javax.swing.JLabel fileLabel;
     private javax.swing.JTextField fileTextField;
-    private javax.swing.JRadioButton jOptionMinMax;
-    private javax.swing.JRadioButton jOptionNone;
-    private javax.swing.JRadioButton jOptionZscore;
     private javax.swing.JLabel labelExport;
+    private javax.swing.JPanel optionPanel;
     // End of variables declaration//GEN-END:variables
 
     public File getSelectedFile() {
         return selectedFile;
     }
-    
+
     @Override
     public boolean isValidState() {
         return validState;
@@ -217,5 +219,31 @@ public class MDExporterPanel extends javax.swing.JPanel implements ValidationSup
     @Override
     public void removeValidStateListener(PropertyChangeListener listener) {
         changeSupport.removePropertyChangeListener(listener);
+    }
+
+    public static class MetadataRadioButton {
+
+        private final JRadioButton radioButton;
+        private final StarPepAnnotationType aType;
+
+        public MetadataRadioButton() {
+            this.aType = null;
+            radioButton = new JRadioButton(NbBundle.getMessage(MetadataExporterPanel.class, "MetadataExporterPanel.RadioButton.all"));
+        }
+
+        public MetadataRadioButton(StarPepAnnotationType aType) {
+            this.aType = aType;
+            radioButton = new JRadioButton(aType.getLabelName());
+            radioButton.setToolTipText(aType.getDescription());
+        }
+
+        public JRadioButton getRadioButton() {
+            return radioButton;
+        }
+
+        public StarPepAnnotationType getAnnotationType() {
+            return aType;
+        }
+
     }
 }

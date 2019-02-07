@@ -55,8 +55,8 @@ public class FileExporterUI extends javax.swing.JPanel implements ValidationSupp
         browseButton = new javax.swing.JButton();
         fileTextField = new javax.swing.JTextField();
 
-        setMinimumSize(new java.awt.Dimension(489, 50));
-        setPreferredSize(new java.awt.Dimension(489, 50));
+        setMinimumSize(new java.awt.Dimension(489, 80));
+        setPreferredSize(new java.awt.Dimension(489, 80));
         setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(fileLabel, org.openide.util.NbBundle.getMessage(FileExporterUI.class, "FileExporterUI.fileLabel.text")); // NOI18N
@@ -64,7 +64,7 @@ public class FileExporterUI extends javax.swing.JPanel implements ValidationSupp
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(fileLabel, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(browseButton, org.openide.util.NbBundle.getMessage(FileExporterUI.class, "FileExporterUI.browseButton.text")); // NOI18N
@@ -77,7 +77,7 @@ public class FileExporterUI extends javax.swing.JPanel implements ValidationSupp
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 2);
         add(browseButton, gridBagConstraints);
 
         fileTextField.setText(org.openide.util.NbBundle.getMessage(FileExporterUI.class, "FileExporterUI.fileTextField.text")); // NOI18N
@@ -86,7 +86,7 @@ public class FileExporterUI extends javax.swing.JPanel implements ValidationSupp
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(fileTextField, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 

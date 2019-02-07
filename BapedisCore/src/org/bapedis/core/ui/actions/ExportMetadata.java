@@ -9,6 +9,9 @@ import java.awt.event.ActionEvent;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.io.impl.FileExporterUI;
 import org.bapedis.core.io.impl.MetadataExporter;
+import org.bapedis.core.io.impl.MetadataExporterPanel;
+import org.bapedis.core.model.GraphVizSetting;
+import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.ui.components.SetupDialog;
@@ -51,10 +54,18 @@ public final class ExportMetadata extends WorkspaceContextSensitiveAction<Attrib
             DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
         } else {
             AttributesModel attrModel = pc.getAttributesModel();
-            FileExporterUI ui = new FileExporterUI("metadata", ".csv");
+            GraphVizSetting graphViz = pc.getGraphVizSetting();
+            MetadataExporter exporter = new MetadataExporter(attrModel);
+            for(StarPepAnnotationType aType: StarPepAnnotationType.values()){
+                if (graphViz.isDisplayedMetadata(aType)){
+                    exporter.setSelectedAnnotationType(aType);
+                }
+            }
+            MetadataExporterPanel ui = new MetadataExporterPanel();
+            ui.setup(exporter);
             if (dialog.setup(ui, ui, NbBundle.getMessage(ExportMetadata.class, "ExportMetadata.dialogTitle"))) {
                 try {
-                    MetadataExporter exporter = new MetadataExporter(attrModel);
+                    ui.unsetup(exporter);
                     exporter.exportTo(ui.getSelectedFile());
                 } catch (Exception ex) {
                     Exceptions.printStackTrace(ex);

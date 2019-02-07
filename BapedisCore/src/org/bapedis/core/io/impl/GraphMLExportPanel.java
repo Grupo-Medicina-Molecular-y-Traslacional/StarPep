@@ -177,7 +177,7 @@ public class GraphMLExportPanel extends javax.swing.JPanel implements Validation
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(fileLabel, gridBagConstraints);
 
         fileTextField.setText(org.openide.util.NbBundle.getMessage(GraphMLExportPanel.class, "GraphMLExportPanel.fileTextField.text")); // NOI18N
@@ -187,7 +187,7 @@ public class GraphMLExportPanel extends javax.swing.JPanel implements Validation
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(fileTextField, gridBagConstraints);
 
         browseButton.setText(org.openide.util.NbBundle.getMessage(GraphMLExportPanel.class, "GraphMLExportPanel.browseButton.text")); // NOI18N
@@ -200,7 +200,7 @@ public class GraphMLExportPanel extends javax.swing.JPanel implements Validation
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 2);
+        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 2);
         add(browseButton, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 

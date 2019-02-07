@@ -32,16 +32,26 @@ public class MetadataExporter implements Exporter {
 
     protected final AttributesModel attrModel;
     protected final char separator = ',';
+    protected StarPepAnnotationType selectedType;
 
     public MetadataExporter(AttributesModel attrModel) {
         this.attrModel = attrModel;
+        selectedType = null;
+    }
+
+    public StarPepAnnotationType getSelectedAnnotationType() {
+        return selectedType;
+    }
+
+    public void setSelectedAnnotationType(StarPepAnnotationType selectedType) {
+        this.selectedType = selectedType;
     }
 
     @Override
     public void exportTo(File file) throws Exception {
         SwingWorker sw = new SwingWorker() {
             private final AtomicBoolean stopRun = new AtomicBoolean(false);
-            private final ProgressTicket ticket = new ProgressTicket(NbBundle.getMessage(FastaExporter.class, "FastaExporter.task.name"), new Cancellable() {
+            private final ProgressTicket ticket = new ProgressTicket(NbBundle.getMessage(MetadataExporter.class, "MetadataExporter.task.name"), new Cancellable() {
                 @Override
                 public boolean cancel() {
                     stopRun.set(true);
@@ -67,24 +77,26 @@ public class MetadataExporter implements Exporter {
                     Edge edge;
                     String xref;
                     List<Peptide> peptides = attrModel.getPeptides();
-                    ticket.switchToDeterminate(peptides.size());                    
+                    ticket.switchToDeterminate(peptides.size());
                     for (Peptide pept : peptides) {
-                        if(stopRun.get()){
+                        if (stopRun.get()) {
                             break;
-                        }                        
+                        }
                         for (StarPepAnnotationType aType : StarPepAnnotationType.values()) {
-                            neighbors = pept.getNeighbors(aType);
-                            for (Node neighbor : neighbors) {
-                                edge = pept.getEdge(neighbor, aType);
-                                xref = Arrays.toString((String[]) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_XREF));
-                                pw.format("\"%s\"", pept.getName());
-                                pw.write(separator);
-                                pw.format("\"%s\"", edge.getLabel());
-                                pw.write(separator);
-                                pw.format("\"%s\"", neighbor.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
-                                pw.write(separator);
-                                pw.format("\"%s\"", xref);
-                                pw.println();
+                            if (selectedType == null || aType == selectedType) {
+                                neighbors = pept.getNeighbors(aType);
+                                for (Node neighbor : neighbors) {
+                                    edge = pept.getEdge(neighbor, aType);
+                                    xref = Arrays.toString((String[]) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_XREF));
+                                    pw.format("\"%s\"", pept.getName());
+                                    pw.write(separator);
+                                    pw.format("\"%s\"", edge.getLabel());
+                                    pw.write(separator);
+                                    pw.format("\"%s\"", neighbor.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
+                                    pw.write(separator);
+                                    pw.format("\"%s\"", xref);
+                                    pw.println();
+                                }
                             }
                         }
                         ticket.progress();

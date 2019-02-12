@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
+<filesystem>
+    <folder name="Actions">
+        <folder name="Tools">
+            <file name="org-netbeans-jmol-displayer-GaussianAction.instance">
+                <!--org.openscience.jmol.app.jmolpanel.JmolPanel.GaussianAction-->
+                <attr
+                    bundlevalue="org.openscience.jmol.app.jmolpanel.Bundle#CTL_GaussianAction" name="displayName"/>
+                <attr
+                    methodvalue="org.openide.awt.Actions.alwaysEnabled" name="instanceCreate"/>
+                <attr name="delegate" newvalue="org.openscience.jmol.app.jmolpanel.JmolPanel$GaussianAction"/>
+                <attr name="iconBase" stringvalue="org/openscience/jmol/app/images/gaussianButton.png"/>
+                <attr boolvalue="false" name="noIconInMenu"/>
+            </file>
+            <file name="org-netbeans-jmol-displayer-ExportAction.instance">
+                <!--org.openscience.jmol.app.jmolpanel.JmolPanel.ExportAction-->
+                <attr
+                    bundlevalue="org.openscience.jmol.app.jmolpanel.Bundle#CTL_ExportAction" name="displayName"/>
+                <attr
+                    methodvalue="org.openide.awt.Actions.alwaysEnabled" name="instanceCreate"/>
+                <attr name="delegate" newvalue="org.openscience.jmol.app.jmolpanel.JmolPanel$ExportAction"/>
+                <attr name="iconBase" stringvalue="org/openscience/jmol/app/images/imageButton.png"/>
+                <attr boolvalue="false" name="noIconInMenu"/>
+            </file>
+            <file name="org-netbeans-jmol-displayer-ScriptConsoleAction.instance">
+                <!--org.openscience.jmol.app.jmolpanel.JmolPanel.ScriptWindowAction-->
+                <attr
+                    bundlevalue="org.openscience.jmol.app.jmolpanel.Bundle#CTL_ScriptConsoleAction" name="displayName"/>
+                <attr
+                    methodvalue="org.openide.awt.Actions.alwaysEnabled" name="instanceCreate"/>
+                <attr name="delegate" newvalue="org.openscience.jmol.app.jmolpanel.JmolPanel$ScriptWindowAction"/>
+                <attr name="iconBase" stringvalue="org/openscience/jmol/app/images/consoleButton.png"/>
+                <attr boolvalue="false" name="noIconInMenu"/>
+            </file>
+            <file name="org-netbeans-jmol-displayer-ScriptEditorAction.instance">
+                <!--org.openscience.jmol.app.jmolpanel.JmolPanel.ScriptEditorAction-->
+                <attr
+                    bundlevalue="org.openscience.jmol.app.jmolpanel.Bundle#CTL_ScriptEditorAction" name="displayName"/>
+                <attr
+                    methodvalue="org.openide.awt.Actions.alwaysEnabled" name="instanceCreate"/>
+                <attr name="delegate" newvalue="org.openscience.jmol.app.jmolpanel.JmolPanel$ScriptEditorAction"/>
+                <attr name="iconBase" stringvalue="org/openscience/jmol/app/images/editorButton.png"/>
+                <attr boolvalue="false" name="noIconInMenu"/>
+            </file>
+            <file name="org-netbeans-jmol-displayer-PovrayAction.instance">
+                <!--org.openscience.jmol.app.jmolpanel.JmolPanel.PovrayAction-->
+                <attr
+                    bundlevalue="org.openscience.jmol.app.jmolpanel.Bundle#CTL_PovrayAction" name="displayName"/>
+                <attr
+                    methodvalue="org.openide.awt.Actions.alwaysEnabled" name="instanceCreate"/>
+                <attr name="delegate" newvalue="org.openscience.jmol.app.jmolpanel.JmolPanel$PovrayAction"/>
+                <attr name="iconBase" stringvalue="org/openscience/jmol/app/images/povrayButton.png"/>
+                <attr boolvalue="false" name="noIconInMenu"/>
+            </file>
+            <file name="org-netbeans-jmol-displayer-WriteAction.instance">
+                <!--org.openscience.jmol.app.jmolpanel.JmolPanel.WriteAction-->
+                <attr
+                    bundlevalue="org.openscience.jmol.app.jmolpanel.Bundle#CTL_WriteAction" name="displayName"/>
+                <attr
+                    methodvalue="org.openide.awt.Actions.alwaysEnabled" name="instanceCreate"/>
+                <attr name="delegate" newvalue="org.openscience.jmol.app.jmolpanel.JmolPanel$WriteAction"/>
+                <attr name="iconBase" stringvalue="org/openscience/jmol/app/images/stateButton.png"/>
+                <attr boolvalue="false" name="noIconInMenu"/>
+            </file>
+            <file name="org-netbeans-jmol-displayer-ToWebAction.instance">
+                <!--org.openscience.jmol.app.jmolpanel.JmolPanel.ToWebAction-->
+                <attr
+                    bundlevalue="org.openscience.jmol.app.jmolpanel.Bundle#CTL_ToWebAction" name="displayName"/>
+                <attr
+                    methodvalue="org.openide.awt.Actions.alwaysEnabled" name="instanceCreate"/>
+                <attr name="delegate" newvalue="org.openscience.jmol.app.jmolpanel.JmolPanel$ToWebAction"/>
+                <attr name="iconBase" stringvalue="org/openscience/jmol/app/images/towebButton.png"/>
+                <attr boolvalue="false" name="noIconInMenu"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="Menu">
+        <folder name="File">
+            <folder name="Export">
+                <attr intvalue="2000" name="position"/>
+                <file name="org-netbeans-jmol-displayer-GaussianAction.shadow">
+                    <!--org.openscience.jmol.app.jmolpanel.JmolPanel.GaussianAction-->
+                    <attr name="originalFile" stringvalue="Actions/Tools/org-netbeans-jmol-displayer-GaussianAction.instance"/>
+                    <attr intvalue="60" name="position"/>
+                </file>
+                <file name="org-netbeans-jmol-displayer-ExportAction.shadow">
+                    <!--org.openscience.jmol.app.jmolpanel.JmolPanel.ExportAction-->
+                    <attr name="originalFile" stringvalue="Actions/Tools/org-netbeans-jmol-displayer-ExportAction.instance"/>
+                    <attr intvalue="10" name="position"/>
+                </file>
+                <file name="org-netbeans-jmol-displayer-PovrayAction.shadow">
+                    <!--org.openscience.jmol.app.jmolpanel.JmolPanel.PovrayAction-->
+                    <attr name="originalFile" stringvalue="Actions/Tools/org-netbeans-jmol-displayer-PovrayAction.instance"/>
+                    <attr intvalue="30" name="position"/>
+                </file>
+                <file name="org-netbeans-jmol-displayer-WriteAction.shadow">
+                    <!--org.openscience.jmol.app.jmolpanel.JmolPanel.WriteAction-->
+                    <attr name="originalFile" stringvalue="Actions/Tools/org-netbeans-jmol-displayer-WriteAction.instance"/>
+                    <attr intvalue="40" name="position"/>
+                </file>
+                <file name="org-netbeans-jmol-displayer-ToWebAction.shadow">
+                    <!--org.openscience.jmol.app.jmolpanel.JmolPanel.ToWebAction-->
+                    <attr name="originalFile" stringvalue="Actions/Tools/org-netbeans-jmol-displayer-ToWebAction.instance"/>
+                    <attr intvalue="20" name="position"/>
+                </file>
+            </folder>
+        </folder>
+    </folder>
+    
+</filesystem>

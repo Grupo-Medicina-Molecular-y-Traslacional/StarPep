@@ -12,6 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import javax.swing.Action;
 import org.bapedis.core.ui.actions.SelectNodeOnGraph;
+import org.bapedis.core.ui.actions.View3DStructure;
 import org.openide.actions.PropertiesAction;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
@@ -45,7 +46,7 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
     public PeptideNode(Peptide peptide, Children children, Lookup lookup) {
         super(children, lookup);
         this.peptide = peptide;
-        actions = new Action[]{new SelectNodeOnGraph(peptide.getGraphNode()), SystemAction.get(PropertiesAction.class)};
+        actions = new Action[]{new SelectNodeOnGraph(peptide.getGraphNode()), new View3DStructure(peptide), SystemAction.get(PropertiesAction.class)};
         peptide.addMolecularFeatureChangeListener(this);
     }
 

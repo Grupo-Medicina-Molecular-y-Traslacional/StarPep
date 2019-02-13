@@ -30,7 +30,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
-import javax.swing.JFrame;
 import javax.swing.JEditorPane;
 import javax.swing.JButton;
 import javax.swing.event.HyperlinkEvent;
@@ -47,13 +46,10 @@ import java.io.IOException;
 
 import org.jmol.i18n.GT;
 import org.jmol.util.Logger;
-import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
-import org.openide.awt.ActionRegistration;
 
-@ActionID(id="org.openscience.jmol.app.jmolpanel.About", category="Help")
-@ActionRegistration(displayName="About")
-@ActionReference(path="Menu/Help")
+//@ActionID(id="org.openscience.jmol.app.jmolpanel.About", category="Help")
+//@ActionRegistration(displayName="About")
+//@ActionReference(path="Menu/Help")
 public class AboutDialog extends JDialog implements ActionListener, HyperlinkListener {
 
   JEditorPane html;

@@ -51,9 +51,9 @@ public final class JmolTopComponent extends TopComponent implements LookupListen
 
         setLayout(new BorderLayout());
 
-//        JmolPanel p = new JmolPanel(null, null, this, null, 600, 600, "", );
-//        add(p);
-//        p.setVisible(true);
+        JmolPanel p = new JmolPanel(null, null, this, null, 600, 600, "", new Point(200, 200));
+        add(p);
+        p.setVisible(true);
 
         setDisplayName("Empty");
 

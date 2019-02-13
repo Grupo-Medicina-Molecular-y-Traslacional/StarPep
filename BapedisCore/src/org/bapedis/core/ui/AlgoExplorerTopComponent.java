@@ -118,7 +118,8 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         comboBoxModel.addElement(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.choose.defaultText"));
         algoComboBox.setModel(comboBoxModel);
 
-        associateLookup(new ProxyLookup(Lookups.singleton(new MetadataNavigatorLookupHint()), 
+        associateLookup(new ProxyLookup(Lookups.singleton(new MetadataNavigatorLookupHint()),
+                Lookups.singleton(new StructureNavigatorLookupHint()),
                 Lookups.singleton(new GraphElementNavigatorLookupHint()),
                 Lookups.singleton(new ClusterNavigatorLookupHint())));        
     }

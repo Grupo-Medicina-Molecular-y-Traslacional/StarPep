@@ -83,6 +83,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         explorerMgr = new ExplorerManager();
         associateLookup(new ProxyLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()),
                 Lookups.singleton(new MetadataNavigatorLookupHint()), 
+                Lookups.singleton(new StructureNavigatorLookupHint()),
                 Lookups.singleton(new GraphElementNavigatorLookupHint()),
                 Lookups.singleton(new ClusterNavigatorLookupHint())));
 

@@ -24,6 +24,7 @@ import org.bapedis.core.model.GraphElementNavigatorModel;
 import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.MetadataNavigatorModel;
 import org.bapedis.core.model.QueryModel;
+import org.bapedis.core.model.StructureNavigatorModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
@@ -340,6 +341,19 @@ public class ProjectManager implements Lookup.Provider {
         }  
         return model;
     }
+    
+    public synchronized StructureNavigatorModel getStructureNavModel(){
+        return getStructureNavModel(currentWS);
+    }
+    
+    public synchronized StructureNavigatorModel getStructureNavModel(Workspace workspace){
+        StructureNavigatorModel model = workspace.getLookup().lookup(StructureNavigatorModel.class);
+        if (model == null) {
+            model = new StructureNavigatorModel();
+            workspace.add(model);
+        }  
+        return model;
+    }    
     
     public synchronized GraphElementNavigatorModel getGraphElementNavModel(){
         return getGraphElementNavModel(currentWS);

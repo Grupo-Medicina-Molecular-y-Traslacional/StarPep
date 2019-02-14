@@ -5,13 +5,11 @@
  */
 package org.bapedis.core.ui.actions;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.StringTokenizer;
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.StarPepAnnotationType;
 import org.openide.util.NbBundle;
@@ -36,7 +34,6 @@ public class View3DStructure extends AbstractAction implements Presenter.Popup {
         String[] crossRefs = peptide.getAnnotationValues(StarPepAnnotationType.CROSSREF);
         StringTokenizer tokenizer;
         String db, code;
-        JMenuItem item;
         for (String crossRef : crossRefs) {
             tokenizer = new StringTokenizer(crossRef, ":");
             db = tokenizer.nextToken();

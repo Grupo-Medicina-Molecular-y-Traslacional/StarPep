@@ -5,20 +5,42 @@
  */
 package org.bapedis.core.ui;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collection;
+import java.util.StringTokenizer;
+import java.util.concurrent.ExecutionException;
+import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.FilterModel;
-import org.bapedis.core.model.MetadataNavigatorModel;
+import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideNode;
 import org.bapedis.core.model.QueryModel;
+import org.bapedis.core.model.StarPepAnnotationType;
+import org.bapedis.core.model.StructureNavigatorModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
+import org.biojava.nbio.structure.Structure;
+import org.biojava.nbio.structure.io.PDBFileReader;
+import org.jdesktop.swingx.JXBusyLabel;
+import org.jmol.api.JmolViewer;
+import org.netbeans.jmol.displayer.JmolTopComponent;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
+import org.openide.util.Exceptions;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
@@ -26,6 +48,7 @@ import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
+import org.openscience.jmol.app.jmolpanel.JmolPanel;
 
 /**
  *
@@ -42,7 +65,11 @@ public class StructureNavigator extends javax.swing.JPanel implements WorkspaceE
     protected final ProjectManager pc;
     protected final InstanceContent content;
     protected final Lookup lookup;
-    private MetadataNavigatorModel navigatorModel;
+    private StructureNavigatorModel structureModel;
+    protected final JXBusyLabel busyLabel;
+//    protected final JPanel strucPanel;
+    protected final JButton next, prev;
+    protected final JLabel structureLabel;
 
     /**
      * Creates new form StructureNavigator
@@ -54,9 +81,42 @@ public class StructureNavigator extends javax.swing.JPanel implements WorkspaceE
         content = new InstanceContent();
         lookup = new AbstractLookup(content);
 
+        busyLabel = new JXBusyLabel(new Dimension(20, 20));
+        busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        busyLabel.setText(NbBundle.getMessage(StructureNavigator.class, "StructureNavigator.busyLabel.text"));
+
+//        scrollPane.setViewportView(strucPanel);
         // Tool bar
         toolBar = new JToolBar();
         toolBar.setFloatable(false);
+
+        prev = new JButton();
+        prev.setToolTipText(NbBundle.getMessage(StructureNavigator.class, "StructureNavigator.prevButton.toolTipText"));
+        prev.setFocusable(true);
+        prev.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/arrow-180.png", false));
+        prev.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                prevStructure();
+            }
+        });
+        toolBar.add(prev);
+
+        structureLabel = new JLabel();
+        toolBar.add(structureLabel);
+
+        next = new JButton();
+        next.setToolTipText(NbBundle.getMessage(StructureNavigator.class, "StructureNavigator.nextButton.toolTipText"));
+        next.setFocusable(false);
+        next.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/arrow.png", false));
+        next.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                nextStructure();
+            }
+        });
+        toolBar.add(next);
+
     }
 
     /**
@@ -68,16 +128,10 @@ public class StructureNavigator extends javax.swing.JPanel implements WorkspaceE
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        scrollPane = new javax.swing.JScrollPane();
+
+        setLayout(new java.awt.BorderLayout());
+        add(scrollPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     @Override
@@ -115,12 +169,25 @@ public class StructureNavigator extends javax.swing.JPanel implements WorkspaceE
 
     @Override
     public void panelDeactivated() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        peptideLkpResult.removeLookupListener(this);
+        removeAttrLookupListener();
+        pc.removeWorkspaceEventListener(this);
+
+        if (currentModel != null) {
+            currentModel.removeQuickFilterChangeListener(this);
+        }
+
+        QueryModel queryModel = pc.getQueryModel();
+        queryModel.removePropertyChangeListener(this);
+
+        FilterModel filterModel = pc.getFilterModel();
+        filterModel.removePropertyChangeListener(this);
+
     }
 
     @Override
     public Lookup getLookup() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return lookup;
     }
 
     @Override
@@ -137,26 +204,36 @@ public class StructureNavigator extends javax.swing.JPanel implements WorkspaceE
 
             FilterModel oldFilterModel = pc.getFilterModel(oldWs);
             oldFilterModel.removePropertyChangeListener(this);
+        }
 
-//            comboBox.setSelectedIndex(-1);
-            attrModelLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
-            attrModelLkpResult.addLookupListener(this);
+        attrModelLkpResult = newWs.getLookup().lookupResult(AttributesModel.class);
+        attrModelLkpResult.addLookupListener(this);
 
-            QueryModel queryModel = pc.getQueryModel(newWs);
-            queryModel.addPropertyChangeListener(this);
+        QueryModel queryModel = pc.getQueryModel(newWs);
+        queryModel.addPropertyChangeListener(this);
 
-            FilterModel filterModel = pc.getFilterModel(newWs);
-            filterModel.addPropertyChangeListener(this);
+        FilterModel filterModel = pc.getFilterModel(newWs);
+        filterModel.addPropertyChangeListener(this);
 
-            currentModel = pc.getAttributesModel(newWs);
-            if (currentModel != null) {
-                currentModel.addQuickFilterChangeListener(this);
-            }
+        currentModel = pc.getAttributesModel(newWs);
+        if (currentModel != null) {
+            currentModel.addQuickFilterChangeListener(this);
+        }
 
-            navigatorModel = pc.getMetadataNavModel(newWs);
+        structureModel = pc.getStructureNavModel(newWs);
+    }
 
-//            comboBox.setSelectedIndex(navigatorModel.getSelectedIndex());
+    private void nextStructure() {
+        if (structureModel != null && structureModel.hasNext()) {
+            structureModel.next();
+            reload();
+        }
+    }
 
+    private void prevStructure() {
+        if (structureModel != null && structureModel.hasPrevious()) {
+            structureModel.prev();
+            reload();
         }
     }
 
@@ -167,17 +244,125 @@ public class StructureNavigator extends javax.swing.JPanel implements WorkspaceE
         }
     }
 
+    private void setBusyLabel(boolean busy) {
+//        scrollPane.setViewportView(busy ? busyLabel : jmolPanel);
+        busyLabel.setBusy(busy);
+        for (Component c : toolBar.getComponents()) {
+            c.setEnabled(!busy);
+        }
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (evt.getSource().equals(currentModel)) {
+            if (evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
+                structureModel.clear();
+                reload();
+            }
+        } else if (evt.getSource() instanceof QueryModel) {
+            if (evt.getPropertyName().equals(QueryModel.RUNNING)) {
+                setBusyLabel(((QueryModel) evt.getSource()).isRunning());
+            }
+        } else if (evt.getSource() instanceof FilterModel) {
+            if (evt.getPropertyName().equals(FilterModel.RUNNING)) {
+                setBusyLabel(((FilterModel) evt.getSource()).isRunning());
+            }
+        }
+    }
+
+    private void reload() {
+        if (structureModel.isEmpty()) {
+            structureLabel.setText("");
+            next.setEnabled(false);
+            prev.setEnabled(false);
+        } else {
+            final String code = structureModel.getCurrentCode();
+            structureLabel.setText(String.format("%s (%d/%d)", code, structureModel.getSelectedIndex() + 1, structureModel.getSize()));
+            next.setEnabled(structureModel.hasNext());
+            prev.setEnabled(structureModel.hasPrevious());
+
+            JmolPanel panel = new JmolPanel(null, null, new JmolTopComponent(), null, 600, 600, "", new Point(200, 200));
+            JmolViewer viewer = panel.getViewer();
+            viewer.script(getScript(code));
+            viewer.script("cartoons only;ssbonds on; select cys; wireframe on; select cys.ca; label %n%r; select;");
+//            viewer.evalString("select protein; spacefill off; wireframe off; backbone 0.4;  ");
+//            viewer.evalString("color chain;  ");
+            scrollPane.setViewportView(panel);
+
+//            SwingWorker worker = new SwingWorker<P>() {
+//                @Override
+//                protected Object doInBackground() throws Exception {
+////                    PDBFileReader reader = new PDBFileReader();
+////
+////                    // the path to the local PDB installation
+////                    reader.setPath("/home/loge/PDBFiles/");
+////                    Structure struc = reader.getStructureById(code);
+//
+////                    JmolViewer viewer = jmolPanel.getViewer();
+////                    viewer.openStringInline(struc.toPDB());
+////                    viewer.script(getScript(code));
+////                    viewer.evalString("select *; spacefill off; wireframe off; backbone 0.4;  ");
+////                    viewer.evalString("color chain;  ");
+//
+//
+////                    return panel;
+//                }
+//
+//                @Override
+//                protected void done() {
+//                    try {
+//                        get();
+//                    } catch (InterruptedException | ExecutionException ex) {
+//                        Exceptions.printStackTrace(ex);
+//                    }
+//                }
+//            };
+//            worker.execute();
+        }
+    }
+
+    private String getScript(String code) {
+        return "var xid = _modelTitle; if (xid.length != 4) { xid = '"
+                + code
+                + "'};load @{'=' + xid}";
     }
 
     @Override
     public void resultChanged(LookupEvent le) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (le.getSource().equals(attrModelLkpResult)) {
+            Collection<? extends AttributesModel> attrModels = attrModelLkpResult.allInstances();
+            if (!attrModels.isEmpty()) {
+                if (currentModel != null) {
+                    currentModel.removeQuickFilterChangeListener(this);
+                }
+                currentModel = attrModels.iterator().next();
+                currentModel.addQuickFilterChangeListener(this);
+                structureModel.clear();
+                reload();
+            }
+        } else if (le.getSource().equals(peptideLkpResult)) {
+            Collection<? extends PeptideNode> peptideNodes = peptideLkpResult.allInstances();
+            if (!peptideNodes.isEmpty()) {
+                structureModel.clear();
+                Peptide peptide = peptideNodes.iterator().next().getPeptide();
+                String[] crossRefs = peptide.getAnnotationValues(StarPepAnnotationType.CROSSREF);
+                StringTokenizer tokenizer;
+                String db, code;
+                for (String crossRef : crossRefs) {
+                    tokenizer = new StringTokenizer(crossRef, ":");
+                    db = tokenizer.nextToken();
+                    if (db.equals("PDB")) {
+                        code = tokenizer.nextToken();
+                        structureModel.add(code.trim());
+                    }
+                }
+                reload();
+            }
+        }
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane scrollPane;
     // End of variables declaration//GEN-END:variables
 }

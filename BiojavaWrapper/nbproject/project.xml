@@ -32,6 +32,51 @@
                 <package>org.biojava.nbio.core.sequence.transcription</package>
                 <package>org.biojava.nbio.core.sequence.views</package>
                 <package>org.biojava.nbio.core.util</package>
+                <package>org.biojava.nbio.structure</package>
+                <package>org.biojava.nbio.structure.align</package>
+                <package>org.biojava.nbio.structure.align.ce</package>
+                <package>org.biojava.nbio.structure.align.client</package>
+                <package>org.biojava.nbio.structure.align.events</package>
+                <package>org.biojava.nbio.structure.align.fatcat</package>
+                <package>org.biojava.nbio.structure.align.fatcat.calc</package>
+                <package>org.biojava.nbio.structure.align.helper</package>
+                <package>org.biojava.nbio.structure.align.model</package>
+                <package>org.biojava.nbio.structure.align.multiple</package>
+                <package>org.biojava.nbio.structure.align.multiple.mc</package>
+                <package>org.biojava.nbio.structure.align.multiple.util</package>
+                <package>org.biojava.nbio.structure.align.pairwise</package>
+                <package>org.biojava.nbio.structure.align.seq</package>
+                <package>org.biojava.nbio.structure.align.util</package>
+                <package>org.biojava.nbio.structure.align.xml</package>
+                <package>org.biojava.nbio.structure.asa</package>
+                <package>org.biojava.nbio.structure.cath</package>
+                <package>org.biojava.nbio.structure.contact</package>
+                <package>org.biojava.nbio.structure.domain</package>
+                <package>org.biojava.nbio.structure.domain.pdp</package>
+                <package>org.biojava.nbio.structure.ecod</package>
+                <package>org.biojava.nbio.structure.io</package>
+                <package>org.biojava.nbio.structure.io.mmcif</package>
+                <package>org.biojava.nbio.structure.io.mmcif.chem</package>
+                <package>org.biojava.nbio.structure.io.mmcif.model</package>
+                <package>org.biojava.nbio.structure.io.sifts</package>
+                <package>org.biojava.nbio.structure.io.util</package>
+                <package>org.biojava.nbio.structure.jama</package>
+                <package>org.biojava.nbio.structure.math</package>
+                <package>org.biojava.nbio.structure.quaternary</package>
+                <package>org.biojava.nbio.structure.quaternary.io</package>
+                <package>org.biojava.nbio.structure.rcsb</package>
+                <package>org.biojava.nbio.structure.scop</package>
+                <package>org.biojava.nbio.structure.scop.server</package>
+                <package>org.biojava.nbio.structure.secstruc</package>
+                <package>org.biojava.nbio.structure.symmetry.analysis</package>
+                <package>org.biojava.nbio.structure.symmetry.core</package>
+                <package>org.biojava.nbio.structure.symmetry.geometry</package>
+                <package>org.biojava.nbio.structure.symmetry.internal</package>
+                <package>org.biojava.nbio.structure.symmetry.misc</package>
+                <package>org.biojava.nbio.structure.symmetry.utils</package>
+                <package>org.biojava.nbio.structure.validation</package>
+                <package>org.biojava.nbio.structure.xtal</package>
+                <package>org.biojava.nbio.structure.xtal.io</package>
             </public-packages>
             <class-path-extension>
                 <runtime-relative-path>ext/biojava-alignment-4.2.0.jar</runtime-relative-path>
@@ -44,6 +89,10 @@
             <class-path-extension>
                 <runtime-relative-path>ext/biojava-core-4.2.0.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/biojava-core-4.2.0.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/biojava-structure-4.2.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/biojava-structure-4.2.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/slf4j-api-1.7.25.jar</runtime-relative-path>

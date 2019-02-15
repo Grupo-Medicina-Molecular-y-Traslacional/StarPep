@@ -21,42 +21,33 @@ import org.openscience.jmol.app.jmolpanel.JmolPanel;
 /**
  * Top component which displays something.
  */
-@ConvertAsProperties(dtd = "-//org.netbeans.examples.modules.povfile//Jmol//EN",
-autostore = false)
-@TopComponent.Description(preferredID = "JmolTopComponent",
-//iconBase="SET/PATH/TO/ICON/HERE", 
-persistenceType = TopComponent.PERSISTENCE_NEVER)
-@TopComponent.Registration(mode = "editor", openAtStartup = true)
-@ActionID(category = "Window", id = "org.netbeans.examples.modules.povfile.JmolTopComponent")
-@ActionReference(position=5, path = "Menu/Window" /*
- * , position = 333
- */)
-@TopComponent.OpenActionRegistration(displayName = "#CTL_JmolAction",
-preferredID = "JmolTopComponent")
-@Messages({
-    "CTL_JmolAction=Molecule Viewer",
-    "CTL_JmolTopComponent=General",
-    "HINT_JmolTopComponent=This is a Molecule Editor"
-})
-public final class JmolTopComponent extends TopComponent implements LookupListener {
+//@ConvertAsProperties(dtd = "-//org.netbeans.examples.modules.povfile//Jmol//EN",
+//autostore = false)
+//@TopComponent.Description(preferredID = "JmolTopComponent",
+////iconBase="SET/PATH/TO/ICON/HERE", 
+//persistenceType = TopComponent.PERSISTENCE_NEVER)
+//@TopComponent.Registration(mode = "editor", openAtStartup = false)
+//@ActionID(category = "Window", id = "org.netbeans.examples.modules.povfile.JmolTopComponent")
+//@Messages({
+//    "CTL_JmolAction=Molecule Viewer",
+//    "CTL_JmolTopComponent=General",
+//    "HINT_JmolTopComponent=This is a Molecule Editor"
+//})
+public final class JmolTopComponent extends TopComponent {
 
     JmolPanel panel;
 
     public JmolTopComponent() {
         initComponents();
-        setName(Bundle.CTL_JmolTopComponent());
-        setToolTipText(Bundle.HINT_JmolTopComponent());
+//        setName(Bundle.CTL_JmolTopComponent());
+//        setToolTipText(Bundle.HINT_JmolTopComponent());
 
         //putClientProperty("print.printable", Boolean.TRUE); // NOI18N
 
         setLayout(new BorderLayout());
 
-        JmolPanel p = new JmolPanel(null, null, this, null, 600, 600, "", new Point(200, 200));
-        add(p);
-        p.setVisible(true);
-
-        setDisplayName("Empty");
-
+        panel = new JmolPanel(null, null, this, 600, 600, "", new Point(200, 200));
+        add(BorderLayout.CENTER, panel);
     }
 
     /**
@@ -80,17 +71,13 @@ public final class JmolTopComponent extends TopComponent implements LookupListen
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
-    Result<LoadScriptCapability> allLSC;
 
     @Override
     public void componentOpened() {
-        allLSC = Utilities.actionsGlobalContext().lookupResult(LoadScriptCapability.class);
-        allLSC.addLookupListener(this);
     }
 
     @Override
     public void componentClosed() {
-//        allLSC.removeLookupListener(this);
     }
 
     void writeProperties(java.util.Properties p) {
@@ -105,16 +92,4 @@ public final class JmolTopComponent extends TopComponent implements LookupListen
         // TODO read your settings according to their version
     }
 
-    @Override
-    public void resultChanged(LookupEvent le) {
-        for (LoadScriptCapability lsc : allLSC.allInstances()) {
-            JmolTopComponent jtc = new JmolTopComponent();
-            jtc.open();
-            jtc.requestActive();
-            panel = new JmolPanel(null, null, new JmolTopComponent(), null, 600, 600, "", new Point(200, 200));
-            panel.getViewer().script(lsc.getScript());
-            jtc.add(panel);
-            jtc.setDisplayName(lsc.getName());
-        }
-    }
 }

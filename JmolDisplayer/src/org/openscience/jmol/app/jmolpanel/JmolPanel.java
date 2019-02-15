@@ -78,6 +78,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -90,10 +91,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import org.openide.awt.*;
-import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
-import org.openide.windows.TopComponent;
 
 public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient {
 
@@ -110,7 +108,7 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
     protected static GaussianDialog gaussianDialog;
     protected RecentFilesDialog recentFiles;
     protected AtomSetChooser atomSetChooser;
-    protected TopComponent frame;
+    protected JComponent parent;
     protected SplashInterface splash;
     protected JFrame consoleframe;
     protected JsonNioService service;
@@ -176,12 +174,11 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
     //private static final String saveasAction = "saveas";
     //private static final String vibAction = "vibrate";
 
-    public JmolPanel(JmolApp jmolApp, Splash splash, TopComponent frame,
-            JmolPanel parent, int startupWidth, int startupHeight,
+    public JmolPanel(JmolApp jmolApp, Splash splash, JComponent parent, int startupWidth, int startupHeight,
             String commandOptions, Point loc) {
         super(true);
         this.jmolApp = jmolApp;
-        this.frame = frame;
+        this.parent = parent;
         this.startupWidth = startupWidth;
         this.startupHeight = startupHeight;
         historyFile = new HistoryFile(new File(""), "PNG");
@@ -192,9 +189,8 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
         } catch (Exception e) {
         }
 
-        frame.setDisplayName("Jmol");
-        frame.setBackground(Color.lightGray);
-        frame.setLayout(new BorderLayout());
+        parent.setBackground(Color.lightGray);
+        parent.setLayout(new BorderLayout());
 
         this.splash = splash;
 
@@ -219,7 +215,7 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
          * SmarterJmolAdapter(); }
          */
 
-        /*
+ /*
          * this version of Jmol needs to have a display so that it can construct
          * JPG images -- if that is not needed, then you can use JmolData.jar
          *
@@ -255,7 +251,6 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
         // if (System.getProperty("plugin.dir") != null) {
         // pluginManager.loadPlugins(System.getProperty("plugin.dir"));
         // }
-
         // install the command table
         say(GT._("Building Command Hooks..."));
         commands = new Hashtable<String, Action>();
@@ -294,20 +289,14 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
 //      viewer.getProperty("DATA_API", "setMenu", viewer
 //          .getFileAsString(jmolApp.menuFile));
 //    }
-
 //    if (jmolApp.isKiosk) {
 //      bannerFrame = new BannerFrame(jmolApp.startupWidth, 75);
 //    } else {
         // prevent new Jmol from covering old Jmol
         if (loc != null) {
-            frame.setLocation(loc);
-        } else if (parent == null) {
-//        loc = historyFile.getWindowPosition("Jmol");
-            if (loc != null) {
-                frame.setLocation(loc);
-            }
+            parent.setLocation(loc);
         } else {
-            loc = parent.frame.getLocationOnScreen();
+            loc = parent.getLocationOnScreen();
             int maxX = screenSize.width - 50;
             int maxY = screenSize.height - 50;
             loc.x += 40;
@@ -315,21 +304,19 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
             if (loc.x > maxX || loc.y > maxY) {
                 loc.setLocation(0, 0);
             }
-            frame.setLocation(loc);
+            parent.setLocation(loc);
 //      }
         }
-        frame.add("Center", this);
+        parent.add("Center", this);
 //    frame.addWindowListener(new AppCloser());
 //    frame.pack();
-        frame.setSize(startupWidth, startupHeight);
+        parent.setSize(startupWidth, startupHeight);
         ImageIcon jmolIcon = JmolResourceHandler.getIconX("icon");
         Image iconImage = jmolIcon.getImage();
 //    frame.setIconImage(iconImage);
 
         // Repositioning windows
-
         //historyFile.repositionWindow("Jmol", getFrame(), 300, 300);
-
         AppConsole console = (AppConsole) viewer.getProperty("DATA_API",
                 "getAppConsole", null);
         if (console != null && console.jcd != null) {
@@ -387,7 +374,6 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
         }
 
         // now pass these to viewer
-
         Jmol jmol = null;
 
         try {
@@ -460,12 +446,10 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
             errorTextArea.append(GT._("Could not create ConsoleTextArea: ") + e);
         }
 
-
-        Point location = jmol.frame.getLocation();
-        Dimension size = jmol.frame.getSize();
+        Point location = jmol.parent.getLocation();
+        Dimension size = jmol.parent.getSize();
 
         // String name = CONSOLE_WINDOW_NAME;     
-
         //Dimension consoleSize = historyFile.getWindowSize(name);
         //Point consolePosition = historyFile.getWindowPosition(name);
         //if (consoleSize != null && consolePosition != null) {
@@ -493,7 +477,6 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
         //if ((consoleVisible != null) && (consoleVisible.equals(Boolean.TRUE))) {
         //jmol.consoleframe.setVisible(true);
         // }
-
     }
 
     public static Jmol getJmol(JmolApp jmolApp, JFrame frame) {
@@ -583,10 +566,10 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
             WebExport.cleanUp();
         }
         if (historyFile != null) {
-            if (frame != null) {
-                jmolApp.border.x = frame.getWidth() - display.dimSize.width;
-                jmolApp.border.y = frame.getHeight() - display.dimSize.height;
-                historyFile.addWindowInfo("Jmol", frame, jmolApp.border);
+            if (parent != null) {
+                jmolApp.border.x = parent.getWidth() - display.dimSize.width;
+                jmolApp.border.y = parent.getHeight() - display.dimSize.height;
+                historyFile.addWindowInfo("Jmol", parent, jmolApp.border);
             }
             //historyFile.addWindowInfo(CONSOLE_WINDOW_NAME, consoleframe);
             AppConsole console = (AppConsole) viewer.getProperty("DATA_API", "getAppConsole", null);
@@ -1046,8 +1029,8 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
             if (gaussianDialog == null) //        gaussianDialog = new GaussianDialog(frame, viewer);
             {
                 gaussianDialog = new GaussianDialog(null, viewer);
-            } 
-                gaussianDialog.setVisible(true);
+            }
+            gaussianDialog.setVisible(true);
         }
     }
 
@@ -1160,7 +1143,7 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String url = JOptionPane.showInputDialog(frame, prompt, title,
+            String url = JOptionPane.showInputDialog(parent, prompt, title,
                     JOptionPane.PLAIN_MESSAGE);
             if (url != null) {
                 if (url.indexOf("://") < 0) {

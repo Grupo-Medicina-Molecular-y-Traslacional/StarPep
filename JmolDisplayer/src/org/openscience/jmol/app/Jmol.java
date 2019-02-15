@@ -33,9 +33,9 @@ import org.openscience.jmol.app.jmolpanel.*;
 
 public class Jmol extends JmolPanel {
 
-  public Jmol(JmolApp jmolApp, Splash splash, TopComponent frame, Jmol parent, int startupWidth,
+  public Jmol(JmolApp jmolApp, Splash splash, Jmol parent, int startupWidth,
       int startupHeight, String commandOptions, Point loc) {
-    super(jmolApp, splash, frame, parent, startupWidth, startupHeight, commandOptions, loc);
+    super(jmolApp, splash, parent, startupWidth, startupHeight, commandOptions, loc);
   }
 
   public static void main(String[] args) {

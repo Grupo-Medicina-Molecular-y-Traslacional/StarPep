@@ -38,7 +38,6 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
-import org.openide.windows.TopComponent;
 
 public class DisplayPanel extends JPanel
         implements JmolFrame, ComponentListener, Printable {
@@ -53,7 +52,7 @@ public class DisplayPanel extends JPanel
     boolean haveBorder;
     MeasurementTable measurementTable;
     JmolPanel jmolPanel;
-    private TopComponent frame;
+    private JComponent parent;
 
     public JFrame getFrame() {
         return null;
@@ -61,7 +60,7 @@ public class DisplayPanel extends JPanel
 
     public DisplayPanel(JmolPanel jmol) {
         jmolPanel = jmol;
-        frame = jmol.frame;
+        parent = jmol.parent;
         status = jmol.status;
         guimap = jmol.guimap;
         border = new Point(20, 20);

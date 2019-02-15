@@ -7,6 +7,8 @@ package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
+import org.bapedis.core.spi.ui.StructureWindowController;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
@@ -14,7 +16,7 @@ import org.openide.util.NbBundle;
  * @author loge
  */
 public class OpenJMol extends AbstractAction{
-
+    private static StructureWindowController strucController = Lookup.getDefault().lookup(StructureWindowController.class);
     private final String code;
 
     public OpenJMol(String code) {
@@ -26,12 +28,10 @@ public class OpenJMol extends AbstractAction{
     public boolean isEnabled() {
         return code != null;
     }
-    
-    
-    
+            
     @Override
     public void actionPerformed(ActionEvent e) {
-        
+        strucController.openStructureWindow(null, code);
     }
     
 }

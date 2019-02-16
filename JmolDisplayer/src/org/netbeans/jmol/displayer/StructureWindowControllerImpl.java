@@ -10,6 +10,11 @@ import javax.swing.JPanel;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.ui.StructureWindowController;
 import org.jmol.api.JmolViewer;
+import org.netbeans.core.api.multiview.MultiViewHandler;
+import org.netbeans.core.api.multiview.MultiViews;
+import org.netbeans.core.spi.multiview.MultiViewDescription;
+import org.netbeans.core.spi.multiview.MultiViewFactory;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.TopComponent;
 import org.openscience.jmol.app.jmolpanel.JmolPanel;
@@ -21,29 +26,30 @@ import org.openscience.jmol.app.jmolpanel.JmolPanel;
 @ServiceProvider(service = StructureWindowController.class)
 public class StructureWindowControllerImpl implements StructureWindowController {
 
+    private TopComponent strucTopComponent;
+
     @Override
     public void openStructureWindow(Peptide peptide, String code) {
-        JmolTopComponent jtc = new JmolTopComponent();
-        jtc.setDisplayName(code);
-        jtc.open();
-        jtc.requestActive();
-        JmolViewer viewer = jtc.panel.getViewer();
-        viewer.script(getScript(code));    
-        viewer.script("cartoons only;ssbonds on; select cys; wireframe on; select cys.ca; label %n%r; select;");
+        if (strucTopComponent == null) {
+            MultiViewDescription[] multiviews = new MultiViewDescription[]{new StructureSceneDescription(peptide, code)};
+            strucTopComponent = MultiViewFactory.createCloneableMultiView(multiviews, multiviews[0]);
+            strucTopComponent.setDisplayName(NbBundle.getMessage(StructureWindowControllerImpl.class, "CTL_StructureTC_title"));
+        } else {
+            MultiViewHandler handler = MultiViews.findMultiViewHandler(strucTopComponent);
+        }
+        strucTopComponent.open();
+        strucTopComponent.requestActive();
     }
 
     @Override
     public JPanel createPanelView(JPanel parent, String code) {
-        JmolPanel jmolPanel = new JmolPanel(null, null, parent, parent.getWidth(), parent.getHeight(), "", new Point(50, 50));
+        JmolPanel jmolPanel = new JmolPanel(null, null, parent, 150, 150, "", new Point(50, 50));
         JmolViewer viewer = jmolPanel.getViewer();
-        viewer.script(getScript(code));
-        viewer.script("cartoons only;ssbonds on; select cys; wireframe on; select cys.ca; label %n%r; select; spin on");
+        viewer.script(StructureScene.getScript(code));
+        //Cartoons
+        viewer.script("select protein; cartoons only; color structure; spin on");
+//        viewer.script("cartoons only;ssbonds on; select cys; wireframe on; select cys.ca; label %n%r; select; spin on");
         return jmolPanel;
     }
 
-    private String getScript(String code) {
-        return "var xid = _modelTitle; if (xid.length != 4) { xid = '"
-                + code
-                + "'};load @{'=' + xid}";
-    }
 }

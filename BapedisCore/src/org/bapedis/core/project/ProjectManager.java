@@ -342,18 +342,18 @@ public class ProjectManager implements Lookup.Provider {
         return model;
     }
     
-    public synchronized StructureNavigatorModel getStructureNavModel(){
-        return getStructureNavModel(currentWS);
-    }
-    
-    public synchronized StructureNavigatorModel getStructureNavModel(Workspace workspace){
-        StructureNavigatorModel model = workspace.getLookup().lookup(StructureNavigatorModel.class);
-        if (model == null) {
-            model = new StructureNavigatorModel();
-            workspace.add(model);
-        }  
-        return model;
-    }    
+//    public synchronized StructureNavigatorModel getStructureNavModel(){
+//        return getStructureNavModel(currentWS);
+//    }
+//    
+//    public synchronized StructureNavigatorModel getStructureNavModel(Workspace workspace){
+//        StructureNavigatorModel model = workspace.getLookup().lookup(StructureNavigatorModel.class);
+//        if (model == null) {
+//            model = new StructureNavigatorModel();
+//            workspace.add(model);
+//        }  
+//        return model;
+//    }    
     
     public synchronized GraphElementNavigatorModel getGraphElementNavModel(){
         return getGraphElementNavModel(currentWS);

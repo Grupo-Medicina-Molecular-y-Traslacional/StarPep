@@ -47,7 +47,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -61,14 +60,12 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.StringTokenizer;
 
 import javax.swing.AbstractAction;
@@ -80,16 +77,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import org.openide.util.NbBundle;
 
@@ -121,9 +114,10 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
     private StatusListener myStatusListener;
     private SurfaceTool surfaceTool;
     private Map<String, Action> commands;
-    private Map<String, JMenuItem> menuItems;
-    private JMenuBar menubar;
-    private JToolBar toolbar;
+    private final JToolBar toolbar;
+//    private Map<String, JMenuItem> menuItems;
+//    private JMenuBar menubar;
+
     // --- action implementations -----------------------------------
     private ExportAction exportAction = new ExportAction();
     private PovrayAction povrayAction = new PovrayAction();
@@ -227,8 +221,6 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
         display.setViewer(viewer);
         myStatusListener.setViewer(viewer);
 
-//    if (!jmolApp.haveDisplay)
-//      return;
         getDialogs();
         say(GT._("Initializing Script Window..."));
         viewer.getProperty("DATA_API", "getAppConsole", Boolean.TRUE);
@@ -262,37 +254,22 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
             }
         }
 
-//    if (jmolApp.isKiosk) {
-//      add("Center", display);
-//    } else {
-        JPanel panel = new JPanel();
-        menuItems = new Hashtable<String, JMenuItem>();
-        say(GT._("Building Menubar..."));
         executeScriptAction = new ExecuteScriptAction();
-        menubar = createMenubar();
-        add("North", menubar);
-        panel.setLayout(new BorderLayout());
         toolbar = createToolbar();
-        panel.add("North", toolbar);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+
         JPanel ip = new JPanel();
         ip.setLayout(new BorderLayout());
         ip.add("Center", display);
         panel.add("Center", ip);
         add("Center", panel);
         add("South", status);
-//    }
 
         say(GT._("Starting display..."));
         display.start();
 
-//    if (jmolApp.menuFile != null) {
-//      viewer.getProperty("DATA_API", "setMenu", viewer
-//          .getFileAsString(jmolApp.menuFile));
-//    }
-//    if (jmolApp.isKiosk) {
-//      bannerFrame = new BannerFrame(jmolApp.startupWidth, 75);
-//    } else {
-        // prevent new Jmol from covering old Jmol
         if (loc != null) {
             parent.setLocation(loc);
         } else {
@@ -305,14 +282,12 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
                 loc.setLocation(0, 0);
             }
             parent.setLocation(loc);
-//      }
         }
         parent.add("Center", this);
-//    frame.addWindowListener(new AppCloser());
-//    frame.pack();
+
         parent.setSize(startupWidth, startupHeight);
-        ImageIcon jmolIcon = JmolResourceHandler.getIconX("icon");
-        Image iconImage = jmolIcon.getImage();
+//        ImageIcon jmolIcon = JmolResourceHandler.getIconX("icon");
+//        Image iconImage = jmolIcon.getImage();
 //    frame.setIconImage(iconImage);
 
         // Repositioning windows
@@ -344,12 +319,11 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
         preferencesDialog = new PreferencesDialog(this, null, guimap, viewer);
         say(GT._("Initializing Recent Files..."));
 //    recentFiles = new RecentFilesDialog(frame);
-//    if (jmolApp.haveDisplay) {
-        if (display.measurementTable != null) {
-            display.measurementTable.dispose();
-        }
-//      display.measurementTable = new MeasurementTable(viewer, frame);
-//    }
+
+//        if (display.measurementTable != null) {
+//            display.measurementTable.dispose();
+//        }
+//        display.measurementTable = new MeasurementTable(viewer);
     }
 
     public JmolViewer getViewer() {
@@ -543,6 +517,10 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
         return actions.toArray(new Action[0]);
     }
 
+    public JToolBar getToolbar() {
+        return toolbar;
+    }
+
     /**
      * To shutdown when run as an application. This is a fairly lame
      * implementation. A more self-respecting implementation would at least
@@ -609,81 +587,6 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
         }
     }
 
-//  protected void setupNewFrame(JmolViewer viewer) {
-//    String state = viewer.getStateInfo();
-//    JFrame newFrame = new JFrame();
-//    JFrame f = this.frame;
-//    Jmol j = new Jmol(jmolApp, null, newFrame, (Jmol) this, startupWidth, startupHeight,
-//        "", (state == null ? null : f.getLocationOnScreen()));
-//    newFrame.setVisible(true);
-//    j.viewer.menuStructure = viewer.menuStructure;
-//    if (state != null) {
-//      dispose(f);
-//      j.viewer.evalStringQuiet(state);
-//    }
-//  }
-    /**
-     * This is the hook through which all menu items are created. It registers
-     * the result with the menuitem hashtable so that it can be fetched with
-     * getMenuItem().
-     *
-     * @param cmd
-     * @return Menu item created
-     * @see #getMenuItem
-     */
-    protected JMenuItem createMenuItem(String cmd) {
-
-        JMenuItem mi;
-        if (cmd.endsWith("Check")) {
-            mi = guimap.newJCheckBoxMenuItem(cmd, false);
-        } else {
-            mi = guimap.newJMenuItem(cmd);
-        }
-
-        ImageIcon f = JmolResourceHandler.getIconX(cmd + "Image");
-        if (f != null) {
-            mi.setHorizontalTextPosition(SwingConstants.RIGHT);
-            mi.setIcon(f);
-        }
-
-        if (cmd.endsWith("Script")) {
-            mi.setActionCommand(JmolResourceHandler.getStringX(cmd));
-            mi.addActionListener(executeScriptAction);
-        } else {
-            mi.setActionCommand(cmd);
-            Action a = getAction(cmd);
-            if (a != null) {
-                mi.addActionListener(a);
-                a.addPropertyChangeListener(new ActionChangedListener(mi));
-                mi.setEnabled(a.isEnabled());
-            } else {
-                mi.setEnabled(false);
-            }
-        }
-        menuItems.put(cmd, mi);
-        return mi;
-    }
-
-    /**
-     * Fetch the menu item that was created for the given command.
-     *
-     * @param cmd Name of the action.
-     * @return item created for the given command or null if one wasn't created.
-     */
-    protected JMenuItem getMenuItem(String cmd) {
-        return menuItems.get(cmd);
-    }
-
-    /**
-     * Fetch the action that was created for the given command.
-     *
-     * @param cmd Name of the action.
-     * @return The action
-     */
-    protected Action getAction(String cmd) {
-        return commands.get(cmd);
-    }
-
     /**
      * Create the toolbar. By default this reads the resource file for the
      * definition of the toolbars.
@@ -691,8 +594,7 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
      * @return The toolbar
      */
     private JToolBar createToolbar() {
-
-        toolbar = new JToolBar();
+        JToolBar toolbar = new JToolBar();
         String[] tool1Keys = tokenize(JmolResourceHandler.getStringX("toolbar"));
         for (int i = 0; i < tool1Keys.length; i++) {
             if (tool1Keys[i].equals("-")) {
@@ -766,7 +668,7 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
         if (a != null) {
             b.setActionCommand(actionCommand);
             b.addActionListener(a);
-            a.addPropertyChangeListener(new ActionChangedListener(b));
+            a.addPropertyChangeListener(new JmolPanel.ActionChangedListener(b));
             b.setEnabled(a.isEnabled());
         } else {
             b.setEnabled(false);
@@ -779,6 +681,79 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
         }
 
         return b;
+    }
+
+//  protected void setupNewFrame(JmolViewer viewer) {
+//    String state = viewer.getStateInfo();
+//    JFrame newFrame = new JFrame();
+//    JFrame f = this.frame;
+//    Jmol j = new Jmol(jmolApp, null, newFrame, (Jmol) this, startupWidth, startupHeight,
+//        "", (state == null ? null : f.getLocationOnScreen()));
+//    newFrame.setVisible(true);
+//    j.viewer.menuStructure = viewer.menuStructure;
+//    if (state != null) {
+//      dispose(f);
+//      j.viewer.evalStringQuiet(state);
+//    }
+//  }
+    /**
+     * This is the hook through which all menu items are created. It registers
+     * the result with the menuitem hashtable so that it can be fetched with
+     * getMenuItem().
+     *
+     * @param cmd
+     * @return Menu item created
+     * @see #getMenuItem
+     */
+//    protected JMenuItem createMenuItem(String cmd) {
+//
+//        JMenuItem mi;
+//        if (cmd.endsWith("Check")) {
+//            mi = guimap.newJCheckBoxMenuItem(cmd, false);
+//        } else {
+//            mi = guimap.newJMenuItem(cmd);
+//        }
+//
+//        ImageIcon f = JmolResourceHandler.getIconX(cmd + "Image");
+//        if (f != null) {
+//            mi.setHorizontalTextPosition(SwingConstants.RIGHT);
+//            mi.setIcon(f);
+//        }
+//
+//        if (cmd.endsWith("Script")) {
+//            mi.setActionCommand(JmolResourceHandler.getStringX(cmd));
+//            mi.addActionListener(executeScriptAction);
+//        } else {
+//            mi.setActionCommand(cmd);
+//            Action a = getAction(cmd);
+//            if (a != null) {
+//                mi.addActionListener(a);
+//                a.addPropertyChangeListener(new ActionChangedListener(mi));
+//                mi.setEnabled(a.isEnabled());
+//            } else {
+//                mi.setEnabled(false);
+//            }
+//        }
+//        menuItems.put(cmd, mi);
+//        return mi;
+//    }
+    /**
+     * Fetch the menu item that was created for the given command.
+     *
+     * @param cmd Name of the action.
+     * @return item created for the given command or null if one wasn't created.
+     */
+//    protected JMenuItem getMenuItem(String cmd) {
+//        return menuItems.get(cmd);
+//    }
+    /**
+     * Fetch the action that was created for the given command.
+     *
+     * @param cmd Name of the action.
+     * @return The action
+     */
+    protected Action getAction(String cmd) {
+        return commands.get(cmd);
     }
 
     /**
@@ -812,90 +787,86 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
      *
      * @return Menubar
      */
-    protected JMenuBar createMenubar() {
-        JMenuBar mb = new JMenuBar();
-        addNormalMenuBar(mb);
-        // The Macros Menu
-//        addMacrosMenuBar(mb);
-        // The Plugin Menu
-        // if (pluginManager != null) {
-        //     mb.add(pluginManager.getMenu());
-        // }
-        // The Help menu, right aligned
-        //mb.add(Box.createHorizontalGlue());
-        addHelpMenuBar(mb);
-        return mb;
-    }
-
-    protected void addMacrosMenuBar(JMenuBar menuBar) {
-        // ok, here needs to be added the funny stuff
-        JMenu macroMenu = guimap.newJMenu("macros");
-        File macroDir = new File(System.getProperty("user.home")
-                + System.getProperty("file.separator") + ".jmol"
-                + System.getProperty("file.separator") + "macros");
-        report("User macros dir: " + macroDir);
-        report("       exists: " + macroDir.exists());
-        report("  isDirectory: " + macroDir.isDirectory());
-        if (macroDir.exists() && macroDir.isDirectory()) {
-            File[] macros = macroDir.listFiles();
-            for (int i = 0; i < macros.length; i++) {
-                // loop over these files and load them
-                String macroName = macros[i].getName();
-                if (macroName.endsWith(".macro")) {
-                    if (Logger.debugging) {
-                        Logger.debug("Possible macro found: " + macroName);
-                    }
-                    FileInputStream macro = null;
-                    try {
-                        macro = new FileInputStream(macros[i]);
-                        Properties macroProps = new Properties();
-                        macroProps.load(macro);
-                        String macroTitle = macroProps.getProperty("Title");
-                        String macroScript = macroProps.getProperty("Script");
-                        JMenuItem mi = new JMenuItem(macroTitle);
-                        mi.setActionCommand(macroScript);
-                        mi.addActionListener(executeScriptAction);
-                        macroMenu.add(mi);
-                    } catch (IOException exception) {
-                        System.err.println("Could not load macro file: ");
-                        System.err.println(exception);
-                    } finally {
-                        if (macro != null) {
-                            try {
-                                macro.close();
-                            } catch (IOException e) {
-                                // Nothing
-                            }
-                            macro = null;
-                        }
-                    }
-                }
-            }
-        }
-        menuBar.add(macroMenu);
-    }
-
-    protected void addNormalMenuBar(JMenuBar menuBar) {
-        String[] menuKeys = tokenize(JmolResourceHandler.getStringX("menubar"));
-        for (int i = 0; i < menuKeys.length; i++) {
-            if (menuKeys[i].equals("-")) {
-                menuBar.add(Box.createHorizontalGlue());
-            } else {
-                JMenu m = createMenu(menuKeys[i]);
-                if (m != null) {
-                    menuBar.add(m);
-                }
-            }
-        }
-    }
-
-    protected void addHelpMenuBar(JMenuBar menuBar) {
-        JMenu m = createMenu("help");
-        if (m != null) {
-            menuBar.add(m);
-        }
-    }
-
+//    protected JMenuBar createMenubar() {
+//        JMenuBar mb = new JMenuBar();
+//        addNormalMenuBar(mb);
+//        // The Macros Menu
+////        addMacrosMenuBar(mb);
+//        // The Plugin Menu
+//        // if (pluginManager != null) {
+//        //     mb.add(pluginManager.getMenu());
+//        // }
+//        // The Help menu, right aligned
+//        //mb.add(Box.createHorizontalGlue());
+//        addHelpMenuBar(mb);
+//        return mb;
+//    }
+//    protected void addMacrosMenuBar(JMenuBar menuBar) {
+//        // ok, here needs to be added the funny stuff
+//        JMenu macroMenu = guimap.newJMenu("macros");
+//        File macroDir = new File(System.getProperty("user.home")
+//                + System.getProperty("file.separator") + ".jmol"
+//                + System.getProperty("file.separator") + "macros");
+//        report("User macros dir: " + macroDir);
+//        report("       exists: " + macroDir.exists());
+//        report("  isDirectory: " + macroDir.isDirectory());
+//        if (macroDir.exists() && macroDir.isDirectory()) {
+//            File[] macros = macroDir.listFiles();
+//            for (int i = 0; i < macros.length; i++) {
+//                // loop over these files and load them
+//                String macroName = macros[i].getName();
+//                if (macroName.endsWith(".macro")) {
+//                    if (Logger.debugging) {
+//                        Logger.debug("Possible macro found: " + macroName);
+//                    }
+//                    FileInputStream macro = null;
+//                    try {
+//                        macro = new FileInputStream(macros[i]);
+//                        Properties macroProps = new Properties();
+//                        macroProps.load(macro);
+//                        String macroTitle = macroProps.getProperty("Title");
+//                        String macroScript = macroProps.getProperty("Script");
+//                        JMenuItem mi = new JMenuItem(macroTitle);
+//                        mi.setActionCommand(macroScript);
+//                        mi.addActionListener(executeScriptAction);
+//                        macroMenu.add(mi);
+//                    } catch (IOException exception) {
+//                        System.err.println("Could not load macro file: ");
+//                        System.err.println(exception);
+//                    } finally {
+//                        if (macro != null) {
+//                            try {
+//                                macro.close();
+//                            } catch (IOException e) {
+//                                // Nothing
+//                            }
+//                            macro = null;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        menuBar.add(macroMenu);
+//    }
+//    protected void addNormalMenuBar(JMenuBar menuBar) {
+//        String[] menuKeys = tokenize(JmolResourceHandler.getStringX("menubar"));
+//        for (int i = 0; i < menuKeys.length; i++) {
+//            if (menuKeys[i].equals("-")) {
+//                menuBar.add(Box.createHorizontalGlue());
+//            } else {
+//                JMenu m = createMenu(menuKeys[i]);
+//                if (m != null) {
+//                    menuBar.add(m);
+//                }
+//            }
+//        }
+//    }
+//    protected void addHelpMenuBar(JMenuBar menuBar) {
+//        JMenu m = createMenu("help");
+//        if (m != null) {
+//            menuBar.add(m);
+//        }
+//    }
     /**
      * Create a menu for the app. By default this pulls the definition of the
      * menu from the associated resource file.
@@ -903,42 +874,41 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
      * @param key
      * @return Menu created
      */
-    protected JMenu createMenu(String key) {
-
-        // Get list of items from resource file:
-        String[] itemKeys = tokenize(JmolResourceHandler.getStringX(key));
-        // Get label associated with this menu:
-        JMenu menu = guimap.newJMenu(key);
-        ImageIcon f = JmolResourceHandler.getIconX(key + "Image");
-        if (f != null) {
-            menu.setHorizontalTextPosition(SwingConstants.RIGHT);
-            menu.setIcon(f);
-        }
-
-        // Loop over the items in this menu:
-        for (int i = 0; i < itemKeys.length; i++) {
-            String item = itemKeys[i];
-            if (item.equals("-")) {
-                menu.addSeparator();
-            } else if (item.endsWith("Menu")) {
-                JMenu pm;
-                if ("recentFilesMenu".equals(item)) {
-                    /*
-                     * recentFilesMenu =
-                     */ pm = createMenu(item);
-                } else {
-                    pm = createMenu(item);
-                }
-                menu.add(pm);
-            } else {
-                JMenuItem mi = createMenuItem(item);
-                menu.add(mi);
-            }
-        }
-        menu.addMenuListener(display.getMenuListener());
-        return menu;
-    }
-
+//    protected JMenu createMenu(String key) {
+//
+//        // Get list of items from resource file:
+//        String[] itemKeys = tokenize(JmolResourceHandler.getStringX(key));
+//        // Get label associated with this menu:
+//        JMenu menu = guimap.newJMenu(key);
+//        ImageIcon f = JmolResourceHandler.getIconX(key + "Image");
+//        if (f != null) {
+//            menu.setHorizontalTextPosition(SwingConstants.RIGHT);
+//            menu.setIcon(f);
+//        }
+//
+//        // Loop over the items in this menu:
+//        for (int i = 0; i < itemKeys.length; i++) {
+//            String item = itemKeys[i];
+//            if (item.equals("-")) {
+//                menu.addSeparator();
+//            } else if (item.endsWith("Menu")) {
+//                JMenu pm;
+//                if ("recentFilesMenu".equals(item)) {
+//                    /*
+//                     * recentFilesMenu =
+//                     */ pm = createMenu(item);
+//                } else {
+//                    pm = createMenu(item);
+//                }
+//                menu.add(pm);
+//            } else {
+//                JMenuItem mi = createMenuItem(item);
+//                menu.add(mi);
+//            }
+//        }
+//        menu.addMenuListener(display.getMenuListener());
+//        return menu;
+//    }
     private static class ActionChangedListener implements PropertyChangeListener {
 
         AbstractButton button;
@@ -1426,6 +1396,7 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
 
         public void actionPerformed(ActionEvent e) {
             display.measurementTable.activate();
+            
         }
     }
 
@@ -1541,7 +1512,6 @@ public class JmolPanel extends JPanel implements SplashInterface, JsonNioClient 
         display.setPreferredSize(d);
         d = new Dimension(width, 30);
         status.setPreferredSize(d);
-        toolbar.setPreferredSize(d);
         JmolConsole.getWindow(this).pack();
     }
 

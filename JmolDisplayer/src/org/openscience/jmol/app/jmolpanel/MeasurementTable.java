@@ -46,7 +46,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import java.awt.event.ActionListener;
 
-public class MeasurementTable extends JDialog {
+public class MeasurementTable extends JPanel {
 
   JmolViewer viewer;
   private JTable measurementTable;
@@ -61,27 +61,26 @@ public class MeasurementTable extends JDialog {
    * @param parentFrame the parent frame
    * @param viewer the JmolViewer in which the animation will take place (?)
    */
-  public MeasurementTable(JmolViewer viewer, JFrame parentFrame) {
+  public MeasurementTable(JmolViewer viewer) {
 
-    super(parentFrame, GT._("Measurements"), false);
+//    super(, GT._("Measurements"), false);
     this.viewer = viewer;
 
-    JPanel container = new JPanel();
-    container.setLayout(new BorderLayout());
+    setLayout(new BorderLayout());
 
-    container.add(constructMeasurementTable(),BorderLayout.CENTER);
+    add(constructMeasurementTable(),BorderLayout.CENTER);
 
     JPanel foo = new JPanel();
     foo.setLayout(new BorderLayout());
     foo.add(constructMeasurementButtonPanel(), BorderLayout.WEST);
     foo.add(constructDismissButtonPanel(), BorderLayout.EAST);
 
-    container.add(foo, BorderLayout.SOUTH);
+    add(foo, BorderLayout.SOUTH);
     
-    addWindowListener(new MeasurementListWindowListener());
-
-    getContentPane().add(container);
-    pack();
+//    addWindowListener(new MeasurementListWindowListener());
+//
+//    getContentPane().add(container);
+//    pack();
     centerDialog();
   }
 

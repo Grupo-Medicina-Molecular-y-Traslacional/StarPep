@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,7 +62,8 @@ public class StructureNavigator extends javax.swing.JPanel implements WorkspaceE
     protected final ProjectManager pc;
     protected final InstanceContent content;
     protected final Lookup lookup;
-    private StructureNavigatorModel structureModel;
+    private ArrayList<String> codes;
+    private int selectedIndex;
     protected final JXBusyLabel busyLabel;
     protected final JPanel strucPanel;
     protected final JButton next, prev;
@@ -119,6 +121,8 @@ public class StructureNavigator extends javax.swing.JPanel implements WorkspaceE
         });
         toolBar.add(next);
 
+        codes = new ArrayList<>();
+        selectedIndex = 0;        
         map = new HashMap<>();
     }
 
@@ -224,21 +228,31 @@ public class StructureNavigator extends javax.swing.JPanel implements WorkspaceE
             currentModel.addQuickFilterChangeListener(this);
         }
 
-        structureModel = pc.getStructureNavModel(newWs);
+        clear();
+        reload();
+    }
+    
+    private void clear() {
+        codes.clear();
+        selectedIndex = 0;
     }
 
     private void nextStructure() {
-        if (structureModel != null && structureModel.hasNext()) {
-            structureModel.next();
+        if (selectedIndex < codes.size() - 1) {
+            selectedIndex++;
             reload();
-        }
+        } else {
+            throw new IllegalStateException("Invalid next structure");
+        }        
     }
 
     private void prevStructure() {
-        if (structureModel != null && structureModel.hasPrevious()) {
-            structureModel.prev();
+        if (selectedIndex > 0) {
+            selectedIndex--;
             reload();
-        }
+        } else {
+            throw new IllegalStateException("Invalid previous structure");
+        }                
     }
 
     private void removeAttrLookupListener() {
@@ -260,7 +274,7 @@ public class StructureNavigator extends javax.swing.JPanel implements WorkspaceE
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource().equals(currentModel)) {
             if (evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
-                structureModel.clear();
+                clear();
                 reload();
             }
         } else if (evt.getSource() instanceof QueryModel) {
@@ -275,16 +289,16 @@ public class StructureNavigator extends javax.swing.JPanel implements WorkspaceE
     }
 
     private void reload() {
-        if (structureModel.isEmpty()) {
+        if (codes.isEmpty()) {
             structureLabel.setText("");
             next.setEnabled(false);
             prev.setEnabled(false);
             strucPanel.removeAll();
         } else {
-            final String code = structureModel.getCurrentCode();
-            structureLabel.setText(String.format("%s (%d/%d)", code, structureModel.getSelectedIndex() + 1, structureModel.getSize()));
-            next.setEnabled(structureModel.hasNext());
-            prev.setEnabled(structureModel.hasPrevious());
+            final String code = codes.get(selectedIndex);
+            structureLabel.setText(String.format("%s (%d/%d)", code, selectedIndex + 1, codes.size()));
+            next.setEnabled(selectedIndex < codes.size() -1);
+            prev.setEnabled(selectedIndex > 0);
 
             strucPanel.removeAll();
             if (map.containsKey(code)) {
@@ -310,13 +324,13 @@ public class StructureNavigator extends javax.swing.JPanel implements WorkspaceE
                 }
                 currentModel = attrModels.iterator().next();
                 currentModel.addQuickFilterChangeListener(this);
-                structureModel.clear();
+                clear();
                 reload();
             }
         } else if (le.getSource().equals(peptideLkpResult)) {
             Collection<? extends PeptideNode> peptideNodes = peptideLkpResult.allInstances();
-            if (!peptideNodes.isEmpty()) {
-                structureModel.clear();
+            clear();
+            if (!peptideNodes.isEmpty()) {                
                 Peptide peptide = peptideNodes.iterator().next().getPeptide();
                 String[] crossRefs = peptide.getAnnotationValues(StarPepAnnotationType.CROSSREF);
                 StringTokenizer tokenizer;
@@ -326,7 +340,7 @@ public class StructureNavigator extends javax.swing.JPanel implements WorkspaceE
                     db = tokenizer.nextToken();
                     if (db.equals("PDB")) {
                         code = tokenizer.nextToken();
-                        structureModel.add(code.trim());
+                        codes.add(code.trim());
                     }
                 }
                 reload();

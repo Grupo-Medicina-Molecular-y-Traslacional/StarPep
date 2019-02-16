@@ -1193,7 +1193,7 @@ public class StateManager {
     float defaultTranslucent = 0.5f;
     int delayMaximumMs = 0;
     float dipoleScale = 1.0f;
-    boolean disablePopupMenu = false;
+    boolean disablePopupMenu = true;
     boolean dragSelected = false;
     boolean drawHover = false;
     boolean drawPicking = false;

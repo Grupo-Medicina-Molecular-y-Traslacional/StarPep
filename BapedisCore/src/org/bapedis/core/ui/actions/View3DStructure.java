@@ -39,11 +39,11 @@ public class View3DStructure extends AbstractAction implements Presenter.Popup {
             db = tokenizer.nextToken();
             if (db.equals("PDB")) {
                 code = tokenizer.nextToken();
-                menu.add(new OpenJMol(code.trim()));
+                menu.add(new OpenJMol(peptide, code.trim()));
             }
         }  
         if (menu.getItemCount() == 0){
-            menu.add(new OpenJMol(null));
+            menu.add(new OpenJMol(peptide, null));
         }
     }    
 

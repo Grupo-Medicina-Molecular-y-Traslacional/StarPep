@@ -35,6 +35,7 @@ public class StructureScene extends JPanel implements MultiViewElement {
 
     private final Peptide peptide;
     private final String code;
+    private final JPanel toolBarPanel;
     private final JPanel centerPanel;
     private JmolPanel jmolPanel;
     private MultiViewElementCallback callback;
@@ -48,10 +49,6 @@ public class StructureScene extends JPanel implements MultiViewElement {
         setLayout(new BorderLayout());
         centerPanel = new JPanel(new BorderLayout());
         add(centerPanel, BorderLayout.CENTER);
-        
-        jmolPanel = new JmolPanel(null, null, centerPanel, 600, 600, "", new Point(200, 200));
-        centerPanel.add(jmolPanel, BorderLayout.CENTER);
-        jmolPanel.setVisible(true);
 
         content = new InstanceContent();
         lookup = new AbstractLookup(content);
@@ -73,6 +70,8 @@ public class StructureScene extends JPanel implements MultiViewElement {
                 }
             }
         }
+        
+        toolBarPanel = new JPanel(new BorderLayout());
     }
 
     @Override
@@ -82,7 +81,7 @@ public class StructureScene extends JPanel implements MultiViewElement {
 
     @Override
     public JComponent getToolbarRepresentation() {
-        return jmolPanel.getToolbar();
+        return toolBarPanel;
     }
 
     @Override
@@ -99,30 +98,11 @@ public class StructureScene extends JPanel implements MultiViewElement {
     }
 
     @Override
-    public void componentOpened() {        
-        jmolPanel = new JmolPanel(null, null, centerPanel, 600, 600, "", new Point(200, 200));
-        centerPanel.add(jmolPanel, BorderLayout.CENTER);
-        
-        JmolViewer viewer = jmolPanel.getViewer();
-        viewer.script(getScript(code));
-        
-        //Cartoons
-        viewer.script("select protein; cartoons only; color structure;");
-
-        //Spacefill
-//            viewer.script("select *; cartoons off; spacefill only; color cpk");
-        //Wire
-//            viewer.script("select *;cartoons off; wireframe -0.1; color cpk");
-        //Ball and stick
-//            viewer.script("select *; cartoons off; spacefill 23%; wireframe 0.15; color cpk");
-
-        centerPanel.revalidate();
-        centerPanel.repaint();
+    public void componentOpened() {
     }
 
     @Override
-    public void componentClosed() {   
-        centerPanel.remove(jmolPanel);
+    public void componentClosed() {
     }
 
     @Override
@@ -135,10 +115,34 @@ public class StructureScene extends JPanel implements MultiViewElement {
 
     @Override
     public void componentActivated() {
+        jmolPanel = new JmolPanel(null, null, centerPanel, 600, 600, "", new Point(200, 200));
+        centerPanel.add(jmolPanel, BorderLayout.CENTER);
+        toolBarPanel.add(jmolPanel.getToolbar(), BorderLayout.CENTER);
+
+        JmolViewer viewer = jmolPanel.getViewer();
+        viewer.script(getScript(code));
+
+        //Cartoons
+        viewer.script("select protein; cartoons only; color structure;");
+
+        //Spacefill
+//            viewer.script("select *; cartoons off; spacefill only; color cpk");
+        //Wire
+//            viewer.script("select *;cartoons off; wireframe -0.1; color cpk");
+        //Ball and stick
+//            viewer.script("select *; cartoons off; spacefill 23%; wireframe 0.15; color cpk");  
+
+        centerPanel.revalidate();
+        centerPanel.repaint();
+        
+        toolBarPanel.revalidate();
+        toolBarPanel.repaint();
     }
 
     @Override
     public void componentDeactivated() {
+        centerPanel.removeAll();
+        toolBarPanel.removeAll();
     }
 
     @Override

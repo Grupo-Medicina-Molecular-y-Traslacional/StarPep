@@ -11,12 +11,14 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.ui.StructureWindowController;
 import org.jmol.api.JmolViewer;
 import org.netbeans.core.api.multiview.MultiViewHandler;
+import org.netbeans.core.api.multiview.MultiViewPerspective;
 import org.netbeans.core.api.multiview.MultiViews;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewFactory;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 import org.openscience.jmol.app.jmolpanel.JmolPanel;
 
 /**
@@ -26,19 +28,14 @@ import org.openscience.jmol.app.jmolpanel.JmolPanel;
 @ServiceProvider(service = StructureWindowController.class)
 public class StructureWindowControllerImpl implements StructureWindowController {
 
-    private TopComponent strucTopComponent;
-
     @Override
     public void openStructureWindow(Peptide peptide, String code) {
-        if (strucTopComponent == null) {
-            MultiViewDescription[] multiviews = new MultiViewDescription[]{new StructureSceneDescription(peptide, code)};
-            strucTopComponent = MultiViewFactory.createCloneableMultiView(multiviews, multiviews[0]);
-            strucTopComponent.setDisplayName(NbBundle.getMessage(StructureWindowControllerImpl.class, "CTL_StructureTC_title"));
-        } else {
-            MultiViewHandler handler = MultiViews.findMultiViewHandler(strucTopComponent);
-        }
-        strucTopComponent.open();
-        strucTopComponent.requestActive();
+        MultiViewDescription[] multiviews = new MultiViewDescription[]{new StructureSceneDescription(peptide, code)};
+        TopComponent tc = MultiViewFactory.createCloneableMultiView(multiviews, multiviews[0]);
+        tc.setDisplayName(peptide.getName() + "-" + code);
+//        WindowManager.getDefault().findTopComponentID(tc);
+        tc.open();
+        tc.requestActive();
     }
 
     @Override

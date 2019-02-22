@@ -76,7 +76,7 @@ import org.openide.util.lookup.InstanceContent;
  *
  * @author loge
  */
-@NavigatorPanel.Registration(mimeType = "peptide/clustering", displayName = "#ClusterNavigator.name")
+//@NavigatorPanel.Registration(mimeType = "peptide/clustering", displayName = "#ClusterNavigator.name")
 public class ClusterNavigator extends JComponent implements
         WorkspaceEventListener, NavigatorPanelWithToolbar, LookupListener, PropertyChangeListener {
 

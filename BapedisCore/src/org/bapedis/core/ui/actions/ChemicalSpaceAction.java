@@ -26,15 +26,15 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-@ActionID(
-        category = "Tools",
-        id = "org.bapedis.core.ui.actions.ChemicalSpaceAction"
-)
-@ActionRegistration(
-        iconBase = "org/bapedis/core/resources/chemSpaceNet.png",
-        displayName = "#CTL_ChemicalSpaceAction"
-)
-@ActionReference(path = "Toolbars/Network", position = 20)
+//@ActionID(
+//        category = "Tools",
+//        id = "org.bapedis.core.ui.actions.ChemicalSpaceAction"
+//)
+//@ActionRegistration(
+//        iconBase = "org/bapedis/core/resources/chemSpaceNet.png",
+//        displayName = "#CTL_ChemicalSpaceAction"
+//)
+//@ActionReference(path = "Toolbars/Network", position = 20)
 public class ChemicalSpaceAction extends AbstractAction {
 
     private final ProjectManager pc;

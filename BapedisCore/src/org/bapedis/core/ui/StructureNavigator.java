@@ -51,7 +51,7 @@ import org.openide.util.lookup.InstanceContent;
  *
  * @author loge
  */
-@NavigatorPanel.Registration(mimeType = "peptide/structure", displayName = "#StructureNavigator.name")
+//@NavigatorPanel.Registration(mimeType = "peptide/structure", displayName = "#StructureNavigator.name")
 public class StructureNavigator extends javax.swing.JPanel implements WorkspaceEventListener,
         NavigatorPanelWithToolbar, LookupListener, PropertyChangeListener {
 

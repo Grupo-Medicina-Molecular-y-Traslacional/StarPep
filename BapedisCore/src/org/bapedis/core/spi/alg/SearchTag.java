@@ -9,6 +9,6 @@ package org.bapedis.core.spi.alg;
  *
  * @author loge
  */
-public interface SequenceTag extends AlgorithmFactory{
+public interface SearchTag extends AlgorithmFactory{
     
 }

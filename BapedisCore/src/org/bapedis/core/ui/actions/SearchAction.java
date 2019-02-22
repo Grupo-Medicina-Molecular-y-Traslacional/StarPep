@@ -9,13 +9,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.AbstractAction;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
-import org.bapedis.core.spi.alg.SequenceTag;
 import org.bapedis.core.spi.alg.impl.SequenceSearchFactory;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.bapedis.core.spi.alg.SearchTag;
 
 /**
  *
@@ -23,16 +23,16 @@ import org.openide.util.NbBundle;
  */
 @ActionID(
         category = "Tools",
-        id = "org.bapedis.core.ui.actions.SequenceAction"
+        id = "org.bapedis.core.ui.actions.SearchAction"
 )
 @ActionRegistration(
-        displayName = "#CTL_Sequence"
+        displayName = "#CTL_SearchBy"
 )
-@ActionReference(path = "Menu/Tools", position = 30)
-public class SequenceAction extends ToolAction{
+@ActionReference(path = "Menu/Tools", position = 20)
+public class SearchAction extends ToolAction{
     
-    public SequenceAction() {
-        super(NbBundle.getMessage(SequenceAction.class, "CTL_Sequence"),
-                SequenceTag.class);           
+    public SearchAction() {
+        super(NbBundle.getMessage(SearchAction.class, "CTL_SearchBy"),
+                SearchTag.class);           
     }        
 }

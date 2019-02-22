@@ -13,16 +13,16 @@ import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 
-@ActionID(
-        category = "Tools",
-        id = "org.bapedis.core.ui.actions.FeatureSelection"
-)
-@ActionRegistration(        
-        displayName = "#CTL_FeatureSelection"
-)
-@ActionReferences({
-    @ActionReference(path = "Menu/Tools/MolecularDescriptor", position = 20)
-})
+//@ActionID(
+//        category = "Tools",
+//        id = "org.bapedis.core.ui.actions.FeatureSelection"
+//)
+//@ActionRegistration(        
+//        displayName = "#CTL_FeatureSelection"
+//)
+//@ActionReferences({
+//    @ActionReference(path = "Menu/Tools/MolecularDescriptor", position = 20)
+//})
 public final class FeatureSelectionAction extends ToolAction {
 
 

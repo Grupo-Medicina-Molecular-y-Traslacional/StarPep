@@ -16,7 +16,7 @@ import org.bapedis.core.spi.alg.FeatureExtractionTag;
  *
  * @author beltran, loge
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 1400)
+//@ServiceProvider(service = AlgorithmFactory.class, position = 1400)
 public class RATransitionFactory implements AlgorithmFactory, FeatureExtractionTag {
 
     @Override

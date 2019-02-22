@@ -28,7 +28,6 @@ import org.bapedis.core.model.StructureNavigatorModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
-import org.bapedis.core.spi.alg.SequenceTag;
 import org.bapedis.core.spi.alg.impl.SequenceSearchFactory;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.gephi.graph.api.Configuration;
@@ -52,6 +51,7 @@ import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
+import org.bapedis.core.spi.alg.SearchTag;
 
 /**
  *
@@ -435,7 +435,7 @@ public class ProjectManager implements Lookup.Provider {
             if (seqSearchfactory != null) {
                 Algorithm defaultAlgorithm = getOrCreateAlgorithm(seqSearchfactory);
                 if (defaultAlgorithm != null) {
-                    model.setTagInterface(SequenceTag.class);
+                    model.setTagInterface(SearchTag.class);
                     model.setSelectedAlgorithm(defaultAlgorithm);
                 }
             }

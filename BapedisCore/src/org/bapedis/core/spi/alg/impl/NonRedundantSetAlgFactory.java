@@ -8,16 +8,16 @@ package org.bapedis.core.spi.alg.impl;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.SequenceTag;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+import org.bapedis.core.spi.alg.SearchTag;
 
 /**
  *
  * @author loge
  */
 @ServiceProvider(service = AlgorithmFactory.class, position = 20)
-public class NonRedundantSetAlgFactory implements SequenceTag {
+public class NonRedundantSetAlgFactory implements SearchTag {
 
     private final NonRedundantSetAlgSetupUI setupUI = new NonRedundantSetAlgSetupUI();
     

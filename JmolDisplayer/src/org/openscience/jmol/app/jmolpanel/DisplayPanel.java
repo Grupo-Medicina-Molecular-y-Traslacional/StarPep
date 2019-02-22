@@ -248,14 +248,14 @@ public class DisplayPanel extends JPanel
         }
     }
 
-    @ActionID(category = "View",
-    id = "org.netbeans.jmol.displayer.MoveToFrontAction")
-    @ActionRegistration(iconBase="org/openscience/jmol/app/images/frontButton.bmp", 
-            displayName = "#CTL_MoveToFrontAction")
-    @ActionReferences({
-        @ActionReference(path = "Menu/View", position = 10)
-    })
-    @NbBundle.Messages("CTL_MoveToFrontAction=Front")
+//    @ActionID(category = "View",
+//    id = "org.netbeans.jmol.displayer.MoveToFrontAction")
+//    @ActionRegistration(iconBase="org/openscience/jmol/app/images/frontButton.bmp", 
+//            displayName = "#CTL_MoveToFrontAction")
+//    @ActionReferences({
+//        @ActionReference(path = "Menu/View", position = 10)
+//    })
+//    @NbBundle.Messages("CTL_MoveToFrontAction=Front")
     public static class MoveToFrontAction implements ActionListener {
         private final String action;
         public MoveToFrontAction() {
@@ -271,14 +271,14 @@ public class DisplayPanel extends JPanel
         }
     }
     
-    @ActionID(category = "View",
-    id = "org.netbeans.jmol.displayer.MoveToTopAction")
-    @ActionRegistration(iconBase="org/openscience/jmol/app/images/topButton.bmp",
-            displayName = "#CTL_MoveToTopAction")
-    @ActionReferences({
-        @ActionReference(path = "Menu/View", position = 20)
-    })
-    @NbBundle.Messages("CTL_MoveToTopAction=Top")
+//    @ActionID(category = "View",
+//    id = "org.netbeans.jmol.displayer.MoveToTopAction")
+//    @ActionRegistration(iconBase="org/openscience/jmol/app/images/topButton.bmp",
+//            displayName = "#CTL_MoveToTopAction")
+//    @ActionReferences({
+//        @ActionReference(path = "Menu/View", position = 20)
+//    })
+//    @NbBundle.Messages("CTL_MoveToTopAction=Top")
     public static class MoveToTopAction implements ActionListener {
         private final String action;
         public MoveToTopAction() {
@@ -294,14 +294,14 @@ public class DisplayPanel extends JPanel
         }
     }
     
-    @ActionID(category = "View",
-    id = "org.netbeans.jmol.displayer.MoveToBottomAction")
-    @ActionRegistration(iconBase="org/openscience/jmol/app/images/bottomButton.bmp",
-            displayName = "#CTL_MoveToBottomAction")
-    @ActionReferences({
-        @ActionReference(path = "Menu/View", position = 30)
-    })
-    @NbBundle.Messages("CTL_MoveToBottomAction=Bottom")
+//    @ActionID(category = "View",
+//    id = "org.netbeans.jmol.displayer.MoveToBottomAction")
+//    @ActionRegistration(iconBase="org/openscience/jmol/app/images/bottomButton.bmp",
+//            displayName = "#CTL_MoveToBottomAction")
+//    @ActionReferences({
+//        @ActionReference(path = "Menu/View", position = 30)
+//    })
+//    @NbBundle.Messages("CTL_MoveToBottomAction=Bottom")
     public static class MoveToBottomAction implements ActionListener {
         private final String action;
         public MoveToBottomAction() {
@@ -317,14 +317,14 @@ public class DisplayPanel extends JPanel
         }
     }
     
-    @ActionID(category = "View",
-    id = "org.netbeans.jmol.displayer.MoveToRightAction")
-    @ActionRegistration(iconBase="org/openscience/jmol/app/images/rightButton.bmp", 
-            displayName = "#CTL_MoveToRightAction")
-    @ActionReferences({
-        @ActionReference(path = "Menu/View", position = 40)
-    })
-    @NbBundle.Messages("CTL_MoveToRightAction=Right")
+//    @ActionID(category = "View",
+//    id = "org.netbeans.jmol.displayer.MoveToRightAction")
+//    @ActionRegistration(iconBase="org/openscience/jmol/app/images/rightButton.bmp", 
+//            displayName = "#CTL_MoveToRightAction")
+//    @ActionReferences({
+//        @ActionReference(path = "Menu/View", position = 40)
+//    })
+//    @NbBundle.Messages("CTL_MoveToRightAction=Right")
     public static class MoveToRightAction implements ActionListener {
         private final String action;
         public MoveToRightAction() {
@@ -340,14 +340,14 @@ public class DisplayPanel extends JPanel
         }
     }
     
-    @ActionID(category = "View",
-    id = "org.netbeans.jmol.displayer.MoveToLeftAction")
-    @ActionRegistration(iconBase="org/openscience/jmol/app/images/leftButton.bmp", 
-            displayName = "#CTL_MoveToLeftAction")
-    @ActionReferences({
-        @ActionReference(path = "Menu/View", position = 50)
-    })
-    @NbBundle.Messages("CTL_MoveToLeftAction=Left")
+//    @ActionID(category = "View",
+//    id = "org.netbeans.jmol.displayer.MoveToLeftAction")
+//    @ActionRegistration(iconBase="org/openscience/jmol/app/images/leftButton.bmp", 
+//            displayName = "#CTL_MoveToLeftAction")
+//    @ActionReferences({
+//        @ActionReference(path = "Menu/View", position = 50)
+//    })
+//    @NbBundle.Messages("CTL_MoveToLeftAction=Left")
     public static class MoveToLeftAction implements ActionListener {
         private final String action;
         public MoveToLeftAction() {
@@ -363,13 +363,13 @@ public class DisplayPanel extends JPanel
         }
     }
     
-    @ActionID(category = "View",
-    id = "org.netbeans.jmol.displayer.DefineCenterAction")
-    @ActionRegistration(displayName = "#CTL_DefineCenterAction")
-    @ActionReferences({
-        @ActionReference(path = "Menu/View", position = 60)
-    })
-    @NbBundle.Messages("CTL_DefineCenterAction=Define Center")
+//    @ActionID(category = "View",
+//    id = "org.netbeans.jmol.displayer.DefineCenterAction")
+//    @ActionRegistration(displayName = "#CTL_DefineCenterAction")
+//    @ActionReferences({
+//        @ActionReference(path = "Menu/View", position = 60)
+//    })
+//    @NbBundle.Messages("CTL_DefineCenterAction=Define Center")
     public static class DefineCenterAction extends AbstractAction {
 
         public DefineCenterAction() {

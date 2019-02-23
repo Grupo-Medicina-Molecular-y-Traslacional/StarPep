@@ -5,16 +5,17 @@
  */
 package org.bapedis.core.spi.ui;
 
-import javax.swing.JPanel;
 import org.bapedis.core.model.Peptide;
+import org.openide.windows.TopComponent;
 
 /**
  *
  * @author loge
  */
 public interface StructureWindowController {
-
-    void openStructureWindow(Peptide peptide, String code);
     
-    JPanel createPanelView(JPanel parent, String code);
+    TopComponent getStructureWindow();
+
+    void openStructureWindow(Peptide peptide);
+    
 }

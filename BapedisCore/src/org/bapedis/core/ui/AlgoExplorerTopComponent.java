@@ -57,7 +57,6 @@ import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionID;
 import org.openide.awt.StatusDisplayer;
-import org.openide.explorer.ExplorerUtils;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.filesystems.FileUtil;
@@ -119,7 +118,6 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         algoComboBox.setModel(comboBoxModel);
 
         associateLookup(new ProxyLookup(Lookups.singleton(new MetadataNavigatorLookupHint()),
-                Lookups.singleton(new StructureNavigatorLookupHint()),
                 Lookups.singleton(new GraphElementNavigatorLookupHint()),
                 Lookups.singleton(new ClusterNavigatorLookupHint())));        
     }

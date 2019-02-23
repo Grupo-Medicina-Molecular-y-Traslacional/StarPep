@@ -8,54 +8,54 @@ package org.bapedis.core.ui.actions;
 import java.awt.event.ActionEvent;
 import java.util.StringTokenizer;
 import javax.swing.AbstractAction;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.StarPepAnnotationType;
+import org.bapedis.core.spi.ui.StructureWindowController;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.actions.Presenter;
 
 /**
  *
  * @author loge
  */
-public class View3DStructure extends AbstractAction implements Presenter.Popup {
+public class View3DStructure extends AbstractAction {
 
+    private static final StructureWindowController strucController = Lookup.getDefault().lookup(StructureWindowController.class);
     private final Peptide peptide;
-    protected JMenu menu;
+    private final boolean display;
 
     public View3DStructure(Peptide peptide) {
         this.peptide = peptide;
-        menu = new JMenu(NbBundle.getMessage(View3DStructure.class, "CTL_View3DStructure"));
-        populateMenuItems();
+        String text = NbBundle.getMessage(View3DStructure.class, "CTL_View3DStructure");
+        display = hasStructure();
+        if (display) {
+            putValue(NAME, NbBundle.getMessage(View3DStructure.class, "CTL_View3DStructure"));
+        } else {
+            putValue(NAME, NbBundle.getMessage(View3DStructure.class, "CTL_View3DStructure.none"));
+        }
     }
     
-    private void populateMenuItems(){
-        String[] crossRefs = peptide.getAnnotationValues(StarPepAnnotationType.CROSSREF);
-        StringTokenizer tokenizer;
-        String db, code;
-        for (String crossRef : crossRefs) {
-            tokenizer = new StringTokenizer(crossRef, ":");
-            db = tokenizer.nextToken();
-            if (db.equals("PDB")) {
-                code = tokenizer.nextToken();
-                menu.add(new OpenJMol(peptide, code.trim()));
-            }
-        }  
-        if (menu.getItemCount() == 0){
-            menu.add(new OpenJMol(peptide, null));
-        }
+    @Override
+    public boolean isEnabled() {
+        return display;
     }    
 
-
+    private boolean hasStructure() {
+        String[] crossRefs = peptide.getAnnotationValues(StarPepAnnotationType.CROSSREF);
+        StringTokenizer tokenizer;
+        for (String crossRef : crossRefs) {
+            tokenizer = new StringTokenizer(crossRef, ":");
+            if (tokenizer.hasMoreTokens() && tokenizer.nextToken().equals("PDB")) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        strucController.openStructureWindow(peptide);
     }
 
-    @Override
-    public JMenuItem getPopupPresenter() {
-        return menu;
-    }
-    
+
 }

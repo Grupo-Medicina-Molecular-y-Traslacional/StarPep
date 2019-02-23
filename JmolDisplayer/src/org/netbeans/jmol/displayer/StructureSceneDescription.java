@@ -11,6 +11,7 @@ import org.bapedis.core.model.Peptide;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.openide.util.HelpCtx;
+import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 
 /**
@@ -18,12 +19,11 @@ import org.openide.windows.TopComponent;
  * @author loge
  */
 public class StructureSceneDescription implements MultiViewDescription, Serializable{
-    private final Peptide peptide;
-    private final String code;
 
-    public StructureSceneDescription(Peptide peptide, String code) {
+    private final Peptide peptide;
+    
+    public StructureSceneDescription(Peptide peptide) {
         this.peptide = peptide;
-        this.code = code;
     }
     
     @Override
@@ -33,7 +33,7 @@ public class StructureSceneDescription implements MultiViewDescription, Serializ
 
     @Override
     public String getDisplayName() {
-        return code;
+        return peptide.getName();
     }
 
     @Override
@@ -48,12 +48,12 @@ public class StructureSceneDescription implements MultiViewDescription, Serializ
 
     @Override
     public String preferredID() {
-        return code;
+        return NbBundle.getMessage(StructureSceneDescription.class, "CTL_StructureTC_title");
     }
 
     @Override
     public MultiViewElement createElement() {
-        return new StructureScene(peptide, code);
+        return new StructureScene();
     }
     
 }

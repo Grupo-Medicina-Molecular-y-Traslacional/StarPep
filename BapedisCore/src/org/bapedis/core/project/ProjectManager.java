@@ -24,7 +24,6 @@ import org.bapedis.core.model.GraphElementNavigatorModel;
 import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.MetadataNavigatorModel;
 import org.bapedis.core.model.QueryModel;
-import org.bapedis.core.model.StructureNavigatorModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;

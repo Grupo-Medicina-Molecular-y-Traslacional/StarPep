@@ -19,5 +19,7 @@ public enum StarPepRelationships implements RelationshipType {
     assessed_against,
     compiled_in,
 //    referenced_by,
-    linked_to    
+    linked_to,
+    modified_by,
+    constituted_by
 }

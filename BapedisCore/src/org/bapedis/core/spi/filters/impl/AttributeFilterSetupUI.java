@@ -7,7 +7,6 @@ package org.bapedis.core.spi.filters.impl;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.Iterator;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.AncestorEvent;
@@ -246,11 +245,15 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
 
     @Override
     public void saveSettings() {
-        filter.setNegative(notCheckBox.isSelected());
-        filter.setAttribute((PeptideAttribute) attrComboBox.getSelectedItem());
-        filter.setOperator((FilterOperator) opComboBox.getSelectedItem());
-        filter.setValue(valueTextField.getText().trim());
-        filter.setMatchCase(matchCaseCheckBox.isSelected());
+        FilterOperator operator = (FilterOperator) opComboBox.getSelectedItem();
+        String operand = valueTextField.getText();
+        if (operator.isValid(operand)) {
+            filter.setNegative(notCheckBox.isSelected());
+            filter.setAttribute((PeptideAttribute) attrComboBox.getSelectedItem());
+            filter.setOperator((FilterOperator) opComboBox.getSelectedItem());
+            filter.setValue(valueTextField.getText().trim());
+            filter.setMatchCase(matchCaseCheckBox.isSelected());
+        }
     }
 
     @Override
@@ -270,7 +273,12 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
             validState = false;
             errorLabel.setText(NbBundle.getMessage(AttributeFilterSetupUI.class, "AttributeFilterSetupUI.errorLabel.invalidOperator"));
         }
-        if (validState && !((FilterOperator) opComboBox.getSelectedItem()).isValid(valueTextField.getText())) {
+        FilterOperator operator = (FilterOperator) opComboBox.getSelectedItem();
+        if (validState && (valueTextField.getText().isEmpty()
+                || ((operator instanceof IntegerFilterOperator
+                || operator instanceof LongFilterOperator
+                || operator instanceof DoubleFilterOperator)
+                && !operator.isValid(valueTextField.getText())))) {
             validState = false;
             errorLabel.setText(NbBundle.getMessage(AttributeFilterSetupUI.class, "AttributeFilterSetupUI.errorLabel.invalidValue"));
         }

@@ -131,7 +131,7 @@ public class MetadataNavigator extends JComponent implements
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         busyLabel.setText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.busyLabel.text"));
-        
+
         findButton = new JButton(table.getActionMap().get("find"));
         findButton.setText("");
         findButton.setToolTipText(NbBundle.getMessage(MetadataNavigator.class, "MetadataNavigator.findButton.toolTipText"));
@@ -395,7 +395,7 @@ public class MetadataNavigator extends JComponent implements
         if (evt.getSource().equals(currentModel)) {
             if (evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
                 reload();
-            }            
+            }
         } else if (evt.getSource() instanceof QueryModel) {
             if (evt.getPropertyName().equals(QueryModel.RUNNING)) {
                 setBusyLabel(((QueryModel) evt.getSource()).isRunning());
@@ -407,7 +407,7 @@ public class MetadataNavigator extends JComponent implements
         }
     }
 
-    private void reload() {        
+    private void reload() {
         setBusyLabel(true);
 
         GraphModel graphModel = pc.getGraphModel();
@@ -449,7 +449,13 @@ public class MetadataNavigator extends JComponent implements
                             graphNode = peptide.getGraphNode();
                             edgeIterable = (annotationType == null) ? graph.getEdges(graphNode) : graph.getEdges(graphNode, relType);
                             for (Edge edge : edgeIterable) {
-                                publish(edge);
+                                if (annotationType != null) {
+                                    if (edge.getTarget().getLabel().equals(annotationType.getLabelName())) {
+                                        publish(edge);
+                                    }
+                                } else {
+                                    publish(edge);
+                                }
                             }
                         }
 

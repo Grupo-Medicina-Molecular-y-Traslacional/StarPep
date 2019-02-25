@@ -7,7 +7,6 @@ package org.bapedis.core.ui;
 
 import java.awt.CardLayout;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -27,8 +26,11 @@ import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.spi.filters.Filter;
 import org.bapedis.core.spi.filters.impl.AttributeFilter;
 import org.bapedis.core.spi.filters.impl.AttributeFilterFactory;
+import org.bapedis.core.spi.filters.impl.DoubleFilterOperator;
 import org.bapedis.core.spi.filters.impl.FilterHelper;
 import org.bapedis.core.spi.filters.impl.FilterOperator;
+import org.bapedis.core.spi.filters.impl.IntegerFilterOperator;
+import org.bapedis.core.spi.filters.impl.LongFilterOperator;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.netbeans.swing.etable.ETableColumn;
 import org.netbeans.swing.etable.ETableColumnModel;
@@ -238,7 +240,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         rightPanel.add(jOperatorComboBox);
 
         jValueTextField.setText(org.openide.util.NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jValueTextField.text")); // NOI18N
-        jValueTextField.setPreferredSize(new java.awt.Dimension(150, 26));
+        jValueTextField.setPreferredSize(new java.awt.Dimension(150, 27));
         jValueTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jValueTextFieldActionPerformed(evt);
@@ -318,7 +320,9 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     private void jValueTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jValueTextFieldKeyTyped
         FilterOperator operator = (FilterOperator) jOperatorComboBox.getSelectedItem();
         char c = evt.getKeyChar();
-        if (operator != null) {
+        if (operator != null && ( operator instanceof IntegerFilterOperator
+                               || operator instanceof LongFilterOperator 
+                               || operator instanceof DoubleFilterOperator)) {
             if (c != KeyEvent.VK_BACK_SPACE && c != KeyEvent.VK_DELETE
                     && !operator.isValid(jValueTextField.getText() + c)) {
                 evt.consume();

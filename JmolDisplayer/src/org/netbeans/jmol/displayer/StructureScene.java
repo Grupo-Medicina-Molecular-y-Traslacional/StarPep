@@ -6,6 +6,7 @@
 package org.netbeans.jmol.displayer;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.ItemEvent;
@@ -19,19 +20,19 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.MetadataNode;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.StarPepAnnotationType;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
-import org.gephi.graph.api.Node;
-import org.gephi.graph.api.NodeIterable;
 import org.jmol.api.JmolViewer;
+import org.netbeans.core.api.multiview.MultiViewHandler;
+import org.netbeans.core.api.multiview.MultiViews;
 import org.netbeans.core.spi.multiview.CloseOperationState;
+import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.netbeans.jmol.model.StructureData;
@@ -82,6 +83,8 @@ public class StructureScene extends JPanel implements MultiViewElement, Workspac
         //Structures option
         strucComboModel = new DefaultComboBoxModel<>();
         strucCombo = new JComboBox<>(strucComboModel);
+        strucCombo.setPreferredSize(new Dimension(76, 27));
+        strucCombo.setToolTipText(NbBundle.getMessage(StructureScene.class, "StructureScene.strucCombo.tooltiptext"));
         strucCombo.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -90,11 +93,8 @@ public class StructureScene extends JPanel implements MultiViewElement, Workspac
         });
         toolbar1.add(strucCombo);
 
-        //Display options
-        JLabel displayLabel = new JLabel(NbBundle.getMessage(StructureScene.class, "StructureScene.displayLabel.text"));
-        toolbar1.add(displayLabel);
-
         displayCombo = new JComboBox<>(new String[]{"Cartoons", "Spacefill", "Wire", "Ball and stick"});
+        displayCombo.setToolTipText(NbBundle.getMessage(StructureScene.class, "StructureScene.displayCombo.tooltiptext"));
         displayCombo.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -105,6 +105,7 @@ public class StructureScene extends JPanel implements MultiViewElement, Workspac
         toolbar1.add(displayCombo);
 
         cbSpin = new JCheckBox("Spin");
+        cbSpin.setToolTipText(NbBundle.getMessage(StructureScene.class, "StructureScene.spin.tooltiptext"));
         cbSpin.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -112,7 +113,7 @@ public class StructureScene extends JPanel implements MultiViewElement, Workspac
             }
         });
         toolbar1.add(cbSpin);
-        
+
         toolbar1.add(Box.createHorizontalGlue());
 
         toolbar1.addSeparator();
@@ -122,7 +123,13 @@ public class StructureScene extends JPanel implements MultiViewElement, Workspac
         if (evt.getStateChange() == ItemEvent.SELECTED
                 && sceneModel != null
                 && !sceneModel.getStructure().equals(strucCombo.getSelectedItem())) {
-            sceneModel.setStructure((String) strucComboModel.getSelectedItem());
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    sceneModel.setStructure((String) strucComboModel.getSelectedItem());
+                }
+            });
+
         }
     }
 
@@ -140,7 +147,7 @@ public class StructureScene extends JPanel implements MultiViewElement, Workspac
 
             JmolViewer viewer = jmolPanel.getViewer();
             viewer.script(getScript(structure));
-            setDisplayOption();            
+            setDisplayOption();
 
             toolBarPanel.add(toolbar1);
             JToolBar toolbar2 = jmolPanel.getToolbar();
@@ -155,20 +162,14 @@ public class StructureScene extends JPanel implements MultiViewElement, Workspac
 
             StringTokenizer tokenizer;
             String name;
-
-            NodeIterable iter = peptide.getNeighbors(StarPepAnnotationType.CROSSREF);
-            for (Node neighbor : iter.toArray()) {
-                name = (String) neighbor.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME);
-                if (name.startsWith("PDB:")) {
-                    tokenizer = new StringTokenizer(name, ":");
-                    if (tokenizer.countTokens() == 2) {
-                        tokenizer.nextToken();
-                        if (tokenizer.nextToken().trim().equals(structure)) {
-                            content.add(new MetadataNode(peptide.getEdge(neighbor, StarPepAnnotationType.CROSSREF)));
-                            break;
-                        }
-                    }
-                }
+            
+            for(MetadataNode node: item.getMetadataNode(null)){
+                content.remove(node);
+            }
+            
+            MetadataNode[] node = item.getMetadataNode(structure);
+            if (node != null){
+                content.add(node[0]);
             }
         }
     }
@@ -268,7 +269,7 @@ public class StructureScene extends JPanel implements MultiViewElement, Workspac
             centerPanel.revalidate();
             centerPanel.repaint();
             toolBarPanel.revalidate();
-            toolBarPanel.repaint();
+            toolBarPanel.repaint();                        
         } else {
             strucComboModel = new DefaultComboBoxModel<>();
             for (String structure : sceneModel.getItem().getStructures()) {

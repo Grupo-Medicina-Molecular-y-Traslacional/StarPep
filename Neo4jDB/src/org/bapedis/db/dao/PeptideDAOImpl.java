@@ -5,6 +5,7 @@
  */
 package org.bapedis.db.dao;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -106,7 +107,7 @@ public class PeptideDAOImpl implements PeptideDAO {
                 }
                 peptideNodes = getPeptides(metadataNodes, queryModel.getRestriction());
             } else {
-                peptideNodes = getPeptides();
+                peptideNodes = getPeptides(queryModel.getRestriction());
             }
 
             // Write lock
@@ -115,34 +116,37 @@ public class PeptideDAOImpl implements PeptideDAO {
             Integer id;
             String seq;
             Node neoNode, neoNeighborNode;
-            try {
-                while (peptideNodes.hasNext()) {
-                    neoNode = peptideNodes.next();
-                    seq = neoNode.getProperty(PRO_SEQ).toString();
-                    // Fill graph
-                    graphNode = getOrAddGraphNodeFromNeoNode(neoNode, graphModel);
-                    id = new Integer((String) graphNode.getId());
-                    for (Relationship relation : neoNode.getRelationships(Direction.OUTGOING)) {
-                        neoNeighborNode = relation.getEndNode();
-                        graphNeighborNode = getOrAddGraphNodeFromNeoNode(neoNeighborNode, graphModel);
-                        getOrAddGraphEdgeFromNeoRelationship(graphNode, graphNeighborNode, relation, graphModel);
-                    }
 
-                    //Fill Attribute Model
-                    if (peptideMap != null && peptideMap.containsKey(id)) {
-                        peptide = peptideMap.get(id);
-                    } else {
-                        //Create new peptide
-                        peptide = new Peptide(graphNode, graphModel.getGraph());
-                        peptide.setAttributeValue(Peptide.ID, id);
-                        peptide.setAttributeValue(Peptide.SEQ, seq);
-                        peptide.setAttributeValue(Peptide.LENGHT, seq.length());
+            if (peptideNodes != null) {
+                try {
+                    while (peptideNodes.hasNext()) {
+                        neoNode = peptideNodes.next();
+                        seq = neoNode.getProperty(PRO_SEQ).toString();
+                        // Fill graph
+                        graphNode = getOrAddGraphNodeFromNeoNode(neoNode, graphModel);
+                        id = new Integer((String) graphNode.getId());
+                        for (Relationship relation : neoNode.getRelationships(Direction.OUTGOING)) {
+                            neoNeighborNode = relation.getEndNode();
+                            graphNeighborNode = getOrAddGraphNodeFromNeoNode(neoNeighborNode, graphModel);
+                            getOrAddGraphEdgeFromNeoRelationship(graphNode, graphNeighborNode, relation, graphModel);
+                        }
+
+                        //Fill Attribute Model
+                        if (peptideMap != null && peptideMap.containsKey(id)) {
+                            peptide = peptideMap.get(id);
+                        } else {
+                            //Create new peptide
+                            peptide = new Peptide(graphNode, graphModel.getGraph());
+                            peptide.setAttributeValue(Peptide.ID, id);
+                            peptide.setAttributeValue(Peptide.SEQ, seq);
+                            peptide.setAttributeValue(Peptide.LENGHT, seq.length());
+                        }
+                        attrModel.addPeptide(peptide);
                     }
-                    attrModel.addPeptide(peptide);
+                } finally {
+                    peptideNodes.close();
+                    tx.success();
                 }
-            } finally {
-                peptideNodes.close();
-                tx.success();
             }
         }
         return attrModel;
@@ -152,45 +156,62 @@ public class PeptideDAOImpl implements PeptideDAO {
         return graphDb.findNodes(StarPepLabel.Peptide);
     }
 
+    protected ResourceIterator<Node> getPeptides(RestrictionLevel restriction) {
+        switch (restriction) {
+            case MATCH_ALL:
+            case MATCH_ANY:
+                return graphDb.findNodes(StarPepLabel.Peptide);
+            case MATCH_NONE:
+                return null;
+        }
+        return null;
+    }
+
     protected ResourceIterator<Node> getPeptides(final List<Node> metadataNodes, RestrictionLevel restriction) {
         ResourceIterator<Node> nodes = null;
         Evaluator restrictiveEvaluator;
-        if (metadataNodes.size() == 1 || restriction == RestrictionLevel.MATCH_ANY) {
-
-            restrictiveEvaluator = new Evaluator() {
-                @Override
-                public Evaluation evaluate(Path path) {
-                    boolean accepted = path.endNode().hasLabel(StarPepLabel.Peptide);
-                    return accepted ? Evaluation.INCLUDE_AND_PRUNE : Evaluation.EXCLUDE_AND_CONTINUE;
-                }
-            };
-            nodes = peptideTraversal.evaluator(restrictiveEvaluator)
-                    .traverse(metadataNodes)
-                    .nodes()
-                    .iterator();
-        } else if (metadataNodes.size() > 1 && restriction == RestrictionLevel.MATCH_ALL) {
-            final Node[] endNodes = metadataNodes.toArray(new Node[0]);
-            final LinkedList<Node> metadataList = new LinkedList<>();
-            restrictiveEvaluator = new Evaluator() {
-                @Override
-                public Evaluation evaluate(Path path) {
-                    if (path.endNode().hasLabel(StarPepLabel.Peptide)) {
-                        metadataList.clear();
-                        try (ResourceIterator<Node> nodes = getMetadata(path.endNode(), endNodes)) {
-                            while (nodes.hasNext()) {
-                                metadataList.add(nodes.next());
-                            }
-                        }
-                        boolean accepted = metadataList.containsAll(metadataNodes);
-                        return accepted ? Evaluation.INCLUDE_AND_PRUNE : Evaluation.EXCLUDE_AND_PRUNE;
+        switch (restriction) {
+            case MATCH_ANY:
+                restrictiveEvaluator = new Evaluator() {
+                    @Override
+                    public Evaluation evaluate(Path path) {
+                        boolean accepted = path.endNode().hasLabel(StarPepLabel.Peptide);
+                        return accepted ? Evaluation.INCLUDE_AND_PRUNE : Evaluation.EXCLUDE_AND_CONTINUE;
                     }
-                    return Evaluation.EXCLUDE_AND_CONTINUE;
-                }
-            };
-            nodes = peptideTraversal.evaluator(restrictiveEvaluator)
-                    .traverse(metadataNodes.get(0))
-                    .nodes()
-                    .iterator();
+                };
+                nodes = peptideTraversal.evaluator(restrictiveEvaluator)
+                        .traverse(metadataNodes)
+                        .nodes()
+                        .iterator();
+                break;
+            case MATCH_ALL:
+                final Node[] endNodes = metadataNodes.toArray(new Node[0]);
+                final LinkedList<Node> metadataList = new LinkedList<>();
+                restrictiveEvaluator = new Evaluator() {
+                    @Override
+                    public Evaluation evaluate(Path path) {
+                        if (path.endNode().hasLabel(StarPepLabel.Peptide)) {
+                            metadataList.clear();
+                            try (ResourceIterator<Node> nodes = getMetadata(path.endNode(), endNodes)) {
+                                while (nodes.hasNext()) {
+                                    metadataList.add(nodes.next());
+                                }
+                            }
+                            boolean accepted = metadataList.containsAll(metadataNodes);
+                            return accepted ? Evaluation.INCLUDE_AND_PRUNE : Evaluation.EXCLUDE_AND_PRUNE;
+                        }
+                        return Evaluation.EXCLUDE_AND_CONTINUE;
+                    }
+                };
+                nodes = peptideTraversal.evaluator(restrictiveEvaluator)
+                        .traverse(metadataNodes.get(0))
+                        .nodes()
+                        .iterator();
+                break;
+            case MATCH_NONE:
+                return new NegativeResoureIterator(metadataNodes.toArray(new Node[0]));
+            default:
+                break;
         }
 
         return nodes;
@@ -286,6 +307,55 @@ public class PeptideDAOImpl implements PeptideDAO {
             mainGraph.addEdge(graphEdge);
         }
         return graphEdge;
+    }
+
+    private class NegativeResoureIterator implements ResourceIterator<Node> {
+
+        private final Node[] excludedMetadata;
+        private final ResourceIterator<Node> allNodes;
+        private Node currentNode;
+
+        public NegativeResoureIterator(Node[] excludedMetadata) {
+            this.excludedMetadata = excludedMetadata;
+            allNodes = getPeptides();
+            currentNode = getNextNode();
+
+        }
+
+        private Node getNextNode() {
+            Node node = null;
+            boolean found = false;
+            while (allNodes.hasNext() && !found) {
+                node = allNodes.next();
+                if (!isReachable(node)) {
+                    found = true;
+                }
+            }
+            return node;
+        }
+
+        private boolean isReachable(Node node) {
+            try (ResourceIterator<Node> metadataNodes = getMetadata(node, excludedMetadata)) { // Rechable nodes
+                return metadataNodes.hasNext();
+            }
+        }
+
+        @Override
+        public void close() {
+            allNodes.close();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return currentNode != null;
+        }
+
+        @Override
+        public Node next() {
+            Node node = currentNode;
+            currentNode = getNextNode();
+            return node;
+        }
     }
 
 }

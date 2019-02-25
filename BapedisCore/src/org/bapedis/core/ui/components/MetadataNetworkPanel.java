@@ -33,8 +33,8 @@ public class MetadataNetworkPanel extends JPanel {
     public MetadataNetworkPanel(GraphVizSetting graphViz, Workspace workspace) {
         super(new GridBagLayout());
         this.workspace = workspace;
-        setMinimumSize(new Dimension(440, 220));
-        setPreferredSize(new Dimension(440, 220));
+        setMinimumSize(new Dimension(440, 280));
+        setPreferredSize(new Dimension(440, 280));
 
         group = new ButtonGroup();
 

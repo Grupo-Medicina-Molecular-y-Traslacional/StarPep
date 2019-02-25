@@ -54,6 +54,12 @@ public class MetadataDAOImpl implements MetadataDAO {
 //                return getMetadata(type, MyLabel.Literature);
             case CROSSREF:
                 return getMetadata(type, StarPepLabel.CrossRef);
+            case Nterminus:
+                return getMetadata(type, StarPepLabel.Nterminus);
+            case Cterminus:
+                return getMetadata(type, StarPepLabel.Cterminus);
+            case UnusualAA:
+                return getMetadata(type, StarPepLabel.UnusualAA);
         }
         return null;
     }

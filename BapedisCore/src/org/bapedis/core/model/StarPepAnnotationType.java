@@ -85,6 +85,42 @@ public enum StarPepAnnotationType {
         public String getDescription() {
             return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.crossref.desc");
         }
+    },
+    Nterminus("modified_by") {
+
+        @Override
+        public String getLabelName() {
+            return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.nterm");
+        }
+
+        @Override
+        public String getDescription() {
+            return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.nterm.desc");
+        }
+    },
+    Cterminus("modified_by") {
+
+        @Override
+        public String getLabelName() {
+            return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.cterm");
+        }
+
+        @Override
+        public String getDescription() {
+            return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.cterm.desc");
+        }
+    },
+    UnusualAA("constituted_by") {
+
+        @Override
+        public String getLabelName() {
+            return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.unusualAA");
+        }
+
+        @Override
+        public String getDescription() {
+            return NbBundle.getMessage(StarPepAnnotationType.class, "AnnotationType.unusualAA.desc");
+        }
     }
     /*
     LITERATURE("referenced_by") {

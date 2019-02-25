@@ -7,6 +7,9 @@ package org.bapedis.core.spi.filters.impl;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 
 /**
  *
@@ -16,52 +19,47 @@ public enum StringFilterOperator implements FilterOperator {
 
     EQUALS("equal to") {
 
-                @Override
-                public boolean applyTo(Object obj, String operand, boolean matchCase) {
-                    return matchCase ? obj.equals(operand) : ((String) obj).toLowerCase().equals(operand.toLowerCase());
-                }
-            },
+        @Override
+        public boolean applyTo(Object obj, String operand, boolean matchCase) {
+            return matchCase ? obj.equals(operand) : ((String) obj).toLowerCase().equals(operand.toLowerCase());
+        }
+    },
     NOT_EQUALS("not equal to") {
-                @Override
-                public boolean applyTo(Object obj, String operand, boolean matchCase) {
-                    return !matchCase ? obj.equals(operand) : ((String) obj).toLowerCase().equals(operand.toLowerCase());
-                }
-            },
+        @Override
+        public boolean applyTo(Object obj, String operand, boolean matchCase) {
+            return !matchCase ? obj.equals(operand) : ((String) obj).toLowerCase().equals(operand.toLowerCase());
+        }
+    },
     CONTAINS("contains") {
 
-                @Override
-                public boolean applyTo(Object obj, String operand, boolean matchCase) {
-                    return matchCase ? ((String) obj).contains(operand) : ((String) obj).toLowerCase().contains(operand.toLowerCase());
-                }
-            },
+        @Override
+        public boolean applyTo(Object obj, String operand, boolean matchCase) {
+            return matchCase ? ((String) obj).contains(operand) : ((String) obj).toLowerCase().contains(operand.toLowerCase());
+        }
+    },
     STARTS_WITH("starts with") {
 
-                @Override
-                public boolean applyTo(Object obj, String operand, boolean matchCase) {
-                    return matchCase ? ((String) obj).startsWith(operand) : ((String) obj).toLowerCase().startsWith(operand.toLowerCase());
-                }
-            },
+        @Override
+        public boolean applyTo(Object obj, String operand, boolean matchCase) {
+            return matchCase ? ((String) obj).startsWith(operand) : ((String) obj).toLowerCase().startsWith(operand.toLowerCase());
+        }
+    },
     ENDS_WITH("ends with") {
 
-                @Override
-                public boolean applyTo(Object obj, String operand, boolean matchCase) {
-                    return matchCase ? ((String) obj).endsWith(operand) : ((String) obj).toLowerCase().endsWith(operand.toLowerCase());
-                }
-            },
+        @Override
+        public boolean applyTo(Object obj, String operand, boolean matchCase) {
+            return matchCase ? ((String) obj).endsWith(operand) : ((String) obj).toLowerCase().endsWith(operand.toLowerCase());
+        }
+    },
     REGEX("regex") {
 
-                @Override
-                public boolean applyTo(Object obj, String operand, boolean matchCase) {
-                    if (matchCase) {
-                        Pattern p = Pattern.compile(operand);
-                        Matcher m = p.matcher((String) obj);
-                        return m.matches();
-                    }
-                    Pattern p = Pattern.compile(operand.toLowerCase());
-                    Matcher m = p.matcher(((String) obj).toLowerCase());
-                    return m.matches();
-                }
-            };
+        @Override
+        public boolean applyTo(Object obj, String operand, boolean matchCase) {
+            Pattern p = Pattern.compile(operand);
+            Matcher m = p.matcher((String) obj);
+            return m.matches();
+        }
+    };
 
     private final String text;
 
@@ -76,6 +74,15 @@ public enum StringFilterOperator implements FilterOperator {
 
     @Override
     public boolean isValid(String operand) {
+        if (!operand.isEmpty() && text.equals("regex")){
+            try{
+                Pattern.compile(operand);
+                return true;
+            } catch(PatternSyntaxException ex){
+                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE));
+                return false;
+            }
+        }
         return !operand.isEmpty();
     }
 

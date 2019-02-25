@@ -28,6 +28,14 @@ public enum RestrictionLevel {
             return NbBundle.getMessage(RestrictionLevel.class, "RestrictionLevel.matchAny");
         }
 
+    },
+    MATCH_NONE {
+
+        @Override
+        public String toString() {
+            return NbBundle.getMessage(RestrictionLevel.class, "RestrictionLevel.matchNone");
+        }
+
     };
 
 }

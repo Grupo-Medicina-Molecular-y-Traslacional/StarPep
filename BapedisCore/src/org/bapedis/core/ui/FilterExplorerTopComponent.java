@@ -178,6 +178,7 @@ public final class FilterExplorerTopComponent extends TopComponent implements Wo
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(restrictiveComboBox, gridBagConstraints);
 

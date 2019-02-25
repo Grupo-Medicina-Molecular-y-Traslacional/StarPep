@@ -69,7 +69,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Void> {
 
     public FilterModel getFilterModel() {
         return filterModel;
-    }        
+    }
 
     private void runAlgorithm(Algorithm preprocessingAlgo) {
         new Thread(new Runnable() {
@@ -198,16 +198,16 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Void> {
         } finally {
             ticket.finish();
             filterModel.setRunning(false);
-            
+
             attrModel.setQuickFilter(set == null || filterModel.isEmpty() ? null : new QuickFilterImpl(set));
 
             if (attrModel.getQuickFilter() == null) {
                 pc.reportMsg(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.noFilter"), workspace);
             } else {
                 pc.reportMsg(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.output.text", set.size()), workspace);
-            }            
+            }
             pc.getGraphVizSetting().fireChangedGraphView();
-            
+
             if (pc.getCurrentWorkspace() != workspace) {
                 String txt = NbBundle.getMessage(FilterExecutor.class, "Workspace.notify.finishedTask", taskName);
                 pc.notifyWorkspaceChange(txt, workspace);
@@ -235,6 +235,14 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Void> {
                         }
                     }
                     return false;
+                case MATCH_NONE:
+                    for (Iterator<Filter> it = filterModel.getFilterIterator(); it.hasNext();) {
+                        Filter filter = it.next();
+                        if (filter.accept(peptide)) {
+                            return false;
+                        }
+                    }
+                    return true;
             }
         }
         return true;

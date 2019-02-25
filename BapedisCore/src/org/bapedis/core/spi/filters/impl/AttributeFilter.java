@@ -82,15 +82,21 @@ public class AttributeFilter implements Filter {
     public String getHTMLDisplayName() {
         return null;
     }
-        
+
     @Override
     public String getDisplayName() {
+        if (attr == null || operator == null || value == null) {
+            return "Invalid filter";
+        }
         String text = attr + " " + operator + " " + value;
         return negative ? "Not (" + text + ")" : text;
     }
 
     @Override
     public boolean accept(Peptide peptide) {
+        if (attr == null || operator == null || value == null) {
+            return false;
+        }
         boolean accepted = false;
         Object objValue = peptide.getAttributeValue(attr);
         if (objValue.getClass().isArray()) {

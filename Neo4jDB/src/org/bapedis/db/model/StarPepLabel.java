@@ -19,5 +19,8 @@ public enum StarPepLabel implements Label {
     Target,
     Database,
 //    Literature,
-    CrossRef
+    CrossRef,
+    Nterminus,
+    Cterminus,
+    UnusualAA
 }

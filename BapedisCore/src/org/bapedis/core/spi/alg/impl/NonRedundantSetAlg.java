@@ -13,11 +13,13 @@ import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.data.PeptideDAO;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.task.ProgressTicket;
 import org.gephi.graph.api.Graph;
@@ -33,10 +35,11 @@ import org.openide.util.NbBundle;
 public class NonRedundantSetAlg implements Algorithm {
 
     private final ProjectManager pc;
+    protected final PeptideDAO dao;
     private List<Node> graphNodes;
     private final NonRedundantSetAlgFactory factory;
     protected final SequenceClustering clusteringAlg;
-    private AttributesModel newAttrModel;
+    private AttributesModel tmpAttrModel, newAttrModel;
     private Workspace workspace;
     private ProgressTicket ticket;
     private boolean stopRun;
@@ -47,6 +50,7 @@ public class NonRedundantSetAlg implements Algorithm {
         this.clusteringAlg = (SequenceClustering) new SequenceClusteringFactory().createAlgorithm();
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
+        dao = Lookup.getDefault().lookup(PeptideDAO.class);
     }
 
     public SequenceAlignmentModel getAlignmentModel() {
@@ -92,6 +96,7 @@ public class NonRedundantSetAlg implements Algorithm {
         graphNodes = null;
         ticket = null;
         newAttrModel = null;
+        tmpAttrModel = null;
     }
 
     @Override
@@ -118,26 +123,36 @@ public class NonRedundantSetAlg implements Algorithm {
         pc.reportMsg(msg, workspace);
         ticket.progress(msg);
 
-        clusteringAlg.initAlgo(workspace, ticket);
-        clusteringAlg.run();
-        clusteringAlg.endAlgo();
-        return clusteringAlg.getClusters();
+        //set peptides
+        tmpAttrModel = dao.getPeptides(new QueryModel(workspace), pc.getGraphModel(workspace), pc.getAttributesModel(workspace));
+        Peptide[] peptides = tmpAttrModel.getPeptides().toArray(new Peptide[0]);
+        clusteringAlg.setPeptides(peptides);
+
+        //Clusterize
+        if (!stopRun) {
+            clusteringAlg.initAlgo(workspace, ticket);
+            clusteringAlg.run();
+            clusteringAlg.endAlgo();
+            return clusteringAlg.getClusters();
+        }
+        return null;
     }
 
     @Override
     public void run() {
         if (!stopRun) {
             Cluster[] clusters = clusterize();
-            //New model
-            AttributesModel tmpAttrModel = pc.getAttributesModel(workspace);
-            graphNodes = new LinkedList<>();
-            newAttrModel = new AttributesModel(workspace);
-            tmpAttrModel.getBridge().copyTo(newAttrModel, null);
-            Peptide peptide;
-            for (Cluster cluster : clusters) {
-                peptide = cluster.getCentroid();
-                newAttrModel.addPeptide(peptide);
-                graphNodes.add(peptide.getGraphNode());
+            if (clusters != null) {
+                //New model
+                graphNodes = new LinkedList<>();
+                newAttrModel = new AttributesModel(workspace);
+                tmpAttrModel.getBridge().copyTo(newAttrModel, null);
+                Peptide peptide;
+                for (Cluster cluster : clusters) {
+                    peptide = cluster.getCentroid();
+                    newAttrModel.addPeptide(peptide);
+                    graphNodes.add(peptide.getGraphNode());
+                }
             }
         }
     }

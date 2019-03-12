@@ -152,7 +152,7 @@ public abstract class AbstractCluster implements Algorithm {
 
     @Override
     public void run() {
-        if (peptides != null) {
+        if (peptides != null && peptides.length > 0) {
             List<Cluster> clusterList = cluterize();
 
             if (clusterList != null) {

@@ -19,6 +19,7 @@ import org.bapedis.core.ui.components.SequenceAlignmentPanel;
 public class NonRedundantSetAlgSetupUI extends javax.swing.JPanel implements AlgorithmSetupUI{
 
     protected NonRedundantSetAlg nrsAlg;
+    private SequenceAlignmentPanel alignmentPanel;
     
     /**
      * Creates new form NonRedundantSetFilterSetupUI
@@ -63,10 +64,20 @@ public class NonRedundantSetAlgSetupUI extends javax.swing.JPanel implements Alg
         SequenceAlignmentModel alignmentModel = (SequenceAlignmentModel) nrsAlg.getAlignmentModel();
         
         centerPanel.removeAll();
-        centerPanel.add(new SequenceAlignmentPanel(alignmentModel), BorderLayout.CENTER);
+        alignmentPanel = new SequenceAlignmentPanel(alignmentModel);
+        centerPanel.add(alignmentPanel, BorderLayout.CENTER);
         centerPanel.revalidate();
         centerPanel.repaint();        
         
         return this;
     }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        if (alignmentPanel != null){
+            alignmentPanel.setEnabled(enabled);
+        }
+    }
+    
+    
 }

@@ -38,6 +38,7 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
     protected final PropertyChangeSupport changeSupport;
     protected SequenceSearch searchAlg;
     protected final AminoAcidCompoundSet compoundSet;
+    private SequenceAlignmentPanel seqAlignmentPanel;
 
     /**
      * Creates new form SeqAlignmentFilterSetupUI
@@ -134,6 +135,21 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
             }
         }
     }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        switcherLink.setEnabled(enabled);
+        jLabel1.setEnabled(enabled);
+        jseqPane.setEnabled(enabled);
+        jSeqTextArea.setEnabled(enabled);
+        jMRLabel.setEnabled(enabled);
+        jMRComboBox.setEnabled(enabled);
+        if (seqAlignmentPanel != null){
+            seqAlignmentPanel.setEnabled(enabled);
+        }
+    }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -262,7 +278,8 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
         SequenceAlignmentModel alignmentModel = searchAlg.getAlignmentModel();
 
         alignmentPanel.removeAll();
-        alignmentPanel.add(new SequenceAlignmentPanel(alignmentModel), BorderLayout.CENTER);
+        seqAlignmentPanel = new SequenceAlignmentPanel(alignmentModel);
+        alignmentPanel.add(seqAlignmentPanel, BorderLayout.CENTER);
         alignmentPanel.revalidate();
         alignmentPanel.repaint();
 

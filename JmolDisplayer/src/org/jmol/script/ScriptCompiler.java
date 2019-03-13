@@ -42,7 +42,7 @@ import java.util.Map;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 public class ScriptCompiler extends ScriptCompilationTokenParser {
 

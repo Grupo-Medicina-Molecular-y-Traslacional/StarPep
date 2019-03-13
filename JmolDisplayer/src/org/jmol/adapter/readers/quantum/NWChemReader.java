@@ -33,7 +33,7 @@ import org.jmol.adapter.smarter.*;
 import org.jmol.api.JmolAdapter;
 import org.jmol.util.ArrayUtil;
 import org.jmol.util.Logger;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /**
  * A reader for NWChem 4.6

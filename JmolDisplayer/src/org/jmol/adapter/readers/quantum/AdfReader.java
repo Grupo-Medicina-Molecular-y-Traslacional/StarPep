@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /**
  * 

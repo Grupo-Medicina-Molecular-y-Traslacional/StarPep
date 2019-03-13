@@ -26,7 +26,7 @@ import java.util.BitSet;
 
 import javax.vecmath.Point3f;
 
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /**
  * A Binary Space Partitioning Forest

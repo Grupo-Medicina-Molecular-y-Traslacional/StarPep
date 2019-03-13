@@ -28,7 +28,7 @@ import javax.vecmath.Point3f;
 import org.jmol.atomdata.AtomDataServer;
 import org.jmol.jvxl.data.JvxlCoder;
 import org.jmol.util.Logger;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 class VolumeDataReader extends SurfaceReader {
 

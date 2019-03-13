@@ -46,7 +46,7 @@ import java.util.Map;
 
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 public class Dipoles extends Shape {
 

@@ -23,7 +23,7 @@
  */
 package org.jmol.util;
 
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 import java.io.DataInputStream;
 import java.io.BufferedInputStream;

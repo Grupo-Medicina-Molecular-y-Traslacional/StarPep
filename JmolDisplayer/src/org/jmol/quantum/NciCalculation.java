@@ -34,7 +34,7 @@ import javax.vecmath.Point3f;
 
 import java.util.List;
 import java.util.BitSet;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /*
  * promolecular and discrete SCF NCIPLOT implemented in Jmol 12.1.49

@@ -27,7 +27,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 
 import org.jmol.util.BinaryDocument;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 class Dsn6BinaryReader extends MapFileReader {
 

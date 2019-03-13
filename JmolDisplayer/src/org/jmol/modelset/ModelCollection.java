@@ -72,7 +72,7 @@ import org.jmol.viewer.ShapeManager;
 import org.jmol.script.Token;
 import org.jmol.viewer.Viewer;
 import org.jmol.viewer.StateManager.Orientation;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 abstract public class ModelCollection extends BondCollection {
 

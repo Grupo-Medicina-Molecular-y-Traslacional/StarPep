@@ -163,10 +163,10 @@ public class ClusterNavigator extends JComponent implements
         bottomPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         clusterSizeLabel = new JLabel();
-        clusterSizeLabel.setIcon(ImageUtilities.loadImageIcon("/org/bapedis/core/resources/rightArrow.png", false));
+        clusterSizeLabel.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/rightArrow.png", false));
 
         filteredSizeLabel = new JLabel();
-        filteredSizeLabel.setIcon(ImageUtilities.loadImageIcon("/org/bapedis/core/resources/rightArrow.png", false));
+        filteredSizeLabel.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/rightArrow.png", false));
 
         bottomPanel.add(clusterSizeLabel);
         bottomPanel.add(filteredSizeLabel);

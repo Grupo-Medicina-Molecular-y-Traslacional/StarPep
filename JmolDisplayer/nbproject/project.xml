@@ -3,7 +3,7 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.jmol.displayer</code-name-base>
+            <code-name-base>org.bapedis.jmolDisplayer</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
@@ -23,29 +23,12 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.api.progress</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>1</release-version>
-                        <specification-version>1.26.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
                     <code-name-base>org.netbeans.core.multiview</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.26.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.jmol.api</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>1.0</specification-version>
+                        <specification-version>1.43.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -54,24 +37,7 @@
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.24.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.modules.settings</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>1</release-version>
-                        <specification-version>1.33.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.swing.tabcontrol</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>1.29.1</specification-version>
+                        <specification-version>1.44.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -79,31 +45,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>7.39.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.dialogs</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>7.23.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.explorer</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>6.40.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.filesystems</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>7.53.2</specification-version>
+                        <specification-version>7.65.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -111,23 +53,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>1.29.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.loaders</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>7.32.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.modules</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>7.27.1</specification-version>
+                        <specification-version>1.48.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -135,15 +61,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>7.25.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.text</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>6.43.1</specification-version>
+                        <specification-version>7.42.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -151,7 +69,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>8.19.1</specification-version>
+                        <specification-version>9.5.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -159,7 +77,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>8.11.1</specification-version>
+                        <specification-version>8.32.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -175,105 +93,26 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>6.48.1</specification-version>
+                        <specification-version>6.74.1</specification-version>
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <public-packages>
-                <package>org.jmol.adapter.readers.cifpdb</package>
-                <package>org.jmol.adapter.readers.molxyz</package>
-                <package>org.jmol.adapter.readers.more</package>
-                <package>org.jmol.adapter.readers.quantum</package>
-                <package>org.jmol.adapter.readers.simple</package>
-                <package>org.jmol.adapter.readers.xml</package>
-                <package>org.jmol.adapter.readers.xtal</package>
-                <package>org.jmol.adapter.smarter</package>
-                <package>org.jmol.api</package>
-                <package>org.jmol.atomdata</package>
-                <package>org.jmol.awt</package>
-                <package>org.jmol.bspt</package>
-                <package>org.jmol.console</package>
-                <package>org.jmol.constant</package>
-                <package>org.jmol.export</package>
-                <package>org.jmol.export.dialog</package>
-                <package>org.jmol.export.history</package>
-                <package>org.jmol.export.image</package>
-                <package>org.jmol.g3d</package>
-                <package>org.jmol.geodesic</package>
-                <package>org.jmol.i18n</package>
-                <package>org.jmol.jcamp</package>
-                <package>org.jmol.jcamp.data</package>
-                <package>org.jmol.jcamp.utils</package>
-                <package>org.jmol.jvxl.api</package>
-                <package>org.jmol.jvxl.calc</package>
-                <package>org.jmol.jvxl.data</package>
-                <package>org.jmol.jvxl.readers</package>
-                <package>org.jmol.minimize</package>
-                <package>org.jmol.minimize.forcefield</package>
-                <package>org.jmol.modelkit</package>
-                <package>org.jmol.modelset</package>
-                <package>org.jmol.modelsetbio</package>
-                <package>org.jmol.popup</package>
-                <package>org.jmol.quantum</package>
-                <package>org.jmol.script</package>
-                <package>org.jmol.shape</package>
-                <package>org.jmol.shapebio</package>
-                <package>org.jmol.shapespecial</package>
-                <package>org.jmol.shapesurface</package>
-                <package>org.jmol.smiles</package>
-                <package>org.jmol.symmetry</package>
-                <package>org.jmol.util</package>
-                <package>org.jmol.viewer</package>
-                <package>org.jmol.viewer.binding</package>
-                <package>org.netbeans.jmol.displayer</package>
-                <package>org.openscience.chimetojmol</package>
-                <package>org.openscience.jmol.app</package>
-                <package>org.openscience.jmol.app.jmolpanel</package>
-                <package>org.openscience.jmol.app.surfacetool</package>
-                <package>org.openscience.jmol.app.webexport</package>
-                <package>org.openscience.jvxl</package>
-                <package>org.openscience.jvxl.simplewriter</package>
-                <package>org.openscience.molecularplayground</package>
-            </public-packages>
+            <public-packages/>
             <class-path-extension>
                 <runtime-relative-path>ext/naga-2_1-r42.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/naga-2_1-r42.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/commons-cli-1.0.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/commons-cli-1.0.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/netscape.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/netscape.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/gnujaxp-onlysax.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/gnujaxp-onlysax.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/saxon.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/saxon.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/itext-1.4.5.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/itext-1.4.5.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/junit.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/junit.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/vecmath1.2-1.14.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/vecmath1.2-1.14.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/Acme.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/Acme.jar</binary-origin>
+                <runtime-relative-path>ext/itext-1.4.5.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/itext-1.4.5.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/gnujaxp.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/gnujaxp.jar</binary-origin>
+                <runtime-relative-path>ext/commons-cli-1.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/commons-cli-1.0.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

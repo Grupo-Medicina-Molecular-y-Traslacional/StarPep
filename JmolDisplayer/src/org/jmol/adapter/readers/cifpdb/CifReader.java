@@ -34,7 +34,7 @@ import org.jmol.api.JmolLineReader;
 import org.jmol.constant.EnumStructure;
 import org.jmol.util.CifDataReader;
 import org.jmol.util.Logger;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /**
  * A true line-free CIF file reader for CIF and mmCIF files.

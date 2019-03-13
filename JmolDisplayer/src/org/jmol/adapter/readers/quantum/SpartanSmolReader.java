@@ -28,7 +28,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.jmol.util.Logger;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /*
  * Spartan SMOL and .spartan compound document reader and .spartan06 zip files

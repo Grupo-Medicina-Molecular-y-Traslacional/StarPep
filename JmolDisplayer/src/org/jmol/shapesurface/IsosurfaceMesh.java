@@ -48,7 +48,7 @@ import org.jmol.jvxl.data.MeshData;
 import org.jmol.jvxl.calc.MarchingSquares;
 import org.jmol.script.Token;
 import org.jmol.shape.Mesh;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 public class IsosurfaceMesh extends Mesh {
   JvxlData jvxlData = new JvxlData();

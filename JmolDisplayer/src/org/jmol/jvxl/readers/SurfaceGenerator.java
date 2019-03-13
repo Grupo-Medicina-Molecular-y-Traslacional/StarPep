@@ -137,7 +137,7 @@ import org.jmol.jvxl.data.VolumeData;
 import org.jmol.jvxl.data.MeshData;
 import org.jmol.jvxl.api.MeshDataServer;
 import org.jmol.jvxl.calc.MarchingSquares;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 public class SurfaceGenerator {
 

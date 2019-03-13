@@ -26,7 +26,7 @@
 package org.jmol.util;
 
 import java.util.BitSet;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 
 public class Parser {

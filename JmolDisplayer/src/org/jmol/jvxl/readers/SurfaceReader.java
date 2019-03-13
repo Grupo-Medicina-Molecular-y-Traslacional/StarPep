@@ -39,7 +39,7 @@ import org.jmol.jvxl.data.*;
 import org.jmol.jvxl.api.MeshDataServer;
 import org.jmol.jvxl.api.VertexDataServer;
 import org.jmol.jvxl.calc.*;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 public abstract class SurfaceReader implements VertexDataServer {
 

@@ -28,7 +28,7 @@ import java.io.BufferedReader;
 import javax.vecmath.Point3f;
 
 import org.jmol.util.SimpleUnitCell;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 abstract class MapFileReader extends VolumeFileReader {
 

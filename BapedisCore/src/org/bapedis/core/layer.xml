@@ -65,7 +65,7 @@
         </folder>
         <file name="UndoRedo_hidden"/>
         <folder name="Workspace">
-            <attr name="position" intvalue="100"/>
+            <attr name="position" intvalue="101"/>
             <attr name="displayName" bundlevalue="org.bapedis.core.ui.Bundle#Toolbar/Workspace"/>
         </folder>
         <folder name="Network">

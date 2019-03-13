@@ -34,7 +34,7 @@ import org.jmol.viewer.Viewer;
 import org.jmol.i18n.GT;
 
 import javax.vecmath.Point3f;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 abstract class ScriptCompilationTokenParser {
   

@@ -47,7 +47,7 @@ import org.apache.commons.cli.HelpFormatter;
 
 import org.jmol.jvxl.readers.*;
 import org.jmol.util.*;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 public class Jvxl {
 

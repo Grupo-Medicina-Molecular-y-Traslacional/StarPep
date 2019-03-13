@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.netbeans.jmol.displayer;
+package org.bapedis.jmolDisplayer.desktop;
 
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
@@ -11,8 +11,8 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.StructureWindowController;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewFactory;
-import org.netbeans.jmol.model.StructureData;
-import org.netbeans.jmol.model.StructureSceneModel;
+import org.bapedis.jmolDisplayer.model.StructureData;
+import org.bapedis.jmolDisplayer.model.StructureSceneModel;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;

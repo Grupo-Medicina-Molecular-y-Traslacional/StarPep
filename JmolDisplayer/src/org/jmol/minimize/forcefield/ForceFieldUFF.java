@@ -36,7 +36,7 @@ import java.util.Map;
 import org.jmol.minimize.Minimizer;
 import org.jmol.util.Logger;
 import org.jmol.util.Parser;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 
 public class ForceFieldUFF extends ForceField {

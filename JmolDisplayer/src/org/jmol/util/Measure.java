@@ -26,7 +26,7 @@ package org.jmol.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Point3f;

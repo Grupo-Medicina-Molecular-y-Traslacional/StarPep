@@ -41,7 +41,7 @@ import org.jmol.atomdata.RadiusData;
 import org.jmol.constant.EnumVdw;
 import org.jmol.jvxl.data.JvxlCoder;
 import org.jmol.jvxl.data.MeshData;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 abstract class AtomDataReader extends VolumeDataReader {
 

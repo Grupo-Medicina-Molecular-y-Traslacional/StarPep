@@ -43,7 +43,7 @@ import org.jmol.util.MeshSurface;
 
 import org.jmol.api.AtomIndexIterator;
 import org.jmol.jvxl.data.MeshData;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 class IsoSolventReader extends AtomDataReader {
 

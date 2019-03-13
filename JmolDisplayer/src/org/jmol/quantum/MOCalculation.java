@@ -32,7 +32,7 @@ import javax.vecmath.Point3f;
 
 import java.util.List;
 import java.util.BitSet;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /*
  * See J. Computational Chemistry, vol 7, p 359, 1986.

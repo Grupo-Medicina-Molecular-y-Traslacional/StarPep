@@ -29,7 +29,7 @@ import javax.vecmath.Point3f;
 
 import org.jmol.g3d.Graphics3D;
 import org.jmol.util.Parser;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /*
  * 

@@ -33,7 +33,7 @@ import java.util.Map;
 import org.jmol.util.Elements;
 import org.jmol.util.TextFormat;
 import org.jmol.util.Logger;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /**
  * Parses a SMILES String to create a <code>SmilesMolecule</code>.

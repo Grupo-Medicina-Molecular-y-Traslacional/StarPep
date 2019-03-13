@@ -51,7 +51,7 @@ import org.jmol.util.TextFormat;
 
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /**
  * CASTEP (http://www.castep.org) .cell file format relevant section of .cell

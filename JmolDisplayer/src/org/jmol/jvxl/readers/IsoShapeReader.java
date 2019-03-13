@@ -31,7 +31,7 @@ import javax.vecmath.Vector3f;
 import org.jmol.jvxl.data.JvxlCoder;
 import org.jmol.util.Logger;
 import org.jmol.util.Measure;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 class IsoShapeReader extends VolumeDataReader {
 

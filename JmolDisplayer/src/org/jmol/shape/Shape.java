@@ -44,7 +44,7 @@ import javax.vecmath.Point3i;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /**
  * Shape now encompasses:

@@ -28,7 +28,7 @@ import java.util.BitSet;
 import org.jmol.adapter.smarter.*;
 import org.jmol.util.Logger;
 import org.jmol.util.Parser;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /**
  * Reads Mopac 93, 6, 7, 2002, or 2009 output files

@@ -32,7 +32,7 @@ import java.util.Random;
 import java.util.BitSet;
 
 import org.jmol.util.Logger;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /**
  * Provides quantization of normalized vectors so that shading for

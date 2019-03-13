@@ -51,7 +51,7 @@ import org.jmol.viewer.binding.Binding;
 import org.jmol.viewer.binding.PfaatBinding;
 import org.jmol.viewer.binding.RasmolBinding;
 import org.jmol.viewer.binding.JmolBinding;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 public class ActionManager {
 

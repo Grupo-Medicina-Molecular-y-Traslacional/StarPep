@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.netbeans.jmol.displayer;
+package org.bapedis.jmolDisplayer.desktop;
 
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;

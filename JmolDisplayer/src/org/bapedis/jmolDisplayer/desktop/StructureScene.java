@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.netbeans.jmol.displayer;
+package org.bapedis.jmolDisplayer.desktop;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -35,8 +35,8 @@ import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
-import org.netbeans.jmol.model.StructureData;
-import org.netbeans.jmol.model.StructureSceneModel;
+import org.bapedis.jmolDisplayer.model.StructureData;
+import org.bapedis.jmolDisplayer.model.StructureSceneModel;
 import org.openide.awt.UndoRedo;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;

@@ -28,7 +28,7 @@ import java.io.BufferedReader;
 import javax.vecmath.Point3f;
 
 import org.jmol.jvxl.data.JvxlCoder;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /*
  * A simple EFVET file reader -- vertices and triangles only

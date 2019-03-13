@@ -27,7 +27,7 @@ import java.util.BitSet;
 
 import org.jmol.modelset.Atom;
 import org.jmol.util.Logger;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /*
  * 

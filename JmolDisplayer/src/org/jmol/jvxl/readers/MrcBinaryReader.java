@@ -25,7 +25,7 @@ package org.jmol.jvxl.readers;
 
 import org.jmol.util.BinaryDocument;
 import org.jmol.util.Logger;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 class MrcBinaryReader extends MapFileReader {
 

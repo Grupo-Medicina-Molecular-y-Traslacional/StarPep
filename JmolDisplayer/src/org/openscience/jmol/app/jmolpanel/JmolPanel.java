@@ -23,7 +23,7 @@
  */
 package org.openscience.jmol.app.jmolpanel;
 
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 import org.jmol.api.JmolAdapter;
 import org.jmol.api.JmolViewer;

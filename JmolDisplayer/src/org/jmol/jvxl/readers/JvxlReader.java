@@ -30,7 +30,7 @@ import org.jmol.util.Logger;
 import org.jmol.util.Parser;
 import org.jmol.g3d.Graphics3D;
 import org.jmol.jvxl.data.JvxlCoder;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 public class JvxlReader extends JvxlXmlReader {
 

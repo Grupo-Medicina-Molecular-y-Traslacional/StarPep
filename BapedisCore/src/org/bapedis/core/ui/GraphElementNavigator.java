@@ -174,8 +174,8 @@ public class GraphElementNavigator extends JComponent implements
         // Botton toolbar
         bottomToolbar = new JToolBar();
         bottomToolbar.setFloatable(false);
-        nodeSizeLabel = new JLabel(ImageUtilities.loadImageIcon("/org/bapedis/core/resources/rightArrow.png", false));
-        edgeSizeLabel = new JLabel(ImageUtilities.loadImageIcon("/org/bapedis/core/resources/rightArrow.png", false));
+        nodeSizeLabel = new JLabel(ImageUtilities.loadImageIcon("org/bapedis/core/resources/rightArrow.png", false));
+        edgeSizeLabel = new JLabel(ImageUtilities.loadImageIcon("org/bapedis/core/resources/rightArrow.png", false));
         bottomToolbar.add(nodeSizeLabel);
         bottomToolbar.addSeparator();
         bottomToolbar.add(edgeSizeLabel);

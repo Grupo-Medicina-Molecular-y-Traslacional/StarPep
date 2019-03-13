@@ -39,7 +39,7 @@ import org.jmol.util.JmolMolecule;
 import org.jmol.util.JmolNode;
 import org.jmol.util.Logger;
 import org.jmol.smiles.SmilesSearch.VTemp;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /**
  * Double bond, allene, square planar and tetrahedral stereochemistry only

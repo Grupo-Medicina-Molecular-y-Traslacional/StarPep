@@ -37,7 +37,7 @@ import javax.vecmath.Vector3f;
 
 import org.jmol.adapter.smarter.Atom;
 import org.jmol.util.Logger;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 public class GamessUSReader extends GamessReader {
 

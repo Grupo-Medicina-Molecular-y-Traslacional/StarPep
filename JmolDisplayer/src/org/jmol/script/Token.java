@@ -37,7 +37,7 @@ import java.util.Map;
 import org.jmol.util.ArrayUtil;
 //import org.jmol.util.Escape;
 import org.jmol.util.Logger;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 //import org.jmol.util.Measure;
 
 public class Token {

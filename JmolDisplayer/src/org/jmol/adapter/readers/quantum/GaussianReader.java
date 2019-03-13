@@ -37,7 +37,7 @@ import javax.vecmath.Vector3f;
 import org.jmol.api.JmolAdapter;
 import org.jmol.util.ArrayUtil;
 import org.jmol.util.Logger;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /**
  * Reader for Gaussian 94/98/03/09 output files.

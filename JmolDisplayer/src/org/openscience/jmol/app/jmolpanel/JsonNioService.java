@@ -23,7 +23,7 @@
  */
 
 package org.openscience.jmol.app.jmolpanel;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,7 +34,6 @@ import java.util.Calendar;
 import javax.vecmath.Point3f;
 
 import org.jmol.api.JmolViewer;
-import org.jmol.util.Logger;
 import org.jmol.util.TextFormat;
 
 import com.json.JSONException;

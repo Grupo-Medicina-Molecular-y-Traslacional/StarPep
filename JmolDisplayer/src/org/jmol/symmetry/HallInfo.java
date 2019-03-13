@@ -56,7 +56,7 @@ import javax.vecmath.Point3i;
 import javax.vecmath.Matrix4f;
 
 import org.jmol.util.Logger;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 class HallInfo {
   

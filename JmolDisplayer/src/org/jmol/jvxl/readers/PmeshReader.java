@@ -31,7 +31,7 @@ import org.jmol.jvxl.data.JvxlCoder;
 import org.jmol.util.BinaryDocument;
 import org.jmol.util.Logger;
 import org.jmol.util.SurfaceFileTyper;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /*
  * 

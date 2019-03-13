@@ -34,7 +34,7 @@ import java.util.Map;
 
 import org.jmol.util.Logger;
 import org.jmol.util.Parser;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /**
  * CSF file reader based on CIF idea -- fluid property fields.

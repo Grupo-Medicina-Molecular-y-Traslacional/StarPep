@@ -46,7 +46,7 @@ import org.jmol.util.Measure;
 import org.jmol.viewer.JmolConstants;
 import org.jmol.api.JmolAdapter;
 import org.jmol.api.JmolBioResolver;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 public final class Resolver implements JmolBioResolver {
 

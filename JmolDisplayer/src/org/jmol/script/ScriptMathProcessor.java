@@ -64,7 +64,7 @@ import org.jmol.util.TextFormat;
 import org.jmol.viewer.JmolConstants;
 import org.jmol.viewer.PropertyManager;
 import org.jmol.viewer.Viewer;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 class ScriptMathProcessor {
   /**

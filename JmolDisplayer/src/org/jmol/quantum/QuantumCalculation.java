@@ -29,7 +29,7 @@ import org.jmol.modelset.Atom;
 import org.jmol.util.Logger;
 
 import java.util.BitSet;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 abstract class QuantumCalculation {
 

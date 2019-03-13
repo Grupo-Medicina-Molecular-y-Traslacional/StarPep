@@ -26,7 +26,7 @@ package org.jmol.jvxl.readers;
 import java.io.BufferedReader;
 
 import org.jmol.viewer.Viewer;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 class XplorReader extends MapFileReader {
 

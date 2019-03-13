@@ -181,10 +181,10 @@ public class MetadataNavigator extends JComponent implements
         bottomPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         fetchedSizeLabel = new JLabel();
-        fetchedSizeLabel.setIcon(ImageUtilities.loadImageIcon("/org/bapedis/core/resources/rightArrow.png", false));
+        fetchedSizeLabel.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/rightArrow.png", false));
 
         filteredSizeLabel = new JLabel();
-        filteredSizeLabel.setIcon(ImageUtilities.loadImageIcon("/org/bapedis/core/resources/rightArrow.png", false));
+        filteredSizeLabel.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/rightArrow.png", false));
 
         bottomPanel.add(fetchedSizeLabel);
         bottomPanel.add(filteredSizeLabel);

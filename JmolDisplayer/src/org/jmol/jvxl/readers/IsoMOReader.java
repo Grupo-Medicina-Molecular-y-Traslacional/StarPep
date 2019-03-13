@@ -38,7 +38,7 @@ import org.jmol.api.QuantumCalculationInterface;
 import org.jmol.api.QuantumPlaneCalculationInterface;
 import org.jmol.constant.EnumQuantumShell;
 import org.jmol.jvxl.data.VolumeData;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 class IsoMOReader extends AtomDataReader {
 

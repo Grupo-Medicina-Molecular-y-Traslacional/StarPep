@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.vecmath.Point3f;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 /**
  * Amber Coordinate File Reader

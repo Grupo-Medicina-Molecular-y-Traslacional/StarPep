@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.netbeans.jmol.model;
+package org.bapedis.jmolDisplayer.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;

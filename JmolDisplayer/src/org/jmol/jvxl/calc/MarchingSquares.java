@@ -32,7 +32,7 @@ import javax.vecmath.Point4f;
 import org.jmol.jvxl.api.VertexDataServer;
 import org.jmol.jvxl.data.VolumeData;
 import org.jmol.util.ArrayUtil;
-import org.netbeans.jmol.displayer.Utilities;
+import org.bapedis.jmolDisplayer.desktop.Utilities;
 
 public class MarchingSquares {
 

@@ -29,7 +29,7 @@ public class NetworkAction extends ToolAction {
         super(NbBundle.getMessage(NetworkAction.class, "CTL_Network"),
                 NetworkTag.class);        
         main.insert(new ShowMetadataNetwork(), 0);
-//        main.insert(new ChemicalSpaceAction(), 1);
+        main.insert(new ChemicalSpaceAction(), 1);
 //        main.insert(new LoadHSP(), 2);
     }     
     

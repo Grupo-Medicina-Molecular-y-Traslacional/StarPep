@@ -25,7 +25,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author loge
  */
-//@ServiceProvider(service = AlgorithmFactory.class, position = 0)
+@ServiceProvider(service = AlgorithmFactory.class, position = 0)
 public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
 
     private MapperAlgorithmPanel setupUI = new MapperAlgorithmPanel();

@@ -19,11 +19,13 @@ public final class VisualRepresentation extends JPanel {
 
     public VisualRepresentation() {
         initComponents();
-        csOption = ChemSpaceOption.TwoD_SPACE;
+        csOption = ChemSpaceOption.NONE;
         networkType = NetworkType.FULL;
 
         setChemSpaceOption(csOption);
         setNetworkType(networkType);
+
+        extLabel.setText(NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.extLabel.text"));
     }
 
     public ChemSpaceOption getChemSpaceOption() {
@@ -33,45 +35,24 @@ public final class VisualRepresentation extends JPanel {
     public void setChemSpaceOption(ChemSpaceOption csOption) {
         ChemSpaceOption oldOption = this.csOption;
         this.csOption = csOption;
-        String desc;
+
         switch (csOption) {
-            case TwoD_SPACE:
-                if (!jOption2D.isSelected()) {
-                    jOption2D.setSelected(true);
-                }
-                jHSPCheckBox.setEnabled(false);
-                desc = NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.extLabel.option1.text");
-                break;
-            case ThreeD_SPACE:
-                if (!jOption3D.isSelected()) {
-                    jOption3D.setSelected(true);
-                }
-                desc = NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.extLabel.option1.text");
-                jHSPCheckBox.setEnabled(false);
-                break;                
             case CHEM_SPACE_NETWORK:
                 if (!jOptionCSN.isSelected()) {
                     jOptionCSN.setSelected(true);
                 }
-                desc = NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.extLabel.option2.text");
-                jHSPCheckBox.setEnabled(true);
-                break;                
+                break;
             case SEQ_SIMILARITY_NETWORK:
                 if (!jOptionSSN.isSelected()) {
                     jOptionSSN.setSelected(true);
                 }
-                desc = NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.extLabel.option2.text");
-                jHSPCheckBox.setEnabled(true);
                 break;
-            default: 
-                jOption2D.setSelected(false);
-                jOption3D.setSelected(false);
+            default:
                 jOptionCSN.setSelected(false);
                 jOptionSSN.setSelected(false);
                 jHSPCheckBox.setSelected(false);
-                desc = NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.extLabel.text");
+
         }
-        extLabel.setText(desc);
         firePropertyChange(CHANGED_CHEM_SPACE, oldOption, csOption);
     }
 
@@ -111,9 +92,6 @@ public final class VisualRepresentation extends JPanel {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         jQuestionLabel = new javax.swing.JLabel();
-        coordinateBasedPanel = new javax.swing.JPanel();
-        jOption2D = new javax.swing.JRadioButton();
-        jOption3D = new javax.swing.JRadioButton();
         coordinateFreePanel = new javax.swing.JPanel();
         jOptionCSN = new javax.swing.JRadioButton();
         jHSPCheckBox = new javax.swing.JCheckBox();
@@ -133,43 +111,6 @@ public final class VisualRepresentation extends JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jQuestionLabel, gridBagConstraints);
-
-        coordinateBasedPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.coordinateBasedPanel.border.title"))); // NOI18N
-        coordinateBasedPanel.setLayout(new java.awt.GridBagLayout());
-
-        buttonGroup1.add(jOption2D);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption2D, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jOption2D.text")); // NOI18N
-        jOption2D.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jOption2DActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-        coordinateBasedPanel.add(jOption2D, gridBagConstraints);
-
-        buttonGroup1.add(jOption3D);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption3D, org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.jOption3D.text")); // NOI18N
-        jOption3D.setEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-        coordinateBasedPanel.add(jOption3D, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(coordinateBasedPanel, gridBagConstraints);
 
         coordinateFreePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(VisualRepresentation.class, "VisualRepresentation.coordinateFreePanel.border.title"))); // NOI18N
         coordinateFreePanel.setLayout(new java.awt.GridBagLayout());
@@ -219,7 +160,7 @@ public final class VisualRepresentation extends JPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(coordinateFreePanel, gridBagConstraints);
@@ -241,7 +182,7 @@ public final class VisualRepresentation extends JPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -252,11 +193,6 @@ public final class VisualRepresentation extends JPanel {
     private void jHSPCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jHSPCheckBoxActionPerformed
         setNetworkType(jHSPCheckBox.isSelected() ? NetworkType.HSP : NetworkType.FULL);
     }//GEN-LAST:event_jHSPCheckBoxActionPerformed
-
-    private void jOption2DActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2DActionPerformed
-        setChemSpaceOption(ChemSpaceOption.TwoD_SPACE);
-        
-    }//GEN-LAST:event_jOption2DActionPerformed
 
     private void jOptionCSNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOptionCSNActionPerformed
         setChemSpaceOption(ChemSpaceOption.CHEM_SPACE_NETWORK);
@@ -269,12 +205,9 @@ public final class VisualRepresentation extends JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bottomPanel;
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JPanel coordinateBasedPanel;
     private javax.swing.JPanel coordinateFreePanel;
     private javax.swing.JLabel extLabel;
     private javax.swing.JCheckBox jHSPCheckBox;
-    private javax.swing.JRadioButton jOption2D;
-    private javax.swing.JRadioButton jOption3D;
     private javax.swing.JRadioButton jOptionCSN;
     private javax.swing.JRadioButton jOptionSSN;
     private javax.swing.JLabel jQuestionLabel;

@@ -9,7 +9,7 @@ package org.bapedis.chemspace.spi;
  *
  * @author loge
  */
-public interface SimilarityMeasureFactory {
+public interface SimilarityCoefficientFactory {
 
      /**
      * The name of the behaviour of the algorithm's provided by this factory.
@@ -28,11 +28,11 @@ public interface SimilarityMeasureFactory {
      * built by this factory.
      * @return a <code>LayoutUI</code> instance
      */
-    public SimilarityMeasureSetupUI getSetupUI();
+    public SimilarityCoefficientSetupUI getSetupUI();
 
     /**
      * Builds an instance of the algorithm.
      * @return  a new <code>Layout</code> instance
      */
-    public SimilarityMeasure createAlgorithm();
+    public SimilarityCoefficient createAlgorithm();
 }

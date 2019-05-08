@@ -8,11 +8,11 @@ import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import org.bapedis.core.model.SimilarityMatrix;
-import org.bapedis.chemspace.spi.SimilarityMeasure;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.DialogDisplayer;
+import org.bapedis.chemspace.spi.SimilarityCoefficient;
 
 /**
  *
@@ -24,7 +24,7 @@ class SimilarityMatrixBuilder extends RecursiveAction {
     private static float MIN_VALUE = 0.7f;
     private Peptide[] peptides;
     private ProgressTicket progressTicket;
-    private SimilarityMeasure similarityMeasure;
+    private SimilarityCoefficient similarityMeasure;
     private AtomicBoolean stopRun;    
     
     private final SimilarityMatrix matrix;
@@ -36,7 +36,7 @@ class SimilarityMatrixBuilder extends RecursiveAction {
         this(peptides, new SimilarityMatrix(peptides), 0, peptides.length, 0, peptides.length);   
     }
 
-    void setContext(SimilarityMeasure similarityMeasure, ProgressTicket progressTicket, AtomicBoolean stopRun) {        
+    void setContext(SimilarityCoefficient similarityMeasure, ProgressTicket progressTicket, AtomicBoolean stopRun) {        
         this.similarityMeasure = similarityMeasure;
         this.progressTicket = progressTicket;        
         this.stopRun = stopRun;

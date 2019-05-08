@@ -15,59 +15,63 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import org.bapedis.chemspace.spi.TwoDTransformer;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.bapedis.chemspace.spi.TwoDTransformerFactory;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.ClusteringTag;
+import org.bapedis.core.spi.alg.impl.AbstractCluster;
 
-public final class VisualTwoDTransformer extends JPanel {
+public final class VisualClusterize extends JPanel {
 
-    public static final String TRANSFORMER_FACTORY = "transformer_factory";
+    public static final String CLUSTERING_FACTORY = "clustering_factory";
     private final DefaultMutableTreeNode treeNode;
-    private final HashMap<String, TwoDTransformer> map;
-    private TwoDTransformerFactory factory;
+    private final HashMap<String, AbstractCluster> map;
+    private AbstractCluster clustering;
 
-    public VisualTwoDTransformer() {
+    public VisualClusterize() {
         initComponents();
-        treeNode = new DefaultMutableTreeNode(NbBundle.getMessage(VisualTwoDTransformer.class, "VisualTwoDTransformer.root.name"), true);
+        treeNode = new DefaultMutableTreeNode(NbBundle.getMessage(VisualClusterize.class, "VisualClusterize.root.name"), true);
         populateJTree();
         jTree1.setModel(new DefaultTreeModel(treeNode));
         jTree1.setRootVisible(true);
-        jTree1.setCellRenderer(new TransformerFactoryNodeRenderer());
+        jTree1.setCellRenderer(new ClusteringFactoryNodeRenderer());
         map = new HashMap<>();
     }
 
-    public HashMap<String, TwoDTransformer> getMap() {
+    public HashMap<String, AbstractCluster> getMap() {
         return map;
     }
 
-    public void setTransformer(TwoDTransformer transformer) {        
-        factory = transformer.getFactory();
-        map.put(factory.getName(), transformer);
-        TransformerFactoryTreeNode factoryNode;
+    public void setClustering(AbstractCluster clustering) {
+        this.clustering = clustering;
+        AlgorithmFactory factory = clustering.getFactory();
+        map.put(factory.getName(), clustering);
+        ClusteringFactoryTreeNode factoryNode;
         for (int i = 0; i < treeNode.getChildCount(); i++) {
-            factoryNode = (TransformerFactoryTreeNode) treeNode.getChildAt(i);
+            factoryNode = (ClusteringFactoryTreeNode) treeNode.getChildAt(i);
             if (factoryNode.getFactory().getName().equals(factory.getName())) {
                 jTree1.setSelectionPath(new TreePath(factoryNode.getPath()));
             }
         }
     }
-
-    public TwoDTransformerFactory getThreeDTransformerFactory() {
-        return factory;
+    
+    public AbstractCluster getClustering(){
+        return clustering;
     }
 
     private void populateJTree() {
-        Collection<? extends TwoDTransformerFactory> factories = Lookup.getDefault().lookupAll(TwoDTransformerFactory.class);
-        for (TwoDTransformerFactory factory : factories) {
-            treeNode.add(new TransformerFactoryTreeNode(factory));
+        Collection<? extends AlgorithmFactory> factories = Lookup.getDefault().lookupAll(AlgorithmFactory.class);
+        for (AlgorithmFactory factory : factories) {
+            if (factory instanceof ClusteringTag) {
+                treeNode.add(new ClusteringFactoryTreeNode(factory));
+            }
         }
     }
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(VisualTwoDTransformer.class, "VisualTwoDTransformer.name");
+        return NbBundle.getMessage(VisualClusterize.class, "VisualClusterize.name");
     }
 
     /**
@@ -126,7 +130,7 @@ public final class VisualTwoDTransformer extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jScrollPane2, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualTwoDTransformer.class, "VisualTwoDTransformer.jInfoLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualClusterize.class, "VisualClusterize.jInfoLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -146,30 +150,29 @@ public final class VisualTwoDTransformer extends JPanel {
 
     private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
         TreePath newPath = evt.getNewLeadSelectionPath();
-
-        if (newPath != null && newPath.getLastPathComponent() instanceof TransformerFactoryTreeNode) {
-            TransformerFactoryTreeNode newNode = (TransformerFactoryTreeNode) newPath.getLastPathComponent();
+        AlgorithmFactory factory = null;
+        if (newPath != null && newPath.getLastPathComponent() instanceof ClusteringFactoryTreeNode) {
+            ClusteringFactoryTreeNode newNode = (ClusteringFactoryTreeNode) newPath.getLastPathComponent();
             factory = newNode.getFactory();
             jTextArea1.setText(factory.getDescription());
-            TwoDTransformer transformer;
             if (!map.containsKey(factory.getName())) {
-                transformer = factory.createAlgorithm();
-                map.put(factory.getName(), transformer);
+                clustering = (AbstractCluster)factory.createAlgorithm();
+                map.put(factory.getName(), clustering);
             } else {
-                transformer = map.get(factory.getName());
+                clustering = map.get(factory.getName());
             }
             if (factory.getSetupUI() != null) {
-                JPanel panel = factory.getSetupUI().getSettingPanel(transformer);
+                JPanel panel = factory.getSetupUI().getSettingPanel(clustering);
                 jScrollPane3.setViewportView(panel);
             } else {
                 jScrollPane3.setViewportView(null);
             }
         } else {
-            factory = null;
+            clustering = null;
             jTextArea1.setText("");
             jScrollPane3.setViewportView(null);
         }
-        firePropertyChange(TRANSFORMER_FACTORY, null, factory);
+        firePropertyChange(CLUSTERING_FACTORY, null, factory);
     }//GEN-LAST:event_jTree1ValueChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -181,14 +184,14 @@ public final class VisualTwoDTransformer extends JPanel {
     private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
 
-    private static class TransformerFactoryTreeNode extends DefaultMutableTreeNode {
+    private static class ClusteringFactoryTreeNode extends DefaultMutableTreeNode {
 
-        public TransformerFactoryTreeNode(TwoDTransformerFactory factory) {
+        public ClusteringFactoryTreeNode(AlgorithmFactory factory) {
             super(factory, false);
         }
 
-        public TwoDTransformerFactory getFactory() {
-            return (TwoDTransformerFactory) userObject;
+        public AlgorithmFactory getFactory() {
+            return (AlgorithmFactory) userObject;
         }
 
         @Override
@@ -198,11 +201,11 @@ public final class VisualTwoDTransformer extends JPanel {
 
     }
 
-    private static class TransformerFactoryNodeRenderer extends DefaultTreeCellRenderer {
+    private static class ClusteringFactoryNodeRenderer extends DefaultTreeCellRenderer {
 
         Icon icon;
 
-        public TransformerFactoryNodeRenderer() {
+        public ClusteringFactoryNodeRenderer() {
             icon = ImageUtilities.loadImageIcon("org/bapedis/chemspace/resources/network.png", false);
         }
 
@@ -221,7 +224,7 @@ public final class VisualTwoDTransformer extends JPanel {
                     expanded, leaf, row,
                     hasFocus);
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-            if (!(node instanceof TransformerFactoryTreeNode)) {
+            if (!(node instanceof ClusteringFactoryTreeNode)) {
                 // Root node
                 setIcon(icon);
             }

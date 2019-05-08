@@ -13,9 +13,9 @@ import org.bapedis.core.model.Workspace;
  *
  * @author loge
  */
-public interface SimilarityMeasure {
+public interface SimilarityCoefficient {
 
-    SimilarityMeasureFactory getFactory();
+    SimilarityCoefficientFactory getFactory();
             
     void setMolecularFeatures(Workspace workspace, MolecularDescriptor[] features);
     

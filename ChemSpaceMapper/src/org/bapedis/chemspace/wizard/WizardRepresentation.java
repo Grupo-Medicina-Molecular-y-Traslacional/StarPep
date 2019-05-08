@@ -12,7 +12,6 @@ import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.impl.CSNEmbedder;
 import org.bapedis.chemspace.impl.NetworkEmbedder;
 import org.bapedis.chemspace.impl.SSNEmbedder;
-import org.bapedis.chemspace.impl.TwoDEmbedder;
 import org.bapedis.chemspace.model.ChemSpaceOption;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
@@ -22,7 +21,6 @@ public class WizardRepresentation implements WizardDescriptor.FinishablePanel<Wi
 
     private final MapperAlgorithm csMapper;
     private CSNEmbedder csnEmbedder;
-    private TwoDEmbedder twoDEmbedder;
     private SSNEmbedder ssnEmbedder;
     private final EventListenerList listeners;
 
@@ -47,7 +45,6 @@ public class WizardRepresentation implements WizardDescriptor.FinishablePanel<Wi
             try {
                 component = new VisualRepresentation();
 
-                twoDEmbedder = (TwoDEmbedder) csMapper.getTwoDEmbedderAlg().clone();
                 csnEmbedder = (CSNEmbedder) csMapper.getCSNEmbedderAlg().clone();
                 ssnEmbedder = (SSNEmbedder) csMapper.getSSNEmbedderAlg().clone();
             } catch (CloneNotSupportedException ex) {
@@ -118,11 +115,6 @@ public class WizardRepresentation implements WizardDescriptor.FinishablePanel<Wi
         wiz.putProperty(ChemSpaceOption.class.getName(), csOption);
         
         switch (csOption) {
-            case TwoD_SPACE:
-                wiz.putProperty(AbstractEmbedder.class.getName(), twoDEmbedder);
-                break;
-            case ThreeD_SPACE:
-                throw new UnsupportedOperationException("3D is not supported yet)");
             case CHEM_SPACE_NETWORK:
                 csnEmbedder.setNetworkType(component.getNetworkType());
                 wiz.putProperty(AbstractEmbedder.class.getName(), csnEmbedder);

@@ -3,14 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.spi;
+package org.bapedis.core.spi.ui;
 
-import javax.swing.JPanel;
+import org.openide.windows.TopComponent;
 
 /**
  *
  * @author loge
  */
-public interface SimilarityMeasureSetupUI {
-       public JPanel getSettingPanel(SimilarityMeasure simMeasure); 
+public interface ClusteringWindowController {
+    TopComponent getClusteringWindow();
+    void openClusteringWindow();
 }

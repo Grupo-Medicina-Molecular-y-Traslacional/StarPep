@@ -24,9 +24,9 @@ import org.openide.WizardDescriptor;
 public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescriptor>, PropertyChangeListener {
 
     private final EventListenerList listeners;
-    private final WizardDescriptor.Panel<WizardDescriptor>[] defaultPanels, twoDPanels, csnPanels, ssnPanels;
+    private final WizardDescriptor.Panel<WizardDescriptor>[] defaultPanels, csnPanels, ssnPanels;
     private WizardDescriptor.Panel<WizardDescriptor>[] currentPanels;
-    private final String[] defaultSteps, twoDSteps, csnSteps, ssnSteps;
+    private final String[] defaultSteps, csnSteps, ssnSteps;
     private WizardDescriptor wizardDesc;
     private int index;
     private ChemSpaceOption csOption;
@@ -35,17 +35,16 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
 
         listeners = new EventListenerList();
 
-        WizardRepresentation wizRep = new WizardRepresentation(csMapper);
-        wizRep.getComponent().addPropertyChangeListener(this);
-
         WizardDescriptor.Panel<WizardDescriptor>[] allPanels = new WizardDescriptor.Panel[]{
-            wizRep, //0
+            new WizardRepresentation(csMapper), //0
             new WizardFeatureExtraction(csMapper), //1
             new WizardFeatureSelection(csMapper), //2
-            new WizardSimilarityMeasure(csMapper), //3
-            new WizardTwoDTransformer(csMapper), //4
+            new WizardClusterize(csMapper), //3            
+            new WizardSimilarityMeasure(csMapper), //4
             new WizardSequenceAlignment(csMapper) //5
         };
+        
+        allPanels[0].getComponent().addPropertyChangeListener(this);
 
         String[] steps = new String[allPanels.length];
         for (int i = 0; i < allPanels.length; i++) {
@@ -63,7 +62,7 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
         }
 
         // Chem Space Option
-        csOption = ChemSpaceOption.TwoD_SPACE;
+        csOption = csMapper.getChemSpaceOption();
 
         //Default Panels
         defaultPanels = new WizardDescriptor.Panel[]{
@@ -73,41 +72,35 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
             steps[0]
         };
 
-        //TwoDimensional Panels
-        twoDPanels = new WizardDescriptor.Panel[]{
-            allPanels[0],
-            allPanels[1],
-            allPanels[2],
-            allPanels[4]
-        };
-        twoDSteps = new String[]{
-            steps[0],
-            steps[1],
-            steps[2],
-            steps[4]
-        };
-
         //CSN Panels
         csnPanels = new WizardDescriptor.Panel[]{
             allPanels[0],
             allPanels[1],
             allPanels[2],
-            allPanels[3]
+            allPanels[3],
+            allPanels[4]
         };
         csnSteps = new String[]{
             steps[0],
             steps[1],
             steps[2],
-            steps[3]
+            steps[3],
+            steps[4]
         };
 
         //SSN Panels
         ssnPanels = new WizardDescriptor.Panel[]{
             allPanels[0],
+            allPanels[1],
+            allPanels[2],
+            allPanels[3],
             allPanels[5]
         };
         ssnSteps = new String[]{
             steps[0],
+            steps[1],
+            steps[2],
+            steps[3],
             steps[5]
         };
         currentPanels = defaultPanels;
@@ -123,10 +116,6 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
         this.csOption = csOption;
         String[] steps = null;
         switch (csOption) {
-            case TwoD_SPACE:
-                currentPanels = twoDPanels;
-                steps = twoDSteps;
-                break;
             case CHEM_SPACE_NETWORK:
                 currentPanels = csnPanels;
                 steps = csnSteps;

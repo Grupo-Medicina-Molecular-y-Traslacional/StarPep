@@ -3,10 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.clustering.impl;
+package org.bapedis.chemspace.clustering.impl;
 
-import java.util.LinkedList;
-import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.openide.util.Exceptions;

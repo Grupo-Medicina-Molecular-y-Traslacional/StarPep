@@ -27,7 +27,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
     protected final JXHyperlink openWizardLink;
     protected MapperAlgorithm csMapper;
-    protected final TwoDChemSpacePanel twoDPanel;
     protected final NetworkPanel csnPanel;
     protected final NetworkPanel ssnPanel;    
 
@@ -39,10 +38,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         
         openWizardLink = new JXHyperlink();
         configureOpenWizardLink();
-        topRightPanel.add(openWizardLink);
-        
-        twoDPanel = new TwoDChemSpacePanel();
-        centerPanel.add(twoDPanel, "2DChemSpace");
+        topRightPanel.add(openWizardLink);        
 
         csnPanel = new NetworkPanel();
         centerPanel.add(csnPanel, "chemSpaceNetwork");   
@@ -95,11 +91,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         CardLayout centerCL = (CardLayout) centerPanel.getLayout();
         CardLayout topLeftCl = (CardLayout) topLeftPanel.getLayout();
         switch (csMapper.getChemSpaceOption()) {
-            case TwoD_SPACE:
-                twoDPanel.setUp(csMapper);
-                topLeftCl.show(topLeftPanel, "2DChemSpace");
-                centerCL.show(centerPanel, "2DChemSpace");
-                break;
             case CHEM_SPACE_NETWORK:
                 csnPanel.setUp(csMapper);
                 topLeftCl.show(topLeftPanel, "chemSpaceNetwork");
@@ -125,10 +116,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     public void setBusy(boolean busy) {        
         openWizardLink.setEnabled(!busy);
         switch (csMapper.getChemSpaceOption()) {
-            case TwoD_SPACE:
-                twoDLabel.setEnabled(!busy);
-                twoDPanel.setEnabled(!busy);
-                break;
             case CHEM_SPACE_NETWORK:
                 csnLabel.setEnabled(!busy);
                 csnPanel.setEnabled(!busy);
@@ -158,7 +145,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         java.awt.GridBagConstraints gridBagConstraints;
 
         topLeftPanel = new javax.swing.JPanel();
-        twoDLabel = new javax.swing.JLabel();
         csnLabel = new javax.swing.JLabel();
         ssnLabel = new javax.swing.JLabel();
         topRightPanel = new javax.swing.JPanel();
@@ -167,11 +153,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         setLayout(new java.awt.GridBagLayout());
 
         topLeftPanel.setLayout(new java.awt.CardLayout());
-
-        twoDLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(twoDLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.twoDLabel.text")); // NOI18N
-        twoDLabel.setToolTipText(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.twoDLabel.toolTipText")); // NOI18N
-        topLeftPanel.add(twoDLabel, "2DChemSpace");
 
         csnLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(csnLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.csnLabel.text")); // NOI18N
@@ -219,7 +200,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private javax.swing.JLabel ssnLabel;
     private javax.swing.JPanel topLeftPanel;
     private javax.swing.JPanel topRightPanel;
-    private javax.swing.JLabel twoDLabel;
     // End of variables declaration//GEN-END:variables
 
     @Override

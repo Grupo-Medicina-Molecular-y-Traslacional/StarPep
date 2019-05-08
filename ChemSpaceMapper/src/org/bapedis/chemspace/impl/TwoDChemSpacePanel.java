@@ -79,7 +79,7 @@ public class TwoDChemSpacePanel extends javax.swing.JPanel implements PropertyCh
 
     public void setUp(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
-        twoDEmbedder = csMapper.getTwoDEmbedderAlg();
+//        twoDEmbedder = csMapper.getTwoDEmbedderAlg();
     }
 
     @Override

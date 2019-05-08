@@ -93,12 +93,6 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
 
         //Chemical Space Embbeder Options
         switch (csOption) {
-            case TwoD_SPACE:
-                TwoDEmbedder embedder = (TwoDEmbedder) wiz.getProperty(AbstractEmbedder.class.getName());
-                if (embedder != null) {
-                    csMapper.setTwoDEmbedderAlg(embedder);
-                }
-                break;
             case CHEM_SPACE_NETWORK:
                 CSNEmbedder csnEmbedder = (CSNEmbedder) wiz.getProperty(AbstractEmbedder.class.getName());
                 if (csnEmbedder != null) {

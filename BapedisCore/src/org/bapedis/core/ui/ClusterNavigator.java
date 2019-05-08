@@ -76,7 +76,7 @@ import org.openide.util.lookup.InstanceContent;
  *
  * @author loge
  */
-//@NavigatorPanel.Registration(mimeType = "peptide/clustering", displayName = "#ClusterNavigator.name")
+@NavigatorPanel.Registration(mimeType = "peptide/clustering", displayName = "#ClusterNavigator.name")
 public class ClusterNavigator extends JComponent implements
         WorkspaceEventListener, NavigatorPanelWithToolbar, LookupListener, PropertyChangeListener {
 
@@ -85,7 +85,7 @@ public class ClusterNavigator extends JComponent implements
     protected final Lookup lookup;
     protected final JToolBar toolBar;
     protected final JXTable table;
-    protected final JButton findButton, refreshButton;
+    protected final JButton findButton, refreshButton, scatter3DButton;
     protected Lookup.Result<PeptideNode> peptideLkpResult;
     protected Lookup.Result<AttributesModel> attrModelLkpResult;
     protected final JXBusyLabel busyLabel;
@@ -143,12 +143,24 @@ public class ClusterNavigator extends JComponent implements
                 }
             }
         });
+        
+        scatter3DButton = new JButton(ImageUtilities.loadImageIcon("org/bapedis/core/resources/coordinates.png", false));
+        scatter3DButton.setToolTipText(NbBundle.getMessage(MetadataNavigator.class, "ClusterNavigator.scatter3DButton.toolTipText"));
+        scatter3DButton.setFocusable(false);
+        scatter3DButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+            }
+        });        
 
         // Tool bar
         toolBar = new JToolBar();
         toolBar.setFloatable(false);
         toolBar.add(refreshButton);
 
+        toolBar.add(scatter3DButton);
+        
         toolBar.addSeparator();
         List<? extends Action> actions = Utilities.actionsForPath("Actions/EditCluster");
         for (Action action : actions) {

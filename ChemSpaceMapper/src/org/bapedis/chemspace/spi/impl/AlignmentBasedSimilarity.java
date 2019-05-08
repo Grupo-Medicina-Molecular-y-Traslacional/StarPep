@@ -5,19 +5,19 @@
  */
 package org.bapedis.chemspace.spi.impl;
 
-import org.bapedis.chemspace.spi.SimilarityMeasure;
-import org.bapedis.chemspace.spi.SimilarityMeasureFactory;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.alg.impl.PairwiseSequenceAlignment;
+import org.bapedis.chemspace.spi.SimilarityCoefficient;
+import org.bapedis.chemspace.spi.SimilarityCoefficientFactory;
 
 /**
  *
  * @author loge
  */
-public class AlignmentBasedSimilarity implements SimilarityMeasure{
+public class AlignmentBasedSimilarity implements SimilarityCoefficient{
     private final AlignmentBasedSimilarityFactory factory;
     private SequenceAlignmentModel alignmentModel;
 
@@ -34,7 +34,7 @@ public class AlignmentBasedSimilarity implements SimilarityMeasure{
     }        
         
     @Override
-    public SimilarityMeasureFactory getFactory() {
+    public SimilarityCoefficientFactory getFactory() {
         return factory;
     }
 

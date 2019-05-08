@@ -3,12 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.model;
+package org.bapedis.chemspace.spi;
+
+import javax.swing.JPanel;
 
 /**
  *
  * @author loge
  */
-public enum ChemSpaceOption {
-    NONE, CHEM_SPACE_NETWORK, SEQ_SIMILARITY_NETWORK
+public interface SimilarityCoefficientSetupUI {
+       public JPanel getSettingPanel(SimilarityCoefficient simMeasure); 
 }

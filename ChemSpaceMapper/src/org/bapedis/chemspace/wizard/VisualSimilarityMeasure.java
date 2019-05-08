@@ -15,18 +15,18 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import org.bapedis.chemspace.spi.SimilarityMeasure;
-import org.bapedis.chemspace.spi.SimilarityMeasureFactory;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.bapedis.chemspace.spi.SimilarityCoefficient;
+import org.bapedis.chemspace.spi.SimilarityCoefficientFactory;
 
 public final class VisualSimilarityMeasure extends JPanel {
 
     public static final String NETWORK_FACTORY = "network_factory";
     private final DefaultMutableTreeNode treeNode;
-    private SimilarityMeasureFactory factory;
-    private final HashMap<String,SimilarityMeasure> map;
+    private SimilarityCoefficient coefficient;
+    private final HashMap<String,SimilarityCoefficient> map;
 
     public VisualSimilarityMeasure() {
         initComponents();
@@ -38,13 +38,14 @@ public final class VisualSimilarityMeasure extends JPanel {
         map = new HashMap<>();
     }
 
-    public SimilarityMeasureFactory getSimilarityMeasureFactory() {
-        return factory;
+    public SimilarityCoefficient getSimilarityCoefficient() {
+        return coefficient;
     }   
     
-    public void setSimilarityMeasure(SimilarityMeasure measure){
-        factory = measure.getFactory();
-        map.put(factory.getName(), measure);
+    public void setSimilarityMeasure(SimilarityCoefficient coefficient){
+        this.coefficient = coefficient;
+        SimilarityCoefficientFactory factory = coefficient.getFactory();
+        map.put(factory.getName(), coefficient);
         SimilarityFactoryTreeNode factoryNode;
         for(int i=0; i< treeNode.getChildCount(); i++){
             factoryNode = (SimilarityFactoryTreeNode)treeNode.getChildAt(i);
@@ -55,8 +56,8 @@ public final class VisualSimilarityMeasure extends JPanel {
     }    
 
     private void populateJTree() {
-        Collection<? extends SimilarityMeasureFactory> factories = Lookup.getDefault().lookupAll(SimilarityMeasureFactory.class);
-        for (SimilarityMeasureFactory factory : factories) {
+        Collection<? extends SimilarityCoefficientFactory> factories = Lookup.getDefault().lookupAll(SimilarityCoefficientFactory.class);
+        for (SimilarityCoefficientFactory factory : factories) {
             treeNode.add(new SimilarityFactoryTreeNode(factory));
         }
     }
@@ -141,27 +142,26 @@ public final class VisualSimilarityMeasure extends JPanel {
 
     private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
         TreePath newPath = evt.getNewLeadSelectionPath();
-        
+        SimilarityCoefficientFactory factory = null;
         if (newPath != null && newPath.getLastPathComponent() instanceof SimilarityFactoryTreeNode) {
             SimilarityFactoryTreeNode newNode = (SimilarityFactoryTreeNode) newPath.getLastPathComponent();
             factory = newNode.getFactory();
             jTextArea1.setText(factory.getDescription());  
-            SimilarityMeasure measure;
             if (!map.containsKey(factory.getName())) {
-                measure = factory.createAlgorithm();
-                map.put(factory.getName(), measure);
+                coefficient = factory.createAlgorithm();
+                map.put(factory.getName(), coefficient);
             } else {
-                measure = map.get(factory.getName());
+                coefficient = map.get(factory.getName());
             }
             if (factory.getSetupUI() != null) {
-                JPanel panel = factory.getSetupUI().getSettingPanel(measure);
+                JPanel panel = factory.getSetupUI().getSettingPanel(coefficient);
                 jScrollPane3.setViewportView(panel);
             } else {
                 jScrollPane3.setViewportView(null);
             }
             
         } else {
-            factory = null;
+            coefficient = null;
             jTextArea1.setText("");
             jScrollPane3.setViewportView(null);
         }
@@ -179,12 +179,12 @@ public final class VisualSimilarityMeasure extends JPanel {
 
     private static class SimilarityFactoryTreeNode extends DefaultMutableTreeNode {
 
-        public SimilarityFactoryTreeNode(SimilarityMeasureFactory factory) {
+        public SimilarityFactoryTreeNode(SimilarityCoefficientFactory factory) {
             super(factory, false);
         }
 
-        public SimilarityMeasureFactory getFactory() {
-            return (SimilarityMeasureFactory) userObject;
+        public SimilarityCoefficientFactory getFactory() {
+            return (SimilarityCoefficientFactory) userObject;
         }
 
         @Override

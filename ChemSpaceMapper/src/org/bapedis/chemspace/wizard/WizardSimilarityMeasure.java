@@ -13,7 +13,7 @@ import javax.swing.event.EventListenerList;
 import org.bapedis.chemspace.impl.AbstractEmbedder;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.impl.CSNEmbedder;
-import org.bapedis.chemspace.spi.SimilarityMeasureFactory;
+import org.bapedis.chemspace.spi.SimilarityCoefficient;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
@@ -93,15 +93,15 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        SimilarityMeasureFactory factory = component.getSimilarityMeasureFactory();
-        if (factory != null) {
-            alg.setSimMeasure(factory.createAlgorithm());
+        SimilarityCoefficient coefficient = component.getSimilarityCoefficient();
+        if (coefficient != null) {
+            alg.setSimMeasure(coefficient);
         }
     }
 
     @Override
     public void validate() throws WizardValidationException {
-        if (getComponent().getSimilarityMeasureFactory() == null) {
+        if (getComponent().getSimilarityCoefficient() == null) {
             isValid = false;
             throw new WizardValidationException(null, NbBundle.getMessage(WizardSimilarityMeasure.class, "VisualSimilarityMeasure.invalid.text"), null);
         }

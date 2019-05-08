@@ -8,12 +8,12 @@ package org.bapedis.chemspace.impl;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.bapedis.chemspace.model.NetworkType;
 import org.bapedis.core.model.SimilarityMatrix;
-import org.bapedis.chemspace.spi.SimilarityMeasure;
 import org.bapedis.chemspace.spi.impl.TanimotoCoefficientFactory;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.task.ProgressTicket;
+import org.bapedis.chemspace.spi.SimilarityCoefficient;
 
 /**
  *
@@ -24,7 +24,7 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
     public static final int MAX_EDGES=100000;
     
     private AtomicBoolean atomicRun;
-    private SimilarityMeasure simMeasure;
+    private SimilarityCoefficient simMeasure;
     private SimilarityMatrix similarityMatrix;
     private float similarityThreshold;
     private NetworkType networkType;
@@ -36,11 +36,11 @@ public class CSNEmbedder extends DescriptorBasedEmbedder implements NetworkEmbed
         networkType = NetworkType.FULL;
     }
 
-    public SimilarityMeasure getSimMeasure() {
+    public SimilarityCoefficient getSimMeasure() {
         return simMeasure;
     }
 
-    public void setSimMeasure(SimilarityMeasure simMeasure) {
+    public void setSimMeasure(SimilarityCoefficient simMeasure) {
         this.simMeasure = simMeasure;
     }
 

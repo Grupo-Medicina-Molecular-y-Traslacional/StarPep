@@ -5,16 +5,16 @@
  */
 package org.bapedis.chemspace.spi.impl;
 
-import org.bapedis.chemspace.spi.SimilarityMeasure;
-import org.bapedis.chemspace.spi.SimilarityMeasureFactory;
-import org.bapedis.chemspace.spi.SimilarityMeasureSetupUI;
 import org.openide.util.NbBundle;
+import org.bapedis.chemspace.spi.SimilarityCoefficient;
+import org.bapedis.chemspace.spi.SimilarityCoefficientFactory;
+import org.bapedis.chemspace.spi.SimilarityCoefficientSetupUI;
 
 /**
  *
  * @author loge
  */
-public class AlignmentBasedSimilarityFactory implements SimilarityMeasureFactory {
+public class AlignmentBasedSimilarityFactory implements SimilarityCoefficientFactory {
 
     @Override
     public String getName() {
@@ -27,12 +27,12 @@ public class AlignmentBasedSimilarityFactory implements SimilarityMeasureFactory
     }
 
     @Override
-    public SimilarityMeasureSetupUI getSetupUI() {
+    public SimilarityCoefficientSetupUI getSetupUI() {
         return null;
     }
 
     @Override
-    public SimilarityMeasure createAlgorithm() {
+    public SimilarityCoefficient createAlgorithm() {
         return new AlignmentBasedSimilarity(this);
     }
     

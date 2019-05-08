@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.clustering.impl;
+package org.bapedis.chemspace.clustering.impl;
 
+import org.bapedis.chemspace.clustering.impl.FeatureBasedClustering;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;

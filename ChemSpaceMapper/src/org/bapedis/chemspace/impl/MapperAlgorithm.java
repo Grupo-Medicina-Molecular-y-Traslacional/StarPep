@@ -19,6 +19,7 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.impl.AbstractCluster;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
 import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
@@ -52,9 +53,9 @@ public class MapperAlgorithm implements Algorithm {
     // Algorithms    
     private AllDescriptors featureExtractionAlg;
     private FeatureSEFiltering featureFilteringAlg;
-    private TwoDEmbedder twoDEmbedderAlg;
     private CSNEmbedder csnEmbedderAlg;
     private SSNEmbedder ssnEmbedderAlg;
+    private AbstractCluster clusteringAlg;
 
     //Algorithm workflow
     private final List<Algorithm> algorithms;
@@ -67,7 +68,7 @@ public class MapperAlgorithm implements Algorithm {
         running = false;
 
         //Mapping Options        
-        csOption = ChemSpaceOption.TwoD_SPACE;
+        csOption = ChemSpaceOption.NONE;
         feOption = FeatureExtractionOption.NEW;
         ffOption = FeatureFilteringOption.YES;
         fwOption = FeatureWeightingOption.NO;
@@ -75,9 +76,10 @@ public class MapperAlgorithm implements Algorithm {
         // Algorithms
         featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
         featureFilteringAlg = (FeatureSEFiltering) new FeatureSEFilteringFactory().createAlgorithm();        
-        twoDEmbedderAlg = (TwoDEmbedder) new TwoDEmbedderFactory().createAlgorithm();
+//        twoDEmbedderAlg = (TwoDEmbedder) new TwoDEmbedderFactory().createAlgorithm();
         csnEmbedderAlg = (CSNEmbedder) new CSNEmbedderFactory().createAlgorithm();
         ssnEmbedderAlg = (SSNEmbedder) new SSNEmbedderFactory().createAlgorithm();
+        clusteringAlg = null;
     }
 
     public boolean isRunning() {
@@ -94,8 +96,6 @@ public class MapperAlgorithm implements Algorithm {
         algorithms.clear();
         
         switch (csOption) {
-            case TwoD_SPACE:
-            case ThreeD_SPACE:
             case CHEM_SPACE_NETWORK:
                 // Feature Extraction
                 if (feOption == FeatureExtractionOption.NEW) {
@@ -108,9 +108,7 @@ public class MapperAlgorithm implements Algorithm {
                 }
                 // Chemical Space Embedder
                 DescriptorBasedEmbedder embedder = null;
-                if (csOption == ChemSpaceOption.TwoD_SPACE) {
-                    embedder = twoDEmbedderAlg;
-                } else if (csOption == ChemSpaceOption.CHEM_SPACE_NETWORK) {
+                if (csOption == ChemSpaceOption.CHEM_SPACE_NETWORK) {
                     embedder = csnEmbedderAlg;
                 }
                 algorithms.add(embedder);
@@ -233,15 +231,6 @@ public class MapperAlgorithm implements Algorithm {
 
     public void setSSNEmbedderAlg(SSNEmbedder ssnEmbedderAlg) {
         this.ssnEmbedderAlg = ssnEmbedderAlg;
-    }
-
-    
-    public TwoDEmbedder getTwoDEmbedderAlg() {
-        return twoDEmbedderAlg;
-    }
-
-    public void setTwoDEmbedderAlg(TwoDEmbedder twoDEmbedderAlg) {
-        this.twoDEmbedderAlg = twoDEmbedderAlg;
     }
 
     @Override

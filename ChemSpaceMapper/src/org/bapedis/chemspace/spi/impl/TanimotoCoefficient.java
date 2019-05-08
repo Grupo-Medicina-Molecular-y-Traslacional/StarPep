@@ -5,17 +5,17 @@
  */
 package org.bapedis.chemspace.spi.impl;
 
-import org.bapedis.chemspace.spi.SimilarityMeasure;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
+import org.bapedis.chemspace.spi.SimilarityCoefficient;
 
 /**
  *
  * @author loge
  */
-public class TanimotoCoefficient implements SimilarityMeasure {
+public class TanimotoCoefficient implements SimilarityCoefficient {
     private final TanimotoCoefficientFactory factory;    
     protected MolecularDescriptor[] features;
     protected int normalizationIndex = 1;

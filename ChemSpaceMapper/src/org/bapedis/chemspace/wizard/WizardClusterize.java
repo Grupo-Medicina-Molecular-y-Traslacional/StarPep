@@ -99,7 +99,6 @@ public class WizardClusterize implements WizardDescriptor.ValidatingPanel<Wizard
         if (alg != null) {
             getComponent().setClustering(alg);
         }
-
     }
 
     @Override

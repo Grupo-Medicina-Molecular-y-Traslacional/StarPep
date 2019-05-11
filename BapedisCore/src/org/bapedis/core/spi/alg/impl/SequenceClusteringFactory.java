@@ -16,7 +16,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author loge
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 10)
+//@ServiceProvider(service = AlgorithmFactory.class, position = 10)
 public class SequenceClusteringFactory implements ClusteringTag {
 
     private final SequenceClusteringPanel setupUI = new SequenceClusteringPanel();

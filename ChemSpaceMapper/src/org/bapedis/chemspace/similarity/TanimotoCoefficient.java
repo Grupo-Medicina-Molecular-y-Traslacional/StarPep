@@ -3,39 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.spi.impl;
+package org.bapedis.chemspace.similarity;
 
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.Workspace;
-import org.bapedis.chemspace.spi.SimilarityCoefficient;
 
 /**
  *
  * @author loge
  */
-public class TanimotoCoefficient implements SimilarityCoefficient {
-    private final TanimotoCoefficientFactory factory;    
-    protected MolecularDescriptor[] features;
+public class TanimotoCoefficient extends AbstractSimCoefficient {
     protected int normalizationIndex = 1;
     
     public TanimotoCoefficient(TanimotoCoefficientFactory factory) {
-        this.factory = factory;
+       super(factory);
     }
-    
+           
     @Override
-    public TanimotoCoefficientFactory getFactory() {
-        return factory;
-    }   
-    
-    @Override
-    public void setMolecularFeatures(Workspace workspace, MolecularDescriptor[] features) {
-        this.features = features;
-    }
-    
-    @Override
-    public float computeSimilarity(Peptide peptide1, Peptide peptide2) throws MolecularDescriptorNotFoundException {
+    public float computeSimilarity() throws MolecularDescriptorNotFoundException {
         double ab = 0.0;
         double a2 = 0.0;
         double b2 = 0.0;

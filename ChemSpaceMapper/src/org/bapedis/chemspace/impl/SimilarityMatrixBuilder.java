@@ -12,7 +12,7 @@ import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.DialogDisplayer;
-import org.bapedis.chemspace.spi.SimilarityCoefficient;
+import org.bapedis.chemspace.similarity.AbstractSimCoefficient;
 
 /**
  *
@@ -24,7 +24,7 @@ class SimilarityMatrixBuilder extends RecursiveAction {
     private static float MIN_VALUE = 0.7f;
     private Peptide[] peptides;
     private ProgressTicket progressTicket;
-    private SimilarityCoefficient similarityMeasure;
+    private AbstractSimCoefficient similarityMeasure;
     private AtomicBoolean stopRun;    
     
     private final SimilarityMatrix matrix;
@@ -36,7 +36,7 @@ class SimilarityMatrixBuilder extends RecursiveAction {
         this(peptides, new SimilarityMatrix(peptides), 0, peptides.length, 0, peptides.length);   
     }
 
-    void setContext(SimilarityCoefficient similarityMeasure, ProgressTicket progressTicket, AtomicBoolean stopRun) {        
+    void setContext(AbstractSimCoefficient similarityMeasure, ProgressTicket progressTicket, AtomicBoolean stopRun) {        
         this.similarityMeasure = similarityMeasure;
         this.progressTicket = progressTicket;        
         this.stopRun = stopRun;
@@ -99,15 +99,14 @@ class SimilarityMatrixBuilder extends RecursiveAction {
             for (int x = xlow; x < Math.min(xhigh, y); x++) {
                 if (!stopRun.get()) {
                     try {
-                        score = similarityMeasure.computeSimilarity(peptides[y], peptides[x]);
+                        similarityMeasure.setPeptide1(peptides[y]);
+                        similarityMeasure.setPeptide2(peptides[x]);
+                        similarityMeasure.run();
+                        score = similarityMeasure.getSimilarityValue();
                         if (score >= MIN_VALUE) {
                             matrix.setValue(peptides[y], peptides[x], score);
                         }
                         progressTicket.progress();
-                    } catch (MolecularDescriptorNotFoundException ex) {
-                        DialogDisplayer.getDefault().notify(ex.getErrorND());
-                        stopRun.set(true);
-                        throw new RuntimeException(ex);
                     } catch(Exception ex){
                         stopRun.set(true);
                         throw new RuntimeException(ex);

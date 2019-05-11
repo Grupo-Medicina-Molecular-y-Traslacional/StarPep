@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.spi.impl;
+package org.bapedis.chemspace.similarity;
 
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;

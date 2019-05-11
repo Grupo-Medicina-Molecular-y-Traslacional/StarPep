@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.spi.alg.impl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
@@ -25,6 +26,7 @@ import org.bapedis.core.task.ProgressTicket;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -87,18 +89,24 @@ public class NonRedundantSetAlg implements Algorithm, Cloneable {
             final Workspace ws = workspace;
             final AttributesModel modelToRemove = pc.getAttributesModel(workspace);
             final AttributesModel modelToAdd = newAttrModel;
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        //To change attribute model
-                        ws.remove(modelToRemove);
-                        ws.add(modelToAdd);
-                    } finally {
-                        pc.getGraphVizSetting(ws).fireChangedGraphView();
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            //To change attribute model
+                            ws.remove(modelToRemove);
+                            ws.add(modelToAdd);
+                        } finally {
+                            pc.getGraphVizSetting(ws).fireChangedGraphView();
+                        }
                     }
-                }
-            });
+                });
+            } catch (InterruptedException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (InvocationTargetException ex) {
+                Exceptions.printStackTrace(ex);
+            }
 
         }
         workspace = null;

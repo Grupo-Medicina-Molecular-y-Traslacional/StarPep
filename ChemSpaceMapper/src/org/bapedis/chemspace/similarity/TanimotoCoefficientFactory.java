@@ -3,20 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.spi.impl;
+package org.bapedis.chemspace.similarity;
 
+import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
-import org.bapedis.chemspace.spi.SimilarityCoefficient;
-import org.bapedis.chemspace.spi.SimilarityCoefficientFactory;
-import org.bapedis.chemspace.spi.SimilarityCoefficientSetupUI;
+import org.bapedis.core.spi.alg.SimilarityTag;
 
 /**
  *
  * @author loge
  */
-@ServiceProvider(service = SimilarityCoefficientFactory.class)
-public class TanimotoCoefficientFactory implements SimilarityCoefficientFactory{
+@ServiceProvider(service = AlgorithmFactory.class)
+public class TanimotoCoefficientFactory implements SimilarityTag {
 
     @Override
     public String getName() {
@@ -29,13 +29,18 @@ public class TanimotoCoefficientFactory implements SimilarityCoefficientFactory{
     }
 
     @Override
-    public SimilarityCoefficientSetupUI getSetupUI() {
+    public AlgorithmSetupUI getSetupUI() {
         return null;
     }
 
     @Override
-    public SimilarityCoefficient createAlgorithm() {
+    public AbstractSimCoefficient createAlgorithm() {
         return new TanimotoCoefficient(this);
     }
-    
+
+    @Override
+    public String getCategory() {
+        return null;
+    }
+
 }

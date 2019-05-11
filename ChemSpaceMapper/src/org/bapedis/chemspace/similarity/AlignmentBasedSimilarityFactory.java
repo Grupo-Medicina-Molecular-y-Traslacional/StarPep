@@ -3,19 +3,23 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.spi.impl;
+package org.bapedis.chemspace.similarity;
 
+import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.SimilarityTag;
 import org.openide.util.NbBundle;
-import org.bapedis.chemspace.spi.SimilarityCoefficient;
-import org.bapedis.chemspace.spi.SimilarityCoefficientFactory;
-import org.bapedis.chemspace.spi.SimilarityCoefficientSetupUI;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author loge
  */
-public class AlignmentBasedSimilarityFactory implements SimilarityCoefficientFactory {
+@ServiceProvider(service = AlgorithmFactory.class)
+public class AlignmentBasedSimilarityFactory implements SimilarityTag {
 
+    private final AlignmentBasedSimilarityPanel setupUI = new AlignmentBasedSimilarityPanel();
+    
     @Override
     public String getName() {
         return NbBundle.getMessage(AlignmentBasedSimilarityFactory.class, "AlignmentBasedSimilarity.name");
@@ -27,13 +31,18 @@ public class AlignmentBasedSimilarityFactory implements SimilarityCoefficientFac
     }
 
     @Override
-    public SimilarityCoefficientSetupUI getSetupUI() {
-        return null;
+    public AlgorithmSetupUI getSetupUI() {
+        return setupUI;
     }
 
     @Override
-    public SimilarityCoefficient createAlgorithm() {
+    public AbstractSimCoefficient createAlgorithm() {
         return new AlignmentBasedSimilarity(this);
+    }
+
+    @Override
+    public String getCategory() {
+        return null;
     }
     
 }

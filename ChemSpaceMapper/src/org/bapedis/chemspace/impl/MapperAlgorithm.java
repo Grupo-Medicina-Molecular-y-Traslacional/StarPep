@@ -13,6 +13,7 @@ import javax.swing.SwingUtilities;
 import org.bapedis.chemspace.model.FeatureFilteringOption;
 import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
+import org.bapedis.chemspace.similarity.AbstractSimCoefficient;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
@@ -52,6 +53,7 @@ public class MapperAlgorithm implements Algorithm {
     private AllDescriptors featureExtractionAlg;
     private FeatureSEFiltering featureSelectionAlg;
     private AbstractCluster clusteringAlg;
+    private AbstractSimCoefficient simCoefficientAlg;
     private NetworkEmbedderAlg networkAlg;
 
     //Algorithm workflow
@@ -69,8 +71,8 @@ public class MapperAlgorithm implements Algorithm {
         feOption = FeatureExtractionOption.NO;
         ffOption = FeatureFilteringOption.NO;        
 
+        networkAlg = (NetworkEmbedderAlg) new NetworkEmbedderFactory().createAlgorithm();
 //        twoDEmbedderAlg = (TwoDEmbedder) new TwoDEmbedderFactory().createAlgorithm();
-//        similarityMeasure = (AlignmentBasedSimilarity) new AlignmentBasedSimilarityFactory().createAlgorithm();
     }
 
     public boolean isRunning() {
@@ -89,7 +91,7 @@ public class MapperAlgorithm implements Algorithm {
         //Non-redundant set
         if (nrdOption == RemovingRedundantOption.YES) {
             if (nrdAlg != null) {
-               // algorithms.add(nrdAlg);
+               algorithms.add(nrdAlg);
             } else {
                 throw new RuntimeException("Internal error: Non-redundant algorithm is null");
             }
@@ -115,16 +117,17 @@ public class MapperAlgorithm implements Algorithm {
 
         // Clustering
         if (clusteringAlg != null) {
-           // algorithms.add(clusteringAlg);
+           algorithms.add(clusteringAlg);
         } else {
             throw new RuntimeException("Internal error: Clustering algorithm is null");
         }
 
-        // Network embedder
-        if (networkAlg != null) {
-           // algorithms.add(networkAlg);
+        // Similarity
+        if (simCoefficientAlg != null) {
+            networkAlg.setSimCoefficient(simCoefficientAlg);
+            algorithms.add(networkAlg);
         } else {
-            throw new RuntimeException("Internal error: Network embedder algorithm is null");
+            throw new RuntimeException("Internal error: Similarity coefficient is null");
         }
 
         running = true;
@@ -234,11 +237,15 @@ public class MapperAlgorithm implements Algorithm {
 
     public NetworkEmbedderAlg getNetworkEmbedderAlg() {
         return networkAlg;
+    }        
+
+    public AbstractSimCoefficient getSimCoefficientAlg() {
+        return simCoefficientAlg;
     }
 
-    public void setNetworkEmbedderAlg(NetworkEmbedderAlg networkAlg) {
-        this.networkAlg = networkAlg;
-    }  
+    public void setSimCoefficientAlg(AbstractSimCoefficient simCoefficientAlg) {
+        this.simCoefficientAlg = simCoefficientAlg;
+    }    
 
     @Override
     public AlgorithmProperty[] getProperties() {

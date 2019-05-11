@@ -13,7 +13,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import static org.bapedis.chemspace.impl.MapperAlgorithm.pc;
 import org.bapedis.chemspace.model.NetworkType;
-import org.bapedis.chemspace.spi.SimilarityCoefficient;
+import org.bapedis.chemspace.similarity.AbstractSimCoefficient;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
@@ -57,7 +57,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
     protected boolean stopRun;
     private SimilarityMatrix similarityMatrix;
     private AtomicBoolean atomicRun;
-    private SimilarityCoefficient simCoefficient;
+    private AbstractSimCoefficient simCoefficient;
     private float similarityThreshold;
     private NetworkType networkType;
 
@@ -68,11 +68,11 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
         notEnoughFeatures = new NotifyDescriptor.Message(NbBundle.getMessage(NetworkEmbedderAlg.class, "DescriptorBasedEmbedder.features.notEnoughHTML"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
-    public SimilarityCoefficient getSimCoefficient() {
+    public AbstractSimCoefficient getSimCoefficient() {
         return simCoefficient;
     }
 
-    public void setSimCoefficient(SimilarityCoefficient simCoefficient) {
+    public void setSimCoefficient(AbstractSimCoefficient simCoefficient) {
         this.simCoefficient = simCoefficient;
     }        
 

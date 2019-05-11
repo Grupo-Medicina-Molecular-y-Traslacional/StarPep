@@ -9,6 +9,7 @@ import java.text.MessageFormat;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.FeatureFilteringOption;
 import org.bapedis.chemspace.model.RemovingRedundantOption;
+import org.bapedis.chemspace.similarity.AbstractSimCoefficient;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
@@ -104,9 +105,9 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
         AbstractCluster clutering = (AbstractCluster) wiz.getProperty(AbstractCluster.class.getName());
         csMapper.setClusteringAlg(clutering);
 
-        //Network Embbeder 
-        NetworkEmbedderAlg networkEmbedder = (NetworkEmbedderAlg) wiz.getProperty(NetworkEmbedderAlg.class.getName());
-        csMapper.setNetworkEmbedderAlg(networkEmbedder);
+        // Similarity  
+        AbstractSimCoefficient simCoefficient = (AbstractSimCoefficient) wiz.getProperty(AbstractSimCoefficient.class.getName());
+        csMapper.setSimCoefficientAlg(simCoefficient);
     }
 
     public static WizardDescriptor createWizardDescriptor(MapperAlgorithm csMapper) {

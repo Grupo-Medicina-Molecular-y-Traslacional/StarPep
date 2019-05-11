@@ -15,12 +15,15 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import org.bapedis.core.model.AlgorithmNode;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.ClusteringTag;
 import org.bapedis.core.spi.alg.impl.AbstractCluster;
+import org.bapedis.core.ui.components.PropertySheetPanel;
+import org.openide.nodes.Node;
 
 public final class VisualClusterize extends JPanel {
 
@@ -28,6 +31,7 @@ public final class VisualClusterize extends JPanel {
     private final DefaultMutableTreeNode treeNode;
     private final HashMap<String, AbstractCluster> map;
     private AbstractCluster clustering;
+    private PropertySheetPanel propSheetPanel;
 
     public VisualClusterize() {
         initComponents();
@@ -37,6 +41,7 @@ public final class VisualClusterize extends JPanel {
         jTree1.setRootVisible(true);
         jTree1.setCellRenderer(new ClusteringFactoryNodeRenderer());
         map = new HashMap<>();
+        propSheetPanel = new PropertySheetPanel();
     }
 
     public HashMap<String, AbstractCluster> getMap() {
@@ -164,7 +169,11 @@ public final class VisualClusterize extends JPanel {
             if (factory.getSetupUI() != null) {
                 JPanel panel = factory.getSetupUI().getSettingPanel(clustering);
                 jScrollPane3.setViewportView(panel);
-            } else {
+            } else if (clustering.getProperties() != null) {
+                propSheetPanel.getPropertySheet().setNodes(new Node[]{new AlgorithmNode(clustering)});
+                jScrollPane3.setViewportView(propSheetPanel);
+            }
+            else {
                 jScrollPane3.setViewportView(null);
             }
         } else {

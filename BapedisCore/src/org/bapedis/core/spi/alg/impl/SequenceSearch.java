@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.spi.alg.impl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -112,18 +113,24 @@ public class SequenceSearch implements Algorithm {
             final Workspace ws = workspace;
             final AttributesModel modelToRemove = pc.getAttributesModel(workspace);
             final AttributesModel modelToAdd = newAttrModel;
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        //To change attribute model
-                        ws.remove(modelToRemove);
-                        ws.add(modelToAdd);
-                    } finally {
-                        pc.getGraphVizSetting(ws).fireChangedGraphView();
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            //To change attribute model
+                            ws.remove(modelToRemove);
+                            ws.add(modelToAdd);
+                        } finally {
+                            pc.getGraphVizSetting(ws).fireChangedGraphView();
+                        }
                     }
-                }
-            });
+                });
+            } catch (InterruptedException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (InvocationTargetException ex) {
+                Exceptions.printStackTrace(ex);
+            }
         }
         workspace = null;
         graphNodes = null;

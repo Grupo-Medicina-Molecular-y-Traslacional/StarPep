@@ -11,7 +11,7 @@ import org.bapedis.chemspace.model.TwoDSpace;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.chemspace.spi.TwoDTransformer;
-import org.bapedis.chemspace.spi.impl.WekaPCATransformerFactory;
+import org.bapedis.chemspace.similarity.WekaPCATransformerFactory;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.task.ProgressTicket;
 import org.gephi.graph.api.Graph;

@@ -18,19 +18,24 @@ import javax.swing.tree.TreePath;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.bapedis.chemspace.spi.SimilarityCoefficient;
-import org.bapedis.chemspace.spi.SimilarityCoefficientFactory;
+import org.bapedis.chemspace.similarity.AbstractSimCoefficient;
+import org.bapedis.core.model.AlgorithmNode;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.SimilarityTag;
+import org.bapedis.core.ui.components.PropertySheetPanel;
+import org.openide.nodes.Node;
 
-public final class VisualSimNetwork extends JPanel {
+public final class VisualSimCoefficient extends JPanel {
 
     public static final String NETWORK_FACTORY = "network_factory";
     private final DefaultMutableTreeNode treeNode;
-    private SimilarityCoefficient coefficient;
-    private final HashMap<String,SimilarityCoefficient> map;
+    private AbstractSimCoefficient simCoefficient;
+    private PropertySheetPanel propSheetPanel;
+    private final HashMap<String, AbstractSimCoefficient> map;
 
-    public VisualSimNetwork() {
+    public VisualSimCoefficient() {
         initComponents();
-        treeNode = new DefaultMutableTreeNode(NbBundle.getMessage(VisualSimNetwork.class, "SimNetwork.root.name"), true);
+        treeNode = new DefaultMutableTreeNode(NbBundle.getMessage(VisualSimCoefficient.class, "SimCoefficient.root.name"), true);
         populateJTree();
         jTree1.setModel(new DefaultTreeModel(treeNode));
         jTree1.setRootVisible(true);
@@ -38,33 +43,35 @@ public final class VisualSimNetwork extends JPanel {
         map = new HashMap<>();
     }
 
-    public SimilarityCoefficient getSimilarityCoefficient() {
-        return coefficient;
-    }   
-    
-    public void setSimilarityMeasure(SimilarityCoefficient coefficient){
-        this.coefficient = coefficient;
-        SimilarityCoefficientFactory factory = coefficient.getFactory();
+    public AbstractSimCoefficient getSimilarityCoefficient() {
+        return simCoefficient;
+    }
+
+    public void setSimilarityCoefficient(AbstractSimCoefficient coefficient) {
+        this.simCoefficient = coefficient;
+        AlgorithmFactory factory = coefficient.getFactory();
         map.put(factory.getName(), coefficient);
         SimilarityFactoryTreeNode factoryNode;
-        for(int i=0; i< treeNode.getChildCount(); i++){
-            factoryNode = (SimilarityFactoryTreeNode)treeNode.getChildAt(i);
-            if (factoryNode.getFactory().getName().equals(factory.getName())){
+        for (int i = 0; i < treeNode.getChildCount(); i++) {
+            factoryNode = (SimilarityFactoryTreeNode) treeNode.getChildAt(i);
+            if (factoryNode.getFactory().getName().equals(factory.getName())) {
                 jTree1.setSelectionPath(new TreePath(factoryNode.getPath()));
             }
         }
-    }    
+    }
 
     private void populateJTree() {
-        Collection<? extends SimilarityCoefficientFactory> factories = Lookup.getDefault().lookupAll(SimilarityCoefficientFactory.class);
-        for (SimilarityCoefficientFactory factory : factories) {
-            treeNode.add(new SimilarityFactoryTreeNode(factory));
+        Collection<? extends AlgorithmFactory> factories = Lookup.getDefault().lookupAll(AlgorithmFactory.class);
+        for (AlgorithmFactory factory : factories) {
+            if (factory instanceof SimilarityTag) {
+                treeNode.add(new SimilarityFactoryTreeNode(factory));
+            }
         }
     }
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(VisualSimNetwork.class, "SimNetwork.name");
+        return NbBundle.getMessage(VisualSimCoefficient.class, "SimCoefficient.name");
     }
 
     /**
@@ -87,7 +94,7 @@ public final class VisualSimNetwork extends JPanel {
         setPreferredSize(new java.awt.Dimension(500, 460));
         setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualSimNetwork.class, "VisualSimNetwork.jInfoLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualSimCoefficient.class, "VisualSimCoefficient.jInfoLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -142,26 +149,30 @@ public final class VisualSimNetwork extends JPanel {
 
     private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
         TreePath newPath = evt.getNewLeadSelectionPath();
-        SimilarityCoefficientFactory factory = null;
+        AlgorithmFactory factory = null;
         if (newPath != null && newPath.getLastPathComponent() instanceof SimilarityFactoryTreeNode) {
             SimilarityFactoryTreeNode newNode = (SimilarityFactoryTreeNode) newPath.getLastPathComponent();
             factory = newNode.getFactory();
-            jTextArea1.setText(factory.getDescription());  
+            jTextArea1.setText(factory.getDescription());
             if (!map.containsKey(factory.getName())) {
-                coefficient = factory.createAlgorithm();
-                map.put(factory.getName(), coefficient);
+                simCoefficient = (AbstractSimCoefficient)factory.createAlgorithm();
+                map.put(factory.getName(), simCoefficient);
             } else {
-                coefficient = map.get(factory.getName());
+                simCoefficient = map.get(factory.getName());
             }
             if (factory.getSetupUI() != null) {
-                JPanel panel = factory.getSetupUI().getSettingPanel(coefficient);
+                JPanel panel = factory.getSetupUI().getSettingPanel(simCoefficient);
                 jScrollPane3.setViewportView(panel);
-            } else {
+            } else if (simCoefficient.getProperties() != null) {
+                propSheetPanel.getPropertySheet().setNodes(new Node[]{new AlgorithmNode(simCoefficient)});
+                jScrollPane3.setViewportView(propSheetPanel);
+            }
+            else {
                 jScrollPane3.setViewportView(null);
             }
-            
+
         } else {
-            coefficient = null;
+            simCoefficient = null;
             jTextArea1.setText("");
             jScrollPane3.setViewportView(null);
         }
@@ -179,12 +190,12 @@ public final class VisualSimNetwork extends JPanel {
 
     private static class SimilarityFactoryTreeNode extends DefaultMutableTreeNode {
 
-        public SimilarityFactoryTreeNode(SimilarityCoefficientFactory factory) {
+        public SimilarityFactoryTreeNode(AlgorithmFactory factory) {
             super(factory, false);
         }
 
-        public SimilarityCoefficientFactory getFactory() {
-            return (SimilarityCoefficientFactory) userObject;
+        public AlgorithmFactory getFactory() {
+            return (AlgorithmFactory) userObject;
         }
 
         @Override

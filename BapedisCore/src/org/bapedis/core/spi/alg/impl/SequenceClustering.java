@@ -123,5 +123,12 @@ public class SequenceClustering extends AbstractCluster {
         }
         return clusterList;
     }
+    
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        SequenceClustering copy = (SequenceClustering) super.clone();
+        copy.alignmentModel = (SequenceAlignmentModel)this.alignmentModel.clone();
+        return copy;
+    }     
 
 }

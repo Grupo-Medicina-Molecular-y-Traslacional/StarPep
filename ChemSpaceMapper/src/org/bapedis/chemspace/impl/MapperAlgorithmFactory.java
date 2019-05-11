@@ -6,16 +6,18 @@
 package org.bapedis.chemspace.impl;
 
 import java.text.MessageFormat;
-import org.bapedis.chemspace.model.ChemSpaceOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.FeatureFilteringOption;
+import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.spi.alg.ChemSpaceTag;
+import org.bapedis.core.spi.alg.impl.AbstractCluster;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
+import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
@@ -67,15 +69,22 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
     }
 
     public static void setUp(MapperAlgorithm csMapper, WizardDescriptor wiz) {
-        // Chemical Space Option       
-        ChemSpaceOption csOption = (ChemSpaceOption) wiz.getProperty(ChemSpaceOption.class.getName());
-        csMapper.setChemSpaceOption(csOption);
+        
+        //Non-redundant set
+        RemovingRedundantOption nrdOption = (RemovingRedundantOption) wiz.getProperty(RemovingRedundantOption.class.getName());
+        if (nrdOption != null) {
+            csMapper.setNrdOption(nrdOption);
+            if (nrdOption == RemovingRedundantOption.YES) {
+                NonRedundantSetAlg nrdAlg = (NonRedundantSetAlg) wiz.getProperty(NonRedundantSetAlg.class.getName());
+                csMapper.setNonRedundantSetAlg(nrdAlg);
+            }
+        }
 
         // Feature Extraction Option
         FeatureExtractionOption feOption = (FeatureExtractionOption) wiz.getProperty(FeatureExtractionOption.class.getName());
         if (feOption != null) {
             csMapper.setFEOption(feOption);
-            if (feOption == FeatureExtractionOption.NEW) {
+            if (feOption == FeatureExtractionOption.YES) {
                 AllDescriptors alg = (AllDescriptors) wiz.getProperty(AllDescriptors.class.getName());
                 csMapper.setFeatureExtractionAlg(alg);
             }
@@ -87,27 +96,17 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
             csMapper.setFFOption(ffOption);
             if (ffOption == FeatureFilteringOption.YES) {
                 FeatureSEFiltering alg = (FeatureSEFiltering) wiz.getProperty(FeatureSEFiltering.class.getName());
-                csMapper.setFeatureFilteringAlg(alg);
+                csMapper.setFeatureSelectionAlg(alg);
             }
         }
 
-        //Chemical Space Embbeder Options
-        switch (csOption) {
-            case CHEM_SPACE_NETWORK:
-                CSNEmbedder csnEmbedder = (CSNEmbedder) wiz.getProperty(AbstractEmbedder.class.getName());
-                if (csnEmbedder != null) {
-                    csMapper.setCSNEmbedderAlg(csnEmbedder);
-                }
-                break;
-            case SEQ_SIMILARITY_NETWORK:
-                SSNEmbedder ssnEmbedder = (SSNEmbedder)wiz.getProperty(AbstractEmbedder.class.getName());
-                if (ssnEmbedder != null){
-                    csMapper.setSSNEmbedderAlg(ssnEmbedder);
-                }
-                break;
-            default:
-                throw new RuntimeException("Internal error: Chemical Space Embedder is null");
-        }
+        // Clustering
+        AbstractCluster clutering = (AbstractCluster) wiz.getProperty(AbstractCluster.class.getName());
+        csMapper.setClusteringAlg(clutering);
+
+        //Network Embbeder 
+        NetworkEmbedderAlg networkEmbedder = (NetworkEmbedderAlg) wiz.getProperty(NetworkEmbedderAlg.class.getName());
+        csMapper.setNetworkEmbedderAlg(networkEmbedder);
     }
 
     public static WizardDescriptor createWizardDescriptor(MapperAlgorithm csMapper) {
@@ -117,7 +116,6 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
         // Open wizard
         WizardDescriptor wiz = new WizardDescriptor(iterator);
         iterator.initialize(wiz);
-        iterator.setChemSpaceOption(csMapper.getChemSpaceOption());
 
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wiz.setTitleFormat(new MessageFormat("{0}"));

@@ -38,7 +38,7 @@ import org.openide.util.NbBundle;
 public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeListener {
     
     protected MapperAlgorithm csMapper;
-    protected NetworkEmbedder netEmbedder;
+    protected NetworkEmbedderAlg netEmbedder;
     private RichTooltip richTooltip;
     private final DecimalFormat formatter;
 
@@ -88,14 +88,8 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
     
     public void setUp(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
-        switch (csMapper.getChemSpaceOption()) {
-            case CHEM_SPACE_NETWORK:
-                netEmbedder = csMapper.getCSNEmbedderAlg();
-                break;
-            case SEQ_SIMILARITY_NETWORK:
-                netEmbedder = csMapper.getSSNEmbedderAlg();
-                break;
-        }
+        netEmbedder = csMapper.getNetworkEmbedderAlg();
+        
         float similarityThreshold = netEmbedder.getSimilarityThreshold();
         jCutoffCurrentValue.setText(formatter.format(similarityThreshold));
         cutoffSlider.setValue((int) (similarityThreshold * 100));
@@ -427,11 +421,11 @@ class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
     
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     static final String CHANGED_THRESHOLD = "changed_threshold";
-    private final NetworkEmbedder embedder;
+    private final NetworkEmbedderAlg embedder;
     private final AtomicBoolean stopRun;
     private final ProgressTicket ticket;
     
-    public NetworkThresholdUpdater(NetworkEmbedder embedder) {
+    public NetworkThresholdUpdater(NetworkEmbedderAlg embedder) {
         this.embedder = embedder;
         stopRun = new AtomicBoolean(false);
         ticket = new ProgressTicket(NbBundle.getMessage(NetworkThresholdUpdater.class, "NetworkThresholdUpdater.task.name"), new Cancellable() {
@@ -447,7 +441,7 @@ class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
     protected Void doInBackground() throws Exception {
         ticket.start();
         GraphModel graphModel = pc.getGraphModel();
-        embedder.updateNetwork(graphModel, ticket, stopRun);
+//        embedder.updateNetwork(graphModel, ticket, stopRun);
 
 //            if (newThreshold < oldThreshold) { // to add edges 
 //            Edge graphEdge;
@@ -461,7 +455,7 @@ class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
 //                            id = String.format("%s-%s", peptides[i].getId(), peptides[j].getId());
 //                            graphEdge = mainGraph.getEdge(id);
 //                            if (graphEdge == null) {
-//                                graphEdge = NetworkEmbedder.createGraphEdge(graphModel, id, peptides[i].getGraphNode(), peptides[j].getGraphNode(), score);
+//                                graphEdge = NetworkEmbedderAlg.createGraphEdge(graphModel, id, peptides[i].getGraphNode(), peptides[j].getGraphNode(), score);
 //                            }
 //                            graph.writeLock();
 //                            try {

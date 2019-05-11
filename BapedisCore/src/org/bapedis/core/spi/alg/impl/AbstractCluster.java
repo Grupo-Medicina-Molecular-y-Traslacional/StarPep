@@ -29,7 +29,7 @@ import org.openide.util.Lookup;
  *
  * @author loge
  */
-public abstract class AbstractCluster implements Algorithm {
+public abstract class AbstractCluster implements Algorithm, Cloneable {
 
     public static PeptideAttribute CLUSTER_ATTR = new PeptideAttribute("cluster", "Cluster", Integer.class, true, -1);
     public static final String CLUSTER_COLUMN = "cluster";
@@ -172,6 +172,12 @@ public abstract class AbstractCluster implements Algorithm {
             }
         }
     }
+    
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        AbstractCluster copy = (AbstractCluster) super.clone();
+        return copy;
+    }    
 
     protected abstract List<Cluster> cluterize();
 

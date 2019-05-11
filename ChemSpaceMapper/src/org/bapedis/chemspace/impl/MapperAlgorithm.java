@@ -11,9 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.swing.SwingUtilities;
 import org.bapedis.chemspace.model.FeatureFilteringOption;
-import org.bapedis.chemspace.model.FeatureWeightingOption;
+import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
-import org.bapedis.chemspace.model.ChemSpaceOption;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
@@ -21,9 +20,8 @@ import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.impl.AbstractCluster;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
-import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
 import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
-import org.bapedis.core.spi.alg.impl.FeatureSEFilteringFactory;
+import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.util.Lookup;
@@ -45,17 +43,16 @@ public class MapperAlgorithm implements Algorithm {
     protected boolean stopRun, running;
 
     //Mapping Options
-    protected ChemSpaceOption csOption;
+    protected RemovingRedundantOption nrdOption;    
     protected FeatureExtractionOption feOption;
     protected FeatureFilteringOption ffOption;
-    protected FeatureWeightingOption fwOption;
 
-    // Algorithms    
+    //Mapping Algorithms   
+    private NonRedundantSetAlg nrdAlg;
     private AllDescriptors featureExtractionAlg;
-    private FeatureSEFiltering featureFilteringAlg;
-    private CSNEmbedder csnEmbedderAlg;
-    private SSNEmbedder ssnEmbedderAlg;
+    private FeatureSEFiltering featureSelectionAlg;
     private AbstractCluster clusteringAlg;
+    private NetworkEmbedderAlg networkAlg;
 
     //Algorithm workflow
     private final List<Algorithm> algorithms;
@@ -68,18 +65,12 @@ public class MapperAlgorithm implements Algorithm {
         running = false;
 
         //Mapping Options        
-        csOption = ChemSpaceOption.NONE;
-        feOption = FeatureExtractionOption.NEW;
-        ffOption = FeatureFilteringOption.YES;
-        fwOption = FeatureWeightingOption.NO;
+        nrdOption = RemovingRedundantOption.NO;
+        feOption = FeatureExtractionOption.NO;
+        ffOption = FeatureFilteringOption.NO;        
 
-        // Algorithms
-        featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
-        featureFilteringAlg = (FeatureSEFiltering) new FeatureSEFilteringFactory().createAlgorithm();        
 //        twoDEmbedderAlg = (TwoDEmbedder) new TwoDEmbedderFactory().createAlgorithm();
-        csnEmbedderAlg = (CSNEmbedder) new CSNEmbedderFactory().createAlgorithm();
-        ssnEmbedderAlg = (SSNEmbedder) new SSNEmbedderFactory().createAlgorithm();
-        clusteringAlg = null;
+//        similarityMeasure = (AlignmentBasedSimilarity) new AlignmentBasedSimilarityFactory().createAlgorithm();
     }
 
     public boolean isRunning() {
@@ -94,30 +85,46 @@ public class MapperAlgorithm implements Algorithm {
 
         // Populate algorithm workflow        
         algorithms.clear();
-        
-        switch (csOption) {
-            case CHEM_SPACE_NETWORK:
-                // Feature Extraction
-                if (feOption == FeatureExtractionOption.NEW) {
-                    algorithms.add(featureExtractionAlg);
-                }
 
-                // Feature Filtering
-                if (ffOption == FeatureFilteringOption.YES) {
-                    algorithms.add(featureFilteringAlg);
-                }
-                // Chemical Space Embedder
-                DescriptorBasedEmbedder embedder = null;
-                if (csOption == ChemSpaceOption.CHEM_SPACE_NETWORK) {
-                    embedder = csnEmbedderAlg;
-                }
-                algorithms.add(embedder);
-                break;
-            case SEQ_SIMILARITY_NETWORK:
-                algorithms.add(ssnEmbedderAlg);
-                break;
-            default:
-                throw new RuntimeException("Internal error: Chemical Space Embedder is null");
+        //Non-redundant set
+        if (nrdOption == RemovingRedundantOption.YES) {
+            if (nrdAlg != null) {
+               // algorithms.add(nrdAlg);
+            } else {
+                throw new RuntimeException("Internal error: Non-redundant algorithm is null");
+            }
+        }
+
+        // Feature Extraction
+        if (feOption == FeatureExtractionOption.YES) {
+            if (featureExtractionAlg != null) {
+                algorithms.add(featureExtractionAlg);
+            } else {
+                throw new RuntimeException("Internal error: Feature extraction algorithm is null");
+            }
+        }
+
+        // Feature Filtering
+        if (ffOption == FeatureFilteringOption.YES) {
+            if (featureSelectionAlg != null) {
+                algorithms.add(featureSelectionAlg);
+            } else {
+                throw new RuntimeException("Internal error: Feature selection algorithm is null");
+            }
+        }
+
+        // Clustering
+        if (clusteringAlg != null) {
+           // algorithms.add(clusteringAlg);
+        } else {
+            throw new RuntimeException("Internal error: Clustering algorithm is null");
+        }
+
+        // Network embedder
+        if (networkAlg != null) {
+           // algorithms.add(networkAlg);
+        } else {
+            throw new RuntimeException("Internal error: Network embedder algorithm is null");
         }
 
         running = true;
@@ -144,14 +151,14 @@ public class MapperAlgorithm implements Algorithm {
 
     @Override
     public void endAlgo() {
-        if (!stopRun){
-           GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
+        if (!stopRun) {
+            GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
             SwingUtilities.invokeLater(new Runnable() {
-               @Override
-               public void run() {
-                   graphWC.openGraphWindow();
-               }
-           });           
+                @Override
+                public void run() {
+                    graphWC.openGraphWindow();
+                }
+            });
         }
         workspace = null;
         progressTicket = null;
@@ -167,14 +174,6 @@ public class MapperAlgorithm implements Algorithm {
             return currentAlg.cancel();
         }
         return stopRun;
-    }        
-
-    public ChemSpaceOption getChemSpaceOption() {
-        return csOption;
-    }
-
-    public void setChemSpaceOption(ChemSpaceOption csOption) {
-        this.csOption = csOption;
     }
 
     public FeatureExtractionOption getFEOption() {
@@ -193,12 +192,20 @@ public class MapperAlgorithm implements Algorithm {
         this.ffOption = ffOption;
     }
 
-    public FeatureWeightingOption getFWOption() {
-        return fwOption;
+    public RemovingRedundantOption getNrdOption() {
+        return nrdOption;
     }
 
-    public void setFWOption(FeatureWeightingOption fwOption) {
-        this.fwOption = fwOption;
+    public void setNrdOption(RemovingRedundantOption nrdOption) {
+        this.nrdOption = nrdOption;
+    }
+
+    public NonRedundantSetAlg getNonRedundantSetAlg() {
+        return nrdAlg;
+    }
+
+    public void setNonRedundantSetAlg(NonRedundantSetAlg nrdAlg) {
+        this.nrdAlg = nrdAlg;
     }
 
     public void setFeatureExtractionAlg(AllDescriptors alg) {
@@ -209,29 +216,29 @@ public class MapperAlgorithm implements Algorithm {
         return featureExtractionAlg;
     }
 
-    public void setFeatureFilteringAlg(FeatureSEFiltering alg) {
-        this.featureFilteringAlg = alg;
+    public void setFeatureSelectionAlg(FeatureSEFiltering alg) {
+        this.featureSelectionAlg = alg;
     }
 
-    public FeatureSEFiltering getFeatureFilteringAlg() {
-        return featureFilteringAlg;
+    public FeatureSEFiltering getFeatureSelectionAlg() {
+        return featureSelectionAlg;
     }
 
-    public CSNEmbedder getCSNEmbedderAlg() {
-        return csnEmbedderAlg;
+    public AbstractCluster getClusteringAlg() {
+        return clusteringAlg;
     }
 
-    public void setCSNEmbedderAlg(CSNEmbedder networkEmbedderAlg) {
-        this.csnEmbedderAlg = networkEmbedderAlg;
+    public void setClusteringAlg(AbstractCluster clusteringAlg) {
+        this.clusteringAlg = clusteringAlg;
     }
 
-    public SSNEmbedder getSSNEmbedderAlg() {
-        return ssnEmbedderAlg;
+    public NetworkEmbedderAlg getNetworkEmbedderAlg() {
+        return networkAlg;
     }
 
-    public void setSSNEmbedderAlg(SSNEmbedder ssnEmbedderAlg) {
-        this.ssnEmbedderAlg = ssnEmbedderAlg;
-    }
+    public void setNetworkEmbedderAlg(NetworkEmbedderAlg networkAlg) {
+        this.networkAlg = networkAlg;
+    }  
 
     @Override
     public AlgorithmProperty[] getProperties() {

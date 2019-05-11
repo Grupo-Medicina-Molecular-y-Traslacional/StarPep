@@ -9,6 +9,6 @@ package org.bapedis.chemspace.model;
  *
  * @author loge
  */
-public enum FeatureWeightingOption {
+public enum RemovingRedundantOption {
     YES, NO
 }

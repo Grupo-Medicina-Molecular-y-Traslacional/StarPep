@@ -10,13 +10,14 @@ import javax.swing.event.ChangeListener;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.model.FeatureFilteringOption;
 import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
+import org.bapedis.core.spi.alg.impl.FeatureSEFilteringFactory;
 import org.bapedis.core.spi.alg.impl.FeatureSEFilteringPanel;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 
 public class WizardFeatureSelection implements WizardDescriptor.Panel<WizardDescriptor>,
-        WizardDescriptor.FinishablePanel<WizardDescriptor>{
+        WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
     private final MapperAlgorithm csMapper;
     private FeatureSEFiltering alg;
@@ -39,9 +40,13 @@ public class WizardFeatureSelection implements WizardDescriptor.Panel<WizardDesc
     public VisualFeatureSelection getComponent() {
         if (component == null) {
             try {
-                alg = (FeatureSEFiltering) csMapper.getFeatureFilteringAlg().clone();
+                if (csMapper.getFeatureSelectionAlg() == null) {
+                    alg = (FeatureSEFiltering) new FeatureSEFilteringFactory().createAlgorithm();
+                } else {
+                    alg = (FeatureSEFiltering) csMapper.getFeatureSelectionAlg().clone();
+                }
                 JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
-                ((FeatureSEFilteringPanel)settingPanel).setShannonDistributionPanel(false);
+                ((FeatureSEFilteringPanel) settingPanel).setShannonDistributionPanel(false);
                 component = new VisualFeatureSelection(settingPanel);
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
@@ -72,8 +77,8 @@ public class WizardFeatureSelection implements WizardDescriptor.Panel<WizardDesc
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
-        FeatureFilteringOption ffOption = (FeatureFilteringOption)wiz.getProperty(FeatureFilteringOption.class.getName());
-        if (ffOption == null){
+        FeatureFilteringOption ffOption = (FeatureFilteringOption) wiz.getProperty(FeatureFilteringOption.class.getName());
+        if (ffOption == null) {
             ffOption = csMapper.getFFOption();
         }
         getComponent().setFFOption(ffOption);
@@ -86,6 +91,8 @@ public class WizardFeatureSelection implements WizardDescriptor.Panel<WizardDesc
         wiz.putProperty(FeatureFilteringOption.class.getName(), ffOption);
         if (ffOption == FeatureFilteringOption.YES) {
             wiz.putProperty(FeatureSEFiltering.class.getName(), alg);
+        } else{
+            wiz.putProperty(FeatureSEFiltering.class.getName(), null);
         }
     }
 

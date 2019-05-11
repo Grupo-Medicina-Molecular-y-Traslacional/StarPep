@@ -33,7 +33,8 @@ public class TwoDEmbedderFactory implements AlgorithmFactory{
 
     @Override
     public Algorithm createAlgorithm() {
-        return new TwoDEmbedder(this);
+        return null;
+//        return new TwoDEmbedder(this);
     }
 
     @Override

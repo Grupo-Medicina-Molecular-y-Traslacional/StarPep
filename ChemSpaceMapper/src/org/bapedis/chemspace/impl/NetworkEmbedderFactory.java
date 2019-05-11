@@ -14,7 +14,7 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class SSNEmbedderFactory implements AlgorithmFactory {
+public class NetworkEmbedderFactory implements AlgorithmFactory {
 
     @Override
     public String getCategory() {
@@ -23,12 +23,12 @@ public class SSNEmbedderFactory implements AlgorithmFactory {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(SSNEmbedderFactory.class, "SSNEmbedder.name");
+        return NbBundle.getMessage(NetworkEmbedderFactory.class, "SSNEmbedder.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(SSNEmbedderFactory.class, "SSNEmbedder.desc");
+        return NbBundle.getMessage(NetworkEmbedderFactory.class, "SSNEmbedder.desc");
     }
 
     @Override
@@ -38,7 +38,7 @@ public class SSNEmbedderFactory implements AlgorithmFactory {
 
     @Override
     public Algorithm createAlgorithm() {
-        return new SSNEmbedder(this);
+        return new NetworkEmbedderAlg(this);
     }
     
 }

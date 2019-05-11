@@ -7,28 +7,28 @@ package org.bapedis.chemspace.wizard;
 
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
-import org.bapedis.chemspace.model.FeatureWeightingOption;
+import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.openide.util.NbBundle;
 
-public final class VisualFeatureWeighting extends JPanel {
+public final class VisualInputSequence extends JPanel {
 
-    static final String CHANGED_OPTION = "weighting_changed";
+    static final String CHANGED_OPTION = "removing_redundant_changed";
     private final JPanel settingPanel;
-    private FeatureWeightingOption fwOption;
+    private RemovingRedundantOption redundantOption;
 
-    public VisualFeatureWeighting(JPanel settingPanel) {
+    public VisualInputSequence(JPanel settingPanel) {
         initComponents();
         this.settingPanel = settingPanel;
         bottomPanel.add(settingPanel, BorderLayout.CENTER);
     }
 
-    public FeatureWeightingOption getFWOption() {
-        return fwOption;
+    public RemovingRedundantOption getRedundantOption() {
+        return redundantOption;
     }
 
-    public void setFWOption(FeatureWeightingOption fwOption) {
-        this.fwOption = fwOption;
-        switch (fwOption) {
+    public void setNrdOption(RemovingRedundantOption redundantOption) {
+        this.redundantOption = redundantOption;
+        switch (redundantOption) {
             case NO:
                 jOption1.setSelected(true);
                 break;
@@ -36,13 +36,17 @@ public final class VisualFeatureWeighting extends JPanel {
                 jOption2.setSelected(true);
                 break;
         }
-        settingPanel.setEnabled(fwOption == FeatureWeightingOption.YES);
+        settingPanel.setEnabled(redundantOption == RemovingRedundantOption.YES);
 
+    }
+    
+    public RemovingRedundantOption getNrdOption(){
+        return redundantOption;
     }
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(VisualFeatureWeighting.class, "FeatureWeighting.name");
+        return NbBundle.getMessage(VisualInputSequence.class, "InputSequence.name");
     }
 
     /**
@@ -75,7 +79,7 @@ public final class VisualFeatureWeighting extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(bottomPanel, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(VisualFeatureWeighting.class, "VisualFeatureWeighting.jQuestionLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(VisualInputSequence.class, "VisualInputSequence.jQuestionLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -85,7 +89,7 @@ public final class VisualFeatureWeighting extends JPanel {
         add(jQuestionLabel, gridBagConstraints);
 
         buttonGroup1.add(jOption1);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(VisualFeatureWeighting.class, "VisualFeatureWeighting.jOption1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(VisualInputSequence.class, "VisualInputSequence.jOption1.text")); // NOI18N
         jOption1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOption1ActionPerformed(evt);
@@ -99,7 +103,7 @@ public final class VisualFeatureWeighting extends JPanel {
         add(jOption1, gridBagConstraints);
 
         buttonGroup1.add(jOption2);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(VisualFeatureWeighting.class, "VisualFeatureWeighting.jOption2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(VisualInputSequence.class, "VisualInputSequence.jOption2.text")); // NOI18N
         jOption2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOption2ActionPerformed(evt);
@@ -114,17 +118,17 @@ public final class VisualFeatureWeighting extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
-        FeatureWeightingOption oldOption = fwOption;
-        fwOption = FeatureWeightingOption.NO;
+        RemovingRedundantOption oldOption = redundantOption;
+        redundantOption = RemovingRedundantOption.NO;
         settingPanel.setEnabled(false);
-        firePropertyChange(CHANGED_OPTION, oldOption, fwOption);
+        firePropertyChange(CHANGED_OPTION, oldOption, redundantOption);
     }//GEN-LAST:event_jOption1ActionPerformed
 
     private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
-        FeatureWeightingOption oldOption = fwOption;
-        fwOption = FeatureWeightingOption.YES;
+        RemovingRedundantOption oldOption = redundantOption;
+        redundantOption = RemovingRedundantOption.YES;
         settingPanel.setEnabled(true);
-        firePropertyChange(CHANGED_OPTION, oldOption, fwOption);
+        firePropertyChange(CHANGED_OPTION, oldOption, redundantOption);
     }//GEN-LAST:event_jOption2ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

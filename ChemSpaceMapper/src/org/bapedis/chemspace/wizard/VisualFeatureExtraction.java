@@ -40,14 +40,14 @@ public final class VisualFeatureExtraction extends JPanel {
     public void setFEOption(FeatureExtractionOption feOption) {
         this.feOption = feOption;
         switch (feOption) {
-            case AVAILABLE:
+            case NO:
                 jOption1.setSelected(true);
                 break;
-            case NEW:
+            case YES:
                 jOption2.setSelected(true);
                 break;
         }
-        settingPanel.setEnabled(feOption == FeatureExtractionOption.NEW);        
+        settingPanel.setEnabled(feOption == FeatureExtractionOption.YES);        
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -114,14 +114,14 @@ public final class VisualFeatureExtraction extends JPanel {
 
     private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
         FeatureExtractionOption oldOption = feOption;
-        feOption = FeatureExtractionOption.NEW;
+        feOption = FeatureExtractionOption.YES;
         settingPanel.setEnabled(true);
         firePropertyChange(CHANGED_OPTION, oldOption, feOption);
     }//GEN-LAST:event_jOption2ActionPerformed
 
     private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
         FeatureExtractionOption oldOption = feOption;
-        feOption = FeatureExtractionOption.AVAILABLE;
+        feOption = FeatureExtractionOption.NO;
         settingPanel.setEnabled(false);
         firePropertyChange(CHANGED_OPTION, oldOption, feOption);
     }//GEN-LAST:event_jOption1ActionPerformed

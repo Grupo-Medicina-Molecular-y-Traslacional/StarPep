@@ -10,18 +10,20 @@ import java.beans.PropertyChangeListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
+import org.bapedis.chemspace.clustering.impl.EMFactory;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.bapedis.core.spi.alg.impl.AbstractCluster;
+import org.openide.util.Exceptions;
 
 public class WizardClusterize implements WizardDescriptor.ValidatingPanel<WizardDescriptor>,
         PropertyChangeListener {
 
     private final MapperAlgorithm csMapper;
-    private AbstractCluster clustering;
+    private AbstractCluster alg;
     private final EventListenerList listeners = new EventListenerList();
     private boolean isValid;
     private WizardDescriptor model;
@@ -44,8 +46,19 @@ public class WizardClusterize implements WizardDescriptor.ValidatingPanel<Wizard
     @Override
     public VisualClusterize getComponent() {
         if (component == null) {
-            component = new VisualClusterize();
-            component.addPropertyChangeListener(this);
+            try {
+                if (csMapper.getClusteringAlg() == null) {
+                    alg = (AbstractCluster) new EMFactory().createAlgorithm();
+                } else {
+                    alg = (AbstractCluster) csMapper.getClusteringAlg().clone();
+                }
+                component = new VisualClusterize();
+                component.setClustering(alg);
+                component.addPropertyChangeListener(this);
+            } catch (CloneNotSupportedException ex) {
+                Exceptions.printStackTrace(ex);
+                alg = null;
+            }
         }
         return component;
     }
@@ -82,9 +95,9 @@ public class WizardClusterize implements WizardDescriptor.ValidatingPanel<Wizard
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state 
         this.model = wiz;
-        clustering = (AbstractCluster) wiz.getProperty(AbstractCluster.class.getName());
-        if (clustering!= null) {
-            getComponent().setClustering(clustering);
+        alg = (AbstractCluster) wiz.getProperty(AbstractCluster.class.getName());
+        if (alg != null) {
+            getComponent().setClustering(alg);
         }
 
     }
@@ -92,10 +105,8 @@ public class WizardClusterize implements WizardDescriptor.ValidatingPanel<Wizard
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        clustering = component.getClustering();
-        if (clustering != null) {
-//            alg.setTransformer(transformer);
-        }
+        alg = component.getClustering();
+        wiz.putProperty(AbstractCluster.class.getName(), alg);
     }
 
     @Override

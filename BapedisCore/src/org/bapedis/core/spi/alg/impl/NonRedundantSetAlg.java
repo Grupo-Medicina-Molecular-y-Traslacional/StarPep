@@ -32,17 +32,17 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class NonRedundantSetAlg implements Algorithm {
+public class NonRedundantSetAlg implements Algorithm, Cloneable {
 
     private final ProjectManager pc;
     protected final PeptideDAO dao;
     private List<Node> graphNodes;
     private final NonRedundantSetAlgFactory factory;
-    protected final SequenceClustering clusteringAlg;
+    protected SequenceClustering clusteringAlg;
     private AttributesModel tmpAttrModel, newAttrModel;
     private Workspace workspace;
     private ProgressTicket ticket;
-    private boolean stopRun;
+    private boolean stopRun, workspaceInput;
     protected final GraphWindowController graphWC;
 
     public NonRedundantSetAlg(NonRedundantSetAlgFactory factory) {
@@ -51,10 +51,19 @@ public class NonRedundantSetAlg implements Algorithm {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
         dao = Lookup.getDefault().lookup(PeptideDAO.class);
+        workspaceInput = false;
     }
 
     public SequenceAlignmentModel getAlignmentModel() {
         return clusteringAlg.getAlignmentModel();
+    }
+
+    public boolean isWorkspaceInput() {
+        return workspaceInput;
+    }
+
+    public void setWorkspaceInput(boolean workspaceInput) {
+        this.workspaceInput = workspaceInput;
     }
 
     @Override
@@ -124,7 +133,12 @@ public class NonRedundantSetAlg implements Algorithm {
         ticket.progress(msg);
 
         //set peptides
-        tmpAttrModel = dao.getPeptides(new QueryModel(workspace), pc.getGraphModel(workspace), pc.getAttributesModel(workspace));
+        if (workspaceInput) {
+            tmpAttrModel = pc.getAttributesModel(workspace);
+        } else {
+            tmpAttrModel = dao.getPeptides(new QueryModel(workspace), pc.getGraphModel(workspace), pc.getAttributesModel(workspace));            
+        }
+
         Peptide[] peptides = tmpAttrModel.getPeptides().toArray(new Peptide[0]);
         clusteringAlg.setPeptides(peptides);
 
@@ -156,5 +170,12 @@ public class NonRedundantSetAlg implements Algorithm {
             }
         }
     }
+    
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        NonRedundantSetAlg copy = (NonRedundantSetAlg) super.clone();
+        copy.clusteringAlg = (SequenceClustering)this.clusteringAlg.clone();
+        return copy;
+    }     
 
 }

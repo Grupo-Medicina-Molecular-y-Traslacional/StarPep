@@ -5,23 +5,22 @@
  */
 package org.bapedis.chemspace.wizard;
 
+import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
-import org.bapedis.chemspace.impl.AbstractEmbedder;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
-import org.bapedis.chemspace.impl.SSNEmbedder;
-import org.bapedis.core.model.SequenceAlignmentModel;
-import org.bapedis.core.ui.components.SequenceAlignmentPanel;
+import org.bapedis.chemspace.model.RemovingRedundantOption;
+import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
+import org.bapedis.core.spi.alg.impl.NonRedundantSetAlgFactory;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 
-public class WizardSequenceAlignment implements WizardDescriptor.Panel<WizardDescriptor> {
+public class WizardInputSequence implements WizardDescriptor.Panel<WizardDescriptor> {
 
     private final MapperAlgorithm csMapper;
-    private SequenceAlignmentModel alignmentModel;
-    private SSNEmbedder ssnEmbedder;
+    private NonRedundantSetAlg alg;
 
-    public WizardSequenceAlignment(MapperAlgorithm csMapper) {
+    public WizardInputSequence(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
     }
 
@@ -29,20 +28,28 @@ public class WizardSequenceAlignment implements WizardDescriptor.Panel<WizardDes
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private VisualSequenceAlignment component;
+    private VisualInputSequence component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public VisualSequenceAlignment getComponent() {
+    public VisualInputSequence getComponent() {
         if (component == null) {
             try {
-                alignmentModel = (SequenceAlignmentModel) csMapper.getSSNEmbedderAlg().getAlignmentModel().clone();
-                component = new VisualSequenceAlignment(new SequenceAlignmentPanel(alignmentModel));
+                if (csMapper.getNonRedundantSetAlg() == null) {
+                    alg = (NonRedundantSetAlg) new NonRedundantSetAlgFactory().createAlgorithm();
+                    alg.setWorkspaceInput(true);
+                } else {
+                    alg = (NonRedundantSetAlg) csMapper.getNonRedundantSetAlg().clone();
+                }
+                JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
+                component = new VisualInputSequence(settingPanel);
+                component.setNrdOption(csMapper.getNrdOption());
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
+                alg = null;
             }
         }
         return component;
@@ -77,14 +84,22 @@ public class WizardSequenceAlignment implements WizardDescriptor.Panel<WizardDes
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
-        ssnEmbedder = (SSNEmbedder)wiz.getProperty(AbstractEmbedder.class.getName());
+        RemovingRedundantOption nrdOption = (RemovingRedundantOption) wiz.getProperty(RemovingRedundantOption.class.getName());
+        if (nrdOption == null) {
+            nrdOption = csMapper.getNrdOption();
+        }
+        getComponent().setNrdOption(nrdOption);
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        if(ssnEmbedder != null){
-            ssnEmbedder.setAlignmentModel(alignmentModel);
+        RemovingRedundantOption nrdOption = getComponent().getRedundantOption();
+        wiz.putProperty(RemovingRedundantOption.class.getName(), nrdOption);
+        if (nrdOption == RemovingRedundantOption.YES) {
+            wiz.putProperty(NonRedundantSetAlg.class.getName(), alg);
+        } else{
+            wiz.putProperty(NonRedundantSetAlg.class.getName(), null);
         }
     }
 

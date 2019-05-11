@@ -10,25 +10,26 @@ import java.beans.PropertyChangeListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
-import org.bapedis.chemspace.impl.AbstractEmbedder;
+import org.bapedis.chemspace.impl.NetworkEmbedderAlg;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
-import org.bapedis.chemspace.impl.CSNEmbedder;
+import org.bapedis.chemspace.impl.NetworkEmbedderFactory;
 import org.bapedis.chemspace.spi.SimilarityCoefficient;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
+import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
-public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel<WizardDescriptor>,
+public class WizardSimNetwork implements WizardDescriptor.ValidatingPanel<WizardDescriptor>,
         PropertyChangeListener {
 
     private final MapperAlgorithm csMapper;
-    private CSNEmbedder alg;
+    private NetworkEmbedderAlg alg;
     private final EventListenerList listeners = new EventListenerList();
     private boolean isValid;
     private WizardDescriptor model;
 
-    public WizardSimilarityMeasure(MapperAlgorithm csMapper) {
+    public WizardSimNetwork(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
         isValid = true;
     }
@@ -37,17 +38,27 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private VisualSimilarityMeasure component;
+    private VisualSimNetwork component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public VisualSimilarityMeasure getComponent() {
+    public VisualSimNetwork getComponent() {
         if (component == null) {
-            component = new VisualSimilarityMeasure();
-            component.addPropertyChangeListener(this);
+            try {
+                if (csMapper.getNetworkEmbedderAlg() == null) {
+                    alg = (NetworkEmbedderAlg) new NetworkEmbedderFactory().createAlgorithm();
+                } else {
+                    alg = (NetworkEmbedderAlg) csMapper.getNetworkEmbedderAlg().clone();
+                }
+                component = new VisualSimNetwork();
+                component.addPropertyChangeListener(this);
+            } catch (CloneNotSupportedException ex) {
+                Exceptions.printStackTrace(ex);
+                alg = null;
+            }
         }
         return component;
     }
@@ -84,9 +95,8 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state  
         this.model = wiz;
-        alg = (CSNEmbedder) wiz.getProperty(AbstractEmbedder.class.getName());
-        if (alg.getSimMeasure() != null) {
-            getComponent().setSimilarityMeasure(alg.getSimMeasure());
+        if (alg != null && alg.getSimCoefficient() != null) {
+            getComponent().setSimilarityMeasure(alg.getSimCoefficient());
         }
     }
 
@@ -95,26 +105,29 @@ public class WizardSimilarityMeasure implements WizardDescriptor.ValidatingPanel
         // use wiz.putProperty to remember current panel state
         SimilarityCoefficient coefficient = component.getSimilarityCoefficient();
         if (coefficient != null) {
-            alg.setSimMeasure(coefficient);
+            alg.setSimCoefficient(coefficient);
         }
+        wiz.putProperty(NetworkEmbedderAlg.class.getName(), alg);
     }
 
     @Override
     public void validate() throws WizardValidationException {
         if (getComponent().getSimilarityCoefficient() == null) {
             isValid = false;
-            throw new WizardValidationException(null, NbBundle.getMessage(WizardSimilarityMeasure.class, "VisualSimilarityMeasure.invalid.text"), null);
+            throw new WizardValidationException(null, NbBundle.getMessage(WizardSimNetwork.class, "SimNetwork.invalid.text"), null);
         }
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {        
-        if (evt.getPropertyName().equals(VisualSimilarityMeasure.NETWORK_FACTORY)) {
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(VisualSimNetwork.NETWORK_FACTORY)) {
             boolean oldState = isValid;
             isValid = evt.getNewValue() != null;
             if (oldState != isValid) {
                 ChangeEvent srcEvt = new ChangeEvent(evt);
-                for (ChangeListener listener : listeners.getListeners(ChangeListener.class)) {
+
+                for (ChangeListener listener : listeners.getListeners(ChangeListener.class
+                )) {
                     listener.stateChanged(srcEvt);
                 }
             }

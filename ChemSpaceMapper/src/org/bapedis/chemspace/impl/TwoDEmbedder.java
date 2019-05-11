@@ -22,13 +22,12 @@ import org.gephi.graph.api.Node;
  *
  * @author loge
  */
-public class TwoDEmbedder extends DescriptorBasedEmbedder {
+public class TwoDEmbedder {
 
     private TwoDTransformer transformer;
     private TwoDSpace twoDSpace;
 
     public TwoDEmbedder(TwoDEmbedderFactory factory) {
-        super(factory);
         transformer = new WekaPCATransformerFactory().createAlgorithm();
     }
 
@@ -36,9 +35,7 @@ public class TwoDEmbedder extends DescriptorBasedEmbedder {
         return twoDSpace;
     }
 
-    @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
-        super.initAlgo(workspace, progressTicket);
         twoDSpace = null;
     }
 
@@ -50,10 +47,10 @@ public class TwoDEmbedder extends DescriptorBasedEmbedder {
         this.transformer = transformer;
     }
 
-    @Override
+
     protected void embed(Peptide[] peptides, MolecularDescriptor[] features) {
-        twoDSpace = transformer.transform(workspace, peptides, features);
-        updateGraphNodePositions(graphModel, ticket, new AtomicBoolean(stopRun));
+//        twoDSpace = transformer.transform(workspace, peptides, features);
+//        updateGraphNodePositions(graphModel, ticket, new AtomicBoolean(stopRun));
     }
     
     public void updateGraphNodePositions(GraphModel graphModel, ProgressTicket ticket, AtomicBoolean atomicBoolean) {        

@@ -10,5 +10,5 @@ package org.bapedis.chemspace.model;
  * @author loge
  */
 public enum FeatureExtractionOption {
-    NEW, AVAILABLE
+    YES, NO
 }

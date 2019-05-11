@@ -5,6 +5,7 @@
  */
 package org.bapedis.chemspace.impl;
 
+import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -27,8 +28,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
     protected final JXHyperlink openWizardLink;
     protected MapperAlgorithm csMapper;
-    protected final NetworkPanel csnPanel;
-    protected final NetworkPanel ssnPanel;    
+    protected final NetworkPanel networkPanel;
 
     /**
      * Creates new form MapperAlgorithmPanel
@@ -40,11 +40,8 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         configureOpenWizardLink();
         topRightPanel.add(openWizardLink);        
 
-        csnPanel = new NetworkPanel();
-        centerPanel.add(csnPanel, "chemSpaceNetwork");   
-        
-        ssnPanel = new NetworkPanel();
-        centerPanel.add(ssnPanel, "seqSimilarityNetwork");
+        networkPanel = new NetworkPanel();
+        centerPanel.add(networkPanel, BorderLayout.CENTER);           
         
         addAncestorListener(new AncestorListener() {
             @Override
@@ -80,54 +77,30 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
                     WizardDescriptor wiz = MapperAlgorithmFactory.createWizardDescriptor(csMapper);
                     if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
                         MapperAlgorithmFactory.setUp(csMapper, wiz);
-                        refreshChemSpaceOption();
                     }
                 }
             }
         });
     }
         
-    private void refreshChemSpaceOption() {
-        CardLayout centerCL = (CardLayout) centerPanel.getLayout();
-        CardLayout topLeftCl = (CardLayout) topLeftPanel.getLayout();
-        switch (csMapper.getChemSpaceOption()) {
-            case CHEM_SPACE_NETWORK:
-                csnPanel.setUp(csMapper);
-                topLeftCl.show(topLeftPanel, "chemSpaceNetwork");
-                centerCL.show(centerPanel, "chemSpaceNetwork");
-                break;
-            case SEQ_SIMILARITY_NETWORK:
-                ssnPanel.setUp(csMapper);
-                topLeftCl.show(topLeftPanel, "seqSimilarityNetwork");
-                centerCL.show(centerPanel, "seqSimilarityNetwork");
-                break;
-        }
-    }
+   
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         this.csMapper = (MapperAlgorithm) algo;
-        refreshChemSpaceOption();
+        networkPanel.setUp(csMapper);
         setBusy(csMapper.isRunning());
         return this;
     }
 
 
     public void setBusy(boolean busy) {        
-        openWizardLink.setEnabled(!busy);
-        switch (csMapper.getChemSpaceOption()) {
-            case CHEM_SPACE_NETWORK:
-                csnLabel.setEnabled(!busy);
-                csnPanel.setEnabled(!busy);
-                break;
-            case SEQ_SIMILARITY_NETWORK:
-                ssnLabel.setEnabled(!busy);
-                ssnPanel.setEnabled(!busy);
-                break;
-        }        
+        openWizardLink.setEnabled(!busy);               
         topLeftPanel.setEnabled(!busy);
         topRightPanel.setEnabled(!busy);
         centerPanel.setEnabled(!busy);
+        networkPanel.setEnabled(!busy);
+        networkLabel.setEnabled(!busy);
     }
 
     public MapperAlgorithm getCheSMapper() {
@@ -145,24 +118,18 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         java.awt.GridBagConstraints gridBagConstraints;
 
         topLeftPanel = new javax.swing.JPanel();
-        csnLabel = new javax.swing.JLabel();
-        ssnLabel = new javax.swing.JLabel();
+        networkLabel = new javax.swing.JLabel();
         topRightPanel = new javax.swing.JPanel();
         centerPanel = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
-        topLeftPanel.setLayout(new java.awt.CardLayout());
+        topLeftPanel.setLayout(new java.awt.BorderLayout());
 
-        csnLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(csnLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.csnLabel.text")); // NOI18N
-        csnLabel.setToolTipText(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.csnLabel.toolTipText")); // NOI18N
-        topLeftPanel.add(csnLabel, "chemSpaceNetwork");
-
-        ssnLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(ssnLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.ssnLabel.text")); // NOI18N
-        ssnLabel.setToolTipText(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.ssnLabel.toolTipText")); // NOI18N
-        topLeftPanel.add(ssnLabel, "seqSimilarityNetwork");
+        networkLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(networkLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.networkLabel.text")); // NOI18N
+        networkLabel.setToolTipText(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.networkLabel.toolTipText")); // NOI18N
+        topLeftPanel.add(networkLabel, java.awt.BorderLayout.CENTER);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -181,7 +148,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
         add(topRightPanel, gridBagConstraints);
 
-        centerPanel.setLayout(new java.awt.CardLayout());
+        centerPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -196,8 +163,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
-    private javax.swing.JLabel csnLabel;
-    private javax.swing.JLabel ssnLabel;
+    private javax.swing.JLabel networkLabel;
     private javax.swing.JPanel topLeftPanel;
     private javax.swing.JPanel topRightPanel;
     // End of variables declaration//GEN-END:variables

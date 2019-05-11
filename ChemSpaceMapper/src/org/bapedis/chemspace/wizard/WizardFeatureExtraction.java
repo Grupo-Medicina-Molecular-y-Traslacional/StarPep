@@ -19,6 +19,7 @@ import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
+import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.Exceptions;
@@ -56,10 +57,14 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
     public VisualFeatureExtraction getComponent() {
         if (component == null) {
             try {
-                alg = (AllDescriptors) csMapper.getFeatureExtractionAlg().clone();
+                if (csMapper.getFeatureExtractionAlg() == null) {
+                    alg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
+                } else {
+                    alg = (AllDescriptors) csMapper.getFeatureExtractionAlg().clone();
+                }
                 JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
                 component = new VisualFeatureExtraction(settingPanel);
-                component.addPropertyChangeListener(this);                
+                component.addPropertyChangeListener(this);
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
                 alg = null;
@@ -80,8 +85,8 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
         this.model = wiz;
-        FeatureExtractionOption feOption = (FeatureExtractionOption)wiz.getProperty(FeatureExtractionOption.class.getName());
-        if (feOption == null){
+        FeatureExtractionOption feOption = (FeatureExtractionOption) wiz.getProperty(FeatureExtractionOption.class.getName());
+        if (feOption == null) {
             feOption = csMapper.getFEOption();
         }
         getComponent().setFEOption(feOption);
@@ -90,8 +95,14 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        wiz.putProperty(FeatureExtractionOption.class.getName(), component.getFEOption());
-        wiz.putProperty(AllDescriptors.class.getName(), alg);
+        FeatureExtractionOption feOption = component.getFEOption();
+        wiz.putProperty(FeatureExtractionOption.class.getName(), feOption);
+
+        if (feOption == FeatureExtractionOption.YES) {
+            wiz.putProperty(AllDescriptors.class.getName(), alg);
+        } else {
+            wiz.putProperty(AllDescriptors.class.getName(), null);
+        }
     }
 
     @Override
@@ -116,12 +127,12 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
 
     @Override
     public void validate() throws WizardValidationException {
-        if (component.getFEOption() == FeatureExtractionOption.AVAILABLE
+        if (component.getFEOption() == FeatureExtractionOption.NO
                 && getAvailableFeatureSize() < ProjectManager.MIN_AVAILABLE_FEATURES) {
             isValid = false;
             throw new WizardValidationException(null, NbBundle.getMessage(WizardFeatureExtraction.class, "WizardFeatureExtraction.invalidOption.text"), null);
-        } else if (component.getFEOption() == FeatureExtractionOption.NEW) {
-            if (alg.getDescriptorKeys().isEmpty()){
+        } else if (component.getFEOption() == FeatureExtractionOption.YES) {
+            if (alg.getDescriptorKeys().isEmpty()) {
                 throw new WizardValidationException(null, NbBundle.getMessage(WizardFeatureExtraction.class, "WizardFeatureExtraction.emptyKeys.info"), null);
             }
         }
@@ -144,7 +155,7 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
         if (evt.getPropertyName().equals(VisualFeatureExtraction.CHANGED_OPTION)) {
             boolean oldState = isValid;
             switch ((FeatureExtractionOption) evt.getNewValue()) {
-                case NEW:
+                case YES:
                     isValid = true;
                     break;
             }
@@ -154,7 +165,7 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
                     listener.stateChanged(srcEvt);
                 }
             }
-            if (isValid){
+            if (isValid) {
                 model.getNotificationLineSupport().setErrorMessage(null);
             }
         }

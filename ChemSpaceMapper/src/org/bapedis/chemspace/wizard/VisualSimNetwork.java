@@ -21,16 +21,16 @@ import org.openide.util.NbBundle;
 import org.bapedis.chemspace.spi.SimilarityCoefficient;
 import org.bapedis.chemspace.spi.SimilarityCoefficientFactory;
 
-public final class VisualSimilarityMeasure extends JPanel {
+public final class VisualSimNetwork extends JPanel {
 
     public static final String NETWORK_FACTORY = "network_factory";
     private final DefaultMutableTreeNode treeNode;
     private SimilarityCoefficient coefficient;
     private final HashMap<String,SimilarityCoefficient> map;
 
-    public VisualSimilarityMeasure() {
+    public VisualSimNetwork() {
         initComponents();
-        treeNode = new DefaultMutableTreeNode(NbBundle.getMessage(VisualSimilarityMeasure.class, "VisualSimilarityMeasure.root.name"), true);
+        treeNode = new DefaultMutableTreeNode(NbBundle.getMessage(VisualSimNetwork.class, "SimNetwork.root.name"), true);
         populateJTree();
         jTree1.setModel(new DefaultTreeModel(treeNode));
         jTree1.setRootVisible(true);
@@ -64,7 +64,7 @@ public final class VisualSimilarityMeasure extends JPanel {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(VisualSimilarityMeasure.class, "SimilarityMeasure.name");
+        return NbBundle.getMessage(VisualSimNetwork.class, "SimNetwork.name");
     }
 
     /**
@@ -87,7 +87,7 @@ public final class VisualSimilarityMeasure extends JPanel {
         setPreferredSize(new java.awt.Dimension(500, 460));
         setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualSimilarityMeasure.class, "VisualSimilarityMeasure.jInfoLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualSimNetwork.class, "VisualSimNetwork.jInfoLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;

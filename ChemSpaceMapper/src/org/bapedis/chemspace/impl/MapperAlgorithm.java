@@ -74,7 +74,7 @@ public class MapperAlgorithm implements Algorithm {
 
         //Mapping Options        
         nrdOption = RemovingRedundantOption.NO;
-        feOption = FeatureExtractionOption.NO;
+        feOption = FeatureExtractionOption.YES;
         ffOption = FeatureFilteringOption.NO;
 
         networkAlg = (NetworkEmbedderAlg) new NetworkEmbedderFactory().createAlgorithm();

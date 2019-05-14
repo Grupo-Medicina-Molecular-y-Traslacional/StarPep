@@ -6,6 +6,7 @@
 package org.bapedis.chemspace.wizard;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.util.Collection;
 import java.util.HashMap;
 import javax.swing.Icon;
@@ -31,7 +32,7 @@ public final class VisualClusterize extends JPanel {
     private final DefaultMutableTreeNode treeNode;
     private final HashMap<String, AbstractCluster> map;
     private AbstractCluster clustering;
-    private PropertySheetPanel propSheetPanel;
+    private final PropertySheetPanel propSheetPanel;
 
     public VisualClusterize() {
         initComponents();
@@ -42,6 +43,7 @@ public final class VisualClusterize extends JPanel {
         jTree1.setCellRenderer(new ClusteringFactoryNodeRenderer());
         map = new HashMap<>();
         propSheetPanel = new PropertySheetPanel();
+        propSheetPanel.setPreferredSize(jScrollPane2.getPreferredSize());
     }
 
     public HashMap<String, AbstractCluster> getMap() {
@@ -90,17 +92,16 @@ public final class VisualClusterize extends JPanel {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
         jInfoLabel = new javax.swing.JLabel();
-        jScrollPane3 = new javax.swing.JScrollPane();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jDescLabel = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
-        setPreferredSize(new java.awt.Dimension(500, 460));
+        setPreferredSize(new java.awt.Dimension(680, 460));
         setLayout(new java.awt.GridBagLayout());
 
-        jScrollPane1.setMinimumSize(new java.awt.Dimension(180, 23));
-        jScrollPane1.setPreferredSize(new java.awt.Dimension(180, 322));
+        jScrollPane1.setMinimumSize(new java.awt.Dimension(220, 322));
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(220, 322));
 
         jTree1.setRootVisible(false);
         jTree1.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
@@ -113,27 +114,11 @@ public final class VisualClusterize extends JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(jScrollPane1, gridBagConstraints);
-
-        jTextArea1.setEditable(false);
-        jTextArea1.setColumns(20);
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setRows(5);
-        jTextArea1.setWrapStyleWord(true);
-        jScrollPane2.setViewportView(jTextArea1);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(jScrollPane2, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualClusterize.class, "VisualClusterize.jInfoLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -150,7 +135,19 @@ public final class VisualClusterize extends JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(jScrollPane3, gridBagConstraints);
+        add(jScrollPane2, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jDescLabel, org.openide.util.NbBundle.getMessage(VisualClusterize.class, "VisualClusterize.jDescLabel.text")); // NOI18N
+        jDescLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        jDescLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jDescLabel.setMinimumSize(new java.awt.Dimension(4, 87));
+        jDescLabel.setPreferredSize(new java.awt.Dimension(4, 87));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(jDescLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
@@ -159,7 +156,7 @@ public final class VisualClusterize extends JPanel {
         if (newPath != null && newPath.getLastPathComponent() instanceof ClusteringFactoryTreeNode) {
             ClusteringFactoryTreeNode newNode = (ClusteringFactoryTreeNode) newPath.getLastPathComponent();
             factory = newNode.getFactory();
-            jTextArea1.setText(factory.getDescription());
+            jDescLabel.setText(NbBundle.getMessage(VisualClusterize.class, "VisualClusterize.jDescLabel.text", factory.getName(), factory.getDescription()));
             if (!map.containsKey(factory.getName())) {
                 clustering = (AbstractCluster)factory.createAlgorithm();
                 map.put(factory.getName(), clustering);
@@ -168,28 +165,30 @@ public final class VisualClusterize extends JPanel {
             }
             if (factory.getSetupUI() != null) {
                 JPanel panel = factory.getSetupUI().getSettingPanel(clustering);
-                jScrollPane3.setViewportView(panel);
+                jScrollPane2.setViewportView(panel);
+                jDescLabel.setVisible(true);
             } else if (clustering.getProperties() != null) {
                 propSheetPanel.getPropertySheet().setNodes(new Node[]{new AlgorithmNode(clustering)});
-                jScrollPane3.setViewportView(propSheetPanel);
+                jScrollPane2.setViewportView(propSheetPanel);
+                jDescLabel.setVisible(false);
             }
             else {
-                jScrollPane3.setViewportView(null);
+                jScrollPane2.setViewportView(null);
+                jDescLabel.setVisible(true);
             }
         } else {
             clustering = null;
-            jTextArea1.setText("");
-            jScrollPane3.setViewportView(null);
+            jDescLabel.setText("");
+            jScrollPane2.setViewportView(null);
         }
         firePropertyChange(CLUSTERING_FACTORY, null, factory);
     }//GEN-LAST:event_jTree1ValueChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jDescLabel;
     private javax.swing.JLabel jInfoLabel;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
 

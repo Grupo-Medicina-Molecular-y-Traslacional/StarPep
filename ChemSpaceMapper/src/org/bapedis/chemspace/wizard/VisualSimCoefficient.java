@@ -11,6 +11,7 @@ import java.util.HashMap;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -30,7 +31,7 @@ public final class VisualSimCoefficient extends JPanel {
     public static final String NETWORK_FACTORY = "network_factory";
     private final DefaultMutableTreeNode treeNode;
     private AbstractSimCoefficient simCoefficient;
-    private PropertySheetPanel propSheetPanel;
+    private final PropertySheetPanel propSheetPanel;
     private final HashMap<String, AbstractSimCoefficient> map;
 
     public VisualSimCoefficient() {
@@ -41,6 +42,8 @@ public final class VisualSimCoefficient extends JPanel {
         jTree1.setRootVisible(true);
         jTree1.setCellRenderer(new SimilarityFactoryNodeRenderer());
         map = new HashMap<>();
+        propSheetPanel = new PropertySheetPanel();
+        propSheetPanel.setPreferredSize(jScrollPane2.getPreferredSize());
     }
 
     public AbstractSimCoefficient getSimilarityCoefficient() {
@@ -87,11 +90,10 @@ public final class VisualSimCoefficient extends JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        jScrollPane3 = new javax.swing.JScrollPane();
+        jDescLabel = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
-        setPreferredSize(new java.awt.Dimension(580, 460));
+        setPreferredSize(new java.awt.Dimension(680, 460));
         setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualSimCoefficient.class, "VisualSimCoefficient.jInfoLabel.text")); // NOI18N
@@ -103,8 +105,8 @@ public final class VisualSimCoefficient extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(jInfoLabel, gridBagConstraints);
 
-        jScrollPane1.setMinimumSize(new java.awt.Dimension(180, 23));
-        jScrollPane1.setPreferredSize(new java.awt.Dimension(180, 322));
+        jScrollPane1.setMinimumSize(new java.awt.Dimension(220, 322));
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(220, 322));
 
         jTree1.setRootVisible(false);
         jTree1.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
@@ -117,26 +119,11 @@ public final class VisualSimCoefficient extends JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(jScrollPane1, gridBagConstraints);
-
-        jTextArea1.setEditable(false);
-        jTextArea1.setColumns(20);
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setRows(5);
-        jTextArea1.setWrapStyleWord(true);
-        jScrollPane2.setViewportView(jTextArea1);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(jScrollPane2, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -144,7 +131,19 @@ public final class VisualSimCoefficient extends JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(jScrollPane3, gridBagConstraints);
+        add(jScrollPane2, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jDescLabel, org.openide.util.NbBundle.getMessage(VisualSimCoefficient.class, "VisualSimCoefficient.jDescLabel.text")); // NOI18N
+        jDescLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        jDescLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jDescLabel.setMinimumSize(new java.awt.Dimension(4, 87));
+        jDescLabel.setPreferredSize(new java.awt.Dimension(4, 87));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(jDescLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
@@ -153,7 +152,7 @@ public final class VisualSimCoefficient extends JPanel {
         if (newPath != null && newPath.getLastPathComponent() instanceof SimilarityFactoryTreeNode) {
             SimilarityFactoryTreeNode newNode = (SimilarityFactoryTreeNode) newPath.getLastPathComponent();
             factory = newNode.getFactory();
-            jTextArea1.setText(factory.getDescription());
+            jDescLabel.setText(NbBundle.getMessage(VisualSimCoefficient.class, "VisualSimCoefficient.jDescLabel.text", factory.getName(), factory.getDescription()));
             if (!map.containsKey(factory.getName())) {
                 simCoefficient = (AbstractSimCoefficient)factory.createAlgorithm();
                 map.put(factory.getName(), simCoefficient);
@@ -162,29 +161,31 @@ public final class VisualSimCoefficient extends JPanel {
             }
             if (factory.getSetupUI() != null) {
                 JPanel panel = factory.getSetupUI().getSettingPanel(simCoefficient);
-                jScrollPane3.setViewportView(panel);
+                jScrollPane2.setViewportView(panel);
+                jDescLabel.setVisible(true);
             } else if (simCoefficient.getProperties() != null) {
                 propSheetPanel.getPropertySheet().setNodes(new Node[]{new AlgorithmNode(simCoefficient)});
-                jScrollPane3.setViewportView(propSheetPanel);
+                jScrollPane2.setViewportView(propSheetPanel);
+                jDescLabel.setVisible(false);
             }
             else {
-                jScrollPane3.setViewportView(null);
+                jScrollPane2.setViewportView(null);
+                jDescLabel.setVisible(true);
             }
 
         } else {
             simCoefficient = null;
-            jTextArea1.setText("");
-            jScrollPane3.setViewportView(null);
+            jDescLabel.setText("");
+            jScrollPane2.setViewportView(null);
         }
         firePropertyChange(NETWORK_FACTORY, null, factory);
     }//GEN-LAST:event_jTree1ValueChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jDescLabel;
     private javax.swing.JLabel jInfoLabel;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
 

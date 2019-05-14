@@ -87,8 +87,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
 
         associateLookup(new ProxyLookup(ExplorerUtils.createLookup(explorerMgr, getActionMap()),
                 Lookups.singleton(new MetadataNavigatorLookupHint()),
-                Lookups.singleton(new GraphElementNavigatorLookupHint()),
-                Lookups.singleton(new ClusterNavigatorLookupHint())));
+                Lookups.singleton(new GraphElementNavigatorLookupHint())));
 
         applyCheckBox.setSelected(NbPreferences.forModule(QueryModel.class).getBoolean(AUTO_APPLY, true));
 

@@ -6,7 +6,6 @@
 package org.bapedis.chemspace.impl;
 
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
@@ -29,19 +28,23 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     protected final JXHyperlink openWizardLink;
     protected MapperAlgorithm csMapper;
     protected final NetworkPanel networkPanel;
+    protected final ClusterPanel clusterPanel;
 
     /**
      * Creates new form MapperAlgorithmPanel
      */
     public MapperAlgorithmPanel() {
         initComponents();
-        
+
         openWizardLink = new JXHyperlink();
         configureOpenWizardLink();
-        topRightPanel.add(openWizardLink);        
+        topPanel.add(openWizardLink);
 
+        clusterPanel = new ClusterPanel();
+        tab1.add(clusterPanel, BorderLayout.CENTER);
+        
         networkPanel = new NetworkPanel();
-        centerPanel.add(networkPanel, BorderLayout.CENTER);           
+        tab2.add(networkPanel, BorderLayout.CENTER);
         
         addAncestorListener(new AncestorListener() {
             @Override
@@ -61,7 +64,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
             @Override
             public void ancestorMoved(AncestorEvent event) {
             }
-        });        
+        });
     }
 
     private void configureOpenWizardLink() {
@@ -82,25 +85,22 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
             }
         });
     }
-        
-   
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         this.csMapper = (MapperAlgorithm) algo;
         networkPanel.setUp(csMapper);
+        clusterPanel.setUp(csMapper);
         setBusy(csMapper.isRunning());
         return this;
     }
 
-
-    public void setBusy(boolean busy) {        
-        openWizardLink.setEnabled(!busy);               
-        topLeftPanel.setEnabled(!busy);
-        topRightPanel.setEnabled(!busy);
-        centerPanel.setEnabled(!busy);
+    public void setBusy(boolean busy) {
+        openWizardLink.setEnabled(!busy);
+        topPanel.setEnabled(!busy);
+        jTabbedPane1.setEnabled(!busy);
+        clusterPanel.setEnabled(!busy);
         networkPanel.setEnabled(!busy);
-        networkLabel.setEnabled(!busy);
     }
 
     public MapperAlgorithm getCheSMapper() {
@@ -117,55 +117,44 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        topLeftPanel = new javax.swing.JPanel();
-        networkLabel = new javax.swing.JLabel();
-        topRightPanel = new javax.swing.JPanel();
-        centerPanel = new javax.swing.JPanel();
+        topPanel = new javax.swing.JPanel();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        tab1 = new javax.swing.JPanel();
+        tab2 = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
-        topLeftPanel.setLayout(new java.awt.BorderLayout());
-
-        networkLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(networkLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.networkLabel.text")); // NOI18N
-        networkLabel.setToolTipText(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.networkLabel.toolTipText")); // NOI18N
-        topLeftPanel.add(networkLabel, java.awt.BorderLayout.CENTER);
-
+        topPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
-        add(topLeftPanel, gridBagConstraints);
+        add(topPanel, gridBagConstraints);
 
-        topRightPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
-        add(topRightPanel, gridBagConstraints);
+        tab1.setLayout(new java.awt.BorderLayout());
+        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.tab1.TabConstraints.tabTitle"), tab1); // NOI18N
 
-        centerPanel.setLayout(new java.awt.BorderLayout());
+        tab2.setLayout(new java.awt.BorderLayout());
+        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.tab2.TabConstraints.tabTitle"), tab2); // NOI18N
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 5, 5);
-        add(centerPanel, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(jTabbedPane1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel centerPanel;
-    private javax.swing.JLabel networkLabel;
-    private javax.swing.JPanel topLeftPanel;
-    private javax.swing.JPanel topRightPanel;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JPanel tab1;
+    private javax.swing.JPanel tab2;
+    private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 
     @Override

@@ -11,7 +11,6 @@ import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Cluster;
-import org.bapedis.core.model.ClusterNavigatorModel;
 import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
@@ -43,7 +42,6 @@ public abstract class AbstractCluster implements Algorithm, Cloneable {
     protected final ProjectManager pc;
     private GraphVizSetting graphViz;
     protected GraphModel graphModel;
-    protected ClusterNavigatorModel navModel;
 
     public AbstractCluster(AlgorithmFactory factory) {
         this.factory = factory;
@@ -77,8 +75,6 @@ public abstract class AbstractCluster implements Algorithm, Cloneable {
         clusters = null;
         graphModel = pc.getGraphModel(workspace);
         graphViz = pc.getGraphVizSetting(workspace);
-        navModel = pc.getClusterNavModel(workspace);
-        navModel.setRunning(true);
     }
 
     @Override
@@ -114,16 +110,13 @@ public abstract class AbstractCluster implements Algorithm, Cloneable {
                 }
             }
 
-            navModel.setClusters(clusters);
 
             if (fireEvent) {
                 graphViz.fireChangedGraphView();
             }
         }
 
-        navModel.setRunning(false);
         attrModel = null;
-        navModel = null;
         workspace = null;
         peptides = null;
         ticket = null;

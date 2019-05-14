@@ -65,6 +65,12 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
 //        pidRichTooltip.addDescriptionSection(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidInfo2.text"));
     }
 
+    public void showPercentangeIdSlider(boolean flag){
+        jToolBar1.setVisible(flag);
+        jPIDInfoLabel.setVisible(flag);
+        jPIDLabel.setVisible(flag);
+    }
+    
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled); //To change body of generated methods, choose Tools | Templates.

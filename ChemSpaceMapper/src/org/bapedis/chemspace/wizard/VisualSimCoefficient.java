@@ -91,7 +91,7 @@ public final class VisualSimCoefficient extends JPanel {
         jScrollPane3 = new javax.swing.JScrollPane();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
-        setPreferredSize(new java.awt.Dimension(500, 460));
+        setPreferredSize(new java.awt.Dimension(580, 460));
         setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualSimCoefficient.class, "VisualSimCoefficient.jInfoLabel.text")); // NOI18N

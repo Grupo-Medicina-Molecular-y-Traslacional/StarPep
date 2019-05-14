@@ -13,7 +13,7 @@ import org.bapedis.core.ui.components.SequenceAlignmentPanel;
 
 /**
  *
- * @author Home
+ * @author Loge
  */
 public class AlignmentBasedSimilarityPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
 
@@ -39,8 +39,10 @@ public class AlignmentBasedSimilarityPanel extends javax.swing.JPanel implements
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
-        AlignmentBasedSimilarity aligmentSim = (AlignmentBasedSimilarity) algo;        
-        add(new SequenceAlignmentPanel(aligmentSim.getAlignmentModel()), BorderLayout.CENTER);
+        AlignmentBasedSimilarity aligmentSim = (AlignmentBasedSimilarity) algo;   
+        SequenceAlignmentPanel panel = new SequenceAlignmentPanel(aligmentSim.getAlignmentModel());
+        panel.showPercentangeIdSlider(false);
+        add(panel, BorderLayout.CENTER);
         return this;
     }
 

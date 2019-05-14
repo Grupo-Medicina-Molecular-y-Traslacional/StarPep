@@ -40,14 +40,14 @@ public abstract class AbstractSimCoefficient implements Algorithm, Cloneable {
     @Override
     public AlgorithmFactory getFactory() {
         return factory;
-    }        
+    }
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
         AttributesModel attrModel = pc.getAttributesModel(workspace);
-        
-        List<MolecularDescriptor> features = new LinkedList<>();
+
+        features = new LinkedList<>();
         for (String key : attrModel.getMolecularDescriptorKeys()) {
             for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
                 features.add(attr);
@@ -75,8 +75,15 @@ public abstract class AbstractSimCoefficient implements Algorithm, Cloneable {
     }
 
     public float getSimilarityValue() {
+        if (similarityVal < 0 || similarityVal > 1) {
+            throw new IllegalStateException("Unexpected similarity value: " + similarityVal);
+        }
         return similarityVal;
-    }        
+    }
+
+    public List<MolecularDescriptor> getFeatures() {
+        return features;
+    }
 
     @Override
     public void endAlgo() {
@@ -107,10 +114,10 @@ public abstract class AbstractSimCoefficient implements Algorithm, Cloneable {
     }
 
     protected abstract float computeSimilarity() throws Exception;
-    
+
     @Override
     public Object clone() throws CloneNotSupportedException {
         AbstractSimCoefficient copy = (AbstractSimCoefficient) super.clone();
         return copy;
-    }       
+    }
 }

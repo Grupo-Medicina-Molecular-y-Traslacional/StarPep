@@ -8,6 +8,7 @@ package org.bapedis.core.model;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import org.bapedis.core.model.Peptide;
 
 /**
  *

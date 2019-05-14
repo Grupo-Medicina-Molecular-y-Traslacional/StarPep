@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.model;
+package org.bapedis.chemspace.model;
 
+import org.bapedis.core.model.Cluster;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Collections;
@@ -39,7 +40,7 @@ public class ClusterNavigatorModel {
 
     public boolean contains(Cluster cluster) {
         for (Cluster c : clusters) {
-            if (c.getId() == cluster.id) {
+            if (c.getId() == cluster.getId()) {
                 return true;
             }
         }

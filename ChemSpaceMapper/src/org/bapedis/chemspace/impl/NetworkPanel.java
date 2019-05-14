@@ -116,10 +116,8 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
     private void setupHistogram(boolean running) {
         histogramPanel.removeAll();
         histogramPanel.setBorder(null);
-        SimilarityMatrix matrix = netEmbedder.getSimilarityMatrix();
-        JQuickHistogram histogram = null;
-        if (!running && matrix != null) {
-            histogram = matrix.getHistogram();
+        JQuickHistogram histogram = netEmbedder.getHistogram();
+        if (!running && histogram != null) {
             histogramPanel.add(histogram.createChartPanel(), BorderLayout.CENTER);
             histogramPanel.setBorder(BorderFactory.createTitledBorder(NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.histogramPanel.borderTitle")));
         }
@@ -130,7 +128,7 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
     
     private void resetTooltip(JQuickHistogram histogram) {
         richTooltip = new RichTooltip();
-        richTooltip.setTitle(NbBundle.getMessage(NetworkPanel.class, "ChemSpaceNetworkPanel.histoInfo.title"));
+        richTooltip.setTitle(NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.histoInfo.title"));
         richTooltip.addDescriptionSection("Number of values: " + ((histogram != null) ? histogram.countValues() : "NaN"));
         richTooltip.addDescriptionSection("Average: " + (histogram != null && histogram.countValues() > 0 ? formatter.format(histogram.getAverage()) : "NaN"));
         richTooltip.addDescriptionSection("Min: " + (histogram != null && histogram.countValues() > 0 ? formatter.format(histogram.getMinValue()) : "NaN"));
@@ -333,7 +331,7 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
     }// </editor-fold>//GEN-END:initComponents
 
     private void jApplyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jApplyButtonActionPerformed
-        if (netEmbedder != null && netEmbedder.getSimilarityMatrix() != null) {
+        if (netEmbedder != null) {
             NetworkThresholdUpdater fnUpdater = new NetworkThresholdUpdater(netEmbedder);
             fnUpdater.addPropertyChangeListener(this);
             setRunning(true);
@@ -354,7 +352,7 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
             jCutoffNewLabel.setVisible(true);
             jCutoffNewValue.setVisible(true);
             jCutoffNewValue.setText(formatter.format(threshold));
-            jApplyButton.setEnabled(netEmbedder != null && netEmbedder.getSimilarityMatrix() != null);
+            jApplyButton.setEnabled(netEmbedder != null);
         } else {
             jCutoffNewLabel.setVisible(false);
             jCutoffNewValue.setVisible(false);
@@ -441,7 +439,7 @@ class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
     protected Void doInBackground() throws Exception {
         ticket.start();
         GraphModel graphModel = pc.getGraphModel();
-//        embedder.updateNetwork(graphModel, ticket, stopRun);
+//        embedder .updateNetwork(graphModel, ticket, stopRun);
 
 //            if (newThreshold < oldThreshold) { // to add edges 
 //            Edge graphEdge;

@@ -15,6 +15,9 @@ import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.similarity.AbstractSimCoefficient;
 import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.model.MolecularDescriptor;
+import org.bapedis.core.model.MolecularDescriptorNotFoundException;
+import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
@@ -25,6 +28,8 @@ import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.task.ProgressTicket;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -36,6 +41,7 @@ public class MapperAlgorithm implements Algorithm {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     public static final String RUNNING = "running";
+    protected final NotifyDescriptor notEnoughFeatures;
 
     private final MapperAlgorithmFactory factory;
     protected final PropertyChangeSupport propertyChangeSupport;
@@ -44,7 +50,7 @@ public class MapperAlgorithm implements Algorithm {
     protected boolean stopRun, running;
 
     //Mapping Options
-    protected RemovingRedundantOption nrdOption;    
+    protected RemovingRedundantOption nrdOption;
     protected FeatureExtractionOption feOption;
     protected FeatureFilteringOption ffOption;
 
@@ -69,10 +75,11 @@ public class MapperAlgorithm implements Algorithm {
         //Mapping Options        
         nrdOption = RemovingRedundantOption.NO;
         feOption = FeatureExtractionOption.NO;
-        ffOption = FeatureFilteringOption.NO;        
+        ffOption = FeatureFilteringOption.NO;
 
         networkAlg = (NetworkEmbedderAlg) new NetworkEmbedderFactory().createAlgorithm();
 //        twoDEmbedderAlg = (TwoDEmbedder) new TwoDEmbedderFactory().createAlgorithm();
+        notEnoughFeatures = new NotifyDescriptor.Message(NbBundle.getMessage(MapperAlgorithm.class, "DescriptorBasedEmbedder.features.notEnoughHTML"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
     public boolean isRunning() {
@@ -91,7 +98,7 @@ public class MapperAlgorithm implements Algorithm {
         //Non-redundant set
         if (nrdOption == RemovingRedundantOption.YES) {
             if (nrdAlg != null) {
-               algorithms.add(nrdAlg);
+                algorithms.add(nrdAlg);
             } else {
                 throw new RuntimeException("Internal error: Non-redundant algorithm is null");
             }
@@ -117,7 +124,7 @@ public class MapperAlgorithm implements Algorithm {
 
         // Clustering
         if (clusteringAlg != null) {
-           algorithms.add(clusteringAlg);
+            algorithms.add(clusteringAlg);
         } else {
             throw new RuntimeException("Internal error: Clustering algorithm is null");
         }
@@ -149,6 +156,37 @@ public class MapperAlgorithm implements Algorithm {
                 algorithm.run();
                 algorithm.endAlgo();
             }
+        }
+    }
+
+    private void preprocessing(List<MolecularDescriptor> features, List<Peptide> peptides) {
+        // Check feature list size
+        if (features.size() < ProjectManager.MIN_AVAILABLE_FEATURES) {
+            DialogDisplayer.getDefault().notify(notEnoughFeatures);
+            pc.reportError(NbBundle.getMessage(NetworkEmbedderAlg.class, "DescriptorBasedEmbedder.features.notEnough"), workspace);
+            cancel();
+        }
+
+        // try/catch for molecular not found exception handling
+        try {
+            // Preprocessing of feature list. Compute max, min, mean and std
+            for (MolecularDescriptor attr : features) {
+                attr.resetSummaryStats(peptides);
+            }
+
+            // Validate molecular features
+            for (MolecularDescriptor attr : features) {
+                if (attr.getMax() == attr.getMin()) {
+                    NotifyDescriptor invalidFeature = new NotifyDescriptor.Message(NbBundle.getMessage(NetworkEmbedderAlg.class, "DescriptorBasedEmbedder.features.invalidFeatureHTML", attr.getDisplayName()), NotifyDescriptor.ERROR_MESSAGE);
+                    DialogDisplayer.getDefault().notify(invalidFeature);
+                    pc.reportError(NbBundle.getMessage(NetworkEmbedderAlg.class, "DescriptorBasedEmbedder.features.invalidFeature", attr.getDisplayName()), workspace);
+                    cancel();
+                }
+            }
+        } catch (MolecularDescriptorNotFoundException ex) {
+            DialogDisplayer.getDefault().notify(ex.getErrorND());
+            pc.reportError(ex.getMessage(), workspace);
+            cancel();
         }
     }
 
@@ -237,7 +275,7 @@ public class MapperAlgorithm implements Algorithm {
 
     public NetworkEmbedderAlg getNetworkEmbedderAlg() {
         return networkAlg;
-    }        
+    }
 
     public AbstractSimCoefficient getSimCoefficientAlg() {
         return simCoefficientAlg;
@@ -245,7 +283,7 @@ public class MapperAlgorithm implements Algorithm {
 
     public void setSimCoefficientAlg(AbstractSimCoefficient simCoefficientAlg) {
         this.simCoefficientAlg = simCoefficientAlg;
-    }    
+    }
 
     @Override
     public AlgorithmProperty[] getProperties() {

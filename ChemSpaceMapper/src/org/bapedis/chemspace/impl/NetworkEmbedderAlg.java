@@ -6,18 +6,13 @@
 package org.bapedis.chemspace.impl;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
-import static org.bapedis.chemspace.impl.MapperAlgorithm.pc;
 import org.bapedis.chemspace.model.NetworkType;
 import org.bapedis.chemspace.similarity.AbstractSimCoefficient;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.MolecularDescriptor;
-import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.SimilarityMatrix;
 import org.bapedis.core.model.Workspace;
@@ -25,14 +20,12 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
+import org.bapedis.core.ui.components.JQuickHistogram;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
-import org.openide.util.NbBundle;
 
 /**
  *
@@ -46,26 +39,25 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
 
-    protected final NotifyDescriptor notEnoughFeatures;
-
     protected final AlgorithmFactory factory;
     protected Workspace workspace;
-    protected AttributesModel attrModel;
+    protected Peptide[] peptides;
+
     protected GraphModel graphModel;
     protected Graph graph;
     protected ProgressTicket ticket;
     protected boolean stopRun;
-    private SimilarityMatrix similarityMatrix;
+//    private SimilarityMatrix similarityMatrix;
     private AtomicBoolean atomicRun;
     private AbstractSimCoefficient simCoefficient;
     private float similarityThreshold;
     private NetworkType networkType;
+    private JQuickHistogram histogram;
 
     public NetworkEmbedderAlg(AlgorithmFactory factory) {
         this.factory = factory;
-        networkType = NetworkType.FULL;
+        networkType = NetworkType.HSP;
         similarityThreshold = 0.7f;
-        notEnoughFeatures = new NotifyDescriptor.Message(NbBundle.getMessage(NetworkEmbedderAlg.class, "DescriptorBasedEmbedder.features.notEnoughHTML"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
     public AbstractSimCoefficient getSimCoefficient() {
@@ -74,7 +66,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
 
     public void setSimCoefficient(AbstractSimCoefficient simCoefficient) {
         this.simCoefficient = simCoefficient;
-    }        
+    }
 
     public float getSimilarityThreshold() {
         return similarityThreshold;
@@ -92,8 +84,8 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
         return networkType;
     }
 
-    public SimilarityMatrix getSimilarityMatrix() {
-        return similarityMatrix;
+    public JQuickHistogram getHistogram() {
+        return histogram;
     }
 
     @Override
@@ -101,24 +93,27 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
         stopRun = false;
         this.workspace = workspace;
         this.ticket = progressTicket;
-        attrModel = pc.getAttributesModel(workspace);
+        AttributesModel attrModel = pc.getAttributesModel(workspace);
         if (attrModel != null) {
+            peptides = attrModel.getPeptides().toArray(new Peptide[0]);
             graphModel = pc.getGraphModel(workspace);
             graph = graphModel.getGraphVisible();
         }
         atomicRun = new AtomicBoolean(stopRun);
+        simCoefficient.initAlgo(workspace, progressTicket);
     }
 
     @Override
     public void endAlgo() {
         workspace = null;
-        attrModel = null;
+        peptides = null;
         graphModel = null;
         graph = null;
         atomicRun = null;
-        if (stopRun) { // Cancelled
-            similarityMatrix = null;
-        }
+//        if (stopRun) { // Cancelled
+//            similarityMatrix = null;
+//        }
+        simCoefficient.endAlgo();
     }
 
     @Override
@@ -145,91 +140,39 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
 
     @Override
     public void run() {
-        if (attrModel != null) {
-            List<Peptide> peptides = attrModel.getPeptides();
-
-            // Setup Similarity Matrix Builder    
-            
-            //Set features to similarity measure
-            //simMeasure.setMolecularFeatures(workspace, features);
-        
-            SimilarityMatrixBuilder task = new SimilarityMatrixBuilder(peptides.toArray(new Peptide[0]));
-            task.setContext(simCoefficient, ticket, atomicRun);
-            int workunits = task.getWorkUnits();
-            ticket.switchToDeterminate(workunits);
-
-            // Compute new similarity matrix        
-            fjPool.invoke(task);
-            task.join();
-            similarityMatrix = task.getSimilarityMatrix();
-
-            // Populate feature list 
-            Set<String> descriptorKeys = attrModel.getMolecularDescriptorKeys();
-            List<MolecularDescriptor> features = new LinkedList<>();
-            for (String key : descriptorKeys) {
-                for (MolecularDescriptor desc : attrModel.getMolecularDescriptors(key)) {
-                    features.add(desc);
-                }
-            }
-            
-            // Preprocessing and validate molecular features
-            preprocessing(features, peptides);
-            
-            switch (getNetworkType()) {
+        if (peptides != null) {
+            switch (networkType) {
                 case FULL:
-                    createFullNetwork(graphModel, ticket, atomicRun);
+                    // Compute new similarity matrix  
+                    SimilarityMatrixBuilder task = new SimilarityMatrixBuilder(peptides);
+                    task.setContext(simCoefficient, ticket, atomicRun);
+                    int workunits = task.getWorkUnits();
+                    ticket.switchToDeterminate(workunits);
+
+                    fjPool.invoke(task);
+                    task.join();
+                    SimilarityMatrix simMatrix = task.getSimilarityMatrix();
+                    histogram = simMatrix.getHistogram();
+                    createFullNetwork(graphModel, simMatrix, ticket, atomicRun);
                     break;
                 case HSP:
+                    histogram = new JQuickHistogram();
+                    ticket.switchToDeterminate(peptides.length);
                     createHSPNetwork(graphModel, ticket, atomicRun);
                     break;
             }
             //embed(peptides.toArray(new Peptide[0]), features.toArray(new MolecularDescriptor[0]));
         }
     }
-    
-    private void preprocessing(List<MolecularDescriptor> features, List<Peptide> peptides) {
-        // Check feature list size
-        if (features.size() < ProjectManager.MIN_AVAILABLE_FEATURES) {
-            DialogDisplayer.getDefault().notify(notEnoughFeatures);
-            pc.reportError(NbBundle.getMessage(NetworkEmbedderAlg.class, "DescriptorBasedEmbedder.features.notEnough"), workspace);
-            cancel();
-        }
 
-        // try/catch for molecular not found exception handling
-        try {
-            // Preprocessing of feature list. Compute max, min, mean and std
-            for (MolecularDescriptor attr : features) {
-                attr.resetSummaryStats(peptides);
-            }
-
-            // Validate molecular features
-            for (MolecularDescriptor attr : features) {
-                if (attr.getMax() == attr.getMin()) {
-                    NotifyDescriptor invalidFeature = new NotifyDescriptor.Message(NbBundle.getMessage(NetworkEmbedderAlg.class, "DescriptorBasedEmbedder.features.invalidFeatureHTML", attr.getDisplayName()), NotifyDescriptor.ERROR_MESSAGE);
-                    DialogDisplayer.getDefault().notify(invalidFeature);
-                    pc.reportError(NbBundle.getMessage(NetworkEmbedderAlg.class, "DescriptorBasedEmbedder.features.invalidFeature", attr.getDisplayName()), workspace);
-                    cancel();
-                }
-            }
-        } catch (MolecularDescriptorNotFoundException ex) {
-            DialogDisplayer.getDefault().notify(ex.getErrorND());
-            pc.reportError(ex.getMessage(), workspace);
-            cancel();
-        }
-    } 
-    
-    
-    
-
-    protected void createFullNetwork(GraphModel graphModel, ProgressTicket ticket, AtomicBoolean stopRun) {
+    protected void createFullNetwork(GraphModel graphModel, SimilarityMatrix simMatrix, ProgressTicket ticket, AtomicBoolean stopRun) {
         clearSimilarityEdges(graphModel);
-        Peptide[] peptides = similarityMatrix.getPeptides();
         Edge graphEdge;
         Float score;
         ticket.switchToDeterminate(peptides.length - 1);
         for (int i = 0; i < peptides.length - 1 && !stopRun.get(); i++) {
             for (int j = i + 1; j < peptides.length && !stopRun.get(); j++) {
-                score = getSimilarityMatrix().getValue(peptides[i], peptides[j]);
+                score = simMatrix.getValue(peptides[i], peptides[j]);
                 if (score != null && score >= similarityThreshold) {
                     if (graph.contains(peptides[i].getGraphNode()) && graph.contains(peptides[j].getGraphNode())) {
                         graphEdge = createSimilarityEdge(graphModel, peptides[i].getGraphNode(), peptides[j].getGraphNode(), score);
@@ -248,50 +191,53 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
 
     protected void createHSPNetwork(GraphModel graphModel, ProgressTicket ticket, AtomicBoolean stopRun) {
         clearSimilarityEdges(graphModel);
-        Peptide[] peptides = similarityMatrix.getPeptides();
 
         Node node1, node2;
         Edge graphEdge;
-        Float score;
-        CandidatePeptide[] candidates = new CandidatePeptide[peptides.length];
+        CandidatePeptide[] candidates = new CandidatePeptide[peptides.length - 1];
         Peptide closestPeptide;
-        double dist;
+        float similarity;
         int cursor;
         for (int i = 0; i < peptides.length; i++) {
             node1 = peptides[i].getGraphNode();
+            cursor = 0;
             for (int j = 0; j < peptides.length; j++) {
                 if (i != j) {
-                    score = similarityMatrix.getValue(peptides[i], peptides[j]);
-                    dist = score == null ? Double.MAX_VALUE : 1 - score;
-                } else {
-                    dist = 0;
+                    simCoefficient.setPeptide1(peptides[i]);
+                    simCoefficient.setPeptide2(peptides[j]);
+                    simCoefficient.run();
+                    similarity = simCoefficient.getSimilarityValue();
+                    candidates[cursor++] = new CandidatePeptide(peptides[j], similarity);
                 }
-                candidates[j] = new CandidatePeptide(dist, peptides[j]);
             }
 
             Arrays.parallelSort(candidates);
             cursor = 0;
             while (cursor < candidates.length) {
-                if (candidates[cursor] != null && candidates[cursor].getDistance() > 0 && candidates[cursor].getDistance() < Double.MAX_VALUE) {
+                if (candidates[cursor] != null) {
                     //Create edge to the closest peptide
                     closestPeptide = candidates[cursor].getPeptide();
                     node2 = closestPeptide.getGraphNode();
                     if (graph.contains(node1) && graph.contains(node2)
                             && graph.getEdge(node1, node2) == null && graph.getEdge(node2, node1) == null) {
-                        score = similarityMatrix.getValue(peptides[i], closestPeptide);
-                        graphEdge = createSimilarityEdge(graphModel, node1, node2, score);
+                        similarity = candidates[cursor].getSimilarity();
+                        graphEdge = createSimilarityEdge(graphModel, node1, node2, similarity);
                         graph.writeLock();
                         try {
                             graph.addEdge(graphEdge);
+                            histogram.addData(similarity);
                         } finally {
                             graph.writeUnlock();
                         }
                     }
                     // ignore elements in the forbidden area
                     for (int k = cursor + 1; k < candidates.length; k++) {
-                        if (candidates[k] != null && candidates[k].getDistance() > 0 && candidates[k].getDistance() < Double.MAX_VALUE) {
-                            score = similarityMatrix.getValue(candidates[k].getPeptide(), closestPeptide);
-                            if (score != null && score > similarityMatrix.getValue(candidates[k].getPeptide(), peptides[i])) {
+                        if (candidates[k] != null) {
+                            simCoefficient.setPeptide1(candidates[k].getPeptide());
+                            simCoefficient.setPeptide2(closestPeptide);
+                            simCoefficient.run();
+                            similarity = simCoefficient.getSimilarityValue();
+                            if (similarity > candidates[k].getSimilarity()) {
                                 candidates[k] = null;
                             }
                         }
@@ -317,7 +263,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
         }
     }
 
-    protected Edge createSimilarityEdge(GraphModel graphModel, Node node1, Node node2, Float score) {
+    protected Edge createSimilarityEdge(GraphModel graphModel, Node node1, Node node2, float similarity) {
         int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
 
         // Create Edge
@@ -336,7 +282,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
         mainGraph.writeLock();
         try {
             mainGraph.addEdge(graphEdge);
-            graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, score);
+            graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, similarity);
         } finally {
             mainGraph.writeUnlock();
         }
@@ -347,31 +293,30 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
 
 class CandidatePeptide implements Comparable<CandidatePeptide> {
 
-    private final double distance;
+    private final float similarity;
     private final Peptide peptide;
 
-    public CandidatePeptide(double distance, Peptide peptide) {
-        this.distance = distance;
+    public CandidatePeptide(Peptide peptide, float similarity) {
         this.peptide = peptide;
+        this.similarity = similarity;
     }
 
     public Peptide getPeptide() {
         return peptide;
     }
 
-    public double getDistance() {
-        return distance;
+    public float getSimilarity() {
+        return similarity;
     }
 
     @Override
     public int compareTo(CandidatePeptide o) {
-        if (distance < o.distance) {
+        if (similarity > o.similarity) {
             return -1;
         }
-        if (distance > o.distance) {
+        if (similarity < o.similarity) {
             return 1;
         }
         return 0;
     }
-
 }

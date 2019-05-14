@@ -6,14 +6,17 @@
 package org.bapedis.chemspace.wizard;
 
 import javax.swing.JPanel;
+import javax.swing.LookAndFeel;
 import javax.swing.event.ChangeListener;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.model.RemovingRedundantOption;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlgFactory;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
+import org.openide.util.Lookup;
 
 public class WizardInputSequence implements WizardDescriptor.Panel<WizardDescriptor> {
 
@@ -47,6 +50,9 @@ public class WizardInputSequence implements WizardDescriptor.Panel<WizardDescrip
                 JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
                 component = new VisualInputSequence(settingPanel);
                 component.setNrdOption(csMapper.getNrdOption());
+                
+                ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+                component.setInputSequencesCount(pc.getAttributesModel().getPeptides().size());
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
                 alg = null;

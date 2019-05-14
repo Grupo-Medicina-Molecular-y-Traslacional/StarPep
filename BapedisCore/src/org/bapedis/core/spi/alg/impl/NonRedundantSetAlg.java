@@ -8,7 +8,6 @@ package org.bapedis.core.spi.alg.impl;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeSet;
 import javax.swing.SwingUtilities;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;

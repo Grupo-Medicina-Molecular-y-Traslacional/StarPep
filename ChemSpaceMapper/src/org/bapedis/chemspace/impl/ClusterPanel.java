@@ -62,9 +62,7 @@ public class ClusterPanel extends JComponent implements PropertyChangeListener {
 
     protected final ProjectManager pc;
 
-    protected final JToolBar toolBar;
     protected final JXTable table;
-    protected final JButton findButton, refreshButton, scatter3DButton;
     protected final JXBusyLabel busyLabel;
     private static final String[] columnNames = {NbBundle.getMessage(ClusterPanel.class, "ClusterPanel.table.columnName.first"),
         NbBundle.getMessage(ClusterPanel.class, "ClusterPanel.table.columnName.second"),
@@ -97,53 +95,6 @@ public class ClusterPanel extends JComponent implements PropertyChangeListener {
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         busyLabel.setText(NbBundle.getMessage(ClusterPanel.class, "ClusterPanel.busyLabel.text"));
-
-        findButton = new JButton(table.getActionMap().get("find"));
-        findButton.setText("");
-        findButton.setToolTipText(NbBundle.getMessage(ClusterPanel.class, "ClusterPanel.findButton.toolTipText"));
-        findButton.setIcon(ImageUtilities.loadImageIcon("org/bapedis/chemspace/resources/search.png", false));
-        findButton.setFocusable(false);
-
-        refreshButton = new JButton(ImageUtilities.loadImageIcon("org/bapedis/chemspace/resources/refresh.png", false));
-        refreshButton.setToolTipText(NbBundle.getMessage(ClusterPanel.class, "ClusterPanel.refreshButton.toolTipText"));
-        refreshButton.setFocusable(false);
-        refreshButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                TableRowSorter sorter = (TableRowSorter) table.getRowSorter();
-                if (sorter != null) {
-                    sorter.setRowFilter(null);
-                }
-            }
-        });
-
-        scatter3DButton = new JButton(ImageUtilities.loadImageIcon("org/bapedis/chemspace/resources/coordinates.png", false));
-        scatter3DButton.setToolTipText(NbBundle.getMessage(ClusterPanel.class, "ClusterPanel.scatter3DButton.toolTipText"));
-        scatter3DButton.setFocusable(false);
-        scatter3DButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-
-        // Tool bar
-        toolBar = new JToolBar();
-        toolBar.setFloatable(false);
-        toolBar.add(refreshButton);
-
-        toolBar.add(scatter3DButton);
-
-        toolBar.addSeparator();
-        List<? extends Action> actions = Utilities.actionsForPath("Actions/EditCluster");
-        for (Action action : actions) {
-            toolBar.add(action);
-        }
-
-        toolBar.addSeparator();
-        toolBar.add(findButton);
-
-        topPanel.add(toolBar);
 
         addAncestorListener(new AncestorListener() {
             @Override
@@ -201,7 +152,6 @@ public class ClusterPanel extends JComponent implements PropertyChangeListener {
         java.awt.GridBagConstraints gridBagConstraints;
 
         scrollPane = new javax.swing.JScrollPane();
-        topPanel = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -212,12 +162,6 @@ public class ClusterPanel extends JComponent implements PropertyChangeListener {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(scrollPane, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-        add(topPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void setClusters() {
@@ -275,9 +219,6 @@ public class ClusterPanel extends JComponent implements PropertyChangeListener {
     private void setBusyLabel(boolean busy) {
         scrollPane.setViewportView(busy ? busyLabel : table);
         busyLabel.setBusy(busy);
-        for (Component c : toolBar.getComponents()) {
-            c.setEnabled(!busy);
-        }
     }
 
     @Override
@@ -346,7 +287,6 @@ public class ClusterPanel extends JComponent implements PropertyChangeListener {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane scrollPane;
-    private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 
     private static class MyTableModel extends AbstractTableModel {

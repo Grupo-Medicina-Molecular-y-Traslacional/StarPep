@@ -25,7 +25,7 @@ import org.openide.util.NbBundle;
  */
 public class MapperAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSetupUI, PropertyChangeListener {
 
-    protected final JXHyperlink openWizardLink;
+    protected final JXHyperlink openWizardLink, scatter3DLink;
     protected MapperAlgorithm csMapper;
     protected final NetworkPanel networkPanel;
     protected final ClusterPanel clusterPanel;
@@ -38,7 +38,11 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
         openWizardLink = new JXHyperlink();
         configureOpenWizardLink();
-        topPanel.add(openWizardLink);
+        topRightPanel.add(openWizardLink);
+        
+        scatter3DLink = new JXHyperlink();
+        configureScatter3DLink();
+        topLeftPanel.add(scatter3DLink);
 
         clusterPanel = new ClusterPanel();
         tab1.add(clusterPanel, BorderLayout.CENTER);
@@ -85,6 +89,21 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
             }
         });
     }
+    
+    private void configureScatter3DLink(){
+        scatter3DLink.setIcon(ImageUtilities.loadImageIcon("org/bapedis/chemspace/resources/coordinates.png", false));
+        scatter3DLink.setText(NbBundle.getMessage(ClusterPanel.class, "MapperAlgorithmPanel.scatter3DButton.text"));
+        scatter3DLink.setToolTipText(NbBundle.getMessage(ClusterPanel.class, "MapperAlgorithmPanel.scatter3DButton.toolTipText"));
+        scatter3DLink.setClickedColor(new java.awt.Color(0, 51, 255));
+        scatter3DLink.setFocusPainted(false);
+        scatter3DLink.setFocusable(false);
+        scatter3DLink.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+
+            }
+        });      
+    }
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
@@ -97,7 +116,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
     public void setBusy(boolean busy) {
         openWizardLink.setEnabled(!busy);
-        topPanel.setEnabled(!busy);
+        topRightPanel.setEnabled(!busy);
         jTabbedPane1.setEnabled(!busy);
         clusterPanel.setEnabled(!busy);
         networkPanel.setEnabled(!busy);
@@ -117,21 +136,26 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        topPanel = new javax.swing.JPanel();
+        topLeftPanel = new javax.swing.JPanel();
+        topRightPanel = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         tab1 = new javax.swing.JPanel();
         tab2 = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
-
-        topPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        add(topLeftPanel, gridBagConstraints);
+
+        topRightPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
-        add(topPanel, gridBagConstraints);
+        add(topRightPanel, gridBagConstraints);
 
         tab1.setLayout(new java.awt.BorderLayout());
         jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.tab1.TabConstraints.tabTitle"), tab1); // NOI18N
@@ -142,10 +166,11 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
         add(jTabbedPane1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -154,7 +179,8 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel tab1;
     private javax.swing.JPanel tab2;
-    private javax.swing.JPanel topPanel;
+    private javax.swing.JPanel topLeftPanel;
+    private javax.swing.JPanel topRightPanel;
     // End of variables declaration//GEN-END:variables
 
     @Override

@@ -11,7 +11,6 @@ import java.util.HashMap;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JTree;
-import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -177,6 +176,7 @@ public final class VisualSimCoefficient extends JPanel {
             simCoefficient = null;
             jDescLabel.setText("");
             jScrollPane2.setViewportView(null);
+            jDescLabel.setVisible(false);
         }
         firePropertyChange(NETWORK_FACTORY, null, factory);
     }//GEN-LAST:event_jTree1ValueChanged

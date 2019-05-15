@@ -79,7 +79,7 @@ public class MapperAlgorithm implements Algorithm {
 
         networkAlg = (NetworkEmbedderAlg) new NetworkEmbedderFactory().createAlgorithm();
 //        twoDEmbedderAlg = (TwoDEmbedder) new TwoDEmbedderFactory().createAlgorithm();
-        notEnoughFeatures = new NotifyDescriptor.Message(NbBundle.getMessage(MapperAlgorithm.class, "DescriptorBasedEmbedder.features.notEnoughHTML"), NotifyDescriptor.ERROR_MESSAGE);
+        notEnoughFeatures = new NotifyDescriptor.Message(NbBundle.getMessage(MapperAlgorithm.class, "MapperAlgorithm.features.notEnoughHTML"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
     public boolean isRunning() {
@@ -163,7 +163,7 @@ public class MapperAlgorithm implements Algorithm {
         // Check feature list size
         if (features.size() < ProjectManager.MIN_AVAILABLE_FEATURES) {
             DialogDisplayer.getDefault().notify(notEnoughFeatures);
-            pc.reportError(NbBundle.getMessage(NetworkEmbedderAlg.class, "DescriptorBasedEmbedder.features.notEnough"), workspace);
+            pc.reportError(NbBundle.getMessage(NetworkEmbedderAlg.class, "MapperAlgorithm.features.notEnough"), workspace);
             cancel();
         }
 
@@ -177,9 +177,9 @@ public class MapperAlgorithm implements Algorithm {
             // Validate molecular features
             for (MolecularDescriptor attr : features) {
                 if (attr.getMax() == attr.getMin()) {
-                    NotifyDescriptor invalidFeature = new NotifyDescriptor.Message(NbBundle.getMessage(NetworkEmbedderAlg.class, "DescriptorBasedEmbedder.features.invalidFeatureHTML", attr.getDisplayName()), NotifyDescriptor.ERROR_MESSAGE);
+                    NotifyDescriptor invalidFeature = new NotifyDescriptor.Message(NbBundle.getMessage(NetworkEmbedderAlg.class, "MapperAlgorithm.features.invalidFeatureHTML", attr.getDisplayName()), NotifyDescriptor.ERROR_MESSAGE);
                     DialogDisplayer.getDefault().notify(invalidFeature);
-                    pc.reportError(NbBundle.getMessage(NetworkEmbedderAlg.class, "DescriptorBasedEmbedder.features.invalidFeature", attr.getDisplayName()), workspace);
+                    pc.reportError(NbBundle.getMessage(NetworkEmbedderAlg.class, "MapperAlgorithm.features.invalidFeature", attr.getDisplayName()), workspace);
                     cancel();
                 }
             }

@@ -180,6 +180,7 @@ public final class VisualClusterize extends JPanel {
             clustering = null;
             jDescLabel.setText("");
             jScrollPane2.setViewportView(null);
+            jDescLabel.setVisible(false);
         }
         firePropertyChange(CLUSTERING_FACTORY, null, factory);
     }//GEN-LAST:event_jTree1ValueChanged

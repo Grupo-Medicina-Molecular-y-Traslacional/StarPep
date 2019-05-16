@@ -193,10 +193,7 @@ public class ClusterPanel extends JComponent implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (csMapper != null && evt.getSource().equals(csMapper)
-                && evt.getPropertyName().equals(MapperAlgorithm.RUNNING)) {
-            setupClusters();
-        }
+
     }
 
     class ClusterPopupAdapter extends MouseUtils.PopupMouseAdapter {

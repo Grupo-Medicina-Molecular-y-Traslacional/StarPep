@@ -35,6 +35,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     protected MapperAlgorithm csMapper;
     protected final NetworkPanel networkPanel;
     protected final ClusterPanel clusterPanel;
+    protected final NetworkReportPanel networkReport;
     protected final JToolBar toolBar;
 
     /**
@@ -65,6 +66,10 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         // Cluster panel
         clusterPanel = new ClusterPanel();
         tab2.add(clusterPanel, BorderLayout.CENTER);
+        
+        //Network report panel
+        networkReport = new NetworkReportPanel();
+        tab3.add(networkReport, BorderLayout.CENTER);
         
         //Busy label
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
@@ -132,6 +137,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         this.csMapper = (MapperAlgorithm) algo;
         networkPanel.setUp(csMapper);
         clusterPanel.setUp(csMapper);
+        networkReport.setUp(csMapper);
         setBusy(csMapper.isRunning());
         return this;
     }
@@ -165,6 +171,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         jTabbedPane1 = new javax.swing.JTabbedPane();
         tab1 = new javax.swing.JPanel();
         tab2 = new javax.swing.JPanel();
+        tab3 = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -185,6 +192,9 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         tab2.setLayout(new java.awt.BorderLayout());
         jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.tab2.TabConstraints.tabTitle"), tab2); // NOI18N
 
+        tab3.setLayout(new java.awt.BorderLayout());
+        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.tab3.TabConstraints.tabTitle"), tab3); // NOI18N
+
         centerPanel.add(jTabbedPane1, "tabCard");
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -203,6 +213,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel tab1;
     private javax.swing.JPanel tab2;
+    private javax.swing.JPanel tab3;
     private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 
@@ -213,6 +224,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
             clusterPanel.setupClusters();
             networkPanel.setupAxis();
             networkPanel.setupHistogram();
+            networkReport.setupReport();
             setBusy((boolean) evt.getNewValue());
         }
     }

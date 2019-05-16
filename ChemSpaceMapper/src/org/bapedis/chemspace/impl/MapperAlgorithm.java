@@ -63,6 +63,7 @@ public class MapperAlgorithm implements Algorithm {
     private AbstractSimCoefficient simCoefficientAlg;
     private final WekaPCATransformer pcaTransformer;
     private final NetworkEmbedderAlg networkAlg;
+    private final NetworkReport networkReport;
 
     //Algorithm workflow
     private Algorithm currentAlg;
@@ -79,6 +80,7 @@ public class MapperAlgorithm implements Algorithm {
 
         pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
         networkAlg = (NetworkEmbedderAlg) new NetworkEmbedderFactory().createAlgorithm();
+        networkReport = (NetworkReport) new NetworkReportFactory().createAlgorithm();
 
         notEnoughFeatures = new NotifyDescriptor.Message(NbBundle.getMessage(MapperAlgorithm.class, "MapperAlgorithm.features.notEnoughHTML"), NotifyDescriptor.ERROR_MESSAGE);
     }
@@ -192,6 +194,12 @@ public class MapperAlgorithm implements Algorithm {
         } else {
             throw new RuntimeException("Internal error: Similarity coefficient is null");
         }
+        
+        //Network report
+        if (!stopRun){
+            currentAlg = networkReport;
+            execute();
+        }
     }
 
     private void execute() {
@@ -297,6 +305,10 @@ public class MapperAlgorithm implements Algorithm {
     public NetworkEmbedderAlg getNetworkEmbedderAlg() {
         return networkAlg;
     }
+
+    public NetworkReport getNetworkReport() {
+        return networkReport;
+    }        
 
     public AbstractSimCoefficient getSimCoefficientAlg() {
         return simCoefficientAlg;

@@ -35,9 +35,6 @@ import org.openide.util.Lookup;
  */
 public class NetworkEmbedderAlg implements Algorithm, Cloneable {
 
-    public static final int MAX_NODES = 1000;
-    public static final int MAX_EDGES = 100000;
-
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
 

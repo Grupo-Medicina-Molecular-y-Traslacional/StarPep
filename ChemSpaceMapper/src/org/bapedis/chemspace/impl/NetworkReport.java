@@ -132,8 +132,8 @@ public class NetworkReport implements Algorithm {
     }
 
     private float calculateDensity(float threshold) {
-        int n = peptides.length;
-        int edgeCount = 0;
+        float n = peptides.length;
+        float edgeCount = 0;
         Node node1, node2;
         Edge graphEdge;
         float similarity;
@@ -151,16 +151,16 @@ public class NetworkReport implements Algorithm {
                 }
             }
         }
-        return (float) 2 * edgeCount / (float) (n * (n - 1));
+        return 2 * edgeCount / (float) (n * (n - 1));
     }
 
     private float calculateModularity(float threshold) {
         int n = peptides.length;
-        int edgeCount = 0;
+        float edgeCount = 0;
         float sum = 0;
         Node node1, node2;
         int cluster1, cluster2;
-        int degree1, degree2;
+        float degree1, degree2;
         Edge graphEdge;
         float similarity;
         int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
@@ -193,17 +193,17 @@ public class NetworkReport implements Algorithm {
                 if (cluster1 > -1 && cluster2 > -1 && cluster1 == cluster2) {
                     degree1 = calculateDegree(node1, relType, threshold);
                     degree2 = calculateDegree(node2, relType, threshold);
-                    sum += (similarity >= threshold ? 1 : 0) - ((float) degree1 * degree2) / ((float) 2 * edgeCount);
+                    sum += ((similarity >= threshold ? 1 : 0) - (degree1 * degree2) / (2 * edgeCount));
                 }
 
             }
         }
 
-        return (1 / (float) 2 * edgeCount) * sum;
+        return (1 / (2 * edgeCount)) * sum;
     }
 
-    private int calculateDegree(Node graphNode, int relType, float threshold) {
-        int degree = 0;
+    private float calculateDegree(Node graphNode, int relType, float threshold) {
+        float degree = 0;
         EdgeIterable relationships = mainGraph.getEdges(graphNode, relType);
         float similarity;
         for (Edge graphEdge : relationships) {

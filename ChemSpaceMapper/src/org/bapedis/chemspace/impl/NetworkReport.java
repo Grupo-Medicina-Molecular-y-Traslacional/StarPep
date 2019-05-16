@@ -95,7 +95,7 @@ public class NetworkReport implements Algorithm {
         XYSeries serieDensity = new XYSeries("Density");
         XYSeries serieModularity = new XYSeries("Modularity");
 
-        for (float threshold = 0; threshold <= 1 && !stopRun; threshold += 0.5) {
+        for (float threshold = 0; threshold <= 1 && !stopRun; threshold += 0.05) {
             serieDensity.add(threshold, calculateDensity(threshold));
             serieModularity.add(threshold, calculateModularity(threshold));
         }
@@ -151,7 +151,7 @@ public class NetworkReport implements Algorithm {
                 }
             }
         }
-        return 2 * edgeCount / (float) (n * (n - 1));
+        return 2 * edgeCount / (n * (n - 1));
     }
 
     private float calculateModularity(float threshold) {
@@ -199,7 +199,7 @@ public class NetworkReport implements Algorithm {
             }
         }
 
-        return (1 / (2 * edgeCount)) * sum;
+        return (sum / (2 * edgeCount));
     }
 
     private float calculateDegree(Node graphNode, int relType, float threshold) {

@@ -12,9 +12,9 @@ import org.openide.util.NbBundle;
 
 /**
  *
- * @author loge
+ * @author Loge
  */
-public class NetworkEmbedderFactory implements AlgorithmFactory {
+public class WekaPCATransformerFactory implements AlgorithmFactory {
 
     @Override
     public String getCategory() {
@@ -23,22 +23,22 @@ public class NetworkEmbedderFactory implements AlgorithmFactory {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(NetworkEmbedderFactory.class, "NetworkEmbedder.name");
+        return NbBundle.getMessage(WekaPCATransformer.class, "WekaPCATransformer.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(NetworkEmbedderFactory.class, "NetworkEmbedder.desc");
+        return NbBundle.getMessage(WekaPCATransformer.class, "WekaPCATransformer.desc");
     }
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        return  null;
+        return null;
     }
 
     @Override
     public Algorithm createAlgorithm() {
-        return new NetworkEmbedderAlg(this);
+        return new WekaPCATransformer(this);
     }
-    
+
 }

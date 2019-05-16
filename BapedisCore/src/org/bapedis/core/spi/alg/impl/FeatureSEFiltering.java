@@ -315,7 +315,6 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
 //          workUnits += (rankedFeatures.length * (rankedFeatures.length - 1)) / 2;
 //          ticket.switchToDeterminate(workUnits);
             String state2 = NbBundle.getMessage(FeatureSEFiltering.class, "FeatureSEFiltering.task.filtering");
-            ticket.progress(state2);
             pc.reportMsg("\n", workspace);
             pc.reportMsg(state2 + "\n", workspace);
 

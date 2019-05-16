@@ -73,12 +73,7 @@ public class ProjectManager implements Lookup.Provider {
     public static final float GRAPH_NODE_SIZE = 10f;
     public static final Color GRAPH_NODE_COLOR = new Color(0.6f, 0.6f, 0.6f);
     public static final float GRAPH_EDGE_WEIGHT = 1f;
-    public static final String GRAPH_EDGE_SIMALIRITY = "pairwise_similarity";
-
-    public static final float GRAPH_SUPER_NODE_SIZE = 10f;
-    public static final Color GRAPH_SUPER_NODE_COLOR = new Color(0.6f, 0.6f, 0.6f);
-    public static final float GRAPH_SUPER_EDGE_WEIGHT = 1f;
-    public static final String GRAPH_SUPER_EDGE_SIMALIRITY = "pairwise_similarity";
+    public static final String GRAPH_EDGE_SIMALIRITY = "similar_to";
 
     public static final String NODE_TABLE_PRO_NAME = "name";
     public static final String NODE_TABLE_PRO_NAME_TITLE = NbBundle.getMessage(ProjectManager.class, "NodeTable.column.name.title");

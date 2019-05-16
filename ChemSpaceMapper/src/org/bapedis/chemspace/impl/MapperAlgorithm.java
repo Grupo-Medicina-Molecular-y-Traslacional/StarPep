@@ -15,14 +15,14 @@ import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.similarity.AbstractSimCoefficient;
 import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
-import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
-import org.bapedis.core.spi.alg.impl.AbstractCluster;
+import org.bapedis.core.spi.alg.impl.AbstractClusterizer;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
@@ -41,6 +41,7 @@ public class MapperAlgorithm implements Algorithm {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     public static final String RUNNING = "running";
+
     protected final NotifyDescriptor notEnoughFeatures;
 
     private final MapperAlgorithmFactory factory;
@@ -58,17 +59,16 @@ public class MapperAlgorithm implements Algorithm {
     private NonRedundantSetAlg nrdAlg;
     private AllDescriptors featureExtractionAlg;
     private FeatureSEFiltering featureSelectionAlg;
-    private AbstractCluster clusteringAlg;
+    private AbstractClusterizer clusteringAlg;
     private AbstractSimCoefficient simCoefficientAlg;
-    private NetworkEmbedderAlg networkAlg;
+    private final WekaPCATransformer pcaTransformer;
+    private final NetworkEmbedderAlg networkAlg;
 
     //Algorithm workflow
-    private final List<Algorithm> algorithms;
     private Algorithm currentAlg;
 
     public MapperAlgorithm(MapperAlgorithmFactory factory) {
         this.factory = factory;
-        algorithms = new LinkedList<>();
         propertyChangeSupport = new PropertyChangeSupport(this);
         running = false;
 
@@ -77,8 +77,9 @@ public class MapperAlgorithm implements Algorithm {
         feOption = FeatureExtractionOption.YES;
         ffOption = FeatureFilteringOption.NO;
 
+        pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
         networkAlg = (NetworkEmbedderAlg) new NetworkEmbedderFactory().createAlgorithm();
-//        twoDEmbedderAlg = (TwoDEmbedder) new TwoDEmbedderFactory().createAlgorithm();
+
         notEnoughFeatures = new NotifyDescriptor.Message(NbBundle.getMessage(MapperAlgorithm.class, "MapperAlgorithm.features.notEnoughHTML"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
@@ -91,91 +92,68 @@ public class MapperAlgorithm implements Algorithm {
         this.workspace = workspace;
         this.progressTicket = progressTicket;
         stopRun = false;
-
-        // Populate algorithm workflow        
-        algorithms.clear();
-
-        //Non-redundant set
-        if (nrdOption == RemovingRedundantOption.YES) {
-            if (nrdAlg != null) {
-                algorithms.add(nrdAlg);
-            } else {
-                throw new RuntimeException("Internal error: Non-redundant algorithm is null");
-            }
-        }
-
-        // Feature Extraction
-        if (feOption == FeatureExtractionOption.YES) {
-            if (featureExtractionAlg != null) {
-                algorithms.add(featureExtractionAlg);
-            } else {
-                throw new RuntimeException("Internal error: Feature extraction algorithm is null");
-            }
-        }
-
-        // Feature Filtering
-        if (ffOption == FeatureFilteringOption.YES) {
-            if (featureSelectionAlg != null) {
-                algorithms.add(featureSelectionAlg);
-            } else {
-                throw new RuntimeException("Internal error: Feature selection algorithm is null");
-            }
-        }
-
-        // Clustering
-        if (clusteringAlg != null) {
-            algorithms.add(clusteringAlg);
-        } else {
-            throw new RuntimeException("Internal error: Clustering algorithm is null");
-        }
-
-        // Similarity
-        if (simCoefficientAlg != null) {
-            networkAlg.setSimCoefficient(simCoefficientAlg);
-            algorithms.add(networkAlg);
-        } else {
-            throw new RuntimeException("Internal error: Similarity coefficient is null");
-        }
-
         running = true;
         propertyChangeSupport.firePropertyChange(RUNNING, false, true);
     }
 
     @Override
     public void run() {
-        String taskName;
-        int count = 1;
-        for (Algorithm algorithm : algorithms) {
-            if (!stopRun) {
-                currentAlg = algorithm;
-                taskName = NbBundle.getMessage(MapperAlgorithm.class, "MapperAlgorithm.workflow.taskName", count++, algorithms.size(), algorithm.getFactory().getName());
-                progressTicket.progress(taskName);
-                progressTicket.switchToIndeterminate();
-                pc.reportMsg(taskName, workspace);
-                algorithm.initAlgo(workspace, progressTicket);
-                algorithm.run();
-                algorithm.endAlgo();
+        //Non-redundant set
+        if (nrdOption == RemovingRedundantOption.YES && !stopRun) {
+            if (nrdAlg != null) {
+                currentAlg = nrdAlg;
+                execute();
+            } else {
+                throw new RuntimeException("Internal error: Non-redundant algorithm is null");
             }
         }
-    }
 
-    private void preprocessing(List<MolecularDescriptor> features, List<Peptide> peptides) {
-        // Check feature list size
-        if (features.size() < ProjectManager.MIN_AVAILABLE_FEATURES) {
-            DialogDisplayer.getDefault().notify(notEnoughFeatures);
-            pc.reportError(NbBundle.getMessage(NetworkEmbedderAlg.class, "MapperAlgorithm.features.notEnough"), workspace);
-            cancel();
+        // Feature Extraction
+        if (feOption == FeatureExtractionOption.YES && !stopRun) {
+            if (featureExtractionAlg != null) {
+                currentAlg = featureExtractionAlg;
+                execute();
+            } else {
+                throw new RuntimeException("Internal error: Feature extraction algorithm is null");
+            }
         }
 
-        // try/catch for molecular not found exception handling
-        try {
-            // Preprocessing of feature list. Compute max, min, mean and std
-            for (MolecularDescriptor attr : features) {
-                attr.resetSummaryStats(peptides);
+        // Feature Selection
+        if (ffOption == FeatureFilteringOption.YES && !stopRun) {
+            if (featureSelectionAlg != null) {
+                currentAlg = featureSelectionAlg;
+                execute();
+            } else {
+                throw new RuntimeException("Internal error: Feature selection algorithm is null");
+            }
+        }
+        
+        // Load all descriptors
+        List<MolecularDescriptor> allFeatures = new LinkedList<>();
+        AttributesModel attrModel = pc.getAttributesModel();
+        if (!stopRun) {            
+            for (String key : attrModel.getMolecularDescriptorKeys()) {
+                for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
+                    allFeatures.add(attr);
+                }
+            }
+
+            // Check feature list size
+            if (allFeatures.size() < ProjectManager.MIN_AVAILABLE_FEATURES) {
+                DialogDisplayer.getDefault().notify(notEnoughFeatures);
+                pc.reportError(NbBundle.getMessage(NetworkEmbedderAlg.class, "MapperAlgorithm.features.notEnough"), workspace);
+                cancel();
+            }
+        }
+
+        // Preprocessing of feature list. Compute max, min, mean and std
+        try {            
+            for (MolecularDescriptor attr : allFeatures) {
+                attr.resetSummaryStats(attrModel.getPeptides());
             }
 
             // Validate molecular features
-            for (MolecularDescriptor attr : features) {
+            for (MolecularDescriptor attr : allFeatures) {
                 if (attr.getMax() == attr.getMin()) {
                     NotifyDescriptor invalidFeature = new NotifyDescriptor.Message(NbBundle.getMessage(NetworkEmbedderAlg.class, "MapperAlgorithm.features.invalidFeatureHTML", attr.getDisplayName()), NotifyDescriptor.ERROR_MESSAGE);
                     DialogDisplayer.getDefault().notify(invalidFeature);
@@ -187,6 +165,45 @@ public class MapperAlgorithm implements Algorithm {
             DialogDisplayer.getDefault().notify(ex.getErrorND());
             pc.reportError(ex.getMessage(), workspace);
             cancel();
+        }
+
+        // Clustering
+        if (clusteringAlg != null && !stopRun) {
+            currentAlg = clusteringAlg;
+            execute();
+        } else {
+            throw new RuntimeException("Internal error: Clustering algorithm is null");
+        }
+        
+        //WekaPCA Transformer
+        if (!stopRun){
+            currentAlg = pcaTransformer;
+            execute();
+            
+            NetworkCoordinateUpdater updater = new NetworkCoordinateUpdater(pcaTransformer.getXYZSpace());
+            updater.execute();
+        }
+
+        // Similarity
+        if (simCoefficientAlg != null && !stopRun) {
+            networkAlg.setSimCoefficient(simCoefficientAlg);
+            currentAlg = networkAlg;
+            execute();
+        } else {
+            throw new RuntimeException("Internal error: Similarity coefficient is null");
+        }
+    }
+
+    private void execute() {
+        if (!stopRun) {
+            String taskName = NbBundle.getMessage(MapperAlgorithm.class, "MapperAlgorithm.workflow.taskName", currentAlg.getFactory().getName());
+            progressTicket.progress(taskName);
+            progressTicket.switchToIndeterminate();
+            pc.reportMsg(taskName, workspace);
+
+            currentAlg.initAlgo(workspace, progressTicket);
+            currentAlg.run();
+            currentAlg.endAlgo();
         }
     }
 
@@ -265,13 +282,17 @@ public class MapperAlgorithm implements Algorithm {
         return featureSelectionAlg;
     }
 
-    public AbstractCluster getClusteringAlg() {
+    public AbstractClusterizer getClusteringAlg() {
         return clusteringAlg;
     }
 
-    public void setClusteringAlg(AbstractCluster clusteringAlg) {
+    public void setClusteringAlg(AbstractClusterizer clusteringAlg) {
         this.clusteringAlg = clusteringAlg;
     }
+
+    public WekaPCATransformer getPCATransformer() {
+        return pcaTransformer;
+    }        
 
     public NetworkEmbedderAlg getNetworkEmbedderAlg() {
         return networkAlg;

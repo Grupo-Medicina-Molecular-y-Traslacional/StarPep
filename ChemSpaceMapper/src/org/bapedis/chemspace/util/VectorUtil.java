@@ -67,21 +67,29 @@ public class VectorUtil {
         }
     }
 
-    public static void normalize(Vector2f[] v) {
+    public static void normalize(Vector3f[] v) {
         float minX = Float.POSITIVE_INFINITY;
         float maxX = Float.NEGATIVE_INFINITY;
+        
         float minY = Float.POSITIVE_INFINITY;
         float maxY = Float.NEGATIVE_INFINITY;
 
-        for (Vector2f v1 : v) {
+        float minZ = Float.POSITIVE_INFINITY;
+        float maxZ = Float.NEGATIVE_INFINITY;
+        
+        for (Vector3f v1 : v) {
             minX = Math.min(minX, v1.getX());
             maxX = Math.max(maxX, v1.getX());
+            
             minY = Math.min(minY, v1.getY());
             maxY = Math.max(maxY, v1.getY());
+            
+            minZ = Math.min(minZ, v1.getZ());
+            maxZ = Math.max(maxZ, v1.getZ());            
         }
 
-        float x, y;
-        for (Vector2f v1 : v) {
+        float x, y, z;
+        for (Vector3f v1 : v) {
             x = v1.getX();
             if (x != 0.0) {
                 v1.setX((x - minX) / (maxX - minX));
@@ -91,6 +99,11 @@ public class VectorUtil {
             if (y != 0.0) {
                 v1.setY((y - minY) / (maxY - minY));
             }
+            
+            z = v1.getZ();
+            if (z != 0.0) {
+                v1.setZ((z - minZ) / (maxZ - minZ));
+            }            
         }
     }
 

@@ -8,10 +8,8 @@ import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import org.bapedis.core.model.SimilarityMatrix;
-import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.task.ProgressTicket;
-import org.openide.DialogDisplayer;
 import org.bapedis.chemspace.similarity.AbstractSimCoefficient;
 
 /**
@@ -99,8 +97,7 @@ class SimilarityMatrixBuilder extends RecursiveAction {
             for (int x = xlow; x < Math.min(xhigh, y); x++) {
                 if (!stopRun.get()) {
                     try {
-                        similarityMeasure.setPeptide1(peptides[y]);
-                        similarityMeasure.setPeptide2(peptides[x]);
+                        similarityMeasure.setPeptidesToCompare(peptides[y], peptides[x]);
                         similarityMeasure.run();
                         score = similarityMeasure.getSimilarityValue();
                         if (score >= MIN_VALUE) {

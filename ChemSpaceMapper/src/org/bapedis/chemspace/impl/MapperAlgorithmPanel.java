@@ -6,13 +6,18 @@
 package org.bapedis.chemspace.impl;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
+import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXHyperlink;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
@@ -26,9 +31,11 @@ import org.openide.util.NbBundle;
 public class MapperAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSetupUI, PropertyChangeListener {
 
     protected final JXHyperlink openWizardLink, scatter3DLink;
+    protected final JXBusyLabel busyLabel;
     protected MapperAlgorithm csMapper;
     protected final NetworkPanel networkPanel;
     protected final ClusterPanel clusterPanel;
+    protected final JToolBar toolBar;
 
     /**
      * Creates new form MapperAlgorithmPanel
@@ -36,20 +43,35 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     public MapperAlgorithmPanel() {
         initComponents();
 
-        openWizardLink = new JXHyperlink();
-        configureOpenWizardLink();
-        topRightPanel.add(openWizardLink);
-        
+        // Tool bar
+        toolBar = new JToolBar();
+        toolBar.setFloatable(false);
+        topPanel.add(toolBar);
+
         scatter3DLink = new JXHyperlink();
         configureScatter3DLink();
-        topLeftPanel.add(scatter3DLink);
+        toolBar.add(scatter3DLink);
 
-        clusterPanel = new ClusterPanel();
-        tab1.add(clusterPanel, BorderLayout.CENTER);
+        toolBar.addSeparator();
         
+        openWizardLink = new JXHyperlink();
+        configureOpenWizardLink();
+        toolBar.add(openWizardLink);
+
+        // Network panel
         networkPanel = new NetworkPanel();
-        tab2.add(networkPanel, BorderLayout.CENTER);
+        tab1.add(networkPanel, BorderLayout.CENTER);
         
+        // Cluster panel
+        clusterPanel = new ClusterPanel();
+        tab2.add(clusterPanel, BorderLayout.CENTER);
+        
+        //Busy label
+        busyLabel = new JXBusyLabel(new Dimension(20, 20));
+        busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        busyLabel.setText(NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.busyLabel.text"));
+        centerPanel.add(busyLabel, "busyCard");
+
         addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
@@ -89,8 +111,8 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
             }
         });
     }
-    
-    private void configureScatter3DLink(){
+
+    private void configureScatter3DLink() {
         scatter3DLink.setIcon(ImageUtilities.loadImageIcon("org/bapedis/chemspace/resources/coordinates.png", false));
         scatter3DLink.setText(NbBundle.getMessage(ClusterPanel.class, "MapperAlgorithmPanel.scatter3DButton.text"));
         scatter3DLink.setToolTipText(NbBundle.getMessage(ClusterPanel.class, "MapperAlgorithmPanel.scatter3DButton.toolTipText"));
@@ -102,7 +124,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
             public void actionPerformed(java.awt.event.ActionEvent e) {
 
             }
-        });      
+        });
     }
 
     @Override
@@ -115,11 +137,13 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     }
 
     public void setBusy(boolean busy) {
+        scatter3DLink.setEnabled(!busy);
         openWizardLink.setEnabled(!busy);
-        topRightPanel.setEnabled(!busy);
-        jTabbedPane1.setEnabled(!busy);
-        clusterPanel.setEnabled(!busy);
-        networkPanel.setEnabled(!busy);
+        topPanel.setEnabled(!busy);
+        busyLabel.setBusy(busy);
+        
+        CardLayout cl = (CardLayout)centerPanel.getLayout();
+        cl.show(centerPanel, busy? "busyCard": "tabCard");
     }
 
     public MapperAlgorithm getCheSMapper() {
@@ -136,26 +160,24 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        topLeftPanel = new javax.swing.JPanel();
-        topRightPanel = new javax.swing.JPanel();
+        topPanel = new javax.swing.JPanel();
+        centerPanel = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         tab1 = new javax.swing.JPanel();
         tab2 = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
+
+        topPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        add(topLeftPanel, gridBagConstraints);
-
-        topRightPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 5);
-        add(topRightPanel, gridBagConstraints);
+        add(topPanel, gridBagConstraints);
+
+        centerPanel.setLayout(new java.awt.CardLayout());
 
         tab1.setLayout(new java.awt.BorderLayout());
         jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.tab1.TabConstraints.tabTitle"), tab1); // NOI18N
@@ -163,30 +185,34 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         tab2.setLayout(new java.awt.BorderLayout());
         jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.tab2.TabConstraints.tabTitle"), tab2); // NOI18N
 
+        centerPanel.add(jTabbedPane1, "tabCard");
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
-        add(jTabbedPane1, gridBagConstraints);
+        add(centerPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel centerPanel;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel tab1;
     private javax.swing.JPanel tab2;
-    private javax.swing.JPanel topLeftPanel;
-    private javax.swing.JPanel topRightPanel;
+    private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (csMapper != null && evt.getSource().equals(csMapper)
-                && evt.getPropertyName().equals(MapperAlgorithm.RUNNING)) {
+                && evt.getPropertyName().equals(MapperAlgorithm.RUNNING)) {            
+            clusterPanel.setupClusters();
+            networkPanel.setupAxis();
+            networkPanel.setupHistogram();
             setBusy((boolean) evt.getNewValue());
         }
     }

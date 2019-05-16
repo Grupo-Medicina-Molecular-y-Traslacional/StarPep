@@ -137,7 +137,6 @@ public class NonRedundantSetAlg implements Algorithm, Cloneable {
     private Cluster[] clusterize() {
         String msg = NbBundle.getMessage(NonRedundantSetAlg.class, "NonRedundantSetAlg.task.clusterize");
         pc.reportMsg(msg, workspace);
-        ticket.progress(msg);
 
         //set peptides
         if (workspaceInput) {

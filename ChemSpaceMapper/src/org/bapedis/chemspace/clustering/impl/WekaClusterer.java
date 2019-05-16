@@ -5,7 +5,6 @@
  */
 package org.bapedis.chemspace.clustering.impl;
 
-import org.bapedis.chemspace.clustering.impl.FeatureBasedClustering;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,8 +17,8 @@ import java.util.TreeMap;
 import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.core.io.impl.MyArffWritable;
 import org.bapedis.core.model.Cluster;
-import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.impl.AbstractClusterizer;
 import org.bapedis.core.util.ArffWriter;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -32,7 +31,7 @@ import weka.core.Instances;
  *
  * @author loge
  */
-public abstract class WekaClusterer<T extends Clusterer> extends FeatureBasedClustering {
+public abstract class WekaClusterer<T extends Clusterer> extends AbstractClusterizer {
 
     static protected final String PRO_CATEGORY = "Properties";
 
@@ -65,7 +64,7 @@ public abstract class WekaClusterer<T extends Clusterer> extends FeatureBasedClu
     }
 
     @Override
-    protected List<Cluster> cluterize(MolecularDescriptor[] features) {
+    protected List<Cluster> cluterize() {
         BufferedReader reader = null;
         try {
             List<Cluster> clusterList = new LinkedList<>();
@@ -90,7 +89,6 @@ public abstract class WekaClusterer<T extends Clusterer> extends FeatureBasedClu
 
             // Clustering dataset 
             if (!stopRun && data != null) {
-                ticket.progress("Building clusterer");
                 pc.reportMsg("Building clusterer\n", workspace);
                 clusterer.buildClusterer(data);
             }
@@ -102,7 +100,6 @@ public abstract class WekaClusterer<T extends Clusterer> extends FeatureBasedClu
             }
 
             if (!stopRun && data != null) {
-                ticket.progress("Clustering dataset");
                 pc.reportMsg("Clustering dataset\n", workspace);
                 eval.evaluateClusterer(data);
                 pc.reportMsg("No. of clusters: " + eval.getNumClusters() + "\n", workspace);

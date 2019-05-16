@@ -20,7 +20,6 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.ui.actions.GlobalContextSensitiveAction;
-import org.bapedis.core.ui.actions.RemoveFilter;
 import org.gephi.graph.api.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
@@ -37,7 +36,7 @@ public class RemoveOtherClusters extends GlobalContextSensitiveAction<Cluster> {
 
     public RemoveOtherClusters() {
         super(Cluster.class);
-        String name = NbBundle.getMessage(RemoveFilter.class, "CTL_RemoveOtherCluster");
+        String name = NbBundle.getMessage(RemoveOtherClusters.class, "CTL_RemoveOtherCluster");
         putValue(NAME, name);
         putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/chemspace/resources/remove.png", false));
         putValue(SHORT_DESCRIPTION, name);        

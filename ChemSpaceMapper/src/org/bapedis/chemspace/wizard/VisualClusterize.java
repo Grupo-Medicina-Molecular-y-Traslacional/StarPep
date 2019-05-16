@@ -22,7 +22,7 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.ClusteringTag;
-import org.bapedis.core.spi.alg.impl.AbstractCluster;
+import org.bapedis.core.spi.alg.impl.AbstractClusterizer;
 import org.bapedis.core.ui.components.PropertySheetPanel;
 import org.openide.nodes.Node;
 
@@ -30,8 +30,8 @@ public final class VisualClusterize extends JPanel {
 
     public static final String CLUSTERING_FACTORY = "clustering_factory";
     private final DefaultMutableTreeNode treeNode;
-    private final HashMap<String, AbstractCluster> map;
-    private AbstractCluster clustering;
+    private final HashMap<String, AbstractClusterizer> map;
+    private AbstractClusterizer clustering;
     private final PropertySheetPanel propSheetPanel;
 
     public VisualClusterize() {
@@ -46,11 +46,11 @@ public final class VisualClusterize extends JPanel {
         propSheetPanel.setPreferredSize(jScrollPane2.getPreferredSize());
     }
 
-    public HashMap<String, AbstractCluster> getMap() {
+    public HashMap<String, AbstractClusterizer> getMap() {
         return map;
     }
 
-    public void setClustering(AbstractCluster clustering) {
+    public void setClustering(AbstractClusterizer clustering) {
         this.clustering = clustering;
         AlgorithmFactory factory = clustering.getFactory();
         map.put(factory.getName(), clustering);
@@ -63,7 +63,7 @@ public final class VisualClusterize extends JPanel {
         }
     }
     
-    public AbstractCluster getClustering(){
+    public AbstractClusterizer getClustering(){
         return clustering;
     }
 
@@ -158,7 +158,7 @@ public final class VisualClusterize extends JPanel {
             factory = newNode.getFactory();
             jDescLabel.setText(NbBundle.getMessage(VisualClusterize.class, "VisualClusterize.jDescLabel.text", factory.getName(), factory.getDescription()));
             if (!map.containsKey(factory.getName())) {
-                clustering = (AbstractCluster)factory.createAlgorithm();
+                clustering = (AbstractClusterizer)factory.createAlgorithm();
                 map.put(factory.getName(), clustering);
             } else {
                 clustering = map.get(factory.getName());

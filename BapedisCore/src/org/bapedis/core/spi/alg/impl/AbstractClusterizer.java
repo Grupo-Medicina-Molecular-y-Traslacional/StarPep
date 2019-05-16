@@ -7,11 +7,13 @@ package org.bapedis.core.spi.alg.impl;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.GraphVizSetting;
+import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Workspace;
@@ -28,7 +30,7 @@ import org.openide.util.Lookup;
  *
  * @author loge
  */
-public abstract class AbstractCluster implements Algorithm, Cloneable {
+public abstract class AbstractClusterizer implements Algorithm, Cloneable {
 
     public static PeptideAttribute CLUSTER_ATTR = new PeptideAttribute("cluster", "Cluster", Integer.class, true, -1);
     public static final String CLUSTER_COLUMN = "cluster";
@@ -37,13 +39,14 @@ public abstract class AbstractCluster implements Algorithm, Cloneable {
     protected ProgressTicket ticket;
     protected AttributesModel attrModel;
     protected Peptide[] peptides;
+    protected MolecularDescriptor[] features;
     protected Workspace workspace;
     protected Cluster[] clusters;
     protected final ProjectManager pc;
     private GraphVizSetting graphViz;
     protected GraphModel graphModel;
 
-    public AbstractCluster(AlgorithmFactory factory) {
+    public AbstractClusterizer(AlgorithmFactory factory) {
         this.factory = factory;
         pc = Lookup.getDefault().lookup(ProjectManager.class);
     }
@@ -68,6 +71,14 @@ public abstract class AbstractCluster implements Algorithm, Cloneable {
             if (attrModel != null) {
                 peptides = attrModel.getPeptides().toArray(new Peptide[0]);
                 attrModel.removeDisplayedColumn(CLUSTER_ATTR);
+                //Load features
+                List<MolecularDescriptor> allFeatures = new LinkedList<>();
+                for (String key : attrModel.getMolecularDescriptorKeys()) {
+                    for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
+                        allFeatures.add(attr);
+                    }
+                }
+                features = allFeatures.toArray(new MolecularDescriptor[0]);
             }
         }
         stopRun = false;
@@ -110,7 +121,6 @@ public abstract class AbstractCluster implements Algorithm, Cloneable {
                 }
             }
 
-
             if (fireEvent) {
                 graphViz.fireChangedGraphView();
             }
@@ -149,8 +159,8 @@ public abstract class AbstractCluster implements Algorithm, Cloneable {
                 int index = 0;
                 clusters = new Cluster[clusterList.size()];
                 for (Cluster c : clusterList) {
-                    c.setPercentage(c.getSize()*100/(double)peptides.length);
-                    clusters[index++] = c;                    
+                    c.setPercentage(c.getSize() * 100 / (double) peptides.length);
+                    clusters[index++] = c;
                 }
 
                 Arrays.sort(clusters, new Comparator<Cluster>() {
@@ -165,12 +175,12 @@ public abstract class AbstractCluster implements Algorithm, Cloneable {
             }
         }
     }
-    
+
     @Override
     public Object clone() throws CloneNotSupportedException {
-        AbstractCluster copy = (AbstractCluster) super.clone();
+        AbstractClusterizer copy = (AbstractClusterizer) super.clone();
         return copy;
-    }    
+    }
 
     protected abstract List<Cluster> cluterize();
 

@@ -15,7 +15,7 @@ import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.spi.alg.ChemSpaceTag;
-import org.bapedis.core.spi.alg.impl.AbstractCluster;
+import org.bapedis.core.spi.alg.impl.AbstractClusterizer;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
@@ -102,7 +102,7 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
         }
 
         // Clustering
-        AbstractCluster clutering = (AbstractCluster) wiz.getProperty(AbstractCluster.class.getName());
+        AbstractClusterizer clutering = (AbstractClusterizer) wiz.getProperty(AbstractClusterizer.class.getName());
         csMapper.setClusteringAlg(clutering);
 
         // Similarity  

@@ -13,13 +13,13 @@ import org.bapedis.clustering.model.BiGraph;
 import org.bapedis.clustering.model.Vertex;
 import org.bapedis.core.model.Cluster;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
-import org.bapedis.core.spi.alg.impl.AbstractCluster;
+import org.bapedis.core.spi.alg.impl.AbstractClusterizer;
 
 /**
  *
  * @author loge
  */
-public class CommunityStructure extends AbstractCluster {
+public class CommunityStructure extends AbstractClusterizer {
 
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
     private int level;

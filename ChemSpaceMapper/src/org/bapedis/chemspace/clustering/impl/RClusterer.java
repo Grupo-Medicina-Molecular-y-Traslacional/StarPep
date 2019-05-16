@@ -16,6 +16,7 @@ import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.impl.AbstractClusterizer;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.core.util.BinaryLocator;
 import org.bapedis.core.util.ExternalTool;
@@ -31,7 +32,7 @@ import org.openide.util.NbPreferences;
  *
  * @author loge
  */
-public abstract class RClusterer extends FeatureBasedClustering {
+public abstract class RClusterer extends AbstractClusterizer {
 
     static final String RSCRIPT_PATH = "rscript_path";
     static protected final String PRO_CATEGORY = "Properties";
@@ -93,7 +94,7 @@ public abstract class RClusterer extends FeatureBasedClustering {
     protected abstract void validateClusterer() throws MyClusterException;
 
     @Override
-    protected List<Cluster> cluterize(MolecularDescriptor[] features) {
+    protected List<Cluster> cluterize() {
         try {
             // Validate 
             try {

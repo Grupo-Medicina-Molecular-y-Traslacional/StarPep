@@ -21,7 +21,7 @@ import org.openide.util.Exceptions;
  *
  * @author loge
  */
-public class SequenceClustering extends AbstractCluster {
+public class SequenceClustering extends AbstractClusterizer {
 
     private final HashMap<Integer, Cluster> clusterMap;
     private SequenceAlignmentModel alignmentModel;

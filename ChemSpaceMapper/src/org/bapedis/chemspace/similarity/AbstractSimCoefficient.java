@@ -56,23 +56,12 @@ public abstract class AbstractSimCoefficient implements Algorithm, Cloneable {
         stopRun = false;
     }
 
-    public Peptide getPeptide1() {
-        return peptide1;
-    }
-
-    public void setPeptide1(Peptide peptide1) {
+    public void setPeptidesToCompare(Peptide peptide1, Peptide peptide2) {
         this.peptide1 = peptide1;
-        similarityVal = -1;
-    }
-
-    public Peptide getPeptide2() {
-        return peptide2;
-    }
-
-    public void setPeptide2(Peptide peptide2) {
         this.peptide2 = peptide2;
         similarityVal = -1;
     }
+
 
     public float getSimilarityValue() {
         if (similarityVal < 0 || similarityVal > 1) {

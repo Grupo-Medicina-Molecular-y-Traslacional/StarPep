@@ -6,7 +6,6 @@
 package org.bapedis.chemspace.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -21,8 +20,6 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
-import org.bapedis.core.ui.actions.GlobalContextSensitiveAction;
-import org.bapedis.core.ui.actions.RemoveFilter;
 import org.gephi.graph.api.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
@@ -41,7 +38,7 @@ public class RemoveCluster extends AbstractAction {
 
     public RemoveCluster(Cluster cluster) {
         this.cluster = cluster;
-        String name = NbBundle.getMessage(RemoveFilter.class, "CTL_RemoveCluster");
+        String name = NbBundle.getMessage(RemoveCluster.class, "CTL_RemoveCluster");
         putValue(NAME, name);
         putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/chemspace/resources/remove.png", false));
         putValue(SHORT_DESCRIPTION, name);

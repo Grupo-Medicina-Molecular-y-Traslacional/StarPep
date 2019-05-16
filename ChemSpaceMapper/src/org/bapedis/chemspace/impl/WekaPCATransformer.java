@@ -3,14 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.similarity;
+package org.bapedis.chemspace.impl;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import org.bapedis.chemspace.model.TwoDSpace;
+import java.util.LinkedList;
+import java.util.List;
+import org.bapedis.chemspace.model.CoordinateSpace;
 import org.bapedis.core.io.impl.MyArffWritable;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
@@ -19,10 +21,14 @@ import org.openide.util.Exceptions;
 import weka.attributeSelection.PrincipalComponents;
 import weka.core.Instance;
 import weka.core.Instances;
-import org.bapedis.chemspace.spi.TwoDTransformer;
 import org.bapedis.core.io.MD_OUTPUT_OPTION;
+import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
+import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.task.ProgressTicket;
 import org.openide.util.Lookup;
 import weka.core.Utils;
 
@@ -30,13 +36,18 @@ import weka.core.Utils;
  *
  * @author loge
  */
-public class WekaPCATransformer implements TwoDTransformer {
+public class WekaPCATransformer implements Algorithm {
 
     private static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private final WekaPCATransformerFactory factory;
     private final PrincipalComponents pca;
     private double varianceCovered;
     protected DecimalFormat df;
+    protected Peptide[] peptides;
+    protected MolecularDescriptor[] features;
+    protected Workspace workspace;
+    protected CoordinateSpace xyzSpace;
+    protected boolean stopRun;
 
     public WekaPCATransformer(WekaPCATransformerFactory factory) {
         this.factory = factory;
@@ -47,13 +58,57 @@ public class WekaPCATransformer implements TwoDTransformer {
         df = new DecimalFormat("0.00", symbols);
     }
 
+    public double getVarianceCovered() {
+        return varianceCovered;
+    }
+
+    public CoordinateSpace getXYZSpace() {
+        return xyzSpace;
+    }        
+
     @Override
-    public WekaPCATransformerFactory getFactory() {
+    public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
+        this.workspace = workspace;
+        AttributesModel attrModel = pc.getAttributesModel(workspace);
+        if (attrModel != null) {
+            peptides = attrModel.getPeptides().toArray(new Peptide[0]);
+            //Load features
+            List<MolecularDescriptor> allFeatures = new LinkedList<>();
+            for (String key : attrModel.getMolecularDescriptorKeys()) {
+                for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
+                    allFeatures.add(attr);
+                }
+            }
+            features = allFeatures.toArray(new MolecularDescriptor[0]);
+        }
+        stopRun = false;
+    }
+
+    @Override
+    public void endAlgo() {
+        workspace = null;
+        features = null;
+        peptides = null;
+    }
+
+    @Override
+    public boolean cancel() {
+        stopRun = true;
+        return false;
+    }
+
+    @Override
+    public AlgorithmProperty[] getProperties() {
+        return null;
+    }
+
+    @Override
+    public AlgorithmFactory getFactory() {
         return factory;
     }
 
     @Override
-    public TwoDSpace transform(Workspace workspace, Peptide[] peptides, MolecularDescriptor[] features) {
+    public void run() {
         try {
             ArffWriter.DEBUG = true;
             MyArffWritable writable = new MyArffWritable(peptides, features, MD_OUTPUT_OPTION.None);
@@ -78,14 +133,14 @@ public class WekaPCATransformer implements TwoDTransformer {
             String variance;
             pc.reportMsg("Sum of eigenvalues: " + sumOfEigenValues, workspace);
             pc.reportMsg("Factor, Eigenvalue, Explained variance, Cumulative eigenvalue, Cumulative variance", workspace);
-            for (int i = 0; i < axisLabels.length; i++) {                
+            for (int i = 0; i < axisLabels.length; i++) {
                 varExp = (eigenValues[index] / sumOfEigenValues) * 100;
                 cumulativeEigen += eigenValues[index];
                 cumulativeVar += varExp;
                 variance = df.format(varExp);
                 axisLabels[i] = String.format("PCA %d (%s%% explained var.)", (i + 1), variance);
                 pc.reportMsg((i + 1) + ", " + df.format(eigenValues[index]) + ", " + variance + "%"
-                             + ", " + df.format(cumulativeEigen) + ", " + df.format(cumulativeVar) + "%", workspace);
+                        + ", " + df.format(cumulativeEigen) + ", " + df.format(cumulativeVar) + "%", workspace);
                 index--;
             }
 
@@ -97,18 +152,10 @@ public class WekaPCATransformer implements TwoDTransformer {
                     coordinates[i][j] = (float) in.value(j);
                 }
             }
-            return new TwoDSpace(peptides, axisLabels, coordinates);
+            xyzSpace = new CoordinateSpace(peptides, axisLabels, coordinates);
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }
-        return null;
-    }
 
-    public double getVarianceCovered() {
-        return varianceCovered;
     }
-
-    public void setVarianceCovered(double varianceCovered) {
-        this.varianceCovered = varianceCovered;
-    }    
 }

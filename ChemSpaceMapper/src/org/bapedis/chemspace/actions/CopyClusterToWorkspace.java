@@ -6,7 +6,6 @@
 package org.bapedis.chemspace.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +16,6 @@ import static javax.swing.Action.SHORT_DESCRIPTION;
 import javax.swing.SwingWorker;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Cluster;
-import org.bapedis.chemspace.model.ClusterNavigatorModel;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;

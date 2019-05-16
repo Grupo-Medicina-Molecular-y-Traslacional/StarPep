@@ -16,14 +16,14 @@ import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
-import org.bapedis.core.spi.alg.impl.AbstractCluster;
+import org.bapedis.core.spi.alg.impl.AbstractClusterizer;
 import org.openide.util.Exceptions;
 
 public class WizardClusterize implements WizardDescriptor.ValidatingPanel<WizardDescriptor>,
         PropertyChangeListener {
 
     private final MapperAlgorithm csMapper;
-    private AbstractCluster alg;
+    private AbstractClusterizer alg;
     private final EventListenerList listeners = new EventListenerList();
     private boolean isValid;
     private WizardDescriptor model;
@@ -48,9 +48,9 @@ public class WizardClusterize implements WizardDescriptor.ValidatingPanel<Wizard
         if (component == null) {
             try {
                 if (csMapper.getClusteringAlg() == null) {
-                    alg = (AbstractCluster) new EMFactory().createAlgorithm();
+                    alg = (AbstractClusterizer) new EMFactory().createAlgorithm();
                 } else {
-                    alg = (AbstractCluster) csMapper.getClusteringAlg().clone();
+                    alg = (AbstractClusterizer) csMapper.getClusteringAlg().clone();
                 }
                 component = new VisualClusterize();
                 component.setClustering(alg);
@@ -95,7 +95,7 @@ public class WizardClusterize implements WizardDescriptor.ValidatingPanel<Wizard
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state 
         this.model = wiz;
-        alg = (AbstractCluster) wiz.getProperty(AbstractCluster.class.getName());
+        alg = (AbstractClusterizer) wiz.getProperty(AbstractClusterizer.class.getName());
         if (alg != null) {
             getComponent().setClustering(alg);
         }
@@ -105,7 +105,7 @@ public class WizardClusterize implements WizardDescriptor.ValidatingPanel<Wizard
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
         alg = component.getClustering();
-        wiz.putProperty(AbstractCluster.class.getName(), alg);
+        wiz.putProperty(AbstractClusterizer.class.getName(), alg);
     }
 
     @Override

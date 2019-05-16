@@ -49,10 +49,7 @@ public class WizardInputSequence implements WizardDescriptor.Panel<WizardDescrip
                 }
                 JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
                 component = new VisualInputSequence(settingPanel);
-                component.setNrdOption(csMapper.getNrdOption());
-                
-                ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-                component.setInputSequencesCount(pc.getAttributesModel().getPeptides().size());
+                component.setNrdOption(csMapper.getNrdOption());                
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
                 alg = null;

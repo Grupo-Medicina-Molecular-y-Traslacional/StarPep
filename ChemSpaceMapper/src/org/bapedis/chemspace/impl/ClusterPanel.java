@@ -6,10 +6,7 @@
 package org.bapedis.chemspace.impl;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -18,23 +15,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
-import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.Peptide;
@@ -43,16 +34,14 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.chemspace.actions.CopyClusterToWorkspace;
 import org.bapedis.chemspace.actions.RemoveCluster;
 import org.bapedis.chemspace.actions.RemoveOtherClusters;
-import org.bapedis.core.spi.alg.impl.AbstractCluster;
+import org.bapedis.core.spi.alg.impl.AbstractClusterizer;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.openide.awt.MouseUtils;
 import org.openide.util.Exceptions;
-import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 
 /**
  *
@@ -69,7 +58,7 @@ public class ClusterPanel extends JComponent implements PropertyChangeListener {
         NbBundle.getMessage(ClusterPanel.class, "ClusterPanel.table.columnName.three")};
 
     protected MapperAlgorithm csMapper;
-    protected AbstractCluster clusteringAlg;
+    protected AbstractClusterizer clusteringAlg;
 
     public ClusterPanel() {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
@@ -96,31 +85,12 @@ public class ClusterPanel extends JComponent implements PropertyChangeListener {
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         busyLabel.setText(NbBundle.getMessage(ClusterPanel.class, "ClusterPanel.busyLabel.text"));
 
-        addAncestorListener(new AncestorListener() {
-            @Override
-            public void ancestorAdded(AncestorEvent event) {
-                if (csMapper != null) {
-                    csMapper.addRunningListener(ClusterPanel.this);
-                }
-            }
-
-            @Override
-            public void ancestorRemoved(AncestorEvent event) {
-                if (csMapper != null) {
-                    csMapper.removeRunningListener(ClusterPanel.this);
-                }
-            }
-
-            @Override
-            public void ancestorMoved(AncestorEvent event) {
-            }
-        });
     }
 
     public void setUp(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
         this.clusteringAlg = csMapper.getClusteringAlg();
-        setClusters();
+        setupClusters();
     }
 
     private synchronized void tableValueChanged(ListSelectionEvent e) {
@@ -164,11 +134,11 @@ public class ClusterPanel extends JComponent implements PropertyChangeListener {
         add(scrollPane, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void setClusters() {
-        if (clusteringAlg != null && clusteringAlg.getClusters() != null) {
+    public void setupClusters() {
+        if (clusteringAlg.getClusters() != null && !csMapper.isRunning()) {
             AttributesModel attrModel = pc.getAttributesModel();
             List<Peptide> peptides = attrModel.getPeptides();
-            setBusyLabel(true);
+            setBusy(true);
             SwingWorker worker = new SwingWorker<TableModel, Void>() {
                 @Override
                 protected TableModel doInBackground() throws Exception {
@@ -205,7 +175,7 @@ public class ClusterPanel extends JComponent implements PropertyChangeListener {
                         Exceptions.printStackTrace(ex);
                         table.setModel(new MyTableModel(columnNames, new Cluster[0]));
                     } finally {
-                        setBusyLabel(false);
+                        setBusy(false);
                     }
                 }
 
@@ -216,32 +186,17 @@ public class ClusterPanel extends JComponent implements PropertyChangeListener {
         }
     }
 
-    private void setBusyLabel(boolean busy) {
+    private void setBusy(boolean busy) {
         scrollPane.setViewportView(busy ? busyLabel : table);
         busyLabel.setBusy(busy);
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-//        if (evt.getSource().equals(currentAttrModel)) {
-//            if (evt.getPropertyName().equals(AttributesModel.CHANGED_FILTER)) {
-//                reload();
-//            }
-//        } else if (evt.getSource() instanceof QueryModel) {
-//            if (evt.getPropertyName().equals(QueryModel.RUNNING)) {
-//                setBusyLabel(((QueryModel) evt.getSource()).isRunning());
-//            }
-//        } else if (evt.getSource() instanceof FilterModel) {
-//            if (evt.getPropertyName().equals(FilterModel.RUNNING)) {
-//                setBusyLabel(((FilterModel) evt.getSource()).isRunning());
-//            }
-//        } else if (evt.getSource() instanceof ClusterNavigatorModel) {
-//            if (evt.getPropertyName().equals(ClusterNavigatorModel.RUNNING)) {
-//                setBusyLabel(((ClusterNavigatorModel) evt.getSource()).isRunning());
-//            } else if (evt.getPropertyName().equals(ClusterNavigatorModel.CHANGED_CLUSTER)) {
-//                reload();
-//            }
-//        }
+        if (csMapper != null && evt.getSource().equals(csMapper)
+                && evt.getPropertyName().equals(MapperAlgorithm.RUNNING)) {
+            setupClusters();
+        }
     }
 
     class ClusterPopupAdapter extends MouseUtils.PopupMouseAdapter {
@@ -316,13 +271,15 @@ public class ClusterPanel extends JComponent implements PropertyChangeListener {
 
         @Override
         public Object getValueAt(int row, int col) {
-            switch (col) {
-                case 0:
-                    return data[row].getId();
-                case 1:
-                    return data[row].getSize();
-                case 2:
-                    return data[row].getPercentage();
+            if (row < data.length) {
+                switch (col) {
+                    case 0:
+                        return data[row].getId();
+                    case 1:
+                        return data[row].getSize();
+                    case 2:
+                        return data[row].getPercentage();
+                }
             }
             return null;
         }

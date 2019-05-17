@@ -49,6 +49,10 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
         }
     }
 
+    public List<AbstractMD> getAlgorithms() {
+        return algorithms;
+    }        
+
     public Set<String> getDescriptorKeys() {
         return descriptorKeys;
     }

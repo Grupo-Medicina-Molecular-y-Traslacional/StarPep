@@ -6,6 +6,8 @@
 package org.bapedis.chemspace.impl;
 
 import java.awt.BorderLayout;
+import org.bapedis.core.ui.components.SimpleHTMLReport;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -26,17 +28,33 @@ public class NetworkReportPanel extends javax.swing.JPanel {
     public void setUp(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
         this.netReport = csMapper.getNetworkReport();
+        this.netReport.setDimension(getPreferredSize());
         setupReport();
     }    
     
     public void setupReport(){
         centerPanel.removeAll();
-        if (netReport != null && !csMapper.isRunning() && netReport.getChartPanel() != null){
-            centerPanel.add(netReport.getChartPanel(), BorderLayout.CENTER);
+        if (netReport != null && !csMapper.isRunning()){
+            centerPanel.add( new SimpleHTMLReport(getReport()), BorderLayout.CENTER);
         }
         centerPanel.revalidate();
         centerPanel.repaint();
     }
+    
+    public String getReport() {
+        String report = "<HTML> <BODY> <h1>" + NbBundle.getMessage(NetworkReport.class, "NetworkReport.name") + "</h1> "
+                + "<br /><br />"
+                + "<h2> Network settings </h2>"
+                + "<hr>"                
+                + csMapper.getSettingsReport()
+                + "<br /><br />"
+                + "<h2> Network measures </h2>"
+                + "<hr>"                
+                + netReport.getMeasureReport()
+                + "</BODY> </HTML>";
+
+        return report;
+    }    
 
     /**
      * This method is called from within the constructor to initialize the form.

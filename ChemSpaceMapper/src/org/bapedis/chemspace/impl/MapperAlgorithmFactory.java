@@ -7,7 +7,7 @@ package org.bapedis.chemspace.impl;
 
 import java.text.MessageFormat;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
-import org.bapedis.chemspace.model.FeatureFilteringOption;
+import org.bapedis.chemspace.model.FeatureSelectionOption;
 import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.bapedis.chemspace.similarity.AbstractSimCoefficient;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
@@ -55,18 +55,7 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
 
     @Override
     public Algorithm createAlgorithm() {
-        MapperAlgorithm csMapper = new MapperAlgorithm(this);
-
-        // Create wizard
-        WizardDescriptor wiz = createWizardDescriptor(csMapper);
-
-        //The image in the left sidebar of the wizard is set like this:
-        //wiz.putProperty(WizardDescriptor.PROP_IMAGE, ImageUtilities.loadImage("org/demo/wizard/banner.PNG", true));
-        if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
-            setUp(csMapper, wiz);
-            return csMapper;
-        }
-        return null;
+        return new MapperAlgorithm(this);
     }
 
     public static void setUp(MapperAlgorithm csMapper, WizardDescriptor wiz) {
@@ -92,10 +81,10 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
         }
 
         // Feature Filtering Option
-        FeatureFilteringOption ffOption = (FeatureFilteringOption) wiz.getProperty(FeatureFilteringOption.class.getName());
+        FeatureSelectionOption ffOption = (FeatureSelectionOption) wiz.getProperty(FeatureSelectionOption.class.getName());
         if (ffOption != null) {
-            csMapper.setFFOption(ffOption);
-            if (ffOption == FeatureFilteringOption.YES) {
+            csMapper.setFSOption(ffOption);
+            if (ffOption == FeatureSelectionOption.YES) {
                 FeatureSEFiltering alg = (FeatureSEFiltering) wiz.getProperty(FeatureSEFiltering.class.getName());
                 csMapper.setFeatureSelectionAlg(alg);
             }

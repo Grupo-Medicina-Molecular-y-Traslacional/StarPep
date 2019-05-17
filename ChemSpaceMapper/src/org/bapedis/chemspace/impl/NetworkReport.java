@@ -5,8 +5,9 @@
  */
 package org.bapedis.chemspace.impl;
 
-import java.awt.Color;
 import java.awt.Dimension;
+import java.io.File;
+import java.io.IOException;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
@@ -16,20 +17,22 @@ import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.impl.AbstractClusterizer;
 import org.bapedis.core.task.ProgressTicket;
+import org.bapedis.core.util.OSUtil;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.EdgeIterable;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
+import org.jfree.chart.ChartRenderingInfo;
+import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.entity.StandardEntityCollection;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -44,17 +47,22 @@ public class NetworkReport implements Algorithm {
     protected Peptide[] peptides;
     protected GraphModel graphModel;
     protected Graph mainGraph;
+    private Dimension dimension;
 
-    private ChartPanel chartPanel;
-    private int width, height;
+    private JFreeChart densityChart, modularityChart;
 
     public NetworkReport(NetworkReportFactory factory) {
         this.factory = factory;
+        dimension = new Dimension(0, 0);
     }
 
-    public ChartPanel getChartPanel() {
-        return chartPanel;
+    public Dimension getDimension() {
+        return dimension;
     }
+
+    public void setDimension(Dimension dimension) {
+        this.dimension = dimension;
+    }          
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
@@ -65,7 +73,8 @@ public class NetworkReport implements Algorithm {
             graphModel = pc.getGraphModel(workspace);
             mainGraph = graphModel.getGraph();
         }
-        chartPanel = null;
+        densityChart = null;
+        modularityChart = null;
     }
 
     @Override
@@ -91,44 +100,50 @@ public class NetworkReport implements Algorithm {
 
     @Override
     public void run() {
-        XYSeriesCollection dataset = new XYSeriesCollection();
-        XYSeries serieDensity = new XYSeries("Density");
-        XYSeries serieModularity = new XYSeries("Modularity");
 
-        for (float threshold = 0; threshold <= 1 && !stopRun; threshold += 0.05) {
-            serieDensity.add(threshold, calculateDensity(threshold));
-            serieModularity.add(threshold, calculateModularity(threshold));
-        }
+        densityChart = createXYLineChart(createDensityDataSet());
+        modularityChart = createXYLineChart(createModularityDataSet());
+        
+    }
 
-        dataset.addSeries(serieDensity);
-        dataset.addSeries(serieModularity);
+    private JFreeChart createXYLineChart(XYSeriesCollection dataset) {
 
         JFreeChart chart = ChartFactory.createXYLineChart(
-                "Density vs Modularity", // chart title
+                "", // chart title
                 "Similarity threshold", // domain axis label
                 "Measure value", // range axis label
                 dataset, // data
                 PlotOrientation.HORIZONTAL.VERTICAL, // orientation
-                true, // include legend
+                false, // include legend
                 false, // tooltips?
                 false // URLs?
         );
 
-        chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new Dimension(width, height));
-        chartPanel.setMinimumSize(new Dimension(width, height));
+        return chart;
+    }
 
-        XYPlot plot = chart.getXYPlot();
-        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+    private XYSeriesCollection createDensityDataSet() {
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        XYSeries serieDensity = new XYSeries("Density");
 
-        // sets paint color for each series
-        renderer.setSeriesPaint(0, Color.RED);
-        renderer.setSeriesPaint(1, Color.BLUE);
+        for (float threshold = 0; threshold <= 1 && !stopRun; threshold += 0.05) {
+            serieDensity.add(threshold, calculateDensity(threshold));
+        }
 
-        //renderer.setSeriesStroke(0, new BasicStroke(4.0f));
-        //renderer.setSeriesStroke(1, new BasicStroke(3.0f));
-        // sets renderer for lines
-        plot.setRenderer(renderer);
+        dataset.addSeries(serieDensity);
+        return dataset;
+    }
+
+    private XYSeriesCollection createModularityDataSet() {
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        XYSeries serieModularity = new XYSeries("Modularity");
+
+        for (float threshold = 0; threshold <= 1 && !stopRun; threshold += 0.05) {
+            serieModularity.add(threshold, calculateModularity(threshold));
+        }
+
+        dataset.addSeries(serieModularity);
+        return dataset;
     }
 
     private float calculateDensity(float threshold) {
@@ -155,7 +170,6 @@ public class NetworkReport implements Algorithm {
     }
 
     private float calculateModularity(float threshold) {
-        int n = peptides.length;
         float edgeCount = 0;
         float sum = 0;
         Node node1, node2;
@@ -187,7 +201,7 @@ public class NetworkReport implements Algorithm {
             for (int j = i + 1; j < peptides.length; j++) {
                 node2 = peptides[j].getGraphNode();
                 graphEdge = mainGraph.getEdge(node1, node2, relType);
-                similarity = (graphEdge != null) ? (float) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY):-1;
+                similarity = (graphEdge != null) ? (float) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY) : -1;
                 cluster1 = (int) node1.getAttribute(AbstractClusterizer.CLUSTER_COLUMN);
                 cluster2 = (int) node2.getAttribute(AbstractClusterizer.CLUSTER_COLUMN);
                 if (cluster1 > -1 && cluster2 > -1 && cluster1 == cluster2) {
@@ -213,6 +227,30 @@ public class NetworkReport implements Algorithm {
             }
         }
         return degree;
+    }
+
+    public String getMeasureReport() {
+        String report = "<b> Density </b>"
+                + "<br />" + renderChart(densityChart, "Density")
+                + "<br /><br />"
+                + "<b> Modularity </b>"
+                + "<br />" + renderChart(modularityChart, "Modularity");
+
+        return report;
+    }
+
+    public String renderChart(JFreeChart chart, String name) {
+        String imageFile = "";
+        if (chart != null) {
+            try {
+                final ChartRenderingInfo info = new ChartRenderingInfo(new StandardEntityCollection());
+                File file = OSUtil.createTempFile(name, "-chart");;
+                imageFile = "<IMG SRC=\"file:" + file.getAbsolutePath() + "\" " + "WIDTH=\"" + dimension.width +"\" HEIGHT=\"" + dimension.height +"\" BORDER=\"0\" USEMAP=\"#chart\"></IMG>";
+                ChartUtilities.saveChartAsPNG(file, chart, 600, 400, info);
+            } catch (IOException e) {
+            }
+        }
+        return imageFile;
     }
 
 }

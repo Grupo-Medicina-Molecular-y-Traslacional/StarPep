@@ -7,14 +7,14 @@ package org.bapedis.chemspace.wizard;
 
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
-import org.bapedis.chemspace.model.FeatureFilteringOption;
+import org.bapedis.chemspace.model.FeatureSelectionOption;
 import org.openide.util.NbBundle;
 
 public final class VisualFeatureSelection extends JPanel {
 
     static final String CHANGED_OPTION = "filtering_changed";
     private final JPanel settingPanel;
-    private FeatureFilteringOption ffOption;
+    private FeatureSelectionOption ffOption;
 
     public VisualFeatureSelection(JPanel settingPanel) {
         initComponents();
@@ -22,11 +22,11 @@ public final class VisualFeatureSelection extends JPanel {
         bottomPanel.add(settingPanel, BorderLayout.CENTER);
     }
 
-    public FeatureFilteringOption getFFOption() {
+    public FeatureSelectionOption getFFOption() {
         return ffOption;
     }
 
-    public void setFFOption(FeatureFilteringOption ffOption) {
+    public void setFFOption(FeatureSelectionOption ffOption) {
         this.ffOption = ffOption;
         switch (ffOption) {
             case NO:
@@ -36,7 +36,7 @@ public final class VisualFeatureSelection extends JPanel {
                 jOption2.setSelected(true);
                 break;
         }
-        settingPanel.setEnabled(ffOption == FeatureFilteringOption.YES);
+        settingPanel.setEnabled(ffOption == FeatureSelectionOption.YES);
     }
 
     @Override
@@ -112,15 +112,15 @@ public final class VisualFeatureSelection extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
-        FeatureFilteringOption oldOption = ffOption;
-        ffOption = FeatureFilteringOption.YES;
+        FeatureSelectionOption oldOption = ffOption;
+        ffOption = FeatureSelectionOption.YES;
         settingPanel.setEnabled(true);
         firePropertyChange(CHANGED_OPTION, oldOption, ffOption);
     }//GEN-LAST:event_jOption2ActionPerformed
 
     private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
-        FeatureFilteringOption oldOption = ffOption;
-        ffOption = FeatureFilteringOption.NO;
+        FeatureSelectionOption oldOption = ffOption;
+        ffOption = FeatureSelectionOption.NO;
         settingPanel.setEnabled(false);
         firePropertyChange(CHANGED_OPTION, oldOption, ffOption);
     }//GEN-LAST:event_jOption1ActionPerformed

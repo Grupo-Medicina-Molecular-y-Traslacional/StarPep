@@ -10,7 +10,6 @@ import java.beans.PropertyChangeListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
-import org.bapedis.chemspace.clustering.impl.EMFactory;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
@@ -47,11 +46,7 @@ public class WizardClusterize implements WizardDescriptor.ValidatingPanel<Wizard
     public VisualClusterize getComponent() {
         if (component == null) {
             try {
-                if (csMapper.getClusteringAlg() == null) {
-                    alg = (AbstractClusterizer) new EMFactory().createAlgorithm();
-                } else {
-                    alg = (AbstractClusterizer) csMapper.getClusteringAlg().clone();
-                }
+                alg = (AbstractClusterizer) csMapper.getClusteringAlg().clone();
                 component = new VisualClusterize();
                 component.setClustering(alg);
                 component.addPropertyChangeListener(this);

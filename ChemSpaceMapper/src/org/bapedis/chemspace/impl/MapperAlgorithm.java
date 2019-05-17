@@ -10,22 +10,28 @@ import java.beans.PropertyChangeSupport;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.SwingUtilities;
-import org.bapedis.chemspace.model.FeatureFilteringOption;
+import org.bapedis.chemspace.clustering.impl.EMFactory;
+import org.bapedis.chemspace.model.FeatureSelectionOption;
 import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.similarity.AbstractSimCoefficient;
+import org.bapedis.chemspace.similarity.AlignmentBasedSimilarityFactory;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
+import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.impl.AbstractClusterizer;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
+import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
 import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
+import org.bapedis.core.spi.alg.impl.FeatureSEFilteringFactory;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
+import org.bapedis.core.spi.alg.impl.NonRedundantSetAlgFactory;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.DialogDisplayer;
@@ -53,7 +59,7 @@ public class MapperAlgorithm implements Algorithm {
     //Mapping Options
     protected RemovingRedundantOption nrdOption;
     protected FeatureExtractionOption feOption;
-    protected FeatureFilteringOption ffOption;
+    protected FeatureSelectionOption fsOption;
 
     //Mapping Algorithms   
     private NonRedundantSetAlg nrdAlg;
@@ -76,7 +82,15 @@ public class MapperAlgorithm implements Algorithm {
         //Mapping Options        
         nrdOption = RemovingRedundantOption.NO;
         feOption = FeatureExtractionOption.YES;
-        ffOption = FeatureFilteringOption.NO;
+        fsOption = FeatureSelectionOption.NO;
+
+        //Mapping algorithms
+        nrdAlg = (NonRedundantSetAlg) new NonRedundantSetAlgFactory().createAlgorithm();
+        nrdAlg.setWorkspaceInput(true);        
+        featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
+        featureSelectionAlg = (FeatureSEFiltering) new FeatureSEFilteringFactory().createAlgorithm();
+        clusteringAlg = (AbstractClusterizer) new EMFactory().createAlgorithm();
+        simCoefficientAlg = (AbstractSimCoefficient) new AlignmentBasedSimilarityFactory().createAlgorithm();
 
         pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
         networkAlg = (NetworkEmbedderAlg) new NetworkEmbedderFactory().createAlgorithm();
@@ -88,7 +102,59 @@ public class MapperAlgorithm implements Algorithm {
     public boolean isRunning() {
         return running;
     }
+    
+    public String getSettingsReport(){
+        String report = getNrdSettings()
+                + "<br />"               
+                + getFESettings()
+                + "<br />" 
+                + getFSSettings()
+                + "<br />" 
+                + getClusteringSettings()
+                + "<br />"       
+                + getSimCoefficientSettings();
+        return report;
+    }
+    
+    private String getNrdSettings(){
+        StringBuilder reportBuilder = new StringBuilder(String.format("<b> Removing redundant sequences</b> (%s)<br />", nrdOption));
+        if(nrdOption == RemovingRedundantOption.YES){
+            reportBuilder.append(String.format("Alignment type: %s <br />", SequenceAlignmentModel.ALIGNMENT_TYPE[nrdAlg.getAlignmentModel().getAlignmentTypeIndex()]));
+            reportBuilder.append(String.format("Substitution matrix: %s <br />", SequenceAlignmentModel.SUBSTITUTION_MATRIX[nrdAlg.getAlignmentModel().getSubstitutionMatrixIndex()]));
+            reportBuilder.append(String.format("Percent identity: %s <br />", nrdAlg.getAlignmentModel().getPercentIdentity() + "%"));
+        }        
+        return reportBuilder.toString();
+        
+    }
 
+    private String getFESettings(){
+        StringBuilder reportBuilder = new StringBuilder(String.format("<b> Feature extraction</b> (%s)<br />", feOption));
+        if(feOption == FeatureExtractionOption.YES){
+            for(Algorithm alg: featureExtractionAlg.getAlgorithms()){
+                reportBuilder.append(String.format("%s <br />", alg.getFactory().getName()));
+            }
+        }        
+        return reportBuilder.toString();        
+    }
+    
+    private String getFSSettings(){
+        StringBuilder reportBuilder = new StringBuilder(String.format("<b> Feature selection</b> (%s)<br />", fsOption));
+        if (fsOption == FeatureSelectionOption.YES){
+            reportBuilder.append(String.format("%s <br />", ""));
+        }
+        return reportBuilder.toString();
+    }
+    
+    private String getClusteringSettings(){
+        String report = String.format("<b> Clustering algorithm</b> (%s)<br />", clusteringAlg.getFactory().getName());
+        return report;
+    }
+    
+    private String getSimCoefficientSettings(){
+        StringBuilder reportBuilder = new StringBuilder(String.format("<b> Similarity coefficient</b> (%s)<br />", simCoefficientAlg.getFactory().getName()));
+        return reportBuilder.toString();
+    }    
+    
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
@@ -121,7 +187,7 @@ public class MapperAlgorithm implements Algorithm {
         }
 
         // Feature Selection
-        if (ffOption == FeatureFilteringOption.YES && !stopRun) {
+        if (fsOption == FeatureSelectionOption.YES && !stopRun) {
             if (featureSelectionAlg != null) {
                 currentAlg = featureSelectionAlg;
                 execute();
@@ -129,11 +195,11 @@ public class MapperAlgorithm implements Algorithm {
                 throw new RuntimeException("Internal error: Feature selection algorithm is null");
             }
         }
-        
+
         // Load all descriptors
         List<MolecularDescriptor> allFeatures = new LinkedList<>();
         AttributesModel attrModel = pc.getAttributesModel();
-        if (!stopRun) {            
+        if (!stopRun) {
             for (String key : attrModel.getMolecularDescriptorKeys()) {
                 for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
                     allFeatures.add(attr);
@@ -149,7 +215,7 @@ public class MapperAlgorithm implements Algorithm {
         }
 
         // Preprocessing of feature list. Compute max, min, mean and std
-        try {            
+        try {
             for (MolecularDescriptor attr : allFeatures) {
                 attr.resetSummaryStats(attrModel.getPeptides());
             }
@@ -176,12 +242,12 @@ public class MapperAlgorithm implements Algorithm {
         } else {
             throw new RuntimeException("Internal error: Clustering algorithm is null");
         }
-        
+
         //WekaPCA Transformer
-        if (!stopRun){
+        if (!stopRun) {
             currentAlg = pcaTransformer;
             execute();
-            
+
             NetworkCoordinateUpdater updater = new NetworkCoordinateUpdater(pcaTransformer.getXYZSpace());
             updater.execute();
         }
@@ -194,9 +260,9 @@ public class MapperAlgorithm implements Algorithm {
         } else {
             throw new RuntimeException("Internal error: Similarity coefficient is null");
         }
-        
+
         //Network report
-        if (!stopRun){
+        if (!stopRun) {
             currentAlg = networkReport;
             execute();
         }
@@ -250,12 +316,12 @@ public class MapperAlgorithm implements Algorithm {
         this.feOption = feOption;
     }
 
-    public FeatureFilteringOption getFFOption() {
-        return ffOption;
+    public FeatureSelectionOption getFSOption() {
+        return fsOption;
     }
 
-    public void setFFOption(FeatureFilteringOption ffOption) {
-        this.ffOption = ffOption;
+    public void setFSOption(FeatureSelectionOption fsOption) {
+        this.fsOption = fsOption;
     }
 
     public RemovingRedundantOption getNrdOption() {
@@ -300,7 +366,7 @@ public class MapperAlgorithm implements Algorithm {
 
     public WekaPCATransformer getPCATransformer() {
         return pcaTransformer;
-    }        
+    }
 
     public NetworkEmbedderAlg getNetworkEmbedderAlg() {
         return networkAlg;
@@ -308,7 +374,7 @@ public class MapperAlgorithm implements Algorithm {
 
     public NetworkReport getNetworkReport() {
         return networkReport;
-    }        
+    }
 
     public AbstractSimCoefficient getSimCoefficientAlg() {
         return simCoefficientAlg;

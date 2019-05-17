@@ -19,7 +19,6 @@ import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
-import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.Exceptions;
@@ -57,11 +56,7 @@ public class WizardFeatureExtraction implements WizardDescriptor.ValidatingPanel
     public VisualFeatureExtraction getComponent() {
         if (component == null) {
             try {
-                if (csMapper.getFeatureExtractionAlg() == null) {
-                    alg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
-                } else {
-                    alg = (AllDescriptors) csMapper.getFeatureExtractionAlg().clone();
-                }
+                alg = (AllDescriptors) csMapper.getFeatureExtractionAlg().clone();
                 JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
                 component = new VisualFeatureExtraction(settingPanel);
                 component.addPropertyChangeListener(this);

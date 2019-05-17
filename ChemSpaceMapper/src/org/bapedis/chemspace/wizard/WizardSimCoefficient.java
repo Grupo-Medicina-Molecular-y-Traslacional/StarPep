@@ -12,7 +12,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.similarity.AbstractSimCoefficient;
-import org.bapedis.chemspace.similarity.AlignmentBasedSimilarityFactory;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.Exceptions;
@@ -46,12 +45,8 @@ public class WizardSimCoefficient implements WizardDescriptor.ValidatingPanel<Wi
     @Override
     public VisualSimCoefficient getComponent() {
         if (component == null) {
-            try {
-                if (csMapper.getSimCoefficientAlg()== null) {
-                    alg = (AbstractSimCoefficient) new AlignmentBasedSimilarityFactory().createAlgorithm();
-                } else {
-                    alg = (AbstractSimCoefficient) csMapper.getSimCoefficientAlg().clone();
-                }
+            try {                
+                alg = (AbstractSimCoefficient) csMapper.getSimCoefficientAlg().clone();
                 component = new VisualSimCoefficient();
                 component.setSimilarityCoefficient(alg);
                 component.addPropertyChangeListener(this);

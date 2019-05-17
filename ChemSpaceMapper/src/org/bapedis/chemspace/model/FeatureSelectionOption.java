@@ -9,6 +9,6 @@ package org.bapedis.chemspace.model;
  *
  * @author loge
  */
-public enum FeatureFilteringOption {
+public enum FeatureSelectionOption {
     YES, NO
 }

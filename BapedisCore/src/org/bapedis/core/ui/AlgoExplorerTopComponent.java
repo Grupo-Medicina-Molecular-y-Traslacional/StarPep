@@ -5,7 +5,9 @@
  */
 package org.bapedis.core.ui;
 
+import java.awt.CardLayout;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -28,6 +30,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 import org.openide.filesystems.FileObject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -52,6 +55,7 @@ import org.bapedis.core.ui.components.AlgDescriptionImage;
 import org.bapedis.core.ui.components.AlgorithmFactoryItem;
 import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.bapedis.core.ui.components.PropertySheetPanel;
+import org.jdesktop.swingx.JXBusyLabel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -104,6 +108,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     private final AlgoPresetPersistence algoPresetPersistence;
     protected Lookup.Result<AttributesModel> peptideLkpResult;
     protected final String NO_SELECTION;
+    protected final JXBusyLabel busyLabel;
 
     public AlgoExplorerTopComponent() {
         initComponents();
@@ -118,7 +123,14 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         algoComboBox.setModel(comboBoxModel);
 
         associateLookup(new ProxyLookup(Lookups.singleton(new MetadataNavigatorLookupHint()),
-                Lookups.singleton(new GraphElementNavigatorLookupHint())));        
+                Lookups.singleton(new GraphElementNavigatorLookupHint())));
+
+        //Busy label
+        busyLabel = new JXBusyLabel(new Dimension(20, 20));
+        busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        busyLabel.setText(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.busyLabel.text"));
+        centerPanel.add(busyLabel, "busyCard");
+
     }
 
     private void removeLookupListener() {
@@ -140,6 +152,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         algoComboBox = new javax.swing.JComboBox<>();
         infoLabel = new javax.swing.JLabel();
         runButton = new javax.swing.JButton();
+        centerPanel = new javax.swing.JPanel();
         scrollPane = new javax.swing.JScrollPane();
         propSheetPanel = new PropertySheetPanel();
         algoToolBar = new javax.swing.JToolBar();
@@ -193,6 +206,11 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
         add(runButton, gridBagConstraints);
+
+        centerPanel.setLayout(new java.awt.CardLayout());
+        centerPanel.add(scrollPane, "settingPanel");
+        centerPanel.add(propSheetPanel, "propSheet");
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -201,16 +219,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(scrollPane, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(propSheetPanel, gridBagConstraints);
+        add(centerPanel, gridBagConstraints);
 
         algoToolBar.setFloatable(false);
         algoToolBar.setRollover(true);
@@ -241,10 +250,10 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
         add(algoToolBar, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -351,7 +360,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             algoPresetPersistence.loadPreset(p, algoModel.getSelectedAlgorithm());
-                            refreshProperties(algoModel);
+                            refreshCenterPanel(algoModel);
                             StatusDisplayer.getDefault().setStatusText(NbBundle.getMessage(AlgoExplorerTopComponent.class, "AlgoExplorerTopComponent.status.loadPreset", algoModel.getSelectedAlgorithm().getFactory().getName(), p.toString()));
                         }
                     });
@@ -389,6 +398,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> algoComboBox;
     private javax.swing.JToolBar algoToolBar;
+    private javax.swing.JPanel centerPanel;
     private javax.swing.JLabel infoLabel;
     private javax.swing.JButton presetsButton;
     private javax.swing.JPanel propSheetPanel;
@@ -439,7 +449,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         if (algoModel.getTagInterface() != null) {
             refreshDisplayName(algoModel);
             refreshAlgChooser(algoModel);
-            refreshProperties(algoModel);
+            refreshCenterPanel(algoModel);
             refreshRunning(algoModel.isRunning());
         }
         algoModel.addPropertyChangeListener(this);
@@ -492,7 +502,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
         setEnableState(!comboBoxModel.getSelectedItem().equals(NO_SELECTION));
     }
 
-    private void refreshProperties(AlgorithmModel algoModel) {
+    private void refreshCenterPanel(AlgorithmModel algoModel) {
         if (algoModel == null || algoModel.getSelectedAlgorithm() == null) {
             ((PropertySheetPanel) propSheetPanel).getPropertySheet().setNodes(new Node[0]);
             scrollPane.setViewportView(null);
@@ -540,9 +550,15 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     private void refreshRunning(boolean running) {
         propSheetPanel.setEnabled(!running);
         setBusy(running);
-        if (scrollPane.getViewport().getView() != null) {
-            scrollPane.getViewport().getView().setEnabled(!running);
+        CardLayout cl = (CardLayout) centerPanel.getLayout();
+        if (running) {
+            cl.show(centerPanel, "busyCard");
+        } else if (scrollPane.getViewport().getView() != null) {
+            cl.show(centerPanel, "settingPanel");
+        } else {
+            cl.show(centerPanel, "propSheet");
         }
+
         resetButton.setEnabled(!running);
         presetsButton.setEnabled(!running);
         algoComboBox.setEnabled(!running);
@@ -558,6 +574,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     }
 
     private void setBusy(boolean busy) {
+        busyLabel.setBusy(busy);
         if (busy) {
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         } else {
@@ -574,7 +591,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             } else if (evt.getPropertyName().equals(AlgorithmModel.CHANGED_ALGORITHM)) {
                 AlgorithmModel algoModel = (AlgorithmModel) evt.getSource();
                 refreshDisplayName(algoModel);
-                refreshProperties(algoModel);
+                refreshCenterPanel(algoModel);
             } else if (evt.getPropertyName().equals(AlgorithmModel.RUNNING)) {
                 AlgorithmModel algoModel = (AlgorithmModel) evt.getSource();
                 refreshRunning(algoModel.isRunning());

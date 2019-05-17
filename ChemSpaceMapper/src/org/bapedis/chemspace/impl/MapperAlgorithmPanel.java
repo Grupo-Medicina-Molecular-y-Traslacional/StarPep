@@ -6,18 +6,15 @@
 package org.bapedis.chemspace.impl;
 
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.jdesktop.swingx.JXBusyLabel;
+import org.bapedis.core.ui.components.SimpleHTMLReport;
 import org.jdesktop.swingx.JXHyperlink;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
@@ -31,7 +28,6 @@ import org.openide.util.NbBundle;
 public class MapperAlgorithmPanel extends javax.swing.JPanel implements AlgorithmSetupUI, PropertyChangeListener {
 
     protected final JXHyperlink openWizardLink, scatter3DLink;
-    protected final JXBusyLabel busyLabel;
     protected MapperAlgorithm csMapper;
     protected final NetworkPanel networkPanel;
     protected final ClusterPanel clusterPanel;
@@ -54,7 +50,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         toolBar.add(scatter3DLink);
 
         toolBar.addSeparator();
-        
+
         openWizardLink = new JXHyperlink();
         configureOpenWizardLink();
         toolBar.add(openWizardLink);
@@ -62,20 +58,14 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         // Network panel
         networkPanel = new NetworkPanel();
         tab1.add(networkPanel, BorderLayout.CENTER);
-        
+
         // Cluster panel
         clusterPanel = new ClusterPanel();
         tab2.add(clusterPanel, BorderLayout.CENTER);
-        
+
         //Network report panel
         networkReport = new NetworkReportPanel();
         tab3.add(networkReport, BorderLayout.CENTER);
-        
-        //Busy label
-        busyLabel = new JXBusyLabel(new Dimension(20, 20));
-        busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        busyLabel.setText(NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.busyLabel.text"));
-        centerPanel.add(busyLabel, "busyCard");
 
         addAncestorListener(new AncestorListener() {
             @Override
@@ -109,6 +99,10 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 if (csMapper != null) {
                     WizardDescriptor wiz = MapperAlgorithmFactory.createWizardDescriptor(csMapper);
+                    
+                    //The image in the left sidebar of the wizard is set like this:
+                    //wiz.putProperty(WizardDescriptor.PROP_IMAGE, ImageUtilities.loadImage("org/demo/wizard/banner.PNG", true));
+
                     if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
                         MapperAlgorithmFactory.setUp(csMapper, wiz);
                     }
@@ -131,10 +125,12 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
             }
         });
     }
+    
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         this.csMapper = (MapperAlgorithm) algo;
+        
         networkPanel.setUp(csMapper);
         clusterPanel.setUp(csMapper);
         networkReport.setUp(csMapper);
@@ -146,10 +142,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         scatter3DLink.setEnabled(!busy);
         openWizardLink.setEnabled(!busy);
         topPanel.setEnabled(!busy);
-        busyLabel.setBusy(busy);
-        
-        CardLayout cl = (CardLayout)centerPanel.getLayout();
-        cl.show(centerPanel, busy? "busyCard": "tabCard");
+
     }
 
     public MapperAlgorithm getCheSMapper() {
@@ -220,7 +213,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (csMapper != null && evt.getSource().equals(csMapper)
-                && evt.getPropertyName().equals(MapperAlgorithm.RUNNING)) {            
+                && evt.getPropertyName().equals(MapperAlgorithm.RUNNING)) {
             clusterPanel.setupClusters();
             networkPanel.setupAxis();
             networkPanel.setupHistogram();

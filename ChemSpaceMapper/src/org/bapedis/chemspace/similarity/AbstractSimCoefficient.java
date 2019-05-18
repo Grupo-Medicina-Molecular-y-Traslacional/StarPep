@@ -25,12 +25,14 @@ import org.openide.util.Lookup;
  */
 public abstract class AbstractSimCoefficient implements Algorithm, Cloneable {
 
+    static protected final String PRO_CATEGORY = "Properties";
     protected ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected final AlgorithmFactory factory;
     protected Workspace workspace;
+    protected Peptide[] peptides;
     protected List<MolecularDescriptor> features;
     protected boolean stopRun;
-    protected Peptide peptide1, peptide2;
+    private Peptide peptide1, peptide2;
     private float similarityVal;
 
     public AbstractSimCoefficient(AlgorithmFactory factory) {
@@ -46,7 +48,7 @@ public abstract class AbstractSimCoefficient implements Algorithm, Cloneable {
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
         AttributesModel attrModel = pc.getAttributesModel(workspace);
-
+        peptides = attrModel.getPeptides().toArray(new Peptide[0]);
         features = new LinkedList<>();
         for (String key : attrModel.getMolecularDescriptorKeys()) {
             for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
@@ -62,7 +64,6 @@ public abstract class AbstractSimCoefficient implements Algorithm, Cloneable {
         similarityVal = -1;
     }
 
-
     public float getSimilarityValue() {
         if (similarityVal < 0 || similarityVal > 1) {
             throw new IllegalStateException("Unexpected similarity value: " + similarityVal);
@@ -77,6 +78,7 @@ public abstract class AbstractSimCoefficient implements Algorithm, Cloneable {
     @Override
     public void endAlgo() {
         workspace = null;
+        peptides = null;
         features = null;
         peptide1 = null;
         peptide2 = null;
@@ -96,13 +98,13 @@ public abstract class AbstractSimCoefficient implements Algorithm, Cloneable {
     @Override
     public void run() {
         try {
-            similarityVal = computeSimilarity();
+            similarityVal = computeSimilarity(peptide1, peptide2);
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }
     }
 
-    protected abstract float computeSimilarity() throws Exception;
+    protected abstract float computeSimilarity(Peptide peptide1, Peptide peptide2) throws Exception;
 
     @Override
     public Object clone() throws CloneNotSupportedException {

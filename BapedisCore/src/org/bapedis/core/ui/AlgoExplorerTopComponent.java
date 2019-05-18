@@ -594,6 +594,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 refreshCenterPanel(algoModel);
             } else if (evt.getPropertyName().equals(AlgorithmModel.RUNNING)) {
                 AlgorithmModel algoModel = (AlgorithmModel) evt.getSource();
+                refreshCenterPanel(algoModel);
                 refreshRunning(algoModel.isRunning());
             }
         }

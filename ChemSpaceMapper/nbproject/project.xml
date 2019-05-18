@@ -111,16 +111,26 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <public-packages>
-                <package>org.bapedis.chemspace.spi</package>
-            </public-packages>
+            <public-packages/>
+            <class-path-extension>
+                <runtime-relative-path>ext/j3dcore.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/j3dcore.jar</binary-origin>
+            </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/commons-math3-3.6.1.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/commons-math3-3.6.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>ext/jogamp-fat.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jogamp-fat.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/vecmath-1.5.2.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/vecmath-1.5.2.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/j3dutils.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/j3dutils.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

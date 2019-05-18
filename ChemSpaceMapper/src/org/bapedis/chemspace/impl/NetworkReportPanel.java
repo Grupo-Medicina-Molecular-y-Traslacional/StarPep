@@ -28,7 +28,6 @@ public class NetworkReportPanel extends javax.swing.JPanel {
     public void setUp(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
         this.netReport = csMapper.getNetworkReport();
-        this.netReport.setDimension(getPreferredSize());
         setupReport();
     }    
     
@@ -44,10 +43,10 @@ public class NetworkReportPanel extends javax.swing.JPanel {
     public String getReport() {
         String report = "<HTML> <BODY> <h1>" + NbBundle.getMessage(NetworkReport.class, "NetworkReport.name") + "</h1> "
                 + "<br /><br />"
-                + "<h2> Network settings </h2>"
-                + "<hr>"                
-                + csMapper.getSettingsReport()
-                + "<br /><br />"
+//                + "<h2> Network settings </h2>"
+//                + "<hr>"                
+//                + csMapper.getSettingsReport()
+//                + "<br /><br />"
                 + "<h2> Network measures </h2>"
                 + "<hr>"                
                 + netReport.getMeasureReport()

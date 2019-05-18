@@ -5,7 +5,6 @@
  */
 package org.bapedis.chemspace.impl;
 
-import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import org.bapedis.core.model.AlgorithmProperty;
@@ -32,7 +31,6 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.openide.util.Lookup;
-import org.openide.util.NbBundle;
 
 /**
  *
@@ -47,22 +45,12 @@ public class NetworkReport implements Algorithm {
     protected Peptide[] peptides;
     protected GraphModel graphModel;
     protected Graph mainGraph;
-    private Dimension dimension;
 
     private JFreeChart densityChart, modularityChart;
 
     public NetworkReport(NetworkReportFactory factory) {
         this.factory = factory;
-        dimension = new Dimension(0, 0);
-    }
-
-    public Dimension getDimension() {
-        return dimension;
-    }
-
-    public void setDimension(Dimension dimension) {
-        this.dimension = dimension;
-    }          
+    }       
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
@@ -126,7 +114,7 @@ public class NetworkReport implements Algorithm {
         XYSeriesCollection dataset = new XYSeriesCollection();
         XYSeries serieDensity = new XYSeries("Density");
 
-        for (float threshold = 0; threshold <= 1 && !stopRun; threshold += 0.05) {
+        for (float threshold = 0; threshold < 1.05 && !stopRun; threshold += 0.05) {
             serieDensity.add(threshold, calculateDensity(threshold));
         }
 
@@ -138,7 +126,7 @@ public class NetworkReport implements Algorithm {
         XYSeriesCollection dataset = new XYSeriesCollection();
         XYSeries serieModularity = new XYSeries("Modularity");
 
-        for (float threshold = 0; threshold <= 1 && !stopRun; threshold += 0.05) {
+        for (float threshold = 0; threshold < 1.05 && !stopRun; threshold += 0.05) {
             serieModularity.add(threshold, calculateModularity(threshold));
         }
 
@@ -245,7 +233,7 @@ public class NetworkReport implements Algorithm {
             try {
                 final ChartRenderingInfo info = new ChartRenderingInfo(new StandardEntityCollection());
                 File file = OSUtil.createTempFile(name, "-chart");;
-                imageFile = "<IMG SRC=\"file:" + file.getAbsolutePath() + "\" " + "WIDTH=\"" + dimension.width +"\" HEIGHT=\"" + dimension.height +"\" BORDER=\"0\" USEMAP=\"#chart\"></IMG>";
+                imageFile = "<IMG SRC=\"file:" + file.getAbsolutePath() + "\" " + "WIDTH=\"600\" HEIGHT=\"400\" BORDER=\"0\" USEMAP=\"#chart\"></IMG>";
                 ChartUtilities.saveChartAsPNG(file, chart, 600, 400, info);
             } catch (IOException e) {
             }

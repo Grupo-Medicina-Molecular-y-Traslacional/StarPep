@@ -8,18 +8,29 @@ package org.bapedis.chemspace.impl;
 import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import org.bapedis.chemspace.component.SpaceArffWritable;
+import org.bapedis.chemspace.component.VisualizePanel3D;
+import org.bapedis.core.io.MD_OUTPUT_OPTION;
+import org.bapedis.core.io.impl.MyArffWritable;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.ui.components.SimpleHTMLReport;
+import org.bapedis.core.util.ArffWriter;
 import org.jdesktop.swingx.JXHyperlink;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
+import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
+import weka.core.Instances;
 
 /**
  *
@@ -99,10 +110,9 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 if (csMapper != null) {
                     WizardDescriptor wiz = MapperAlgorithmFactory.createWizardDescriptor(csMapper);
-                    
+
                     //The image in the left sidebar of the wizard is set like this:
                     //wiz.putProperty(WizardDescriptor.PROP_IMAGE, ImageUtilities.loadImage("org/demo/wizard/banner.PNG", true));
-
                     if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
                         MapperAlgorithmFactory.setUp(csMapper, wiz);
                     }
@@ -121,16 +131,42 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         scatter3DLink.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
+                if (csMapper != null & csMapper.getPCATransformer().getXYZSpace() != null) {
+                    try {
+                        ArffWriter.DEBUG = true;
+                        SpaceArffWritable writable = new SpaceArffWritable(csMapper.getPCATransformer().getXYZSpace());
+                        File f = ArffWriter.writeToArffFile(writable);
+                        BufferedReader reader = new BufferedReader(new FileReader(f));
+                        Instances data = new Instances(reader);
 
+                        final VisualizePanel3D panel = new VisualizePanel3D();
+                        panel.setInstances(data, 1, 2, 3, 4);
+
+                        final JFrame frame = new JFrame("Scatter plot 3D");
+                        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+                            public void windowClosing(java.awt.event.WindowEvent e) {
+                                panel.freeResources();
+                                frame.dispose();
+                                System.exit(1);
+                            }
+                        });
+                        frame.setSize(800, 600);
+                        frame.setContentPane(panel);
+                        frame.setVisible(true);
+                    } catch (IOException ex) {
+                        Exceptions.printStackTrace(ex);
+                    } catch (Exception ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                }
             }
         });
     }
-    
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         this.csMapper = (MapperAlgorithm) algo;
-        
+
         networkPanel.setUp(csMapper);
         clusterPanel.setUp(csMapper);
         networkReport.setUp(csMapper);

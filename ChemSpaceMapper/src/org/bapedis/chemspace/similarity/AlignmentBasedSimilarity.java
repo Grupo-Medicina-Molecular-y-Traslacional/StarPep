@@ -5,6 +5,7 @@
  */
 package org.bapedis.chemspace.similarity;
 
+import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.spi.alg.impl.PairwiseSequenceAlignment;
 
@@ -29,7 +30,7 @@ public class AlignmentBasedSimilarity extends AbstractSimCoefficient{
     }                
 
     @Override
-    public float computeSimilarity() throws Exception {        
+    public float computeSimilarity(Peptide peptide1, Peptide peptide2) throws Exception {        
         return PairwiseSequenceAlignment.computeSequenceIdentity(peptide1.getBiojavaSeq(), peptide2.getBiojavaSeq(), alignmentModel);
     }
     

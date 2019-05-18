@@ -13,15 +13,14 @@ import org.bapedis.core.model.Peptide;
  *
  * @author loge
  */
-public class TanimotoCoefficient extends AbstractSimCoefficient {
-    protected int normalizationIndex = 1;
+public class TanimotoCoefficient extends NormalizableFunction {    
     
     public TanimotoCoefficient(TanimotoCoefficientFactory factory) {
        super(factory);
     }
            
     @Override
-    public float computeSimilarity() throws MolecularDescriptorNotFoundException {
+    public float computeSimilarity(Peptide peptide1, Peptide peptide2) throws MolecularDescriptorNotFoundException {
         double ab = 0.0;
         double a2 = 0.0;
         double b2 = 0.0;
@@ -36,14 +35,5 @@ public class TanimotoCoefficient extends AbstractSimCoefficient {
         return (float) ab / (float) (a2 + b2 - ab);
     }
     
-    private double normalizedValue(Peptide peptide, MolecularDescriptor attr) throws MolecularDescriptorNotFoundException {
-        switch (normalizationIndex) {
-            case 0:
-                return Math.abs(attr.getNormalizedZscoreValue(peptide));
-            case 1:
-                return attr.getNormalizedMinMaxValue(peptide);
-        }
-        throw new IllegalArgumentException("Unknown value for normalization index: " + normalizationIndex);
-    }     
-    
+
 }

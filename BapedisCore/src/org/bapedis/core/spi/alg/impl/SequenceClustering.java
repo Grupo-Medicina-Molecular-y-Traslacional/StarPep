@@ -32,6 +32,7 @@ public class SequenceClustering extends AbstractClusterizer {
         super(factory);
         alignmentModel = new SequenceAlignmentModel();
         clusterMap = new HashMap<>();
+        preprocessing = false;
     }
 
     public SequenceAlignmentModel getAlignmentModel() {

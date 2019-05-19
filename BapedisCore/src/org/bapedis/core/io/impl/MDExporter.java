@@ -132,7 +132,7 @@ public class MDExporter implements Exporter {
                     get();
                 } catch (InterruptedException | ExecutionException ex) {
                     if (ex.getCause() instanceof MolecularDescriptorNotFoundException) {
-                        NotifyDescriptor errorND = ((MolecularDescriptorNotFoundException) ex.getCause()).getErrorND();
+                        NotifyDescriptor errorND = ((MolecularDescriptorNotFoundException) ex.getCause()).getErrorNotifyDescriptor();
                         DialogDisplayer.getDefault().notify(errorND);
                     } else {
                         Exceptions.printStackTrace(ex);

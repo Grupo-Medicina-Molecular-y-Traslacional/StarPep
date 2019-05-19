@@ -14,6 +14,7 @@ import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Cluster;
 import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.MolecularDescriptor;
+import org.bapedis.core.model.MolecularDescriptorException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Workspace;
@@ -24,6 +25,7 @@ import org.bapedis.core.task.ProgressTicket;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.Table;
+import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
 
 /**
@@ -45,10 +47,12 @@ public abstract class AbstractClusterizer implements Algorithm, Cloneable {
     protected final ProjectManager pc;
     private GraphVizSetting graphViz;
     protected GraphModel graphModel;
+    protected boolean preprocessing;
 
     public AbstractClusterizer(AlgorithmFactory factory) {
         this.factory = factory;
         pc = Lookup.getDefault().lookup(ProjectManager.class);
+        preprocessing = true;
     }
 
     public Peptide[] getPeptides() {
@@ -63,11 +67,24 @@ public abstract class AbstractClusterizer implements Algorithm, Cloneable {
         return clusters;
     }
 
+    public boolean isPreprocessing() {
+        return preprocessing;
+    }
+
+    public void setPreprocessing(boolean preprocessing) {
+        this.preprocessing = preprocessing;
+    }        
+
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
-        if (peptides == null) {
-            attrModel = pc.getAttributesModel(workspace);
+        stopRun = false;
+        ticket = progressTicket;
+        clusters = null;
+        graphModel = pc.getGraphModel(workspace);
+        graphViz = pc.getGraphVizSetting(workspace);  
+        attrModel = pc.getAttributesModel(workspace);
+        if (peptides == null) {            
             if (attrModel != null) {
                 peptides = attrModel.getPeptides().toArray(new Peptide[0]);
                 attrModel.removeDisplayedColumn(CLUSTER_ATTR);
@@ -79,13 +96,18 @@ public abstract class AbstractClusterizer implements Algorithm, Cloneable {
                     }
                 }
                 features = allFeatures.toArray(new MolecularDescriptor[0]);
+
+                if (preprocessing) {
+                    try {
+                        MolecularDescriptor.preprocessing(allFeatures, attrModel.getPeptides());
+                    } catch (MolecularDescriptorException ex) {
+                        DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
+                        pc.reportError(ex.getMessage(), workspace);
+                        cancel();
+                    }
+                }
             }
         }
-        stopRun = false;
-        ticket = progressTicket;
-        clusters = null;
-        graphModel = pc.getGraphModel(workspace);
-        graphViz = pc.getGraphVizSetting(workspace);
     }
 
     @Override
@@ -152,7 +174,7 @@ public abstract class AbstractClusterizer implements Algorithm, Cloneable {
 
     @Override
     public void run() {
-        if (peptides != null && peptides.length > 0) {
+        if (peptides != null && peptides.length > 0 && !stopRun) {
             List<Cluster> clusterList = cluterize();
 
             if (clusterList != null) {

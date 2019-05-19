@@ -19,7 +19,7 @@ import org.bapedis.chemspace.similarity.AlignmentBasedSimilarityFactory;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
-import org.bapedis.core.model.MolecularDescriptorNotFoundException;
+import org.bapedis.core.model.MolecularDescriptorException;
 import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
@@ -35,7 +35,6 @@ import org.bapedis.core.spi.alg.impl.NonRedundantSetAlgFactory;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -47,8 +46,6 @@ public class MapperAlgorithm implements Algorithm {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     public static final String RUNNING = "running";
-
-    protected final NotifyDescriptor notEnoughFeatures;
 
     private final MapperAlgorithmFactory factory;
     protected final PropertyChangeSupport propertyChangeSupport;
@@ -85,8 +82,7 @@ public class MapperAlgorithm implements Algorithm {
         fsOption = FeatureSelectionOption.NO;
 
         //Mapping algorithms
-        nrdAlg = (NonRedundantSetAlg) new NonRedundantSetAlgFactory().createAlgorithm();
-        nrdAlg.setWorkspaceInput(true);        
+        nrdAlg = (NonRedundantSetAlg) new NonRedundantSetAlgFactory().createAlgorithm();               
         featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
         featureSelectionAlg = (FeatureSEFiltering) new FeatureSEFilteringFactory().createAlgorithm();
         clusteringAlg = (AbstractClusterizer) new EMFactory().createAlgorithm();
@@ -94,9 +90,7 @@ public class MapperAlgorithm implements Algorithm {
 
         pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
         networkAlg = (NetworkEmbedderAlg) new NetworkEmbedderFactory().createAlgorithm();
-        networkReport = (NetworkReport) new NetworkReportFactory().createAlgorithm();
-
-        notEnoughFeatures = new NotifyDescriptor.Message(NbBundle.getMessage(MapperAlgorithm.class, "MapperAlgorithm.features.notEnoughHTML"), NotifyDescriptor.ERROR_MESSAGE);
+        networkReport = (NetworkReport) new NetworkReportFactory().createAlgorithm();        
     }
 
     public boolean isRunning() {
@@ -151,8 +145,8 @@ public class MapperAlgorithm implements Algorithm {
     }
     
     private String getSimCoefficientSettings(){
-        StringBuilder reportBuilder = new StringBuilder(String.format("<b> Similarity coefficient</b> (%s)<br />", simCoefficientAlg.getFactory().getName()));
-        return reportBuilder.toString();
+        String reportBuilder = String.format("<b> Similarity coefficient</b> (%s)<br />", simCoefficientAlg.getFactory().getName());
+        return reportBuilder;
     }    
     
     @Override
@@ -169,6 +163,7 @@ public class MapperAlgorithm implements Algorithm {
         //Non-redundant set
         if (nrdOption == RemovingRedundantOption.YES && !stopRun) {
             if (nrdAlg != null) {
+                nrdAlg.setWorkspaceInput(true); 
                 currentAlg = nrdAlg;
                 execute();
             } else {
@@ -205,38 +200,20 @@ public class MapperAlgorithm implements Algorithm {
                     allFeatures.add(attr);
                 }
             }
-
-            // Check feature list size
-            if (allFeatures.size() < ProjectManager.MIN_AVAILABLE_FEATURES) {
-                DialogDisplayer.getDefault().notify(notEnoughFeatures);
-                pc.reportError(NbBundle.getMessage(NetworkEmbedderAlg.class, "MapperAlgorithm.features.notEnough"), workspace);
-                cancel();
-            }
         }
 
         // Preprocessing of feature list. Compute max, min, mean and std
         try {
-            for (MolecularDescriptor attr : allFeatures) {
-                attr.resetSummaryStats(attrModel.getPeptides());
-            }
-
-            // Validate molecular features
-            for (MolecularDescriptor attr : allFeatures) {
-                if (attr.getMax() == attr.getMin()) {
-                    NotifyDescriptor invalidFeature = new NotifyDescriptor.Message(NbBundle.getMessage(NetworkEmbedderAlg.class, "MapperAlgorithm.features.invalidFeatureHTML", attr.getDisplayName()), NotifyDescriptor.ERROR_MESSAGE);
-                    DialogDisplayer.getDefault().notify(invalidFeature);
-                    pc.reportError(NbBundle.getMessage(NetworkEmbedderAlg.class, "MapperAlgorithm.features.invalidFeature", attr.getDisplayName()), workspace);
-                    cancel();
-                }
-            }
-        } catch (MolecularDescriptorNotFoundException ex) {
-            DialogDisplayer.getDefault().notify(ex.getErrorND());
+            MolecularDescriptor.preprocessing(allFeatures, attrModel.getPeptides());
+        } catch (MolecularDescriptorException ex) {
+            DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
             pc.reportError(ex.getMessage(), workspace);
             cancel();
         }
 
         // Clustering
-        if (clusteringAlg != null && !stopRun) {
+        if (!stopRun) {
+            clusteringAlg.setPreprocessing(false);
             currentAlg = clusteringAlg;
             execute();
         } else {

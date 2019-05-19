@@ -7,6 +7,10 @@ package org.bapedis.core.model;
 
 import java.util.Arrays;
 import java.util.List;
+import org.bapedis.core.project.ProjectManager;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -100,6 +104,25 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
     
     public double getDoubleValue(Peptide peptide) throws MolecularDescriptorNotFoundException{
         return getDoubleValue(peptide, this);
+    }
+    
+    public static void preprocessing(List<MolecularDescriptor> allFeatures, List<Peptide> peptides) throws MolecularDescriptorException{
+            // Check feature list size
+            if (allFeatures.size() < ProjectManager.MIN_AVAILABLE_FEATURES) {
+                throw new MolecularDescriptorNotEnoughException();
+            }
+            
+            for (MolecularDescriptor attr : allFeatures) {
+                attr.resetSummaryStats(peptides);
+            }
+
+            // Validate molecular features
+            for (MolecularDescriptor attr : allFeatures) {
+                if (attr.getMax() == attr.getMin()) {
+                    throw new MolecularDescriptorConstantException(attr);
+                }
+            }            
+    
     }
 
     public static double getDoubleValue(Peptide pept, MolecularDescriptor attribute) throws MolecularDescriptorNotFoundException {

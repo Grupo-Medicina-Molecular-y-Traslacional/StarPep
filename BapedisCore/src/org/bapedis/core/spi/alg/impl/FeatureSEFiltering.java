@@ -408,8 +408,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
             pc.reportMsg("\nTotal of removed features: " + removed, workspace);
             pc.reportMsg("\nTotal of remaining features: " + count, workspace);
         } catch (MolecularDescriptorNotFoundException ex) {
-            NotifyDescriptor errorND = ex.getErrorND();
-            DialogDisplayer.getDefault().notify(errorND);
+            DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
             pc.reportError(ex.getMessage(), workspace);
         }
     }

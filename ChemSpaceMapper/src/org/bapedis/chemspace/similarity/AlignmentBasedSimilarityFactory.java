@@ -5,6 +5,7 @@
  */
 package org.bapedis.chemspace.similarity;
 
+import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.spi.alg.SimilarityTag;
@@ -36,7 +37,7 @@ public class AlignmentBasedSimilarityFactory implements SimilarityTag {
     }
 
     @Override
-    public AbstractSimCoefficient createAlgorithm() {
+    public Algorithm createAlgorithm() {
         return new AlignmentBasedSimilarity(this);
     }
 

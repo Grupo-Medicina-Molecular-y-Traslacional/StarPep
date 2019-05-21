@@ -18,8 +18,11 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
+ * Ref: Ulrik Brandes, A Faster Algorithm for Betweenness Centrality, in Journal
+ * of Mathematical Sociology 25(2):163-177, (2001)
  *
- * @author loge
+ * @author pjmcswee
+ * @author Jonny Wray
  */
 public class BetweenessCentrality extends AbstractCentrality {
 

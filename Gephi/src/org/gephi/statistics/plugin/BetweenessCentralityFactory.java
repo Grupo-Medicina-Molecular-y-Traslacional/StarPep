@@ -21,17 +21,17 @@ public class BetweenessCentralityFactory implements AlgorithmFactory, NetworkTag
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(GraphDistanceBuilder.class, "BetweenessCentrality.name");
+        return NbBundle.getMessage(BetweenessCentralityFactory.class, "BetweenessCentrality.name");
     }
 
     @Override
     public String getCategory() {
-        return NbBundle.getMessage(GraphDistanceBuilder.class, "Measure.category");
+        return NbBundle.getMessage(BetweenessCentralityFactory.class, "Measure.category");
     }
 
     @Override
     public String getDescription() {
-       return NbBundle.getMessage(GraphDistanceBuilder.class, "BetweenessCentrality.desc");
+       return NbBundle.getMessage(BetweenessCentralityFactory.class, "BetweenessCentrality.desc");
     }
 
     @Override

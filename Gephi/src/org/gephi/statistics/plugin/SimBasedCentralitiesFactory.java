@@ -51,21 +51,21 @@ import org.openide.util.NbBundle;
  * @author pjmcswee
  */
 
-public class GraphDistanceBuilder implements AlgorithmFactory {
+public class SimBasedCentralitiesFactory implements AlgorithmFactory {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(GraphDistanceBuilder.class, "GraphDistance.centralities.name");
+        return NbBundle.getMessage(SimBasedCentralitiesFactory.class, "GraphDistance.centralities.name");
     }
 
     @Override
     public String getCategory() {
-        return NbBundle.getMessage(GraphDistanceBuilder.class, "Measure.category");
+        return NbBundle.getMessage(SimBasedCentralitiesFactory.class, "Measure.category");
     }
 
     @Override
     public String getDescription() {
-       return NbBundle.getMessage(GraphDistanceBuilder.class, "GraphDistance.centralities.desc");
+       return NbBundle.getMessage(SimBasedCentralitiesFactory.class, "GraphDistance.centralities.desc");
     }
 
     @Override
@@ -75,7 +75,7 @@ public class GraphDistanceBuilder implements AlgorithmFactory {
 
     @Override
     public Algorithm createAlgorithm() {
-        return new GraphDistance(this);
+        return new SimBasedCentralities(this);
     }
 
 }

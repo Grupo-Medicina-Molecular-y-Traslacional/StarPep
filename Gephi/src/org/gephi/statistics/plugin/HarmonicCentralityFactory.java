@@ -44,28 +44,30 @@ package org.gephi.statistics.plugin;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.NetworkTag;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author pjmcswee
  */
-
-public class SimBasedCentralitiesFactory implements AlgorithmFactory {
+@ServiceProvider(service=AlgorithmFactory.class)
+public class HarmonicCentralityFactory implements NetworkTag {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(SimBasedCentralitiesFactory.class, "GraphDistance.centralities.name");
+        return NbBundle.getMessage(HarmonicCentralityFactory.class, "HarmonicCentrality.name");
     }
 
     @Override
     public String getCategory() {
-        return NbBundle.getMessage(SimBasedCentralitiesFactory.class, "Measure.category");
+        return NbBundle.getMessage(HarmonicCentralityFactory.class, "Measure.category");
     }
 
     @Override
     public String getDescription() {
-       return NbBundle.getMessage(SimBasedCentralitiesFactory.class, "GraphDistance.centralities.desc");
+       return NbBundle.getMessage(HarmonicCentralityFactory.class, "HarmonicCentrality.desc");
     }
 
     @Override
@@ -75,7 +77,7 @@ public class SimBasedCentralitiesFactory implements AlgorithmFactory {
 
     @Override
     public Algorithm createAlgorithm() {
-        return new SimBasedCentralities(this);
+        return new HarmonicCentrality(this);
     }
 
 }

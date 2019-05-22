@@ -26,7 +26,9 @@ public class AlgorithmNode extends AbstractNode {
         super(Children.LEAF);
         this.algorithm = algorithm;
         setName(algorithm.getFactory().getName());
+        setShortDescription(algorithm.getFactory().getDescription());
     }
+        
 
     @Override
     public PropertySet[] getPropertySets() {

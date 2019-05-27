@@ -8,7 +8,7 @@ import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import org.bapedis.chemspace.distance.AbstractDistance;
-import org.bapedis.core.model.SimilarityMatrix;
+import org.bapedis.chemspace.model.SimilarityMatrix;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.task.ProgressTicket;
 

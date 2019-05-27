@@ -31,9 +31,9 @@ public class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
     static final String CHANGED_THRESHOLD = "changed_threshold";
     private final AtomicBoolean stopRun;
     private final ProgressTicket ticket;
-    private final float newThreshold, currentThreshold;
+    private final double newThreshold, currentThreshold;
 
-    public NetworkThresholdUpdater(float newThreshold, float currentThreshold) {
+    public NetworkThresholdUpdater(double newThreshold, double currentThreshold) {
         this.newThreshold = newThreshold;
         this.currentThreshold = currentThreshold;
         stopRun = new AtomicBoolean(false);

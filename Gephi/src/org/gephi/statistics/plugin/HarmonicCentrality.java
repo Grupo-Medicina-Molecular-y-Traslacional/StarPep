@@ -123,9 +123,9 @@ public class HarmonicCentrality extends AbstractCentrality {
     }
 
     protected double getEdgeWeight(Edge edge) {
-        Object val = edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
+        Object val = edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE);
         if (val != null) {
-            return 1 - (double) val;
+            return (double) val;
         }
         return Double.POSITIVE_INFINITY;
     }
@@ -203,10 +203,6 @@ public class HarmonicCentrality extends AbstractCentrality {
         }
     }
 
-    protected void calculateCentrality(int s_index) {
-
-    }
-
     @Override
     public void endAlgo() {
 
@@ -272,6 +268,7 @@ public class HarmonicCentrality extends AbstractCentrality {
 //        ChartUtils.scaleChart(chart, dSeries, isNormalized);
 //        return ChartUtils.renderChart(chart, pName + ".png");
 //    }    
+    
     class NodeComparator implements Comparator<Node> {
 
         private final double[] d;

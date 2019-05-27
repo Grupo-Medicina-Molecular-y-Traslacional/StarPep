@@ -80,7 +80,7 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
         this.csMapper = csMapper;
         netEmbedder = csMapper.getNetworkEmbedderAlg();
 
-        float similarityThreshold = netEmbedder.getSimilarityThreshold();
+        double similarityThreshold = netEmbedder.getSimilarityThreshold();
         jCutoffCurrentValue.setText(formatter.format(similarityThreshold));
         cutoffSlider.setValue((int) (similarityThreshold * 100));
         jCutoffNewLabel.setVisible(false);
@@ -107,14 +107,14 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
     public void setupHistogram() {
         histogramPanel.removeAll();
         histogramPanel.setBorder(null);
-        JQuickHistogram histogram = netEmbedder.getHistogram();
-        if (!csMapper.isRunning() && histogram != null) {
-            histogramPanel.add(histogram.createChartPanel(), BorderLayout.CENTER);
-            histogramPanel.setBorder(BorderFactory.createTitledBorder(NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.histogramPanel.borderTitle")));
-        }
+//        JQuickHistogram histogram = netEmbedder.getHistogram();
+//        if (!csMapper.isRunning() && histogram != null) {
+//            histogramPanel.add(histogram.createChartPanel(), BorderLayout.CENTER);
+//            histogramPanel.setBorder(BorderFactory.createTitledBorder(NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.histogramPanel.borderTitle")));
+//        }
         histogramPanel.revalidate();
         histogramPanel.repaint();
-        resetTooltip(histogram);
+//        resetTooltip(histogram);
     }
 
     private void resetTooltip(JQuickHistogram histogram) {
@@ -142,7 +142,7 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
         }
     }
 
-    private void thresholdChanged(float value) {
+    private void thresholdChanged(double value) {
         netEmbedder.setSimilarityThreshold(value);
         jCutoffCurrentValue.setText(formatter.format(value));
         jCutoffNewLabel.setVisible(false);
@@ -507,7 +507,7 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(NetworkThresholdUpdater.CHANGED_THRESHOLD)) {
             setRunning(false);
-            thresholdChanged((float) evt.getNewValue());
+            thresholdChanged((double) evt.getNewValue());
         }else if (evt.getPropertyName().equals(NetworkCoordinateUpdater.UPDATED_POSITIONS)){
             setRunning(false);
         }

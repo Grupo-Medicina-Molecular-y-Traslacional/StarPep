@@ -84,6 +84,9 @@ public class ProjectManager implements Lookup.Provider {
     public static final String EDGE_TABLE_PRO_SIMILARITY = "similarity";
     public static final String EDGE_TABLE_PRO_SIMILARITY_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.similarity.title");
 
+    public static final String EDGE_TABLE_PRO_DISTANCE = "distance";
+    public static final String EDGE_TABLE_PRO_DISTANCE_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.distance.title");
+    
     final String OUTPUT_ID = "output";
     TopComponent outputWindow;
 
@@ -374,6 +377,10 @@ public class ProjectManager implements Lookup.Provider {
         if (!edgeTable.hasColumn(EDGE_TABLE_PRO_SIMILARITY)) {
             edgeTable.addColumn(EDGE_TABLE_PRO_SIMILARITY, EDGE_TABLE_PRO_SIMILARITY_TITLE, Double.class, Origin.DATA, null, false);
         }
+        if (!edgeTable.hasColumn(EDGE_TABLE_PRO_DISTANCE)) {
+            edgeTable.addColumn(EDGE_TABLE_PRO_DISTANCE, EDGE_TABLE_PRO_DISTANCE_TITLE, Double.class, Origin.DATA, null, false);
+        }
+        
     }
 
     public synchronized QueryModel getQueryModel() {

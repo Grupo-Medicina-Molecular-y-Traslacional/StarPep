@@ -7,10 +7,10 @@ package org.bapedis.chemspace.impl;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
+import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.core.model.SimilarityMatrix;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.task.ProgressTicket;
-import org.bapedis.chemspace.similarity.AbstractSimCoefficient;
 
 /**
  *
@@ -22,7 +22,7 @@ class SimilarityMatrixBuilder extends RecursiveAction {
     private static float MIN_VALUE = 0.7f;
     private Peptide[] peptides;
     private ProgressTicket progressTicket;
-    private AbstractSimCoefficient similarityMeasure;
+    private AbstractDistance distFunc;
     private AtomicBoolean stopRun;    
     
     private final SimilarityMatrix matrix;
@@ -34,8 +34,8 @@ class SimilarityMatrixBuilder extends RecursiveAction {
         this(peptides, new SimilarityMatrix(peptides), 0, peptides.length, 0, peptides.length);   
     }
 
-    void setContext(AbstractSimCoefficient similarityMeasure, ProgressTicket progressTicket, AtomicBoolean stopRun) {        
-        this.similarityMeasure = similarityMeasure;
+    void setContext(AbstractDistance distFunc, ProgressTicket progressTicket, AtomicBoolean stopRun) {        
+        this.distFunc = distFunc;
         this.progressTicket = progressTicket;        
         this.stopRun = stopRun;
     }
@@ -75,34 +75,34 @@ class SimilarityMatrixBuilder extends RecursiveAction {
                 int middle = ylow + (yhigh - ylow) / 2;
                 // up and down
                 SimilarityMatrixBuilder up = new SimilarityMatrixBuilder(peptides, matrix, xlow, xhigh, ylow, middle);
-                up.setContext(similarityMeasure, progressTicket, stopRun);
+                up.setContext(distFunc, progressTicket, stopRun);
                 SimilarityMatrixBuilder down = new SimilarityMatrixBuilder(peptides, matrix, xlow, xhigh, middle, yhigh);
-                down.setContext(similarityMeasure, progressTicket, stopRun);
+                down.setContext(distFunc, progressTicket, stopRun);
                 invokeAll(up, down);
             }
         } else if (!stopRun.get()) {
             int middle = xlow + (xhigh - xlow) / 2;
             // left and right            
             SimilarityMatrixBuilder left = new SimilarityMatrixBuilder(peptides, matrix, xlow, middle, ylow, yhigh);
-            left.setContext(similarityMeasure, progressTicket, stopRun);
+            left.setContext(distFunc, progressTicket, stopRun);
             SimilarityMatrixBuilder right = new SimilarityMatrixBuilder(peptides, matrix, middle, xhigh, ylow, yhigh);        
-            right.setContext(similarityMeasure, progressTicket, stopRun);
+            right.setContext(distFunc, progressTicket, stopRun);
             invokeAll(left, right);
         }
     }
 
     private void computeDirectly() {
-        float score;
+        double distance, similarity;
         for (int y = ylow; y < yhigh; y++) {
             for (int x = xlow; x < Math.min(xhigh, y); x++) {
                 if (!stopRun.get()) {
                     try {
-                        similarityMeasure.setPeptidesToCompare(peptides[y], peptides[x]);
-                        similarityMeasure.run();
-                        score = similarityMeasure.getSimilarityValue();
-                        if (score >= MIN_VALUE) {
-                            matrix.setValue(peptides[y], peptides[x], score);
-                        }
+//                        similarityMeasure.setPeptidesToCompare(peptides[y], peptides[x]);
+//                        similarityMeasure.run();
+//                        score = similarityMeasure.getSimilarityValue();
+//                        if (score >= MIN_VALUE) {
+//                            matrix.setValue(peptides[y], peptides[x], score);
+//                        }
                         progressTicket.progress();
                     } catch(Exception ex){
                         stopRun.set(true);

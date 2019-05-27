@@ -89,7 +89,7 @@ public class ClusterPanel extends JComponent implements PropertyChangeListener {
 
     public void setUp(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
-        this.clusteringAlg = csMapper.getClusteringAlg();
+//        this.clusteringAlg = csMapper.getClusteringAlg();
         setupClusters();
     }
 

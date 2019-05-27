@@ -10,24 +10,24 @@ import java.beans.PropertyChangeListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
+import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
-import org.bapedis.chemspace.similarity.AbstractSimCoefficient;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
-public class WizardSimCoefficient implements WizardDescriptor.ValidatingPanel<WizardDescriptor>,
+public class WizardDistanceFunc implements WizardDescriptor.ValidatingPanel<WizardDescriptor>,
         PropertyChangeListener {
 
     private final MapperAlgorithm csMapper;
-    private AbstractSimCoefficient alg;
+    private AbstractDistance alg;
     private final EventListenerList listeners = new EventListenerList();
     private boolean isValid;
     private WizardDescriptor model;
 
-    public WizardSimCoefficient(MapperAlgorithm csMapper) {
+    public WizardDistanceFunc(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
         isValid = true;
     }
@@ -36,19 +36,19 @@ public class WizardSimCoefficient implements WizardDescriptor.ValidatingPanel<Wi
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private VisualSimCoefficient component;
+    private VisualDistanceFunc component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public VisualSimCoefficient getComponent() {
+    public VisualDistanceFunc getComponent() {
         if (component == null) {
             try {                
-                alg = (AbstractSimCoefficient) csMapper.getSimCoefficientAlg().clone();
-                component = new VisualSimCoefficient();
-                component.setSimilarityCoefficient(alg);
+                alg = (AbstractDistance) csMapper.getDistanceFunction().clone();
+                component = new VisualDistanceFunc();
+                component.setDistanceFunction(alg);
                 component.addPropertyChangeListener(this);
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
@@ -91,30 +91,30 @@ public class WizardSimCoefficient implements WizardDescriptor.ValidatingPanel<Wi
         // use wiz.getProperty to retrieve previous panel state  
         this.model = wiz;
         this.model = wiz;
-        alg = (AbstractSimCoefficient) wiz.getProperty(AbstractSimCoefficient.class.getName());
+        alg = (AbstractDistance) wiz.getProperty(AbstractDistance.class.getName());
         if (alg != null) {
-            getComponent().setSimilarityCoefficient(alg);
+            getComponent().setDistanceFunction(alg);
         }
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        alg = component.getSimilarityCoefficient();
-        wiz.putProperty(AbstractSimCoefficient.class.getName(), alg);
+        alg = component.getDistanceFunction();
+        wiz.putProperty(AbstractDistance.class.getName(), alg);
     }
 
     @Override
     public void validate() throws WizardValidationException {
-        if (getComponent().getSimilarityCoefficient() == null) {
+        if (getComponent().getDistanceFunction()== null) {
             isValid = false;
-            throw new WizardValidationException(null, NbBundle.getMessage(WizardSimCoefficient.class, "SimCoefficient.invalid.text"), null);
+            throw new WizardValidationException(null, NbBundle.getMessage(WizardDistanceFunc.class, "DistanceFunction.invalid.text"), null);
         }
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(VisualSimCoefficient.NETWORK_FACTORY)) {
+        if (evt.getPropertyName().equals(VisualDistanceFunc.DISTANCE_FUNCTION)) {
             boolean oldState = isValid;
             isValid = evt.getNewValue() != null;
             if (oldState != isValid) {

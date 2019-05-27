@@ -3,45 +3,46 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.similarity;
+package org.bapedis.clustering.impl;
 
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.SimilarityTag;
+import org.bapedis.core.spi.alg.ClusteringTag;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
- * @author Loge
+ * @author loge
  */
-@ServiceProvider(service = AlgorithmFactory.class)
-public class DistanceBasedSimilarityFactory implements SimilarityTag {
+@ServiceProvider(service = AlgorithmFactory.class, position = 40)
+public class EMFactory implements ClusteringTag {
 
+    
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(EM.class, "EM.category");
     }
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(DistanceBasedSimilarity.class,"DistanceBasedSimilarity.name");
+         return NbBundle.getMessage(EM.class, "EM.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(DistanceBasedSimilarity.class,"DistanceBasedSimilarity.desc");
+         return NbBundle.getMessage(EM.class, "EM.desc");
     }
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        return null;                
+        return null;
     }
 
     @Override
     public Algorithm createAlgorithm() {
-        return new DistanceBasedSimilarity(this);
+        return new EM(this);
     }
     
 }

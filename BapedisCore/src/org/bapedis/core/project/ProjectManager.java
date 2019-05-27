@@ -372,7 +372,7 @@ public class ProjectManager implements Lookup.Provider {
             edgeTable.addColumn(EDGE_TABLE_PRO_XREF, EDGE_TABLE_PRO_XREF_TITLE, String[].class, Origin.DATA, new String[]{}, false);
         }
         if (!edgeTable.hasColumn(EDGE_TABLE_PRO_SIMILARITY)) {
-            edgeTable.addColumn(EDGE_TABLE_PRO_SIMILARITY, EDGE_TABLE_PRO_SIMILARITY_TITLE, Float.class, Origin.DATA, null, false);
+            edgeTable.addColumn(EDGE_TABLE_PRO_SIMILARITY, EDGE_TABLE_PRO_SIMILARITY_TITLE, Double.class, Origin.DATA, null, false);
         }
     }
 

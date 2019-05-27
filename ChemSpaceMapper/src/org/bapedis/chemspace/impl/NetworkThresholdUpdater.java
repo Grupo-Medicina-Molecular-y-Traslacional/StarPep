@@ -74,7 +74,7 @@ public class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
         Graph graph = graphModel.getGraphVisible();
         
         Node node1, node2;
-        float similarity;
+        double similarity;
         int relType = graph.getModel().getEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
         if (newThreshold < currentThreshold) { // to add edges 
             Edge graphEdge;
@@ -85,7 +85,7 @@ public class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
                     if (graph.contains(node1) && graph.contains(node2)) {
                         graphEdge = mainGraph.getEdge(node2, node1, relType);
                         if (graphEdge != null) {
-                            similarity = (float) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
+                            similarity = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
                             if (similarity >= newThreshold && similarity < currentThreshold) {
                                 graph.writeLock();
                                 try {
@@ -102,7 +102,7 @@ public class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
             graph.writeLock();
             try {
                 for (Edge edge : graph.getEdges()) {
-                    similarity = (float) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
+                    similarity = (double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
                     if (similarity < newThreshold) {
                         graph.removeEdge(edge);
                     }

@@ -45,9 +45,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.Stack;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.Workspace;
@@ -124,12 +122,12 @@ public class HarmonicCentrality extends AbstractCentrality {
         return properties.toArray(new AlgorithmProperty[0]);
     }
 
-    protected float getEdgeWeight(Edge edge) {
+    protected double getEdgeWeight(Edge edge) {
         Object val = edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
         if (val != null) {
-            return 1 - (float) val;
+            return 1 - (double) val;
         }
-        return Float.POSITIVE_INFINITY;
+        return Double.POSITIVE_INFINITY;
     }
 
     @Override

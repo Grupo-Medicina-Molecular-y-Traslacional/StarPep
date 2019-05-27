@@ -139,7 +139,7 @@ public class NetworkReport implements Algorithm {
         float edgeCount = 0;
         Node node1, node2;
         Edge graphEdge;
-        float similarity;
+        double similarity;
         int relType = graphModel.getEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
         for (int i = 0; i < peptides.length; i++) {
             node1 = peptides[i].getGraphNode();
@@ -147,7 +147,7 @@ public class NetworkReport implements Algorithm {
                 node2 = peptides[j].getGraphNode();
                 graphEdge = mainGraph.getEdge(node1, node2, relType);
                 if (graphEdge != null) {
-                    similarity = (float) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
+                    similarity = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
                     if (similarity >= threshold) {
                         edgeCount++;
                     }
@@ -164,7 +164,7 @@ public class NetworkReport implements Algorithm {
         int cluster1, cluster2;
         float degree1, degree2;
         Edge graphEdge;
-        float similarity;
+        double similarity;
         int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
 
         //Edge count
@@ -174,7 +174,7 @@ public class NetworkReport implements Algorithm {
                 node2 = peptides[j].getGraphNode();
                 graphEdge = mainGraph.getEdge(node1, node2, relType);
                 if (graphEdge != null) {
-                    similarity = (float) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
+                    similarity = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
                     if (similarity >= threshold) {
                         edgeCount++;
                     }
@@ -189,7 +189,7 @@ public class NetworkReport implements Algorithm {
             for (int j = i + 1; j < peptides.length; j++) {
                 node2 = peptides[j].getGraphNode();
                 graphEdge = mainGraph.getEdge(node1, node2, relType);
-                similarity = (graphEdge != null) ? (float) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY) : -1;
+                similarity = (graphEdge != null) ? (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY) : -1;
                 cluster1 = (int) node1.getAttribute(AbstractClusterizer.CLUSTER_COLUMN);
                 cluster2 = (int) node2.getAttribute(AbstractClusterizer.CLUSTER_COLUMN);
                 if (cluster1 > -1 && cluster2 > -1 && cluster1 == cluster2) {
@@ -207,9 +207,9 @@ public class NetworkReport implements Algorithm {
     private float calculateDegree(Node graphNode, int relType, float threshold) {
         float degree = 0;
         EdgeIterable relationships = mainGraph.getEdges(graphNode, relType);
-        float similarity;
+        double similarity;
         for (Edge graphEdge : relationships) {
-            similarity = (float) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
+            similarity = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
             if (similarity >= threshold) {
                 degree++;
             }

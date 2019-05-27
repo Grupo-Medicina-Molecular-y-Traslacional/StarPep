@@ -6,10 +6,10 @@
 package org.bapedis.chemspace.impl;
 
 import java.text.MessageFormat;
+import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.FeatureSelectionOption;
 import org.bapedis.chemspace.model.RemovingRedundantOption;
-import org.bapedis.chemspace.similarity.AbstractSimCoefficient;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
@@ -19,7 +19,6 @@ import org.bapedis.core.spi.alg.impl.AbstractClusterizer;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
-import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
@@ -90,13 +89,9 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
             }
         }
 
-        // Clustering
-        AbstractClusterizer clutering = (AbstractClusterizer) wiz.getProperty(AbstractClusterizer.class.getName());
-        csMapper.setClusteringAlg(clutering);
-
         // Similarity  
-        AbstractSimCoefficient simCoefficient = (AbstractSimCoefficient) wiz.getProperty(AbstractSimCoefficient.class.getName());
-        csMapper.setSimCoefficientAlg(simCoefficient);
+        AbstractDistance distFunction = (AbstractDistance) wiz.getProperty(AbstractDistance.class.getName());
+        csMapper.setDistanceFunction(distFunction);
     }
 
     public static WizardDescriptor createWizardDescriptor(MapperAlgorithm csMapper) {

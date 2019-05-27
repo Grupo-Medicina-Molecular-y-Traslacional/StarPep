@@ -19,8 +19,6 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import org.bapedis.chemspace.component.SpaceArffWritable;
 import org.bapedis.chemspace.component.VisualizePanel3D;
-import org.bapedis.core.io.MD_OUTPUT_OPTION;
-import org.bapedis.core.io.impl.MyArffWritable;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.util.ArffWriter;
@@ -168,8 +166,8 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         this.csMapper = (MapperAlgorithm) algo;
 
         networkPanel.setUp(csMapper);
-        clusterPanel.setUp(csMapper);
-        networkReport.setUp(csMapper);
+//        clusterPanel.setUp(csMapper);
+//        networkReport.setUp(csMapper);
         setBusy(csMapper.isRunning());
         return this;
     }
@@ -250,10 +248,10 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     public void propertyChange(PropertyChangeEvent evt) {
         if (csMapper != null && evt.getSource().equals(csMapper)
                 && evt.getPropertyName().equals(MapperAlgorithm.RUNNING)) {
-            clusterPanel.setupClusters();
+//            clusterPanel.setupClusters();
             networkPanel.setupAxis();
             networkPanel.setupHistogram();
-            networkReport.setupReport();
+//            networkReport.setupReport();
             setBusy((boolean) evt.getNewValue());
         }
     }

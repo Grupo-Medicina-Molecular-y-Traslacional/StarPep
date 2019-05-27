@@ -3,12 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.clustering.impl;
+package org.bapedis.clustering.impl;
 
 import java.awt.Component;
 import java.awt.Dimension;
 import java.util.Random;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;

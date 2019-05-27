@@ -6,9 +6,7 @@
 package org.bapedis.chemspace.wizard;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.util.Collection;
-import java.util.HashMap;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JTree;
@@ -16,69 +14,58 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import org.bapedis.core.model.AlgorithmNode;
+import org.bapedis.chemspace.distance.AbstractDistance;
+import org.bapedis.chemspace.distance.DistanceFunction;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.bapedis.core.spi.alg.AlgorithmFactory;
-import org.bapedis.core.spi.alg.ClusteringTag;
-import org.bapedis.core.spi.alg.impl.AbstractClusterizer;
 import org.bapedis.core.ui.components.PropertySheetPanel;
-import org.openide.nodes.Node;
 
-public final class VisualClusterize extends JPanel {
+public final class VisualDistanceFunc extends JPanel {
 
-    public static final String CLUSTERING_FACTORY = "clustering_factory";
+    public static final String DISTANCE_FUNCTION = "distance_function";
     private final DefaultMutableTreeNode treeNode;
-    private final HashMap<String, AbstractClusterizer> map;
-    private AbstractClusterizer clustering;
+    private AbstractDistance distFunc;
     private final PropertySheetPanel propSheetPanel;
 
-    public VisualClusterize() {
+    public VisualDistanceFunc() {
         initComponents();
-        treeNode = new DefaultMutableTreeNode(NbBundle.getMessage(VisualClusterize.class, "VisualClusterize.root.name"), true);
+        treeNode = new DefaultMutableTreeNode(NbBundle.getMessage(VisualDistanceFunc.class, "DistanceFunction.root.name"), true);
         populateJTree();
         jTree1.setModel(new DefaultTreeModel(treeNode));
         jTree1.setRootVisible(true);
-        jTree1.setCellRenderer(new ClusteringFactoryNodeRenderer());
-        map = new HashMap<>();
+        jTree1.setCellRenderer(new DistanceFactoryNodeRenderer());
         propSheetPanel = new PropertySheetPanel();
         propSheetPanel.setPreferredSize(jScrollPane2.getPreferredSize());
     }
 
-    public HashMap<String, AbstractClusterizer> getMap() {
-        return map;
-    }
+    public AbstractDistance getDistanceFunction() {
+        return distFunc;
+    }    
 
-    public void setClustering(AbstractClusterizer clustering) {
-        this.clustering = clustering;
-        AlgorithmFactory factory = clustering.getFactory();
-        map.put(factory.getName(), clustering);
-        ClusteringFactoryTreeNode factoryNode;
+    public void setDistanceFunction(AbstractDistance distFunc) {
+        this.distFunc = distFunc;
+        DistanceFunctionTreeNode distNode;
         for (int i = 0; i < treeNode.getChildCount(); i++) {
-            factoryNode = (ClusteringFactoryTreeNode) treeNode.getChildAt(i);
-            if (factoryNode.getFactory().getName().equals(factory.getName())) {
-                jTree1.setSelectionPath(new TreePath(factoryNode.getPath()));
+            distNode = (DistanceFunctionTreeNode) treeNode.getChildAt(i);
+            if (distNode.getDistanceFunction().getName().equals(distFunc.getName())) {
+                jTree1.setSelectionPath(new TreePath(distNode.getPath()));
             }
         }
     }
-    
-    public AbstractClusterizer getClustering(){
-        return clustering;
-    }
 
     private void populateJTree() {
-        Collection<? extends AlgorithmFactory> factories = Lookup.getDefault().lookupAll(AlgorithmFactory.class);
-        for (AlgorithmFactory factory : factories) {
-            if (factory instanceof ClusteringTag) {
-                treeNode.add(new ClusteringFactoryTreeNode(factory));
+        Collection<? extends DistanceFunction> factories = Lookup.getDefault().lookupAll(DistanceFunction.class);
+        for (DistanceFunction distFunc : factories) {
+            if (distFunc instanceof AbstractDistance) {
+                treeNode.add(new DistanceFunctionTreeNode((AbstractDistance)distFunc));
             }
         }
     }
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(VisualClusterize.class, "VisualClusterize.name");
+        return NbBundle.getMessage(VisualDistanceFunc.class, "DistanceFunction.name");
     }
 
     /**
@@ -90,15 +77,24 @@ public final class VisualClusterize extends JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        jInfoLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
-        jInfoLabel = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jDescLabel = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
         setPreferredSize(new java.awt.Dimension(680, 460));
         setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualDistanceFunc.class, "VisualDistanceFunc.jInfoLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(jInfoLabel, gridBagConstraints);
 
         jScrollPane1.setMinimumSize(new java.awt.Dimension(220, 322));
         jScrollPane1.setPreferredSize(new java.awt.Dimension(220, 322));
@@ -119,15 +115,6 @@ public final class VisualClusterize extends JPanel {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(jScrollPane1, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualClusterize.class, "VisualClusterize.jInfoLabel.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-        add(jInfoLabel, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -137,7 +124,7 @@ public final class VisualClusterize extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jScrollPane2, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jDescLabel, org.openide.util.NbBundle.getMessage(VisualClusterize.class, "VisualClusterize.jDescLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jDescLabel, org.openide.util.NbBundle.getMessage(VisualDistanceFunc.class, "VisualDistanceFunc.jDescLabel.text")); // NOI18N
         jDescLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         jDescLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jDescLabel.setMinimumSize(new java.awt.Dimension(4, 87));
@@ -152,37 +139,17 @@ public final class VisualClusterize extends JPanel {
 
     private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
         TreePath newPath = evt.getNewLeadSelectionPath();
-        AlgorithmFactory factory = null;
-        if (newPath != null && newPath.getLastPathComponent() instanceof ClusteringFactoryTreeNode) {
-            ClusteringFactoryTreeNode newNode = (ClusteringFactoryTreeNode) newPath.getLastPathComponent();
-            factory = newNode.getFactory();
-            jDescLabel.setText(NbBundle.getMessage(VisualClusterize.class, "VisualClusterize.jDescLabel.text", factory.getName(), factory.getDescription()));
-            if (!map.containsKey(factory.getName())) {
-                clustering = (AbstractClusterizer)factory.createAlgorithm();
-                map.put(factory.getName(), clustering);
-            } else {
-                clustering = map.get(factory.getName());
-            }
-            if (factory.getSetupUI() != null) {
-                JPanel panel = factory.getSetupUI().getSettingPanel(clustering);
-                jScrollPane2.setViewportView(panel);
-                jDescLabel.setVisible(true);
-            } else if (clustering.getProperties() != null) {
-                propSheetPanel.getPropertySheet().setNodes(new Node[]{new AlgorithmNode(clustering)});
-                jScrollPane2.setViewportView(propSheetPanel);
-                jDescLabel.setVisible(false);
-            }
-            else {
-                jScrollPane2.setViewportView(null);
-                jDescLabel.setVisible(true);
-            }
+        if (newPath != null && newPath.getLastPathComponent() instanceof DistanceFunctionTreeNode) {
+            DistanceFunctionTreeNode newNode = (DistanceFunctionTreeNode) newPath.getLastPathComponent();
+            distFunc = newNode.getDistanceFunction();
+            jDescLabel.setText(NbBundle.getMessage(VisualDistanceFunc.class, "VisualDistanceFunc.jDescLabel.text", distFunc.getName(), distFunc.getDescription()));
+            jDescLabel.setVisible(true);            
         } else {
-            clustering = null;
+            distFunc = null;
             jDescLabel.setText("");
-            jScrollPane2.setViewportView(null);
             jDescLabel.setVisible(false);
         }
-        firePropertyChange(CLUSTERING_FACTORY, null, factory);
+        firePropertyChange(DISTANCE_FUNCTION, null, distFunc);
     }//GEN-LAST:event_jTree1ValueChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -193,28 +160,28 @@ public final class VisualClusterize extends JPanel {
     private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
 
-    private static class ClusteringFactoryTreeNode extends DefaultMutableTreeNode {
+    private static class DistanceFunctionTreeNode extends DefaultMutableTreeNode {
 
-        public ClusteringFactoryTreeNode(AlgorithmFactory factory) {
-            super(factory, false);
+        public DistanceFunctionTreeNode(AbstractDistance distFunc) {
+            super(distFunc, false);
         }
 
-        public AlgorithmFactory getFactory() {
-            return (AlgorithmFactory) userObject;
+        public AbstractDistance getDistanceFunction() {
+            return (AbstractDistance) userObject;
         }
 
         @Override
         public String toString() {
-            return getFactory().getName();
+            return getDistanceFunction().getName();
         }
 
     }
 
-    private static class ClusteringFactoryNodeRenderer extends DefaultTreeCellRenderer {
+    private static class DistanceFactoryNodeRenderer extends DefaultTreeCellRenderer {
 
         Icon icon;
 
-        public ClusteringFactoryNodeRenderer() {
+        public DistanceFactoryNodeRenderer() {
             icon = ImageUtilities.loadImageIcon("org/bapedis/chemspace/resources/network.png", false);
         }
 
@@ -233,7 +200,7 @@ public final class VisualClusterize extends JPanel {
                     expanded, leaf, row,
                     hasFocus);
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-            if (!(node instanceof ClusteringFactoryTreeNode)) {
+            if (!(node instanceof DistanceFunctionTreeNode)) {
                 // Root node
                 setIcon(icon);
             }

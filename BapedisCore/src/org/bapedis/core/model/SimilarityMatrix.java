@@ -19,7 +19,7 @@ public class SimilarityMatrix implements Serializable {
     protected final Peptide[] peptides;
     protected final JQuickHistogram histogram;
     protected static PeptideAttribute INDEX_ATTR = new PeptideAttribute("indexAttr", "indexAttr", Integer.class, false);
-    protected Float[] data;
+    protected double[] data;
 
     public SimilarityMatrix(Peptide[] peptides) {
         this.peptides = peptides;
@@ -27,7 +27,7 @@ public class SimilarityMatrix implements Serializable {
             peptides[index].setAttributeValue(INDEX_ATTR, index);
         }
         int size = peptides.length;
-        data = new Float[size * (size - 1) / 2];
+        data = new double[size * (size - 1) / 2];
         histogram = new JQuickHistogram();
     }
 
@@ -35,13 +35,13 @@ public class SimilarityMatrix implements Serializable {
         return peptides;
     }        
 
-    public void setValue(Peptide peptide1, Peptide peptide2, Float value) {
+    public void setValue(Peptide peptide1, Peptide peptide2, double value) {
         if (peptide1.hasAttribute(INDEX_ATTR) && peptide2.hasAttribute(INDEX_ATTR)) {
             int x = (int) peptide1.getAttributeValue(INDEX_ATTR);
             int y = (int) peptide2.getAttributeValue(INDEX_ATTR);
             assert x != y;
             data[pos(x, y)] = value;
-            histogram.addData(value);
+//            histogram.addData(value);
         }
     }
 
@@ -49,7 +49,7 @@ public class SimilarityMatrix implements Serializable {
         return histogram;
     }
 
-    public Float getValue(Peptide peptide1, Peptide peptide2) {
+    public double getValue(Peptide peptide1, Peptide peptide2) {
         if (peptide1.hasAttribute(INDEX_ATTR) && peptide2.hasAttribute(INDEX_ATTR)) {
             int x = (int) peptide1.getAttributeValue(INDEX_ATTR);
             int y = (int) peptide2.getAttributeValue(INDEX_ATTR);
@@ -59,7 +59,7 @@ public class SimilarityMatrix implements Serializable {
         return -1.f;
     }
 
-    public Float[] getValues() {
+    public double[] getValues() {
         return data;
     }
 
@@ -76,7 +76,7 @@ public class SimilarityMatrix implements Serializable {
     private void writeObject(ObjectOutputStream o)
             throws IOException {
         o.writeInt(data.length);
-        for (Float value : data) {
+        for (double value : data) {
             o.writeDouble(value);
         }
     }
@@ -84,7 +84,7 @@ public class SimilarityMatrix implements Serializable {
     private void readObject(ObjectInputStream o)
             throws IOException, ClassNotFoundException {
         int size = o.readInt();
-        data = new Float[size];
+        data = new double[size];
         for (int i = 0; i < data.length; i++) {
             data[i] = o.readFloat();
         }

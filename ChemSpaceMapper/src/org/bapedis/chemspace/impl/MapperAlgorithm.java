@@ -7,15 +7,16 @@ package org.bapedis.chemspace.impl;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.SwingUtilities;
-import org.bapedis.chemspace.clustering.impl.EMFactory;
+import org.bapedis.chemspace.distance.AbstractDistance;
+import org.bapedis.chemspace.distance.DistanceFunction;
+import org.bapedis.chemspace.distance.Euclidean;
 import org.bapedis.chemspace.model.FeatureSelectionOption;
 import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
-import org.bapedis.chemspace.similarity.AbstractSimCoefficient;
-import org.bapedis.chemspace.similarity.AlignmentBasedSimilarityFactory;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
@@ -25,7 +26,6 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
-import org.bapedis.core.spi.alg.impl.AbstractClusterizer;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
 import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
@@ -62,8 +62,7 @@ public class MapperAlgorithm implements Algorithm {
     private NonRedundantSetAlg nrdAlg;
     private AllDescriptors featureExtractionAlg;
     private FeatureSEFiltering featureSelectionAlg;
-    private AbstractClusterizer clusteringAlg;
-    private AbstractSimCoefficient simCoefficientAlg;
+    private AbstractDistance distFunction;
     private final WekaPCATransformer pcaTransformer;
     private final NetworkEmbedderAlg networkAlg;
     private final NetworkReport networkReport;
@@ -84,13 +83,18 @@ public class MapperAlgorithm implements Algorithm {
         //Mapping algorithms
         nrdAlg = (NonRedundantSetAlg) new NonRedundantSetAlgFactory().createAlgorithm();               
         featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
-        featureSelectionAlg = (FeatureSEFiltering) new FeatureSEFilteringFactory().createAlgorithm();
-        clusteringAlg = (AbstractClusterizer) new EMFactory().createAlgorithm();
-        simCoefficientAlg = (AbstractSimCoefficient) new AlignmentBasedSimilarityFactory().createAlgorithm();
-
+        featureSelectionAlg = (FeatureSEFiltering) new FeatureSEFilteringFactory().createAlgorithm();        
         pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
         networkAlg = (NetworkEmbedderAlg) new NetworkEmbedderFactory().createAlgorithm();
-        networkReport = (NetworkReport) new NetworkReportFactory().createAlgorithm();        
+        networkReport = (NetworkReport) new NetworkReportFactory().createAlgorithm();  
+        
+        //Default distance function
+        Collection<? extends DistanceFunction> factories = Lookup.getDefault().lookupAll(DistanceFunction.class);
+        for (DistanceFunction distFunc : factories) {
+            if (distFunc instanceof Euclidean) {
+                this.distFunction = (AbstractDistance)distFunc;
+            }
+        }                              
     }
 
     public boolean isRunning() {
@@ -103,10 +107,8 @@ public class MapperAlgorithm implements Algorithm {
                 + getFESettings()
                 + "<br />" 
                 + getFSSettings()
-                + "<br />" 
-                + getClusteringSettings()
                 + "<br />"       
-                + getSimCoefficientSettings();
+                + getDistanceSettings();
         return report;
     }
     
@@ -138,14 +140,9 @@ public class MapperAlgorithm implements Algorithm {
         }
         return reportBuilder.toString();
     }
-    
-    private String getClusteringSettings(){
-        String report = String.format("<b> Clustering algorithm</b> (%s)<br />", clusteringAlg.getFactory().getName());
-        return report;
-    }
-    
-    private String getSimCoefficientSettings(){
-        String reportBuilder = String.format("<b> Similarity coefficient</b> (%s)<br />", simCoefficientAlg.getFactory().getName());
+        
+    private String getDistanceSettings(){
+        String reportBuilder = String.format("<b> Distance Function</b> (%s)<br />", distFunction.getName());
         return reportBuilder;
     }    
     
@@ -211,15 +208,6 @@ public class MapperAlgorithm implements Algorithm {
             cancel();
         }
 
-        // Clustering
-        if (!stopRun) {
-            clusteringAlg.setPreprocessing(false);
-            currentAlg = clusteringAlg;
-            execute();
-        } else {
-            throw new RuntimeException("Internal error: Clustering algorithm is null");
-        }
-
         //WekaPCA Transformer
         if (!stopRun) {
             currentAlg = pcaTransformer;
@@ -229,20 +217,20 @@ public class MapperAlgorithm implements Algorithm {
             updater.execute();
         }
 
-        // Similarity
-        if (simCoefficientAlg != null && !stopRun) {
-            networkAlg.setSimCoefficient(simCoefficientAlg);
+        // Network construction
+        if (distFunction != null && !stopRun) {
+            networkAlg.setDistanceFunction(distFunction);
             currentAlg = networkAlg;
             execute();
         } else {
-            throw new RuntimeException("Internal error: Similarity coefficient is null");
+            throw new RuntimeException("Internal error: Distance function is null");
         }
 
         //Network report
-        if (!stopRun) {
-            currentAlg = networkReport;
-            execute();
-        }
+//        if (!stopRun) {
+//            currentAlg = networkReport;
+//            execute();
+//        }
     }
 
     private void execute() {
@@ -333,14 +321,6 @@ public class MapperAlgorithm implements Algorithm {
         return featureSelectionAlg;
     }
 
-    public AbstractClusterizer getClusteringAlg() {
-        return clusteringAlg;
-    }
-
-    public void setClusteringAlg(AbstractClusterizer clusteringAlg) {
-        this.clusteringAlg = clusteringAlg;
-    }
-
     public WekaPCATransformer getPCATransformer() {
         return pcaTransformer;
     }
@@ -353,12 +333,12 @@ public class MapperAlgorithm implements Algorithm {
         return networkReport;
     }
 
-    public AbstractSimCoefficient getSimCoefficientAlg() {
-        return simCoefficientAlg;
+    public AbstractDistance getDistanceFunction() {
+        return distFunction;
     }
 
-    public void setSimCoefficientAlg(AbstractSimCoefficient simCoefficientAlg) {
-        this.simCoefficientAlg = simCoefficientAlg;
+    public void setDistanceFunction(AbstractDistance distFunction) {
+        this.distFunction = distFunction;
     }
 
     @Override

@@ -15,7 +15,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.bapedis.lib.graphstore</code-name-base>
+                    <code-name-base>org.bapedis.lib.swingx</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -23,7 +23,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.bapedis.lib.swingx</code-name-base>
+                    <code-name-base>org.gephi.graph</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>

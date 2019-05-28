@@ -80,7 +80,6 @@ public abstract class WekaClusterer<T extends Clusterer> extends AbstractCluster
             // Load instances
             Instances data = null;
             if (!stopRun) {
-                ArffWriter.DEBUG = true;
                 MyArffWritable writable = new MyArffWritable(peptides, features, MD_OUTPUT_OPTION.MIN_MAX);
                 File f = ArffWriter.writeToArffFile(writable);
                 reader = new BufferedReader(new FileReader(f));

@@ -131,7 +131,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 if (csMapper != null & csMapper.getPCATransformer().getXYZSpace() != null) {
                     try {
-                        ArffWriter.DEBUG = true;
                         SpaceArffWritable writable = new SpaceArffWritable(csMapper.getPCATransformer().getXYZSpace());
                         File f = ArffWriter.writeToArffFile(writable);
                         BufferedReader reader = new BufferedReader(new FileReader(f));

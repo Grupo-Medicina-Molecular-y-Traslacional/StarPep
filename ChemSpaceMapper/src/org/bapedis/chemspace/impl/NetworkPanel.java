@@ -473,7 +473,7 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
 
     private void jApplyThresholdButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jApplyThresholdButtonActionPerformed
         if (netEmbedder != null) {
-            float threshold = cutoffSlider.getValue() / 100.f;
+            double threshold = cutoffSlider.getValue() / 100.0;
             NetworkThresholdUpdater fnUpdater = new NetworkThresholdUpdater(threshold, netEmbedder.getSimilarityThreshold());
             fnUpdater.addPropertyChangeListener(this);
             setRunning(true);

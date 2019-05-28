@@ -81,71 +81,71 @@ public class MapperAlgorithm implements Algorithm {
         fsOption = FeatureSelectionOption.NO;
 
         //Mapping algorithms
-        nrdAlg = (NonRedundantSetAlg) new NonRedundantSetAlgFactory().createAlgorithm();               
+        nrdAlg = (NonRedundantSetAlg) new NonRedundantSetAlgFactory().createAlgorithm();
         featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
-        featureSelectionAlg = (FeatureSEFiltering) new FeatureSEFilteringFactory().createAlgorithm();        
+        featureSelectionAlg = (FeatureSEFiltering) new FeatureSEFilteringFactory().createAlgorithm();
         pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
         networkAlg = (NetworkEmbedderAlg) new NetworkEmbedderFactory().createAlgorithm();
-        networkReport = (NetworkReport) new NetworkReportFactory().createAlgorithm();  
-        
+        networkReport = (NetworkReport) new NetworkReportFactory().createAlgorithm();
+
         //Default distance function
         Collection<? extends DistanceFunction> factories = Lookup.getDefault().lookupAll(DistanceFunction.class);
         for (DistanceFunction distFunc : factories) {
             if (distFunc instanceof Euclidean) {
-                this.distFunction = (AbstractDistance)distFunc;
+                this.distFunction = (AbstractDistance) distFunc;
             }
-        }                              
+        }
     }
 
     public boolean isRunning() {
         return running;
     }
-    
-    public String getSettingsReport(){
+
+    public String getSettingsReport() {
         String report = getNrdSettings()
-                + "<br />"               
+                + "<br />"
                 + getFESettings()
-                + "<br />" 
+                + "<br />"
                 + getFSSettings()
-                + "<br />"       
+                + "<br />"
                 + getDistanceSettings();
         return report;
     }
-    
-    private String getNrdSettings(){
+
+    private String getNrdSettings() {
         StringBuilder reportBuilder = new StringBuilder(String.format("<b> Removing redundant sequences</b> (%s)<br />", nrdOption));
-        if(nrdOption == RemovingRedundantOption.YES){
+        if (nrdOption == RemovingRedundantOption.YES) {
             reportBuilder.append(String.format("Alignment type: %s <br />", SequenceAlignmentModel.ALIGNMENT_TYPE[nrdAlg.getAlignmentModel().getAlignmentTypeIndex()]));
             reportBuilder.append(String.format("Substitution matrix: %s <br />", SequenceAlignmentModel.SUBSTITUTION_MATRIX[nrdAlg.getAlignmentModel().getSubstitutionMatrixIndex()]));
             reportBuilder.append(String.format("Percent identity: %s <br />", nrdAlg.getAlignmentModel().getPercentIdentity() + "%"));
-        }        
+        }
         return reportBuilder.toString();
-        
+
     }
 
-    private String getFESettings(){
+    private String getFESettings() {
         StringBuilder reportBuilder = new StringBuilder(String.format("<b> Feature extraction</b> (%s)<br />", feOption));
-        if(feOption == FeatureExtractionOption.YES){
-            for(Algorithm alg: featureExtractionAlg.getAlgorithms()){
+        if (feOption == FeatureExtractionOption.YES) {
+            for (Algorithm alg : featureExtractionAlg.getAlgorithms()) {
                 reportBuilder.append(String.format("%s <br />", alg.getFactory().getName()));
             }
-        }        
-        return reportBuilder.toString();        
+        }
+        return reportBuilder.toString();
     }
-    
-    private String getFSSettings(){
+
+    private String getFSSettings() {
         StringBuilder reportBuilder = new StringBuilder(String.format("<b> Feature selection</b> (%s)<br />", fsOption));
-        if (fsOption == FeatureSelectionOption.YES){
+        if (fsOption == FeatureSelectionOption.YES) {
             reportBuilder.append(String.format("%s <br />", ""));
         }
         return reportBuilder.toString();
     }
-        
-    private String getDistanceSettings(){
+
+    private String getDistanceSettings() {
         String reportBuilder = String.format("<b> Distance Function</b> (%s)<br />", distFunction.getName());
         return reportBuilder;
-    }    
-    
+    }
+
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
@@ -160,7 +160,7 @@ public class MapperAlgorithm implements Algorithm {
         //Non-redundant set
         if (nrdOption == RemovingRedundantOption.YES && !stopRun) {
             if (nrdAlg != null) {
-                nrdAlg.setWorkspaceInput(true); 
+                nrdAlg.setWorkspaceInput(true);
                 currentAlg = nrdAlg;
                 execute();
             } else {
@@ -200,12 +200,14 @@ public class MapperAlgorithm implements Algorithm {
         }
 
         // Preprocessing of feature list. Compute max, min, mean and std
-        try {
-            MolecularDescriptor.preprocessing(allFeatures, attrModel.getPeptides());
-        } catch (MolecularDescriptorException ex) {
-            DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
-            pc.reportError(ex.getMessage(), workspace);
-            cancel();
+        if (!stopRun) {
+            try {
+                MolecularDescriptor.preprocessing(allFeatures, attrModel.getPeptides());
+            } catch (MolecularDescriptorException ex) {
+                DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
+                pc.reportError(ex.getMessage(), workspace);
+                cancel();
+            }
         }
 
         //WekaPCA Transformer
@@ -218,12 +220,14 @@ public class MapperAlgorithm implements Algorithm {
         }
 
         // Network construction
-        if (distFunction != null && !stopRun) {
-            networkAlg.setDistanceFunction(distFunction);
-            currentAlg = networkAlg;
-            execute();
-        } else {
-            throw new RuntimeException("Internal error: Distance function is null");
+        if (!stopRun) {
+            if (distFunction != null) {
+                networkAlg.setDistanceFunction(distFunction);
+                currentAlg = networkAlg;
+                execute();
+            } else {
+                throw new RuntimeException("Internal error: Distance function is null");
+            }
         }
 
         //Network report

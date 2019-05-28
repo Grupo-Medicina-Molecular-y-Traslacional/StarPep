@@ -110,7 +110,6 @@ public class WekaPCATransformer implements Algorithm {
     @Override
     public void run() {
         try {
-            ArffWriter.DEBUG = true;
             MyArffWritable writable = new MyArffWritable(peptides, features, MD_OUTPUT_OPTION.None);
             File f = ArffWriter.writeToArffFile(writable);
             BufferedReader reader = new BufferedReader(new FileReader(f));

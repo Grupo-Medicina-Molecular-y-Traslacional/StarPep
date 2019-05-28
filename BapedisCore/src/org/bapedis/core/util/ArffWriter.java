@@ -19,7 +19,6 @@ import java.util.Date;
  */
 public class ArffWriter {
 
-    public static boolean DEBUG = false;
 
     public static File writeToArffFile(ArffWritable data) throws Exception {
         File f = OSUtil.createTempFile("weka-", "-arff");
@@ -30,9 +29,6 @@ public class ArffWriter {
     public static void writeToArffFile(File file, ArffWritable data) throws Exception {
         // if (file.exists())
         // throw new IllegalStateException("arff file exists: '" + file + "'");
-        if (DEBUG) {
-            System.out.println("Writing arff file: '" + file.getAbsolutePath() + "'"); //(.tmp)");
-        }
         writeToArff(new FileWriter(file), data);
     }
 

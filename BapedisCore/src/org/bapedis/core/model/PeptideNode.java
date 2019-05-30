@@ -21,6 +21,7 @@ import org.openide.nodes.Sheet;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.Utilities;
 import org.openide.util.actions.SystemAction;
 import org.openide.util.lookup.Lookups;
 
@@ -31,6 +32,7 @@ import org.openide.util.lookup.Lookups;
 public class PeptideNode extends AbstractNode implements PropertyChangeListener {
 
     protected static final String displayName = NbBundle.getMessage(PeptideNode.class, "PeptideNode.displayName");
+    protected static final Action[] globalActions = Utilities.actionsForPath("Actions/EditPeptides").toArray(new Action[0]);
     protected Peptide peptide;
     private final Action[] actions;
     protected Sheet sheet;
@@ -46,7 +48,15 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
     public PeptideNode(Peptide peptide, Children children, Lookup lookup) {
         super(children, lookup);
         this.peptide = peptide;
-        actions = new Action[]{new SelectNodeOnGraph(peptide.getGraphNode()), new View3DStructure(peptide), SystemAction.get(PropertiesAction.class)};
+
+        Action[] localActions = new Action[]{new SelectNodeOnGraph(peptide.getGraphNode()),
+                                             new View3DStructure(peptide),
+                                             SystemAction.get(PropertiesAction.class)};
+        
+        actions = new Action[localActions.length + globalActions.length];
+        System.arraycopy(globalActions, 0, actions, 0, globalActions.length);
+        System.arraycopy(localActions, 0, actions, globalActions.length, localActions.length);
+        
         peptide.addMolecularFeatureChangeListener(this);
     }
 
@@ -92,17 +102,17 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
         property = createPropertyField("seq", NbBundle.getMessage(PeptideNode.class, "PropertySet.seq"),
                 NbBundle.getMessage(PeptideNode.class, "PropertySet.seq.desc"), String.class, peptide.getSequence());
         set.put(property);
-        sheet.put(set);        
+        sheet.put(set);
 
         // Features         
         for (PeptideAttribute attr : peptide.getAttributes()) {
             if (attr instanceof MolecularDescriptor) {
                 setMolecularFeature((MolecularDescriptor) attr);
-            } else if (attr.isVisible() && attr != Peptide.ID && attr != Peptide.SEQ){
+            } else if (attr.isVisible() && attr != Peptide.ID && attr != Peptide.SEQ) {
                 setOtherFeatures(attr);
             }
         }
-        
+
         return sheet;
     }
 

@@ -191,12 +191,14 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
         histoInfoLabel = new javax.swing.JLabel();
         histogramPanel = new javax.swing.JPanel();
         jApplyThresholdButton = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
         coordinatesPanel = new javax.swing.JPanel();
         jApplyCoordinateButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jXComboBox = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
         jYComboBox = new javax.swing.JComboBox<>();
+        jLabel3 = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -333,6 +335,15 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         thresholdPanel.add(jApplyThresholdButton, gridBagConstraints);
 
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.jLabel4.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        thresholdPanel.add(jLabel4, gridBagConstraints);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -355,7 +366,7 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         coordinatesPanel.add(jApplyCoordinateButton, gridBagConstraints);
@@ -375,6 +386,7 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
@@ -382,8 +394,8 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.jLabel2.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         coordinatesPanel.add(jLabel2, gridBagConstraints);
 
@@ -393,12 +405,21 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         coordinatesPanel.add(jYComboBox, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(NetworkPanel.class, "NetworkPanel.jLabel3.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        coordinatesPanel.add(jLabel3, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -496,6 +517,8 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
     private javax.swing.JToolBar jCutoffToolBar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JButton jLessCutoffButton;
     private javax.swing.JButton jMoreCutoffButton;
     private javax.swing.JComboBox<String> jXComboBox;

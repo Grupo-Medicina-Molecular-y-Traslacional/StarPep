@@ -39,8 +39,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     protected final JXHyperlink openWizardLink, scatter3DLink;
     protected MapperAlgorithm csMapper;
     protected final NetworkPanel networkPanel;
-    protected final ClusterPanel clusterPanel;
-    protected final NetworkReportPanel networkReport;
     protected final JToolBar toolBar;
 
     /**
@@ -55,8 +53,8 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         topPanel.add(toolBar);
 
         scatter3DLink = new JXHyperlink();
-        configureScatter3DLink();
-        toolBar.add(scatter3DLink);
+//        configureScatter3DLink();
+//        toolBar.add(scatter3DLink);
 
         toolBar.addSeparator();
 
@@ -68,13 +66,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         networkPanel = new NetworkPanel();
         tab1.add(networkPanel, BorderLayout.CENTER);
 
-        // Cluster panel
-        clusterPanel = new ClusterPanel();
-        tab2.add(clusterPanel, BorderLayout.CENTER);
-
-        //Network report panel
-        networkReport = new NetworkReportPanel();
-        tab3.add(networkReport, BorderLayout.CENTER);
 
         addAncestorListener(new AncestorListener() {
             @Override
@@ -121,8 +112,8 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
     private void configureScatter3DLink() {
         scatter3DLink.setIcon(ImageUtilities.loadImageIcon("org/bapedis/chemspace/resources/coordinates.png", false));
-        scatter3DLink.setText(NbBundle.getMessage(ClusterPanel.class, "MapperAlgorithmPanel.scatter3DButton.text"));
-        scatter3DLink.setToolTipText(NbBundle.getMessage(ClusterPanel.class, "MapperAlgorithmPanel.scatter3DButton.toolTipText"));
+        scatter3DLink.setText(NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.scatter3DButton.text"));
+        scatter3DLink.setToolTipText(NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.scatter3DButton.toolTipText"));
         scatter3DLink.setClickedColor(new java.awt.Color(0, 51, 255));
         scatter3DLink.setFocusPainted(false);
         scatter3DLink.setFocusable(false);
@@ -196,8 +187,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         centerPanel = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         tab1 = new javax.swing.JPanel();
-        tab2 = new javax.swing.JPanel();
-        tab3 = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -214,12 +203,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
         tab1.setLayout(new java.awt.BorderLayout());
         jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.tab1.TabConstraints.tabTitle"), tab1); // NOI18N
-
-        tab2.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.tab2.TabConstraints.tabTitle"), tab2); // NOI18N
-
-        tab3.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.tab3.TabConstraints.tabTitle"), tab3); // NOI18N
 
         centerPanel.add(jTabbedPane1, "tabCard");
 
@@ -238,8 +221,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private javax.swing.JPanel centerPanel;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel tab1;
-    private javax.swing.JPanel tab2;
-    private javax.swing.JPanel tab3;
     private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 
@@ -247,10 +228,8 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     public void propertyChange(PropertyChangeEvent evt) {
         if (csMapper != null && evt.getSource().equals(csMapper)
                 && evt.getPropertyName().equals(MapperAlgorithm.RUNNING)) {
-//            clusterPanel.setupClusters();
             networkPanel.setupAxis();
             networkPanel.setupHistogram();
-//            networkReport.setupReport();
             setBusy((boolean) evt.getNewValue());
         }
     }

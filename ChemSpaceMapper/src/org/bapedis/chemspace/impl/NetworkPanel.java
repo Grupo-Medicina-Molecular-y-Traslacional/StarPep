@@ -127,12 +127,12 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
     private void setRunning(boolean running) {
         jXComboBox.setEnabled(!running);
         jYComboBox.setEnabled(!running);
-        
+
         jCutoffToolBar.setEnabled(!running);
         jLessCutoffButton.setEnabled(!running);
         jMoreCutoffButton.setEnabled(!running);
         cutoffSlider.setEnabled(!running);
-        
+
         if (running) {
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         } else {
@@ -147,25 +147,23 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
         jCutoffNewValue.setVisible(false);
         jApplyThresholdButton.setEnabled(false);
     }
-    
-    public void setupAxis() {
-        if (csMapper.isRunning()) {
-            modelX.removeAllElements();
-            modelY.removeAllElements();
-        } else {
-            CoordinateSpace xyzSpace = csMapper.getPCATransformer().getXYZSpace();
 
-            if (xyzSpace != null) {
-                String[] axisLabels = xyzSpace.getAxisLabels();
-                for (String axis : axisLabels) {
-                    modelX.addElement(axis);
-                    modelY.addElement(axis);
-                }
-                modelX.setSelectedItem(axisLabels[xyzSpace.getxAxis()]);
-                modelY.setSelectedItem(axisLabels[xyzSpace.getyAxis()]);
+    public void setupAxis() {
+        modelX.removeAllElements();
+        modelY.removeAllElements();
+
+        CoordinateSpace xyzSpace = csMapper.getPCATransformer().getXYZSpace();
+
+        if (xyzSpace != null) {
+            String[] axisLabels = xyzSpace.getAxisLabels();
+            for (String axis : axisLabels) {
+                modelX.addElement(axis);
+                modelY.addElement(axis);
             }
+            modelX.setSelectedItem(axisLabels[xyzSpace.getxAxis()]);
+            modelY.setSelectedItem(axisLabels[xyzSpace.getyAxis()]);
         }
-    }    
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -474,7 +472,7 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
             CoordinateSpace xyzSpace = csMapper.getPCATransformer().getXYZSpace();
             xyzSpace.setxAxis(jXComboBox.getSelectedIndex());
             xyzSpace.setyAxis(jYComboBox.getSelectedIndex());
-            
+
             NetworkCoordinateUpdater updater = new NetworkCoordinateUpdater(xyzSpace);
             updater.addPropertyChangeListener(this);
             setRunning(true);
@@ -529,7 +527,7 @@ public class NetworkPanel extends javax.swing.JPanel implements PropertyChangeLi
         if (evt.getPropertyName().equals(NetworkThresholdUpdater.CHANGED_THRESHOLD)) {
             setRunning(false);
             thresholdChanged((double) evt.getNewValue());
-        }else if (evt.getPropertyName().equals(NetworkCoordinateUpdater.UPDATED_POSITIONS)){
+        } else if (evt.getPropertyName().equals(NetworkCoordinateUpdater.UPDATED_POSITIONS)) {
             setRunning(false);
         }
     }

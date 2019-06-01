@@ -5,7 +5,6 @@
  */
 package org.bapedis.chemspace.impl;
 
-import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
@@ -13,7 +12,6 @@ import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Hashtable;
-import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;

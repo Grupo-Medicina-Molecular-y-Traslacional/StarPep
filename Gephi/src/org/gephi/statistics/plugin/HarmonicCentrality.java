@@ -200,6 +200,7 @@ public class HarmonicCentrality extends AbstractCentrality {
                     harmonic[s_index] += Double.isInfinite(d[i]) ? 0.0 : 1.0 / d[i];
                 }
             }
+            progress.progress();
         }
     }
 

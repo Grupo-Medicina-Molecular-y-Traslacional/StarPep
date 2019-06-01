@@ -91,6 +91,9 @@ public abstract class AbstractScaleLayout extends AbstractLayout{
     public void runLayout() {
         double xMean = 0, yMean = 0;
         for (Node n : nodes) {
+            if (!canLayout()) {
+                return;
+            }             
             xMean += n.x();
             yMean += n.y();
         }

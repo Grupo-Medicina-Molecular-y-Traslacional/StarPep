@@ -29,7 +29,7 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
 
     protected AttributeFilter filter;
     protected boolean validState;
-    protected final ProjectManager pc;
+    protected final static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected final PropertyChangeSupport changeSupport;
 
     /**
@@ -37,7 +37,6 @@ public class AttributeFilterSetupUI extends javax.swing.JPanel implements Filter
      */
     public AttributeFilterSetupUI() {
         initComponents();
-        pc = Lookup.getDefault().lookup(ProjectManager.class);
         changeSupport = new PropertyChangeSupport(this);
         validState = false;
         valueTextField.getDocument().addDocumentListener(new DocumentListener() {

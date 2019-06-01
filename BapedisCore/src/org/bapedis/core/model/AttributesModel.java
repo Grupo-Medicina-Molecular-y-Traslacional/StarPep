@@ -18,9 +18,8 @@ import java.util.Set;
 import javax.swing.event.SwingPropertyChangeSupport;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
-import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.Origin;
 import org.gephi.graph.api.Table;
 import org.netbeans.swing.etable.QuickFilter;
 import org.openide.nodes.AbstractNode;
@@ -75,7 +74,7 @@ public class AttributesModel {
         List<MolecularDescriptor> list = new LinkedList<>();
         list.add(Peptide.LENGHT);
         mdMap.put(Peptide.LENGHT.getCategory(), list);
-        addNodeTableColumn(Peptide.LENGHT);
+        addNodeTableColumn(Peptide.ID);
     }
     
     public Workspace getOwnerWS() {
@@ -107,7 +106,7 @@ public class AttributesModel {
     private void addNodeTableColumn(PeptideAttribute attr) {
         Table table = pc.getGraphModel().getNodeTable();
         if (!table.hasColumn(attr.getDisplayName())) {
-            table.addColumn(attr.getDisplayName(), attr.getType());
+            table.addColumn(attr.getDisplayName(), attr.getType(), Origin.PROPERTY);
             
             org.gephi.graph.api.Node node;
             for (Peptide peptide : peptideMap.values()) {
@@ -225,8 +224,8 @@ public class AttributesModel {
     
     private void checkDefaultNodeAttributes(Peptide peptide) {
         org.gephi.graph.api.Node node = peptide.getGraphNode();
-        if (node.getAttribute(Peptide.LENGHT.getDisplayName()) == null) {
-            node.setAttribute(Peptide.LENGHT.getDisplayName(), peptide.getLength());
+        if (node.getAttribute(Peptide.ID.getDisplayName()) == null) {
+            node.setAttribute(Peptide.ID.getDisplayName(), peptide.getId());
         }
     }
     
@@ -343,7 +342,7 @@ public class AttributesModel {
             }
         }
         
-        private void copyGraphTo(GraphModel targetGraphModel) {
+         private void copyGraphTo(GraphModel targetGraphModel) {
             GraphModel currentGraphModel = pc.getGraphModel(workspace);
             currentGraphModel.getGraph().readLock();
             try {

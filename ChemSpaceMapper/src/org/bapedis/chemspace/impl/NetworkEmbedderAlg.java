@@ -9,8 +9,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.IntStream;
+import javax.vecmath.Vector3f;
 import org.bapedis.chemspace.distance.AbstractDistance;
+import org.bapedis.chemspace.model.CoordinateSpace;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
@@ -25,6 +26,12 @@ import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import org.openide.DialogDisplayer;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
@@ -45,9 +52,11 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
     protected int relType;
     protected ProgressTicket ticket;
     private final AtomicBoolean stopRun;
+    private CoordinateSpace xyzSpace;
     private AbstractDistance distFunc;
     private double maxDistance;
     private double currentThreshold;
+    private ChartPanel densityChart;
 
     public NetworkEmbedderAlg(AlgorithmFactory factory) {
         this.factory = factory;
@@ -63,12 +72,24 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
         this.distFunc = distFunc;
     }
 
+    public CoordinateSpace getXyzSpace() {
+        return xyzSpace;
+    }
+
+    public void setXyzSpace(CoordinateSpace xyzSpace) {
+        this.xyzSpace = xyzSpace;
+    }
+
     public double getSimilarityThreshold() {
         return currentThreshold;
     }
 
     public void setSimilarityThreshold(double threshold) {
         this.currentThreshold = threshold;
+    }
+
+    public ChartPanel getDensityChart() {
+        return densityChart;
     }
 
     @Override
@@ -93,6 +114,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
             }
             distFunc.setFeatures(allFeatures);
         }
+        densityChart = null;
     }
 
     @Override
@@ -101,6 +123,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
         peptides = null;
         graphModel = null;
         graph = null;
+        pc.getGraphVizSetting().fireChangedGraphView();
     }
 
     @Override
@@ -134,30 +157,25 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
             }
         } finally {
             mainGraph.writeUnlock();
-            pc.getGraphVizSetting().fireChangedGraphView();
         }
 
         // task size
-        ticket.switchToDeterminate(2 * peptides.length);
+        ticket.switchToDeterminate(3 * peptides.length + 1);
 
         // Create new edges...
         if (peptides != null && !stopRun.get()) {
-            try {
-                Arrays.stream(peptides).parallel().forEach(peptide -> {
-                    if (!stopRun.get()) {
-                        try {
-                            computeHSPNeighbors(peptide);
-                            ticket.progress();
-                        } catch (MolecularDescriptorNotFoundException ex) {
-                            DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
-                            Exceptions.printStackTrace(ex);
-                            cancel();
-                        }
+            Arrays.stream(peptides).parallel().forEach(peptide -> {
+                if (!stopRun.get()) {
+                    try {
+                        computeHSPNeighbors(peptide);
+                        ticket.progress();
+                    } catch (MolecularDescriptorNotFoundException ex) {
+                        DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
+                        Exceptions.printStackTrace(ex);
+                        cancel();
                     }
-                });
-            } finally {
-                pc.getGraphVizSetting().fireChangedGraphView();
-            }
+                }
+            });
         }
 
         // Report max distance
@@ -166,40 +184,61 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
         }
 
         //Compute similarity values
-        IntStream.range(0, peptides.length).parallel().forEach(index -> {
-            if (!stopRun.get()) {
-                computeSimilarityValues(index);
-                ticket.progress();
-            }
-        });
+        computeSimilarityRelationships();
 
+        //Update node positions
+        updateNodePositions();
+
+        densityChart = new ChartPanel(createXYLineChart("Network Density", createDensityDataSet()));
+        ticket.progress();
     }
 
-    private void computeSimilarityValues(int index) {
+    private void updateNodePositions() {
+        Vector3f[] positions = xyzSpace.getPositions();
+        graph.readLock();
+        try {
+            Node node;
+            Vector3f p;
+            for (int i = 0; i < positions.length && !stopRun.get(); i++) {
+                p = positions[i];
+                node = peptides[i].getGraphNode();
+                node.setX((float) ((0.01 + p.getX()) * 1000) - 500);
+                node.setY((float) ((0.01 + p.getY()) * 1000) - 500);
+                node.setZ(0); // 2D  
+                ticket.progress();
+            }
+        } finally {
+            graph.readUnlock();
+        }
+    }
+
+    private void computeSimilarityRelationships() {
         double distance, similarity;
         Node node1, node2;
         Edge graphEdge;
-        node1 = peptides[index].getGraphNode();
+        for (int i = 0; i < peptides.length; i++) {
+            node1 = peptides[i].getGraphNode();
+            for (int j = i + 1; j < peptides.length && !stopRun.get(); j++) {
+                node2 = peptides[j].getGraphNode();
+                graphEdge = mainGraph.getEdge(node1, node2, relType);
+                if (graphEdge != null) {
+                    distance = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE);
+                    similarity = 1.0 - distance / maxDistance;
 
-        for (int j = index + 1; j < peptides.length && !stopRun.get(); j++) {
-            node2 = peptides[j].getGraphNode();
-            graphEdge = mainGraph.getEdge(node1, node2, relType);
-            if (graphEdge != null) {
-                distance = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE);
-                similarity = 1.0 - distance / maxDistance;
+                    graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, similarity);
 
-                graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, similarity);
-
-                // Add the edge to the graph view
-                if (similarity >= currentThreshold) {
-                    graph.writeLock();
-                    try {
-                        graph.addEdge(graphEdge);
-                    } finally {
-                        graph.writeUnlock();
+                    // Add the edge to the graph view
+                    if (similarity >= currentThreshold) {
+                        graph.writeLock();
+                        try {
+                            graph.addEdge(graphEdge);
+                        } finally {
+                            graph.writeUnlock();
+                        }
                     }
                 }
             }
+            ticket.progress();
         }
     }
 
@@ -290,6 +329,56 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
         return graphEdge;
     }
 
+    private JFreeChart createXYLineChart(String chartTitle, XYSeriesCollection dataset) {
+
+        JFreeChart chart = ChartFactory.createXYLineChart(
+                chartTitle, // chart title
+                "Similarity threshold", // domain axis label
+                "Value", // range axis label
+                dataset, // data
+                PlotOrientation.HORIZONTAL.VERTICAL, // orientation
+                false, // include legend
+                false, // tooltips?
+                false // URLs?
+        );
+
+        return chart;
+    }
+
+    private XYSeriesCollection createDensityDataSet() {
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        XYSeries serieDensity = new XYSeries("Density");
+
+        for (double threshold = 0; threshold < 1.05 && !stopRun.get(); threshold += 0.05) {
+            serieDensity.add(threshold, calculateDensity(threshold));
+        }
+
+        dataset.addSeries(serieDensity);
+        return dataset;
+    }
+
+    private float calculateDensity(double threshold) {
+        float n = peptides.length;
+        float edgeCount = 0;
+        Node node1, node2;
+        Edge graphEdge;
+        double similarity;
+        int relType = graphModel.getEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+        for (int i = 0; i < peptides.length; i++) {
+            node1 = peptides[i].getGraphNode();
+            for (int j = i + 1; j < peptides.length; j++) {
+                node2 = peptides[j].getGraphNode();
+                graphEdge = mainGraph.getEdge(node1, node2, relType);
+                if (graphEdge != null) {
+                    similarity = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
+                    if (similarity >= threshold) {
+                        edgeCount++;
+                    }
+                }
+            }
+        }
+        return 2 * edgeCount / (n * (n - 1));
+    }
 }
 
 class CandidatePeptide implements Comparable<CandidatePeptide> {

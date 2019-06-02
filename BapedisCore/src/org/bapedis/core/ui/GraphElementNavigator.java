@@ -322,8 +322,6 @@ public class GraphElementNavigator extends JComponent implements
         final GraphElementsDataTable dataModel = navigatorModel.getVisualElement() == GraphElementType.Node ? new GraphElementsDataTable(graph.getNodeCount(), getNodeColumns(columns))
                 : new GraphElementsDataTable(graph.getEdgeCount(), getEdgeColumns(columns));
         table.setModel(dataModel);
-        nodeSizeLabel.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.nodeSizeLabel.text", graph.getNodeCount()));
-        edgeSizeLabel.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edgeSizeLabel.text", graph.getEdgeCount()));
 
         SwingWorker worker = new SwingWorker<Void, Element>() {
             @Override
@@ -343,6 +341,8 @@ public class GraphElementNavigator extends JComponent implements
                             break;
                     }
                 } finally {
+                    nodeSizeLabel.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.nodeSizeLabel.text", graph.getNodeCount()));
+                    edgeSizeLabel.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edgeSizeLabel.text", graph.getEdgeCount()));                    
                     graph.readUnlock();
                 }
                 return null;

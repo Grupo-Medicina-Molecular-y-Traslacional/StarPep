@@ -453,7 +453,7 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             refreshRunning(algoModel.isRunning());
         }
         algoModel.addPropertyChangeListener(this);
-        if (pc.getAttributesModel() == null) {
+        if (pc.getAttributesModel(newWs) == null) {
             algoComboBox.setEnabled(false);
             setEnableState(false);
         }
@@ -503,28 +503,26 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     }
 
     private void refreshCenterPanel(AlgorithmModel algoModel) {
+        CardLayout cl = (CardLayout) centerPanel.getLayout();
         if (algoModel == null || algoModel.getSelectedAlgorithm() == null) {
             ((PropertySheetPanel) propSheetPanel).getPropertySheet().setNodes(new Node[0]);
             scrollPane.setViewportView(null);
-            scrollPane.setVisible(false);
-            propSheetPanel.setVisible(true);
+            cl.show(centerPanel, "settingPanel");
         } else {
             Algorithm selectedAlgorithm = algoModel.getSelectedAlgorithm();
-
-            if (selectedAlgorithm.getFactory().getSetupUI() != null) {
+            if (algoModel.isRunning()) {
+                cl.show(centerPanel, "busyCard");
+            } else if (selectedAlgorithm.getFactory().getSetupUI() != null) {
                 JPanel settingPanel = selectedAlgorithm.getFactory().getSetupUI().getSettingPanel(selectedAlgorithm);
-                propSheetPanel.setVisible(false);
                 presetsButton.setVisible(false);
                 scrollPane.setViewportView(settingPanel);
-                scrollPane.setVisible(true);
+                cl.show(centerPanel, "settingPanel");
             } else {
                 scrollPane.setViewportView(null);
-                scrollPane.setVisible(false);
                 ((PropertySheetPanel) propSheetPanel).getPropertySheet().setNodes(new Node[]{new AlgorithmNode(selectedAlgorithm)});
-                propSheetPanel.setVisible(true);
+                cl.show(centerPanel, "propSheet");
                 presetsButton.setVisible(true);
             }
-
             DefaultComboBoxModel comboBoxModel = (DefaultComboBoxModel) algoComboBox.getModel();
             for (int i = 1; i < comboBoxModel.getSize(); i++) {
                 AlgorithmFactoryItem item = (AlgorithmFactoryItem) comboBoxModel.getElementAt(i);
@@ -534,8 +532,6 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
             }
         }
         richTooltip = null;
-        revalidate();
-        repaint();
     }
 
     private void setEnableState(boolean enabled) {
@@ -548,7 +544,6 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
     }
 
     private void refreshRunning(boolean running) {
-        propSheetPanel.setEnabled(!running);
         setBusy(running);
         CardLayout cl = (CardLayout) centerPanel.getLayout();
         if (running) {
@@ -593,10 +588,10 @@ public final class AlgoExplorerTopComponent extends TopComponent implements Work
                 refreshDisplayName(algoModel);
                 refreshCenterPanel(algoModel);
             } else if (evt.getPropertyName().equals(AlgorithmModel.RUNNING)) {
-                AlgorithmModel algoModel = (AlgorithmModel) evt.getSource();                
-                if (!algoModel.isRunning()){
+                AlgorithmModel algoModel = (AlgorithmModel) evt.getSource();
+                if (!algoModel.isRunning()) {
                     refreshCenterPanel(algoModel);
-                }                
+                }
                 refreshRunning(algoModel.isRunning());
             }
         }

@@ -12,6 +12,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
+import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.Exceptions;
@@ -102,6 +103,7 @@ public class WizardDistanceFunc implements WizardDescriptor.ValidatingPanel<Wiza
         // use wiz.putProperty to remember current panel state
         alg = component.getDistanceFunction();
         wiz.putProperty(AbstractDistance.class.getName(), alg);
+        wiz.putProperty(MD_OUTPUT_OPTION.class.getName(), component.getOption());
     }
 
     @Override

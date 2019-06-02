@@ -15,15 +15,15 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-@ActionID(
-        category = "Tools",
-        id = "org.bapedis.core.ui.actions.ClusteringAction"
-)
-@ActionRegistration(
-        displayName = "#CTL_Clustering",
-        lazy=false
-)
-@ActionReference(path = "Menu/Tools", position = 70)
+//@ActionID(
+//        category = "Tools",
+//        id = "org.bapedis.core.ui.actions.ClusteringAction"
+//)
+//@ActionRegistration(
+//        displayName = "#CTL_Clustering",
+//        lazy=false
+//)
+//@ActionReference(path = "Menu/Tools", position = 70)
 public class ClusteringAction extends ToolAction {
     
     public ClusteringAction() {

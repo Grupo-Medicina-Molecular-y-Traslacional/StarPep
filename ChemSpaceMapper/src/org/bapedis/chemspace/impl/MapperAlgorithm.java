@@ -5,8 +5,6 @@
  */
 package org.bapedis.chemspace.impl;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,13 +43,11 @@ import org.openide.util.NbBundle;
 public class MapperAlgorithm implements Algorithm {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-    public static final String RUNNING = "running";
 
     private final MapperAlgorithmFactory factory;
-    protected final PropertyChangeSupport propertyChangeSupport;
     protected Workspace workspace;
     protected ProgressTicket progressTicket;
-    protected boolean stopRun, running;
+    protected boolean stopRun;
 
     //Mapping Options
     protected RemovingRedundantOption nrdOption;
@@ -65,15 +61,12 @@ public class MapperAlgorithm implements Algorithm {
     private AbstractDistance distFunction;
     private final WekaPCATransformer pcaTransformer;
     private final NetworkEmbedderAlg networkAlg;
-    private final NetworkReport networkReport;
 
     //Algorithm workflow
     private Algorithm currentAlg;
 
     public MapperAlgorithm(MapperAlgorithmFactory factory) {
         this.factory = factory;
-        propertyChangeSupport = new PropertyChangeSupport(this);
-        running = false;
 
         //Mapping Options        
         nrdOption = RemovingRedundantOption.NO;
@@ -86,7 +79,6 @@ public class MapperAlgorithm implements Algorithm {
         featureSelectionAlg = (FeatureSEFiltering) new FeatureSEFilteringFactory().createAlgorithm();
         pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
         networkAlg = (NetworkEmbedderAlg) new NetworkEmbedderFactory().createAlgorithm();
-        networkReport = (NetworkReport) new NetworkReportFactory().createAlgorithm();
 
         //Default distance function
         Collection<? extends DistanceFunction> factories = Lookup.getDefault().lookupAll(DistanceFunction.class);
@@ -97,67 +89,17 @@ public class MapperAlgorithm implements Algorithm {
         }
     }
 
-    public boolean isRunning() {
-        return running;
-    }
-
-    public String getSettingsReport() {
-        String report = getNrdSettings()
-                + "<br />"
-                + getFESettings()
-                + "<br />"
-                + getFSSettings()
-                + "<br />"
-                + getDistanceSettings();
-        return report;
-    }
-
-    private String getNrdSettings() {
-        StringBuilder reportBuilder = new StringBuilder(String.format("<b> Removing redundant sequences</b> (%s)<br />", nrdOption));
-        if (nrdOption == RemovingRedundantOption.YES) {
-            reportBuilder.append(String.format("Alignment type: %s <br />", SequenceAlignmentModel.ALIGNMENT_TYPE[nrdAlg.getAlignmentModel().getAlignmentTypeIndex()]));
-            reportBuilder.append(String.format("Substitution matrix: %s <br />", SequenceAlignmentModel.SUBSTITUTION_MATRIX[nrdAlg.getAlignmentModel().getSubstitutionMatrixIndex()]));
-            reportBuilder.append(String.format("Percent identity: %s <br />", nrdAlg.getAlignmentModel().getPercentIdentity() + "%"));
-        }
-        return reportBuilder.toString();
-
-    }
-
-    private String getFESettings() {
-        StringBuilder reportBuilder = new StringBuilder(String.format("<b> Feature extraction</b> (%s)<br />", feOption));
-        if (feOption == FeatureExtractionOption.YES) {
-            for (Algorithm alg : featureExtractionAlg.getAlgorithms()) {
-                reportBuilder.append(String.format("%s <br />", alg.getFactory().getName()));
-            }
-        }
-        return reportBuilder.toString();
-    }
-
-    private String getFSSettings() {
-        StringBuilder reportBuilder = new StringBuilder(String.format("<b> Feature selection</b> (%s)<br />", fsOption));
-        if (fsOption == FeatureSelectionOption.YES) {
-            reportBuilder.append(String.format("%s <br />", ""));
-        }
-        return reportBuilder.toString();
-    }
-
-    private String getDistanceSettings() {
-        String reportBuilder = String.format("<b> Distance Function</b> (%s)<br />", distFunction.getName());
-        return reportBuilder;
-    }
-
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
         this.progressTicket = progressTicket;
-        stopRun = false;
-        running = true;
-        propertyChangeSupport.firePropertyChange(RUNNING, false, true);
+        stopRun = false;        
     }
 
     @Override
     public void run() {
         //Non-redundant set
+        pc.reportMsg(String.format("Removing redundant sequences: %s", nrdOption), workspace);
         if (nrdOption == RemovingRedundantOption.YES && !stopRun) {
             if (nrdAlg != null) {
                 nrdAlg.setWorkspaceInput(true);
@@ -169,6 +111,7 @@ public class MapperAlgorithm implements Algorithm {
         }
 
         // Feature Extraction
+        pc.reportMsg(String.format("Feature extraction: %s", feOption), workspace);
         if (feOption == FeatureExtractionOption.YES && !stopRun) {
             if (featureExtractionAlg != null) {
                 currentAlg = featureExtractionAlg;
@@ -179,6 +122,7 @@ public class MapperAlgorithm implements Algorithm {
         }
 
         // Feature Selection
+        pc.reportMsg(String.format("Feature selection: %s", fsOption), workspace);
         if (fsOption == FeatureSelectionOption.YES && !stopRun) {
             if (featureSelectionAlg != null) {
                 currentAlg = featureSelectionAlg;
@@ -199,7 +143,8 @@ public class MapperAlgorithm implements Algorithm {
             }
         }
 
-        // Preprocessing of feature list. Compute max, min, mean and std
+        // Preprocessing of features. Computing max, min, mean and std
+        pc.reportMsg("Preprocessing of features. Computing max, min, mean and std", workspace);
         if (!stopRun) {
             try {
                 MolecularDescriptor.preprocessing(allFeatures, attrModel.getPeptides());
@@ -211,30 +156,28 @@ public class MapperAlgorithm implements Algorithm {
         }
 
         //WekaPCA Transformer
+        pc.reportMsg("Applying PCA transformation", workspace);
         if (!stopRun) {
+            if (distFunction != null && pcaTransformer.getOption() != distFunction.getOption()){
+                pcaTransformer.setOption(distFunction.getOption());
+            }
             currentAlg = pcaTransformer;
             execute();
-
-            NetworkCoordinateUpdater updater = new NetworkCoordinateUpdater(pcaTransformer.getXYZSpace());
-            updater.execute();
         }
 
         // Network construction
+        pc.reportMsg("Network construction", workspace);        
         if (!stopRun) {
             if (distFunction != null) {
+                pc.reportMsg(String.format("Distance Function: %s", distFunction.getName()), workspace);                  
                 networkAlg.setDistanceFunction(distFunction);
+                networkAlg.setXyzSpace(pcaTransformer.getXYZSpace());
                 currentAlg = networkAlg;
                 execute();
             } else {
                 throw new RuntimeException("Internal error: Distance function is null");
             }
         }
-
-        //Network report
-//        if (!stopRun) {
-//            currentAlg = networkReport;
-//            execute();
-//        }
     }
 
     private void execute() {
@@ -263,9 +206,6 @@ public class MapperAlgorithm implements Algorithm {
         }
         workspace = null;
         progressTicket = null;
-
-        running = false;
-        propertyChangeSupport.firePropertyChange(RUNNING, true, false);
     }
 
     @Override
@@ -333,10 +273,6 @@ public class MapperAlgorithm implements Algorithm {
         return networkAlg;
     }
 
-    public NetworkReport getNetworkReport() {
-        return networkReport;
-    }
-
     public AbstractDistance getDistanceFunction() {
         return distFunction;
     }
@@ -354,13 +290,4 @@ public class MapperAlgorithm implements Algorithm {
     public AlgorithmFactory getFactory() {
         return factory;
     }
-
-    public void addRunningListener(PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
-    }
-
-    public void removeRunningListener(PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
-    }
-
 }

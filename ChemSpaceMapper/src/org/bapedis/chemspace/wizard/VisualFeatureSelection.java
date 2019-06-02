@@ -60,7 +60,7 @@ public final class VisualFeatureSelection extends JPanel {
         jOption1 = new javax.swing.JRadioButton();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
-        setPreferredSize(new java.awt.Dimension(680, 460));
+        setPreferredSize(new java.awt.Dimension(500, 460));
         setLayout(new java.awt.GridBagLayout());
 
         bottomPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());

@@ -16,17 +16,16 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.distance.DistanceFunction;
+import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.bapedis.core.ui.components.PropertySheetPanel;
 
 public final class VisualDistanceFunc extends JPanel {
 
     public static final String DISTANCE_FUNCTION = "distance_function";
     private final DefaultMutableTreeNode treeNode;
     private AbstractDistance distFunc;
-    private final PropertySheetPanel propSheetPanel;
 
     public VisualDistanceFunc() {
         initComponents();
@@ -35,8 +34,6 @@ public final class VisualDistanceFunc extends JPanel {
         jTree1.setModel(new DefaultTreeModel(treeNode));
         jTree1.setRootVisible(true);
         jTree1.setCellRenderer(new DistanceFactoryNodeRenderer());
-        propSheetPanel = new PropertySheetPanel();
-        propSheetPanel.setPreferredSize(jScrollPane2.getPreferredSize());
     }
 
     public AbstractDistance getDistanceFunction() {
@@ -52,6 +49,24 @@ public final class VisualDistanceFunc extends JPanel {
                 jTree1.setSelectionPath(new TreePath(distNode.getPath()));
             }
         }
+        switch(distFunc.getOption()){
+            case Z_SCORE:
+                jOptionZscore.setSelected(true);
+                break;
+            case MIN_MAX:
+                jOptionMinMax.setSelected(true);
+                break;
+        }
+    }
+    
+    public MD_OUTPUT_OPTION getOption(){
+        if (jOptionZscore.isSelected()){
+            return MD_OUTPUT_OPTION.Z_SCORE;
+        }
+        if (jOptionMinMax.isSelected()){
+            return MD_OUTPUT_OPTION.MIN_MAX;
+        }        
+        return MD_OUTPUT_OPTION.None;
     }
 
     private void populateJTree() {
@@ -77,14 +92,19 @@ public final class VisualDistanceFunc extends JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jInfoLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        optionPanel = new javax.swing.JPanel();
+        optLabel = new javax.swing.JLabel();
+        jOptionMinMax = new javax.swing.JRadioButton();
+        jOptionZscore = new javax.swing.JRadioButton();
         jDescLabel = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
-        setPreferredSize(new java.awt.Dimension(680, 460));
+        setPreferredSize(new java.awt.Dimension(500, 460));
         setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualDistanceFunc.class, "VisualDistanceFunc.jInfoLabel.text")); // NOI18N
@@ -112,9 +132,63 @@ public final class VisualDistanceFunc extends JPanel {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jScrollPane1, gridBagConstraints);
+
+        optionPanel.setLayout(new java.awt.GridBagLayout());
+
+        optLabel.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(optLabel, org.openide.util.NbBundle.getMessage(VisualDistanceFunc.class, "VisualDistanceFunc.optLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
+        optionPanel.add(optLabel, gridBagConstraints);
+
+        buttonGroup1.add(jOptionMinMax);
+        org.openide.awt.Mnemonics.setLocalizedText(jOptionMinMax, org.openide.util.NbBundle.getMessage(VisualDistanceFunc.class, "VisualDistanceFunc.jOptionMinMax.text")); // NOI18N
+        jOptionMinMax.setToolTipText(org.openide.util.NbBundle.getMessage(VisualDistanceFunc.class, "VisualDistanceFunc.jOptionMinMax.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        optionPanel.add(jOptionMinMax, gridBagConstraints);
+
+        buttonGroup1.add(jOptionZscore);
+        org.openide.awt.Mnemonics.setLocalizedText(jOptionZscore, org.openide.util.NbBundle.getMessage(VisualDistanceFunc.class, "VisualDistanceFunc.jOptionZscore.text")); // NOI18N
+        jOptionZscore.setToolTipText(org.openide.util.NbBundle.getMessage(VisualDistanceFunc.class, "VisualDistanceFunc.jOptionZscore.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        optionPanel.add(jOptionZscore, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jDescLabel, org.openide.util.NbBundle.getMessage(VisualDistanceFunc.class, "VisualDistanceFunc.jDescLabel.text")); // NOI18N
+        jDescLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        optionPanel.add(jDescLabel, gridBagConstraints);
+
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(VisualDistanceFunc.class, "VisualDistanceFunc.jLabel1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        optionPanel.add(jLabel1, gridBagConstraints);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -122,19 +196,7 @@ public final class VisualDistanceFunc extends JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(jScrollPane2, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jDescLabel, org.openide.util.NbBundle.getMessage(VisualDistanceFunc.class, "VisualDistanceFunc.jDescLabel.text")); // NOI18N
-        jDescLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        jDescLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jDescLabel.setMinimumSize(new java.awt.Dimension(4, 87));
-        jDescLabel.setPreferredSize(new java.awt.Dimension(4, 87));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-        add(jDescLabel, gridBagConstraints);
+        add(optionPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
@@ -142,22 +204,26 @@ public final class VisualDistanceFunc extends JPanel {
         if (newPath != null && newPath.getLastPathComponent() instanceof DistanceFunctionTreeNode) {
             DistanceFunctionTreeNode newNode = (DistanceFunctionTreeNode) newPath.getLastPathComponent();
             distFunc = newNode.getDistanceFunction();
-            jDescLabel.setText(NbBundle.getMessage(VisualDistanceFunc.class, "VisualDistanceFunc.jDescLabel.text", distFunc.getName(), distFunc.getDescription()));
+            jDescLabel.setText(distFunc.getDescription());
             jDescLabel.setVisible(true);            
         } else {
             distFunc = null;
             jDescLabel.setText("");
-            jDescLabel.setVisible(false);
         }
         firePropertyChange(DISTANCE_FUNCTION, null, distFunc);
     }//GEN-LAST:event_jTree1ValueChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel jDescLabel;
     private javax.swing.JLabel jInfoLabel;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JRadioButton jOptionMinMax;
+    private javax.swing.JRadioButton jOptionZscore;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTree jTree1;
+    private javax.swing.JLabel optLabel;
+    private javax.swing.JPanel optionPanel;
     // End of variables declaration//GEN-END:variables
 
     private static class DistanceFunctionTreeNode extends DefaultMutableTreeNode {

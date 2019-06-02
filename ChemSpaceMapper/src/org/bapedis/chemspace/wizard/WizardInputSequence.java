@@ -14,7 +14,7 @@ import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 
-public class WizardInputSequence implements WizardDescriptor.Panel<WizardDescriptor> {
+public class WizardInputSequence implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
     private final MapperAlgorithm csMapper;
     private NonRedundantSetAlg alg;
@@ -95,6 +95,11 @@ public class WizardInputSequence implements WizardDescriptor.Panel<WizardDescrip
         } else{
             wiz.putProperty(NonRedundantSetAlg.class.getName(), null);
         }
+    }
+
+    @Override
+    public boolean isFinishPanel() {
+        return true;
     }
 
 }

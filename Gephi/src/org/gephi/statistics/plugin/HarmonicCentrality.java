@@ -41,6 +41,7 @@
  */
 package org.gephi.statistics.plugin;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -119,7 +120,8 @@ public class HarmonicCentrality extends AbstractCentrality {
 
     @Override
     public AlgorithmProperty[] getProperties() {
-        return properties.toArray(new AlgorithmProperty[0]);
+//        return properties.toArray(new AlgorithmProperty[0]);
+        return null;
     }
 
     protected double getEdgeWeight(Edge edge) {
@@ -132,75 +134,74 @@ public class HarmonicCentrality extends AbstractCentrality {
 
     @Override
     protected void calculateCentrality() {
-        int n = graph.getNodeCount();
-        progress.switchToDeterminate(n);
+        progress.switchToDeterminate(graph.getNodeCount());
+        Arrays.stream(nodes).parallel().forEach(node -> {
+            if (!isCanceled) {
+                calculateCentrality(node);
+                progress.progress();
+            }
+        });
+    }
 
-        double[] d = new double[n];
+    private void calculateCentrality(Node sourceNode) {
+        double[] d = new double[graph.getNodeCount()];
 
         Set<Node> unvisitedNodes = new HashSet<>();
         Set<Node> visitedNodes = new HashSet<>();
 
-        for (Node sourceNode : nodes) {
+        for (int i = 0; i < d.length; i++) {
+            d[i] = Double.POSITIVE_INFINITY;
+        }
 
-            //Initialize
-            unvisitedNodes.clear();
-            visitedNodes.clear();
+        int s_index = (Integer) sourceNode.getAttribute(NODE_INDEX);
+        d[s_index] = 0;
 
-            for (int i = 0; i < d.length; i++) {
-                d[i] = Double.POSITIVE_INFINITY;
+        unvisitedNodes.add(sourceNode);
+
+        Node minDistanceNode;
+        double minDistance;
+        double dist;
+        while (!unvisitedNodes.isEmpty()) {
+
+            // find node with smallest distance value
+            minDistance = Double.POSITIVE_INFINITY;
+            minDistanceNode = null;
+            for (Node node : unvisitedNodes) {
+                int index = (Integer) node.getAttribute(NODE_INDEX);
+
+                if (d[index] < minDistance) {
+                    minDistance = d[index];
+                    minDistanceNode = node;
+                }
             }
 
-            int s_index = (Integer) sourceNode.getAttribute(NODE_INDEX);
-            d[s_index] = 0;
+            unvisitedNodes.remove(minDistanceNode);
+            visitedNodes.add(minDistanceNode);
 
-            unvisitedNodes.add(sourceNode);
+            int v_index = (Integer) minDistanceNode.getAttribute(NODE_INDEX);
 
-            Node minDistanceNode;
-            double minDistance;
-            double dist;
-            while (!unvisitedNodes.isEmpty()) {
+            EdgeIterable edgeIter = getEdgeIter(graph, minDistanceNode, directed);
 
-                // find node with smallest distance value
-                minDistance = Double.POSITIVE_INFINITY;
-                minDistanceNode = null;
-                for (Node node : unvisitedNodes) {
-                    int index = (Integer) node.getAttribute(NODE_INDEX);
+            for (Edge edge : edgeIter) {
+                Node reachable = graph.getOpposite(minDistanceNode, edge);
 
-                    if (d[index] < minDistance) {
-                        minDistance = d[index];
-                        minDistanceNode = node;
-                    }
-                }
+                if (!visitedNodes.contains(reachable)) {
+                    int r_index = (Integer) reachable.getAttribute(NODE_INDEX);
 
-                unvisitedNodes.remove(minDistanceNode);
-                visitedNodes.add(minDistanceNode);
+                    dist = d[v_index] + getEdgeWeight(edge);
 
-                int v_index = (Integer) minDistanceNode.getAttribute(NODE_INDEX);
-
-                EdgeIterable edgeIter = getEdgeIter(graph, minDistanceNode, directed);
-
-                for (Edge edge : edgeIter) {
-                    Node reachable = graph.getOpposite(minDistanceNode, edge);
-
-                    if (!visitedNodes.contains(reachable)) {
-                        int r_index = (Integer) reachable.getAttribute(NODE_INDEX);
-
-                        dist = d[v_index] + getEdgeWeight(edge);
-
-                        if (dist < d[r_index]) {
-                            d[r_index] = dist;
-                            unvisitedNodes.add(reachable);
-                        }
+                    if (dist < d[r_index]) {
+                        d[r_index] = dist;
+                        unvisitedNodes.add(reachable);
                     }
                 }
             }
+        }
 
-            for (int i = 0; i < N; i++) {
-                if (d[i] > 0) {
-                    harmonic[s_index] += Double.isInfinite(d[i]) ? 0.0 : 1.0 / d[i];
-                }
+        for (int i = 0; i < N; i++) {
+            if (d[i] > 0) {
+                harmonic[s_index] += Double.isInfinite(d[i]) ? 0.0 : 1.0 / d[i];
             }
-            progress.progress();
         }
     }
 
@@ -269,7 +270,6 @@ public class HarmonicCentrality extends AbstractCentrality {
 //        ChartUtils.scaleChart(chart, dSeries, isNormalized);
 //        return ChartUtils.renderChart(chart, pName + ".png");
 //    }    
-    
     class NodeComparator implements Comparator<Node> {
 
         private final double[] d;

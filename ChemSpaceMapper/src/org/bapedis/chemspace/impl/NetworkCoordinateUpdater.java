@@ -27,51 +27,40 @@ import org.openide.util.NbBundle;
  * @author Loge
  */
 public class NetworkCoordinateUpdater extends SwingWorker<Void, Void> {
-        protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-        static final String UPDATED_POSITIONS = "updated_positions";
-        private final AtomicBoolean stopRun;
-        private final ProgressTicket ticket;
-        private final CoordinateSpace xyzSpace;
 
-        public NetworkCoordinateUpdater(CoordinateSpace xyzSpace) {
-            this.xyzSpace = xyzSpace;
-            stopRun = new AtomicBoolean(false);
-            ticket = new ProgressTicket(NbBundle.getMessage(NetworkThresholdUpdater.class, "GraphNodePositionUpdater.task.name"), new Cancellable() {
-                @Override
-                public boolean cancel() {
-                    stopRun.set(true);
-                    return true;
-                }
-            });
-            ticket.start();
-        }
+    protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+    static final String UPDATED_POSITIONS = "updated_positions";
+    private final AtomicBoolean stopRun;
+    private final ProgressTicket ticket;
+    private final CoordinateSpace xyzSpace;
+    private final int xAxis, yAxis, zAxis;
 
-        @Override
-        protected Void doInBackground() throws Exception {            
-            updateNodePositions();
-            return null;
-        }
-
-        @Override
-        protected void done() {
-            try {
-                get();
-            } catch (InterruptedException | ExecutionException ex) {
-                Exceptions.printStackTrace(ex);
-            } finally {
-                firePropertyChange(UPDATED_POSITIONS, null, null);
-                ticket.finish();
+    public NetworkCoordinateUpdater(CoordinateSpace xyzSpace, int xAxis, int yAxis, int zAxis) {
+        this.xyzSpace = xyzSpace;
+        this.xAxis = xAxis;
+        this.yAxis = yAxis;
+        this.zAxis = zAxis;
+        stopRun = new AtomicBoolean(false);
+        ticket = new ProgressTicket(NbBundle.getMessage(NetworkThresholdUpdater.class, "GraphNodePositionUpdater.task.name"), new Cancellable() {
+            @Override
+            public boolean cancel() {
+                stopRun.set(true);
+                return true;
             }
-        }
-        
-    public void updateNodePositions() {        
+        });
+        ticket.start();
+    }
+
+    @Override
+    protected Void doInBackground() throws Exception {
+        xyzSpace.updatePositions(xAxis, yAxis, zAxis);
         Vector3f[] positions = xyzSpace.getPositions();
         Peptide[] peptides = xyzSpace.getPeptides();
         ticket.switchToDeterminate(peptides.length);
         GraphModel graphModel = pc.getGraphModel();
         Graph graphVisible = graphModel.getGraphVisible();
         graphVisible.readLock();
-        try {            
+        try {
             Node node;
             Vector3f p;
             for (int i = 0; i < positions.length && !stopRun.get(); i++) {
@@ -85,6 +74,19 @@ public class NetworkCoordinateUpdater extends SwingWorker<Void, Void> {
         } finally {
             graphVisible.readUnlock();
         }
-    }           
-
+        return null;
     }
+
+    @Override
+    protected void done() {
+        try {
+            get();
+        } catch (InterruptedException | ExecutionException ex) {
+            Exceptions.printStackTrace(ex);
+        } finally {
+            firePropertyChange(UPDATED_POSITIONS, null, null);
+            ticket.finish();
+        }
+    }
+
+}

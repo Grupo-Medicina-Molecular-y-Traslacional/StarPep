@@ -11,11 +11,11 @@ import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.FeatureSelectionOption;
 import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
+import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.spi.alg.ChemSpaceTag;
-import org.bapedis.core.spi.alg.impl.AbstractClusterizer;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
@@ -58,7 +58,7 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
     }
 
     public static void setUp(MapperAlgorithm csMapper, WizardDescriptor wiz) {
-        
+
         //Non-redundant set
         RemovingRedundantOption nrdOption = (RemovingRedundantOption) wiz.getProperty(RemovingRedundantOption.class.getName());
         if (nrdOption != null) {
@@ -91,7 +91,11 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
 
         // Similarity  
         AbstractDistance distFunction = (AbstractDistance) wiz.getProperty(AbstractDistance.class.getName());
-        csMapper.setDistanceFunction(distFunction);
+        MD_OUTPUT_OPTION option = (MD_OUTPUT_OPTION) wiz.getProperty(MD_OUTPUT_OPTION.class.getName());
+        if (distFunction != null) {
+            distFunction.setOption(option);
+            csMapper.setDistanceFunction(distFunction);
+        }
     }
 
     public static WizardDescriptor createWizardDescriptor(MapperAlgorithm csMapper) {

@@ -24,6 +24,8 @@ import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
+import org.gephi.graph.api.Origin;
+import org.gephi.graph.api.Table;
 import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
 
@@ -71,7 +73,7 @@ public abstract class AbstractClusterizer implements Algorithm, Cloneable {
 
     public void setPreprocessing(boolean preprocessing) {
         this.preprocessing = preprocessing;
-    }        
+    }
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
@@ -80,9 +82,9 @@ public abstract class AbstractClusterizer implements Algorithm, Cloneable {
         ticket = progressTicket;
         clusters = null;
         graphModel = pc.getGraphModel(workspace);
-        graphViz = pc.getGraphVizSetting(workspace);  
+        graphViz = pc.getGraphVizSetting(workspace);
         attrModel = pc.getAttributesModel(workspace);
-        if (peptides == null) {            
+        if (peptides == null) {
             if (attrModel != null) {
                 peptides = attrModel.getPeptides().toArray(new Peptide[0]);
                 attrModel.removeDisplayedColumn(CLUSTER_ATTR);
@@ -113,21 +115,34 @@ public abstract class AbstractClusterizer implements Algorithm, Cloneable {
         if (attrModel != null && !stopRun) {
             attrModel.addDisplayedColumn(CLUSTER_ATTR);
 
+            boolean fireEvent = false;
+            Table nodeTable = graphModel.getNodeTable();
+            if (!nodeTable.hasColumn(CLUSTER_ATTR.getId())) {
+                nodeTable.addColumn(CLUSTER_ATTR.getId(), CLUSTER_ATTR.getDisplayName(), CLUSTER_ATTR.getType(), Origin.DATA, CLUSTER_ATTR.getDefaultValue(), true);
+                fireEvent = true;
+            }
+
+            Node graphNode;
             //Set default values            
             for (Peptide peptide : attrModel.getPeptideMap().values()) {
                 peptide.setAttributeValue(CLUSTER_ATTR, CLUSTER_ATTR.getDefaultValue());
+                graphNode = peptide.getGraphNode();
+                graphNode.setAttribute(CLUSTER_ATTR.getId(), CLUSTER_ATTR.getDefaultValue());
             }
 
             //Set cluster values    
             if (clusters != null) {
-                Node graphNode;
                 for (Cluster c : clusters) {
                     for (Peptide p : c.getMembers()) {
                         p.setAttributeValue(CLUSTER_ATTR, c.getId());
                         graphNode = p.getGraphNode();
-                        graphNode.setAttribute(CLUSTER_ATTR.getDisplayName(), c.getId());
+                        graphNode.setAttribute(CLUSTER_ATTR.getId(), c.getId());
                     }
                 }
+            }
+
+            if (fireEvent) {
+                graphViz.fireChangedGraphView();
             }
         }
 

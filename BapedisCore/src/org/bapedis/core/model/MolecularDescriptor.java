@@ -5,12 +5,8 @@
  */
 package org.bapedis.core.model;
 
-import java.util.Arrays;
 import java.util.List;
 import org.bapedis.core.project.ProjectManager;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
-import org.openide.util.NbBundle;
 
 /**
  *

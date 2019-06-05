@@ -86,7 +86,7 @@ public class ProjectManager implements Lookup.Provider {
 
     public static final String EDGE_TABLE_PRO_DISTANCE = "distance";
     public static final String EDGE_TABLE_PRO_DISTANCE_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.distance.title");
-    
+
     final String OUTPUT_ID = "output";
     TopComponent outputWindow;
 
@@ -324,20 +324,20 @@ public class ProjectManager implements Lookup.Provider {
         }
         return model;
     }
-    
-    public synchronized MetadataNavigatorModel getMetadataNavModel(){
+
+    public synchronized MetadataNavigatorModel getMetadataNavModel() {
         return getMetadataNavModel(currentWS);
     }
-    
-    public synchronized MetadataNavigatorModel getMetadataNavModel(Workspace workspace){
+
+    public synchronized MetadataNavigatorModel getMetadataNavModel(Workspace workspace) {
         MetadataNavigatorModel model = workspace.getLookup().lookup(MetadataNavigatorModel.class);
         if (model == null) {
             model = new MetadataNavigatorModel();
             workspace.add(model);
-        }  
+        }
         return model;
     }
-    
+
 //    public synchronized StructureNavigatorModel getStructureNavModel(){
 //        return getStructureNavModel(currentWS);
 //    }
@@ -350,19 +350,18 @@ public class ProjectManager implements Lookup.Provider {
 //        }  
 //        return model;
 //    }    
-    
-    public synchronized GraphElementNavigatorModel getGraphElementNavModel(){
+    public synchronized GraphElementNavigatorModel getGraphElementNavModel() {
         return getGraphElementNavModel(currentWS);
     }
-    
-    public synchronized GraphElementNavigatorModel getGraphElementNavModel(Workspace workspace){
+
+    public synchronized GraphElementNavigatorModel getGraphElementNavModel(Workspace workspace) {
         GraphElementNavigatorModel model = workspace.getLookup().lookup(GraphElementNavigatorModel.class);
         if (model == null) {
             model = new GraphElementNavigatorModel();
             workspace.add(model);
-        }  
+        }
         return model;
-    }         
+    }
 
     protected void createDefaultColumns(GraphModel graphModel) {
         Table nodeTable = graphModel.getNodeTable();
@@ -380,7 +379,7 @@ public class ProjectManager implements Lookup.Provider {
         if (!edgeTable.hasColumn(EDGE_TABLE_PRO_DISTANCE)) {
             edgeTable.addColumn(EDGE_TABLE_PRO_DISTANCE, EDGE_TABLE_PRO_DISTANCE_TITLE, Double.class, Origin.DATA, null, false);
         }
-        
+
     }
 
     public synchronized QueryModel getQueryModel() {

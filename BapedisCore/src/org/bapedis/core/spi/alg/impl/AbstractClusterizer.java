@@ -24,7 +24,6 @@ import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
-import org.gephi.graph.api.Table;
 import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
 
@@ -35,7 +34,6 @@ import org.openide.util.Lookup;
 public abstract class AbstractClusterizer implements Algorithm, Cloneable {
 
     public static PeptideAttribute CLUSTER_ATTR = new PeptideAttribute("cluster", "Cluster", Integer.class, true, -1);
-    public static final String CLUSTER_COLUMN = "cluster";
     protected final AlgorithmFactory factory;
     protected boolean stopRun;
     protected ProgressTicket ticket;
@@ -115,36 +113,21 @@ public abstract class AbstractClusterizer implements Algorithm, Cloneable {
         if (attrModel != null && !stopRun) {
             attrModel.addDisplayedColumn(CLUSTER_ATTR);
 
-            //Add cluster column
-            boolean fireEvent = false;
-            Table nodeTable = graphModel.getNodeTable();
-            if (!nodeTable.hasColumn(CLUSTER_COLUMN)) {
-                nodeTable.addColumn(CLUSTER_COLUMN, "Cluster", Integer.class, null);
-                fireEvent = true;
-            }
-
             //Set default values            
-            for (Node node : graphModel.getGraph().getNodes()) {
-                node.setAttribute(CLUSTER_COLUMN, CLUSTER_ATTR.getDefaultValue());
-            }
             for (Peptide peptide : attrModel.getPeptideMap().values()) {
                 peptide.setAttributeValue(CLUSTER_ATTR, CLUSTER_ATTR.getDefaultValue());
             }
 
             //Set cluster values    
             if (clusters != null) {
-                Node node;
+                Node graphNode;
                 for (Cluster c : clusters) {
                     for (Peptide p : c.getMembers()) {
                         p.setAttributeValue(CLUSTER_ATTR, c.getId());
-                        node = p.getGraphNode();
-                        node.setAttribute(CLUSTER_COLUMN, c.getId());
+                        graphNode = p.getGraphNode();
+                        graphNode.setAttribute(CLUSTER_ATTR.getDisplayName(), c.getId());
                     }
                 }
-            }
-
-            if (fireEvent) {
-                graphViz.fireChangedGraphView();
             }
         }
 

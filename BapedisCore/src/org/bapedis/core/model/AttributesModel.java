@@ -106,7 +106,7 @@ public class AttributesModel {
     private void addNodeTableColumn(PeptideAttribute attr) {
         Table table = pc.getGraphModel().getNodeTable();
         if (!table.hasColumn(attr.getDisplayName())) {
-            table.addColumn(attr.getDisplayName(), attr.getType(), Origin.PROPERTY);
+            table.addColumn(attr.getId(), attr.getDisplayName(), attr.getType(), Origin.DATA, attr.getDefaultValue(), true);
             
             org.gephi.graph.api.Node node;
             for (Peptide peptide : peptideMap.values()) {

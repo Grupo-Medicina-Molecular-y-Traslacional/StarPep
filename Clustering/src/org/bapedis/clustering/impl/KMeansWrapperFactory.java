@@ -16,7 +16,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author loge
  */
-//@ServiceProvider(service = AlgorithmFactory.class, position = 30)
+@ServiceProvider(service = AlgorithmFactory.class, position = 30)
 public class KMeansWrapperFactory implements ClusteringTag{
 
     @Override

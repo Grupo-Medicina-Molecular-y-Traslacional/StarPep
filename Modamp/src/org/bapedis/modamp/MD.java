@@ -331,7 +331,7 @@ public class MD {
         
         return hMMax;
     }
-
+    
     /**
      * The Grand average of hydropathicity GRAVY value for a peptide or protein
      * is calculated as the sum of hydropathy values [9] of all the amino acids,
@@ -351,7 +351,18 @@ public class MD {
         gravy /= seq.length();
         return gravy;
     }
-
+    
+    public static double[] gravyByAA( String seq, Map<String, Double> hydro_scale )
+    {
+        double[] gravyByAA = new double[ seq.length() ];
+        for ( int i = 0; i < seq.length(); i++ ) 
+        {
+            gravyByAA[i] = hydro_scale.getOrDefault( seq.subSequence( i, i + 1 ), 0.0 ); //sum
+        }
+        
+        return gravyByAA;
+    }
+    
     /**
      * The Grand average of hydropathicity GRAVY value for a peptide or protein
      * is calculated as the sum of hydropathy values [9] of all the amino acids,
@@ -362,8 +373,14 @@ public class MD {
      * @param seq
      * @return GRAVY
      */
-    public static double gravy(String seq) {
+    public static double gravy( String seq ) 
+    {
         return gravy(seq, HydrophobicityScale.kyte_doolittle_hydrov_hash());
+    }
+    
+    public static double[] gravyByAA( String seq ) 
+    {
+        return gravyByAA( seq, HydrophobicityScale.kyte_doolittle_hydrov_hash() );
     }
 
     /**

@@ -70,6 +70,21 @@ public class MD {
         double OH = 17.00738;
         return H + molW + OH;
     }
+    
+    public static double[] mwByAA( String seq )
+    {
+        Map<String, Double> aa_hash = otherScales.molecularWeight();
+        
+        double[] molW = new double[ seq.length() + 2 ];
+        for ( int i = 0; i < seq.length(); i++ ) 
+        {
+            molW[i] = aa_hash.getOrDefault( seq.subSequence( i, i + 1 ), 0.0 );
+        }
+        
+        molW[ seq.length() - 1 ] = 1.00797;
+        molW[ seq.length() - 2 ] = 17.00738;
+        return molW;
+    }
 
     /**
      * Compute the net charge Z of a peptide sequences at a certain pH and a

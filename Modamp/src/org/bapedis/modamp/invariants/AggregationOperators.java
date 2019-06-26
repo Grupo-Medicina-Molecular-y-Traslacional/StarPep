@@ -7,6 +7,7 @@ package org.bapedis.modamp.invariants;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.alg.impl.AbstractMD;
 import org.openide.util.Exceptions;
@@ -17,34 +18,100 @@ import org.openide.util.Exceptions;
  */
 public class AggregationOperators 
 {
-    private static final String[] METHODS = { "variance", "skewness", "kurtosis", "standardDeviation", "variationCoefficient", "range" };
+    private static final String[] METHODS = { "generalizedMean", "variance", "skewness", "kurtosis", "standardDeviation", "variationCoefficient", "range", "i50" };
     
-    private static final String[] ACRONYM = { "V", "S", "K", "SD", "VC", "RA" };
+    private static final String[] ACRONYM = { "-", "V", "S", "K", "SD", "VC", "RA", "i50" };
     
-    public static void applyOperators( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, AggregationOperators operators )
+    public static void applyOperators( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, AggregationOperators operators, boolean applyMeans )
     {
-        Method[] declaredMethods = operators.getClass().getMethods();
-        
         for ( int i = 0; i < METHODS.length; i++ )
-        {        
-            for ( Method method : declaredMethods ) 
+        {
+            try 
             {
-                if ( method.getName().equals( METHODS[i] ) ) 
+                if ( METHODS[i].equals( "generalizedMean" ) )
                 {
-                    try 
+                    if ( applyMeans )
                     {
-                        double val = (double) method.invoke( operators, new Object[]{ lovis } );
-                        peptide.setAttributeValue( md.getOrAddAttribute( ACRONYM[i] + "-" + keyAttr,
-                                                                         ACRONYM[i] + "-" + keyAttr, Double.class, 0d ), val );
-                    }
-                    catch ( IllegalAccessException | IllegalArgumentException | InvocationTargetException ex )
-                    {
-                        Exceptions.printStackTrace( ex );
+                        double val = operators.generalizedMean( lovis, -1 );
+                        peptide.setAttributeValue( md.getOrAddAttribute( "HM-" + keyAttr,
+                                                                         "HM-" + keyAttr, Double.class, 0d ), val );
+
+                        val = operators.generalizedMean( lovis, 2 );
+                        peptide.setAttributeValue( md.getOrAddAttribute( "P2-" + keyAttr,
+                                                                         "P2-" + keyAttr, Double.class, 0d ), val );
+
+                        val = operators.generalizedMean( lovis, 3 );
+                        peptide.setAttributeValue( md.getOrAddAttribute( "P3-" + keyAttr,
+                                                                         "P3-" + keyAttr, Double.class, 0d ), val );
                     }
                 }
+                else
+                {
+                    Method method = operators.getClass().getMethod( METHODS[i], double[].class );
+                    
+                    double val = (double) method.invoke( operators, new Object[]{ lovis } );
+                    peptide.setAttributeValue( md.getOrAddAttribute( ACRONYM[i] + "-" + keyAttr,
+                                                                     ACRONYM[i] + "-" + keyAttr, Double.class, 0d ), val );
+                }
+            }
+            catch ( IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex )
+            {
+                Exceptions.printStackTrace( ex );
             }
         }
-    }    
+    }
+    
+    public double generalizedMean( double[] lovis, int pot ) 
+    {
+        int  n = lovis.length, nZeros = 0;        
+        if ( n == 0 ) 
+        {
+            return 0;
+        }
+        
+        double value = 0;
+        for ( int i = 0; i < n; i++ )
+        {
+            if ( lovis[i] < 0 && ( pot % 2 != 0 ) )
+            {
+                return Double.NaN;
+            }
+            else if ( lovis[i] == 0 ) 
+            {
+                nZeros++;
+            }
+            else 
+            {
+                value = value + Math.pow( lovis[i], pot );
+            }
+        }
+        
+        if ( ( n - nZeros ) == 0 ) // all lovis are zeros
+        {
+            return 0;
+        }
+        
+        if ( !Double.isNaN( value ) )
+        {
+            switch ( pot ) 
+            {
+                case -1: // harmonic mean
+                    value = ( n - nZeros ) / value;
+                    break;
+                case 2: // quadratic mean
+                    value = Math.sqrt( value / ( n - nZeros ) );
+                    break;
+                case 3: // potential mean
+                    value = Math.cbrt( value / ( n - nZeros ) );
+                    break;
+                default:
+                    value = Double.NaN;
+                    break;
+            }
+        }
+        
+        return value;
+    }
     
     public double variance( double[] lovis ) 
     {
@@ -147,6 +214,11 @@ public class AggregationOperators
         return XMax( lovis ) - XMin( lovis );
     }
     
+    public static double i50( double[] lovis ) 
+    {
+        return percentil( lovis, 75 ) - percentil( lovis, 25 );
+    }
+    
     private double thirdCentralMoment( double[] lovis ) 
     {
         double sum = 0;        
@@ -212,5 +284,20 @@ public class AggregationOperators
         }
         
         return min;
+    }
+    
+    private static double percentil( double[] lovis, int per ) 
+    {
+        int longitud = lovis.length;
+        if ( longitud == 0 ) 
+        {
+            return 0;
+        }
+        
+        double[] a1 = lovis.clone();
+        Arrays.sort( a1 );
+        
+        int num = (per * longitud) / 100;
+        return a1[num];
     }
 }

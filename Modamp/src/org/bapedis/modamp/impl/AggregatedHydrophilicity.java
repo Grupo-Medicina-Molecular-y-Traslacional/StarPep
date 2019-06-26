@@ -36,16 +36,16 @@ public class AggregatedHydrophilicity extends AverageHydrophilicity
         if ( HOPT810101 ) 
         {
             lovis = MD.gravyByAA( peptide.getSequence(), HydrophilicityScale.hopp_Woods_hydrov_hash() );
-            AggregationOperators.applyOperators( lovis, HOPT810101_NAME, peptide, this, operators );
+            AggregationOperators.applyOperators( lovis, HOPT810101_NAME, peptide, this, operators, false );
         }
         
         if ( KUHL950101 )
         {
             lovis = MD.gravyByAA( peptide.getSequence(), HydrophilicityScale.kuhn_hydrov_hash() );
-            AggregationOperators.applyOperators( lovis, KUHL950101_NAME, peptide, this, operators );
+            AggregationOperators.applyOperators( lovis, KUHL950101_NAME, peptide, this, operators, true );
         }
         
         lovis = MD.gravyByAA( peptide.getSequence() );
-        AggregationOperators.applyOperators( lovis, GRAVY, peptide, this, operators );
+        AggregationOperators.applyOperators( lovis, GRAVY, peptide, this, operators, false );
     }
 }

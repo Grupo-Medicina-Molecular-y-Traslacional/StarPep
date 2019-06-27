@@ -18,7 +18,7 @@ import org.openide.util.Exceptions;
  */
 public class AggregationOperators 
 {
-    private static final String[] METHODS = { "generalizedMean", "variance", "skewness", "kurtosis", "standardDeviation", "variationCoefficient", "range", "i50" };
+    private static final String[] METHODS = { "means", "variance", "skewness", "kurtosis", "standardDeviation", "variationCoefficient", "range", "i50" };
     
     private static final String[] ACRONYM = { "-", "V", "S", "K", "SD", "VC", "RA", "i50" };
     
@@ -28,18 +28,18 @@ public class AggregationOperators
         {
             try 
             {
-                if ( METHODS[i].equals( "generalizedMean" ) )
+                if ( METHODS[i].equals( "means" ) )
                 {
+                    double val = operators.generalizedMean( lovis, 2 );
+                    peptide.setAttributeValue( md.getOrAddAttribute( "P2-" + keyAttr,
+                                                                     "P2-" + keyAttr, Double.class, 0d ), val );
+                    
                     if ( applyMeans )
                     {
-                        double val = operators.generalizedMean( lovis, -1 );
+                        val = operators.generalizedMean( lovis, -1 );
                         peptide.setAttributeValue( md.getOrAddAttribute( "HM-" + keyAttr,
                                                                          "HM-" + keyAttr, Double.class, 0d ), val );
-
-                        val = operators.generalizedMean( lovis, 2 );
-                        peptide.setAttributeValue( md.getOrAddAttribute( "P2-" + keyAttr,
-                                                                         "P2-" + keyAttr, Double.class, 0d ), val );
-
+                        
                         val = operators.generalizedMean( lovis, 3 );
                         peptide.setAttributeValue( md.getOrAddAttribute( "P3-" + keyAttr,
                                                                          "P3-" + keyAttr, Double.class, 0d ), val );

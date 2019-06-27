@@ -275,6 +275,19 @@ public class MD {
         
         return -1 * (bi / seq.length());
     }
+    
+    public static double[] bomanByAA( String seq )
+    {
+        Map<String, Double> BI = otherScales.bomanIndex();
+        
+        double[] bi = new double[ seq.length() ];
+        for ( int i = 0; i < seq.length(); i++ )
+        {
+            bi[i] = BI.getOrDefault( seq.subSequence( i, i + 1 ), 0.0 );
+        }
+        
+        return bi;
+    }
 
     /**
      * compute the max averaged hydrophobic moment. The averaged hydrophobic

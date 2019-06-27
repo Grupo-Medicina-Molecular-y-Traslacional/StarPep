@@ -15,6 +15,7 @@ import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.invariants.AggregationOperators;
+import org.bapedis.modamp.invariants.GOWAWA;
 import org.bapedis.modamp.scales.ChargeScale;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
@@ -48,7 +49,7 @@ public class AggregatedNetCharge extends AbstractMD
         properties = new LinkedList<>();
         
         populateProperties();
-        operators = new AggregationOperators();
+        operators = new GOWAWA();
     }
     
     private void populateProperties() 
@@ -110,19 +111,19 @@ public class AggregatedNetCharge extends AbstractMD
         if ( KLEP840101 ) 
         {
             lovis = MD.sumAndAvgByAA( seq, ChargeScale.klein_hash() );
-            AggregationOperators.applyOperators( lovis, KLEP840101_NAME, peptide, this, operators, false );
+            operators.applyAllOperators( lovis, KLEP840101_NAME, peptide, this, false );
         }
         
         if ( CHAM830107 )
         {
             lovis = MD.sumAndAvgByAA( seq, ChargeScale.charton_ctc_hash() );
-            AggregationOperators.applyOperators( lovis, CHAM830107_NAME, peptide, this, operators, true );
+            operators.applyAllOperators( lovis, CHAM830107_NAME, peptide, this, true );
         }
         
         if ( CHAM830108 )
         {
             lovis = MD.sumAndAvgByAA( seq, ChargeScale.charton_ctdc_hash() );
-            AggregationOperators.applyOperators( lovis, CHAM830108_NAME, peptide, this, operators, true );
+            operators.applyAllOperators( lovis, CHAM830108_NAME, peptide, this, true );
         }
     }
     

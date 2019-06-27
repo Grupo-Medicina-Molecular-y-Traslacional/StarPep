@@ -11,6 +11,7 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.invariants.AggregationOperators;
+import org.bapedis.modamp.invariants.GOWAWA;
 
 /**
  *
@@ -24,7 +25,7 @@ public class AggregatedBomanIndex extends AbstractMD
     {
         super( factory );
         
-        operators = new AggregationOperators();
+        operators = new GOWAWA();
     }
     
     @Override
@@ -37,6 +38,6 @@ public class AggregatedBomanIndex extends AbstractMD
     protected void compute( Peptide peptide ) 
     {        
         double[] lovis = MD.bomanByAA( peptide.getSequence() );
-        AggregationOperators.applyOperators( lovis, "Boman", peptide, this, operators, false );
+        operators.applyAllOperators( lovis, "Boman", peptide, this, false );
     }
 }

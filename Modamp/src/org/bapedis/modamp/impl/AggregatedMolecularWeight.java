@@ -6,6 +6,7 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.invariants.AggregationOperators;
+import org.bapedis.modamp.invariants.GOWAWA;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -24,7 +25,7 @@ public class AggregatedMolecularWeight extends AbstractMD
     {
         super( factory );
         
-        operators = new AggregationOperators();
+        operators = new GOWAWA();
     }
     
     @Override
@@ -37,6 +38,6 @@ public class AggregatedMolecularWeight extends AbstractMD
     protected void compute(Peptide peptide) 
     {
         double[] lovis = MD.mwByAA( peptide.getSequence() );
-        AggregationOperators.applyOperators( lovis, "mw", peptide, this, operators, true );
+        operators.applyAllOperators( lovis, "mw", peptide, this, true );
     }
 }

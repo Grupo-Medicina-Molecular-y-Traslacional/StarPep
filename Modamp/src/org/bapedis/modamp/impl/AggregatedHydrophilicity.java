@@ -10,6 +10,7 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.invariants.AggregationOperators;
+import org.bapedis.modamp.invariants.GOWAWA;
 import org.bapedis.modamp.scales.HydrophilicityScale;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
@@ -26,7 +27,7 @@ public class AggregatedHydrophilicity extends AverageHydrophilicity
     {
         super( factory );
         
-        operators = new AggregationOperators();
+        operators = new GOWAWA();
     }
     
     @Override
@@ -56,16 +57,16 @@ public class AggregatedHydrophilicity extends AverageHydrophilicity
         if ( HOPT810101 ) 
         {
             lovis = MD.gravyByAA( peptide.getSequence(), HydrophilicityScale.hopp_Woods_hydrov_hash() );
-            AggregationOperators.applyOperators( lovis, HOPT810101_NAME, peptide, this, operators, false );
+            operators.applyAllOperators( lovis, HOPT810101_NAME, peptide, this, false );
         }
         
         if ( KUHL950101 )
         {
             lovis = MD.gravyByAA( peptide.getSequence(), HydrophilicityScale.kuhn_hydrov_hash() );
-            AggregationOperators.applyOperators( lovis, KUHL950101_NAME, peptide, this, operators, true );
+            operators.applyAllOperators( lovis, KUHL950101_NAME, peptide, this, true );
         }
         
         lovis = MD.gravyByAA( peptide.getSequence() );
-        AggregationOperators.applyOperators( lovis, GRAVY, peptide, this, operators, false );
+        operators.applyAllOperators( lovis, GRAVY, peptide, this, false );
     }
 }

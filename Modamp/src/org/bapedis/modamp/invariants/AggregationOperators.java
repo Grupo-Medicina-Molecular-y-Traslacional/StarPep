@@ -16,13 +16,13 @@ import org.openide.util.Exceptions;
  *
  * @author Cesar
  */
-public class AggregationOperators 
+abstract public class AggregationOperators 
 {
     private static final String[] METHODS = { "means", "variance", "skewness", "kurtosis", "standardDeviation", "variationCoefficient", "range", "i50" };
     
     private static final String[] ACRONYM = { "-", "V", "S", "K", "SD", "VC", "RA", "i50" };
     
-    public static void applyOperators( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, AggregationOperators operators, boolean applyMeans )
+    public void applyAllOperators( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, boolean applyMeans )
     {
         for ( int i = 0; i < METHODS.length; i++ )
         {
@@ -30,26 +30,28 @@ public class AggregationOperators
             {
                 if ( METHODS[i].equals( "means" ) )
                 {
-                    double val = operators.generalizedMean( lovis, 2 );
+                    double val = this.generalizedMean( lovis, 2 );
                     peptide.setAttributeValue( md.getOrAddAttribute( "P2-" + keyAttr,
                                                                      "P2-" + keyAttr, Double.class, 0d ), val );
                     
                     if ( applyMeans )
                     {
-                        val = operators.generalizedMean( lovis, -1 );
+                        val = this.generalizedMean( lovis, -1 );
                         peptide.setAttributeValue( md.getOrAddAttribute( "HM-" + keyAttr,
                                                                          "HM-" + keyAttr, Double.class, 0d ), val );
                         
-                        val = operators.generalizedMean( lovis, 3 );
+                        val = this.generalizedMean( lovis, 3 );
                         peptide.setAttributeValue( md.getOrAddAttribute( "P3-" + keyAttr,
                                                                          "P3-" + keyAttr, Double.class, 0d ), val );
+                        
+                        compute( lovis, keyAttr, peptide, md );
                     }
                 }
                 else
                 {
-                    Method method = operators.getClass().getMethod( METHODS[i], double[].class );
+                    Method method = this.getClass().getMethod( METHODS[i], double[].class );
                     
-                    double val = (double) method.invoke( operators, new Object[]{ lovis } );
+                    double val = (double) method.invoke( this, new Object[]{ lovis } );
                     peptide.setAttributeValue( md.getOrAddAttribute( ACRONYM[i] + "-" + keyAttr,
                                                                      ACRONYM[i] + "-" + keyAttr, Double.class, 0d ), val );
                 }
@@ -61,7 +63,9 @@ public class AggregationOperators
         }
     }
     
-    public double generalizedMean( double[] lovis, int pot ) 
+    abstract protected void compute( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md );
+    
+    private double generalizedMean( double[] lovis, int pot ) 
     {
         int  n = lovis.length, nZeros = 0;        
         if ( n == 0 ) 
@@ -113,7 +117,7 @@ public class AggregationOperators
         return value;
     }
     
-    public double variance( double[] lovis ) 
+    final public double variance( double[] lovis ) 
     {
         int longitud = lovis.length;
         double sum = 0;
@@ -146,7 +150,7 @@ public class AggregationOperators
         return sum / (longitud - 1);
     }
     
-    public double skewness( double[] lovis ) 
+    final public double skewness( double[] lovis ) 
     {
         if ( lovis.length < 3 ) 
         {
@@ -159,7 +163,7 @@ public class AggregationOperators
         return result;
     }
     
-    public double kurtosis( double[] lovis ) 
+    final public double kurtosis( double[] lovis ) 
     {
         int n = lovis.length;        
         if (n < 4) 
@@ -187,12 +191,12 @@ public class AggregationOperators
                 / ((n - 1) * (n - 2) * (n - 3) * stdDev4);
     }
     
-    public double standardDeviation( double[] lovis ) 
+    final public double standardDeviation( double[] lovis ) 
     {
         return Math.sqrt( variance( lovis ) );
     }
     
-    public double variationCoefficient( double[] lovis ) 
+    final public double variationCoefficient( double[] lovis ) 
     {
         int longitud = lovis.length;
         if (longitud <= 0) 
@@ -209,12 +213,12 @@ public class AggregationOperators
         return standardDeviation( lovis ) / ArithmeticMean;
     }
     
-    public double range( double[] lovis ) 
+    final public double range( double[] lovis ) 
     {
         return XMax( lovis ) - XMin( lovis );
     }
     
-    public static double i50( double[] lovis ) 
+    final public static double i50( double[] lovis ) 
     {
         return percentil( lovis, 75 ) - percentil( lovis, 25 );
     }

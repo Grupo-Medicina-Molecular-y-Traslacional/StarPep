@@ -13,10 +13,10 @@ import org.bapedis.core.spi.alg.impl.AbstractMD;
  *
  * @author Cesar
  */
-public class GOWAWA extends AggregationOperators
+abstract public class GOWAWA extends AggregationOperators
 {
     @Override
-    final protected void compute( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md )
+    protected void compute( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md )
     {
         for ( String key : defaultOWAWAs )
         {

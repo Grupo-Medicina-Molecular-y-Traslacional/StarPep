@@ -15,7 +15,7 @@ import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.invariants.AggregationOperators;
-import org.bapedis.modamp.invariants.GOWAWA;
+import org.bapedis.modamp.invariants.Choquet;
 import org.bapedis.modamp.scales.ChargeScale;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
@@ -49,7 +49,7 @@ public class AggregatedNetCharge extends AbstractMD
         properties = new LinkedList<>();
         
         populateProperties();
-        operators = new GOWAWA();
+        operators = new Choquet();
     }
     
     private void populateProperties() 

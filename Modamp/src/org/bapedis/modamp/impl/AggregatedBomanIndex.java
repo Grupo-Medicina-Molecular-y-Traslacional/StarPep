@@ -11,7 +11,7 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.invariants.AggregationOperators;
-import org.bapedis.modamp.invariants.GOWAWA;
+import org.bapedis.modamp.invariants.Choquet;
 
 /**
  *
@@ -25,7 +25,7 @@ public class AggregatedBomanIndex extends AbstractMD
     {
         super( factory );
         
-        operators = new GOWAWA();
+        operators = new Choquet();
     }
     
     @Override

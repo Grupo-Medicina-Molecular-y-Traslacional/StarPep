@@ -10,7 +10,7 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.invariants.AggregationOperators;
-import org.bapedis.modamp.invariants.GOWAWA;
+import org.bapedis.modamp.invariants.Choquet;
 import org.bapedis.modamp.scales.HydrophilicityScale;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
@@ -27,7 +27,7 @@ public class AggregatedHydrophilicity extends AverageHydrophilicity
     {
         super( factory );
         
-        operators = new GOWAWA();
+        operators = new Choquet();
     }
     
     @Override

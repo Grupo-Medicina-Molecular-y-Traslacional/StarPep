@@ -6,7 +6,7 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.invariants.AggregationOperators;
-import org.bapedis.modamp.invariants.GOWAWA;
+import org.bapedis.modamp.invariants.Choquet;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -25,7 +25,7 @@ public class AggregatedMolecularWeight extends AbstractMD
     {
         super( factory );
         
-        operators = new GOWAWA();
+        operators = new Choquet();
     }
     
     @Override

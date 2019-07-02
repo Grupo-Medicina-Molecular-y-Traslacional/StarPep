@@ -8,6 +8,7 @@ package org.bapedis.modamp.invariants;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.alg.impl.AbstractMD;
 import org.openide.util.Exceptions;
@@ -22,7 +23,7 @@ abstract public class AggregationOperators
     
     private static final String[] ACRONYM = { "-", "V", "S", "K", "SD", "VC", "RA", "i50" };
     
-    public void applyAllOperators( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, boolean applyMeans )
+    public void applyAllOperators( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, boolean applyMeans, List<String> operatorsList )
     {
         for ( int i = 0; i < METHODS.length; i++ )
         {
@@ -30,30 +31,44 @@ abstract public class AggregationOperators
             {
                 if ( METHODS[i].equals( "means" ) )
                 {
-                    double val = this.generalizedMean( lovis, 2 );
-                    peptide.setAttributeValue( md.getOrAddAttribute( "P2-" + keyAttr,
-                                                                     "P2-" + keyAttr, Double.class, 0d ), val );
+                    double val;
+                    
+                    if ( operatorsList.contains( "P2" ) )
+                    {
+                        val = this.generalizedMean( lovis, 2 );
+                        peptide.setAttributeValue( md.getOrAddAttribute( "P2-" + keyAttr,
+                                                                         "P2-" + keyAttr, Double.class, 0d ), val );
+                    }
                     
                     if ( applyMeans )
                     {
-                        val = this.generalizedMean( lovis, -1 );
-                        peptide.setAttributeValue( md.getOrAddAttribute( "HM-" + keyAttr,
-                                                                         "HM-" + keyAttr, Double.class, 0d ), val );
+                        if ( operatorsList.contains( "HM" ) )
+                        {
+                            val = this.generalizedMean( lovis, -1 );
+                            peptide.setAttributeValue( md.getOrAddAttribute( "HM-" + keyAttr,
+                                                                             "HM-" + keyAttr, Double.class, 0d ), val );
+                        }
                         
-                        val = this.generalizedMean( lovis, 3 );
-                        peptide.setAttributeValue( md.getOrAddAttribute( "P3-" + keyAttr,
-                                                                         "P3-" + keyAttr, Double.class, 0d ), val );
+                        if ( operatorsList.contains( "P3" ) )
+                        {
+                            val = this.generalizedMean( lovis, 3 );
+                            peptide.setAttributeValue( md.getOrAddAttribute( "P3-" + keyAttr,
+                                                                             "P3-" + keyAttr, Double.class, 0d ), val );
+                        }
                         
-                        compute( lovis, keyAttr, peptide, md );
+                        compute( lovis, keyAttr, peptide, md, operatorsList );
                     }
                 }
                 else
                 {
-                    Method method = this.getClass().getMethod( METHODS[i], double[].class );
-                    
-                    double val = (double) method.invoke( this, new Object[]{ lovis } );
-                    peptide.setAttributeValue( md.getOrAddAttribute( ACRONYM[i] + "-" + keyAttr,
-                                                                     ACRONYM[i] + "-" + keyAttr, Double.class, 0d ), val );
+                    if ( operatorsList.contains( ACRONYM[i] ) )
+                    {
+                        Method method = this.getClass().getMethod( METHODS[i], double[].class );
+                        
+                        double val = (double) method.invoke( this, new Object[]{ lovis } );
+                        peptide.setAttributeValue( md.getOrAddAttribute( ACRONYM[i] + "-" + keyAttr,
+                                                                         ACRONYM[i] + "-" + keyAttr, Double.class, 0d ), val );
+                    }
                 }
             }
             catch ( IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex )
@@ -63,7 +78,7 @@ abstract public class AggregationOperators
         }
     }
     
-    abstract protected void compute( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md );
+    abstract protected void compute( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, List<String> operatorsList );
     
     private double generalizedMean( double[] lovis, int pot ) 
     {

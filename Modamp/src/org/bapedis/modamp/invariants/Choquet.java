@@ -7,6 +7,7 @@ package org.bapedis.modamp.invariants;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.alg.impl.AbstractMD;
 
@@ -17,24 +18,27 @@ import org.bapedis.core.spi.alg.impl.AbstractMD;
 public class Choquet extends GOWAWA
 {
     @Override
-    final protected void compute( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md )
+    final protected void compute( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, List<String> operatorsList )
     {
-        super.compute( lovis, keyAttr, peptide, md );
+        super.compute( lovis, keyAttr, peptide, md, operatorsList );
         
-        for ( String key : defaultChoquet )
+        if ( operatorsList.contains( "CHOQUET" ) )
         {
-            String[] values = key.split( "//" );
-            
-            HashMap<Choquet.PARAMETER_NAMES, Object> parameters = new HashMap<>();
-            parameters.put( Choquet.PARAMETER_NAMES.L_VALUE              , Float.parseFloat( values[0] ) );            
-            parameters.put( Choquet.PARAMETER_NAMES.SINGLETON_METHOD     , values[1]  );
-            parameters.put( Choquet.PARAMETER_NAMES.ALFA_SINGLETON_METHOD, Float.parseFloat( values[2] )    );
-            
-            String[] params2String = new String[]{ "" };
-            double val = compute( lovis, parameters, params2String );
-            peptide.setAttributeValue( md.getOrAddAttribute( "CHOQUET[" + params2String[0] + "]-" + keyAttr,
-                                                             "CHOQUET[" + params2String[0] + "]-" + keyAttr, Double.class, 0d ), val );
-        }        
+            for ( String key : defaultChoquet )
+            {
+                String[] values = key.split( "//" );
+                
+                HashMap<Choquet.PARAMETER_NAMES, Object> parameters = new HashMap<>();
+                parameters.put( Choquet.PARAMETER_NAMES.L_VALUE              , Float.parseFloat( values[0] ) );            
+                parameters.put( Choquet.PARAMETER_NAMES.SINGLETON_METHOD     , values[1]  );
+                parameters.put( Choquet.PARAMETER_NAMES.ALFA_SINGLETON_METHOD, Float.parseFloat( values[2] )    );
+                
+                String[] params2String = new String[]{ "" };
+                double val = compute( lovis, parameters, params2String );
+                peptide.setAttributeValue( md.getOrAddAttribute( "CHOQUET[" + params2String[0] + "]-" + keyAttr,
+                                                                 "CHOQUET[" + params2String[0] + "]-" + keyAttr, Double.class, 0d ), val );
+            }
+        }
     }
     
     private enum PARAMETER_NAMES 

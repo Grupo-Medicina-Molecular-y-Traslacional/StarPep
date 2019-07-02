@@ -6,6 +6,7 @@
 package org.bapedis.modamp.invariants;
 
 import java.util.HashMap;
+import java.util.List;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.alg.impl.AbstractMD;
 
@@ -16,27 +17,30 @@ import org.bapedis.core.spi.alg.impl.AbstractMD;
 abstract public class GOWAWA extends AggregationOperators
 {
     @Override
-    protected void compute( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md )
+    protected void compute( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, List<String> operatorsList )
     {
-        for ( String key : defaultOWAWAs )
+        if ( operatorsList.contains( "GOWAWA" ) )
         {
-            String[] values = key.split( "//" );
-            
-            HashMap<PARAMETER_NAMES, Object> parameters = new HashMap<>();
-            parameters.put( PARAMETER_NAMES.BETA_OWAWA, Float.parseFloat( values[0] ) );
-            parameters.put( PARAMETER_NAMES.LAMBDA_OWA, Integer.parseInt( values[1] ) );
-            parameters.put( PARAMETER_NAMES.METHOD_OWA, values[2]                     );
-            parameters.put( PARAMETER_NAMES.ALFA_OWA  , Float.parseFloat( values[3] ) );
-            parameters.put( PARAMETER_NAMES.BETA_OWA  , Float.parseFloat( values[4] ) );
-            parameters.put( PARAMETER_NAMES.DELTA_WA  , Integer.parseInt( values[5] ) );
-            parameters.put( PARAMETER_NAMES.METHOD_WA , values[6]                     );
-            parameters.put( PARAMETER_NAMES.ALFA_WA   , Float.parseFloat( values[7] ) );
-            parameters.put( PARAMETER_NAMES.BETA_WA   , Float.parseFloat( values[8] ) );
-            
-            String[] params2String = new String[]{ "" };
-            double val = compute( lovis, parameters, params2String );
-            peptide.setAttributeValue( md.getOrAddAttribute( "GOWAWA[" + params2String[0] + "]-" + keyAttr,
-                                                             "GOWAWA[" + params2String[0] + "]-" + keyAttr, Double.class, 0d ), val );
+            for ( String key : defaultOWAWAs )
+            {
+                String[] values = key.split( "//" );
+                
+                HashMap<PARAMETER_NAMES, Object> parameters = new HashMap<>();
+                parameters.put( PARAMETER_NAMES.BETA_OWAWA, Float.parseFloat( values[0] ) );
+                parameters.put( PARAMETER_NAMES.LAMBDA_OWA, Integer.parseInt( values[1] ) );
+                parameters.put( PARAMETER_NAMES.METHOD_OWA, values[2]                     );
+                parameters.put( PARAMETER_NAMES.ALFA_OWA  , Float.parseFloat( values[3] ) );
+                parameters.put( PARAMETER_NAMES.BETA_OWA  , Float.parseFloat( values[4] ) );
+                parameters.put( PARAMETER_NAMES.DELTA_WA  , Integer.parseInt( values[5] ) );
+                parameters.put( PARAMETER_NAMES.METHOD_WA , values[6]                     );
+                parameters.put( PARAMETER_NAMES.ALFA_WA   , Float.parseFloat( values[7] ) );
+                parameters.put( PARAMETER_NAMES.BETA_WA   , Float.parseFloat( values[8] ) );
+                
+                String[] params2String = new String[]{ "" };
+                double val = compute( lovis, parameters, params2String );
+                peptide.setAttributeValue( md.getOrAddAttribute( "GOWAWA[" + params2String[0] + "]-" + keyAttr,
+                                                                 "GOWAWA[" + params2String[0] + "]-" + keyAttr, Double.class, 0d ), val );
+            }
         }
     }
     

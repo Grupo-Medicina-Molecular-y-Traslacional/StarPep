@@ -14,27 +14,27 @@ import org.bapedis.core.spi.alg.FeatureExtractionTag;
 
 /**
  *
- * @author beltran, loge
+ * @author Cesar
  */
 @ServiceProvider(service = AlgorithmFactory.class, position = 400)
-public class AggregatedPropertiesFactory implements AlgorithmFactory, FeatureExtractionTag
+public class IndicesNonClassicOperatorsFactory implements AlgorithmFactory, FeatureExtractionTag
 {
     @Override
     public String getCategory() 
     {
-        return NbBundle.getMessage( AggregatedPropertiesFactory.class, "AggregatedProperties.category" );
+        return NbBundle.getMessage( IndicesNonClassicOperatorsFactory.class, "IndicesNonClassicOperators.category" );
     }
     
     @Override
     public String getName()
     {
-        return NbBundle.getMessage( AggregatedPropertiesFactory.class, "AggregatedProperties.name" );
+        return NbBundle.getMessage( IndicesNonClassicOperatorsFactory.class, "IndicesNonClassicOperators.name" );
     }
     
     @Override
     public String getDescription()
     {
-        return NbBundle.getMessage( AggregatedPropertiesFactory.class, "AggregatedProperties.desc" );
+        return NbBundle.getMessage( IndicesNonClassicOperatorsFactory.class, "IndicesNonClassicOperators.desc" );
     }
     
     @Override
@@ -46,6 +46,6 @@ public class AggregatedPropertiesFactory implements AlgorithmFactory, FeatureExt
     @Override
     public Algorithm createAlgorithm()
     {
-        return new AggregatedProperties( this );
+        return new IndicesNonClassicOperators( this );
     }    
 }

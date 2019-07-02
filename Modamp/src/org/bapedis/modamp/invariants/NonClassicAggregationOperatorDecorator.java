@@ -13,11 +13,11 @@ import org.bapedis.core.spi.alg.impl.AbstractMD;
  *
  * @author Cesar
  */
-abstract public class AggregationOperatorDecorator extends AggregationOperator
+abstract public class NonClassicAggregationOperatorDecorator extends NonClassicAggregationOperator
 {
-    protected AggregationOperator operator;
+    protected NonClassicAggregationOperator operator;
     
-    public AggregationOperatorDecorator( AggregationOperator operator )
+    public NonClassicAggregationOperatorDecorator( NonClassicAggregationOperator operator )
     {
         this.operator = operator;
     }

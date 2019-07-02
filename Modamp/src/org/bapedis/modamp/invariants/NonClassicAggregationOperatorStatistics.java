@@ -17,13 +17,13 @@ import org.openide.util.Exceptions;
  *
  * @author Cesar
  */
-final public class Statistics extends AggregationOperatorDecorator
+final public class NonClassicAggregationOperatorStatistics extends NonClassicAggregationOperatorDecorator
 {
     private final String[] METHODS = { "variance", "skewness", "kurtosis", "standardDeviation", "variationCoefficient", "range", "i50" };
     
     private final String[] ACRONYM = { "V", "S", "K", "SD", "VC", "RA", "i50" };
-    
-    public Statistics( AggregationOperator operator )
+        
+    public NonClassicAggregationOperatorStatistics( NonClassicAggregationOperator operator )
     {
         super( operator );
     }

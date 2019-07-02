@@ -13,9 +13,9 @@ import org.bapedis.core.spi.alg.impl.AbstractMD;
  *
  * @author Cesar
  */
-final public class Means extends AggregationOperatorDecorator
+final public class NonClassicAggregationOperatorMeans extends NonClassicAggregationOperatorDecorator
 {    
-    public Means( AggregationOperator operator ) 
+    public NonClassicAggregationOperatorMeans( NonClassicAggregationOperator operator ) 
     {
         super( operator );
     }

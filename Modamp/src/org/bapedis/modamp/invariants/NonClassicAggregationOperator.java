@@ -13,11 +13,7 @@ import org.bapedis.core.spi.alg.impl.AbstractMD;
  *
  * @author Cesar
  */
-final public class AggregationOperatorBase extends AggregationOperator
+abstract public class NonClassicAggregationOperator implements IAggregationOperator
 {
-    @Override
-    public void applyOperators( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, boolean applyMeans, List<String> operatorsList )
-    {
-        
-    }    
+    abstract public void applyOperators( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, boolean applyMeans, List<String> operatorsList );
 }

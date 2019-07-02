@@ -14,9 +14,9 @@ import org.bapedis.core.spi.alg.impl.AbstractMD;
  *
  * @author Cesar
  */
-final public class GOWAWA extends AggregationOperatorDecorator
-{
-    public GOWAWA( AggregationOperator operator ) 
+final public class NonClassicAggregationOperatorGOWAWA extends NonClassicAggregationOperatorDecorator
+{    
+    public NonClassicAggregationOperatorGOWAWA( NonClassicAggregationOperator operator ) 
     {
         super( operator );
     }

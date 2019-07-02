@@ -15,9 +15,9 @@ import org.bapedis.core.spi.alg.impl.AbstractMD;
  *
  * @author Cesar
  */
-final public class Choquet extends AggregationOperatorDecorator
-{
-    public Choquet( AggregationOperator operator )
+final public class NonClassicAggregationOperatorChoquet extends NonClassicAggregationOperatorDecorator
+{    
+    public NonClassicAggregationOperatorChoquet( NonClassicAggregationOperator operator )
     {
         super( operator );
     }
@@ -51,10 +51,10 @@ final public class Choquet extends AggregationOperatorDecorator
             {
                 String[] values = key.split( "//" );
                 
-                HashMap<Choquet.PARAMETER_NAMES, Object> parameters = new HashMap<>();
-                parameters.put( Choquet.PARAMETER_NAMES.L_VALUE              , Float.parseFloat( values[0] ) );            
-                parameters.put( Choquet.PARAMETER_NAMES.SINGLETON_METHOD     , values[1]  );
-                parameters.put( Choquet.PARAMETER_NAMES.ALFA_SINGLETON_METHOD, Float.parseFloat( values[2] )    );
+                HashMap<NonClassicAggregationOperatorChoquet.PARAMETER_NAMES, Object> parameters = new HashMap<>();
+                parameters.put(NonClassicAggregationOperatorChoquet.PARAMETER_NAMES.L_VALUE              , Float.parseFloat( values[0] ) );            
+                parameters.put(NonClassicAggregationOperatorChoquet.PARAMETER_NAMES.SINGLETON_METHOD     , values[1]  );
+                parameters.put(NonClassicAggregationOperatorChoquet.PARAMETER_NAMES.ALFA_SINGLETON_METHOD, Float.parseFloat( values[2] )    );
                 
                 String[] params2String = new String[]{ "" };
                 double val = compute( lovis, parameters, params2String );

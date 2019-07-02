@@ -24,7 +24,8 @@ import org.openide.util.NbBundle;
  */
 public class AverageHydrophilicity extends AbstractMD 
 {
-    protected String  GRAVY;
+    protected boolean GRAVY;
+    protected String  GRAVY_NAME;
     protected boolean HOPT810101;
     protected String  HOPT810101_NAME;
     protected boolean KUHL950101;    
@@ -43,7 +44,8 @@ public class AverageHydrophilicity extends AbstractMD
     
     protected void populateProperties()
     {
-        GRAVY = "AvgGRAVY";        
+        GRAVY = true;
+        GRAVY_NAME = "AvgGRAVY";        
         HOPT810101 = true;
         HOPT810101_NAME = "AvgHydrophilicity(HOPT810101)";
         KUHL950101 = true;
@@ -95,7 +97,10 @@ public class AverageHydrophilicity extends AbstractMD
             addAttribute( KUHL950101_NAME, KUHL950101_NAME, Double.class );
         }
         
-        addAttribute( GRAVY, GRAVY, Double.class );        
+        if ( GRAVY )
+        {
+            addAttribute( GRAVY_NAME, GRAVY_NAME, Double.class );
+        }
     }
     
     @Override
@@ -116,7 +121,7 @@ public class AverageHydrophilicity extends AbstractMD
         }
         
         val = MD.gravy(peptide.getSequence());
-        peptide.setAttributeValue(getAttribute(GRAVY), val);
+        peptide.setAttributeValue(getAttribute( GRAVY_NAME ), val);
     }
     
     @Override

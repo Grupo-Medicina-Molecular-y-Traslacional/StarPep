@@ -7,7 +7,9 @@ package org.bapedis.modamp.impl;
 
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.invariants.AggregationOperators;
 import org.bapedis.modamp.invariants.Choquet;
@@ -33,7 +35,8 @@ public class AggregatedHydrophilicity extends AverageHydrophilicity
     @Override
     protected void populateProperties() 
     {
-        GRAVY = "GRAVY";
+        GRAVY = false;
+        GRAVY_NAME = "GRAVY";
         HOPT810101 = true;
         HOPT810101_NAME = "Hydrophilicity(HOPT810101)";
         KUHL950101 = true;
@@ -48,6 +51,18 @@ public class AggregatedHydrophilicity extends AverageHydrophilicity
         {
             Exceptions.printStackTrace(ex);
         }
+    }
+    
+    @Override
+    public void initAlgo(Workspace workspace, ProgressTicket progressTicket) 
+    {
+        HOPT810101 = false;
+        KUHL950101 = false;
+        
+        super.initAlgo( workspace, progressTicket );
+        
+        HOPT810101 = true;
+        KUHL950101 = true;
     }
     
     @Override
@@ -67,6 +82,6 @@ public class AggregatedHydrophilicity extends AverageHydrophilicity
         }
         
         lovis = MD.gravyByAA( peptide.getSequence() );
-        operators.applyAllOperators( lovis, GRAVY, peptide, this, false );
+        operators.applyAllOperators( lovis, GRAVY_NAME, peptide, this, false );
     }
 }

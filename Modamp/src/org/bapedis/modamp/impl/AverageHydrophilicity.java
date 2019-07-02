@@ -46,7 +46,7 @@ public class AverageHydrophilicity extends AbstractMD
     {
         GRAVY = true;
         GRAVY_NAME = "AvgGRAVY";        
-        HOPT810101 = true;
+        HOPT810101 = false;
         HOPT810101_NAME = "AvgHydrophilicity(HOPT810101)";
         KUHL950101 = true;
         KUHL950101_NAME = "AvgHydrophilicity(KUHL950101)";

@@ -14,38 +14,38 @@ import org.bapedis.core.spi.alg.FeatureExtractionTag;
 
 /**
  *
- * @author Cesar
+ * @author beltran, loge
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 700)
-public class AggregatedHydrophilicityFactory implements AlgorithmFactory, FeatureExtractionTag 
+@ServiceProvider(service = AlgorithmFactory.class, position = 400)
+public class AggregatedPropertiesFactory implements AlgorithmFactory, FeatureExtractionTag
 {
     @Override
     public String getCategory() 
     {
-        return NbBundle.getMessage( AggregatedHydrophilicityFactory.class, "AggregatedHydrophilicity.category" );
+        return NbBundle.getMessage( AggregatedPropertiesFactory.class, "AggregatedProperties.category" );
     }
     
     @Override
-    public String getName() 
+    public String getName()
     {
-        return NbBundle.getMessage( AggregatedHydrophilicityFactory.class, "AggregatedHydrophilicity.name" );
+        return NbBundle.getMessage( AggregatedPropertiesFactory.class, "AggregatedProperties.name" );
     }
     
     @Override
-    public String getDescription() 
+    public String getDescription()
     {
-        return NbBundle.getMessage( AggregatedHydrophilicityFactory.class, "AggregatedHydrophilicity.desc" );
+        return NbBundle.getMessage( AggregatedPropertiesFactory.class, "AggregatedProperties.desc" );
     }
     
     @Override
     public AlgorithmSetupUI getSetupUI() 
     {
-       return null;
+        return null;
     }
     
     @Override
-    public Algorithm createAlgorithm() 
+    public Algorithm createAlgorithm()
     {
-        return new AggregatedHydrophilicity( this );
+        return new AggregatedProperties( this );
     }    
 }

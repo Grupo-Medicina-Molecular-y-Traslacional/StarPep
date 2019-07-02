@@ -8,8 +8,12 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.modamp.MD;
-import org.bapedis.modamp.invariants.AggregationOperators;
+import org.bapedis.modamp.invariants.AggregationOperator;
+import org.bapedis.modamp.invariants.AggregationOperatorBase;
 import org.bapedis.modamp.invariants.Choquet;
+import org.bapedis.modamp.invariants.GOWAWA;
+import org.bapedis.modamp.invariants.Means;
+import org.bapedis.modamp.invariants.Statistics;
 import org.bapedis.modamp.scales.ChargeScale;
 import org.bapedis.modamp.scales.HydrophilicityScale;
 import org.openide.util.Exceptions;
@@ -46,7 +50,7 @@ public class AggregatedProperties extends AbstractMD
     
     final private List<String> operatorsList;
     
-    final private AggregationOperators operators;
+    final private AggregationOperator operators;
     final private List<AlgorithmProperty> properties;
     
     public AggregatedProperties( AggregatedPropertiesFactory factory ) 
@@ -72,7 +76,7 @@ public class AggregatedProperties extends AbstractMD
         setGowawaOperator( true );
         setChoquetOperator( true );
         
-        operators = new Choquet();
+        operators = new Choquet( new GOWAWA( new Statistics( new Means( new AggregationOperatorBase() ) ) ) );
         properties = new LinkedList<>();
         
         try
@@ -116,34 +120,34 @@ public class AggregatedProperties extends AbstractMD
         if ( isMass() )
         {
             lovis = MD.mwByAA( peptide.getSequence() );
-            operators.applyAllOperators( lovis, "mw", peptide, this, true, operatorsList );
+            operators.applyOperators( lovis, "mw", peptide, this, true, operatorsList );
         }
         
         if ( isBoman() )
         {
             lovis = MD.bomanByAA( peptide.getSequence() );
-            operators.applyAllOperators( lovis, "Boman", peptide, this, false, operatorsList );
+            operators.applyOperators( lovis, "Boman", peptide, this, false, operatorsList );
         }
         
         if ( isCharge() )
         {
             lovis = MD.sumAndAvgByAA( peptide.getSequence(), ChargeScale.klein_hash() );
-            operators.applyAllOperators( lovis, "NetCharge(KLEP840101)", peptide, this, false, operatorsList );
+            operators.applyOperators( lovis, "NetCharge(KLEP840101)", peptide, this, false, operatorsList );
             
             /*lovis = MD.sumAndAvgByAA( peptide.getSequence(), ChargeScale.charton_ctc_hash() );
-            operators.applyAllOperators( lovis, "NetCharge(CHAM830107)", peptide, this, true, operatorsList );
+            operators.applyOperators( lovis, "NetCharge(CHAM830107)", peptide, this, true, operatorsList );
             
             lovis = MD.sumAndAvgByAA( peptide.getSequence(), ChargeScale.charton_ctdc_hash() );
-            operators.applyAllOperators( lovis, "NetCharge(CHAM830108)", peptide, this, true, operatorsList );*/
+            operators.applyOperators( lovis, "NetCharge(CHAM830108)", peptide, this, true, operatorsList );*/
         }
         
         if ( isHydrophilicity() )
         {
             lovis = MD.gravyByAA( peptide.getSequence(), HydrophilicityScale.kuhn_hydrov_hash() );
-            operators.applyAllOperators( lovis, "Hydrophilicity(KUHL950101)", peptide, this, true, operatorsList );
+            operators.applyOperators( lovis, "Hydrophilicity(KUHL950101)", peptide, this, true, operatorsList );
             
             lovis = MD.gravyByAA( peptide.getSequence() );
-            operators.applyAllOperators( lovis, "GRAVY", peptide, this, false, operatorsList );
+            operators.applyOperators( lovis, "GRAVY", peptide, this, false, operatorsList );
         }
     }
     

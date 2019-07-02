@@ -15,13 +15,36 @@ import org.bapedis.core.spi.alg.impl.AbstractMD;
  *
  * @author Cesar
  */
-public class Choquet extends GOWAWA
+final public class Choquet extends AggregationOperatorDecorator
 {
-    @Override
-    final protected void compute( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, List<String> operatorsList )
+    public Choquet( AggregationOperator operator )
     {
-        super.compute( lovis, keyAttr, peptide, md, operatorsList );
+        super( operator );
+    }
+    
+    @Override
+    public void applyOperators( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, boolean applyMeans, List<String> operatorsList )
+    {
+        super.applyOperators( lovis, keyAttr, peptide, md, applyMeans, operatorsList ); //To change body of generated methods, choose Tools | Templates.
         
+        if ( applyMeans )
+        {
+            compute( lovis, keyAttr, peptide, md, operatorsList );
+        }
+    }
+    
+    private enum PARAMETER_NAMES 
+    {
+        ALFA_SINGLETON_METHOD, SINGLETON_METHOD, L_VALUE
+    }
+    
+    private enum SINGLETON_METHODS 
+    {
+        AGGREGATED_OBJECTS_1, AGGREGATED_OBJECTS_2
+    }
+    
+    private void compute( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, List<String> operatorsList )
+    {        
         if ( operatorsList.contains( "CHOQUET" ) )
         {
             for ( String key : defaultChoquet )
@@ -39,16 +62,6 @@ public class Choquet extends GOWAWA
                                                                  "CHOQUET[" + params2String[0] + "]-" + keyAttr, Double.class, 0d ), val );
             }
         }
-    }
-    
-    private enum PARAMETER_NAMES 
-    {
-        ALFA_SINGLETON_METHOD, SINGLETON_METHOD, L_VALUE
-    }
-    
-    private enum SINGLETON_METHODS 
-    {
-        AGGREGATED_OBJECTS_1, AGGREGATED_OBJECTS_2
     }
     
     private double compute( double[] lovis, HashMap<PARAMETER_NAMES, Object> parameters, String[] outParams2String )

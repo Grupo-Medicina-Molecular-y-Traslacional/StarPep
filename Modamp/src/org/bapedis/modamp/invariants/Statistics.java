@@ -17,58 +17,33 @@ import org.openide.util.Exceptions;
  *
  * @author Cesar
  */
-abstract public class AggregationOperators 
+final public class Statistics extends AggregationOperatorDecorator
 {
-    private static final String[] METHODS = { "means", "variance", "skewness", "kurtosis", "standardDeviation", "variationCoefficient", "range", "i50" };
+    private final String[] METHODS = { "variance", "skewness", "kurtosis", "standardDeviation", "variationCoefficient", "range", "i50" };
     
-    private static final String[] ACRONYM = { "-", "V", "S", "K", "SD", "VC", "RA", "i50" };
+    private final String[] ACRONYM = { "V", "S", "K", "SD", "VC", "RA", "i50" };
     
-    public void applyAllOperators( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, boolean applyMeans, List<String> operatorsList )
+    public Statistics( AggregationOperator operator )
     {
+        super( operator );
+    }
+    
+    @Override
+    public void applyOperators( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, boolean applyMeans, List<String> operatorsList )
+    {
+        super.applyOperators( lovis, keyAttr, peptide, md, applyMeans, operatorsList ); //To change body of generated methods, choose Tools | Templates.
+        
         for ( int i = 0; i < METHODS.length; i++ )
         {
             try 
             {
-                if ( METHODS[i].equals( "means" ) )
+                if ( operatorsList.contains( ACRONYM[i] ) )
                 {
-                    double val;
+                    Method method = this.getClass().getMethod( METHODS[i], double[].class );
                     
-                    if ( operatorsList.contains( "P2" ) )
-                    {
-                        val = this.generalizedMean( lovis, 2 );
-                        peptide.setAttributeValue( md.getOrAddAttribute( "P2-" + keyAttr,
-                                                                         "P2-" + keyAttr, Double.class, 0d ), val );
-                    }
-                    
-                    if ( applyMeans )
-                    {
-                        if ( operatorsList.contains( "HM" ) )
-                        {
-                            val = this.generalizedMean( lovis, -1 );
-                            peptide.setAttributeValue( md.getOrAddAttribute( "HM-" + keyAttr,
-                                                                             "HM-" + keyAttr, Double.class, 0d ), val );
-                        }
-                        
-                        if ( operatorsList.contains( "P3" ) )
-                        {
-                            val = this.generalizedMean( lovis, 3 );
-                            peptide.setAttributeValue( md.getOrAddAttribute( "P3-" + keyAttr,
-                                                                             "P3-" + keyAttr, Double.class, 0d ), val );
-                        }
-                        
-                        compute( lovis, keyAttr, peptide, md, operatorsList );
-                    }
-                }
-                else
-                {
-                    if ( operatorsList.contains( ACRONYM[i] ) )
-                    {
-                        Method method = this.getClass().getMethod( METHODS[i], double[].class );
-                        
-                        double val = (double) method.invoke( this, new Object[]{ lovis } );
-                        peptide.setAttributeValue( md.getOrAddAttribute( ACRONYM[i] + "-" + keyAttr,
-                                                                         ACRONYM[i] + "-" + keyAttr, Double.class, 0d ), val );
-                    }
+                    double val = (double) method.invoke( this, new Object[]{ lovis } );
+                    peptide.setAttributeValue( md.getOrAddAttribute( ACRONYM[i] + "-" + keyAttr,
+                                                                     ACRONYM[i] + "-" + keyAttr, Double.class, 0d ), val );
                 }
             }
             catch ( IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex )
@@ -76,60 +51,6 @@ abstract public class AggregationOperators
                 Exceptions.printStackTrace( ex );
             }
         }
-    }
-    
-    abstract protected void compute( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, List<String> operatorsList );
-    
-    private double generalizedMean( double[] lovis, int pot ) 
-    {
-        int  n = lovis.length, nZeros = 0;        
-        if ( n == 0 ) 
-        {
-            return 0;
-        }
-        
-        double value = 0;
-        for ( int i = 0; i < n; i++ )
-        {
-            if ( lovis[i] < 0 && ( pot % 2 != 0 ) )
-            {
-                return Double.NaN;
-            }
-            else if ( lovis[i] == 0 ) 
-            {
-                nZeros++;
-            }
-            else 
-            {
-                value = value + Math.pow( lovis[i], pot );
-            }
-        }
-        
-        if ( ( n - nZeros ) == 0 ) // all lovis are zeros
-        {
-            return 0;
-        }
-        
-        if ( !Double.isNaN( value ) )
-        {
-            switch ( pot ) 
-            {
-                case -1: // harmonic mean
-                    value = ( n - nZeros ) / value;
-                    break;
-                case 2: // quadratic mean
-                    value = Math.sqrt( value / ( n - nZeros ) );
-                    break;
-                case 3: // potential mean
-                    value = Math.cbrt( value / ( n - nZeros ) );
-                    break;
-                default:
-                    value = Double.NaN;
-                    break;
-            }
-        }
-        
-        return value;
     }
     
     final public double variance( double[] lovis ) 
@@ -255,22 +176,6 @@ abstract public class AggregationOperators
         }
         
         return sum;
-    }
-    
-    private double arithmeticMean( double[] lovis ) 
-    {
-        double sum = 0;
-        for (int i = 0; i < lovis.length; i++) 
-        {
-            sum += lovis[i];
-        }
-        
-        if ( (lovis.length > 0) && (sum != 0) ) 
-        {
-            return sum / lovis.length;
-        }
-        
-        return 0;
     }
     
     private double XMax( double[] lovis ) 

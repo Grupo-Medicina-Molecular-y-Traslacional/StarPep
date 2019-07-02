@@ -14,10 +14,35 @@ import org.bapedis.core.spi.alg.impl.AbstractMD;
  *
  * @author Cesar
  */
-abstract public class GOWAWA extends AggregationOperators
+final public class GOWAWA extends AggregationOperatorDecorator
 {
+    public GOWAWA( AggregationOperator operator ) 
+    {
+        super( operator );
+    }
+    
     @Override
-    protected void compute( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, List<String> operatorsList )
+    public void applyOperators( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, boolean applyMeans, List<String> operatorsList )
+    {
+        super.applyOperators( lovis, keyAttr, peptide, md, applyMeans, operatorsList ); //To change body of generated methods, choose Tools | Templates.
+        
+        if ( applyMeans )
+        {
+            computeGOWAWA( lovis, keyAttr, peptide, md, operatorsList );
+        }
+    }
+    
+    private enum PARAMETER_NAMES 
+    {
+        BETA_OWAWA, LAMBDA_OWA, METHOD_OWA, ALFA_OWA, BETA_OWA, DELTA_WA, METHOD_WA, ALFA_WA, BETA_WA
+    }
+    
+    private enum WEIGHT_METHODS 
+    {
+        S_OWA, WINDOW_OWA, EXPONENTIAL_SMOOTHING_1, EXPONENTIAL_SMOOTHING_2, AGGREGATED_OBJECTS_1, AGGREGATED_OBJECTS_2, NONE
+    }
+    
+    private void computeGOWAWA( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, List<String> operatorsList )
     {
         if ( operatorsList.contains( "GOWAWA" ) )
         {
@@ -37,24 +62,14 @@ abstract public class GOWAWA extends AggregationOperators
                 parameters.put( PARAMETER_NAMES.BETA_WA   , Float.parseFloat( values[8] ) );
                 
                 String[] params2String = new String[]{ "" };
-                double val = compute( lovis, parameters, params2String );
+                double val = computeGOWAWA( lovis, parameters, params2String );
                 peptide.setAttributeValue( md.getOrAddAttribute( "GOWAWA[" + params2String[0] + "]-" + keyAttr,
                                                                  "GOWAWA[" + params2String[0] + "]-" + keyAttr, Double.class, 0d ), val );
             }
         }
     }
     
-    private enum PARAMETER_NAMES 
-    {
-        BETA_OWAWA, LAMBDA_OWA, METHOD_OWA, ALFA_OWA, BETA_OWA, DELTA_WA, METHOD_WA, ALFA_WA, BETA_WA
-    }
-    
-    private enum WEIGHT_METHODS 
-    {
-        S_OWA, WINDOW_OWA, EXPONENTIAL_SMOOTHING_1, EXPONENTIAL_SMOOTHING_2, AGGREGATED_OBJECTS_1, AGGREGATED_OBJECTS_2, NONE
-    }
-    
-    private double compute( double[] lovis_, HashMap<PARAMETER_NAMES, Object> parameters, String[] outParams2String )
+    private double computeGOWAWA( double[] lovis_, HashMap<PARAMETER_NAMES, Object> parameters, String[] outParams2String )
     {
         if ( lovis_ == null || lovis_.length == 0 )
         {

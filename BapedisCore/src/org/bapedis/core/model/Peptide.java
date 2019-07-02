@@ -70,7 +70,7 @@ import org.openide.util.NbBundle;
             seq = (String) attrsValue.get(SEQ);
         }
         return seq;
-    }
+    }        
 
     public ProteinSequence getBiojavaSeq() throws CompoundNotFoundException {
         if (biojavaSeq == null) {
@@ -84,6 +84,16 @@ import org.openide.util.NbBundle;
             length = (int) attrsValue.get(LENGHT); 
         }
         return length;
+    }
+    
+    public int[][] calcAdjancencyMtrix(){
+        int[][] matrix = new int[length][length];
+        for(int i=0; i<length; i++){
+            for(int j=0; j<length; j++){
+                matrix[i][j] = (j==i-1 || j==i+1)? 1:0;
+            }
+        }                
+        return matrix;
     }
 
     public void setAttributeValue(PeptideAttribute attr, Object value) {

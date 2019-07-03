@@ -40,20 +40,20 @@ public abstract class AbstractMD implements Algorithm {
     private final Map<String, MolecularDescriptor> map;
     public static final String MD_ADDED = "md_added";
     protected final PropertyChangeSupport propertyChangeSupport;
-
+    
     public AbstractMD(AlgorithmFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         this.factory = factory;
         map = Collections.synchronizedMap(new LinkedHashMap<>());
         propertyChangeSupport = new PropertyChangeSupport(this);
     }
-
+    
     protected void addAttribute(String id, String displayName, Class<?> type) {
         MolecularDescriptor attr = new MolecularDescriptor(id, displayName, type, factory.getName());
         addAttribute(attr);
     }
-
-    protected MolecularDescriptor getOrAddAttribute(String id, String displayName, Class<?> type, Double defaultValue) {
+    
+    public MolecularDescriptor getOrAddAttribute(String id, String displayName, Class<?> type, Double defaultValue) {
         synchronized (map) {
             MolecularDescriptor attr = map.get(id);
             if (attr == null) {

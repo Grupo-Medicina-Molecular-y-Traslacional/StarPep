@@ -63,8 +63,8 @@ final public class NonClassicAggregationOperatorGOWAWA extends NonClassicAggrega
                 
                 String[] params2String = new String[]{ "" };
                 double val = computeGOWAWA( lovis, parameters, params2String );
-                peptide.setAttributeValue( md.getOrAddAttribute( "GOWAWA[" + params2String[0] + "]-" + keyAttr,
-                                                                 "GOWAWA[" + params2String[0] + "]-" + keyAttr, Double.class, 0d ), val );
+                peptide.setAttributeValue( md.getOrAddAttribute( keyAttr + "-GOWAWA[" + params2String[0] + "]",
+                                                                 keyAttr + "-GOWAWA[" + params2String[0] + "]", Double.class, 0d ), val );
             }
         }
     }

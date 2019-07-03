@@ -8,6 +8,7 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.modamp.MD;
+import org.bapedis.modamp.invariants.ClassicAggregationOperator;
 import org.bapedis.modamp.invariants.NonClassicAggregationOperatorBase;
 import org.bapedis.modamp.invariants.NonClassicAggregationOperatorChoquet;
 import org.bapedis.modamp.invariants.NonClassicAggregationOperatorGOWAWA;
@@ -48,9 +49,17 @@ public class IndicesNonClassicOperators extends AbstractMD
     private boolean gowawaOperator;
     private boolean choquetOperator;
     
-    final private List<String> operatorsList;
+    private boolean autocorrelationOperator;
+    private boolean gravitationalOperator;
+    private boolean totalSumOperator;
+    private boolean electroTopStateOperator;
     
-    final private NonClassicAggregationOperator operators;
+    final private List<String> classicOperatorsList;
+    final private List<String> nonClassicOperatorsList;
+    
+    final private ClassicAggregationOperator classicOperators;
+    final private NonClassicAggregationOperator nonClassicOperators;
+    
     final private List<AlgorithmProperty> properties;
     
     public IndicesNonClassicOperators( IndicesNonClassicOperatorsFactory factory ) 
@@ -62,7 +71,9 @@ public class IndicesNonClassicOperators extends AbstractMD
         charge = true;
         hydrophilicity = true;
         
-        operatorsList = new LinkedList<>();
+        classicOperatorsList = new LinkedList<>();
+        nonClassicOperatorsList = new LinkedList<>();
+        
         setQuadraticMeanOperator( true );
         setPotentialMeanOperator( true );
         setHarmonicMeanOperator( true );
@@ -76,26 +87,39 @@ public class IndicesNonClassicOperators extends AbstractMD
         setGowawaOperator( true );
         setChoquetOperator( true );
         
-        operators = new NonClassicAggregationOperatorChoquet( new NonClassicAggregationOperatorGOWAWA( 
-                                                              new NonClassicAggregationOperatorStatistics( 
-                                                              new NonClassicAggregationOperatorMeans( 
-                                                              new NonClassicAggregationOperatorBase() ) ) ) );
+        setAutocorrelationOperator( true );
+        setGravitationalOperator( true );
+        setTotalSumOperator( true );
+        setElectroTopStateOperator( true );
+        
+        nonClassicOperators = new NonClassicAggregationOperatorChoquet( new NonClassicAggregationOperatorGOWAWA( 
+                                                                        new NonClassicAggregationOperatorStatistics( 
+                                                                        new NonClassicAggregationOperatorMeans( 
+                                                                        new NonClassicAggregationOperatorBase() ) ) ) );
+        
+        classicOperators = new ClassicAggregationOperator( nonClassicOperators );
+        
         properties = new LinkedList<>();
         
         try
         {
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.p2.name"  ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.p2.desc"  ), "isQuadraticMeanOperator"      , "setQuadraticMeanOperator"       ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.p3.name"  ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.p3.desc"  ), "isPotentialMeanOperator"      , "setPotentialMeanOperator"       ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.hm.name"  ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.hm.desc"  ), "isHarmonicMeanOperator"       , "setHarmonicMeanOperator"        ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.v.name"   ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.v.desc"   ), "isVarianceOperator"           , "setVarianceOperator"            ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.s.name"   ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.s.desc"   ), "isSkewnessOperator"           , "setSkewnessOperator"            ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.k.name"   ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.k.desc"   ), "isKurtosisOperator"           , "setKurtosisOperator"            ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.sd.name"  ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.sd.desc"  ), "isStandardDeviationOperator"  , "setStandardDeviationOperator"   ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.vc.name"  ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.vc.desc"  ), "isVariationCoefficientOpertor", "setVariationCoefficientOpertor" ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.ra.name"  ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.ra.desc"  ), "isRangeOpertor"               , "setRangeOpertor"                ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.i50.name" ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.i50.desc" ), "isI50Opertor"                 , "setI50Opertor"                  ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.gowawa.name"  ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.gowawa.desc"  ), "isGowawaOperator"  , "setGowawaOperator"  ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.choquet.name" ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.choquet.desc" ), "isChoquetOperator" , "setChoquetOperator" ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.p2.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.p2.desc"      ), "isQuadraticMeanOperator"      , "setQuadraticMeanOperator"       ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.p3.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.p3.desc"      ), "isPotentialMeanOperator"      , "setPotentialMeanOperator"       ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.hm.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.hm.desc"      ), "isHarmonicMeanOperator"       , "setHarmonicMeanOperator"        ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.v.name"       ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.v.desc"       ), "isVarianceOperator"           , "setVarianceOperator"            ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.s.name"       ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.s.desc"       ), "isSkewnessOperator"           , "setSkewnessOperator"            ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.k.name"       ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.k.desc"       ), "isKurtosisOperator"           , "setKurtosisOperator"            ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.sd.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.sd.desc"      ), "isStandardDeviationOperator"  , "setStandardDeviationOperator"   ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.vc.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.vc.desc"      ), "isVariationCoefficientOpertor", "setVariationCoefficientOpertor" ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.ra.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.ra.desc"      ), "isRangeOpertor"               , "setRangeOpertor"                ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.i50.name"     ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.i50.desc"     ), "isI50Opertor"                 , "setI50Opertor"                  ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.gowawa.name"  ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.gowawa.desc"  ), "isGowawaOperator"             , "setGowawaOperator"              ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.choquet.name" ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.choquet.desc" ), "isChoquetOperator"            , "setChoquetOperator"             ) );
+            
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.ac.name"  ), "Classic Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.ac.desc"  ), "isAutocorrelationOperator" , "setAutocorrelationOperator" ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.gv.name"  ), "Classic Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.gv.desc"  ), "isGravitationalOperator"   , "setGravitationalOperator"   ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.ts.name"  ), "Classic Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.ts.desc"  ), "isTotalSumOperator"        , "setTotalSumOperator"        ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.es.name"  ), "Classic Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.es.desc"  ), "isElectroTopStateOperator" , "setElectroTopStateOperator" ) );
             
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "IndicesNonClassicOperators.mass.name"           ), "Chemical Properties", NbBundle.getMessage(IndicesNonClassicOperators.class, "IndicesNonClassicOperators.mass.desc"           ), "isMass"          , "setMass"           ) );
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "IndicesNonClassicOperators.boman.name"          ), "Chemical Properties", NbBundle.getMessage(IndicesNonClassicOperators.class, "IndicesNonClassicOperators.boman.desc"          ), "isBoman"         , "setBoman"          ) );
@@ -122,34 +146,33 @@ public class IndicesNonClassicOperators extends AbstractMD
         if ( isMass() )
         {
             lovis = MD.mwByAA( peptide.getSequence() );
-            operators.applyOperators( lovis, "mw", peptide, this, true, operatorsList );
+            nonClassicOperators.applyOperators( lovis, "mw", peptide, this, true, nonClassicOperatorsList );            
+            classicOperators   .applyOperators( lovis, "mw", peptide, this, true, nonClassicOperatorsList, classicOperatorsList );
         }
         
         if ( isBoman() )
         {
             lovis = MD.bomanByAA( peptide.getSequence() );
-            operators.applyOperators( lovis, "Boman", peptide, this, false, operatorsList );
+            nonClassicOperators.applyOperators( lovis, "Boman", peptide, this, false, nonClassicOperatorsList );            
+            classicOperators   .applyOperators( lovis, "Boman", peptide, this, false, nonClassicOperatorsList, classicOperatorsList );
         }
         
         if ( isCharge() )
         {
             lovis = MD.sumAndAvgByAA( peptide.getSequence(), ChargeScale.klein_hash() );
-            operators.applyOperators( lovis, "NetCharge(KLEP840101)", peptide, this, false, operatorsList );
-            
-            /*lovis = MD.sumAndAvgByAA( peptide.getSequence(), ChargeScale.charton_ctc_hash() );
-            operators.applyOperators( lovis, "NetCharge(CHAM830107)", peptide, this, true, operatorsList );
-            
-            lovis = MD.sumAndAvgByAA( peptide.getSequence(), ChargeScale.charton_ctdc_hash() );
-            operators.applyOperators( lovis, "NetCharge(CHAM830108)", peptide, this, true, operatorsList );*/
+            nonClassicOperators.applyOperators( lovis, "NetCharge(KLEP840101)", peptide, this, false, nonClassicOperatorsList );            
+            classicOperators   .applyOperators( lovis, "NetCharge(KLEP840101)", peptide, this, false, nonClassicOperatorsList, classicOperatorsList );
         }
         
         if ( isHydrophilicity() )
         {
             lovis = MD.gravyByAA( peptide.getSequence(), HydrophilicityScale.kuhn_hydrov_hash() );
-            operators.applyOperators( lovis, "Hydrophilicity(KUHL950101)", peptide, this, true, operatorsList );
+            nonClassicOperators.applyOperators( lovis, "Hydrophilicity(KUHL950101)", peptide, this, true, nonClassicOperatorsList );
+            classicOperators   .applyOperators( lovis, "Hydrophilicity(KUHL950101)", peptide, this, true, nonClassicOperatorsList, classicOperatorsList );
             
             lovis = MD.gravyByAA( peptide.getSequence() );
-            operators.applyOperators( lovis, "GRAVY", peptide, this, false, operatorsList );
+            nonClassicOperators.applyOperators( lovis, "GRAVY", peptide, this, false, nonClassicOperatorsList );
+            classicOperators   .applyOperators( lovis, "GRAVY", peptide, this, false, nonClassicOperatorsList, classicOperatorsList );
         }
     }
     
@@ -210,11 +233,11 @@ public class IndicesNonClassicOperators extends AbstractMD
         
         if ( quadraticMeanOperator )
         {
-            operatorsList.add( "P2" );
+            nonClassicOperatorsList.add( "P2" );
         }
         else
         {
-            operatorsList.remove( "P2" );
+            nonClassicOperatorsList.remove( "P2" );
         }
     }
     
@@ -229,11 +252,11 @@ public class IndicesNonClassicOperators extends AbstractMD
         
         if ( potentialMeanOperator )
         {
-            operatorsList.add( "P3" );
+            nonClassicOperatorsList.add( "P3" );
         }
         else
         {
-            operatorsList.remove( "P3" );
+            nonClassicOperatorsList.remove( "P3" );
         }
     }
     
@@ -248,11 +271,11 @@ public class IndicesNonClassicOperators extends AbstractMD
         
         if ( harmonicMeanOperator )
         {
-            operatorsList.add( "HM" );
+            nonClassicOperatorsList.add( "HM" );
         }
         else
         {
-            operatorsList.remove( "HM" );
+            nonClassicOperatorsList.remove( "HM" );
         }
     }
     
@@ -267,11 +290,11 @@ public class IndicesNonClassicOperators extends AbstractMD
         
         if ( gowawaOperator )
         {
-            operatorsList.add( "GOWAWA" );
+            nonClassicOperatorsList.add( "GOWAWA" );
         }
         else
         {
-            operatorsList.remove( "GOWAWA" );
+            nonClassicOperatorsList.remove( "GOWAWA" );
         }
     }
     
@@ -286,11 +309,11 @@ public class IndicesNonClassicOperators extends AbstractMD
         
         if ( choquetOperator )
         {
-            operatorsList.add( "CHOQUET" );
+            nonClassicOperatorsList.add( "CHOQUET" );
         }
         else
         {
-            operatorsList.remove( "CHOQUET" );
+            nonClassicOperatorsList.remove( "CHOQUET" );
         }
     }
     
@@ -305,11 +328,11 @@ public class IndicesNonClassicOperators extends AbstractMD
         
         if ( varianceOperator )
         {
-            operatorsList.add( "V" );
+            nonClassicOperatorsList.add( "V" );
         }
         else
         {
-            operatorsList.remove( "V" );
+            nonClassicOperatorsList.remove( "V" );
         }
     }
     
@@ -324,11 +347,11 @@ public class IndicesNonClassicOperators extends AbstractMD
         
         if ( skewnessOperator )
         {
-            operatorsList.add( "S" );
+            nonClassicOperatorsList.add( "S" );
         }
         else
         {
-            operatorsList.remove( "S" );
+            nonClassicOperatorsList.remove( "S" );
         }
     }
     
@@ -343,11 +366,11 @@ public class IndicesNonClassicOperators extends AbstractMD
         
         if ( kurtosisOperator )
         {
-            operatorsList.add( "K" );
+            nonClassicOperatorsList.add( "K" );
         }
         else
         {
-            operatorsList.remove( "K" );
+            nonClassicOperatorsList.remove( "K" );
         }
     }
     
@@ -362,11 +385,11 @@ public class IndicesNonClassicOperators extends AbstractMD
         
         if ( standardDeviationOperator )
         {
-            operatorsList.add( "SD" );
+            nonClassicOperatorsList.add( "SD" );
         }
         else
         {
-            operatorsList.remove( "SD" );
+            nonClassicOperatorsList.remove( "SD" );
         }
     }
     
@@ -381,11 +404,11 @@ public class IndicesNonClassicOperators extends AbstractMD
         
         if ( variationCoefficientOpertor )
         {
-            operatorsList.add( "VC" );
+            nonClassicOperatorsList.add( "VC" );
         }
         else
         {
-            operatorsList.remove( "VC" );
+            nonClassicOperatorsList.remove( "VC" );
         }
     }
     
@@ -400,11 +423,11 @@ public class IndicesNonClassicOperators extends AbstractMD
         
         if ( rangeOpertor )
         {
-            operatorsList.add( "RA" );
+            nonClassicOperatorsList.add( "RA" );
         }
         else
         {
-            operatorsList.remove( "RA" );
+            nonClassicOperatorsList.remove( "RA" );
         }
     }
     
@@ -419,11 +442,87 @@ public class IndicesNonClassicOperators extends AbstractMD
         
         if ( i50Opertor )
         {
-            operatorsList.add( "i50" );
+            nonClassicOperatorsList.add( "i50" );
         }
         else
         {
-            operatorsList.remove( "i50" );
+            nonClassicOperatorsList.remove( "i50" );
+        }
+    }
+    
+    public boolean isAutocorrelationOperator() 
+    {
+        return autocorrelationOperator;
+    }
+    
+    public void setAutocorrelationOperator( Boolean autocorrelationOperator )
+    {
+        this.autocorrelationOperator = autocorrelationOperator;
+        
+        if ( autocorrelationOperator )
+        {
+            classicOperatorsList.add( "AC" );
+        }
+        else
+        {
+            classicOperatorsList.remove( "AC" );
+        }
+    }
+    
+    public boolean isGravitationalOperator()
+    {
+        return gravitationalOperator;
+    }
+    
+    public void setGravitationalOperator( Boolean gravitationalOperator )
+    {
+        this.gravitationalOperator = gravitationalOperator;
+        
+        if ( gravitationalOperator )
+        {
+            classicOperatorsList.add( "GV" );
+        }
+        else
+        {
+            classicOperatorsList.remove( "GV" );
+        }
+    }
+    
+    public boolean isTotalSumOperator() 
+    {
+        return totalSumOperator;
+    }
+    
+    public void setTotalSumOperator( Boolean totalSumOperator )
+    {
+        this.totalSumOperator = totalSumOperator;
+        
+        if ( totalSumOperator )
+        {
+            classicOperatorsList.add( "TS" );
+        }
+        else
+        {
+            classicOperatorsList.remove( "TS" );
+        }
+    }
+    
+    public boolean isElectroTopStateOperator()
+    {
+        return electroTopStateOperator;
+    }
+    
+    public void setElectroTopStateOperator( Boolean electroTopStateOperator )
+    {
+        this.electroTopStateOperator = electroTopStateOperator;
+        
+        if ( electroTopStateOperator )
+        {
+            classicOperatorsList.add( "ES" );
+        }
+        else
+        {
+            classicOperatorsList.remove( "ES" );
         }
     }
 }

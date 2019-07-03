@@ -42,8 +42,8 @@ final public class NonClassicAggregationOperatorStatistics extends NonClassicAgg
                     Method method = this.getClass().getMethod( METHODS[i], double[].class );
                     
                     double val = (double) method.invoke( this, new Object[]{ lovis } );
-                    peptide.setAttributeValue( md.getOrAddAttribute( ACRONYM[i] + "-" + keyAttr,
-                                                                     ACRONYM[i] + "-" + keyAttr, Double.class, 0d ), val );
+                    peptide.setAttributeValue( md.getOrAddAttribute( keyAttr + "-" + ACRONYM[i],
+                                                                     keyAttr + "-" + ACRONYM[i], Double.class, 0d ), val );
                 }
             }
             catch ( IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex )

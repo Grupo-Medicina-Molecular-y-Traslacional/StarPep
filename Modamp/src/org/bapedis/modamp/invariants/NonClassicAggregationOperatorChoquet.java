@@ -58,8 +58,8 @@ final public class NonClassicAggregationOperatorChoquet extends NonClassicAggreg
                 
                 String[] params2String = new String[]{ "" };
                 double val = compute( lovis, parameters, params2String );
-                peptide.setAttributeValue( md.getOrAddAttribute( "CHOQUET[" + params2String[0] + "]-" + keyAttr,
-                                                                 "CHOQUET[" + params2String[0] + "]-" + keyAttr, Double.class, 0d ), val );
+                peptide.setAttributeValue( md.getOrAddAttribute( keyAttr + "-CHOQUET[" + params2String[0] + "]",
+                                                                 keyAttr + "-CHOQUET[" + params2String[0] + "]", Double.class, 0d ), val );
             }
         }
     }

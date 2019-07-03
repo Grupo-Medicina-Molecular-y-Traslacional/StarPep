@@ -8,6 +8,7 @@ package org.bapedis.chemspace.impl;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.vecmath.Vector3f;
 import org.bapedis.chemspace.distance.AbstractDistance;
@@ -35,6 +36,8 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.openide.DialogDisplayer;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.bapedis.chemspace.model.NetworkType;
+import org.bapedis.chemspace.model.DistanceMatrix;
 
 /**
  *
@@ -43,6 +46,8 @@ import org.openide.util.Lookup;
 public class NetworkEmbedderAlg implements Algorithm, Cloneable {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+    protected static final ForkJoinPool fjPool = new ForkJoinPool();
+    public static final int FULL_MAX_NODES = 1000;
 
     protected final AlgorithmFactory factory;
     protected Workspace workspace;
@@ -57,11 +62,21 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
     private double maxDistance;
     private double currentThreshold;
     private ChartPanel densityChart;
+    private NetworkType networkType;
 
     public NetworkEmbedderAlg(AlgorithmFactory factory) {
         this.factory = factory;
         currentThreshold = 0.7;
         stopRun = new AtomicBoolean(false);
+        networkType = NetworkType.HSP;
+    }
+
+    public NetworkType getNetworkType() {
+        return networkType;
+    }
+
+    public void setNetworkType(NetworkType networkType) {
+        this.networkType = networkType;
     }
 
     public AbstractDistance getDistanceFunction() {
@@ -114,6 +129,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
             }
             distFunc.setFeatures(allFeatures);
         }
+        maxDistance = 0;
         densityChart = null;
     }
 
@@ -159,6 +175,73 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
             mainGraph.writeUnlock();
         }
 
+        switch (networkType) {
+            case FULL:
+                createFullNetwork();
+                break;
+            case HSP:
+                createHSPNetwork();
+                break;
+            default:
+                throw new IllegalStateException("Unknown network type: " + networkType);
+        }
+
+        // Report max distance
+        if (!stopRun.get()) {
+            pc.reportMsg("Max distance: " + maxDistance, workspace);
+        }
+
+        //Compute similarity values
+        computeSimilarityRelationships();
+
+        //Update node positions
+        updateNodePositions();
+
+        densityChart = new ChartPanel(createXYLineChart("Network Density", createDensityDataSet()));
+        ticket.progress();
+    }
+
+    private void createFullNetwork() {
+        // Setup Similarity Matrix Builder
+        DistanceMatrixBuilder task = new DistanceMatrixBuilder(peptides);
+        task.setContext(distFunc, ticket, stopRun);
+        int workunits = task.getWorkUnits();
+        ticket.switchToDeterminate(workunits + peptides.length - 1);
+
+        // Compute new distance matrix        
+        fjPool.invoke(task);
+        task.join();
+        DistanceMatrix distanceMatrix = task.getDistanceMatrix();
+
+        //Create full network
+        Node node1, node2;
+        Edge graphEdge;
+        double distance;
+        for (int i = 0; i < peptides.length - 1 && !stopRun.get(); i++) {
+            node1 = peptides[i].getGraphNode();
+            for (int j = i + 1; j < peptides.length && !stopRun.get(); j++) {
+                distance = distanceMatrix.getValue(peptides[i], peptides[j]);
+                node2 = peptides[j].getGraphNode();
+                mainGraph.writeLock();
+                try {
+                    graphEdge = mainGraph.getEdge(node1, node2, relType);
+                    if (graphEdge == null) {
+                        graphEdge = createEdge(node1, node2);
+                        mainGraph.addEdge(graphEdge);
+                        graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE, distance);
+                    }
+                } finally {
+                    mainGraph.writeUnlock();
+                }
+                if (distance > maxDistance) {
+                    maxDistance = distance;
+                }                
+            }
+            ticket.progress();
+        }
+    }
+
+    private void createHSPNetwork() {
         // task size
         ticket.switchToDeterminate(3 * peptides.length + 1);
 
@@ -177,20 +260,6 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
                 }
             });
         }
-
-        // Report max distance
-        if (!stopRun.get()) {
-            pc.reportMsg("Max distance: " + maxDistance, workspace);
-        }
-
-        //Compute similarity values
-        computeSimilarityRelationships();
-
-        //Update node positions
-        updateNodePositions();
-
-        densityChart = new ChartPanel(createXYLineChart("Network Density", createDensityDataSet()));
-        ticket.progress();
     }
 
     private void updateNodePositions() {

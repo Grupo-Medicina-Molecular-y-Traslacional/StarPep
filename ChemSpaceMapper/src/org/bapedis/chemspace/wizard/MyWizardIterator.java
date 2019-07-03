@@ -30,10 +30,11 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
         listeners = new EventListenerList();
 
         panels = new WizardDescriptor.Panel[]{
-            new WizardInputSequence(csMapper), //0
-            new WizardFeatureExtraction(csMapper), //1
-            new WizardFeatureSelection(csMapper), //2
-            new WizardDistanceFunc(csMapper), //3
+            new WizardNetworkRepresentation(csMapper),
+            new WizardInputSequence(csMapper), 
+            new WizardFeatureExtraction(csMapper), 
+            new WizardFeatureSelection(csMapper), 
+            new WizardDistanceFunc(csMapper), 
         };
         
 //        allPanels[0].getComponent().addPropertyChangeListener(this);

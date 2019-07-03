@@ -4,38 +4,25 @@
  */
 package org.bapedis.chemspace.model;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
-import org.bapedis.core.ui.components.JQuickHistogram;
 
 /**
  *
  * @author Longendri Aguilera Mendoza
  */
-public class SimilarityMatrix implements Serializable {
+public class DistanceMatrix {
 
-    protected final Peptide[] peptides;
-    protected final JQuickHistogram histogram;
     protected static PeptideAttribute INDEX_ATTR = new PeptideAttribute("indexAttr", "indexAttr", Integer.class, false);
     protected double[] data;
 
-    public SimilarityMatrix(Peptide[] peptides) {
-        this.peptides = peptides;
+    public DistanceMatrix(Peptide[] peptides) {
         for (int index = 0; index < peptides.length; index++) {
             peptides[index].setAttributeValue(INDEX_ATTR, index);
         }
         int size = peptides.length;
         data = new double[size * (size - 1) / 2];
-        histogram = new JQuickHistogram();
-    }
-
-    public Peptide[] getPeptides() {
-        return peptides;
-    }        
+    }    
 
     public void setValue(Peptide peptide1, Peptide peptide2, double value) {
         if (peptide1.hasAttribute(INDEX_ATTR) && peptide2.hasAttribute(INDEX_ATTR)) {
@@ -43,12 +30,7 @@ public class SimilarityMatrix implements Serializable {
             int y = (int) peptide2.getAttributeValue(INDEX_ATTR);
             assert x != y;
             data[pos(x, y)] = value;
-//            histogram.addData(value);
         }
-    }
-
-    public JQuickHistogram getHistogram() {
-        return histogram;
     }
 
     public double getValue(Peptide peptide1, Peptide peptide2) {
@@ -58,7 +40,7 @@ public class SimilarityMatrix implements Serializable {
             assert x != y;
             return data[pos(x, y)];
         }
-        return -1.f;
+        return Double.NaN;
     }
 
     public double[] getValues() {
@@ -75,20 +57,4 @@ public class SimilarityMatrix implements Serializable {
         return a * (a - 1) / 2 + b;
     }
 
-    private void writeObject(ObjectOutputStream o)
-            throws IOException {
-        o.writeInt(data.length);
-        for (double value : data) {
-            o.writeDouble(value);
-        }
-    }
-
-    private void readObject(ObjectInputStream o)
-            throws IOException, ClassNotFoundException {
-        int size = o.readInt();
-        data = new double[size];
-        for (int i = 0; i < data.length; i++) {
-            data[i] = o.readFloat();
-        }
-    }
 }

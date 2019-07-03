@@ -9,6 +9,7 @@ import java.text.MessageFormat;
 import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.FeatureSelectionOption;
+import org.bapedis.chemspace.model.NetworkType;
 import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
 import org.bapedis.core.io.MD_OUTPUT_OPTION;
@@ -58,6 +59,12 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
     }
 
     public static void setUp(MapperAlgorithm csMapper, WizardDescriptor wiz) {
+        
+        //Network type
+        NetworkType networkType = (NetworkType) wiz.getProperty(NetworkType.class.getName());
+        if (networkType != null){
+            csMapper.getNetworkEmbedderAlg().setNetworkType(networkType);
+        }
 
         //Non-redundant set
         RemovingRedundantOption nrdOption = (RemovingRedundantOption) wiz.getProperty(RemovingRedundantOption.class.getName());

@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.model;
+package org.bapedis.chemspace.impl;
 
 /**
  *
- * @author loge
+ * @author cicese
  */
-public enum NetworkType {
-    FULL, HSP
+public class AbstractEmbedder {
+    
 }

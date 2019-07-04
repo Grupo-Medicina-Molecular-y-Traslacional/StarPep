@@ -9,7 +9,6 @@ import org.bapedis.core.project.ProjectManager;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Element;
-import org.openide.util.NbBundle;
 
 /**
  *
@@ -18,13 +17,7 @@ import org.openide.util.NbBundle;
 public class GraphEdgeAttributeColumn implements GraphElementDataColumn{
     public static enum Direction{Source, Target};
     protected final Direction direction;
-    protected final String name;
-    
-    public GraphEdgeAttributeColumn( Direction direction){
-        this((direction == Direction.Source)? NbBundle.getMessage(GraphEdgeAttributeColumn.class, "GraphElement.column.source"):
-                                                NbBundle.getMessage(GraphEdgeAttributeColumn.class, "GraphElement.column.target"),
-                direction);
-    }
+    protected final String name;    
 
     public GraphEdgeAttributeColumn(String name, Direction direction) {
         this.name = name;

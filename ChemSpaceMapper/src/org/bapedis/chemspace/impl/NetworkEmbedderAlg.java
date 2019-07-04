@@ -295,6 +295,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
                     similarity = 1.0 - distance / maxDistance;
 
                     graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, similarity);
+                    graphEdge.setWeight(similarity);
 
                     // Add the edge to the graph view
                     if (similarity >= currentThreshold) {

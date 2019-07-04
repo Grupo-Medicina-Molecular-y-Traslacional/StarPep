@@ -46,6 +46,7 @@ import java.util.Set;
 import org.bapedis.core.project.ProjectManager;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.Table;
+import org.gephi.graph.impl.GraphStoreConfiguration;
 
 /**
  * Class to keep available state (in data laboratory) of the columns of a table
@@ -56,14 +57,18 @@ import org.gephi.graph.api.Table;
  */
 public class GraphElementAvailableColumnsModel {
 
-    private static final int MAX_AVAILABLE_COLUMNS = 5;
-    private final Set<GraphElementDataColumn> availableColumns = new LinkedHashSet<>();
-    private final Set<GraphElementDataColumn> allKnownColumns = new LinkedHashSet<>();
-    public static final String DefaultColumnID = ProjectManager.NODE_TABLE_PRO_NAME;
-    public static final String[] IgnoredColumnIDs = new String[]{"timeset"};
+    protected static final int MAX_AVAILABLE_COLUMNS = 5;
+    protected final Set<GraphElementDataColumn> availableColumns;
+    protected final Set<GraphElementDataColumn> allKnownColumns;
+    protected final String[] defaultColumnID;
+    protected final String[] ignoredColumnIDs;
 
-    public GraphElementAvailableColumnsModel() {
-        allKnownColumns.add(new GraphNodeDegreeDataColumn());
+    public GraphElementAvailableColumnsModel(String[] defaultColumnID, String[] ignoredColumnIDs) {
+        this.defaultColumnID = defaultColumnID;
+        this.ignoredColumnIDs = ignoredColumnIDs;
+
+        availableColumns = new LinkedHashSet<>();
+        allKnownColumns = new LinkedHashSet<>();
     }
 
     public boolean isColumnAvailable(GraphElementDataColumn column) {
@@ -148,9 +153,6 @@ public class GraphElementAvailableColumnsModel {
 
         removeAllColumns();
 
-        if (table.getColumn(DefaultColumnID) != null) {
-            addAvailableColumn(new GraphElementAttributeColumn(table.getColumn(DefaultColumnID)));
-        }                
         Column[] tableColumns = table.toArray();
 
         //Keep existing available columns as available.
@@ -160,7 +162,7 @@ public class GraphElementAvailableColumnsModel {
         for (GraphElementDataColumn column : availableColumnsCopy) {
             if (column instanceof GraphElementAttributeColumn) {
                 for (Column c : tableColumns) {
-                    if (!c.getId().equals(DefaultColumnID) && !isIgnored(c.getId()) && column.getColumn().equals(c)) {
+                    if (!isIgnored(c.getId()) && column.getColumn().equals(c)) {
                         addAvailableColumn(new GraphElementAttributeColumn(c));
                         break;
                     }
@@ -173,7 +175,7 @@ public class GraphElementAvailableColumnsModel {
         //!allKnownColumns.contains(column)
         boolean isNew;
         for (Column c : tableColumns) {
-            if (!isIgnored(c.getId())) {
+            if (!isDefault(c.getId()) && !isIgnored(c.getId())) {
                 isNew = true;
                 for (GraphElementDataColumn column : allKnownColumns) {
                     if (column.getColumn() != null && column.getColumn().equals(c)) {
@@ -187,12 +189,21 @@ public class GraphElementAvailableColumnsModel {
         }
     }
 
-    private boolean isIgnored(String id) {
-        for (String iid : IgnoredColumnIDs) {
+    public boolean isIgnored(String id) {
+        for (String iid : ignoredColumnIDs) {
             if (iid.equals(id)) {
                 return true;
             }
         }
         return false;
     }
+    
+    public boolean isDefault(String id) {
+        for (String iid : defaultColumnID) {
+            if (iid.equals(id)) {
+                return true;
+            }
+        }
+        return false;
+    }    
 }

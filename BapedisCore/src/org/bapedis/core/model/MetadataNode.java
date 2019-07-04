@@ -64,7 +64,7 @@ public class MetadataNode extends AbstractNode {
         sheet.put(set);
 
         // Database reference
-        String[] xrefs = (String[]) edge.getAttribute("dbRef");
+        String[] xrefs = (String[]) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_XREF);
         set = Sheet.createPropertiesSet();
         set.setName("DbRef");
         set.setDisplayName(NbBundle.getMessage(MetadataNode.class, "PropertySet.dbRef"));

@@ -295,7 +295,7 @@ public class PeptideDAOImpl implements PeptideDAO {
             graphEdge = factory.newEdge(id, startNode, endNode, relType, ProjectManager.GRAPH_EDGE_WEIGHT, false);
             graphEdge.setLabel(relName);
             if (relation.hasProperty(PRO_XREF)) {
-                graphEdge.setAttribute(PRO_XREF, relation.getProperty(PRO_XREF));
+                graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_XREF, relation.getProperty(PRO_XREF));
             }
 
             //Set color

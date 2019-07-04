@@ -82,7 +82,7 @@ public class GraphElementAvailableColumnsPanel extends javax.swing.JPanel {
             gbc.gridy=i;
             gbc.anchor = GridBagConstraints.WEST;
             contentPanel.add(columnsCheckBoxes[i], gbc);
-            if (columns[i] instanceof GraphElementAttributeColumn && columns[i].getColumn().getId().equals(GraphElementAvailableColumnsModel.DefaultColumnID)){
+            if (columns[i] instanceof GraphElementAttributeColumn && availableColumnsModel.isDefault(columns[i].getColumn().getId())){
                 columnsCheckBoxes[i].setEnabled(false);
             }
         }

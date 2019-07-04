@@ -55,6 +55,7 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.Table;
+import org.gephi.graph.impl.GraphStoreConfiguration;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
@@ -89,8 +90,6 @@ public class GraphElementNavigator extends JComponent implements
     protected final JXTable table;
     protected final JLabel nodeSizeLabel, edgeSizeLabel;
     protected GraphElementNavigatorModel navigatorModel;
-    private final GraphElementDataColumn[] edgeColumns;
-
     /**
      * Creates new form GraphElementNavigator
      */
@@ -180,10 +179,6 @@ public class GraphElementNavigator extends JComponent implements
         bottomToolbar.addSeparator();
         bottomToolbar.add(edgeSizeLabel);
         add(bottomToolbar, BorderLayout.SOUTH);
-
-        edgeColumns = new GraphElementDataColumn[]{new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Source),
-            null,
-            new GraphEdgeAttributeColumn(GraphEdgeAttributeColumn.Direction.Target)};
     }
 
     private void initToogleButton(JToggleButton btn) {
@@ -202,31 +197,40 @@ public class GraphElementNavigator extends JComponent implements
     }
 
     private void nodesButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        if (navigatorModel.getVisualElement() != GraphElementType.Node) {
-            navigatorModel.setVisualElement(GraphElementType.Node);
+        if (navigatorModel.getElementType() != GraphElementType.Node) {
+            navigatorModel.setElementType(GraphElementType.Node);
             reload();
-            availableColumnsButton.setEnabled(true);
+//            availableColumnsButton.setEnabled(true);
         }
 
     }
 
     private void edgesButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        if (navigatorModel.getVisualElement() != GraphElementType.Edge) {
-            navigatorModel.setVisualElement(GraphElementType.Edge);
+        if (navigatorModel.getElementType() != GraphElementType.Edge) {
+            navigatorModel.setElementType(GraphElementType.Edge);
             reload();
-            availableColumnsButton.setEnabled(false);
+//            availableColumnsButton.setEnabled(false);
         }
     }
 
     private void availableColumnsButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        if (navigatorModel.getVisualElement() == GraphElementType.Node) {
-            Table columns = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel().getNodeTable();
-            GraphElementAvailableColumnsModel nodeAvailableColumnsModel = navigatorModel.getNodeAvailableColumnsModel();
-            nodeAvailableColumnsModel.syncronizeTableColumns(columns);
-            DialogDescriptor dd = new DialogDescriptor(new GraphElementAvailableColumnsPanel(nodeAvailableColumnsModel), NbBundle.getMessage(GraphElementAvailableColumnsPanel.class, "GraphElementAvailableColumnsPanel.title"));
+        Table columns = null;
+        GraphElementAvailableColumnsModel availableColumnsModel = null;
+        GraphElementType elementType = navigatorModel.getElementType();
+        if (elementType == GraphElementType.Node) {
+            columns = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel().getNodeTable();
+            availableColumnsModel = navigatorModel.getNodeAvailableColumnsModel();
+        } else if (elementType == GraphElementType.Edge) {
+            columns = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel().getEdgeTable();
+            availableColumnsModel = navigatorModel.getEdgeAvailableColumnsModel();            
+        }
+
+        if (columns != null && availableColumnsModel != null) {            
+            availableColumnsModel.syncronizeTableColumns(columns);
+            DialogDescriptor dd = new DialogDescriptor(new GraphElementAvailableColumnsPanel(availableColumnsModel), NbBundle.getMessage(GraphElementAvailableColumnsPanel.class, "GraphElementAvailableColumnsPanel.title"));
             dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION});
             DialogDisplayer.getDefault().notify(dd);
-            ((GraphElementsDataTable) table.getModel()).resetColumns(nodeAvailableColumnsModel.getAvailableColumns());
+            ((GraphElementsDataTable) table.getModel()).resetColumns(availableColumnsModel.getAvailableColumns());
         }
     }
 
@@ -240,7 +244,7 @@ public class GraphElementNavigator extends JComponent implements
         Element element;
         for (int i : selectedRows) {
             element = dataModel.getElementAtRow(table.convertRowIndexToModel(i));
-            switch (navigatorModel.getVisualElement()) {
+            switch (navigatorModel.getElementType()) {
                 case Node:
                     content.add(new GraphNodeWrapper((Node) element));
                     break;
@@ -295,14 +299,14 @@ public class GraphElementNavigator extends JComponent implements
 
         navigatorModel = pc.getGraphElementNavModel(newWs);
 
-        switch (navigatorModel.getVisualElement()) {
+        switch (navigatorModel.getElementType()) {
             case Node:
                 nodesBtn.setSelected(true);
-                availableColumnsButton.setEnabled(true);
+//                availableColumnsButton.setEnabled(true);
                 break;
             case Edge:
                 edgesBtn.setSelected(true);
-                availableColumnsButton.setEnabled(false);
+//                availableColumnsButton.setEnabled(false);
                 break;
         }
 
@@ -317,10 +321,10 @@ public class GraphElementNavigator extends JComponent implements
     private void reload() {
         setBusyLabel(true);
         GraphModel graphModel = pc.getGraphModel();
-        Table columns = navigatorModel.getVisualElement() == GraphElementType.Node ? graphModel.getNodeTable() : graphModel.getEdgeTable();
+        Table columns = navigatorModel.getElementType() == GraphElementType.Node ? graphModel.getNodeTable() : graphModel.getEdgeTable();
         final Graph graph = graphModel.getGraphVisible();
-        final GraphElementsDataTable dataModel = navigatorModel.getVisualElement() == GraphElementType.Node ? new GraphElementsDataTable(graph.getNodeCount(), getNodeColumns(columns))
-                : new GraphElementsDataTable(graph.getEdgeCount(), getEdgeColumns(columns));
+        final GraphElementsDataTable dataModel = navigatorModel.getElementType() == GraphElementType.Node ? new GraphElementsDataTable(graph.getNodeCount(), getNodeColumns(columns))
+                : (navigatorModel.getElementType() == GraphElementType.Edge ? new GraphElementsDataTable(graph.getEdgeCount(), getEdgeColumns(columns)) : null);
         table.setModel(dataModel);
 
         SwingWorker worker = new SwingWorker<Void, Element>() {
@@ -328,7 +332,7 @@ public class GraphElementNavigator extends JComponent implements
             protected Void doInBackground() throws Exception {
                 graph.readLock();
                 try {
-                    switch (navigatorModel.getVisualElement()) {
+                    switch (navigatorModel.getElementType()) {
                         case Node:
                             for (Node node : graph.getNodes()) {
                                 publish(node);
@@ -342,7 +346,7 @@ public class GraphElementNavigator extends JComponent implements
                     }
                 } finally {
                     nodeSizeLabel.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.nodeSizeLabel.text", graph.getNodeCount()));
-                    edgeSizeLabel.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edgeSizeLabel.text", graph.getEdgeCount()));                    
+                    edgeSizeLabel.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.edgeSizeLabel.text", graph.getEdgeCount()));
                     graph.readUnlock();
                 }
                 return null;
@@ -370,12 +374,9 @@ public class GraphElementNavigator extends JComponent implements
     }
 
     private GraphElementDataColumn[] getEdgeColumns(Table table) {
-//        if (currentModel != null && currentModel.getMainGView() == AttributesModel.CSN_VIEW) {
-//            edgeColumns[1] = new GraphElementAttributeColumn(table.getColumn(ProjectManager.EDGE_TABLE_PRO_SIMILARITY));
-//        } else {
-        edgeColumns[1] = new GraphElementAttributeColumn(table.getColumn("label"));
-//        } 
-        return edgeColumns;
+        GraphElementAvailableColumnsModel edgeAvailableColumnsModel = navigatorModel.getEdgeAvailableColumnsModel();
+        edgeAvailableColumnsModel.syncronizeTableColumns(table);
+        return edgeAvailableColumnsModel.getAvailableColumns();
     }
 
     private GraphElementDataColumn[] getNodeColumns(Table table) {

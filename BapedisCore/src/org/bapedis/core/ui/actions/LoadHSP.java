@@ -95,7 +95,7 @@ public class LoadHSP extends AbstractAction {
         mainGraph.writeLock();
         try {
             mainGraph.addEdge(graphEdge);
-            graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, score);
+            graphEdge.setWeight(score);
         } finally {
             mainGraph.writeUnlock();
         }

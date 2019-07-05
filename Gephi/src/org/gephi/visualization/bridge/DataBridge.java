@@ -102,6 +102,7 @@ public class DataBridge implements VizArchitecture {
     protected EdgeModel[] edges;
 
     private boolean force;
+    private boolean useWeight;
 
     @Override
     public void initArchitecture() {
@@ -109,6 +110,7 @@ public class DataBridge implements VizArchitecture {
         this.vizConfig = VizController.getInstance().getVizConfig();
         this.limits = VizController.getInstance().getLimits();
         this.textManager = VizController.getInstance().getTextManager();
+        useWeight = false;
     }
 
     public synchronized NodeModel[] getNodeModelsForNodes(Node[] n) {
@@ -238,7 +240,7 @@ public class DataBridge implements VizArchitecture {
                         } else {
                             model = edges[id];
                         }
-                        float w = (float) edge.getWeight(graphView);
+                        float w = useWeight?(float) edge.getWeight(graphView): 1.f;
                         model.setWeight(w);
                         minWeight = Math.min(w, minWeight);
                         maxWeight = Math.max(w, maxWeight);

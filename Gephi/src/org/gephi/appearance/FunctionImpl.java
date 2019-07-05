@@ -98,7 +98,7 @@ public abstract class FunctionImpl implements Function {
         } else if (isRanking()) {
             Number val = ranking.getValue(element);
             if (val == null) {
-                Logger.getLogger("").log(Level.WARNING, "The element with id ''{0}'' has a null value for ranking. Using 0 instead", element.getId());
+                Logger.getLogger("").log(Level.WARNING, "The element with id {0} has a null value for ranking. Using 0 instead", element.getId());
                 val = 0;
             }
             ((RankingTransformer) transformer).transform(element, ranking, interpolator, val);

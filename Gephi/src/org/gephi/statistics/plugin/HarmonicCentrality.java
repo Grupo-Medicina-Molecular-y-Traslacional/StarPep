@@ -123,14 +123,7 @@ public class HarmonicCentrality extends AbstractCentrality {
 //        return properties.toArray(new AlgorithmProperty[0]);
         return null;
     }
-
-    protected double getEdgeWeight(Edge edge) {
-        Object val = edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE);
-        if (val != null) {
-            return (double) val;
-        }
-        return Double.POSITIVE_INFINITY;
-    }
+    
 
     @Override
     protected void calculateCentrality() {
@@ -188,7 +181,7 @@ public class HarmonicCentrality extends AbstractCentrality {
                 if (!visitedNodes.contains(reachable)) {
                     int r_index = (Integer) reachable.getAttribute(NODE_INDEX);
 
-                    dist = d[v_index] + getEdgeWeight(edge);
+                    dist = d[v_index] + (1 - edge.getWeight());
 
                     if (dist < d[r_index]) {
                         d[r_index] = dist;

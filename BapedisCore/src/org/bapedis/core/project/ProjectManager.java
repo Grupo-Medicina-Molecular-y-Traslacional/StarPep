@@ -73,16 +73,13 @@ public class ProjectManager implements Lookup.Provider {
     public static final float GRAPH_NODE_SIZE = 10f;
     public static final Color GRAPH_NODE_COLOR = new Color(0.6f, 0.6f, 0.6f);
     public static final float GRAPH_EDGE_WEIGHT = 1f;
-    public static final String GRAPH_EDGE_SIMALIRITY = "similar_to";
+    public static final String GRAPH_EDGE_SIMALIRITY = "similarity";
 
     public static final String NODE_TABLE_PRO_NAME = "name";
     public static final String NODE_TABLE_PRO_NAME_TITLE = NbBundle.getMessage(ProjectManager.class, "NodeTable.column.name.title");
 
     public static final String EDGE_TABLE_PRO_XREF = "xref";
     public static final String EDGE_TABLE_PRO_XREF_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.xref.title");
-
-    public static final String EDGE_TABLE_PRO_SIMILARITY = "similarity";
-    public static final String EDGE_TABLE_PRO_SIMILARITY_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.similarity.title");
 
     public static final String EDGE_TABLE_PRO_DISTANCE = "distance";
     public static final String EDGE_TABLE_PRO_DISTANCE_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.distance.title");
@@ -372,9 +369,6 @@ public class ProjectManager implements Lookup.Provider {
         Table edgeTable = graphModel.getEdgeTable();
         if (!edgeTable.hasColumn(EDGE_TABLE_PRO_XREF)) {
             edgeTable.addColumn(EDGE_TABLE_PRO_XREF, EDGE_TABLE_PRO_XREF_TITLE, String[].class, Origin.DATA, new String[]{}, false);
-        }
-        if (!edgeTable.hasColumn(EDGE_TABLE_PRO_SIMILARITY)) {
-            edgeTable.addColumn(EDGE_TABLE_PRO_SIMILARITY, EDGE_TABLE_PRO_SIMILARITY_TITLE, Double.class, Origin.DATA, null, false);
         }
         if (!edgeTable.hasColumn(EDGE_TABLE_PRO_DISTANCE)) {
             edgeTable.addColumn(EDGE_TABLE_PRO_DISTANCE, EDGE_TABLE_PRO_DISTANCE_TITLE, Double.class, Origin.DATA, null, false);

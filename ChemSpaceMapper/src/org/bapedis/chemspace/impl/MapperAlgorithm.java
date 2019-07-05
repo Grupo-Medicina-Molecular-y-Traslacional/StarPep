@@ -70,7 +70,7 @@ public class MapperAlgorithm implements Algorithm {
         //Mapping Options        
         nrdOption = RemovingRedundantOption.NO;
         feOption = FeatureExtractionOption.YES;
-        fsOption = FeatureSelectionOption.NO;
+        fsOption = FeatureSelectionOption.YES;
 
         //Mapping algorithms
         nrdAlg = (NonRedundantSetAlg) new NonRedundantSetAlgFactory().createAlgorithm();

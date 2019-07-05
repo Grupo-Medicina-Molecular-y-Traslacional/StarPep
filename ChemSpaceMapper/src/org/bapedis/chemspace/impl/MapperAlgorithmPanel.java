@@ -606,7 +606,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private void jApplyThresholdButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jApplyThresholdButtonActionPerformed
         if (netEmbedder != null) {
             double threshold = cutoffSlider.getValue() / 100.0;
-            NetworkThresholdUpdater fnUpdater = new NetworkThresholdUpdater(threshold, netEmbedder.getSimilarityThreshold());
+            NetworkThresholdUpdater fnUpdater = new NetworkThresholdUpdater(threshold, netEmbedder);
             fnUpdater.addPropertyChangeListener(this);
             setRunning(true);
             fnUpdater.execute();

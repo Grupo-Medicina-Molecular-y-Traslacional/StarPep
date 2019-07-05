@@ -31,11 +31,12 @@ public class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
     static final String CHANGED_THRESHOLD = "changed_threshold";
     private final AtomicBoolean stopRun;
     private final ProgressTicket ticket;
-    private final double newThreshold, currentThreshold;
+    protected NetworkEmbedderAlg netEmbedder;
+    private final double newThreshold;
 
-    public NetworkThresholdUpdater(double newThreshold, double currentThreshold) {
+    public NetworkThresholdUpdater(double newThreshold, NetworkEmbedderAlg netEmbedder) {
         this.newThreshold = newThreshold;
-        this.currentThreshold = currentThreshold;
+        this.netEmbedder = netEmbedder;
         stopRun = new AtomicBoolean(false);
         ticket = new ProgressTicket(NbBundle.getMessage(NetworkThresholdUpdater.class, "NetworkThresholdUpdater.task.name"), new Cancellable() {
             @Override
@@ -48,32 +49,15 @@ public class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
     }
 
     @Override
-    protected Void doInBackground() throws Exception {        
-        applySimilarityThreshold();
-        return null;
-    }
-
-    @Override
-    protected void done() {
-        try {
-            get();
-        } catch (InterruptedException | ExecutionException ex) {
-            Exceptions.printStackTrace(ex);
-        } finally {
-            firePropertyChange(CHANGED_THRESHOLD, null, newThreshold);
-            pc.getGraphVizSetting().fireChangedGraphView();
-            ticket.finish();
-        }
-    }
-    
-    public void applySimilarityThreshold() {
+    protected Void doInBackground() throws Exception {
         AttributesModel attrModel = pc.getAttributesModel();
         Peptide[] peptides = attrModel.getPeptides().toArray(new Peptide[0]);
-        GraphModel graphModel = pc.getGraphModel();        
+        GraphModel graphModel = pc.getGraphModel();
         Graph mainGraph = graphModel.getGraph();
         Graph graph = graphModel.getGraphVisible();
-        
+
         Node node1, node2;
+        double currentThreshold = netEmbedder.getSimilarityThreshold();
         double similarity;
         int relType = graph.getModel().getEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
         if (newThreshold < currentThreshold) { // to add edges 
@@ -85,7 +69,7 @@ public class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
                     if (graph.contains(node1) && graph.contains(node2)) {
                         graphEdge = mainGraph.getEdge(node2, node1, relType);
                         if (graphEdge != null) {
-                            similarity = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
+                            similarity = graphEdge.getWeight();
                             if (similarity >= newThreshold && similarity < currentThreshold) {
                                 graph.writeLock();
                                 try {
@@ -102,7 +86,7 @@ public class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
             graph.writeLock();
             try {
                 for (Edge edge : graph.getEdges()) {
-                    similarity = (double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
+                    similarity = edge.getWeight();
                     if (similarity < newThreshold) {
                         graph.removeEdge(edge);
                     }
@@ -111,7 +95,23 @@ public class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
                 graph.writeUnlock();
             }
         }
-    }
-    
 
+        return null;
+    }
+
+    @Override
+    protected void done() {
+        try {
+            get();
+            if (netEmbedder.getSimilarityThreshold() != newThreshold) {
+                netEmbedder.setSimilarityThreshold(newThreshold);
+            }
+        } catch (InterruptedException | ExecutionException ex) {
+            Exceptions.printStackTrace(ex);
+        } finally {
+            firePropertyChange(CHANGED_THRESHOLD, null, newThreshold);
+            pc.getGraphVizSetting().fireChangedGraphView();
+            ticket.finish();
+        }
+    }
 }

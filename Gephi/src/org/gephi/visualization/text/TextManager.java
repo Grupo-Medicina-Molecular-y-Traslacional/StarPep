@@ -59,6 +59,7 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.TextProperties;
+import org.gephi.graph.impl.GraphStoreConfiguration;
 import org.gephi.visualization.VizArchitecture;
 import org.gephi.visualization.VizController;
 import org.gephi.visualization.apiimpl.GraphDrawable;
@@ -168,7 +169,7 @@ public class TextManager implements VizArchitecture {
                     //Initialize columns if needed
                     if (model.getNodeTextColumns() == null || model.getNodeTextColumns().length == 0) {
                         GraphModel gm = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel();
-                        model.setTextColumns(new Column[]{gm.getNodeTable().getColumn(ProjectManager.NODE_TABLE_PRO_NAME)}, new Column[]{gm.getEdgeTable().getColumn(ProjectManager.EDGE_TABLE_PRO_SIMILARITY)});
+                        model.setTextColumns(new Column[]{gm.getNodeTable().getColumn(ProjectManager.NODE_TABLE_PRO_NAME)}, new Column[]{gm.getEdgeTable().getColumn(GraphStoreConfiguration.EDGE_WEIGHT_COLUMN_ID)});
                     }
                 }
             }

@@ -162,7 +162,7 @@ public class GraphElementAvailableColumnsModel {
         for (GraphElementDataColumn column : availableColumnsCopy) {
             if (column instanceof GraphElementAttributeColumn) {
                 for (Column c : tableColumns) {
-                    if (!isIgnored(c.getId()) && column.getColumn().equals(c)) {
+                    if (!isIgnored(c) && column.getColumn().equals(c)) {
                         addAvailableColumn(new GraphElementAttributeColumn(c));
                         break;
                     }
@@ -175,7 +175,7 @@ public class GraphElementAvailableColumnsModel {
         //!allKnownColumns.contains(column)
         boolean isNew;
         for (Column c : tableColumns) {
-            if (!isDefault(c.getId()) && !isIgnored(c.getId())) {
+            if (!isDefault(c) && !isIgnored(c)) {
                 isNew = true;
                 for (GraphElementDataColumn column : allKnownColumns) {
                     if (column.getColumn() != null && column.getColumn().equals(c)) {
@@ -189,7 +189,8 @@ public class GraphElementAvailableColumnsModel {
         }
     }
 
-    public boolean isIgnored(String id) {
+    public boolean isIgnored(Column c) {        
+        String id = c.getId();
         for (String iid : ignoredColumnIDs) {
             if (iid.equals(id)) {
                 return true;
@@ -198,7 +199,8 @@ public class GraphElementAvailableColumnsModel {
         return false;
     }
     
-    public boolean isDefault(String id) {
+    public boolean isDefault(Column c) {
+        String id = c.getId();
         for (String iid : defaultColumnID) {
             if (iid.equals(id)) {
                 return true;

@@ -66,7 +66,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
 
     public NetworkEmbedderAlg(AlgorithmFactory factory) {
         this.factory = factory;
-        currentThreshold = 0.7;
+        currentThreshold = 0.0;
         stopRun = new AtomicBoolean(false);
         networkType = NetworkType.HSP;
     }
@@ -293,8 +293,6 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
                 if (graphEdge != null) {
                     distance = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE);
                     similarity = 1.0 - distance / maxDistance;
-
-                    graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY, similarity);
                     graphEdge.setWeight(similarity);
 
                     // Add the edge to the graph view
@@ -440,7 +438,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
                 node2 = peptides[j].getGraphNode();
                 graphEdge = mainGraph.getEdge(node1, node2, relType);
                 if (graphEdge != null) {
-                    similarity = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_SIMILARITY);
+                    similarity = graphEdge.getWeight();
                     if (similarity >= threshold) {
                         edgeCount++;
                     }

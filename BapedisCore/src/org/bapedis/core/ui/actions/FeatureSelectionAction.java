@@ -5,13 +5,12 @@
  */
 package org.bapedis.core.ui.actions;
 
-import org.bapedis.core.spi.alg.FeatureSelectionTag;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
-import org.openide.util.NbBundle.Messages;
+import org.bapedis.core.spi.alg.FeatureSelectionTag;
 
 @ActionID(
         category = "Tools",
@@ -27,7 +26,7 @@ public final class FeatureSelectionAction extends ToolAction {
 
 
     public FeatureSelectionAction() {
-        super(NbBundle.getMessage(FeatureExtractionAction.class, "CTL_FeatureSelection"),
+        super(NbBundle.getMessage(FeatureSelectionAction.class, "CTL_FeatureSelection"),
                 FeatureSelectionTag.class);
     }
 

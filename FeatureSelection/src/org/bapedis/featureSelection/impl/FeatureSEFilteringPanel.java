@@ -3,13 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.spi.alg.impl;
+package org.bapedis.featureSelection.impl;
 
-import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import javax.swing.event.AncestorEvent;
@@ -26,7 +23,7 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class FeatureSEFilteringPanel extends javax.swing.JPanel implements AlgorithmSetupUI, PropertyChangeListener {
+public class FeatureSEFilteringPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
 
     private FeatureSEFiltering algorithm;
     private final NotifyDescriptor errorND;
@@ -145,33 +142,6 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
             DialogDisplayer.getDefault().notify(errorND);
             algorithm.setCorrelationCutoff(-1);
         }
-    }
-
-    private void refreshState() {
-        boolean running = algorithm != null && algorithm.isRunning();
-        boolean enabled = !running && isEnabled();
-
-        jResetButton.setEnabled(enabled);
-        rankingOutputPanel.setEnabled(enabled);
-        jRB_selectAll.setEnabled(enabled);
-
-        jRB_selectTop.setEnabled(enabled);
-        jTF_top.setEnabled(enabled && jRB_selectTop.isSelected());
-
-        jRB_threshold.setEnabled(enabled);
-        jTF_threshold.setEnabled(enabled && jRB_threshold.isSelected());
-        infoSEThreshold.setEnabled(enabled && jRB_threshold.isSelected());
-
-        redundancyPanel.setEnabled(enabled);
-        redundantComboBox.setEnabled(enabled);
-        jLabelThreshodl.setEnabled(enabled && redundantComboBox.getSelectedItem() != FeatureSEFiltering.CORRELATION_NONE);
-        jTF_corr.setEnabled(enabled && redundantComboBox.getSelectedItem() != FeatureSEFiltering.CORRELATION_NONE);
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled); //To change body of generated methods, choose Tools | Templates.
-        refreshState();
     }
 
     /**
@@ -468,48 +438,8 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         } else {
             jTF_corr.setText("");
         }
-
-        addAncestorListener(new AncestorListener() {
-            @Override
-            public void ancestorAdded(AncestorEvent event) {
-                algorithm.addPropertyChangeListener(FeatureSEFilteringPanel.this);
-            }
-
-            @Override
-            public void ancestorRemoved(AncestorEvent event) {
-                algorithm.removePropertyChangeListener(FeatureSEFilteringPanel.this);
-            }
-
-            @Override
-            public void ancestorMoved(AncestorEvent event) {
-            }
-        });
-
-        refreshState();
-
-        algorithm.setWidth(shannonEntropyPanel.getWidth());
-        algorithm.setHeight(shannonEntropyPanel.getHeight());
-
+        
         return this;
-    }
-
-    public void setShannonDistributionPanel(boolean running) {
-        shannonEntropyPanel.removeAll();
-        shannonEntropyPanel.setBorder(null);
-        if (!running && algorithm.getShannonEntropyPanel() != null) {
-            shannonEntropyPanel.add(algorithm.getShannonEntropyPanel(), BorderLayout.CENTER);
-            shannonEntropyPanel.setBorder(BorderFactory.createTitledBorder(NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.shannonEntropyPanel.borderTitle")));
-        }
-        shannonEntropyPanel.revalidate();
-        shannonEntropyPanel.repaint();
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource().equals(algorithm) && evt.getPropertyName().equals(FeatureSEFiltering.RUNNING)) {
-            refreshState();
-            setShannonDistributionPanel(algorithm.isRunning());
-        }
     }
 
 }

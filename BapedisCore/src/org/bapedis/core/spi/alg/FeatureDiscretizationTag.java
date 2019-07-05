@@ -9,6 +9,6 @@ package org.bapedis.core.spi.alg;
  *
  * @author Loge
  */
-public interface FeatureSelectionTag extends AlgorithmFactory{
+public interface FeatureDiscretizationTag extends AlgorithmFactory{
     // Tag Interface
 }

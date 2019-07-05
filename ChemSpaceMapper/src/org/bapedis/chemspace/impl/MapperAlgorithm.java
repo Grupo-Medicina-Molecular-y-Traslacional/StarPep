@@ -25,10 +25,10 @@ import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
-import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
-import org.bapedis.core.spi.alg.impl.FeatureSEFilteringFactory;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlgFactory;
+import org.bapedis.core.spi.alg.impl.TwoStageUnsupervisedSelection;
+import org.bapedis.core.spi.alg.impl.TwoStageUnsupervisedSelectionFactory;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.DialogDisplayer;
@@ -56,7 +56,7 @@ public class MapperAlgorithm implements Algorithm {
     //Mapping Algorithms   
     private NonRedundantSetAlg nrdAlg;
     private AllDescriptors featureExtractionAlg;
-    private FeatureSEFiltering featureSelectionAlg;
+    private TwoStageUnsupervisedSelection featureSelectionAlg;
     private AbstractDistance distFunction;
     private final WekaPCATransformer pcaTransformer;
     private final NetworkEmbedderAlg networkAlg;
@@ -75,7 +75,7 @@ public class MapperAlgorithm implements Algorithm {
         //Mapping algorithms
         nrdAlg = (NonRedundantSetAlg) new NonRedundantSetAlgFactory().createAlgorithm();
         featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
-        featureSelectionAlg = (FeatureSEFiltering) new FeatureSEFilteringFactory().createAlgorithm();
+        featureSelectionAlg = (TwoStageUnsupervisedSelection) new TwoStageUnsupervisedSelectionFactory().createAlgorithm();
         pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
         networkAlg = (NetworkEmbedderAlg) new NetworkEmbedderFactory().createAlgorithm();
 
@@ -256,11 +256,11 @@ public class MapperAlgorithm implements Algorithm {
         return featureExtractionAlg;
     }
 
-    public void setFeatureSelectionAlg(FeatureSEFiltering alg) {
+    public void setFeatureSelectionAlg(TwoStageUnsupervisedSelection alg) {
         this.featureSelectionAlg = alg;
     }
 
-    public FeatureSEFiltering getFeatureSelectionAlg() {
+    public TwoStageUnsupervisedSelection getFeatureSelectionAlg() {
         return featureSelectionAlg;
     }
 

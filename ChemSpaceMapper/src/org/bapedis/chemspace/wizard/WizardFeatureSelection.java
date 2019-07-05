@@ -9,8 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.model.FeatureSelectionOption;
-import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
-import org.bapedis.core.spi.alg.impl.FeatureSEFilteringPanel;
+import org.bapedis.core.spi.alg.impl.TwoStageUnsupervisedSelection;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
@@ -19,7 +18,7 @@ public class WizardFeatureSelection implements WizardDescriptor.Panel<WizardDesc
         WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
     private final MapperAlgorithm csMapper;
-    private FeatureSEFiltering alg;
+    private TwoStageUnsupervisedSelection alg;
 
     public WizardFeatureSelection(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
@@ -39,9 +38,8 @@ public class WizardFeatureSelection implements WizardDescriptor.Panel<WizardDesc
     public VisualFeatureSelection getComponent() {
         if (component == null) {
             try {
-                alg = (FeatureSEFiltering) csMapper.getFeatureSelectionAlg().clone();
+                alg = (TwoStageUnsupervisedSelection) csMapper.getFeatureSelectionAlg().clone();
                 JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
-                ((FeatureSEFilteringPanel) settingPanel).setShannonDistributionPanel(false);
                 component = new VisualFeatureSelection(settingPanel);
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
@@ -85,9 +83,9 @@ public class WizardFeatureSelection implements WizardDescriptor.Panel<WizardDesc
         FeatureSelectionOption ffOption = getComponent().getFFOption();
         wiz.putProperty(FeatureSelectionOption.class.getName(), ffOption);
         if (ffOption == FeatureSelectionOption.YES) {
-            wiz.putProperty(FeatureSEFiltering.class.getName(), alg);
+            wiz.putProperty(TwoStageUnsupervisedSelection.class.getName(), alg);
         } else {
-            wiz.putProperty(FeatureSEFiltering.class.getName(), null);
+            wiz.putProperty(TwoStageUnsupervisedSelection.class.getName(), null);
         }
     }
 

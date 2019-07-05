@@ -3,21 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.spi.alg.impl;
+package org.bapedis.featureSelection.impl;
 
 import org.bapedis.core.spi.alg.Algorithm;
-import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.FeatureSelectionTag;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+import org.bapedis.core.spi.alg.FeatureFilteringTag;
 
 /**
  *
  * @author loge
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 0)
-public class FeatureSEFilteringFactory implements FeatureSelectionTag {
+@ServiceProvider(service = FeatureFilteringTag.class, position = 10)
+public class FeatureSEFilteringFactory implements FeatureFilteringTag {
 
     private FeatureSEFilteringPanel panel;
     

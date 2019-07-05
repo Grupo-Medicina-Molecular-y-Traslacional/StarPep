@@ -11,14 +11,12 @@ import java.util.Iterator;
 import javax.swing.AbstractAction;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
-import org.bapedis.core.spi.alg.FeatureSelectionTag;
-import org.bapedis.core.spi.alg.impl.FeatureSEFilteringFactory;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.Lookup;
-import org.openide.util.NbBundle;
+import org.bapedis.core.spi.alg.FeatureSelectionTag;
 
 @ActionID(
         category = "Tools",
@@ -38,15 +36,15 @@ public class FilterMDToolBar extends AbstractAction {
     public FilterMDToolBar() {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         
-        AlgorithmFactory finteringFactory = null;
+        AlgorithmFactory fSelectionFactory = null;
         for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
             final AlgorithmFactory factory = it.next();
-            if (factory instanceof FeatureSEFilteringFactory){
-                finteringFactory = factory;
+            if (factory instanceof FeatureSelectionTag){
+                fSelectionFactory = factory;
             }
         }        
         
-        actionListener = finteringFactory != null ?ToolAction.createActionListener(finteringFactory, FeatureSelectionTag.class): null;
+        actionListener = fSelectionFactory != null ?ToolAction.createActionListener(fSelectionFactory, FeatureSelectionTag.class): null;
     }
         
     @Override

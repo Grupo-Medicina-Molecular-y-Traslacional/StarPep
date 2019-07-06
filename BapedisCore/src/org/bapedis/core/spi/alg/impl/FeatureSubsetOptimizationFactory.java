@@ -7,7 +7,7 @@ package org.bapedis.core.spi.alg.impl;
 
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.FeatureSelectionTag;
+import org.bapedis.core.spi.alg.FeatureSubsetOptimizationTag;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -15,10 +15,10 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Loge
  */
-@ServiceProvider(service = FeatureSelectionTag.class, position = 0)
-public class TwoStageUnsupervisedSelectionFactory implements FeatureSelectionTag {
+@ServiceProvider(service = FeatureSubsetOptimizationTag.class, position = 20)
+public class FeatureSubsetOptimizationFactory implements FeatureSubsetOptimizationTag {
 
-    TwoStageUnsupervisedSelectionSetupUI setupUI = new TwoStageUnsupervisedSelectionSetupUI();
+    private final FeatureSubsetOptimizationSetupUI setupUI = new FeatureSubsetOptimizationSetupUI();
     
     @Override
     public String getCategory() {
@@ -27,12 +27,12 @@ public class TwoStageUnsupervisedSelectionFactory implements FeatureSelectionTag
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(TwoStageUnsupervisedSelection.class, "TwoStageUnsupervisedSelection.name");
+        return NbBundle.getMessage(FeatureSubsetOptimizationFactory.class, "FeatureSubsetOptimization.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(TwoStageUnsupervisedSelection.class, "TwoStageUnsupervisedSelection.desc");
+        return NbBundle.getMessage(FeatureSubsetOptimizationFactory.class, "FeatureSubsetOptimization.desc");
     }
 
     @Override
@@ -42,7 +42,7 @@ public class TwoStageUnsupervisedSelectionFactory implements FeatureSelectionTag
 
     @Override
     public Algorithm createAlgorithm() {
-        return new TwoStageUnsupervisedSelection(this);
+        return new FeatureSubsetOptimization(this);
     }
     
 }

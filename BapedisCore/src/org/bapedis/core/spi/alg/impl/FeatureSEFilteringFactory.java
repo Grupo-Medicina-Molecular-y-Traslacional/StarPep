@@ -3,27 +3,24 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.featureSelection.impl;
+package org.bapedis.core.spi.alg.impl;
 
 import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.openide.util.NbBundle;
-import org.openide.util.lookup.ServiceProvider;
-import org.bapedis.core.spi.alg.FeatureFilteringTag;
 
 /**
  *
  * @author loge
  */
-@ServiceProvider(service = FeatureFilteringTag.class, position = 10)
-public class FeatureSEFilteringFactory implements FeatureFilteringTag {
+public class FeatureSEFilteringFactory implements AlgorithmFactory {
 
-    private FeatureSEFilteringPanel panel;
+    private final FeatureSEFilteringPanel panel = new FeatureSEFilteringPanel();;
     
     @Override
     public String getCategory() {
         return null;
-//        return NbBundle.getMessage(FeatureSEFiltering.class, "FeatureFiltering.category");
     }
 
     @Override
@@ -38,9 +35,6 @@ public class FeatureSEFilteringFactory implements FeatureFilteringTag {
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        if (panel == null){
-            panel = new FeatureSEFilteringPanel();
-        }
         return panel;
     }
 

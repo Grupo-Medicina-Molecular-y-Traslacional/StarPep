@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.featureSelection.impl;
+package org.bapedis.core.spi.alg.impl;
 
 import javax.swing.JPanel;
 import org.bapedis.core.spi.alg.Algorithm;
@@ -23,6 +23,16 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
         initComponents();
     }
 
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled); //To change body of generated methods, choose Tools | Templates.
+        
+        jLabel1.setEnabled(enabled);
+        jComboBox1.setEnabled(enabled);
+    }
+    
+    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -35,6 +45,7 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
 
         jLabel1 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox<>();
+        extLabel = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -56,6 +67,13 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jComboBox1, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(extLabel, org.openide.util.NbBundle.getMessage(FeatureDiscretizationPanel.class, "FeatureDiscretizationPanel.extLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        add(extLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
@@ -71,6 +89,7 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel extLabel;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables

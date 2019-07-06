@@ -53,5 +53,5 @@ public interface Algorithm extends Runnable {
      */
     public AlgorithmFactory getFactory();
 
-
+    
 }

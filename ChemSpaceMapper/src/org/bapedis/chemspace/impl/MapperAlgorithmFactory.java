@@ -19,7 +19,7 @@ import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.spi.alg.ChemSpaceTag;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
-import org.bapedis.core.spi.alg.impl.TwoStageUnsupervisedSelection;
+import org.bapedis.core.spi.alg.impl.UnsupervisedFeatureSelection;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
@@ -91,7 +91,7 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
         if (ffOption != null) {
             csMapper.setFSOption(ffOption);
             if (ffOption == FeatureSelectionOption.YES) {
-                TwoStageUnsupervisedSelection alg = (TwoStageUnsupervisedSelection) wiz.getProperty(TwoStageUnsupervisedSelection.class.getName());
+                UnsupervisedFeatureSelection alg = (UnsupervisedFeatureSelection) wiz.getProperty(UnsupervisedFeatureSelection.class.getName());
                 csMapper.setFeatureSelectionAlg(alg);
             }
         }

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.featureSelection.impl;
+package org.bapedis.core.spi.alg.impl;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Bin;
+import org.bapedis.core.model.BinsPartition;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
@@ -27,7 +28,7 @@ import org.openide.util.Lookup;
  *
  * @author Loge
  */
-public class FeatureDiscretization implements Algorithm {
+public class FeatureDiscretization implements Algorithm, Cloneable {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
 
@@ -99,7 +100,7 @@ public class FeatureDiscretization implements Algorithm {
     @Override
     public void run() {
         int numberOfInstances = peptides.size();
-        
+
         switch (numberOfBinsOption) {
             case Bin_Number_Peptide_OPTION:
                 numberOfBins = numberOfInstances;
@@ -122,14 +123,12 @@ public class FeatureDiscretization implements Algorithm {
         }
 
         pc.reportMsg("Number of bins: " + numberOfBins, workspace);
-        
+
         List<MolecularDescriptor> allFeatures = new LinkedList<>();
 
         for (String key : attrModel.getMolecularDescriptorKeys()) {
-            if (!key.equals(MolecularDescriptor.DEFAULT_CATEGORY)) {
-                for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
-                    allFeatures.add(attr);
-                }
+            for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
+                allFeatures.add(attr);
             }
         }
 
@@ -140,12 +139,14 @@ public class FeatureDiscretization implements Algorithm {
                     compute(descriptor);
                 } catch (MolecularDescriptorNotFoundException ex) {
                     Exceptions.printStackTrace(ex);
-                    DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());                    
+                    DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
                     stopRun.set(true);
                 }
                 ticket.progress();
             }
         });
+
+        pc.reportMsg("Maximum entropy: " + Math.log(numberOfBins), workspace);
     }
 
     private void compute(MolecularDescriptor descriptor) throws MolecularDescriptorNotFoundException {
@@ -188,8 +189,14 @@ public class FeatureDiscretization implements Algorithm {
             bin = bins[binIndex];
             bin.incrementCount();
         }
-        // Set the bins for later use  
-        descriptor.setBins(bins);
+        // Set the bins partition for later use  
+        descriptor.setBinsPartition(new BinsPartition(bins));
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        FeatureDiscretization copy = (FeatureDiscretization) super.clone(); //To change body of generated methods, choose Tools | Templates.
+        return copy;
     }
 
 }

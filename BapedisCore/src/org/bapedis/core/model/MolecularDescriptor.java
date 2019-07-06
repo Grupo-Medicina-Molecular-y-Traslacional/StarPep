@@ -17,8 +17,7 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
     public static final String DEFAULT_CATEGORY = "Default";
     protected final String category;
     protected double max, min, mean, var, std;
-    protected Bin[] bins;
-    protected double entropy;
+    protected BinsPartition binsPartition;
 
     public MolecularDescriptor(String id, String displayName, Class<?> type) {
         this(id, displayName, type, DEFAULT_CATEGORY, null);
@@ -35,7 +34,7 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
         max = Double.NaN;
         mean = Double.NaN;
         std = Double.NaN;
-        entropy = Double.NaN;
+        binsPartition = null;
     }
 
     public String getCategory() {
@@ -75,21 +74,13 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
         return std;
     }
 
-    public Bin[] getBins() {
-        return bins;
-    }
+    public BinsPartition getBinsPartition() {
+        return binsPartition;
+    }     
 
-    public void setBins(Bin[] bins) {
-        this.bins = bins;
-    }        
-
-    public double getEntropy() {
-        return entropy;
-    }
-
-    public void setEntropy(double entropy) {
-        this.entropy = entropy;
-    }        
+    public void setBinsPartition(BinsPartition binsPartition) {
+        this.binsPartition = binsPartition;
+    }    
     
     public double getNormalizedMinMaxValue(Peptide peptide) throws MolecularDescriptorNotFoundException{
        if (Double.isNaN(min) || Double.isNaN(max)){

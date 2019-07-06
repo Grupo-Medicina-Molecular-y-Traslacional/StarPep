@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.featureSelection.impl;
+package org.bapedis.core.spi.alg.impl;
 
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
@@ -13,13 +13,13 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
-import static org.bapedis.featureSelection.impl.FeatureSEFiltering.pc;
+import static org.bapedis.core.spi.alg.impl.FeatureSEFiltering.pc;
 
 /**
  *
  * @author Loge
  */
-public class FeatureSubsetOptimization implements Algorithm{
+public class FeatureSubsetOptimization implements Algorithm, Cloneable{
 
     //To initialize
     protected Workspace workspace;
@@ -71,5 +71,12 @@ public class FeatureSubsetOptimization implements Algorithm{
     public void run() {
         
     }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        FeatureSubsetOptimization copy = (FeatureSubsetOptimization)super.clone(); //To change body of generated methods, choose Tools | Templates.
+        return copy;
+    }
+        
     
 }

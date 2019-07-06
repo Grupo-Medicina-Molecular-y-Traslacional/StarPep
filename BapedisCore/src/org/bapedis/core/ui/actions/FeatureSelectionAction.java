@@ -12,12 +12,17 @@ import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.bapedis.core.spi.alg.FeatureSelectionTag;
 
+/**
+ *
+ * @author Home
+ */
 @ActionID(
         category = "Tools",
         id = "org.bapedis.core.ui.actions.FeatureSelection"
 )
 @ActionRegistration(        
-        displayName = "#CTL_FeatureSelection"
+        displayName = "#CTL_FeatureSelection",
+        lazy=false
 )
 @ActionReferences({
     @ActionReference(path = "Menu/Tools/MolecularDescriptor", position = 20)

@@ -3,22 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.featureSelection.impl;
+package org.bapedis.core.spi.alg.impl;
 
 import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.FeatureSubsetOptimizationTag;
 import org.openide.util.NbBundle;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Loge
  */
-@ServiceProvider(service = FeatureSubsetOptimizationTag.class, position = 20)
-public class FeatureSubsetOptimizationFactory implements FeatureSubsetOptimizationTag {
+public class FeatureDiscretizationFactory implements AlgorithmFactory {
 
-    private FeatureSubsetOptimizationSetupUI setupUI = new FeatureSubsetOptimizationSetupUI();
+    FeatureDiscretizationPanel setupUI = new FeatureDiscretizationPanel();
     
     @Override
     public String getCategory() {
@@ -27,12 +25,12 @@ public class FeatureSubsetOptimizationFactory implements FeatureSubsetOptimizati
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(FeatureSubsetOptimizationFactory.class, "FeatureSubsetOptimization.name");
+        return NbBundle.getMessage(FeatureDiscretizationFactory.class, "FeatureDiscretization.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(FeatureSubsetOptimizationFactory.class, "FeatureSubsetOptimization.desc");
+        return NbBundle.getMessage(FeatureDiscretizationFactory.class, "FeatureDiscretization.desc");
     }
 
     @Override
@@ -42,7 +40,7 @@ public class FeatureSubsetOptimizationFactory implements FeatureSubsetOptimizati
 
     @Override
     public Algorithm createAlgorithm() {
-        return new FeatureSubsetOptimization(this);
+        return new FeatureDiscretization(this);
     }
     
 }

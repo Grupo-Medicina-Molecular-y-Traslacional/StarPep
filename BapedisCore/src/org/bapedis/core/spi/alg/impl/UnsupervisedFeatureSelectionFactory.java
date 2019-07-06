@@ -3,11 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.featureSelection.impl;
+package org.bapedis.core.spi.alg.impl;
 
 import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.FeatureDiscretizationTag;
+import org.bapedis.core.spi.alg.FeatureSelectionTag;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -15,10 +16,10 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Loge
  */
-@ServiceProvider(service = FeatureDiscretizationTag.class, position = 0)
-public class FeatureDiscretizationFactory implements FeatureDiscretizationTag {
+@ServiceProvider(service = AlgorithmFactory.class, position = 0)
+public class UnsupervisedFeatureSelectionFactory implements AlgorithmFactory, FeatureSelectionTag {
 
-    FeatureDiscretizationPanel setupUI = new FeatureDiscretizationPanel();
+    UnsupervisedFeatureSelectionSetupUI setupUI = new UnsupervisedFeatureSelectionSetupUI();
     
     @Override
     public String getCategory() {
@@ -27,12 +28,12 @@ public class FeatureDiscretizationFactory implements FeatureDiscretizationTag {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(FeatureDiscretizationFactory.class, "FeatureDiscretization.name");
+        return NbBundle.getMessage(UnsupervisedFeatureSelection.class, "UnsupervisedFeatureSelection.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(FeatureDiscretizationFactory.class, "FeatureDiscretization.desc");
+        return NbBundle.getMessage(UnsupervisedFeatureSelection.class, "UnsupervisedFeatureSelection.desc");
     }
 
     @Override
@@ -42,7 +43,7 @@ public class FeatureDiscretizationFactory implements FeatureDiscretizationTag {
 
     @Override
     public Algorithm createAlgorithm() {
-        return new FeatureDiscretization(this);
+        return new UnsupervisedFeatureSelection(this);
     }
     
 }

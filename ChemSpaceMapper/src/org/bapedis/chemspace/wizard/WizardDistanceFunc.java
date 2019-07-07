@@ -20,6 +20,7 @@ import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
 public class WizardDistanceFunc implements WizardDescriptor.ValidatingPanel<WizardDescriptor>,
+        WizardDescriptor.FinishablePanel<WizardDescriptor>,
         PropertyChangeListener {
 
     private final MapperAlgorithm csMapper;
@@ -46,7 +47,7 @@ public class WizardDistanceFunc implements WizardDescriptor.ValidatingPanel<Wiza
     @Override
     public VisualDistanceFunc getComponent() {
         if (component == null) {
-            try {                
+            try {
                 alg = (AbstractDistance) csMapper.getDistanceFunction().clone();
                 component = new VisualDistanceFunc();
                 component.setDistanceFunction(alg);
@@ -107,7 +108,7 @@ public class WizardDistanceFunc implements WizardDescriptor.ValidatingPanel<Wiza
 
     @Override
     public void validate() throws WizardValidationException {
-        if (getComponent().getDistanceFunction()== null) {
+        if (getComponent().getDistanceFunction() == null) {
             isValid = false;
             throw new WizardValidationException(null, NbBundle.getMessage(WizardDistanceFunc.class, "DistanceFunction.invalid.text"), null);
         }
@@ -130,4 +131,10 @@ public class WizardDistanceFunc implements WizardDescriptor.ValidatingPanel<Wiza
         }
     }
 
+    @Override
+    public boolean isFinishPanel() {
+        return isValid;
+    }
+
+    
 }

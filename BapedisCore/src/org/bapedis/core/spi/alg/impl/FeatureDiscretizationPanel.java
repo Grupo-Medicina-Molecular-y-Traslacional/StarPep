@@ -45,7 +45,7 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
 
         jLabel1 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox<>();
-        extLabel = new javax.swing.JLabel();
+        infoLabel = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -68,12 +68,16 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jComboBox1, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(extLabel, org.openide.util.NbBundle.getMessage(FeatureDiscretizationPanel.class, "FeatureDiscretizationPanel.extLabel.text")); // NOI18N
+        infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(infoLabel, org.openide.util.NbBundle.getMessage(FeatureDiscretizationPanel.class, "FeatureDiscretizationPanel.infoLabel.text")); // NOI18N
+        infoLabel.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureDiscretizationPanel.class, "FeatureDiscretizationPanel.infoLabel.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        add(extLabel, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(infoLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
@@ -89,7 +93,7 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel extLabel;
+    private javax.swing.JLabel infoLabel;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables

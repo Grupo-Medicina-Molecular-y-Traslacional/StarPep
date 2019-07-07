@@ -19,11 +19,11 @@ import org.openide.util.Exceptions;
  */
 public class ClassicAggregationOperator implements IAggregationOperator
 {
-    final private int MAX_K = 7;
+    private int maxK = 1;
+    
     final private NonClassicAggregationOperator nonClassicOperator;
     
-    private final String[] METHODS = { "autocorrelation", "gravitational", "totalSumLagK", "electroTopologicalState" };
-    
+    private final String[] METHODS = { "autocorrelation", "gravitational", "totalSumLagK", "electroTopologicalState" };    
     private final String[] ACRONYM = { "AC", "GV", "TS", "ES" };
     
     public ClassicAggregationOperator( NonClassicAggregationOperator nonClassicOperator )
@@ -33,49 +33,59 @@ public class ClassicAggregationOperator implements IAggregationOperator
     
     public void applyOperators( double[] lovis, String keyAttr, Peptide peptide, AbstractMD md, boolean applyMeans, List<String> nonClassicOperatorsList, List<String> classicOperatorsList )
     {
-        for ( int i = 0; i < METHODS.length; i++ )
+        if ( !classicOperatorsList.isEmpty() )
         {
-            try 
+            int[][] distanceMatrix = maxK == 1 ? peptide.calcAdjancencyMtrix() : computeFloydAPSP( peptide.calcAdjancencyMtrix() );
+            
+            ArrayList<Double> elements = new ArrayList<>( peptide.getLength() * 2 );            
+            for ( int i = 0; i < METHODS.length; i++ )
             {
-                if ( classicOperatorsList.contains( ACRONYM[i] ) )
+                try 
                 {
-                    if ( i >= 0 && i <= 2 )
+                    if ( classicOperatorsList.contains( ACRONYM[i] ) )
                     {
-                        for ( int t = 1; t <= MAX_K; t++ )
+                        if ( i >= 0 && i <= 2 )
                         {
-                            Method method = this.getClass().getMethod( METHODS[i], double[].class, Peptide.class, Integer.class );
+                            for ( int t = 1; t <= maxK; t++ )
+                            {
+                                Method method = this.getClass().getMethod( METHODS[i], double[].class, Peptide.class, Integer.class, int[][].class, ArrayList.class );
+                                
+                                String tmp = keyAttr + "-" + ACRONYM[i] + "[" + t + "]";                                
+                                double[] newLovis = (double[]) method.invoke( this, new Object[]{ lovis, peptide, t, distanceMatrix, elements } );
+                                
+                                nonClassicOperator.applyOperators( newLovis, tmp, peptide, md, applyMeans, nonClassicOperatorsList );
+                                newLovis = null;
+                            }
+                        }
+                        else
+                        {
+                            Method method = this.getClass().getMethod( METHODS[i], double[].class, Peptide.class, int[][].class );
                             
-                            String tmp = keyAttr + "-" + ACRONYM[i] + "[" + t + "]";                                
-                            double[] newLovis = (double[]) method.invoke( this, new Object[]{ lovis, peptide, t } );
+                            String tmp = keyAttr + "-" + ACRONYM[i];                                
+                            double[] newLovis = (double[]) method.invoke( this, new Object[]{ lovis, peptide, distanceMatrix } );
                             
                             nonClassicOperator.applyOperators( newLovis, tmp, peptide, md, applyMeans, nonClassicOperatorsList );
+                            newLovis = null;
                         }
                     }
-                    else
-                    {
-                        Method method = this.getClass().getMethod( METHODS[i], double[].class, Peptide.class );
-                        
-                        String tmp = keyAttr + "-" + ACRONYM[i];                                
-                        double[] newLovis = (double[]) method.invoke( this, new Object[]{ lovis, peptide } );
-                        
-                        nonClassicOperator.applyOperators( newLovis, tmp, peptide, md, applyMeans, nonClassicOperatorsList );
-                    }
+                }
+                catch ( IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex )
+                {
+                    Exceptions.printStackTrace( ex );
                 }
             }
-            catch ( IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex )
-            {
-                Exceptions.printStackTrace( ex );
-            }
+            
+            elements.clear();
+            elements = null;
+            distanceMatrix = null;
         }
     }
     
-    final public double[] autocorrelation( double[] a, Peptide peptide, Integer k )
+    final public double[] autocorrelation( double[] a, Peptide peptide, Integer k, int[][] distanceMatrix, ArrayList<Double> elements )
     {
-        ArrayList<Double> elements = new ArrayList<>();
+        elements.clear();
         
         int n = peptide.getLength();
-        int[][] distanceMatrix = computeFloydAPSP( peptide.calcAdjancencyMtrix() );
-        
         for ( int i = 0; i < n; i++ ) 
         {
             for ( int j = i; j < n; j++ ) 
@@ -91,17 +101,15 @@ public class ClassicAggregationOperator implements IAggregationOperator
         for (int i = 0; i < elements.size(); i++) 
         {
             result[i] = elements.get(i);
-        }
+        }        
         return result;
     }
     
-    final public double[] gravitational( double[] a, Peptide peptide, Integer k )
+    final public double[] gravitational( double[] a, Peptide peptide, Integer k, int[][] distanceMatrix, ArrayList<Double> elements )
     {
-        ArrayList<Double> elements = new ArrayList<>();
+        elements.clear();
         
         int n = peptide.getLength();
-        int[][] distanceMatrix = computeFloydAPSP( peptide.calcAdjancencyMtrix() );
-        
         for ( int i = 0; i < n; i++ ) 
         {
             for ( int j = i + 1; j < n; j++ ) 
@@ -117,17 +125,15 @@ public class ClassicAggregationOperator implements IAggregationOperator
         for ( int i = 0; i < elements.size(); i++ ) 
         {
             result[i] = elements.get(i);
-        }
+        }        
         return result;
     }
     
-    public double[] totalSumLagK( double[] a, Peptide peptide, Integer k )
+    public double[] totalSumLagK( double[] a, Peptide peptide, Integer k, int[][] distanceMatrix, ArrayList<Double> elements )
     {
-        ArrayList<Double> elements = new ArrayList<>();
+        elements.clear();
         
         int n = peptide.getLength();
-        int[][] distanceMatrix = computeFloydAPSP( peptide.calcAdjancencyMtrix() );
-        
         for ( int i = 0; i < n; i++ ) 
         {
             for ( int j = i + 1; j < n; j++ ) 
@@ -147,10 +153,9 @@ public class ClassicAggregationOperator implements IAggregationOperator
         return result;
     }
     
-    public double[] electroTopologicalState( double[] lovis, Peptide peptide ) 
+    public double[] electroTopologicalState( double[] lovis, Peptide peptide, int[][] distanceMatrix ) 
     {
         int longitud = peptide.getLength();
-        int[][] distanceMatrix = computeFloydAPSP( peptide.calcAdjancencyMtrix() );
         
         double[] Si = new double[ longitud ];
         double Li = 0;
@@ -203,5 +208,10 @@ public class ClassicAggregationOperator implements IAggregationOperator
             }
         }
         return distMatrix;
+    }
+    
+    public void setMaxK( int maxK )
+    {
+        this.maxK = maxK;
     }
 }

@@ -17,24 +17,24 @@ import org.bapedis.core.spi.alg.FeatureExtractionTag;
  * @author Cesar
  */
 @ServiceProvider(service = AlgorithmFactory.class, position = 400)
-public class IndicesNonClassicOperatorsFactory implements AlgorithmFactory, FeatureExtractionTag
+public class IndicesBasedOperatorsFactory implements AlgorithmFactory, FeatureExtractionTag
 {
     @Override
     public String getCategory() 
     {
-        return NbBundle.getMessage( IndicesNonClassicOperatorsFactory.class, "IndicesNonClassicOperators.category" );
+        return NbBundle.getMessage(IndicesBasedOperatorsFactory.class, "IndicesBasedOperators.category" );
     }
     
     @Override
     public String getName()
     {
-        return NbBundle.getMessage( IndicesNonClassicOperatorsFactory.class, "IndicesNonClassicOperators.name" );
+        return NbBundle.getMessage(IndicesBasedOperatorsFactory.class, "IndicesBasedOperators.name" );
     }
     
     @Override
     public String getDescription()
     {
-        return NbBundle.getMessage( IndicesNonClassicOperatorsFactory.class, "IndicesNonClassicOperators.desc" );
+        return NbBundle.getMessage(IndicesBasedOperatorsFactory.class, "IndicesBasedOperators.desc" );
     }
     
     @Override
@@ -46,6 +46,6 @@ public class IndicesNonClassicOperatorsFactory implements AlgorithmFactory, Feat
     @Override
     public Algorithm createAlgorithm()
     {
-        return new IndicesNonClassicOperators( this );
+        return new IndicesBasedOperators( this );
     }    
 }

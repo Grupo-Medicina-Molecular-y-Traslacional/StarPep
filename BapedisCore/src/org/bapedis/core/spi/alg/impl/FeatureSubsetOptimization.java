@@ -101,7 +101,7 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
         BitSet temp_group;
 
         //Initialize
-        ExecutorService m_pool = Executors.newCachedThreadPool();
+        ExecutorService m_pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         BitSet m_best_group = new BitSet(features.length);
         if (direction == Direction.Backward) {
             for (i = 0; i < features.length; i++) {
@@ -123,7 +123,7 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
             done = true;
             addone = false;
 
-            for (i = 0; i < features.length; i++) {
+            for (i = 0; i < features.length && !stopRun; i++) {
                 switch (direction) {
                     case Backward:
                         z = temp_group.get(i);
@@ -169,7 +169,7 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
                 }
             }
 
-            for (int j = 0; j < results.size(); j++) {
+            for (int j = 0; j < results.size() && !stopRun; j++) {
                 Future<Double[]> f = results.get(j);
 
                 int index = f.get()[0].intValue();

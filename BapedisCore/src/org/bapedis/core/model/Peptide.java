@@ -69,14 +69,14 @@ import org.openide.util.NbBundle;
         }
         return seq;
     }        
-
+    
     public ProteinSequence getBiojavaSeq() throws CompoundNotFoundException {
         if (biojavaSeq == null) {
             biojavaSeq = new ProteinSequence(getSequence());
         }
         return biojavaSeq;
     }
-
+    
     public int getLength() {
         return getSequence().length();
     }

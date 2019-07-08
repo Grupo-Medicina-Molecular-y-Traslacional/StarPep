@@ -36,8 +36,10 @@ public class FeatureSubsetOptimizationSetupUI extends javax.swing.JPanel impleme
 
         strategyPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        jStrategyComboBox = new javax.swing.JComboBox<>();
+        info = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        jDirectionComboBox = new javax.swing.JComboBox<>();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -51,18 +53,42 @@ public class FeatureSubsetOptimizationSetupUI extends javax.swing.JPanel impleme
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         strategyPanel.add(jLabel1, gridBagConstraints);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Backward elimination" }));
+        jStrategyComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Greedy hill-climbing search" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        strategyPanel.add(jComboBox1, gridBagConstraints);
+        strategyPanel.add(jStrategyComboBox, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.jLabel2.text")); // NOI18N
+        info.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(info, org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.info.text")); // NOI18N
+        info.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.info.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        strategyPanel.add(info, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.jLabel2.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         strategyPanel.add(jLabel2, gridBagConstraints);
+
+        jDirectionComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Forward", "Backward" }));
+        jDirectionComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jDirectionComboBoxActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        strategyPanel.add(jDirectionComboBox, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -73,17 +99,43 @@ public class FeatureSubsetOptimizationSetupUI extends javax.swing.JPanel impleme
         add(strategyPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jDirectionComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDirectionComboBoxActionPerformed
+        switch(jDirectionComboBox.getSelectedIndex()){
+            case 0:
+                optimizationAlg.setDirection(FeatureSubsetOptimization.Direction.Forward);
+                break;
+            case 1:
+                optimizationAlg.setDirection(FeatureSubsetOptimization.Direction.Backward);
+                break;
+            default:
+                optimizationAlg.setDirection(null);
+        }
+    }//GEN-LAST:event_jDirectionComboBoxActionPerformed
+
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         optimizationAlg = (FeatureSubsetOptimization) algo;
+        
+        switch(optimizationAlg.getDirection()){
+            case Forward:
+                jDirectionComboBox.setSelectedIndex(0);
+                break;
+            case Backward:
+                jDirectionComboBox.setSelectedIndex(1);
+                break;
+            default:
+                jDirectionComboBox.setSelectedIndex(-1);
+        }
         return this;
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JLabel info;
+    private javax.swing.JComboBox<String> jDirectionComboBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JComboBox<String> jStrategyComboBox;
     private javax.swing.JPanel strategyPanel;
     // End of variables declaration//GEN-END:variables
 }

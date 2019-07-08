@@ -30,7 +30,7 @@ import org.openide.util.NbBundle;
 
     public static final PeptideAttribute ID = new PeptideAttribute("id", NbBundle.getMessage(Peptide.class, "Peptide.attribute.id"), Integer.class, true);
     public static final PeptideAttribute SEQ = new PeptideAttribute("seq", NbBundle.getMessage(Peptide.class, "Peptide.attribute.seq"), String.class, true);
-    public static final MolecularDescriptor LENGHT = new MolecularDescriptor("length", NbBundle.getMessage(Peptide.class, "Peptide.attribute.length"), Integer.class);
+    public static final MolecularDescriptor LENGHT = new MolecularDescriptor("length", NbBundle.getMessage(Peptide.class, "Peptide.attribute.length"), Integer.class, NbBundle.getMessage(Peptide.class, "Peptide.attribute.length"));
     public final static String CHANGED_ATTRIBUTE = "changed_attribute";
     protected final PropertyChangeSupport propertyChangeSupport;
 
@@ -41,7 +41,6 @@ import org.openide.util.NbBundle;
     protected int id;
     protected String seq;
     protected ProteinSequence biojavaSeq;    
-    protected int length;
 
     public Peptide(Node graphNode, Graph graph) {
         this.graphNode = graphNode;
@@ -51,7 +50,6 @@ import org.openide.util.NbBundle;
         
         id = -1;
         seq = null;
-        length = 0;
     }
 
     public int getId() {
@@ -80,16 +78,14 @@ import org.openide.util.NbBundle;
     }
 
     public int getLength() {
-        if (length == 0){
-            length = (int) attrsValue.get(LENGHT); 
-        }
-        return length;
+        return getSequence().length();
     }
     
     public int[][] calcAdjancencyMtrix(){
-        int[][] matrix = new int[length][length];
-        for(int i=0; i<length; i++){
-            for(int j=0; j<length; j++){
+        int n = getLength();
+        int[][] matrix = new int[n][n];
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++){
                 matrix[i][j] = (j==i-1 || j==i+1)? 1:0;
             }
         }                

@@ -116,6 +116,7 @@ public class RemoveDescriptor implements Algorithm {
 
     @Override
     public void run() {
+        ticket.switchToDeterminate(descriptorKeys.size());
         for (String key : descriptorKeys) {
             if (!stopRun) {
                 if (attrModel.hasMolecularDescriptors(key)) {
@@ -123,6 +124,7 @@ public class RemoveDescriptor implements Algorithm {
                     pc.reportMsg("Deleted: " + key, workspace);
                 }
             }
+            ticket.progress();
         }
         descriptorKeys.clear();
     }

@@ -19,8 +19,6 @@ import javax.swing.event.SwingPropertyChangeSupport;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.Origin;
-import org.gephi.graph.api.Table;
 import org.netbeans.swing.etable.QuickFilter;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Index;
@@ -120,8 +118,6 @@ public class AttributesModel {
 //            node.setAttribute(attr.getId(), peptide.getAttributeValue(attr));
 //        }
 //    }
-
-
     public Set<String> getMolecularDescriptorKeys() {
         return mdMap.keySet();
     }
@@ -147,12 +143,10 @@ public class AttributesModel {
     }
 
     public void deleteAllMolecularDescriptors(String category) {
-        if (!category.equals(MolecularDescriptor.DEFAULT_CATEGORY)) {
-            for (PeptideAttribute attr : mdMap.remove(category)) {
-                delete(attr);
-            }
-            propertyChangeSupport.firePropertyChange(MD_ATTR_REMOVED, category, null);
+        for (PeptideAttribute attr : mdMap.remove(category)) {
+            delete(attr);
         }
+        propertyChangeSupport.firePropertyChange(MD_ATTR_REMOVED, category, null);
     }
 
     public void deleteAttribute(MolecularDescriptor attr) {

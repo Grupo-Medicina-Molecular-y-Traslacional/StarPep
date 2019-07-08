@@ -40,7 +40,8 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
     public static final int Bin_Rice_OPTION = 5;
 
     private final FeatureDiscretizationFactory factory;
-    int numberOfBinsOption, numberOfBins;
+    private int numberOfBinsOption, numberOfBins;
+    private double maxEntropy;
 
     //To initialize
     protected Workspace workspace;
@@ -64,6 +65,10 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
         this.numberOfBinsOption = numberOfBinsOption;
     }
 
+    public double getMaxEntropy() {
+        return maxEntropy;
+    }
+
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
@@ -71,6 +76,7 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
         attrModel = pc.getAttributesModel(workspace);
         peptides = attrModel.getPeptides();
         stopRun.set(false);
+        maxEntropy = Double.NaN;
     }
 
     @Override
@@ -136,7 +142,7 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
         allFeatures.parallelStream().forEach(descriptor -> {
             if (!stopRun.get()) {
                 try {
-                    compute(descriptor);
+                    computeBinsPartition(descriptor);
                 } catch (MolecularDescriptorNotFoundException ex) {
                     Exceptions.printStackTrace(ex);
                     DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
@@ -146,10 +152,10 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
             }
         });
 
-        pc.reportMsg("Maximum entropy: " + Math.log(numberOfBins), workspace);
+        maxEntropy = Math.log(numberOfBins);
     }
 
-    private void compute(MolecularDescriptor descriptor) throws MolecularDescriptorNotFoundException {
+    private void computeBinsPartition(MolecularDescriptor descriptor) throws MolecularDescriptorNotFoundException {
         Bin[] bins = new Bin[numberOfBins];
         Bin bin;
         double binWidth, lower, upper, min, max, val;
@@ -171,26 +177,33 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
         }
 
         for (Peptide peptide : peptides) {
-            binIndex = bins.length - 1;
-            val = MolecularDescriptor.getDoubleValue(peptide, descriptor);
-            if (val < max) {
-                double fraction = (val - min) / (max - min);
-                if (fraction < 0.0) {
-                    fraction = 0.0;
-                }
-                binIndex = (int) (fraction * bins.length);
-                // rounding could result in binIndex being equal to bins
-                // which will cause an IndexOutOfBoundsException - see bug
-                // report 1553088
-                if (binIndex >= bins.length) {
-                    binIndex = bins.length - 1;
-                }
-            }
+            binIndex = getBinIndex(peptide, descriptor, bins.length);
             bin = bins[binIndex];
             bin.incrementCount();
         }
         // Set the bins partition for later use  
-        descriptor.setBinsPartition(new BinsPartition(bins));
+        descriptor.setBinsPartition(new BinsPartition(bins, peptides.size()));
+    }
+
+    public static int getBinIndex(Peptide peptide, MolecularDescriptor descriptor, int numberOfBins) throws MolecularDescriptorNotFoundException {
+        int binIndex = numberOfBins - 1;
+        double val = MolecularDescriptor.getDoubleValue(peptide, descriptor);
+        double min = descriptor.getMin();
+        double max = descriptor.getMax();        
+        if (val < max) {
+            double fraction = (val - min) / (max - min);
+            if (fraction < 0.0) {
+                fraction = 0.0;
+            }
+            binIndex = (int) (fraction * numberOfBins);
+            // rounding could result in binIndex being equal to bins
+            // which will cause an IndexOutOfBoundsException - see bug
+            // report 1553088
+            if (binIndex >= numberOfBins) {
+                binIndex = numberOfBins - 1;
+            }
+        }
+        return binIndex;
     }
 
     @Override

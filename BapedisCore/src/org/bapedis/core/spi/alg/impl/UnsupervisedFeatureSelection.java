@@ -42,6 +42,7 @@ public class UnsupervisedFeatureSelection implements Algorithm, Cloneable {
     protected FeatureDiscretization preprocessing;
     protected FeatureSEFiltering filtering;
     protected FeatureSubsetOptimization subsetOptimization;
+    private boolean debug;
 
     public UnsupervisedFeatureSelection(UnsupervisedFeatureSelectionFactory factory) {
         this.factory = factory;
@@ -54,6 +55,8 @@ public class UnsupervisedFeatureSelection implements Algorithm, Cloneable {
 
         firstStage = true;
         secondStage = true;
+
+        debug = true;
     }
 
     public FeatureDiscretization getPreprocessingAlg() {
@@ -90,10 +93,19 @@ public class UnsupervisedFeatureSelection implements Algorithm, Cloneable {
         ticket = progressTicket;
         attrModel = pc.getAttributesModel(workspace);
         stopRun = false;
+
+        filtering.setDebug(debug);
+        subsetOptimization.setDebug(debug);
     }
 
     @Override
     public void endAlgo() {
+        //Set null to bins partition
+        for (String key : attrModel.getMolecularDescriptorKeys()) {
+            for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
+                attr.setBinsPartition(null);
+            }
+        }
         workspace = null;
         attrModel = null;
         ticket = null;
@@ -119,7 +131,8 @@ public class UnsupervisedFeatureSelection implements Algorithm, Cloneable {
     public void run() {
         if (attrModel != null) {
             try {
-                //----------Preprocessing all descriptors
+                double maxEntropy = Double.NaN;
+                //----------Preprocessing all descriptors                
                 if (firstStage || secondStage) {
                     List<MolecularDescriptor> allFeatures = new LinkedList<>();
 
@@ -137,15 +150,18 @@ public class UnsupervisedFeatureSelection implements Algorithm, Cloneable {
                         pc.reportError("There is not calculated molecular descriptors", workspace);
                         stopRun = true;
                     }
-
                     execute(preprocessing);
+                    maxEntropy = preprocessing.getMaxEntropy();
+                    pc.reportMsg("Maximum entropy: " + maxEntropy, workspace);
                 }
 
                 if (firstStage) {
+                    filtering.setMaxEntropy(maxEntropy);
                     execute(filtering);
                 }
 
                 if (secondStage) {
+                    subsetOptimization.setMaxEntropy(maxEntropy);
                     execute(subsetOptimization);
                 }
 

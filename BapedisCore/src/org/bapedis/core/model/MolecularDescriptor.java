@@ -14,14 +14,9 @@ import org.bapedis.core.project.ProjectManager;
  */
 public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
 
-    public static final String DEFAULT_CATEGORY = "Default";
     protected final String category;
     protected double max, min, mean, var, std;
     protected BinsPartition binsPartition;
-
-    public MolecularDescriptor(String id, String displayName, Class<?> type) {
-        this(id, displayName, type, DEFAULT_CATEGORY, null);
-    }
     
     public MolecularDescriptor(String id, String displayName, Class<?> type, String category) {
         this(id, displayName, type, category, null);

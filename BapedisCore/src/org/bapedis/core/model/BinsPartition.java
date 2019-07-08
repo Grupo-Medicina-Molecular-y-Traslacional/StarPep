@@ -9,14 +9,15 @@ package org.bapedis.core.model;
  *
  * @author Loge
  */
-public class BinsPartition {
+  public class BinsPartition {
     private final Bin[] bins;
-    private final double entropy, maxEntropy;
+    private final int numberOfInstances;
+    private final double entropy;
 
-    public BinsPartition(Bin[] bins) {
+    public BinsPartition(Bin[] bins, int numberOfInstances) {
         this.bins = bins;
-        entropy = calculateEntropy(bins);
-        maxEntropy = Math.log(bins.length);
+        this.numberOfInstances = numberOfInstances;
+        entropy = calcEntropy(bins);
     }
 
     public Bin[] getBins() {
@@ -25,22 +26,22 @@ public class BinsPartition {
 
     public double getEntropy() {
         return entropy;
-    }     
+    }         
+
+    public int getNumberOfInstances() {
+        return numberOfInstances;
+    }        
     
-    public double getMaximumEntropy(){
-        return maxEntropy;
-    } 
-    
-    private double calculateEntropy(Bin[] bins) {
-        double entropy = 0.;
+    private double calcEntropy(Bin[] bins) {
+        double sum = 0.;
         double prob;
         for (Bin bin : bins) {
             if (bin.getCount() > 0) {
-                prob = (double) bin.getCount() / bins.length;
-                entropy -= prob * Math.log(prob);
+                prob = (double) bin.getCount() / numberOfInstances;
+                sum -= prob * Math.log(prob);
             }
         }
-        return entropy;
+        return sum;
     }
     
 }

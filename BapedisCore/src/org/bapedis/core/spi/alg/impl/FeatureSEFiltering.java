@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Stack;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.BinsPartition;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
@@ -51,6 +50,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     private int correlationOption;
     private double correlationCutoff;
     private int thresholdPercent;
+    private double maxEntropy;
     private boolean selectTop;
     private int topRank;
     private boolean debug;
@@ -63,11 +63,12 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         correlationCutoff = 0.9;
         selectTop = false;
         topRank = 50;
-        debug = true;
+        debug = false;
+        maxEntropy = Double.NaN;
     }
 
     private boolean isValid() {
-        boolean isValid = thresholdPercent > 0 && thresholdPercent <= 100;
+        boolean isValid = thresholdPercent > 0 && thresholdPercent <= 100 && maxEntropy != Double.NaN;
         if (correlationOption != CORRELATION_NONE) {
             isValid = correlationCutoff >= 0 && correlationCutoff <= 1;
         }
@@ -81,6 +82,14 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     public void setThresholdPercent(int thresholdPercent) {
         this.thresholdPercent = thresholdPercent;
     }
+
+    public double getMaxEntropy() {
+        return maxEntropy;
+    }
+
+    public void setMaxEntropy(double maxEntropy) {
+        this.maxEntropy = maxEntropy;
+    }        
 
     public int getCorrelationOption() {
         return correlationOption;
@@ -125,6 +134,14 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     public void setTopRank(int topRank) {
         this.topRank = topRank;
     }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }        
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
@@ -172,19 +189,19 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
             List<MolecularDescriptor> features = new LinkedList<>();
             List<MolecularDescriptor> toRemove = new LinkedList<>();
 
-            BinsPartition partition = Peptide.LENGHT.getBinsPartition();
-            double threshold = ((double) thresholdPercent / 100.0) * partition.getMaximumEntropy();
+            double threshold = ((double) thresholdPercent / 100.0) * maxEntropy;
             pc.reportMsg("Entropy cutoff value: " + threshold, workspace);
-
             for (String key : attrModel.getMolecularDescriptorKeys()) {
                 for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
-                    if (attr.getBinsPartition().getEntropy() < threshold && !key.equals(MolecularDescriptor.DEFAULT_CATEGORY)) {
+                    if (attr.getBinsPartition().getEntropy() < threshold) {
                         toRemove.add(attr);
                     } else {
                         features.add(attr);
                     }
                 }
             }
+            
+            
             // Removing Useless attribute
             for (MolecularDescriptor attr : toRemove) {
                 attrModel.deleteAttribute(attr);
@@ -192,7 +209,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                     pc.reportMsg("Removed: " + attr.getDisplayName() + " - score: " + attr.getBinsPartition().getEntropy(), workspace);
                 }
             }
-            int removed = toRemove.size();
+            int removed = toRemove.size();                  
             pc.reportMsg("Useless features removed: " + removed, workspace);
             toRemove = null;
 

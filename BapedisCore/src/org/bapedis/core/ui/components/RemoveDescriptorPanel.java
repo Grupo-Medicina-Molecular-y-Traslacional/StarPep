@@ -51,7 +51,6 @@ public class RemoveDescriptorPanel extends javax.swing.JPanel implements Propert
 
         AttributesModel attrModel = workspace.getLookup().lookup(AttributesModel.class);
         selectionPanel = new DescriptorSelectionPanel(attrModel, Color.RED);
-        selectionPanel.removeDescriptorRow(MolecularDescriptor.DEFAULT_CATEGORY);
         selectionPanel.setSelectedDescriptorKeys(algo.getDescriptorKeys());
 
         centerPanel.add(selectionPanel, BorderLayout.CENTER);

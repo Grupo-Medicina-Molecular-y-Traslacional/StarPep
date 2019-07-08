@@ -29,8 +29,10 @@ import org.bapedis.modamp.invariants.NonClassicAggregationOperator;
  *
  * @author Cesar
  */
-public class IndicesNonClassicOperators extends AbstractMD 
+public class IndicesBasedOperators extends AbstractMD 
 {
+    private Integer maxK;
+    
     private boolean mass;
     private boolean boman;
     private boolean charge;
@@ -62,7 +64,7 @@ public class IndicesNonClassicOperators extends AbstractMD
     
     final private List<AlgorithmProperty> properties;
     
-    public IndicesNonClassicOperators( IndicesNonClassicOperatorsFactory factory ) 
+    public IndicesBasedOperators( IndicesBasedOperatorsFactory factory ) 
     {
         super( factory );
         
@@ -99,32 +101,35 @@ public class IndicesNonClassicOperators extends AbstractMD
         
         classicOperators = new ClassicAggregationOperator( nonClassicOperators );
         
+        setMaxK( 1 );
+        
         properties = new LinkedList<>();
         
         try
         {
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.p2.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.p2.desc"      ), "isQuadraticMeanOperator"      , "setQuadraticMeanOperator"       ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.p3.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.p3.desc"      ), "isPotentialMeanOperator"      , "setPotentialMeanOperator"       ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.hm.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.hm.desc"      ), "isHarmonicMeanOperator"       , "setHarmonicMeanOperator"        ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.v.name"       ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.v.desc"       ), "isVarianceOperator"           , "setVarianceOperator"            ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.s.name"       ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.s.desc"       ), "isSkewnessOperator"           , "setSkewnessOperator"            ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.k.name"       ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.k.desc"       ), "isKurtosisOperator"           , "setKurtosisOperator"            ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.sd.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.sd.desc"      ), "isStandardDeviationOperator"  , "setStandardDeviationOperator"   ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.vc.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.vc.desc"      ), "isVariationCoefficientOpertor", "setVariationCoefficientOpertor" ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.ra.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.ra.desc"      ), "isRangeOpertor"               , "setRangeOpertor"                ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.i50.name"     ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.i50.desc"     ), "isI50Opertor"                 , "setI50Opertor"                  ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.gowawa.name"  ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.gowawa.desc"  ), "isGowawaOperator"             , "setGowawaOperator"              ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.choquet.name" ), "Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.choquet.desc" ), "isChoquetOperator"            , "setChoquetOperator"             ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.p2.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.p2.desc"      ), "isQuadraticMeanOperator"      , "setQuadraticMeanOperator"       ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.p3.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.p3.desc"      ), "isPotentialMeanOperator"      , "setPotentialMeanOperator"       ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.hm.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.hm.desc"      ), "isHarmonicMeanOperator"       , "setHarmonicMeanOperator"        ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.v.name"       ), "Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.v.desc"       ), "isVarianceOperator"           , "setVarianceOperator"            ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.s.name"       ), "Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.s.desc"       ), "isSkewnessOperator"           , "setSkewnessOperator"            ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.k.name"       ), "Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.k.desc"       ), "isKurtosisOperator"           , "setKurtosisOperator"            ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.sd.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.sd.desc"      ), "isStandardDeviationOperator"  , "setStandardDeviationOperator"   ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.vc.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.vc.desc"      ), "isVariationCoefficientOpertor", "setVariationCoefficientOpertor" ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.ra.name"      ), "Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.ra.desc"      ), "isRangeOpertor"               , "setRangeOpertor"                ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.i50.name"     ), "Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.i50.desc"     ), "isI50Opertor"                 , "setI50Opertor"                  ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.gowawa.name"  ), "Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.gowawa.desc"  ), "isGowawaOperator"             , "setGowawaOperator"              ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.choquet.name" ), "Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.choquet.desc" ), "isChoquetOperator"            , "setChoquetOperator"             ) );
             
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.ac.name"  ), "Classic Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.ac.desc"  ), "isAutocorrelationOperator" , "setAutocorrelationOperator" ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.gv.name"  ), "Classic Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.gv.desc"  ), "isGravitationalOperator"   , "setGravitationalOperator"   ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.ts.name"  ), "Classic Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.ts.desc"  ), "isTotalSumOperator"        , "setTotalSumOperator"        ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.es.name"  ), "Classic Aggregation Operators", NbBundle.getMessage(IndicesNonClassicOperators.class, "AggregationOperators.es.desc"  ), "isElectroTopStateOperator" , "setElectroTopStateOperator" ) );
+            properties.add(AlgorithmProperty.createProperty(this, Integer.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.maxk.name" ), "Classic Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.maxk.desc" ), "getMaxK"                   , "setMaxK"                    ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.ac.name"   ), "Classic Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.ac.desc"   ), "isAutocorrelationOperator" , "setAutocorrelationOperator" ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.gv.name"   ), "Classic Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.gv.desc"   ), "isGravitationalOperator"   , "setGravitationalOperator"   ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.ts.name"   ), "Classic Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.ts.desc"   ), "isTotalSumOperator"        , "setTotalSumOperator"        ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.es.name"   ), "Classic Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.es.desc"   ), "isElectroTopStateOperator" , "setElectroTopStateOperator" ) );
             
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "IndicesNonClassicOperators.mass.name"           ), "Chemical Properties", NbBundle.getMessage(IndicesNonClassicOperators.class, "IndicesNonClassicOperators.mass.desc"           ), "isMass"          , "setMass"           ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "IndicesNonClassicOperators.boman.name"          ), "Chemical Properties", NbBundle.getMessage(IndicesNonClassicOperators.class, "IndicesNonClassicOperators.boman.desc"          ), "isBoman"         , "setBoman"          ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "IndicesNonClassicOperators.charge.name"         ), "Chemical Properties", NbBundle.getMessage(IndicesNonClassicOperators.class, "IndicesNonClassicOperators.charge.desc"         ), "isCharge"        , "setCharge"         ) );
-            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesNonClassicOperators.class, "IndicesNonClassicOperators.hydrophilicity.name" ), "Chemical Properties", NbBundle.getMessage(IndicesNonClassicOperators.class, "IndicesNonClassicOperators.hydrophilicity.desc" ), "isHydrophilicity", "setHydrophilicity" ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.mass.name"           ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.mass.desc"           ), "isMass"          , "setMass"           ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.boman.name"          ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.boman.desc"          ), "isBoman"         , "setBoman"          ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.charge.name"         ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.charge.desc"         ), "isCharge"        , "setCharge"         ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.hydrophilicity.name" ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.hydrophilicity.desc" ), "isHydrophilicity", "setHydrophilicity" ) );
         }
         catch ( NoSuchMethodException ex )
         {
@@ -524,5 +529,16 @@ public class IndicesNonClassicOperators extends AbstractMD
         {
             classicOperatorsList.remove( "ES" );
         }
+    }
+    
+    public Integer getMaxK()
+    {
+        return maxK;
+    }
+    
+    public void setMaxK( Integer maxK )
+    {
+        this.maxK = maxK;
+        classicOperators.setMaxK( maxK );
     }
 }

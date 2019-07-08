@@ -25,32 +25,28 @@ final public class NonClassicAggregationOperatorMeans extends NonClassicAggregat
     {
         super.applyOperators( lovis, keyAttr, peptide, md, applyMeans, operatorsList ); //To change body of generated methods, choose Tools | Templates.
         
-        double val;
+        double val;        
+        if ( operatorsList.contains( "P2" ) )
+        {
+            val = this.generalizedMean( lovis, 2 );
+            peptide.setAttributeValue( md.getOrAddAttribute( keyAttr + "-P2",
+                                                             keyAttr + "-P2", Double.class, 0d ), val );
+        }
         
         if ( applyMeans )
         {
-            if ( operatorsList.contains( "P2" ) )
+            if ( operatorsList.contains( "P3" ) )
             {
-                val = this.generalizedMean( lovis, 2 );
-                peptide.setAttributeValue( md.getOrAddAttribute( keyAttr + "-P2",
-                                                                 keyAttr + "-P2", Double.class, 0d ), val );
+                val = this.generalizedMean( lovis, 3 );
+                peptide.setAttributeValue( md.getOrAddAttribute( keyAttr + "-P3",
+                                                                 keyAttr + "-P3", Double.class, 0d ), val );
             }
             
-            if ( applyMeans )
+            if ( operatorsList.contains( "HM" ) )
             {
-                if ( operatorsList.contains( "P3" ) )
-                {
-                    val = this.generalizedMean( lovis, 3 );
-                    peptide.setAttributeValue( md.getOrAddAttribute( keyAttr + "-P3",
-                                                                     keyAttr + "-P3", Double.class, 0d ), val );
-                }
-                
-                if ( operatorsList.contains( "HM" ) )
-                {
-                    val = this.generalizedMean( lovis, -1 );
-                    peptide.setAttributeValue( md.getOrAddAttribute( keyAttr + "-HM",
-                                                                     keyAttr + "-HM", Double.class, 0d ), val );
-                }
+                val = this.generalizedMean( lovis, -1 );
+                peptide.setAttributeValue( md.getOrAddAttribute( keyAttr + "-HM",
+                                                                 keyAttr + "-HM", Double.class, 0d ), val );
             }
         }
     }

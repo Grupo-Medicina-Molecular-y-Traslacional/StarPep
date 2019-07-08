@@ -82,10 +82,9 @@ import org.openide.util.NbBundle;
     }
     
     public int[][] calcAdjancencyMtrix(){
-        int n = getLength();
-        int[][] matrix = new int[n][n];
-        for(int i=0; i<n; i++){
-            for(int j=0; j<n; j++){
+        int[][] matrix = new int[getLength()][getLength()];
+        for(int i=0; i<getLength(); i++){
+            for(int j=0; j<getLength(); j++){
                 matrix[i][j] = (j==i-1 || j==i+1)? 1:0;
             }
         }                

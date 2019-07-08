@@ -302,7 +302,7 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
                 n++;
             }
         }
-        term1 = term1 / n;
+        term1 = n > 0 ? term1 / n : 0;
 
         //Second term
         MolecularDescriptor fj, fk;

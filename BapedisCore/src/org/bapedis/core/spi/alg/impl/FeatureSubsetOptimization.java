@@ -136,6 +136,7 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
                 fjPool.invoke(task);
                 task.join();
                 MIMatrix miMatrix = task.getMIMatrix();
+
                 BitSet subset = search(descriptors, miMatrix);
                 MolecularDescriptor attr;
                 int count = 0;
@@ -152,7 +153,6 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
                         count++;
                     }
                 }
-
                 pc.reportMsg("\nTotal of removed features: " + removed, workspace);
                 pc.reportMsg("Total of remaining features: " + count, workspace);
             } catch (Exception ex) {
@@ -303,33 +303,28 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
 
     private double evaluateSubset(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
         double term1 = 0, term2 = 0;
-        int n = 0;
-        //First term      
-        for (int j = 0; j < features.length; j++) {
-            if (subset.get(j)) {
-                term1 += features[j].getBinsPartition().getEntropy()/maxEntropy ;
-                n++;
-            }
-        }
-//        term1 = n > 0 ? term1 / n : 0;
+        double n = 0.;
 
-        //Second term
         MolecularDescriptor fj, fk;
         for (int j = 0; j < features.length; j++) {
             if (subset.get(j)) {
                 fj = features[j];
+                term1 += features[j].getBinsPartition().getEntropy();
+                term2 += features[j].getBinsPartition().getEntropy();
+                n++;
                 for (int k = 0; k < features.length; k++) {
-                    if (k != j && subset.get(k)) {
+                    if (j != k && subset.get(k)) {
                         fk = features[k];
-                        term2 += miMatrix.getValue(j, k) / Math.min(fj.getBinsPartition().getEntropy(), fk.getBinsPartition().getEntropy());
+                        term2 += miMatrix.getValue(j, k);
+//                        penalization += miMatrix.getValue(j, k) / Math.min(fj.getBinsPartition().getEntropy(), fk.getBinsPartition().getEntropy());
+//                      penalization += 2 * miMatrix.getValue(j, k) / (fj.getBinsPartition().getEntropy() + fk.getBinsPartition().getEntropy());
                     }
 
                 }
             }
         }
-//        term2 = n > 1 ? term2 / (n * (n - 1)) : 0;
-
-        return term1 - term2;
+//        return ((double) (features.length - n) / features.length) * score;
+        return term1/n - term2/(n*n);
     }
 
     private MIMatrixBuilder createMatrixBuilder(Peptide[] peptides, MolecularDescriptor[] features) throws MolecularDescriptorNotFoundException {
@@ -340,57 +335,6 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
             }
         }
         return new MIMatrixBuilder(features, binIndex, ticket, stopRun);
-    }
-
-    /**
-     * Jensen-Shannon divergence JS(P||Q) = (KL(P||M) + KL(Q||M)) / 2, where M =
-     * (P+Q)/2. The Jensen-Shannon divergence is a popular method of measuring
-     * the similarity between two probability distributions. It is also known as
-     * information radius or total divergence to the average. It is based on the
-     * Kullback-Leibler divergence, with the difference that it is always a
-     * finite value. The square root of the Jensen-Shannon divergence is a
-     * metric.
-     */
-    public static double JensenShannonDivergence(double[] x, double[] y) {
-        double[] m = new double[x.length];
-        for (int i = 0; i < m.length; i++) {
-            m[i] = (x[i] + y[i]) / 2;
-        }
-
-        return (KullbackLeiblerDivergence(x, m) + KullbackLeiblerDivergence(y, m)) / 2;
-    }
-
-    /**
-     * Kullback-Leibler divergence. The Kullback-Leibler divergence (also
-     * information divergence, information gain, relative entropy, or KLIC) is a
-     * non-symmetric measure of the difference between two probability
-     * distributions P and Q. KL measures the expected number of extra bits
-     * required to code samples from P when using a code based on Q, rather than
-     * using a code based on P. Typically P represents the "true" distribution
-     * of data, observations, or a precise calculated theoretical distribution.
-     * The measure Q typically represents a theory, model, description, or
-     * approximation of P.
-     * <p>
-     * Although it is often intuited as a distance metric, the KL divergence is
-     * not a true metric - for example, the KL from P to Q is not necessarily
-     * the same as the KL from Q to P.
-     */
-    public static double KullbackLeiblerDivergence(double[] x, double[] y) {
-        boolean intersection = false;
-        double kl = 0.0;
-
-        for (int i = 0; i < x.length; i++) {
-            if (x[i] != 0.0 && y[i] != 0.0) {
-                intersection = true;
-                kl += x[i] * Math.log(x[i] / y[i]);
-            }
-        }
-
-        if (intersection) {
-            return kl;
-        } else {
-            return Double.POSITIVE_INFINITY;
-        }
     }
 
     @Override

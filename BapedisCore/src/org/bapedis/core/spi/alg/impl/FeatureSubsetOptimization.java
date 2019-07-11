@@ -30,6 +30,9 @@ import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import static org.bapedis.core.spi.alg.impl.FeatureSEFiltering.pc;
 import org.openide.util.Exceptions;
+import static java.util.concurrent.ForkJoinTask.invokeAll;
+import static java.util.concurrent.ForkJoinTask.invokeAll;
+import static java.util.concurrent.ForkJoinTask.invokeAll;
 
 /**
  *
@@ -302,29 +305,22 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
     }
 
     private double evaluateSubset(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
-        double term1 = 0, term2 = 0;
-        double n = 0.;
+        double relevance = 0, redundancy = 0;
+        int n = 0;
 
-        MolecularDescriptor fj, fk;
         for (int j = 0; j < features.length; j++) {
             if (subset.get(j)) {
-                fj = features[j];
-                term1 += features[j].getBinsPartition().getEntropy();
-                term2 += features[j].getBinsPartition().getEntropy();
+                relevance += features[j].getBinsPartition().getEntropy();
+                redundancy += features[j].getBinsPartition().getEntropy();
                 n++;
                 for (int k = 0; k < features.length; k++) {
                     if (j != k && subset.get(k)) {
-                        fk = features[k];
-                        term2 += miMatrix.getValue(j, k);
-//                        penalization += miMatrix.getValue(j, k) / Math.min(fj.getBinsPartition().getEntropy(), fk.getBinsPartition().getEntropy());
-//                      penalization += 2 * miMatrix.getValue(j, k) / (fj.getBinsPartition().getEntropy() + fk.getBinsPartition().getEntropy());
+                        redundancy += miMatrix.getValue(j, k);
                     }
-
                 }
             }
         }
-//        return ((double) (features.length - n) / features.length) * score;
-        return term1/n - term2/(n*n);
+        return relevance/n - redundancy/(n*n);
     }
 
     private MIMatrixBuilder createMatrixBuilder(Peptide[] peptides, MolecularDescriptor[] features) throws MolecularDescriptorNotFoundException {

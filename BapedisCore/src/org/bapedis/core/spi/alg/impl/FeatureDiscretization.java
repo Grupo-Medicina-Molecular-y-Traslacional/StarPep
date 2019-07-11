@@ -53,7 +53,7 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
     public FeatureDiscretization(FeatureDiscretizationFactory factory) {
         this.factory = factory;
         stopRun = new AtomicBoolean();
-        numberOfBinsOption = Bin_Number_Peptide_OPTION;
+        numberOfBinsOption = Bin_Sturges_OPTION;
         numberOfBins = 0;
     }
 

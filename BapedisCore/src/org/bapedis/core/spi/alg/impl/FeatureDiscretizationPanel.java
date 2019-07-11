@@ -6,32 +6,74 @@
 package org.bapedis.core.spi.alg.impl;
 
 import javax.swing.JPanel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Loge
  */
-public class FeatureDiscretizationPanel extends javax.swing.JPanel implements AlgorithmSetupUI{
+public class FeatureDiscretizationPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
 
     /**
      * Creates new form FeatureDiscretizationPanel
      */
     private FeatureDiscretization discretizationAlg;
+    private final NotifyDescriptor errorND;
+
     public FeatureDiscretizationPanel() {
         initComponents();
+        errorND = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureDiscretizationPanel.class, "FeatureDiscretizationPanel.errorND"), NotifyDescriptor.ERROR_MESSAGE);
+
+        //Create document listeners
+        jTF_value.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateNumberOfBins();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateNumberOfBins();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
+            }
+        });
     }
 
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled); //To change body of generated methods, choose Tools | Templates.
-        
+
         jLabel1.setEnabled(enabled);
         jComboBox1.setEnabled(enabled);
+
+        if (jTF_value.isVisible()) {
+            jTF_value.setEnabled(enabled);
+        }
     }
-    
-    
+
+    private void updateNumberOfBins() {
+        try {
+            if (!jTF_value.getText().isEmpty()) {
+                int value = Integer.parseInt(jTF_value.getText());
+                if (discretizationAlg.getBinsOption() == FeatureDiscretization.BinsOption.User_Defined) {
+                    discretizationAlg.setNumberOfBins(value);
+                }
+            }
+        } catch (NumberFormatException ex) {
+            DialogDisplayer.getDefault().notify(errorND);
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -46,6 +88,7 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
         jLabel1 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox<>();
         infoLabel = new javax.swing.JLabel();
+        jTF_value = new javax.swing.JTextField();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -56,7 +99,7 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jLabel1, gridBagConstraints);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "<html>The number of peptides (<i>n</i>)</html>", "<html>The square root of <i>n</i></html>", "<html>Half of <i>n</i></html>", "<html>One-third of <i>n</i></html>", "<html>Sturges's rule</html>", "<html>Rice's rule</html>" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "<html>User defined value</html>", "<html>Sturges's rule</html>", "<html>Rice's rule</html>" }));
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox1ActionPerformed(evt);
@@ -74,20 +117,60 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(infoLabel, gridBagConstraints);
+
+        jTF_value.setText(org.openide.util.NbBundle.getMessage(FeatureDiscretizationPanel.class, "FeatureDiscretizationPanel.jTF_value.text")); // NOI18N
+        jTF_value.setPreferredSize(new java.awt.Dimension(90, 27));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(jTF_value, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        discretizationAlg.setNumberOfBinsOption(jComboBox1.getSelectedIndex());
+        switch (jComboBox1.getSelectedIndex()) {
+            case 0:
+                if (discretizationAlg.getBinsOption() != FeatureDiscretization.BinsOption.User_Defined) {
+                    discretizationAlg.setBinsOption(FeatureDiscretization.BinsOption.User_Defined);
+                }
+                jTF_value.setText(String.valueOf(discretizationAlg.getNumberOfBins()));
+                jTF_value.setVisible(true);
+                break;
+            case 1:
+                if (discretizationAlg.getBinsOption() != FeatureDiscretization.BinsOption.Sturges_Rule) {
+                    discretizationAlg.setBinsOption(FeatureDiscretization.BinsOption.Sturges_Rule);
+                }
+                jTF_value.setVisible(false);
+                break;
+            case 2:
+                if (discretizationAlg.getBinsOption() != FeatureDiscretization.BinsOption.Rice_Rule) {
+                    discretizationAlg.setBinsOption(FeatureDiscretization.BinsOption.Rice_Rule);
+                }
+                jTF_value.setVisible(false);
+                break;
+        }
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         discretizationAlg = (FeatureDiscretization) algo;
-        jComboBox1.setSelectedIndex(discretizationAlg.getNumberOfBinsOption());
+        jComboBox1.setSelectedIndex(-1);
+        switch (discretizationAlg.getBinsOption()) {
+            case User_Defined:
+                jComboBox1.setSelectedIndex(0);
+                break;
+            case Sturges_Rule:
+                jComboBox1.setSelectedIndex(1);
+                break;
+            case Rice_Rule:
+                jComboBox1.setSelectedIndex(2);
+                break;
+        }
+
         return this;
     }
 
@@ -96,5 +179,6 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
     private javax.swing.JLabel infoLabel;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JTextField jTF_value;
     // End of variables declaration//GEN-END:variables
 }

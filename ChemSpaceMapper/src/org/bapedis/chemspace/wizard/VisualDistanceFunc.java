@@ -104,7 +104,7 @@ public final class VisualDistanceFunc extends JPanel {
         jLabel1 = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
-        setPreferredSize(new java.awt.Dimension(500, 460));
+        setPreferredSize(new java.awt.Dimension(560, 580));
         setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualDistanceFunc.class, "VisualDistanceFunc.jInfoLabel.text")); // NOI18N

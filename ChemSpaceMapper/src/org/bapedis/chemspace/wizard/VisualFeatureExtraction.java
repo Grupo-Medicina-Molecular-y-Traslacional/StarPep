@@ -61,7 +61,7 @@ public final class VisualFeatureExtraction extends JPanel {
         bottomPanel = new javax.swing.JPanel();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
-        setPreferredSize(new java.awt.Dimension(500, 460));
+        setPreferredSize(new java.awt.Dimension(560, 580));
         setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(VisualFeatureExtraction.class, "VisualFeatureExtraction.jQuestionLabel.text")); // NOI18N

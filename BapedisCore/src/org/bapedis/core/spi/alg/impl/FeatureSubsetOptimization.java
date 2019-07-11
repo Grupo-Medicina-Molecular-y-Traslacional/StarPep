@@ -13,11 +13,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
-import static java.util.concurrent.ForkJoinTask.invokeAll;
 import java.util.concurrent.Future;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Logger;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Bin;
@@ -25,14 +23,12 @@ import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
-import static org.bapedis.core.spi.alg.impl.FeatureSEFiltering.pc;
 import org.openide.util.Exceptions;
-import static java.util.concurrent.ForkJoinTask.invokeAll;
-import static java.util.concurrent.ForkJoinTask.invokeAll;
-import static java.util.concurrent.ForkJoinTask.invokeAll;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -40,6 +36,7 @@ import static java.util.concurrent.ForkJoinTask.invokeAll;
  */
 public class FeatureSubsetOptimization implements Algorithm, Cloneable {
 
+    protected ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
 
     public enum Direction {

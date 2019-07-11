@@ -126,7 +126,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         centerPanel.setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jcbSelectTop, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jcbSelectTop.text")); // NOI18N
-        jcbSelectTop.setPreferredSize(new java.awt.Dimension(73, 27));
+        jcbSelectTop.setPreferredSize(new java.awt.Dimension(120, 27));
         jcbSelectTop.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbSelectTopActionPerformed(evt);
@@ -139,7 +139,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         centerPanel.add(jcbSelectTop, gridBagConstraints);
 
         jTF_top.setText(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jTF_top.text")); // NOI18N
-        jTF_top.setPreferredSize(new java.awt.Dimension(90, 23));
+        jTF_top.setPreferredSize(new java.awt.Dimension(90, 27));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -155,12 +155,12 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
         uselessPanel.add(jLabel1, gridBagConstraints);
         jLabel1.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jLabel1.AccessibleContext.accessibleName")); // NOI18N
 
         jSpinnerEntropy.setModel(new javax.swing.SpinnerNumberModel(10, 1, 100, 1));
-        jSpinnerEntropy.setPreferredSize(new java.awt.Dimension(50, 20));
+        jSpinnerEntropy.setPreferredSize(new java.awt.Dimension(50, 27));
         jSpinnerEntropy.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSpinnerEntropyStateChanged(evt);
@@ -170,7 +170,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
         uselessPanel.add(jSpinnerEntropy, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jLabel2.text")); // NOI18N
@@ -198,7 +198,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
         uselessPanel.add(infoLabel1, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -238,7 +238,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
         redundancyPanel.add(jLabel4, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jLabel3.text")); // NOI18N
@@ -250,7 +250,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         redundancyPanel.add(jLabel3, gridBagConstraints);
 
         jSpinnerCorrelation.setModel(new javax.swing.SpinnerNumberModel(0.9d, 0.0d, 1.0d, 0.1d));
-        jSpinnerCorrelation.setPreferredSize(new java.awt.Dimension(50, 20));
+        jSpinnerCorrelation.setPreferredSize(new java.awt.Dimension(50, 27));
         jSpinnerCorrelation.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSpinnerCorrelationStateChanged(evt);
@@ -260,7 +260,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
         redundancyPanel.add(jSpinnerCorrelation, gridBagConstraints);
 
         infoLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
@@ -271,7 +271,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
         redundancyPanel.add(infoLabel2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();

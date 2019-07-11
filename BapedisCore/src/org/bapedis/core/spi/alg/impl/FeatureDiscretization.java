@@ -31,16 +31,11 @@ import org.openide.util.Lookup;
 public class FeatureDiscretization implements Algorithm, Cloneable {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-
-    public static final int Bin_Number_Peptide_OPTION = 0;
-    public static final int Bin_Square_OPTION = 1;
-    public static final int Bin_Half_OPTION = 2;
-    public static final int Bin_One_Thrid_OPTION = 3;
-    public static final int Bin_Sturges_OPTION = 4;
-    public static final int Bin_Rice_OPTION = 5;
+    public enum BinsOption{User_Defined, Sturges_Rule, Rice_Rule}
 
     private final FeatureDiscretizationFactory factory;
-    private int numberOfBinsOption, numberOfBins;
+    private int numberOfBins;
+    private BinsOption binsOption;
     private double maxEntropy;
 
     //To initialize
@@ -53,17 +48,25 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
     public FeatureDiscretization(FeatureDiscretizationFactory factory) {
         this.factory = factory;
         stopRun = new AtomicBoolean();
-        numberOfBinsOption = Bin_Sturges_OPTION;
-        numberOfBins = 0;
+        binsOption = BinsOption.User_Defined;
+        numberOfBins = 100;
     }
 
-    public int getNumberOfBinsOption() {
-        return numberOfBinsOption;
+    public int getNumberOfBins() {
+        return numberOfBins;
     }
 
-    public void setNumberOfBinsOption(int numberOfBinsOption) {
-        this.numberOfBinsOption = numberOfBinsOption;
+    public void setNumberOfBins(int numberOfBins) {
+        this.numberOfBins = numberOfBins;
     }
+
+    public BinsOption getBinsOption() {
+        return binsOption;
+    }
+
+    public void setBinsOption(BinsOption binsOption) {
+        this.binsOption = binsOption;
+    }    
 
     public double getMaxEntropy() {
         return maxEntropy;
@@ -107,27 +110,16 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
     public void run() {
         int numberOfInstances = peptides.size();
 
-        switch (numberOfBinsOption) {
-            case Bin_Number_Peptide_OPTION:
-                numberOfBins = numberOfInstances;
-                break;
-            case Bin_Square_OPTION:
-                numberOfBins = (int) Math.sqrt(numberOfInstances);
-                break;
-            case Bin_Half_OPTION:
-                numberOfBins = numberOfInstances / 2;
-                break;
-            case Bin_One_Thrid_OPTION:
-                numberOfBins = numberOfInstances / 3;
-                break;
-            case Bin_Sturges_OPTION:
+        switch (binsOption) {
+            case Sturges_Rule:
                 numberOfBins = (int) (Math.log(numberOfInstances) / Math.log(2)) + 1;
                 break;
-            case Bin_Rice_OPTION:
+            case Rice_Rule:
                 numberOfBins = 2 * (int) Math.cbrt(numberOfInstances);
                 break;
         }
 
+        pc.reportMsg("Bins option: " + binsOption, workspace);
         pc.reportMsg("Number of bins: " + numberOfBins, workspace);
 
         List<MolecularDescriptor> allFeatures = new LinkedList<>();

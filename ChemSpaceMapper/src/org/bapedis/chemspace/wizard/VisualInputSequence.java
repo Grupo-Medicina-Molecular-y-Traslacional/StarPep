@@ -65,7 +65,7 @@ public final class VisualInputSequence extends JPanel {
         jOption2 = new javax.swing.JRadioButton();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
-        setPreferredSize(new java.awt.Dimension(500, 460));
+        setPreferredSize(new java.awt.Dimension(560, 580));
         setLayout(new java.awt.GridBagLayout());
 
         bottomPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());

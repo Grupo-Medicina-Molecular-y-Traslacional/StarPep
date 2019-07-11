@@ -72,7 +72,7 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         infoLabel = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
-        setPreferredSize(new java.awt.Dimension(500, 460));
+        setPreferredSize(new java.awt.Dimension(560, 580));
         setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.jQuestionLabel.text")); // NOI18N
@@ -117,6 +117,7 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(infoLabel, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.infoLabel.text")); // NOI18N
         infoLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        infoLabel.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;

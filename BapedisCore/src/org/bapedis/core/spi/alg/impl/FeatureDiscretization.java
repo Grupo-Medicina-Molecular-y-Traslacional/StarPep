@@ -31,10 +31,9 @@ import org.openide.util.Lookup;
 public class FeatureDiscretization implements Algorithm, Cloneable {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-    public enum BinsOption{User_Defined, Sturges_Rule, Rice_Rule}
+    public enum BinsOption{Sturges_Rule, Rice_Rule}
 
     private final FeatureDiscretizationFactory factory;
-    private int numberOfBins;
     private BinsOption binsOption;
     private double maxEntropy;
 
@@ -48,16 +47,7 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
     public FeatureDiscretization(FeatureDiscretizationFactory factory) {
         this.factory = factory;
         stopRun = new AtomicBoolean();
-        binsOption = BinsOption.User_Defined;
-        numberOfBins = 100;
-    }
-
-    public int getNumberOfBins() {
-        return numberOfBins;
-    }
-
-    public void setNumberOfBins(int numberOfBins) {
-        this.numberOfBins = numberOfBins;
+        binsOption = BinsOption.Sturges_Rule;
     }
 
     public BinsOption getBinsOption() {
@@ -109,7 +99,7 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
     @Override
     public void run() {
         int numberOfInstances = peptides.size();
-
+        int numberOfBins;
         switch (binsOption) {
             case Sturges_Rule:
                 numberOfBins = (int) (Math.log(numberOfInstances) / Math.log(2)) + 1;
@@ -117,6 +107,8 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
             case Rice_Rule:
                 numberOfBins = 2 * (int) Math.cbrt(numberOfInstances);
                 break;
+            default:
+                throw new IllegalStateException("Unknown number of bins");
         }
 
         pc.reportMsg("Bins option: " + binsOption, workspace);
@@ -134,7 +126,7 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
         allFeatures.parallelStream().forEach(descriptor -> {
             if (!stopRun.get()) {
                 try {
-                    computeBinsPartition(descriptor);
+                    computeBinsPartition(descriptor, numberOfBins);
                 } catch (MolecularDescriptorNotFoundException ex) {
                     Exceptions.printStackTrace(ex);
                     DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
@@ -147,7 +139,7 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
         maxEntropy = Math.log(numberOfBins);
     }
 
-    private void computeBinsPartition(MolecularDescriptor descriptor) throws MolecularDescriptorNotFoundException {
+    private void computeBinsPartition(MolecularDescriptor descriptor, int numberOfBins) throws MolecularDescriptorNotFoundException {
         Bin[] bins = new Bin[numberOfBins];
         Bin bin;
         double binWidth, lower, upper, min, max, val;

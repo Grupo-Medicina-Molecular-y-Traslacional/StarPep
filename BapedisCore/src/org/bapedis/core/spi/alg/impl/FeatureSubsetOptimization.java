@@ -142,15 +142,18 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
                 int count = 0;
                 int removed = 0;
                 for (int i = 0; i < descriptors.length; i++) {
+                    attr = descriptors[i];
                     if (!subset.get(i)) {
-                        removed++;
-                        attr = descriptors[i];
+                        removed++;                        
                         attrModel.deleteAttribute(attr);
                         if (debug) {
                             pc.reportMsg("Removed: " + attr.getDisplayName() + " - score: " + attr.getBinsPartition().getEntropy(), workspace);
                         }
                     } else {
                         count++;
+                        if (debug){
+                            pc.reportMsg(attr.getDisplayName() + " - score: " + attr.getBinsPartition().getEntropy(), workspace);
+                        }
                     }
                 }
                 pc.reportMsg("\nTotal of removed features: " + removed, workspace);
@@ -304,15 +307,28 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
     private double evaluateSubset(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
         double relevance = 0, redundancy = 0;
         int n = 0;
-
+        double entropy, maxVal = 0;
+        for (int j = 0; j < features.length; j++){
+          if (subset.get(j)){
+              entropy = features[j].getBinsPartition().getEntropy();
+              if (entropy > maxVal){
+                  maxVal = entropy;
+              }
+          }
+        }
+        
+        double minVal;
         for (int j = 0; j < features.length; j++) {
             if (subset.get(j)) {
-                relevance += features[j].getBinsPartition().getEntropy();
-                redundancy += features[j].getBinsPartition().getEntropy();
+                entropy = features[j].getBinsPartition().getEntropy()/maxVal;
+                relevance += entropy;
+                redundancy += entropy;
                 n++;
                 for (int k = 0; k < features.length; k++) {
                     if (j != k && subset.get(k)) {
-                        redundancy += miMatrix.getValue(j, k);
+                        minVal = Math.min(features[j].getBinsPartition().getEntropy(),
+                                          features[k].getBinsPartition().getEntropy());
+                        redundancy += miMatrix.getValue(j, k)/minVal;
                     }
                 }
             }

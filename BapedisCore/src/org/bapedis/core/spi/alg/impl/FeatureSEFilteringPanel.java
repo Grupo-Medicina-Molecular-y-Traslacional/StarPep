@@ -159,7 +159,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         uselessPanel.add(jLabel1, gridBagConstraints);
         jLabel1.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jLabel1.AccessibleContext.accessibleName")); // NOI18N
 
-        jSpinnerEntropy.setModel(new javax.swing.SpinnerNumberModel(10, 1, 100, 1));
+        jSpinnerEntropy.setModel(new javax.swing.SpinnerNumberModel(10, 0, 100, 1));
         jSpinnerEntropy.setPreferredSize(new java.awt.Dimension(50, 27));
         jSpinnerEntropy.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -249,8 +249,8 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         redundancyPanel.add(jLabel3, gridBagConstraints);
 
-        jSpinnerCorrelation.setModel(new javax.swing.SpinnerNumberModel(0.9d, 0.0d, 1.0d, 0.1d));
-        jSpinnerCorrelation.setPreferredSize(new java.awt.Dimension(50, 27));
+        jSpinnerCorrelation.setModel(new javax.swing.SpinnerNumberModel(0.9d, 0.0d, 1.0d, 0.01d));
+        jSpinnerCorrelation.setPreferredSize(new java.awt.Dimension(60, 27));
         jSpinnerCorrelation.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSpinnerCorrelationStateChanged(evt);

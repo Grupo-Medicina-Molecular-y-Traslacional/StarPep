@@ -68,7 +68,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     }
 
     private boolean isValid() {
-        boolean isValid = thresholdPercent > 0 && thresholdPercent <= 100 && maxEntropy != Double.NaN;
+        boolean isValid = thresholdPercent >= 0 && thresholdPercent <= 100 && maxEntropy != Double.NaN;
         if (correlationOption != CORRELATION_NONE) {
             isValid = correlationCutoff >= 0 && correlationCutoff <= 1;
         }
@@ -193,7 +193,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
             pc.reportMsg("Entropy cutoff value: " + threshold, workspace);
             for (String key : attrModel.getMolecularDescriptorKeys()) {
                 for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
-                    if (attr.getBinsPartition().getEntropy() < threshold) {
+                    if (attr.getBinsPartition().getEntropy() <= threshold) {
                         toRemove.add(attr);
                     } else {
                         features.add(attr);

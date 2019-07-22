@@ -18,6 +18,8 @@ import java.util.Set;
 import javax.swing.event.SwingPropertyChangeSupport;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
+import org.gephi.graph.api.Edge;
+import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.netbeans.swing.etable.QuickFilter;
 import org.openide.nodes.AbstractNode;
@@ -332,8 +334,22 @@ public class AttributesModel {
                 org.gephi.graph.api.Node[] nodes = currentGraphModel.getGraph().getNodes().toArray();
                 targetGraphModel.bridge().copyNodes(nodes);
 
-//                Graph targetGraph = targetGraphModel.getGraph();
-//                Graph visibleCurrentGraph = currentGraphModel.getGraphVisible();
+                
+                Graph targetGraph = targetGraphModel.getGraph();
+                Graph visibleCurrentGraph = currentGraphModel.getGraphVisible();
+                
+                List<Edge> edgesToAdd = new LinkedList<>();
+                for (Edge edge : targetGraph.getEdges()) {
+                    if (visibleCurrentGraph.hasEdge(edge.getId()) 
+                            && targetGraph.hasNode(edge.getSource().getId())
+                            && targetGraph.hasNode(edge.getTarget().getId())) {
+                        edgesToAdd.add(edge);
+                    }
+                }  
+                if (!edgesToAdd.isEmpty()) {
+                    targetGraphModel.getGraphVisible().addAllEdges(edgesToAdd);
+                }                
+                
 //                
 //                List<Edge> edgesToRemove = new LinkedList<>();
 //                for (Edge edge : targetGraph.getEdges()) {

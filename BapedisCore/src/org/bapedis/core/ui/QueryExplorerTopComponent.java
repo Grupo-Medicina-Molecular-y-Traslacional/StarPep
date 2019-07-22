@@ -161,6 +161,7 @@ public final class QueryExplorerTopComponent extends TopComponent implements Wor
         runButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/run.gif"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(runButton, org.openide.util.NbBundle.getMessage(QueryExplorerTopComponent.class, "QueryExplorerTopComponent.runButton.text")); // NOI18N
         runButton.setToolTipText(org.openide.util.NbBundle.getMessage(QueryExplorerTopComponent.class, "QueryExplorerTopComponent.runButton.toolTipText")); // NOI18N
+        runButton.setFocusable(false);
         runButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 runButtonActionPerformed(evt);

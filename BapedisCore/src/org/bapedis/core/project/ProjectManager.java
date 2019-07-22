@@ -363,7 +363,7 @@ public class ProjectManager implements Lookup.Provider {
     protected void createDefaultColumns(GraphModel graphModel) {
         Table nodeTable = graphModel.getNodeTable();
         if (!nodeTable.hasColumn(NODE_TABLE_PRO_NAME)) {
-            nodeTable.addColumn(NODE_TABLE_PRO_NAME, NODE_TABLE_PRO_NAME_TITLE, String.class, Origin.PROPERTY, "", false);
+            nodeTable.addColumn(NODE_TABLE_PRO_NAME, NODE_TABLE_PRO_NAME_TITLE, String.class, Origin.DATA, "", false);
         }
 
         Table edgeTable = graphModel.getEdgeTable();

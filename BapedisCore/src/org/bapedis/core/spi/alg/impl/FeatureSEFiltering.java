@@ -20,6 +20,7 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
+import static org.bapedis.core.spi.alg.impl.FeatureSEFiltering.pc;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -89,7 +90,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
 
     public void setMaxEntropy(double maxEntropy) {
         this.maxEntropy = maxEntropy;
-    }        
+    }
 
     public int getCorrelationOption() {
         return correlationOption;
@@ -141,7 +142,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
 
     public void setDebug(boolean debug) {
         this.debug = debug;
-    }        
+    }
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
@@ -200,8 +201,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                     }
                 }
             }
-            
-            
+
             // Removing Useless attribute
             for (MolecularDescriptor attr : toRemove) {
                 attrModel.deleteAttribute(attr);
@@ -209,27 +209,14 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                     pc.reportMsg("Removed: " + attr.getDisplayName() + " - score: " + attr.getBinsPartition().getEntropy(), workspace);
                 }
             }
-            int removed = toRemove.size();                  
+            int removed = toRemove.size();
             pc.reportMsg("Useless features removed: " + removed, workspace);
             toRemove = null;
 
             //----------Ranking all features
             pc.reportMsg("Ranking molecular features", workspace);
             MolecularDescriptor[] rankedFeatures = features.toArray(new MolecularDescriptor[0]);
-            Arrays.parallelSort(rankedFeatures, new Comparator<MolecularDescriptor>() {
-                @Override
-                public int compare(MolecularDescriptor o1, MolecularDescriptor o2) {
-                    double entropy1 = o1.getBinsPartition().getEntropy();
-                    double entropy2 = o2.getBinsPartition().getEntropy();
-                    if (entropy1 > entropy2) {
-                        return -1;
-                    }
-                    if (entropy1 < entropy2) {
-                        return 1;
-                    }
-                    return 0;
-                }
-            });
+            Arrays.parallelSort(rankedFeatures, new FeatureComparator());
             features = null;
             pc.reportMsg("Done", workspace);
 
@@ -276,29 +263,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
             }
 
             //Print top 5 bottom 3
-            pc.reportMsg("Top 5", workspace);
-            int top5 = 0;
-            for (int i = 0; i < rankedFeatures.length && top5 < 5; i++) {
-                if (rankedFeatures[i] != null) {
-                    pc.reportMsg(rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getBinsPartition().getEntropy(), workspace);
-                    top5++;
-                }
-            }
-            pc.reportMsg("...", workspace);
-            pc.reportMsg("Bottom 3", workspace);
-            Stack<MolecularDescriptor> stack = new Stack<>();
-            int bottom3 = 0;
-            for (int i = rankedFeatures.length - 1; i >= 0 && bottom3 < 3; i--) {
-                if (rankedFeatures[i] != null) {
-                    stack.push(rankedFeatures[i]);
-                    bottom3++;
-                }
-            }
-            MolecularDescriptor descriptor;
-            while (!stack.isEmpty()) {
-                descriptor = stack.pop();
-                pc.reportMsg(descriptor.getDisplayName() + " - score: " + descriptor.getBinsPartition().getEntropy(), workspace);
-            }
+            FeatureComparator.printTop5Buttom3(rankedFeatures, workspace);
 
             pc.reportMsg("\nTotal of removed features: " + removed, workspace);
             pc.reportMsg("Total of remaining features: " + count, workspace);
@@ -547,4 +512,47 @@ class IntDoublePair implements Comparable<IntDoublePair> {
         return position;
     }
 
+}
+
+class FeatureComparator implements Comparator<MolecularDescriptor> {
+
+    @Override
+    public int compare(MolecularDescriptor o1, MolecularDescriptor o2) {
+        double entropy1 = o1.getBinsPartition().getEntropy();
+        double entropy2 = o2.getBinsPartition().getEntropy();
+        if (entropy1 > entropy2) {
+            return -1;
+        }
+        if (entropy1 < entropy2) {
+            return 1;
+        }
+        return 0;
+    }
+
+    public static void printTop5Buttom3(MolecularDescriptor[] rankedFeatures, Workspace workspace) {
+        //Print top 5 bottom 3
+        pc.reportMsg("Top 5", workspace);
+        int top5 = 0;
+        for (int i = 0; i < rankedFeatures.length && top5 < 5; i++) {
+            if (rankedFeatures[i] != null) {
+                pc.reportMsg(rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getBinsPartition().getEntropy(), workspace);
+                top5++;
+            }
+        }
+        pc.reportMsg("...", workspace);
+        pc.reportMsg("Bottom 3", workspace);
+        Stack<MolecularDescriptor> stack = new Stack<>();
+        int bottom3 = 0;
+        for (int i = rankedFeatures.length - 1; i >= 0 && bottom3 < 3; i--) {
+            if (rankedFeatures[i] != null) {
+                stack.push(rankedFeatures[i]);
+                bottom3++;
+            }
+        }
+        MolecularDescriptor descriptor;
+        while (!stack.isEmpty()) {
+            descriptor = stack.pop();
+            pc.reportMsg(descriptor.getDisplayName() + " - score: " + descriptor.getBinsPartition().getEntropy(), workspace);
+        }
+    }
 }

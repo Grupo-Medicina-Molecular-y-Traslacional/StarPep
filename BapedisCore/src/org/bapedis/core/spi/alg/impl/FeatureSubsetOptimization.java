@@ -317,20 +317,31 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
     private double evaluateSubset2(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
         double score = 0;
         int n = 0;
+        
+        double entropy, absoluteMaxVal = 0;
+        for (int j = 0; j < features.length; j++) {
+            if (subset.get(j)) {
+                entropy = features[j].getBinsPartition().getEntropy();
+                if (entropy > absoluteMaxVal) {
+                    absoluteMaxVal = entropy;
+                }
+            }
+        }
+        
         double redudancy;
         for (int j = 0; j < features.length; j++) {
             if (subset.get(j)) {
                 n++;
+                entropy = features[j].getBinsPartition().getEntropy();
                 redudancy = 0.0;
                 for (int k = 0; k < features.length; k++) {
                     if (j != k && subset.get(k)) {
                         if (miMatrix.getValue(j, k) > redudancy){
-                            redudancy = miMatrix.getValue(j, k) / Math.min(features[j].getBinsPartition().getEntropy(),
-                                features[k].getBinsPartition().getEntropy());
+                            redudancy = miMatrix.getValue(j, k);
                         }
                     }
                 }
-                score += features[j].getBinsPartition().getEntropy() * (1 - redudancy);
+                score += entropy/maxEntropy - redudancy/entropy;
             }
         }
         return score;

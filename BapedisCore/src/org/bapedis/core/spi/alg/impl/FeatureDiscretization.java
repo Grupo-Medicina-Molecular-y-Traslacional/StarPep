@@ -51,7 +51,7 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
     public FeatureDiscretization(FeatureDiscretizationFactory factory) {
         this.factory = factory;
         stopRun = new AtomicBoolean();
-        binsOption = BinsOption.User_Defined;
+        binsOption = BinsOption.Sturges_Rule;
         numberOfBins = 50;
     }
 

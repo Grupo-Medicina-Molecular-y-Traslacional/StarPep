@@ -308,7 +308,11 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
         return m_best_group;
     }
     
-    private double evaluateSubset(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
+     private double evaluateSubset(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException{
+         return evaluateSubset1(subset, features, miMatrix);
+     }
+    
+    private double evaluateSubset2(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
         double score = 0;
         double entropy, maxMI;
         for (int j = 0; j < features.length; j++) {
@@ -327,6 +331,29 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
             }
         }
         return score;
+    }    
+    
+    private double evaluateSubset1(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
+        double relevance = 0, redundancy = 0;
+        int n = 0;
+        double entropy;
+        double minVal;
+        for (int j = 0; j < features.length; j++) {
+            if (subset.get(j)) {
+                entropy = features[j].getBinsPartition().getEntropy() / maxEntropy;
+                relevance += entropy;
+                redundancy += entropy;
+                n++;
+                for (int k = 0; k < features.length; k++) {
+                    if (j != k && subset.get(k)) {
+                        minVal = Math.min(features[j].getBinsPartition().getEntropy(),
+                                features[k].getBinsPartition().getEntropy());
+                        redundancy += miMatrix.getValue(j, k) / minVal;
+                    }
+                }
+            }
+        }
+        return relevance / n - redundancy / (n * n);
     }    
 
     private MIMatrixBuilder createMatrixBuilder(Peptide[] peptides, MolecularDescriptor[] features) throws MolecularDescriptorNotFoundException {

@@ -83,7 +83,6 @@ public class AppearanceSetupUIPanel extends javax.swing.JPanel implements Algori
     private transient AppearanceUIModel model;
     private transient ItemListener attributeListener;
     private final transient SplineEditor splineEditor;
-    protected final JXBusyLabel busyLabel;
     private final String NO_SELECTION = NbBundle.getMessage(AppearanceSetupUIPanel.class, "AppearanceSetupUIPanel.choose.text");
     private AppearanceAlgorithm algorithm;
 
@@ -109,43 +108,6 @@ public class AppearanceSetupUIPanel extends javax.swing.JPanel implements Algori
         splineEditor.setTitle(NbBundle.getMessage(AppearanceSetupUIPanel.class, "AppearanceSetupUIPanel.splineEditor.title"));
         splineEditor.setControl1(new Point2D.Float(0, 0));
         splineEditor.setControl2(new Point2D.Float(1, 1));
-        refreshModel(model);
-
-        busyLabel = new JXBusyLabel(new Dimension(20, 20));
-        busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        busyLabel.setText(NbBundle.getMessage(AppearanceSetupUIPanel.class, "AppearanceSetupUIPanel.busyLabel.text"));
-
-        addAncestorListener(new AncestorListener() {
-            @Override
-            public void ancestorAdded(AncestorEvent event) {
-                if (algorithm != null) {
-                    algorithm.addRunningListener(AppearanceSetupUIPanel.this);
-                }
-            }
-
-            @Override
-            public void ancestorRemoved(AncestorEvent event) {
-                if (algorithm != null) {
-                    algorithm.removeRunningListener(AppearanceSetupUIPanel.this);
-                }
-            }
-
-            @Override
-            public void ancestorMoved(AncestorEvent event) {
-            }
-        });
-    }
-
-    private void setBusy(boolean running) {
-        busyLabel.setBusy(running);
-        if (running) {
-            centerPanel.removeAll();
-            centerPanel.add(busyLabel, BorderLayout.CENTER);
-            centerPanel.revalidate();
-            centerPanel.repaint();
-        } else {
-            refreshCenterPanel();
-        }
     }
 
     /**
@@ -305,9 +267,6 @@ public class AppearanceSetupUIPanel extends javax.swing.JPanel implements Algori
             refreshCenterPanel();
             refreshCombo();
             refreshControls();
-        } else if (algorithm != null && evt.getSource().equals(algorithm)
-                && evt.getPropertyName().equals(AppearanceAlgorithm.RUNNING)) {
-            setBusy((boolean) evt.getNewValue());
         }
     }
 
@@ -439,6 +398,9 @@ public class AppearanceSetupUIPanel extends javax.swing.JPanel implements Algori
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         this.algorithm = (AppearanceAlgorithm) algo;
+        refreshCenterPanel();
+        refreshCombo();
+        refreshControls();        
         return this;
     }
 

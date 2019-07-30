@@ -240,8 +240,8 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
         List<Edge> toAddEdges = new LinkedList<>();
         int relType;
         boolean added;
-        for (Node node : toAddNodes) {
-            // Add metada nodes and relationships to list
+        // Add metada nodes and relationships to list
+        for (Node node : toAddNodes) {            
             for (StarPepAnnotationType aType : StarPepAnnotationType.values()) {
                 relType = graphModel.getEdgeType(aType.getRelationType());
                 if (relType != -1 && graphViz.isDisplayedMetadata(aType)) {
@@ -253,10 +253,25 @@ public class GraphWindowControllerImpl implements GraphWindowController, Workspa
                         }
                     }
                 }
-            }
+            }            
         }
 
+        //Add node elements
         graph.addAllNodes(toAddNodes);
+        
+        //Add similarity relationships to list
+        for(Node node : toAddNodes){
+            relType = graphModel.getEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+            if (relType != -1) {
+                for (Node neighbor : graphModel.getGraph().getNeighbors(node, relType)) {
+                    if (graph.contains(neighbor)){
+                        toAddEdges.add(graphModel.getGraph().getEdge(node, neighbor, relType));
+                    }
+                }
+            }        
+        }
+         
+        //Add other elements
         graph.addAllNodes(metadataNodes);
         graph.addAllEdges(toAddEdges);
     }

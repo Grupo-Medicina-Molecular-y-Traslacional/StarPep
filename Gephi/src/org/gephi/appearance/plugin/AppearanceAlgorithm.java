@@ -30,10 +30,8 @@ import org.openide.util.Lookup;
 public class AppearanceAlgorithm implements Algorithm {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-    public static final String RUNNING = "running";
     private final AppearanceAlgorithmFactory factory;
     protected final AppearanceController appearanceController;
-    protected final PropertyChangeSupport propertyChangeSupport;
     protected Function selectedFunction;
     protected GraphModel graphModel;
     protected ProgressTicket ticket;
@@ -42,7 +40,6 @@ public class AppearanceAlgorithm implements Algorithm {
     public AppearanceAlgorithm(AppearanceAlgorithmFactory factory) {
         this.factory = factory;
         appearanceController = Lookup.getDefault().lookup(AppearanceController.class);
-        propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
     @Override
@@ -56,7 +53,6 @@ public class AppearanceAlgorithm implements Algorithm {
         ticket = progressTicket;
 
         stopRun = false;
-        propertyChangeSupport.firePropertyChange(RUNNING, false, true);
     }
 
     @Override
@@ -64,7 +60,6 @@ public class AppearanceAlgorithm implements Algorithm {
         selectedFunction = null;
         graphModel = null;
         ticket = null;
-        propertyChangeSupport.firePropertyChange(RUNNING, true, false);
     }
 
     @Override
@@ -123,14 +118,5 @@ public class AppearanceAlgorithm implements Algorithm {
                 }
             }
         }
-    }
-    
-    public void addRunningListener(PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
-    }
-
-    public void removeRunningListener(PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
-    }    
-
+    }       
 }

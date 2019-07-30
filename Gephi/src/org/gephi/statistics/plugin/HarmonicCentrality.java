@@ -50,7 +50,6 @@ import java.util.Set;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.task.ProgressTicket;
 import org.gephi.graph.api.*;
 import org.openide.util.Exceptions;
@@ -129,7 +128,7 @@ public class HarmonicCentrality extends AbstractCentrality {
     protected void calculateCentrality() {
         progress.switchToDeterminate(graph.getNodeCount());
         Arrays.stream(nodes).parallel().forEach(node -> {
-            if (!isCanceled) {
+            if (!isCanceled.get()) {
                 calculateCentrality(node);
                 progress.progress();
             }
@@ -154,7 +153,7 @@ public class HarmonicCentrality extends AbstractCentrality {
         Node minDistanceNode;
         double minDistance;
         double dist;
-        while (!unvisitedNodes.isEmpty()) {
+        while (!unvisitedNodes.isEmpty() && !isCanceled.get()) {
 
             // find node with smallest distance value
             minDistance = Double.POSITIVE_INFINITY;
@@ -176,6 +175,10 @@ public class HarmonicCentrality extends AbstractCentrality {
             EdgeIterable edgeIter = getEdgeIter(graph, minDistanceNode, directed);
 
             for (Edge edge : edgeIter) {
+                if (isCanceled.get()) {
+                    edgeIter.doBreak();
+                    return;
+                }                
                 Node reachable = graph.getOpposite(minDistanceNode, edge);
 
                 if (!visitedNodes.contains(reachable)) {

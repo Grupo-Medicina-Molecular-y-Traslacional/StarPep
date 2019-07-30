@@ -77,7 +77,7 @@ public class BetweenessCentrality extends AbstractCentrality {
             LinkedList<Node>[] P = new LinkedList[n];
             
             for (Node s : nodes) {
-                if (isCanceled) {
+                if (isCanceled.get()) {
                     return;
                 }
                 Stack<Node> S = new Stack<>();

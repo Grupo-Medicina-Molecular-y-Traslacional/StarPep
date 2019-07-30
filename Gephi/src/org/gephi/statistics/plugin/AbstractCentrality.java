@@ -5,6 +5,7 @@
  */
 package org.gephi.statistics.plugin;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
@@ -29,7 +30,7 @@ public abstract class AbstractCentrality implements Algorithm {
     protected GraphModel graphModel;
     protected Graph graph;
     protected Node[] nodes;
-    protected boolean isCanceled;
+    protected final AtomicBoolean isCanceled;
     protected Workspace workspace;
     protected ProgressTicket progress;
     protected final boolean directed = false;
@@ -37,13 +38,14 @@ public abstract class AbstractCentrality implements Algorithm {
 
     public AbstractCentrality(AlgorithmFactory factory) {
         this.factory = factory;
+        isCanceled = new AtomicBoolean(false);
     }
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
         this.progress = progressTicket;
-        isCanceled = false;
+        isCanceled.set(false);
         graphModel = pc.getGraphModel(workspace);
         graph = graphModel.getGraphVisible();
         nodes = graph.getNodes().toArray();
@@ -55,7 +57,7 @@ public abstract class AbstractCentrality implements Algorithm {
 
     @Override
     public boolean cancel() {
-        this.isCanceled = true;
+        isCanceled.set(true);
         return true;
     }
 

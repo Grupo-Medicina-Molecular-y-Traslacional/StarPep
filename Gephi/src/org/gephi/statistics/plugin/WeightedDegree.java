@@ -129,6 +129,15 @@ public class WeightedDegree implements Algorithm {
         }
 
         if (nodeTable.hasColumn(Modularity.MODULARITY_CLASS)) {
+
+            //Set default values
+            Double defaultValue = new Double(0);
+            for (Node node : graphModel.getGraph().getNodes()) {
+                node.setAttribute(WINDEGREE, defaultValue);
+                node.setAttribute(WOUTDEGREE, defaultValue);
+                node.setAttribute(WDEGREE, defaultValue);                
+            }
+
             Node oppositeNode;
             progress.switchToDeterminate(graph.getNodeCount());
             NodeIterable nodesIterable = graph.getNodes();

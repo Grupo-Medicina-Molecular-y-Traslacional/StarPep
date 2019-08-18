@@ -23,6 +23,7 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
+import static org.bapedis.core.ui.actions.CopyPeptidesToWorkspace.pc;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -31,7 +32,6 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.Exceptions;
-import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
@@ -69,7 +69,7 @@ public class CopyPeptides extends AbstractAction implements LookupListener, Pres
         putValue(NAME, NbBundle.getMessage(CopyPeptides.class, "CopyPeptides.name"));
 
 //        menu.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/copy.gif", false));
-        menu.setToolTipText(NbBundle.getMessage(RemoveWorkspace.class, "CopyPeptides.toolTipText"));        
+        menu.setToolTipText(NbBundle.getMessage(RemoveWorkspace.class, "CopyPeptides.toolTipText"));
     }
 
     @Override
@@ -87,12 +87,10 @@ public class CopyPeptides extends AbstractAction implements LookupListener, Pres
         menu.add(new CopyPeptidesToWorkspace(null));
         Workspace currWs = pc.getCurrentWorkspace();
         Workspace otherWs;
-        JMenuItem item;
-        CopyPeptidesToWorkspace action;
         for (Iterator<? extends Workspace> it = pc.getWorkspaceIterator(); it.hasNext();) {
             otherWs = it.next();
             if (currWs != otherWs) {
-                menu.add(new CopyPeptidesToWorkspace(otherWs));               
+                menu.add(new CopyPeptidesToWorkspace(otherWs));
             }
         }
         return menu;
@@ -126,66 +124,27 @@ class CopyPeptidesToWorkspace extends GlobalContextSensitiveAction<Peptide> {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        AttributesModel currAttrModel = pc.getAttributesModel();
-        final List<Integer> peptideIDs = new LinkedList<>();
-
         Collection<? extends Peptide> context = lkpResult.allInstances();
         if (!context.isEmpty()) {
-            SwingWorker worker = new SwingWorker<Void, Void>() {
-                @Override
-                protected Void doInBackground() throws Exception {
-                    for (Peptide peptide : context) {
-                        peptideIDs.add(peptide.getId());
-                    }
-                    AttributesModel newAttrModel;
-                    if (workspace != null || ((workspace = createWorkspace()) != null)) {
-                        if (workspace.isBusy()) {
-                            throw new MyException(NbBundle.getMessage(CopyPeptides.class, "CopyPeptidesToWorkspace.error.busyWorkspace", workspace.getName()));
-                        }
-
-                        newAttrModel = pc.getAttributesModel(workspace);
-                        if (newAttrModel == null) {
-                            newAttrModel = new AttributesModel(workspace);
-                            workspace.add(newAttrModel);
-                        }
-                        //Check duplited peptide
-                        Map<Integer, Peptide> map = newAttrModel.getPeptideMap();
-                        if (map.size() > 0) {
-                            for (Integer id : peptideIDs) {
-                                if (map.containsKey(id)) {
-                                    throw new MyException(NbBundle.getMessage(CopyPeptides.class, "CopyPeptidesToWorkspace.error.duplicatedPeptide", id, workspace.getName()));
-                                }
-                            }
-                        }
-
-                        //Copy peptides and graph
-                        currAttrModel.getBridge().copyTo(newAttrModel, peptideIDs);
-                    }
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        get();
-                        if (workspace != null) {
-                            pc.setCurrentWorkspace(workspace);
-                            pc.getGraphVizSetting(workspace).fireChangedGraphView();
-                        }
-                    } catch (InterruptedException | ExecutionException ex) {
-                        if (ex.getCause() instanceof MyException) {
-                            NotifyDescriptor errorND = new NotifyDescriptor.Message(((MyException) ex.getCause()).getErrorMsg(), NotifyDescriptor.ERROR_MESSAGE);
-                            DialogDisplayer.getDefault().notify(errorND);
-                        } else {
-                            Exceptions.printStackTrace(ex);
-                        }
-                    }
-                }
-            };
+            SwingWorker worker = new CopyPeptidesWorker(context, workspace);
             worker.execute();
         }
     }
+}
 
+class CopyPeptidesWorker extends SwingWorker<Void, Void> {
+    private final List<Integer> peptideIDs;
+    private final Collection<? extends Peptide> context;
+    private Workspace workspace;
+    private AttributesModel currAttrModel; 
+
+    public CopyPeptidesWorker(Collection<? extends Peptide> context, Workspace workspace) {
+        this.context = context;
+        peptideIDs = new LinkedList<>();
+        currAttrModel = pc.getAttributesModel();
+        this.workspace = workspace;
+    }
+    
     private Workspace createWorkspace() {
         String name = Workspace.getPrefixName() + " " + Workspace.getCount();
         DialogDescriptor.InputLine dd = new DialogDescriptor.InputLine("", NbBundle.getMessage(NewWorkspace.class, "NewWorkspace.dialog.title"));
@@ -197,8 +156,58 @@ class CopyPeptidesToWorkspace extends GlobalContextSensitiveAction<Peptide> {
             return ws;
         }
         return null;
+    }    
+
+    @Override
+    protected Void doInBackground() throws Exception {
+        for (Peptide peptide : context) {
+            peptideIDs.add(peptide.getId());
+        }
+        AttributesModel newAttrModel;
+        if (workspace != null || ((workspace = createWorkspace()) != null)) {
+            if (workspace.isBusy()) {
+                throw new MyException(NbBundle.getMessage(CopyPeptides.class, "CopyPeptidesToWorkspace.error.busyWorkspace", workspace.getName()));
+            }
+
+            newAttrModel = pc.getAttributesModel(workspace);
+            if (newAttrModel == null) {
+                newAttrModel = new AttributesModel(workspace);
+                workspace.add(newAttrModel);
+            }
+            //Check duplited peptide
+            Map<Integer, Peptide> map = newAttrModel.getPeptideMap();
+            if (map.size() > 0) {
+                for (Integer id : peptideIDs) {
+                    if (map.containsKey(id)) {
+                        throw new MyException(NbBundle.getMessage(CopyPeptides.class, "CopyPeptidesToWorkspace.error.duplicatedPeptide", id, workspace.getName()));
+                    }
+                }
+            }
+
+            //Copy peptides and graph
+            currAttrModel.getBridge().copyTo(newAttrModel, peptideIDs);
+        }
+        return null;
     }
 
+    @Override
+    protected void done() {
+        try {
+            get();
+            if (workspace != null) {
+                pc.setCurrentWorkspace(workspace);
+                pc.getGraphVizSetting(workspace).fireChangedGraphView();
+            }
+        } catch (InterruptedException | ExecutionException ex) {
+            if (ex.getCause() instanceof MyException) {
+                NotifyDescriptor errorND = new NotifyDescriptor.Message(((MyException) ex.getCause()).getErrorMsg(), NotifyDescriptor.ERROR_MESSAGE);
+                DialogDisplayer.getDefault().notify(errorND);
+            } else {
+                Exceptions.printStackTrace(ex);
+            }
+        }
+    }
+    
     private class MyException extends RuntimeException {
 
         private final String errorMsg;
@@ -210,6 +219,5 @@ class CopyPeptidesToWorkspace extends GlobalContextSensitiveAction<Peptide> {
         public String getErrorMsg() {
             return errorMsg;
         }
-    }
-
+    }    
 }

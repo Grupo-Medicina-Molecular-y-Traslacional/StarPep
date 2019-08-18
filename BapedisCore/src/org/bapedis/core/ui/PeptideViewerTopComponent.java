@@ -79,7 +79,7 @@ import org.openide.util.lookup.ProxyLookup;
 @Messages({
     "CTL_PeptideViewerAction=Peptide nodes",
     "CTL_PeptideViewerTopComponent=Peptide nodes",
-    "HINT_PeptideViewerTopComponent=A peptide and neighbor nodes window"
+    "HINT_PeptideViewerTopComponent=A peptide nodes window"
 })
 public final class PeptideViewerTopComponent extends TopComponent implements
         ExplorerManager.Provider, WorkspaceEventListener, LookupListener, PropertyChangeListener {

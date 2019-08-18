@@ -56,6 +56,7 @@ import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.NodeIterable;
 import org.gephi.graph.api.Table;
+import static org.gephi.statistics.plugin.BetweenessCentrality.BETWEENNESS;
 import org.openide.util.Lookup;
 
 /**
@@ -672,6 +673,13 @@ public class Modularity implements Algorithm {
         if (modCol == null) {
             modCol = nodeTable.addColumn(MODULARITY_CLASS, "Modularity Class", Integer.class, 0);
         }
+        
+        //Set default values
+        Integer defaultValue = new Integer(-1);
+        for(Node node: graphModel.getGraph().getNodes()){
+            node.setAttribute(modCol, defaultValue);
+        }
+        
         for (Node n : graph.getNodes()) {
             int n_index = theStructure.map.get(n);
             n.setAttribute(modCol, struct[n_index]);

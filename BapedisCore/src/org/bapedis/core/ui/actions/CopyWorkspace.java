@@ -16,18 +16,19 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import javax.swing.AbstractAction;
-import javax.swing.ButtonGroup;
+import static javax.swing.Action.NAME;
+import static javax.swing.Action.SMALL_ICON;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingWorker;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
-import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.Workspace;
+import org.bapedis.core.project.ProjectManager;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -40,82 +41,64 @@ import org.openide.util.LookupListener;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.Presenter;
 
+/**
+ *
+ * @author Loge
+ */
 @ActionID(
         category = "File",
-        id = "org.bapedis.core.ui.actions.SelectWorkspace"
+        id = "org.bapedis.core.ui.actions.CopyWorkspace"
 )
 @ActionRegistration(
-        displayName = "#CTL_SelectWorkspace",
+        displayName = "#CTL_CopyWorkspace",
         lazy = false
 )
 @ActionReferences({
-    @ActionReference(path = "Menu/File", position = 80),
-    @ActionReference(path = "Toolbars/Workspace", position = 50)
+    @ActionReference(path = "Menu/File", position = 230),
+    @ActionReference(path = "Toolbars/Workspace", position = 110)
 })
-public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar, Presenter.Menu, WorkspaceEventListener, LookupListener, PropertyChangeListener {
+public class CopyWorkspace extends AbstractAction implements Presenter.Toolbar, Presenter.Menu, WorkspaceEventListener, LookupListener, PropertyChangeListener {
+
+    protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
 
     protected JPopupMenu popup;
     protected JMenu menu;
-    protected ButtonGroup popupGroup;
-    protected ButtonGroup menuGroup;
-    protected HashMap<Integer, JCheckBoxMenuItem> popupMap;
-    protected HashMap<Integer, JCheckBoxMenuItem> menuMap;
-    protected ProjectManager pc;
+
+    protected HashMap<Integer, JMenuItem> popupMap;
+    protected HashMap<Integer, JMenuItem> menuMap;
+
     protected Lookup.Result<Workspace> lkpResult;
 
-    public SelectWorkspace() {
-        pc = Lookup.getDefault().lookup(ProjectManager.class);
-        pc.addWorkspaceEventListener(this);
+    public CopyWorkspace() {
+        popup = new JPopupMenu(NbBundle.getMessage(CopyPeptides.class, "CTL_CopyWorkspace"));
+        menu = new JMenu(NbBundle.getMessage(SelectWorkspace.class, "CTL_CopyWorkspace"));
+
+        popupMap = new HashMap<>();
+        menuMap = new HashMap<>();
+
         lkpResult = pc.getLookup().lookupResult(Workspace.class);
         lkpResult.addLookupListener(this);
-        popup = new JPopupMenu();
-        popupGroup = new ButtonGroup();
-        popupMap = new HashMap<>();
-        menu = new JMenu(NbBundle.getMessage(SelectWorkspace.class, "CTL_SelectWorkspace"));
-        menuGroup = new ButtonGroup();
-        menuMap = new HashMap<>();
+
+        putValue(SMALL_ICON, ImageUtilities.loadImageIcon("org/bapedis/core/resources/duplicateWorkspace.png", false));
+        putValue(NAME, NbBundle.getMessage(RemoveCurrentWorkspace.class, "CTL_CopyWorkspace"));
+
         populateMenuItems();
         pc.getCurrentWorkspace().addPropertyChangeListener(this);
     }
 
     @Override
-    public void actionPerformed(ActionEvent ae) {
-    }
-
-    private JCheckBoxMenuItem createJMenuItem(final Workspace ws) {
-        JCheckBoxMenuItem item = new JCheckBoxMenuItem(ws.getName());
-        item.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-//                Workspace currentWS = pc.getCurrentWorkspace();
-//                if (currentWS.isBusy()) {
-//                    DialogDisplayer.getDefault().notify(currentWS.getBusyNotifyDescriptor());
-//                    Workspace ws = pc.getCurrentWorkspace();
-//                    JCheckBoxMenuItem item = popupMap.get(ws.getId());
-//                    item.setSelected(true);
-//                    item = menuMap.get(ws.getId());
-//                    item.setSelected(true);
-//                } else {
-                    pc.setCurrentWorkspace(ws);
-//                }
-            }
-        });
-        if (ws.equals(pc.getCurrentWorkspace())) {
-            item.setSelected(true);
-        }
-        return item;
+    public void actionPerformed(ActionEvent e) {
     }
 
     @Override
     public Component getToolbarPresenter() {
-        Image iconImage = ImageUtilities.loadImage("org/bapedis/core/resources/workspace.png");
+        Image iconImage = ImageUtilities.loadImage("org/bapedis/core/resources/duplicateWorkspace.png");
         ImageIcon icon = new ImageIcon(iconImage);
 
         final JButton dropDownButton = DropDownButtonFactory.createDropDownButton(new ImageIcon(
                 new BufferedImage(32, 32, BufferedImage.TYPE_BYTE_GRAY)), popup);
-
         dropDownButton.setIcon(icon);
-        dropDownButton.setToolTipText(NbBundle.getMessage(SelectWorkspace.class, "CTL_SelectWorkspace"));
+        dropDownButton.setToolTipText(NbBundle.getMessage(RemoveWorkspace.class, "CTL_CopyWorkspace"));
         dropDownButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -143,29 +126,54 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
         return dropDownButton;
     }
 
+    private void populateMenuItems() {
+        JMenu popupItem = new JMenu(NbBundle.getMessage(CopyPeptides.class, "CTL_CopyWorkspace"));
+        popupItem.add(createJMenuItem(null));
+        popup.add(popupItem);
+
+        JMenuItem item = createJMenuItem(null);
+        menu.add(item);
+        for (Iterator<? extends Workspace> it = pc.getWorkspaceIterator(); it.hasNext();) {
+            Workspace ws = it.next();
+            if (ws != pc.getCurrentWorkspace()) {
+                item = createJMenuItem(ws);
+                popupItem.add(item);
+                popupMap.put(ws.getId(), item);
+
+                item = createJMenuItem(ws);
+                menu.add(item);
+                menuMap.put(ws.getId(), item);
+            }
+        }
+    }
+
+    private JMenuItem createJMenuItem(final Workspace ws) {
+        String name;
+        if (ws == null) {
+            name = NbBundle.getMessage(CopyPeptides.class, "CopyPeptidesToWorkspace.newWorkspace.name");
+        } else {
+            name = ws.getName();
+        }        
+        JMenuItem item = new JMenuItem(name);
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingWorker worker = new CopyPeptidesWorker(pc.getAttributesModel().getPeptides(), ws);
+                worker.execute();
+            }
+        });
+        return item;
+    }
+
+    @Override
+    public JMenuItem getMenuPresenter() {
+        return menu;
+    }
+
     @Override
     public void workspaceChanged(Workspace oldWs, Workspace newWs) {
         oldWs.removePropertyChangeListener(this);
         newWs.addPropertyChangeListener(this);
-        JCheckBoxMenuItem item = popupMap.get(newWs.getId());
-        item.setSelected(true);
-        item = menuMap.get(newWs.getId());
-        item.setSelected(true);
-    }
-
-    private void populateMenuItems() {
-        JCheckBoxMenuItem item;
-        for (Iterator<? extends Workspace> it = pc.getWorkspaceIterator(); it.hasNext();) {
-            Workspace ws = it.next();
-            item = createJMenuItem(ws);
-            popup.add(item);
-            popupGroup.add(item);
-            popupMap.put(ws.getId(), item);
-            item = createJMenuItem(ws);
-            menu.add(item);
-            menuGroup.add(item);
-            menuMap.put(ws.getId(), item);
-        }
     }
 
     @Override
@@ -173,8 +181,7 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
         Collection<? extends Workspace> workspaces = lkpResult.allInstances();
         popup.removeAll();
         menu.removeAll();
-        popupGroup = new ButtonGroup();
-        menuGroup = new ButtonGroup();
+
         popupMap.clear();
         menuMap.clear();
         populateMenuItems();
@@ -183,7 +190,7 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         String propertyName = evt.getPropertyName();
-        JCheckBoxMenuItem item;
+        JMenuItem item;
         if (propertyName.equals(Workspace.PRO_NAME)) {
             Workspace ws = (Workspace) evt.getSource();
             item = popupMap.get(ws.getId());
@@ -191,11 +198,6 @@ public class SelectWorkspace extends AbstractAction implements Presenter.Toolbar
             item = menuMap.get(ws.getId());
             item.setText(evt.getNewValue().toString());
         }
-    }
-
-    @Override
-    public JMenuItem getMenuPresenter() {
-        return menu;
     }
 
 }

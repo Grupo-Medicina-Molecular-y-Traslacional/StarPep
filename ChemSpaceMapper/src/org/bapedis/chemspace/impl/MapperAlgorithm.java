@@ -1,4 +1,4 @@
-/*
+  /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -25,6 +25,8 @@ import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
+import org.bapedis.core.spi.alg.impl.EmbeddingAlgorithm;
+import org.bapedis.core.spi.alg.impl.EmbeddingAlgorithmFactory;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlgFactory;
 import org.bapedis.core.spi.alg.impl.UnsupervisedFeatureSelection;
@@ -55,6 +57,7 @@ public class MapperAlgorithm implements Algorithm {
 
     //Mapping Algorithms   
     private NonRedundantSetAlg nrdAlg;
+    private EmbeddingAlgorithm embeddingAlg;
     private AllDescriptors featureExtractionAlg;
     private UnsupervisedFeatureSelection featureSelectionAlg;
     private AbstractDistance distFunction;
@@ -74,6 +77,7 @@ public class MapperAlgorithm implements Algorithm {
 
         //Mapping algorithms
         nrdAlg = (NonRedundantSetAlg) new NonRedundantSetAlgFactory().createAlgorithm();
+        embeddingAlg = (EmbeddingAlgorithm) new EmbeddingAlgorithmFactory().createAlgorithm();
         featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
         featureSelectionAlg = (UnsupervisedFeatureSelection) new UnsupervisedFeatureSelectionFactory().createAlgorithm();
         pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
@@ -92,12 +96,12 @@ public class MapperAlgorithm implements Algorithm {
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
         this.progressTicket = progressTicket;
-        stopRun = false;        
+        stopRun = false;
     }
 
     @Override
     public void run() {
-        //Non-redundant set
+        // Non-redundant set
         pc.reportMsg(String.format("Removing redundant sequences: %s", nrdOption), workspace);
         if (nrdOption == RemovingRedundantOption.YES && !stopRun) {
             if (nrdAlg != null) {
@@ -106,6 +110,17 @@ public class MapperAlgorithm implements Algorithm {
                 execute();
             } else {
                 throw new RuntimeException("Internal error: Non-redundant algorithm is null");
+            }
+        }
+
+        // Embedding peptide sequences
+        pc.reportMsg("Embedding peptide sequences", workspace);
+        if (!stopRun) {
+            if (embeddingAlg != null) {
+                currentAlg = embeddingAlg;
+                execute();
+            } else {
+                throw new RuntimeException("Internal error: Embedding algorithm is null");
             }
         }
 
@@ -157,7 +172,7 @@ public class MapperAlgorithm implements Algorithm {
         //WekaPCA Transformer
         pc.reportMsg("Applying PCA transformation", workspace);
         if (!stopRun) {
-            if (distFunction != null && pcaTransformer.getOption() != distFunction.getOption()){
+            if (distFunction != null && pcaTransformer.getOption() != distFunction.getOption()) {
                 pcaTransformer.setOption(distFunction.getOption());
             }
             currentAlg = pcaTransformer;
@@ -165,10 +180,10 @@ public class MapperAlgorithm implements Algorithm {
         }
 
         // Network construction
-        pc.reportMsg("Network construction", workspace);        
+        pc.reportMsg("Network construction", workspace);
         if (!stopRun) {
             if (distFunction != null) {
-                pc.reportMsg(String.format("Distance Function: %s", distFunction.getName()), workspace);                  
+                pc.reportMsg(String.format("Distance Function: %s", distFunction.getName()), workspace);
                 networkAlg.setDistanceFunction(distFunction);
                 networkAlg.setXyzSpace(pcaTransformer.getXYZSpace());
                 currentAlg = networkAlg;
@@ -238,7 +253,7 @@ public class MapperAlgorithm implements Algorithm {
 
     public void setNrdOption(RemovingRedundantOption nrdOption) {
         this.nrdOption = nrdOption;
-    }
+    }       
 
     public NonRedundantSetAlg getNonRedundantSetAlg() {
         return nrdAlg;
@@ -247,6 +262,14 @@ public class MapperAlgorithm implements Algorithm {
     public void setNonRedundantSetAlg(NonRedundantSetAlg nrdAlg) {
         this.nrdAlg = nrdAlg;
     }
+
+    public EmbeddingAlgorithm getEmbeddingAlg() {
+        return embeddingAlg;
+    }
+
+    public void setEmbeddingAlg(EmbeddingAlgorithm embeddingAlg) {
+        this.embeddingAlg = embeddingAlg;
+    }        
 
     public void setFeatureExtractionAlg(AllDescriptors alg) {
         this.featureExtractionAlg = alg;

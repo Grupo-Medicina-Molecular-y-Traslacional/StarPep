@@ -18,6 +18,7 @@ import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.spi.alg.ChemSpaceTag;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
+import org.bapedis.core.spi.alg.impl.EmbeddingAlgorithm;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
 import org.bapedis.core.spi.alg.impl.UnsupervisedFeatureSelection;
 import org.openide.WizardDescriptor;
@@ -74,7 +75,13 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
                 NonRedundantSetAlg nrdAlg = (NonRedundantSetAlg) wiz.getProperty(NonRedundantSetAlg.class.getName());
                 csMapper.setNonRedundantSetAlg(nrdAlg);
             }
-        }
+        }      
+        
+        //Embedding query sequences
+        EmbeddingAlgorithm embeddingAlg = (EmbeddingAlgorithm) wiz.getProperty(EmbeddingAlgorithm.class.getName());
+        if (embeddingAlg != null){
+            csMapper.setEmbeddingAlg(embeddingAlg);
+        } 
 
         // Feature Extraction Option
         FeatureExtractionOption feOption = (FeatureExtractionOption) wiz.getProperty(FeatureExtractionOption.class.getName());

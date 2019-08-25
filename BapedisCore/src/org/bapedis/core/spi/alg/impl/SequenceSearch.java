@@ -1,4 +1,4 @@
-/*
+ /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -37,6 +37,7 @@ import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 
 /**
  *
@@ -61,6 +62,9 @@ public class SequenceSearch implements Algorithm {
     public SequenceSearch(SequenceSearchFactory factory) {
         this.factory = factory;
         alignmentModel = new SequenceAlignmentModel();
+        int percentIdentity = NbPreferences.forModule(SequenceSearch.class).getInt("PercentIdentity", 70);
+        alignmentModel.setPercentIdentity(percentIdentity);
+        
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         maximumResults = -1;
         dao = Lookup.getDefault().lookup(PeptideDAO.class);
@@ -126,6 +130,7 @@ public class SequenceSearch implements Algorithm {
                         }
                     }
                 });
+                NbPreferences.forModule(SequenceSearch.class).putInt("PercentIdentity", alignmentModel.getPercentIdentity());
             } catch (InterruptedException ex) {
                 Exceptions.printStackTrace(ex);
             } catch (InvocationTargetException ex) {

@@ -97,8 +97,8 @@ public class EmbeddingAlgorithmPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         topPanel.add(jLabel1, gridBagConstraints);
 
-        jTextField2.setEditable(false);
         jTextField2.setEnabled(false);
+        jTextField2.setMinimumSize(new java.awt.Dimension(90, 20));
         jTextField2.setPreferredSize(new java.awt.Dimension(120, 20));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -107,7 +107,6 @@ public class EmbeddingAlgorithmPanel extends javax.swing.JPanel implements Algor
         topPanel.add(jTextField2, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jBtBrowse, org.openide.util.NbBundle.getMessage(EmbeddingAlgorithmPanel.class, "EmbeddingAlgorithmPanel.jBtBrowse.text")); // NOI18N
-        jBtBrowse.setEnabled(false);
         jBtBrowse.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtBrowseActionPerformed(evt);
@@ -127,7 +126,12 @@ public class EmbeddingAlgorithmPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
         topPanel.add(jLabel2, gridBagConstraints);
 
-        jTextField1.setEnabled(false);
+        jTextField1.setEditable(false);
+        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jTextField1KeyTyped(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -264,33 +268,43 @@ public class EmbeddingAlgorithmPanel extends javax.swing.JPanel implements Algor
         }
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             inputFile = chooser.getSelectedFile();
-            jTextField2.setText(inputFile.getAbsolutePath());
+            jTextField1.setText(inputFile.getAbsolutePath());
             String name = inputFile.getName();
-            jTextField1.setText(name.replaceFirst("[.][^.]+$", ""));
+            jTextField2.setText(name.replaceFirst("[.][^.]+$", ""));
+            jTextField2.setEnabled(true);
+            jBtAdd.setEnabled(true);
         }
     }//GEN-LAST:event_jBtBrowseActionPerformed
 
     private void jBtAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtAddActionPerformed
         try {
             if (jTextField1.getText().trim().isEmpty()) {
-                throw new Exception("The name of the database is empty");
+                throw new Exception(NbBundle.getMessage(EmbeddingAlgorithmPanel.class, "EmbeddingAlgorithmPanel.emptyFastaFile"));
             }
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
-            String ds = jTextField1.getText();
+
+            inputFile = new File(jTextField1.getText());
+            if (!inputFile.exists()) {
+                throw new Exception(NbBundle.getMessage(EmbeddingAlgorithmPanel.class, "EmbeddingAlgorithmPanel.fileNotExist"));
+            }
+
             if (jTextField2.getText().isEmpty()) {
-                NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(EmbeddingAlgorithmPanel.class, "EmbeddingAlgorithmPanel.emptyFastaFile"), NotifyDescriptor.ERROR_MESSAGE);
+                NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(EmbeddingAlgorithmPanel.class, "EmbeddingAlgorithmPanel.emptyDatabase"), NotifyDescriptor.ERROR_MESSAGE);
                 DialogDisplayer.getDefault().notify(nd);
                 return;
             }
-            inputFile = new File(jTextField2.getText());
-
+            String ds = jTextField2.getText();
             embeddingAlg.addDataSetFromFile(ds, inputFile);
             DefaultListModel<String> model = new DefaultListModel<>();
             model.addElement(ds);
             moveFromTo(new int[]{0}, model, listModel1);
 
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(EmbeddingAlgorithmPanel.class, "EmbeddingAlgorithmPanel.confirmation"), NotifyDescriptor.INFORMATION_MESSAGE);
+            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(EmbeddingAlgorithmPanel.class, "EmbeddingAlgorithmPanel.confirmation", ds), NotifyDescriptor.INFORMATION_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
+
+            jTextField2.setText("");
+            jTextField2.setEnabled(false);
+            jBtAdd.setEnabled(false);
         } catch (Exception ex) {
             NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
@@ -317,6 +331,10 @@ public class EmbeddingAlgorithmPanel extends javax.swing.JPanel implements Algor
         button2Action();
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    private void jTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyTyped
+
+    }//GEN-LAST:event_jTextField1KeyTyped
+
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         embeddingAlg = (EmbeddingAlgorithm) algo;
@@ -325,7 +343,7 @@ public class EmbeddingAlgorithmPanel extends javax.swing.JPanel implements Algor
         }
         for (String ds : embeddingAlg.nonSelected.keySet()) {
             listModel1.addElement(ds);
-        }        
+        }
         return this;
     }
 
@@ -336,14 +354,14 @@ public class EmbeddingAlgorithmPanel extends javax.swing.JPanel implements Algor
         }
         moveFromTo(indices, listModel1, listModel2);
     }
-    
+
     private void button2Action() {
         int[] indices = jList2.getSelectedIndices();
         for (int i = 0; i < indices.length; i++) {
             embeddingAlg.recover(listModel2.get(indices[i]));
         }
         moveFromTo(indices, listModel2, listModel1);
-    }    
+    }
 
     private void moveFromTo(int[] indices, DefaultListModel<String> srcModel, DefaultListModel<String> desModel) {
         for (int i = indices.length - 1; i >= 0; i--) {

@@ -9,14 +9,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.swing.SwingUtilities;
 import org.bapedis.core.model.AlgorithmProperty;
+import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.task.ProgressTicket;
 import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
 import org.biojava.nbio.core.sequence.ProteinSequence;
@@ -24,6 +32,11 @@ import org.biojava.nbio.core.sequence.compound.AminoAcidCompoundSet;
 import org.biojava.nbio.core.sequence.io.BufferedReaderBytesRead;
 import org.biojava.nbio.core.sequence.io.GenericFastaHeaderParser;
 import org.biojava.nbio.core.sequence.io.ProteinSequenceCreator;
+import org.gephi.graph.api.Graph;
+import org.gephi.graph.api.GraphFactory;
+import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.Node;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -36,14 +49,21 @@ public class EmbeddingAlgorithm implements Algorithm, Cloneable {
     static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected final EmbeddingAlgorithmFactory factory;
     protected LinkedHashMap<String, List<ProteinSequence>> selected, nonSelected;
+    protected GraphModel graphModel;
     protected Workspace workspace;
     protected ProgressTicket progressTicket;
+    private List<Node> graphNodes;
+    private AttributesModel newAttrModel;
     protected boolean stopRun;
+    protected final GraphWindowController graphWC;
+
+    private static AtomicInteger counter = new AtomicInteger(45120);
 
     public EmbeddingAlgorithm(EmbeddingAlgorithmFactory factory) {
         this.factory = factory;
         selected = new LinkedHashMap<>();
         nonSelected = new LinkedHashMap<>();
+        graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
     }
 
     public void addDataSetFromFile(String ds, File inputFile) throws Exception {
@@ -110,7 +130,7 @@ public class EmbeddingAlgorithm implements Algorithm, Cloneable {
                         if (sb.length() > 100) {
                             throw new Exception(NbBundle.getMessage(EmbeddingAlgorithm.class, "EmbeddingAlgorithm.invalidSeqLength", header));
                         }
-                        
+
                         try {
                             @SuppressWarnings("unchecked")
                             ProteinSequence sequence = (ProteinSequence) sequenceCreator.getSequence(seq, sequenceIndex);
@@ -131,7 +151,7 @@ public class EmbeddingAlgorithm implements Algorithm, Cloneable {
             }
         }
     }
-    
+
     public void remove(String ds) {
         moveFromTo(ds, selected, nonSelected);
     }
@@ -148,19 +168,54 @@ public class EmbeddingAlgorithm implements Algorithm, Cloneable {
 
     public void recover(String ds) {
         moveFromTo(ds, nonSelected, selected);
-    }    
+    }
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
         this.progressTicket = progressTicket;
+        graphModel = pc.getGraphModel(workspace);
         stopRun = false;
+        graphNodes = null;
     }
 
     @Override
     public void endAlgo() {
+        if (newAttrModel != null && !stopRun) {
+            // To refresh graph view
+            GraphModel graphModel = pc.getGraphModel(workspace);
+            Graph graph = graphModel.getGraphVisible();
+            graph.clear();
+            graphWC.refreshGraphView(workspace, graphNodes, null);
+
+            final Workspace ws = workspace;
+            final AttributesModel modelToRemove = pc.getAttributesModel(workspace);
+            final AttributesModel modelToAdd = newAttrModel;
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            //To change attribute model
+                            ws.remove(modelToRemove);
+                            ws.add(modelToAdd);
+                        } finally {
+                            pc.getGraphVizSetting(ws).fireChangedGraphView();
+                        }
+                    }
+                });
+            } catch (InterruptedException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (InvocationTargetException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
+
         workspace = null;
         progressTicket = null;
+        graphModel = null;
+        newAttrModel = null;
+        graphNodes = null;
     }
 
     @Override
@@ -181,15 +236,87 @@ public class EmbeddingAlgorithm implements Algorithm, Cloneable {
 
     @Override
     public void run() {
-        
+        Graph mainGraph = graphModel.getGraph();
+        AttributesModel attrModel = pc.getAttributesModel(workspace);
+        //Create new workspace
+        newAttrModel = new AttributesModel(workspace);
+        graphNodes = new LinkedList<>();
+
+        if (attrModel != null) {
+            //Target list
+            for (Peptide peptide : attrModel.getPeptides()) {
+                if (peptide.getGraphNode().getLabel().equals("Peptide")) {
+                    newAttrModel.addPeptide(peptide);
+                    graphNodes.add(peptide.getGraphNode());
+                }
+            }
+
+            //Add new peptides and graph nodes
+            Peptide peptide;
+            Node node;
+            String id, seq;
+            for (Map.Entry<String, List<ProteinSequence>> entry : selected.entrySet()) {
+                for (ProteinSequence protein : entry.getValue()) {
+                    id = protein.getAccession().getID();
+                    seq = protein.getSequenceAsString();
+
+                    node = getOrAddGraphNode(graphModel, entry.getKey(), id);
+
+                    peptide = new Peptide(node, mainGraph);
+                    peptide.setAttributeValue(Peptide.ID, counter.getAndIncrement());
+                    peptide.setAttributeValue(Peptide.SEQ, seq);
+                    peptide.setAttributeValue(Peptide.LENGHT, seq.length());
+
+                    newAttrModel.addPeptide(peptide);
+                    graphNodes.add(node);
+                }
+            }
+
+            //Removing non selected nodes
+            for (Map.Entry<String, List<ProteinSequence>> entry : nonSelected.entrySet()) {
+                for (ProteinSequence protein : entry.getValue()) {
+                    id = protein.getAccession().getID();
+                    node = mainGraph.getNode(id);
+                    if (node != null) {
+                        mainGraph.removeNode(node);
+                    }
+                }
+            }
+        }
     }
-    
+
+    private Node getOrAddGraphNode(GraphModel graphModel, String label, String id) {
+        Graph mainGraph = graphModel.getGraph();
+        Node graphNode = mainGraph.getNode(id);
+        if (graphNode == null) {
+            GraphFactory graphFactory = graphModel.factory();
+            graphNode = graphFactory.newNode(id);
+
+            graphNode.setLabel(label);
+            graphNode.setSize(ProjectManager.GRAPH_NODE_SIZE);
+            graphNode.setAttribute(ProjectManager.NODE_TABLE_PRO_NAME, id);
+
+            //Set random position
+            graphNode.setX((float) ((0.01 + Math.random()) * 1000) - 500);
+            graphNode.setY((float) ((0.01 + Math.random()) * 1000) - 500);
+
+            //Set color
+            graphNode.setR(ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f);
+            graphNode.setG(ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f);
+            graphNode.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
+            graphNode.setAlpha(1f);
+
+            mainGraph.addNode(graphNode);
+        }
+        return graphNode;
+    }
+
     @Override
     public Object clone() throws CloneNotSupportedException {
         EmbeddingAlgorithm copy = (EmbeddingAlgorithm) super.clone(); //To change body of generated methods, choose Tools | Templates.
-        copy.selected = (LinkedHashMap<String, List<ProteinSequence>>)selected.clone();
-        copy.nonSelected = (LinkedHashMap<String, List<ProteinSequence>>)nonSelected .clone();
+        copy.selected = (LinkedHashMap<String, List<ProteinSequence>>) selected.clone();
+        copy.nonSelected = (LinkedHashMap<String, List<ProteinSequence>>) nonSelected.clone();
         return copy;
-    }    
+    }
 
 }

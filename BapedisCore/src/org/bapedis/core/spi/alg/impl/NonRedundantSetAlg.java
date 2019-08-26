@@ -139,13 +139,22 @@ public class NonRedundantSetAlg implements Algorithm, Cloneable {
         pc.reportMsg(msg, workspace);
 
         //set peptides
+        Peptide[] peptides;
         if (workspaceInput) {
             tmpAttrModel = pc.getAttributesModel(workspace);
+            List<Peptide> peptideList = new LinkedList<>();
+            for(Peptide peptide: tmpAttrModel.getPeptides()){
+                if (peptide.getGraphNode().getLabel().equals("Peptide")){
+                    peptideList.add(peptide);
+                }
+            } 
+            peptides = peptideList.toArray(new Peptide[0]);
         } else {
             tmpAttrModel = dao.getPeptides(new QueryModel(workspace), pc.getGraphModel(workspace), pc.getAttributesModel(workspace));            
+            peptides = tmpAttrModel.getPeptides().toArray(new Peptide[0]);
         }
 
-        Peptide[] peptides = tmpAttrModel.getPeptides().toArray(new Peptide[0]);
+        
         clusteringAlg.setPeptides(peptides);
 
         //Clusterize

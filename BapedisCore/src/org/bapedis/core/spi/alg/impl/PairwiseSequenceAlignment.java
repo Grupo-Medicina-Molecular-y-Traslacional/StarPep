@@ -19,12 +19,12 @@ import org.biojava.nbio.core.sequence.compound.AminoAcidCompound;
  */
 public class PairwiseSequenceAlignment {
 
-    public static float computeSequenceIdentity(ProteinSequence peptide1, ProteinSequence peptide2, SequenceAlignmentModel model) {
+    public static double computeSequenceIdentity(ProteinSequence peptide1, ProteinSequence peptide2, SequenceAlignmentModel model) {
         Alignments.PairwiseSequenceAlignerType alignerType = model.getAlignerType();
         SubstitutionMatrix<AminoAcidCompound> substitutionMatrix = model.getSubstitutionMatrix();
         SimpleGapPenalty gapPenalty = new SimpleGapPenalty();
         SequencePair<ProteinSequence, AminoAcidCompound> pair;
-        float score;
+        double score;
         String seq1 = peptide1.getSequenceAsString();
         String seq2 = peptide2.getSequenceAsString();
         if (seq1.equals(seq2)) {
@@ -32,7 +32,7 @@ public class PairwiseSequenceAlignment {
         } else {
             pair = Alignments.getPairwiseAlignment(peptide1, peptide2,
                     alignerType, gapPenalty, substitutionMatrix);
-            score = ((float) pair.getNumIdenticals()) / getDenominatorValue(pair, seq1, seq2, alignerType);
+            score = ((double) pair.getNumIdenticals()) / getDenominatorValue(pair, seq1, seq2, alignerType);
         }
         return score;
     }

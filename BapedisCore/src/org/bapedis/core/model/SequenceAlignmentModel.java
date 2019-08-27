@@ -34,8 +34,8 @@ public class SequenceAlignmentModel implements Cloneable{
     public static final int DEFAULT_SUBSTITUTION_MATRIX_INDEX = 7; // Blosum 62 by Henikoff & Henikoff
     
     public static final int PID_MAX=100;
-    public static final int PID_MIN=50;
-    public static final int[] PID_REFS= new int[]{50, 70, 100};  
+    public static final int PID_MIN=30;
+    public static final int[] PID_REFS= new int[]{30, 50, 70, 100};  
     public static final int PID_MAJORTICKSPACING = 20;
     public static final int PID_MINORTICKSPACING = 10;    
     public static final int DEFAULT_PID=98;    

@@ -98,7 +98,7 @@ public class AttributeFilter implements Filter {
             return false;
         }
         boolean accepted = false;
-        Object objValue = peptide.getAttributeValue(attr);
+        Object objValue = peptide.getAttributeValue(attr);        
         if (objValue.getClass().isArray()) {
             Object[] array = (Object[]) objValue;
             for (Object obj : array) {

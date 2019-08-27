@@ -177,6 +177,7 @@ public class EmbeddingAlgorithmPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         centerPanel.add(jLabel4, gridBagConstraints);
 
+        jList1.setPreferredSize(new java.awt.Dimension(230, 0));
         jScrollPane1.setViewportView(jList1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -188,6 +189,7 @@ public class EmbeddingAlgorithmPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         centerPanel.add(jScrollPane1, gridBagConstraints);
 
+        jList2.setPreferredSize(new java.awt.Dimension(230, 0));
         jScrollPane2.setViewportView(jList2);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -338,11 +340,14 @@ public class EmbeddingAlgorithmPanel extends javax.swing.JPanel implements Algor
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         embeddingAlg = (EmbeddingAlgorithm) algo;
+        listModel1.clear();
         for (String ds : embeddingAlg.selected.keySet()) {
             listModel1.addElement(ds);
         }
+        
+        listModel2.clear();
         for (String ds : embeddingAlg.nonSelected.keySet()) {
-            listModel1.addElement(ds);
+            listModel2.addElement(ds);
         }
         return this;
     }

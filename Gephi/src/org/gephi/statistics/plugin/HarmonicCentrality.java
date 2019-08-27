@@ -50,6 +50,7 @@ import java.util.Set;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.Workspace;
+import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.task.ProgressTicket;
 import org.gephi.graph.api.*;
 import org.openide.util.Exceptions;
@@ -122,7 +123,6 @@ public class HarmonicCentrality extends AbstractCentrality {
 //        return properties.toArray(new AlgorithmProperty[0]);
         return null;
     }
-    
 
     @Override
     protected void calculateCentrality() {
@@ -178,7 +178,7 @@ public class HarmonicCentrality extends AbstractCentrality {
                 if (isCanceled.get()) {
                     edgeIter.doBreak();
                     return;
-                }                
+                }
                 Node reachable = graph.getOpposite(minDistanceNode, edge);
 
                 if (!visitedNodes.contains(reachable)) {

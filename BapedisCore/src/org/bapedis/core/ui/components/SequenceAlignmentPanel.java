@@ -51,9 +51,10 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
 
         //Label table
         Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
-        labelTable.put(SequenceAlignmentModel.PID_REFS[0], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.low")));
-        labelTable.put(SequenceAlignmentModel.PID_REFS[1], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.middle")));
-        labelTable.put(SequenceAlignmentModel.PID_REFS[2], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.high")));
+        labelTable.put(SequenceAlignmentModel.PID_REFS[0], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.veryLow")));
+        labelTable.put(SequenceAlignmentModel.PID_REFS[1], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.low")));
+        labelTable.put(SequenceAlignmentModel.PID_REFS[2], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.middle")));
+        labelTable.put(SequenceAlignmentModel.PID_REFS[3], new JLabel(NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.pidSlider.high")));
 
         jPIDSlider.setLabelTable(labelTable);
         jPIDLabel.setText(model.getPercentIdentity() + "%");
@@ -202,11 +203,12 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         jToolBar1.add(jLessButton);
 
         jPIDSlider.setMajorTickSpacing(10);
-        jPIDSlider.setMinimum(50);
+        jPIDSlider.setMinimum(30);
         jPIDSlider.setMinorTickSpacing(5);
         jPIDSlider.setPaintLabels(true);
         jPIDSlider.setPaintTicks(true);
         jPIDSlider.setToolTipText(org.openide.util.NbBundle.getMessage(SequenceAlignmentPanel.class, "SequenceAlignmentPanel.jPIDSlider.toolTipText")); // NOI18N
+        jPIDSlider.setValue(70);
         jPIDSlider.setMinimumSize(new java.awt.Dimension(360, 80));
         jPIDSlider.setPreferredSize(new java.awt.Dimension(360, 80));
         jPIDSlider.addChangeListener(new javax.swing.event.ChangeListener() {

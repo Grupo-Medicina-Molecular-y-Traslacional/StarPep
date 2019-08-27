@@ -103,12 +103,18 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
                 NbBundle.getMessage(PeptideNode.class, "PropertySet.seq.desc"), String.class, peptide.getSequence());
         set.put(property);
         sheet.put(set);
+        
+        // Length property
+        property = createPropertyField("length", NbBundle.getMessage(PeptideNode.class, "PropertySet.length"),
+                NbBundle.getMessage(PeptideNode.class, "PropertySet.length.desc"), Integer.class, peptide.getLength());
+        set.put(property);
+        sheet.put(set);        
 
         // Features         
         for (PeptideAttribute attr : peptide.getAttributes()) {
             if (attr instanceof MolecularDescriptor) {
                 setMolecularFeature((MolecularDescriptor) attr);
-            } else if (attr.isVisible() && attr != Peptide.ID && attr != Peptide.SEQ) {
+            } else if (attr.isVisible() && attr != Peptide.ID && attr != Peptide.SEQ && attr != Peptide.LENGHT) {
                 setOtherFeatures(attr);
             }
         }

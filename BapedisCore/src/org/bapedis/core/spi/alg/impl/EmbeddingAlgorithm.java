@@ -10,16 +10,20 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.SwingUtilities;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
@@ -56,7 +60,7 @@ public class EmbeddingAlgorithm implements Algorithm, Cloneable {
     private AttributesModel newAttrModel;
     protected boolean stopRun;
     protected final GraphWindowController graphWC;
-
+    protected final SequenceAlignmentModel alignmentModel;
     private static AtomicInteger counter = new AtomicInteger(45120);
 
     public EmbeddingAlgorithm(EmbeddingAlgorithmFactory factory) {
@@ -64,6 +68,8 @@ public class EmbeddingAlgorithm implements Algorithm, Cloneable {
         selected = new LinkedHashMap<>();
         nonSelected = new LinkedHashMap<>();
         graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
+        alignmentModel = new SequenceAlignmentModel();
+        alignmentModel.setPercentIdentity(30);
     }
 
     public void addDataSetFromFile(String ds, File inputFile) throws Exception {
@@ -242,16 +248,18 @@ public class EmbeddingAlgorithm implements Algorithm, Cloneable {
         newAttrModel = new AttributesModel(workspace);
         graphNodes = new LinkedList<>();
 
+        // Target list of peptides
+        List<Peptide> targetList = new LinkedList<>();
         if (attrModel != null) {
             //Target list
             for (Peptide peptide : attrModel.getPeptides()) {
                 if (peptide.getGraphNode().getLabel().equals("Peptide")) {
-                    newAttrModel.addPeptide(peptide);
-                    graphNodes.add(peptide.getGraphNode());
+                    targetList.add(peptide);
                 }
             }
 
-            //Add new peptides and graph nodes
+            //Add query peptides and graph nodes            
+            List<Peptide> queryList = new LinkedList<>();
             Peptide peptide;
             Node node;
             String id, seq;
@@ -266,19 +274,73 @@ public class EmbeddingAlgorithm implements Algorithm, Cloneable {
                     peptide.setAttributeValue(Peptide.ID, counter.getAndIncrement());
                     peptide.setAttributeValue(Peptide.SEQ, seq);
                     peptide.setAttributeValue(Peptide.LENGHT, seq.length());
+                    peptide.setBiojavaSeq(protein);
 
-                    newAttrModel.addPeptide(peptide);
-                    graphNodes.add(node);
+                    queryList.add(peptide);
                 }
             }
 
-            //Removing non selected nodes
-            for (Map.Entry<String, List<ProteinSequence>> entry : nonSelected.entrySet()) {
-                for (ProteinSequence protein : entry.getValue()) {
-                    id = protein.getAccession().getID();
-                    node = mainGraph.getNode(id);
-                    if (node != null) {
-                        mainGraph.removeNode(node);
+            if (!stopRun) {
+                if (queryList.size() > 0) {
+                    //Searching in target list                 
+                    Peptide[] targets = targetList.toArray(new Peptide[0]);
+                    // Stop if max rejects ocurred
+                    double identityScore = 0.5;
+                    double score;
+                    int rejections = 0;
+                    TreeSet<SequenceSearch.SequenceHit> hits;
+
+                    for (Peptide query : queryList) {
+                        if (!stopRun) {
+                            // Sort by decreasing common words
+                            Arrays.parallelSort(targets, new CommonKMersComparator(query.getSequence()));
+                        }
+                        hits = new TreeSet<>();
+                        for (int i = 0; i < targets.length && !stopRun && rejections < SequenceSearch.MAX_REJECTS; i++) {
+                            try {
+                                score = PairwiseSequenceAlignment.computeSequenceIdentity(query.getBiojavaSeq(), targets[i].getBiojavaSeq(), alignmentModel);
+                                if (score >= identityScore) {
+                                    hits.add(new SequenceSearch.SequenceHit(targets[i], score));
+                                } else {
+                                    rejections++;
+                                }
+                            } catch (CompoundNotFoundException ex) {
+                                Exceptions.printStackTrace(ex);
+                            }
+                        }
+
+                        if (!stopRun) {
+                            SequenceSearch.SequenceHit hit;
+                            for (Iterator<SequenceSearch.SequenceHit> it = hits.descendingIterator(); it.hasNext();) {
+                                hit = it.next();
+                                if (!newAttrModel.getPeptideMap().containsKey(hit.getPeptide().getId())) {
+                                    newAttrModel.addPeptide(hit.getPeptide());
+                                    graphNodes.add(hit.getPeptide().getGraphNode());
+                                }
+                            }
+                        }
+                    }
+
+                    //Add query peptides to new attribute model
+                    for (Peptide query : queryList) {
+                        newAttrModel.addPeptide(query);
+                        graphNodes.add(query.getGraphNode());
+                    }
+                } else {
+                    for (Peptide query : targetList) {
+                        newAttrModel.addPeptide(query);
+                        graphNodes.add(query.getGraphNode());
+                    }
+                }
+
+                //Removing non selected nodes
+                for (Map.Entry<String, List<ProteinSequence>> entry : nonSelected.entrySet()) {
+                    for (ProteinSequence protein : entry.getValue()) {
+                        id = protein.getAccession().getID();
+                        node = mainGraph.getNode(id);
+                        if (node != null) {
+                            mainGraph.removeNode(node);
+                        }
                     }
                 }
             }

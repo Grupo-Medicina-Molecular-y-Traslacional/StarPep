@@ -62,8 +62,8 @@ public class SequenceSearch implements Algorithm {
     public SequenceSearch(SequenceSearchFactory factory) {
         this.factory = factory;
         alignmentModel = new SequenceAlignmentModel();
-        int percentIdentity = NbPreferences.forModule(SequenceSearch.class).getInt("PercentIdentity", 70);
-        alignmentModel.setPercentIdentity(percentIdentity);
+//        int percentIdentity = NbPreferences.forModule(SequenceSearch.class).getInt("PercentIdentity", 70);
+//        alignmentModel.setPercentIdentity(percentIdentity);
         
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         maximumResults = -1;
@@ -130,7 +130,7 @@ public class SequenceSearch implements Algorithm {
                         }
                     }
                 });
-                NbPreferences.forModule(SequenceSearch.class).putInt("PercentIdentity", alignmentModel.getPercentIdentity());
+//                NbPreferences.forModule(SequenceSearch.class).putInt("PercentIdentity", alignmentModel.getPercentIdentity());
             } catch (InterruptedException ex) {
                 Exceptions.printStackTrace(ex);
             } catch (InvocationTargetException ex) {
@@ -172,7 +172,7 @@ public class SequenceSearch implements Algorithm {
                 // Assign peptide from targets to result list
                 // Stop if max rejects ocurred
                 float identityScore = alignmentModel.getIndentityScore();
-                float score;
+                double score;
                 int rejections = 0;
                 TreeSet<SequenceHit> hits = new TreeSet<>();
                 for (int i = 0; i < targets.length && !stopRun && rejections < MAX_REJECTS; i++) {
@@ -208,12 +208,12 @@ public class SequenceSearch implements Algorithm {
         }
     }
 
-    private static class SequenceHit implements Comparable<SequenceHit> {
+    static class SequenceHit implements Comparable<SequenceHit> {
 
         private final Peptide peptide;
-        private final float score;
+        private final double score;
 
-        public SequenceHit(Peptide peptide, float score) {
+        public SequenceHit(Peptide peptide, double score) {
             this.peptide = peptide;
             this.score = score;
         }
@@ -222,13 +222,13 @@ public class SequenceSearch implements Algorithm {
             return peptide;
         }
 
-        public float getScore() {
+        public double getScore() {
             return score;
         }
 
         @Override
         public int compareTo(SequenceHit other) {
-            float diff = getScore() - other.getScore();
+            double diff = getScore() - other.getScore();
             if (diff > 0) {
                 return 1;
             }

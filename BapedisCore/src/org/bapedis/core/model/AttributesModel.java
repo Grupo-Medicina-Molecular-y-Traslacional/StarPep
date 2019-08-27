@@ -71,9 +71,9 @@ public class AttributesModel {
         displayedColumnsModel.add(Peptide.SEQ);
         displayedColumnsModel.add(Peptide.LENGHT);
 
-        List<MolecularDescriptor> list = new LinkedList<>();
-        list.add(Peptide.LENGHT);
-        mdMap.put(Peptide.LENGHT.getCategory(), list);
+//        List<MolecularDescriptor> list = new LinkedList<>();
+//        list.add(Peptide.LENGHT);
+//        mdMap.put(Peptide.LENGHT.getCategory(), list);
     }
 
     public Workspace getOwnerWS() {

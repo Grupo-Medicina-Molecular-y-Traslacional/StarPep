@@ -122,15 +122,17 @@ public abstract class AbstractClusterizer implements Algorithm, Cloneable {
                 fireEvent = true;
             }
 
-            Node graphNode;
+            
             //Set default values            
             for (Peptide peptide : attrModel.getPeptideMap().values()) {
                 peptide.setAttributeValue(CLUSTER_ATTR, CLUSTER_ATTR.getDefaultValue());
-                graphNode = peptide.getGraphNode();
-                graphNode.setAttribute(CLUSTER_ATTR.getId(), CLUSTER_ATTR.getDefaultValue());
+            }
+            for (Node node : graphModel.getGraph().getNodes()) {
+                node.setAttribute(CLUSTER_ATTR.getId(), CLUSTER_ATTR.getDefaultValue());
             }
 
-            //Set cluster values    
+            //Set cluster values  
+            Node graphNode;
             if (clusters != null) {
                 for (Cluster c : clusters) {
                     for (Peptide p : c.getMembers()) {

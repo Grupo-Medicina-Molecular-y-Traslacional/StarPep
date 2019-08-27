@@ -42,6 +42,8 @@ public class VisualQuerySequence extends javax.swing.JPanel {
         jInfoLabel = new javax.swing.JLabel();
         centerPanel = new javax.swing.JPanel();
 
+        setMinimumSize(new java.awt.Dimension(460, 400));
+        setPreferredSize(new java.awt.Dimension(560, 580));
         setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualQuerySequence.class, "VisualQuerySequence.jInfoLabel.text")); // NOI18N

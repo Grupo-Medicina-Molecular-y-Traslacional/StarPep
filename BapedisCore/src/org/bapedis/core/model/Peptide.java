@@ -30,7 +30,7 @@ import org.openide.util.NbBundle;
 
     public static final PeptideAttribute ID = new PeptideAttribute("id", NbBundle.getMessage(Peptide.class, "Peptide.attribute.id"), Integer.class, true);
     public static final PeptideAttribute SEQ = new PeptideAttribute("seq", NbBundle.getMessage(Peptide.class, "Peptide.attribute.seq"), String.class, true);
-    public static final MolecularDescriptor LENGHT = new MolecularDescriptor("length", NbBundle.getMessage(Peptide.class, "Peptide.attribute.length"), Integer.class, NbBundle.getMessage(Peptide.class, "Peptide.attribute.length"));
+    public static final PeptideAttribute LENGHT = new PeptideAttribute("length", NbBundle.getMessage(Peptide.class, "Peptide.attribute.length"), Integer.class, true);
     public final static String CHANGED_ATTRIBUTE = "changed_attribute";
     protected final PropertyChangeSupport propertyChangeSupport;
 
@@ -68,6 +68,10 @@ import org.openide.util.NbBundle;
             seq = (String) attrsValue.get(SEQ);
         }
         return seq;
+    }     
+
+    public void setBiojavaSeq(ProteinSequence biojavaSeq) {
+        this.biojavaSeq = biojavaSeq;
     }        
     
     public ProteinSequence getBiojavaSeq() throws CompoundNotFoundException {

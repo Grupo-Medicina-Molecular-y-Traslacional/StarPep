@@ -1,5 +1,6 @@
 package org.bapedis.modamp.impl;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.model.AlgorithmProperty;
@@ -7,6 +8,8 @@ import org.bapedis.core.spi.alg.impl.AbstractMD;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.task.ProgressTicket;
+import org.bapedis.modamp.AminoAcidProperties;
+import org.bapedis.modamp.AminoAcidProperty;
 import org.bapedis.modamp.MD;
 import org.bapedis.modamp.invariants.ClassicAggregationOperator;
 import org.bapedis.modamp.invariants.NonClassicAggregationOperatorBase;
@@ -25,6 +28,7 @@ import org.bapedis.modamp.invariants.NonClassicAggregationOperator;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 /**
  *
  * @author Cesar
@@ -32,7 +36,21 @@ import org.bapedis.modamp.invariants.NonClassicAggregationOperator;
 public class IndicesBasedOperators extends AbstractMD 
 {
     private Integer maxK;
+    private AminoAcidProperties aminoacidProperties;
     
+    private boolean z1;
+    private boolean z2;
+    private boolean z3;
+    private boolean ptt;
+    private boolean eps;
+    private boolean scm;
+    private boolean scv;
+    private boolean pie;
+    private boolean pah;
+    private boolean pbs;
+    private boolean isa;
+    private boolean gcp1;
+    private boolean gcp2;
     private boolean mass;
     private boolean boman;
     private boolean charge;
@@ -68,6 +86,28 @@ public class IndicesBasedOperators extends AbstractMD
     {
         super( factory );
         
+        try 
+        {
+            aminoacidProperties = new AminoAcidProperties();
+        }
+        catch ( IOException ex )
+        {
+            
+        }
+        
+        ptt = true;
+        gcp1 = true;
+        gcp2 = true;
+        eps = true;
+        scm = true;
+        scv = true;
+        pie = true;
+        pah = true;
+        pbs = true;
+        isa = true;
+        z1 = true;
+        z2 = true;
+        z3 = true;
         mass = true;
         boman = true;
         charge = true;
@@ -126,6 +166,19 @@ public class IndicesBasedOperators extends AbstractMD
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.ts.name"   ), "Classic Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.ts.desc"   ), "isTotalSumOperator"        , "setTotalSumOperator"        ) );
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.es.name"   ), "Classic Aggregation Operators", NbBundle.getMessage(IndicesBasedOperators.class, "AggregationOperators.es.desc"   ), "isElectroTopStateOperator" , "setElectroTopStateOperator" ) );
             
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.ptt.name"            ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.ptt.desc"            ), "isPtt"           , "setPtt"            ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.gcp1.name"           ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.gcp1.desc"           ), "isGcp1"          , "setGcp1"           ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.gcp2.name"           ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.gcp2.desc"           ), "isGcp2"          , "setGcp2"           ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.eps.name"            ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.eps.desc"            ), "isEps"           , "setEps"            ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.scm.name"            ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.scm.desc"            ), "isScm"           , "setScm"            ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.scv.name"            ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.scv.desc"            ), "isScv"           , "setScv"            ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.pie.name"            ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.pie.desc"            ), "isPie"           , "setPie"            ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.pah.name"            ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.pah.desc"            ), "isPah"           , "setPah"            ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.pbs.name"            ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.pbs.desc"            ), "isPbs"           , "setPbs"            ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.isa.name"            ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.isa.desc"            ), "isIsa"           , "setIsa"            ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.z1.name"             ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.z1.desc"             ), "isZ1"            , "setZ1"             ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.z2.name"             ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.z2.desc"             ), "isZ2"            , "setZ2"             ) );
+            properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.z3.name"             ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.z3.desc"             ), "isZ3"            , "setZ3"             ) );
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.mass.name"           ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.mass.desc"           ), "isMass"          , "setMass"           ) );
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.boman.name"          ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.boman.desc"          ), "isBoman"         , "setBoman"          ) );
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.charge.name"         ), "Chemical Properties", NbBundle.getMessage(IndicesBasedOperators.class, "IndicesBasedOperators.charge.desc"         ), "isCharge"        , "setCharge"         ) );
@@ -144,9 +197,100 @@ public class IndicesBasedOperators extends AbstractMD
     }
     
     @Override
-    protected void compute(Peptide peptide) 
+    protected void compute( Peptide peptide ) 
     {
         double[] lovis;
+        
+        if ( isPtt() )
+        {
+            lovis = aminoacidProperties.getAminoacidPropertyValues( peptide.getSequence(), AminoAcidProperty.ptt );
+            nonClassicOperators.applyOperators( lovis, "ppt", peptide, this, true, nonClassicOperatorsList );            
+            classicOperators   .applyOperators( lovis, "ppt", peptide, this, true, nonClassicOperatorsList, classicOperatorsList );
+        }
+        
+        if ( isGcp1() )
+        {
+            lovis = aminoacidProperties.getAminoacidPropertyValues( peptide.getSequence(), AminoAcidProperty.gcp1 );
+            nonClassicOperators.applyOperators( lovis, "gcp1", peptide, this, true, nonClassicOperatorsList );
+            classicOperators   .applyOperators( lovis, "gcp1", peptide, this, true, nonClassicOperatorsList, classicOperatorsList );
+        }
+        
+        if ( isGcp2() )
+        {
+            lovis = aminoacidProperties.getAminoacidPropertyValues( peptide.getSequence(), AminoAcidProperty.gcp2 );
+            nonClassicOperators.applyOperators( lovis, "gcp2", peptide, this, false, nonClassicOperatorsList );
+            classicOperators   .applyOperators( lovis, "gcp2", peptide, this, false, nonClassicOperatorsList, classicOperatorsList );
+        }
+        
+        if ( isEps() )
+        {
+            lovis = aminoacidProperties.getAminoacidPropertyValues( peptide.getSequence(), AminoAcidProperty.eps );
+            nonClassicOperators.applyOperators( lovis, "eps", peptide, this, false, nonClassicOperatorsList );
+            classicOperators   .applyOperators( lovis, "eps", peptide, this, false, nonClassicOperatorsList, classicOperatorsList );
+        }
+        
+        if ( isScm() )
+        {
+            lovis = aminoacidProperties.getAminoacidPropertyValues( peptide.getSequence(), AminoAcidProperty.side_chain_mass );
+            nonClassicOperators.applyOperators( lovis, "scm", peptide, this, true, nonClassicOperatorsList );
+            classicOperators   .applyOperators( lovis, "scm", peptide, this, true, nonClassicOperatorsList, classicOperatorsList );
+        }
+        
+        if ( isScv() )
+        {
+            lovis = aminoacidProperties.getAminoacidPropertyValues( peptide.getSequence(), AminoAcidProperty.side_chain_volume );
+            nonClassicOperators.applyOperators( lovis, "scv", peptide, this, true, nonClassicOperatorsList );
+            classicOperators   .applyOperators( lovis, "scv", peptide, this, true, nonClassicOperatorsList, classicOperatorsList );
+        }
+        
+        if ( isPie() )
+        {
+            lovis = aminoacidProperties.getAminoacidPropertyValues( peptide.getSequence(), AminoAcidProperty.pie );
+            nonClassicOperators.applyOperators( lovis, "pie", peptide, this, true, nonClassicOperatorsList );
+            classicOperators   .applyOperators( lovis, "pie", peptide, this, true, nonClassicOperatorsList, classicOperatorsList );
+        }
+        
+        if (  isPah() )
+        {
+            lovis = aminoacidProperties.getAminoacidPropertyValues( peptide.getSequence(), AminoAcidProperty.pah );
+            nonClassicOperators.applyOperators( lovis, "pah", peptide, this, true, nonClassicOperatorsList );
+            classicOperators   .applyOperators( lovis, "pah", peptide, this, true, nonClassicOperatorsList, classicOperatorsList );
+        }
+        
+        if ( isPbs() )
+        {
+            lovis = aminoacidProperties.getAminoacidPropertyValues( peptide.getSequence(), AminoAcidProperty.pbs );
+            nonClassicOperators.applyOperators( lovis, "pbs", peptide, this, true, nonClassicOperatorsList );
+            classicOperators   .applyOperators( lovis, "pbs", peptide, this, true, nonClassicOperatorsList, classicOperatorsList );
+        }
+        
+        if ( isIsa() )
+        {
+            lovis = aminoacidProperties.getAminoacidPropertyValues( peptide.getSequence(), AminoAcidProperty.isa );
+            nonClassicOperators.applyOperators( lovis, "isa", peptide, this, true, nonClassicOperatorsList );
+            classicOperators   .applyOperators( lovis, "isa", peptide, this, true, nonClassicOperatorsList, classicOperatorsList );
+        }
+        
+        if ( isZ1() )
+        {
+            lovis = aminoacidProperties.getAminoacidPropertyValues( peptide.getSequence(), AminoAcidProperty.z1 );
+            nonClassicOperators.applyOperators( lovis, "z1", peptide, this, false, nonClassicOperatorsList );
+            classicOperators   .applyOperators( lovis, "z1", peptide, this, false, nonClassicOperatorsList, classicOperatorsList );
+        }
+        
+        if ( isZ2() )
+        {
+            lovis = aminoacidProperties.getAminoacidPropertyValues( peptide.getSequence(), AminoAcidProperty.z2 );
+            nonClassicOperators.applyOperators( lovis, "z2", peptide, this, false, nonClassicOperatorsList );
+            classicOperators   .applyOperators( lovis, "z2", peptide, this, false, nonClassicOperatorsList, classicOperatorsList );
+        }
+        
+        if ( isZ3() )
+        {
+            lovis = aminoacidProperties.getAminoacidPropertyValues( peptide.getSequence(), AminoAcidProperty.z3 );
+            nonClassicOperators.applyOperators( lovis, "z3", peptide, this, false, nonClassicOperatorsList );
+            classicOperators   .applyOperators( lovis, "z3", peptide, this, false, nonClassicOperatorsList, classicOperatorsList );
+        }
         
         if ( isMass() )
         {
@@ -185,6 +329,136 @@ public class IndicesBasedOperators extends AbstractMD
     public AlgorithmProperty[] getProperties()
     {
         return properties.toArray( new AlgorithmProperty[0] );
+    }
+    
+    public boolean isPtt() 
+    {
+        return ptt;
+    }
+    
+    public void setPtt( Boolean ptt )
+    {
+        this.ptt = ptt;
+    }
+    
+    public boolean isGcp1()
+    {
+        return gcp1;
+    }
+    
+    public void setGcp1( Boolean gcp1 )
+    {
+        this.gcp1 = gcp1;
+    }
+    
+    public boolean isGcp2()
+    {
+        return gcp2;
+    }
+    
+    public void setGcp2( Boolean gcp2 )
+    {
+        this.gcp2 = gcp2;
+    }
+    
+    public boolean isEps() 
+    {
+        return eps;
+    }
+    
+    public void setEps( Boolean eps )
+    {
+        this.eps = eps;
+    }
+    
+    public boolean isScm()
+    {
+        return scm;
+    }
+    
+    public void setScm( Boolean scm )
+    {
+        this.scm = scm;
+    }
+    
+    public boolean isScv()
+    {
+        return scv;
+    }
+    
+    public void setScv( Boolean scv )
+    {
+        this.scv = scv;
+    }
+    
+    public boolean isPie()
+    {
+        return pie;
+    }
+    
+    public void setPie( Boolean pie )
+    {
+        this.pie = pie;
+    }
+    
+    public boolean isPah() 
+    {
+        return pah;
+    }
+    
+    public void setPah( Boolean pah )
+    {
+        this.pah = pah;
+    }
+    
+    public boolean isPbs()
+    {
+        return pbs;
+    }
+    
+    public void setPbs( Boolean pbs )
+    {
+        this.pbs = pbs;
+    }
+    
+    public boolean isIsa() 
+    {
+        return isa;
+    }
+    
+    public void setIsa( Boolean isa )
+    {
+        this.isa = isa;
+    }
+    
+    public boolean isZ1()
+    {
+        return z1;
+    }
+    
+    public void setZ1( Boolean z1 )
+    {
+        this.z1 = z1;
+    }
+    
+    public boolean isZ2()
+    {
+        return z2;
+    }
+    
+    public void setZ2( Boolean z2 ) 
+    {
+        this.z2 = z2;
+    }
+    
+    public boolean isZ3() 
+    {
+        return z3;
+    }
+    
+    public void setZ3( Boolean z3 )
+    {
+        this.z3 = z3;
     }
     
     public boolean isMass() 

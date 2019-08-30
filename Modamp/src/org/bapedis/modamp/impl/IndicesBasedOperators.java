@@ -92,7 +92,7 @@ public class IndicesBasedOperators extends AbstractMD
         }
         catch ( IOException ex )
         {
-            
+            Exceptions.printStackTrace(ex);
         }
         
         ptt = true;

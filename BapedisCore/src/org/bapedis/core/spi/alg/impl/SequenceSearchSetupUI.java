@@ -8,19 +8,12 @@ package org.bapedis.core.spi.alg.impl;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
-import java.beans.PropertyChangeSupport;
 import javax.swing.JPanel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.ui.components.SequenceAlignmentPanel;
-import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
-import org.biojava.nbio.core.sequence.ProteinSequence;
-import org.biojava.nbio.core.sequence.compound.AminoAcidCompoundSet;
 import org.jdesktop.swingx.JXHyperlink;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -29,21 +22,23 @@ import org.openide.util.NbBundle;
  */
 public class SequenceSearchSetupUI extends javax.swing.JPanel implements AlgorithmSetupUI {
 
-    protected final JXHyperlink switcherLink;
-
-    private enum Card {
+    protected enum Card {
         SEQUENCE, ALIGNMENT
     };
-    private Card card;
-    protected final PropertyChangeSupport changeSupport;
-    protected SequenceSearch searchAlg;
-    protected final AminoAcidCompoundSet compoundSet;
-    private SequenceAlignmentPanel seqAlignmentPanel;
+
+    protected final JXHyperlink switcherLink;
+    protected Card card;
+    protected BaseSequenceSearchAlg searchAlg;
+    protected SequenceAlignmentPanel seqAlignmentPanel;
+    protected final AlgorithmSetupUI querySetupUI;
+    protected JPanel querySetupPanel;
 
     /**
      * Creates new form SeqAlignmentFilterSetupUI
+     *
+     * @param querySetupUI
      */
-    public SequenceSearchSetupUI() {
+    public SequenceSearchSetupUI(AlgorithmSetupUI querySetupUI) {
         initComponents();
 
         card = Card.SEQUENCE;
@@ -52,25 +47,7 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
 
         CardLayout cl = (CardLayout) centerPanel.getLayout();
         cl.show(centerPanel, "sequence");
-        changeSupport = new PropertyChangeSupport(this);
-        jErrorLabel.setText(" ");
-        compoundSet = AminoAcidCompoundSet.getAminoAcidCompoundSet();
-        jSeqTextArea.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                updateValidState();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                updateValidState();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-            }
-        });
+        this.querySetupUI = querySetupUI;
     }
 
     private void configureSwitcherLink() {
@@ -111,45 +88,45 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
         }
     }
 
-    private void updateValidState() {
-        String seq = jSeqTextArea.getText();
-        boolean validState = seq.length() > 0;
-        String aa;
-        jErrorLabel.setText(" ");
-        for (int i = 0; i < seq.length() && validState; i++) {
-            aa = seq.substring(i, i + 1);
-            if (compoundSet.getCompoundForString(aa) == null) {
-                jErrorLabel.setText(NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.jErrorLabel.text", aa));
-                validState = false;
-            }
+    @Override
+    public void setEnabled(boolean enabled) {
+        switcherLink.setEnabled(enabled);
+        jMRLabel.setEnabled(enabled);
+        jMRComboBox.setEnabled(enabled);
+        if (seqAlignmentPanel != null) {
+            seqAlignmentPanel.setEnabled(enabled);
         }
-        if (searchAlg != null) {
-            if (validState) {
-                try {
-                    searchAlg.setQuery(new ProteinSequence(jSeqTextArea.getText()));
-                } catch (CompoundNotFoundException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
-            } else {
-                searchAlg.setQuery(null);
-            }
+        if (querySetupPanel != null){
+            querySetupPanel.setEnabled(enabled);
         }
     }
 
     @Override
-    public void setEnabled(boolean enabled) {
-        switcherLink.setEnabled(enabled);
-        jLabel1.setEnabled(enabled);
-        jseqPane.setEnabled(enabled);
-        jSeqTextArea.setEnabled(enabled);
-        jMRLabel.setEnabled(enabled);
-        jMRComboBox.setEnabled(enabled);
-        if (seqAlignmentPanel != null){
-            seqAlignmentPanel.setEnabled(enabled);
+    public JPanel getSettingPanel(Algorithm algo) {
+        searchAlg = (BaseSequenceSearchAlg) algo;
+        
+        int maximumResults = searchAlg.getMaximumResults();
+        if (maximumResults == -1) {
+            jMRComboBox.setSelectedItem("All");
+        } else if (maximumResults > 0) {
+            jMRComboBox.setSelectedItem(String.valueOf(maximumResults));
         }
+
+        SequenceAlignmentModel alignmentModel = searchAlg.getAlignmentModel();        
+        seqAlignmentPanel = new SequenceAlignmentPanel(alignmentModel);
+        
+        alignmentPanel.removeAll();
+        alignmentPanel.add(seqAlignmentPanel, BorderLayout.CENTER);
+        alignmentPanel.revalidate();
+        alignmentPanel.repaint();
+
+        querySetupPanel = querySetupUI.getSettingPanel(algo);
+        queryPanel.add(querySetupPanel, BorderLayout.CENTER);
+        
+        return this;
+//        ProteinSequence seq = searchAlg.getQuery();
+//        jSeqTextArea.setText(seq != null ? seq.getSequenceAsString() : "");
     }
-    
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -163,12 +140,10 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
 
         centerPanel = new javax.swing.JPanel();
         seqPanel = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jseqPane = new javax.swing.JScrollPane();
-        jSeqTextArea = new javax.swing.JTextArea();
-        jErrorLabel = new javax.swing.JLabel();
+        toolBar = new javax.swing.JToolBar();
         jMRLabel = new javax.swing.JLabel();
         jMRComboBox = new javax.swing.JComboBox<>();
+        queryPanel = new javax.swing.JPanel();
         alignmentPanel = new javax.swing.JPanel();
 
         setMinimumSize(new java.awt.Dimension(460, 300));
@@ -179,51 +154,11 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
 
         seqPanel.setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.jLabel1.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
-        seqPanel.add(jLabel1, gridBagConstraints);
-
-        jSeqTextArea.setColumns(20);
-        jSeqTextArea.setLineWrap(true);
-        jSeqTextArea.setRows(5);
-        jSeqTextArea.setWrapStyleWord(true);
-        jseqPane.setViewportView(jSeqTextArea);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 0);
-        seqPanel.add(jseqPane, gridBagConstraints);
-
-        jErrorLabel.setForeground(new java.awt.Color(255, 0, 0));
-        org.openide.awt.Mnemonics.setLocalizedText(jErrorLabel, org.openide.util.NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.jErrorLabel.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-        seqPanel.add(jErrorLabel, gridBagConstraints);
+        toolBar.setRollover(true);
 
         org.openide.awt.Mnemonics.setLocalizedText(jMRLabel, org.openide.util.NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.jMRLabel.text")); // NOI18N
         jMRLabel.setToolTipText(org.openide.util.NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.jMRLabel.toolTipText")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 5);
-        seqPanel.add(jMRLabel, gridBagConstraints);
+        toolBar.add(jMRLabel);
 
         jMRComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "10", "50", "100", "250", "500", "1000" }));
         jMRComboBox.addActionListener(new java.awt.event.ActionListener() {
@@ -231,12 +166,20 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
                 jMRComboBoxActionPerformed(evt);
             }
         });
+        toolBar.add(jMRComboBox);
+
+        seqPanel.add(toolBar, new java.awt.GridBagConstraints());
+
+        queryPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        seqPanel.add(jMRComboBox, gridBagConstraints);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        seqPanel.add(queryPanel, gridBagConstraints);
 
         centerPanel.add(seqPanel, "sequence");
 
@@ -264,37 +207,14 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
         }
     }//GEN-LAST:event_jMRComboBoxActionPerformed
 
-    @Override
-    public JPanel getSettingPanel(Algorithm algo) {
-        searchAlg = (SequenceSearch) algo;
-        int maximumResults = searchAlg.getMaximumResults();
-        if (maximumResults == -1) {
-            jMRComboBox.setSelectedItem("All");
-        } else if (maximumResults > 0) {
-            jMRComboBox.setSelectedItem(String.valueOf(maximumResults));
-        }
-        ProteinSequence seq = searchAlg.getQuery();
-        jSeqTextArea.setText(seq != null ? seq.getSequenceAsString() : "");
-        SequenceAlignmentModel alignmentModel = searchAlg.getAlignmentModel();
-
-        alignmentPanel.removeAll();
-        seqAlignmentPanel = new SequenceAlignmentPanel(alignmentModel);
-        alignmentPanel.add(seqAlignmentPanel, BorderLayout.CENTER);
-        alignmentPanel.revalidate();
-        alignmentPanel.repaint();
-
-        return this;
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel alignmentPanel;
     private javax.swing.JPanel centerPanel;
-    private javax.swing.JLabel jErrorLabel;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JComboBox<String> jMRComboBox;
     private javax.swing.JLabel jMRLabel;
-    private javax.swing.JTextArea jSeqTextArea;
-    private javax.swing.JScrollPane jseqPane;
+    private javax.swing.JPanel queryPanel;
     private javax.swing.JPanel seqPanel;
+    private javax.swing.JToolBar toolBar;
     // End of variables declaration//GEN-END:variables
 }

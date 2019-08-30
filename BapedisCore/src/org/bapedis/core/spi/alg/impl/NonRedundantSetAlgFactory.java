@@ -16,7 +16,7 @@ import org.bapedis.core.spi.alg.SearchTag;
  *
  * @author loge
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 20)
+@ServiceProvider(service = AlgorithmFactory.class, position = 30)
 public class NonRedundantSetAlgFactory implements SearchTag {
 
     private final NonRedundantSetAlgSetupUI setupUI = new NonRedundantSetAlgSetupUI();

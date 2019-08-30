@@ -17,8 +17,8 @@ import org.bapedis.core.spi.alg.SearchTag;
  * @author loge
  */
 @ServiceProvider(service = AlgorithmFactory.class, position = 10)
-public class SequenceSearchFactory implements SearchTag{
-    private SequenceSearchSetupUI setupUI = new SequenceSearchSetupUI();
+public class SingleQuerySearchFactory implements SearchTag{
+    private SequenceSearchSetupUI setupUI = new SequenceSearchSetupUI(new SingleQuerySearchPanel());
     
     @Override
     public String getCategory() {
@@ -27,12 +27,12 @@ public class SequenceSearchFactory implements SearchTag{
 
     @Override
     public String getName() {
-       return NbBundle.getMessage(SequenceSearch.class, "SequenceSearch.name");
+       return NbBundle.getMessage(SingleQuerySearch.class, "SingleQuerySearch.name");
     }
 
     @Override
     public String getDescription() {
-       return NbBundle.getMessage(SequenceSearch.class, "SequenceSearch.desc");
+       return NbBundle.getMessage(SingleQuerySearch.class, "SingleQuerySearch.desc");
     }
 
     @Override
@@ -42,7 +42,7 @@ public class SequenceSearchFactory implements SearchTag{
 
     @Override
     public Algorithm createAlgorithm() {
-        return new SequenceSearch(this);
+        return new SingleQuerySearch(this);
     }
     
 }

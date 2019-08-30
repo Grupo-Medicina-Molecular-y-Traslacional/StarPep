@@ -288,7 +288,7 @@ public class EmbeddingAlgorithm implements Algorithm, Cloneable {
                     double identityScore = 0.5;
                     double score;
                     int rejections = 0;
-                    TreeSet<SequenceSearch.SequenceHit> hits;
+                    TreeSet<SequenceHit> hits;
 
                     for (Peptide query : queryList) {
                         if (!stopRun) {
@@ -296,11 +296,11 @@ public class EmbeddingAlgorithm implements Algorithm, Cloneable {
                             Arrays.parallelSort(targets, new CommonKMersComparator(query.getSequence()));
                         }
                         hits = new TreeSet<>();
-                        for (int i = 0; i < targets.length && !stopRun && rejections < SequenceSearch.MAX_REJECTS; i++) {
+                        for (int i = 0; i < targets.length && !stopRun && rejections < SingleQuerySearch.MAX_REJECTS; i++) {
                             try {
                                 score = PairwiseSequenceAlignment.computeSequenceIdentity(query.getBiojavaSeq(), targets[i].getBiojavaSeq(), alignmentModel);
                                 if (score >= identityScore) {
-                                    hits.add(new SequenceSearch.SequenceHit(targets[i], score));
+                                    hits.add(new SequenceHit(targets[i], score));
                                 } else {
                                     rejections++;
                                 }
@@ -310,8 +310,8 @@ public class EmbeddingAlgorithm implements Algorithm, Cloneable {
                         }
 
                         if (!stopRun) {
-                            SequenceSearch.SequenceHit hit;
-                            for (Iterator<SequenceSearch.SequenceHit> it = hits.descendingIterator(); it.hasNext();) {
+                            SequenceHit hit;
+                            for (Iterator<SequenceHit> it = hits.descendingIterator(); it.hasNext();) {
                                 hit = it.next();
                                 if (!newAttrModel.getPeptideMap().containsKey(hit.getPeptide().getId())) {
                                     newAttrModel.addPeptide(hit.getPeptide());

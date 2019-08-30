@@ -6,38 +6,43 @@
 package org.bapedis.core.spi.alg.impl;
 
 import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.spi.alg.SearchTag;
+import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Loge
  */
+@ServiceProvider(service = AlgorithmFactory.class, position = 20)
 public class MultiQuerySearchFactory implements SearchTag {
+    private SequenceSearchSetupUI setupUI = new SequenceSearchSetupUI(new MultiQuerySearchPanel());
 
     @Override
     public String getCategory() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return null;
     }
 
     @Override
     public String getName() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       return NbBundle.getMessage(SingleQuerySearch.class, "MultiQuerySearch.name");
     }
 
     @Override
     public String getDescription() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       return NbBundle.getMessage(SingleQuerySearch.class, "MultiQuerySearch.desc");
     }
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return setupUI;
     }
 
     @Override
     public Algorithm createAlgorithm() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new MultiQuerySearch(this);
     }
     
 }

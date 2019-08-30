@@ -11,7 +11,7 @@ import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 
 /**
  *
- * @author Home
+ * @author Loge
  */
 public class MultiQuerySearchPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
 
@@ -45,7 +45,8 @@ public class MultiQuerySearchPanel extends javax.swing.JPanel implements Algorit
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+        return this;
     }
 
 

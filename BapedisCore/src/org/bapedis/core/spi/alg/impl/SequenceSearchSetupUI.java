@@ -154,6 +154,7 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
 
         seqPanel.setLayout(new java.awt.GridBagLayout());
 
+        toolBar.setFloatable(false);
         toolBar.setRollover(true);
 
         org.openide.awt.Mnemonics.setLocalizedText(jMRLabel, org.openide.util.NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.jMRLabel.text")); // NOI18N
@@ -168,7 +169,13 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
         });
         toolBar.add(jMRComboBox);
 
-        seqPanel.add(toolBar, new java.awt.GridBagConstraints());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        seqPanel.add(toolBar, gridBagConstraints);
 
         queryPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();

@@ -5,10 +5,13 @@
  */
 package org.bapedis.core.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
 import org.bapedis.core.project.ProjectManager;
@@ -16,6 +19,7 @@ import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
 import org.biojava.nbio.core.sequence.ProteinSequence;
 import org.biojava.nbio.core.sequence.compound.AminoAcidCompoundSet;
 import org.biojava.nbio.core.sequence.io.BufferedReaderBytesRead;
+import org.biojava.nbio.core.sequence.io.FastaWriterHelper;
 import org.biojava.nbio.core.sequence.io.GenericFastaHeaderParser;
 import org.biojava.nbio.core.sequence.io.ProteinSequenceCreator;
 import org.openide.util.Lookup;
@@ -25,15 +29,24 @@ import org.openide.util.NbBundle;
  *
  * @author Loge
  */
-public class FASTAfile {
+public class FASTASEQ {
+
     protected static int MAX_LENGTH = 100;
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
 
-    public List<ProteinSequence> load(File inputFile) throws Exception {
+    public static List<ProteinSequence> load(String fasta) throws Exception{
+        return load(new StringReader(fasta));
+    }
+
+    public static List<ProteinSequence> load(File inputFile) throws Exception {
+        FileInputStream inStream = new FileInputStream(inputFile);
+        InputStreamReader isr = new InputStreamReader(inStream);
+        return load(isr);
+    }
+
+    private static List<ProteinSequence> load(Reader reader) throws Exception {
         try {
-            FileInputStream inStream = new FileInputStream(inputFile);
-            InputStreamReader isr = new InputStreamReader(inStream);
-            BufferedReaderBytesRead br = new BufferedReaderBytesRead(isr);
+            BufferedReaderBytesRead br = new BufferedReaderBytesRead(reader);
             GenericFastaHeaderParser headerParser = new GenericFastaHeaderParser<>();
             ProteinSequenceCreator sequenceCreator = new ProteinSequenceCreator(AminoAcidCompoundSet.getAminoAcidCompoundSet());
             List<ProteinSequence> entries = new LinkedList<>();
@@ -43,7 +56,7 @@ public class FASTAfile {
             long fileIndex = br.getBytesRead();
             String line = br.readLine();
             if (line.charAt(0) != '>') {
-                throw new IOException(NbBundle.getMessage(FASTAfile.class, "FASTAfile.invalidFirstLine"));
+                throw new IOException(NbBundle.getMessage(FASTASEQ.class, "FASTAfile.invalidFirstLine"));
             }
 
             boolean keepGoing = true;
@@ -54,7 +67,7 @@ public class FASTAfile {
                         if (sb.length() > 0) {//i.e. if there is already a sequence before
                             //    logger.debug("Sequence index=" + sequenceIndex);                                
                             if (sb.length() > 100) {
-                                throw new Exception(NbBundle.getMessage(FASTAfile.class, "FASTAfile.invalidSeqLength", header));
+                                throw new Exception(NbBundle.getMessage(FASTASEQ.class, "FASTAfile.invalidSeqLength", header));
                             }
 
                             try {
@@ -63,7 +76,7 @@ public class FASTAfile {
                                 headerParser.parseHeader(header, sequence);
                                 entries.add(sequence);
                             } catch (CompoundNotFoundException e) {
-                                throw new CompoundNotFoundException(NbBundle.getMessage(FASTAfile.class, "FASTAfile.compoundNotFound", header, e.getMessage()));
+                                throw new CompoundNotFoundException(NbBundle.getMessage(FASTASEQ.class, "FASTAfile.compoundNotFound", header, e.getMessage()));
                             }
 
                             sb.setLength(0); //this is faster, better memory utilization (same buffer)
@@ -88,7 +101,7 @@ public class FASTAfile {
                     }
                     //    logger.debug("Sequence index=" + sequenceIndex + " " + fileIndex );
                     if (sb.length() > MAX_LENGTH) {
-                        throw new Exception(NbBundle.getMessage(FASTAfile.class, "FASTAfile.invalidSeqLength", header));
+                        throw new Exception(NbBundle.getMessage(FASTASEQ.class, "FASTAfile.invalidSeqLength", header));
                     }
 
                     try {
@@ -97,7 +110,7 @@ public class FASTAfile {
                         headerParser.parseHeader(header, sequence);
                         entries.add(sequence);
                     } catch (Exception e) {
-                        throw new CompoundNotFoundException(NbBundle.getMessage(FASTAfile.class, "FASTAfile.compoundNotFound", header, e.getMessage()));
+                        throw new CompoundNotFoundException(NbBundle.getMessage(FASTASEQ.class, "FASTAfile.compoundNotFound", header, e.getMessage()));
                     }
                     keepGoing = false;
                 }
@@ -107,7 +120,13 @@ public class FASTAfile {
         } catch (CompoundNotFoundException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new Exception(NbBundle.getMessage(FASTAfile.class, "FASTAfile.badInput", ex.getMessage()));
+            throw new Exception(NbBundle.getMessage(FASTASEQ.class, "FASTAfile.badInput", ex.getMessage()));
         }
+    }
+    
+    public static String asFASTA(List<ProteinSequence> entries) throws Exception{
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        FastaWriterHelper.writeProteinSequence(baos, entries);
+        return baos.toString();
     }
 }

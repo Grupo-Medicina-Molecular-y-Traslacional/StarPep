@@ -70,14 +70,14 @@ public abstract class BaseSequenceSearchAlg implements Algorithm {
     public void setMaximumResults(int maximumResults) {
         this.maximumResults = maximumResults;
     }
-    
+
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
         stopRun = false;
         newAttrModel = null;
         graphNodes = null;
-    }    
+    }
 
     @Override
     public AlgorithmProperty[] getProperties() {
@@ -158,8 +158,10 @@ class SequenceHit implements Comparable<SequenceHit> {
         double diff = getScore() - other.getScore();
         if (diff > 0) {
             return 1;
+        } else if (diff < 0) {
+            return -1;
         }
-        return -1;
+        return 0;
     }
 }
 

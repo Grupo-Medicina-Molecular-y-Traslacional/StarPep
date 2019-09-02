@@ -43,7 +43,7 @@ public class AttributesModel {
     protected final Set<PeptideAttribute> displayedColumnsModel;
     private static final int MAX_DISPLAYED_COLUMNS = 6;
     protected List<PeptideNode> nodeList;
-    private final PeptideNodeContainer container;
+    private PeptideNodeContainer container;
     private List<Peptide> filteredPept;
     protected QuickFilter quickFilter;
     public static final String CHANGED_FILTER = "quickFilter";
@@ -189,8 +189,11 @@ public class AttributesModel {
         return bridge;
     }
 
-    public void refresh(int a) {
-        container.refreshNodes();
+    public void refresh() {
+        filteredPept = null;
+        container = new PeptideNodeContainer();
+        rootNode = new AbstractNode(container);
+//        container.refreshNodes();
     }
 
     public Node getRootNode() {
@@ -204,7 +207,7 @@ public class AttributesModel {
     public void addPeptide(Peptide peptide) {
         nodeList.add(new PeptideNode(peptide));
         peptideMap.put(peptide.getId(), peptide);
-        checkDefaultNodeAttributes(peptide);
+        checkDefaultNodeAttributes(peptide);        
     }
 
     private void checkDefaultNodeAttributes(Peptide peptide) {

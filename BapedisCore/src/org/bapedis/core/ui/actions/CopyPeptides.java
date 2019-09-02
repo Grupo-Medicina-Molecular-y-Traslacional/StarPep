@@ -23,7 +23,6 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.ui.GraphWindowController;
-import static org.bapedis.core.ui.actions.CopyPeptidesToWorkspace.pc;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -141,7 +140,7 @@ class CopyPeptidesWorker extends SwingWorker<Void, Void> {
     public CopyPeptidesWorker(Collection<? extends Peptide> context, Workspace workspace) {
         this.context = context;
         peptideIDs = new LinkedList<>();
-        currAttrModel = pc.getAttributesModel();
+        currAttrModel = CopyPeptides.pc.getAttributesModel();
         this.workspace = workspace;
     }
     
@@ -152,7 +151,7 @@ class CopyPeptidesWorker extends SwingWorker<Void, Void> {
         if (DialogDisplayer.getDefault().notify(dd).equals(DialogDescriptor.OK_OPTION) && !dd.getInputText().isEmpty()) {
             name = dd.getInputText();
             Workspace ws = new Workspace(name);
-            pc.add(ws);
+            CopyPeptides.pc.add(ws);
             return ws;
         }
         return null;
@@ -169,7 +168,7 @@ class CopyPeptidesWorker extends SwingWorker<Void, Void> {
                 throw new MyException(NbBundle.getMessage(CopyPeptides.class, "CopyPeptidesToWorkspace.error.busyWorkspace", workspace.getName()));
             }
 
-            newAttrModel = pc.getAttributesModel(workspace);
+            newAttrModel = CopyPeptides.pc.getAttributesModel(workspace);
             if (newAttrModel == null) {
                 newAttrModel = new AttributesModel(workspace);
                 workspace.add(newAttrModel);
@@ -195,8 +194,8 @@ class CopyPeptidesWorker extends SwingWorker<Void, Void> {
         try {
             get();
             if (workspace != null) {
-                pc.setCurrentWorkspace(workspace);
-                pc.getGraphVizSetting(workspace).fireChangedGraphView();
+                CopyPeptides.pc.setCurrentWorkspace(workspace);
+                CopyPeptides.pc.getGraphVizSetting(workspace).fireChangedGraphView();
             }
         } catch (InterruptedException | ExecutionException ex) {
             if (ex.getCause() instanceof MyException) {

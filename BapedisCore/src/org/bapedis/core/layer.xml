@@ -23,6 +23,10 @@
                 <attr name="position" intvalue="399"/>
             </file>                                                                     
             <file name="org-openide-actions-SaveAsAction.shadow_hidden"/>
+            <folder name="ImportData">
+                <attr name="displayName" bundlevalue="org.bapedis.core.ui.Bundle#Menu/Import"/> 
+                <attr name="position" intvalue="1425"/>
+            </folder>               
             <folder name="ExportData">
                 <attr name="displayName" bundlevalue="org.bapedis.core.ui.Bundle#Menu/Export"/> 
                 <attr name="position" intvalue="1427"/>

@@ -457,10 +457,6 @@ public final class PeptideViewerTopComponent extends TopComponent implements
 
     private void setData(AttributesModel attrModel) {
         this.currentModel = attrModel;
-        populateVisibleColumns(attrModel);
-        populateFilterFields(attrModel);
-        explorerMgr.setRootContext(currentModel == null ? Node.EMPTY : currentModel.getRootNode());
-        setQuickFilter();
         if (currentModel != null) {
             currentModel.addQuickFilterChangeListener(this);
             currentModel.addDisplayColumnChangeListener(this);
@@ -474,6 +470,10 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             jFilteredLabel.setText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewerTopComponent.jFilteredLabel.text", 0));
             jFilteredLabel.setVisible(false);
         }
+        populateVisibleColumns(attrModel);
+        populateFilterFields(attrModel);
+        explorerMgr.setRootContext(currentModel == null ? Node.EMPTY : currentModel.getRootNode());
+        setQuickFilter();        
     }
 
     private void setQuickFilter() {

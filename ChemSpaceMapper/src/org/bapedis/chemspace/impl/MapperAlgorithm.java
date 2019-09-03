@@ -114,15 +114,15 @@ public class MapperAlgorithm implements Algorithm {
         }
 
         // Embedding peptide sequences
-        pc.reportMsg("Embedding peptide sequences", workspace);
-        if (!stopRun) {
-            if (embeddingAlg != null) {
-                currentAlg = embeddingAlg;
-                execute();
-            } else {
-                throw new RuntimeException("Internal error: Embedding algorithm is null");
-            }
-        }
+//        pc.reportMsg("Embedding peptide sequences", workspace);
+//        if (!stopRun) {
+//            if (embeddingAlg != null) {
+//                currentAlg = embeddingAlg;
+//                execute();
+//            } else {
+//                throw new RuntimeException("Internal error: Embedding algorithm is null");
+//            }
+//        }
 
         // Feature Extraction
         pc.reportMsg(String.format("Feature extraction: %s", feOption), workspace);

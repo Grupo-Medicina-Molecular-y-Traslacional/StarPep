@@ -65,6 +65,7 @@ public class FASTAImporter {
                     List<Integer> peptideIDs = new LinkedList<>();
                     for(Peptide peptide: oldModel.getPeptides()){
                         peptideIDs.add(peptide.getId());
+                        graphNodes.add(peptide.getGraphNode());
                     }
                     oldModel.getBridge().copyTo(newAttrModel, peptideIDs);
                 }
@@ -101,7 +102,7 @@ public class FASTAImporter {
                     }
                     workspace.add(newAttrModel);
                     pc.setCurrentWorkspace(workspace);
-//                    graphWC.refreshGraphView(workspace, graphNodes, null);
+                    graphWC.refreshGraphView(workspace, graphNodes, null);
                     pc.getGraphVizSetting(workspace).fireChangedGraphView();
                 } catch (InterruptedException | ExecutionException ex) {
                     Exceptions.printStackTrace(ex);

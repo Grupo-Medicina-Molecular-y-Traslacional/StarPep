@@ -42,12 +42,9 @@ public class FASTAImporter {
     private static AtomicInteger counter = new AtomicInteger(45120);
 
     public void importFASTA(File file, String label, Workspace workspace) {
-        AttributesModel newAttrModel = pc.getAttributesModel(workspace);
-        if (newAttrModel == null) {
-            newAttrModel = new AttributesModel(workspace);
-            workspace.add(newAttrModel);
-        }
-        AttributesModel attrModel = newAttrModel;
+        AttributesModel newAttrModel = new AttributesModel(workspace);
+        AttributesModel oldModel = pc.getAttributesModel(workspace);
+
         GraphModel graphModel = pc.getGraphModel(workspace);
         Graph mainGraph = graphModel.getGraph();
         List<Node> graphNodes = new LinkedList<>();
@@ -63,7 +60,14 @@ public class FASTAImporter {
             });
 
             @Override
-            protected Object doInBackground() throws Exception {                
+            protected Object doInBackground() throws Exception {
+                if (oldModel != null) {
+                    List<Integer> peptideIDs = new LinkedList<>();
+                    for(Peptide peptide: oldModel.getPeptides()){
+                        peptideIDs.add(peptide.getId());
+                    }
+                    oldModel.getBridge().copyTo(newAttrModel, peptideIDs);
+                }
                 List<ProteinSequence> entries = FASTASEQ.load(file);
                 ticket.start(entries.size());
                 Peptide peptide;
@@ -81,7 +85,7 @@ public class FASTAImporter {
                     peptide.setAttributeValue(Peptide.LENGHT, seq.length());
                     peptide.setBiojavaSeq(protein);
 
-                    attrModel.addPeptide(peptide);
+                    newAttrModel.addPeptide(peptide);
                     graphNodes.add(node);
                     ticket.progress();
                 }
@@ -91,14 +95,17 @@ public class FASTAImporter {
             @Override
             protected void done() {
                 try {
-                    get();    
-//                    attrModel.refresh();
+                    get();
+                    if (oldModel != null){
+                        workspace.remove(oldModel);                        
+                    }
+                    workspace.add(newAttrModel);
                     pc.setCurrentWorkspace(workspace);
 //                    graphWC.refreshGraphView(workspace, graphNodes, null);
                     pc.getGraphVizSetting(workspace).fireChangedGraphView();
                 } catch (InterruptedException | ExecutionException ex) {
                     Exceptions.printStackTrace(ex);
-                } finally {                    
+                } finally {
                     ticket.finish();
                 }
             }

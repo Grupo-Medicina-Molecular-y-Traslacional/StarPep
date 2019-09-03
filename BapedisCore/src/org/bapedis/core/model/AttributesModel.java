@@ -188,14 +188,7 @@ public class AttributesModel {
     public AttributeModelBridge getBridge() {
         return bridge;
     }
-
-    public void refresh() {
-        filteredPept = null;
-        container = new PeptideNodeContainer();
-        rootNode = new AbstractNode(container);
-//        container.refreshNodes();
-    }
-
+    
     public Node getRootNode() {
         return rootNode;
     }
@@ -207,7 +200,8 @@ public class AttributesModel {
     public void addPeptide(Peptide peptide) {
         nodeList.add(new PeptideNode(peptide));
         peptideMap.put(peptide.getId(), peptide);
-        checkDefaultNodeAttributes(peptide);        
+        checkDefaultNodeAttributes(peptide);     
+        filteredPept = null;
     }
 
     private void checkDefaultNodeAttributes(Peptide peptide) {

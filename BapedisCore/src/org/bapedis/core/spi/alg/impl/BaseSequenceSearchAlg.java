@@ -17,7 +17,6 @@ import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
-import static org.bapedis.core.model.PeptideAttribute.CLUSTER_ATTR;
 import static org.bapedis.core.model.PeptideAttribute.RANK_ATTR;
 import static org.bapedis.core.model.PeptideAttribute.SCORE_ATTR;
 import org.bapedis.core.model.PeptideHit;
@@ -64,7 +63,7 @@ public abstract class BaseSequenceSearchAlg implements Algorithm {
         alignmentModel = new SequenceAlignmentModel();
 
 //        int percentIdentity = NbPreferences.forModule(SequenceSearch.class).getInt("PercentIdentity", 70);
-//        alignmentModel.setPercentIdentity(percentIdentity);
+        alignmentModel.setPercentIdentity(70);
         dao = Lookup.getDefault().lookup(PeptideDAO.class);
         graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
         workspaceInput = false;

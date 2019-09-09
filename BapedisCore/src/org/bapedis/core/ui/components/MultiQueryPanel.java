@@ -35,21 +35,22 @@ public class MultiQueryPanel extends javax.swing.JPanel {
 
     /**
      * Creates new form MultiQuerySearchPanel
+     *
      * @param multiQueryObj
      */
     public MultiQueryPanel(MultiQuery multiQueryObj) {
         initComponents();
-        
+
         this.multiQueryObj = multiQueryObj;
-        
+
         chooser = new JFileChooser();
         chooser.setCurrentDirectory(new java.io.File("."));
         chooser.setDialogTitle("Open FASTA file");
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         FileNameExtensionFilter fileFilter = new FileNameExtensionFilter("FASTA format (*.fasta)", "fasta");
         chooser.addChoosableFileFilter(fileFilter);
-        chooser.setFileFilter(fileFilter);     
-        
+        chooser.setFileFilter(fileFilter);
+
         jSeqTextArea.setText(multiQueryObj.getFasta());
         jSeqTextArea.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -66,12 +67,12 @@ public class MultiQueryPanel extends javax.swing.JPanel {
             @Override
             public void changedUpdate(DocumentEvent e) {
             }
-        });        
+        });
     }
-    
+
     private void updateFasta() {
         String seq = jSeqTextArea.getText();
-        if (multiQueryObj != null){
+        if (multiQueryObj != null) {
             multiQueryObj.setFasta(seq);
         }
     }
@@ -86,46 +87,14 @@ public class MultiQueryPanel extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jBtBrowse = new javax.swing.JButton();
         jBtAdd = new javax.swing.JButton();
         jBtClear = new javax.swing.JButton();
         scrollPane = new javax.swing.JScrollPane();
         jSeqTextArea = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(MultiQueryPanel.class, "MultiQueryPanel.jLabel1.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(jLabel1, gridBagConstraints);
-
-        jTextField1.setEditable(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(jTextField1, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jBtBrowse, org.openide.util.NbBundle.getMessage(MultiQueryPanel.class, "MultiQueryPanel.jBtBrowse.text")); // NOI18N
-        jBtBrowse.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtBrowseActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-        add(jBtBrowse, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jBtAdd, org.openide.util.NbBundle.getMessage(MultiQueryPanel.class, "MultiQueryPanel.jBtAdd.text")); // NOI18N
         jBtAdd.setToolTipText(org.openide.util.NbBundle.getMessage(MultiQueryPanel.class, "MultiQueryPanel.jBtAdd.toolTipText")); // NOI18N
@@ -136,9 +105,9 @@ public class MultiQueryPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(jBtAdd, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jBtClear, org.openide.util.NbBundle.getMessage(MultiQueryPanel.class, "MultiQueryPanel.jBtClear.text")); // NOI18N
@@ -148,10 +117,10 @@ public class MultiQueryPanel extends javax.swing.JPanel {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(jBtClear, gridBagConstraints);
 
         jSeqTextArea.setColumns(20);
@@ -159,7 +128,7 @@ public class MultiQueryPanel extends javax.swing.JPanel {
         scrollPane.setViewportView(jSeqTextArea);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -171,58 +140,60 @@ public class MultiQueryPanel extends javax.swing.JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(MultiQueryPanel.class, "MultiQueryPanel.jLabel2.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jLabel2, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(MultiQueryPanel.class, "MultiQueryPanel.jLabel1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(jLabel1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jBtBrowseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtBrowseActionPerformed
+    private void jBtAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtAddActionPerformed
         if (inputFile != null) {
             chooser.setCurrentDirectory(inputFile.getParentFile());
         }
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             inputFile = chooser.getSelectedFile();
-            jTextField1.setText(inputFile.getAbsolutePath());
-        }
-    }//GEN-LAST:event_jBtBrowseActionPerformed
+            jLabel1.setText(inputFile.getAbsolutePath());
+            //Load FASTA file
+            try {
+                setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                
+                if (!inputFile.exists()) {
+                    throw new Exception(NbBundle.getMessage(MultiQueryPanel.class, "MultiQueryPanel.fileNotExist"));
+                }
 
-    private void jBtAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtAddActionPerformed
-        try {
-            if (jTextField1.getText().trim().isEmpty()) {
-                throw new Exception(NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "MultiQuerySearchPanel.emptyFastaFile"));
+                List<ProteinSequence> queries = FASTASEQ.load(inputFile);
+                multiQueryObj.setFasta(FASTASEQ.asFASTA(queries));
+                jSeqTextArea.setText(multiQueryObj.getFasta());
+            } catch (Exception ex) {
+                NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
+                DialogDisplayer.getDefault().notify(nd);
+            } finally {
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
-            setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
-            inputFile = new File(jTextField1.getText());
-            if (!inputFile.exists()) {
-                throw new Exception(NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "MultiQuerySearchPanel.fileNotExist"));
-            }
-
-            List<ProteinSequence> queries = FASTASEQ.load(inputFile);
-            multiQueryObj.setFasta(FASTASEQ.asFASTA(queries));
-            jSeqTextArea.setText(multiQueryObj.getFasta());
-        } catch (Exception ex) {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
-            DialogDisplayer.getDefault().notify(nd);
-        } finally {
-            setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
     }//GEN-LAST:event_jBtAddActionPerformed
 
     private void jBtClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtClearActionPerformed
-       jSeqTextArea.setText("");
+        jSeqTextArea.setText("");
     }//GEN-LAST:event_jBtClearActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBtAdd;
-    private javax.swing.JButton jBtBrowse;
     private javax.swing.JButton jBtClear;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JTextArea jSeqTextArea;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JScrollPane scrollPane;
     // End of variables declaration//GEN-END:variables
 }

@@ -11,6 +11,7 @@ import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.FeatureSelectionOption;
 import org.bapedis.chemspace.model.NetworkType;
 import org.bapedis.chemspace.model.SimilaritySearchingOption;
+import org.bapedis.chemspace.searching.ChemBaseSimilaritySearchAlg;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
 import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.core.spi.alg.Algorithm;
@@ -18,8 +19,6 @@ import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.spi.alg.ChemSpaceTag;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
-import org.bapedis.core.spi.alg.impl.EmbeddingQuerySeqAlg;
-import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
 import org.bapedis.core.spi.alg.impl.UnsupervisedFeatureSelection;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
@@ -67,21 +66,15 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
             csMapper.getNetworkEmbedderAlg().setNetworkType(networkType);
         }
 
-        //Non-redundant set
+        //Similarity searching
         SimilaritySearchingOption searchingOption = (SimilaritySearchingOption) wiz.getProperty(SimilaritySearchingOption.class.getName());
         if (searchingOption != null) {
             csMapper.setSearchingOption(searchingOption);
             if (searchingOption == SimilaritySearchingOption.YES) {
-//                NonRedundantSetAlg nrdAlg = (NonRedundantSetAlg) wiz.getProperty(NonRedundantSetAlg.class.getName());
-//                csMapper.setNonRedundantSetAlg(nrdAlg);
+                ChemBaseSimilaritySearchAlg simSearching = (ChemBaseSimilaritySearchAlg) wiz.getProperty(ChemBaseSimilaritySearchAlg.class.getName());
+                csMapper.setSimSearchingAlg(simSearching);
             }
-        }      
-        
-        //Embedding query sequences
-        EmbeddingQuerySeqAlg embeddingAlg = (EmbeddingQuerySeqAlg) wiz.getProperty(EmbeddingQuerySeqAlg.class.getName());
-        if (embeddingAlg != null){
-            csMapper.setEmbeddingAlg(embeddingAlg);
-        } 
+        }              
 
         // Feature Extraction Option
         FeatureExtractionOption feOption = (FeatureExtractionOption) wiz.getProperty(FeatureExtractionOption.class.getName());

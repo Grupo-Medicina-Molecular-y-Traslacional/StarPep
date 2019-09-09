@@ -248,4 +248,10 @@ public abstract class ChemBaseSimilaritySearchAlg implements Algorithm, Cloneabl
         targetList = null;
         queryList = null;
     }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        ChemBaseSimilaritySearchAlg copy = (ChemBaseSimilaritySearchAlg) super.clone(); //To change body of generated methods, choose Tools | Templates.
+        return copy;
+    }       
 }

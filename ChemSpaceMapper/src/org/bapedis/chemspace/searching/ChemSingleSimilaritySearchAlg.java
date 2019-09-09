@@ -56,4 +56,12 @@ public class ChemSingleSimilaritySearchAlg extends ChemBaseSimilaritySearchAlg i
         return querySeq;
     }
 
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        ChemSingleSimilaritySearchAlg copy = (ChemSingleSimilaritySearchAlg) super.clone(); //To change body of generated methods, choose Tools | Templates.
+        if (querySeq != null) {
+            copy.querySeq = String.copyValueOf(querySeq.toCharArray());
+        }
+        return copy;
+    }
 }

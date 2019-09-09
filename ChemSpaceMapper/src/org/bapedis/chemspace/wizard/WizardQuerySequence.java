@@ -5,12 +5,11 @@
  */
 package org.bapedis.chemspace.wizard;
 
-import java.awt.Component;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.model.SimilaritySearchingOption;
-import org.bapedis.core.spi.alg.impl.EmbeddingQuerySeqAlg;
+import org.bapedis.chemspace.searching.ChemBaseSimilaritySearchAlg;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
@@ -22,7 +21,7 @@ import org.openide.util.HelpCtx;
 public class WizardQuerySequence implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
     private final MapperAlgorithm csMapper;
-    private EmbeddingQuerySeqAlg alg;
+    private ChemBaseSimilaritySearchAlg alg;
     private VisualQuerySequence component;
     
     public WizardQuerySequence(MapperAlgorithm csMapper) {
@@ -38,7 +37,7 @@ public class WizardQuerySequence implements WizardDescriptor.FinishablePanel<Wiz
     public VisualQuerySequence getComponent() {
         if (component == null) {
             try {
-                alg = (EmbeddingQuerySeqAlg) csMapper.getEmbeddingAlg().clone();
+                alg = (ChemBaseSimilaritySearchAlg) csMapper.getSimSearchingAlg().clone();
                 JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
                 component = new VisualQuerySequence(settingPanel);
                 component.setSearchingOption(csMapper.getSearchingOption());
@@ -70,9 +69,9 @@ public class WizardQuerySequence implements WizardDescriptor.FinishablePanel<Wiz
         SimilaritySearchingOption searchingOption = getComponent().getSearchingOption();
         wiz.putProperty(SimilaritySearchingOption.class.getName(), searchingOption);
         if (searchingOption == SimilaritySearchingOption.YES) {
-            //wiz.putProperty(EmbeddingQuerySeqAlg.class.getName(), alg);
+            wiz.putProperty(ChemBaseSimilaritySearchAlg.class.getName(), alg);
         } else{
-            //wiz.putProperty(EmbeddingQuerySeqAlg.class.getName(), null);
+            wiz.putProperty(ChemBaseSimilaritySearchAlg.class.getName(), null);
         }        
     }
 

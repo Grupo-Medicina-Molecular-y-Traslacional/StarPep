@@ -80,6 +80,7 @@ public class SingleQueryPanel extends javax.swing.JPanel {
         jLabel1.setEnabled(enabled);
         jseqPane.setEnabled(enabled);
         jSeqTextArea.setEnabled(enabled);
+        jSeqTextArea.setEnabled(enabled);
     }
     
     

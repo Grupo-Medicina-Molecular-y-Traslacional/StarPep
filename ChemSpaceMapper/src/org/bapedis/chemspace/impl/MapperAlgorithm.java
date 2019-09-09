@@ -15,6 +15,8 @@ import org.bapedis.chemspace.distance.Euclidean;
 import org.bapedis.chemspace.model.FeatureSelectionOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.SimilaritySearchingOption;
+import org.bapedis.chemspace.searching.ChemBaseSimilaritySearchAlg;
+import org.bapedis.chemspace.searching.ChemMultiSimilaritySearchFactory;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
@@ -54,7 +56,7 @@ public class MapperAlgorithm implements Algorithm {
     protected SimilaritySearchingOption searchingOption;    
 
     //Mapping Algorithms   
-    private EmbeddingQuerySeqAlg embeddingAlg;
+    private ChemBaseSimilaritySearchAlg simSearchingAlg;
     private AllDescriptors featureExtractionAlg;
     private UnsupervisedFeatureSelection featureSelectionAlg;
     private AbstractDistance distFunction;
@@ -73,7 +75,7 @@ public class MapperAlgorithm implements Algorithm {
         fsOption = FeatureSelectionOption.YES;
 
         //Mapping algorithms
-        embeddingAlg = (EmbeddingQuerySeqAlg) new EmbeddingQuerySeqFactory().createAlgorithm();
+        simSearchingAlg = (ChemBaseSimilaritySearchAlg) new ChemMultiSimilaritySearchFactory().createAlgorithm();
         featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
         featureSelectionAlg = (UnsupervisedFeatureSelection) new UnsupervisedFeatureSelectionFactory().createAlgorithm();
         pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
@@ -251,13 +253,13 @@ public class MapperAlgorithm implements Algorithm {
         this.searchingOption = searchingOption;
     }
 
-    public EmbeddingQuerySeqAlg getEmbeddingAlg() {
-        return embeddingAlg;
+    public ChemBaseSimilaritySearchAlg getSimSearchingAlg() {
+        return simSearchingAlg;
     }
 
-    public void setEmbeddingAlg(EmbeddingQuerySeqAlg embeddingAlg) {
-        this.embeddingAlg = embeddingAlg;
-    }        
+    public void setSimSearchingAlg(ChemBaseSimilaritySearchAlg simSearchingAlg) {
+        this.simSearchingAlg = simSearchingAlg;
+    }         
 
     public void setFeatureExtractionAlg(AllDescriptors alg) {
         this.featureExtractionAlg = alg;

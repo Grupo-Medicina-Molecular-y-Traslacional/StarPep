@@ -9,14 +9,10 @@ import java.awt.Cursor;
 import java.io.File;
 import java.util.List;
 import javax.swing.JFileChooser;
-import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.MultiQuery;
-import org.bapedis.core.spi.alg.impl.EmbeddingQuerySeqPanel;
-import org.bapedis.core.spi.alg.impl.MultiQuerySeqSearch;
 import org.bapedis.core.util.FASTASEQ;
 import org.biojava.nbio.core.sequence.ProteinSequence;
 import org.openide.DialogDisplayer;
@@ -69,6 +65,16 @@ public class MultiQueryPanel extends javax.swing.JPanel {
             }
         });
     }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        jBtAdd.setEnabled(enabled);
+        jBtClear.setEnabled(enabled);
+        jLabel1.setEnabled(enabled);
+        jLabel2.setEnabled(enabled);
+        scrollPane.setEnabled(enabled);
+        jSeqTextArea.setEnabled(enabled);
+    }        
 
     private void updateFasta() {
         String seq = jSeqTextArea.getText();

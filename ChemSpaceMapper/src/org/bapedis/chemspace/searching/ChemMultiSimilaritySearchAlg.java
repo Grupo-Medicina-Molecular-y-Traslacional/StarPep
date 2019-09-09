@@ -31,16 +31,16 @@ public class ChemMultiSimilaritySearchAlg extends ChemBaseSimilaritySearchAlg im
             List<PeptideHit> resultList;
             for (Peptide query : queryList) {
                 if (!stopRun) {
-                    resultList = searchSimilarTo(query);                    
-                    dataFusion(resultList, mapResult);                    
+                    resultList = searchSimilarTo(query);
+                    dataFusion(resultList, mapResult);
                 }
             }
             saveResults(mapResult);
-            
-            for (Peptide query : queryList){
+
+            for (Peptide query : queryList) {
                 newAttrModel.addPeptide(query);
-                graphNodes.add(query.getGraphNode());            
-            }            
+                graphNodes.add(query.getGraphNode());
+            }
         }
     }
 
@@ -54,4 +54,12 @@ public class ChemMultiSimilaritySearchAlg extends ChemBaseSimilaritySearchAlg im
         return fasta;
     }
 
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        ChemMultiSimilaritySearchAlg copy = (ChemMultiSimilaritySearchAlg) super.clone(); //To change body of generated methods, choose Tools | Templates.
+        if (fasta != null) {
+            copy.fasta = String.copyValueOf(fasta.toCharArray());
+        }
+        return copy;
+    }
 }

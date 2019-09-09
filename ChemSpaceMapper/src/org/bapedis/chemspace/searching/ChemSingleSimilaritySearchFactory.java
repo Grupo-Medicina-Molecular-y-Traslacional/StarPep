@@ -13,6 +13,7 @@ import org.openide.util.NbBundle;
  *
  * @author Loge
  */
+
 public class ChemSingleSimilaritySearchFactory implements SimilaritySearchTag {
 
     private static ChemSimilaritySearchSetupUI setupUI = new ChemSimilaritySearchSetupUI();
@@ -41,5 +42,5 @@ public class ChemSingleSimilaritySearchFactory implements SimilaritySearchTag {
     public Algorithm createAlgorithm() {
         return new ChemSingleSimilaritySearchAlg(this);
     }
-    
+       
 }

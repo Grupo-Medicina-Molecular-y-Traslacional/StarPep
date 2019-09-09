@@ -9,16 +9,14 @@ import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.openide.util.NbBundle;
-import org.openide.util.lookup.ServiceProvider;
-import org.bapedis.core.spi.alg.SearchTag;
 
 /**
  *
- * @author loge
+ * @author Loge
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 10)
-public class SingleQuerySearchFactory implements SearchTag{
-    private SequenceSearchSetupUI setupUI = new SequenceSearchSetupUI(new SingleQuerySearchPanel());
+public class EmbeddingQuerySeqFactory implements AlgorithmFactory {
+
+    private static EmbeddingQuerySeqPanel setupUI = new EmbeddingQuerySeqPanel();
     
     @Override
     public String getCategory() {
@@ -27,12 +25,12 @@ public class SingleQuerySearchFactory implements SearchTag{
 
     @Override
     public String getName() {
-       return NbBundle.getMessage(SingleQuerySearch.class, "SingleQuerySearch.name");
+        return NbBundle.getMessage(EmbeddingQuerySeqAlg.class, "EmbeddingAlgorithm.name");
     }
 
     @Override
     public String getDescription() {
-       return NbBundle.getMessage(SingleQuerySearch.class, "SingleQuerySearch.desc");
+        return NbBundle.getMessage(EmbeddingQuerySeqAlg.class, "EmbeddingAlgorithm.desc");
     }
 
     @Override
@@ -42,7 +40,7 @@ public class SingleQuerySearchFactory implements SearchTag{
 
     @Override
     public Algorithm createAlgorithm() {
-        return new SingleQuerySearch(this);
+        return new EmbeddingQuerySeqAlg(this);
     }
     
 }

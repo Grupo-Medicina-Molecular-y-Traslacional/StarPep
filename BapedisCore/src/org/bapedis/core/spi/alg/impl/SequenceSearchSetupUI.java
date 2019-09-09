@@ -12,7 +12,11 @@ import javax.swing.JPanel;
 import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.MultiQuery;
+import org.bapedis.core.spi.alg.SingleQuery;
+import org.bapedis.core.ui.components.MultiQueryPanel;
 import org.bapedis.core.ui.components.SequenceAlignmentPanel;
+import org.bapedis.core.ui.components.SingleQueryPanel;
 import org.jdesktop.swingx.JXHyperlink;
 import org.openide.util.NbBundle;
 
@@ -30,15 +34,13 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
     protected Card card;
     protected BaseSequenceSearchAlg searchAlg;
     protected SequenceAlignmentPanel seqAlignmentPanel;
-    protected final AlgorithmSetupUI querySetupUI;
-    protected JPanel querySetupPanel;
+    protected JPanel queryPanel;
 
     /**
      * Creates new form SeqAlignmentFilterSetupUI
      *
-     * @param querySetupUI
      */
-    public SequenceSearchSetupUI(AlgorithmSetupUI querySetupUI) {
+    public SequenceSearchSetupUI() {
         initComponents();
 
         card = Card.SEQUENCE;
@@ -47,7 +49,6 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
 
         CardLayout cl = (CardLayout) centerPanel.getLayout();
         cl.show(centerPanel, "sequence");
-        this.querySetupUI = querySetupUI;
     }
 
     private void configureSwitcherLink() {
@@ -91,27 +92,24 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
     @Override
     public void setEnabled(boolean enabled) {
         switcherLink.setEnabled(enabled);
-        jMRLabel.setEnabled(enabled);
-        jMRComboBox.setEnabled(enabled);
         if (seqAlignmentPanel != null) {
             seqAlignmentPanel.setEnabled(enabled);
         }
-        if (querySetupPanel != null){
-            querySetupPanel.setEnabled(enabled);
+        if (queryPanel != null){
+            queryPanel.setEnabled(enabled);
         }
     }
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
-        searchAlg = (BaseSequenceSearchAlg) algo;
-        
-        int maximumResults = searchAlg.getMaximumResults();
-        if (maximumResults == -1) {
-            jMRComboBox.setSelectedItem("All");
-        } else if (maximumResults > 0) {
-            jMRComboBox.setSelectedItem(String.valueOf(maximumResults));
-        }
+        searchAlg = (BaseSequenceSearchAlg) algo;       
 
+        if (searchAlg.isWorkspaceInput()){
+            jOption2.setSelected(true);
+        }else{
+            jOption1.setSelected(true);
+        }
+        
         SequenceAlignmentModel alignmentModel = searchAlg.getAlignmentModel();        
         seqAlignmentPanel = new SequenceAlignmentPanel(alignmentModel);
         
@@ -120,12 +118,20 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
         alignmentPanel.revalidate();
         alignmentPanel.repaint();
 
-        querySetupPanel = querySetupUI.getSettingPanel(algo);
-        queryPanel.add(querySetupPanel, BorderLayout.CENTER);
+        if (searchAlg instanceof SingleQuery){
+            queryPanel = new SingleQueryPanel((SingleQuery)searchAlg);
+        }else if (searchAlg instanceof MultiQuery){ 
+            queryPanel = new MultiQueryPanel((MultiQuery)searchAlg);
+        }else{
+            queryPanel = null;
+        }
+        
+        querySetupPanel.removeAll();
+        querySetupPanel.add(queryPanel, BorderLayout.CENTER);
+        querySetupPanel.revalidate();
+        querySetupPanel.repaint();        
         
         return this;
-//        ProteinSequence seq = searchAlg.getQuery();
-//        jSeqTextArea.setText(seq != null ? seq.getSequenceAsString() : "");
     }
 
     /**
@@ -138,12 +144,14 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         centerPanel = new javax.swing.JPanel();
         seqPanel = new javax.swing.JPanel();
-        toolBar = new javax.swing.JToolBar();
-        jMRLabel = new javax.swing.JLabel();
-        jMRComboBox = new javax.swing.JComboBox<>();
-        queryPanel = new javax.swing.JPanel();
+        inputPanel = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jOption1 = new javax.swing.JRadioButton();
+        jOption2 = new javax.swing.JRadioButton();
+        querySetupPanel = new javax.swing.JPanel();
         alignmentPanel = new javax.swing.JPanel();
 
         setMinimumSize(new java.awt.Dimension(460, 300));
@@ -154,39 +162,65 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
 
         seqPanel.setLayout(new java.awt.GridBagLayout());
 
-        toolBar.setFloatable(false);
-        toolBar.setRollover(true);
+        inputPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.inputPanel.border.title"))); // NOI18N
+        inputPanel.setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(jMRLabel, org.openide.util.NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.jMRLabel.text")); // NOI18N
-        jMRLabel.setToolTipText(org.openide.util.NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.jMRLabel.toolTipText")); // NOI18N
-        toolBar.add(jMRLabel);
-
-        jMRComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "10", "50", "100", "250", "500", "1000" }));
-        jMRComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMRComboBoxActionPerformed(evt);
-            }
-        });
-        toolBar.add(jMRComboBox);
-
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.jLabel1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-        seqPanel.add(toolBar, gridBagConstraints);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        inputPanel.add(jLabel1, gridBagConstraints);
 
-        queryPanel.setLayout(new java.awt.BorderLayout());
+        buttonGroup1.add(jOption1);
+        jOption1.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.jOption1.text")); // NOI18N
+        jOption1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOption1ActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 0, 0);
+        inputPanel.add(jOption1, gridBagConstraints);
+
+        buttonGroup1.add(jOption2);
+        org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.jOption2.text")); // NOI18N
+        jOption2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOption2ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 0, 0);
+        inputPanel.add(jOption2, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        seqPanel.add(inputPanel, gridBagConstraints);
+
+        querySetupPanel.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-        seqPanel.add(queryPanel, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        seqPanel.add(querySetupPanel, gridBagConstraints);
 
         centerPanel.add(seqPanel, "sequence");
 
@@ -203,25 +237,28 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
         add(centerPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jMRComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMRComboBoxActionPerformed
-        if (searchAlg != null) {
-            String selectedItem = (String) jMRComboBox.getSelectedItem();
-            if (selectedItem.equals("All")) {
-                searchAlg.setMaximumResults(-1);
-            } else {
-                searchAlg.setMaximumResults(Integer.parseInt(selectedItem));
-            }
+    private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
+        if (searchAlg != null && searchAlg.isWorkspaceInput()){
+            searchAlg.setWorkspaceInput(false);
         }
-    }//GEN-LAST:event_jMRComboBoxActionPerformed
+    }//GEN-LAST:event_jOption1ActionPerformed
+
+    private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
+        if (searchAlg != null && !searchAlg.isWorkspaceInput()){
+            searchAlg.setWorkspaceInput(true);
+        }
+    }//GEN-LAST:event_jOption2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel alignmentPanel;
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel centerPanel;
-    private javax.swing.JComboBox<String> jMRComboBox;
-    private javax.swing.JLabel jMRLabel;
-    private javax.swing.JPanel queryPanel;
+    private javax.swing.JPanel inputPanel;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JRadioButton jOption1;
+    private javax.swing.JRadioButton jOption2;
+    private javax.swing.JPanel querySetupPanel;
     private javax.swing.JPanel seqPanel;
-    private javax.swing.JToolBar toolBar;
     // End of variables declaration//GEN-END:variables
 }

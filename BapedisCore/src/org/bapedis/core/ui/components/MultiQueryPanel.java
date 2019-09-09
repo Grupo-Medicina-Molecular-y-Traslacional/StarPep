@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.spi.alg.impl;
+package org.bapedis.core.ui.components;
 
 import java.awt.Cursor;
 import java.io.File;
@@ -14,7 +14,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.bapedis.core.spi.alg.Algorithm;
-import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.MultiQuery;
+import org.bapedis.core.spi.alg.impl.EmbeddingQuerySeqPanel;
+import org.bapedis.core.spi.alg.impl.MultiQuerySeqSearch;
 import org.bapedis.core.util.FASTASEQ;
 import org.biojava.nbio.core.sequence.ProteinSequence;
 import org.openide.DialogDisplayer;
@@ -25,17 +27,20 @@ import org.openide.util.NbBundle;
  *
  * @author Loge
  */
-public class MultiQuerySearchPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
+public class MultiQueryPanel extends javax.swing.JPanel {
 
-    private JFileChooser chooser;
+    private final JFileChooser chooser;
     private File inputFile;
-    private MultiQuerySearch querySearchAlg;
+    private final MultiQuery multiQueryObj;
 
     /**
      * Creates new form MultiQuerySearchPanel
+     * @param multiQueryObj
      */
-    public MultiQuerySearchPanel() {
+    public MultiQueryPanel(MultiQuery multiQueryObj) {
         initComponents();
+        
+        this.multiQueryObj = multiQueryObj;
         
         chooser = new JFileChooser();
         chooser.setCurrentDirectory(new java.io.File("."));
@@ -45,6 +50,7 @@ public class MultiQuerySearchPanel extends javax.swing.JPanel implements Algorit
         chooser.addChoosableFileFilter(fileFilter);
         chooser.setFileFilter(fileFilter);     
         
+        jSeqTextArea.setText(multiQueryObj.getFasta());
         jSeqTextArea.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
@@ -65,8 +71,8 @@ public class MultiQuerySearchPanel extends javax.swing.JPanel implements Algorit
     
     private void updateFasta() {
         String seq = jSeqTextArea.getText();
-        if (querySearchAlg != null){
-            querySearchAlg.setFasta(seq);
+        if (multiQueryObj != null){
+            multiQueryObj.setFasta(seq);
         }
     }
 
@@ -91,7 +97,7 @@ public class MultiQuerySearchPanel extends javax.swing.JPanel implements Algorit
 
         setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(MultiQuerySearchPanel.class, "MultiQuerySearchPanel.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(MultiQueryPanel.class, "MultiQueryPanel.jLabel1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -109,7 +115,7 @@ public class MultiQuerySearchPanel extends javax.swing.JPanel implements Algorit
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jTextField1, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jBtBrowse, org.openide.util.NbBundle.getMessage(MultiQuerySearchPanel.class, "MultiQuerySearchPanel.jBtBrowse.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jBtBrowse, org.openide.util.NbBundle.getMessage(MultiQueryPanel.class, "MultiQueryPanel.jBtBrowse.text")); // NOI18N
         jBtBrowse.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtBrowseActionPerformed(evt);
@@ -121,8 +127,8 @@ public class MultiQuerySearchPanel extends javax.swing.JPanel implements Algorit
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(jBtBrowse, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jBtAdd, org.openide.util.NbBundle.getMessage(MultiQuerySearchPanel.class, "MultiQuerySearchPanel.jBtAdd.text")); // NOI18N
-        jBtAdd.setToolTipText(org.openide.util.NbBundle.getMessage(MultiQuerySearchPanel.class, "MultiQuerySearchPanel.jBtAdd.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jBtAdd, org.openide.util.NbBundle.getMessage(MultiQueryPanel.class, "MultiQueryPanel.jBtAdd.text")); // NOI18N
+        jBtAdd.setToolTipText(org.openide.util.NbBundle.getMessage(MultiQueryPanel.class, "MultiQueryPanel.jBtAdd.toolTipText")); // NOI18N
         jBtAdd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtAddActionPerformed(evt);
@@ -135,7 +141,7 @@ public class MultiQuerySearchPanel extends javax.swing.JPanel implements Algorit
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jBtAdd, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jBtClear, org.openide.util.NbBundle.getMessage(MultiQuerySearchPanel.class, "MultiQuerySearchPanel.jBtClear.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jBtClear, org.openide.util.NbBundle.getMessage(MultiQueryPanel.class, "MultiQueryPanel.jBtClear.text")); // NOI18N
         jBtClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtClearActionPerformed(evt);
@@ -162,7 +168,7 @@ public class MultiQuerySearchPanel extends javax.swing.JPanel implements Algorit
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(scrollPane, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(MultiQuerySearchPanel.class, "MultiQuerySearchPanel.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(MultiQueryPanel.class, "MultiQueryPanel.jLabel2.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -184,18 +190,18 @@ public class MultiQuerySearchPanel extends javax.swing.JPanel implements Algorit
     private void jBtAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtAddActionPerformed
         try {
             if (jTextField1.getText().trim().isEmpty()) {
-                throw new Exception(NbBundle.getMessage(EmbeddingAlgorithmPanel.class, "MultiQuerySearchPanel.emptyFastaFile"));
+                throw new Exception(NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "MultiQuerySearchPanel.emptyFastaFile"));
             }
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
             inputFile = new File(jTextField1.getText());
             if (!inputFile.exists()) {
-                throw new Exception(NbBundle.getMessage(EmbeddingAlgorithmPanel.class, "MultiQuerySearchPanel.fileNotExist"));
+                throw new Exception(NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "MultiQuerySearchPanel.fileNotExist"));
             }
 
             List<ProteinSequence> queries = FASTASEQ.load(inputFile);
-            querySearchAlg.setFasta(FASTASEQ.asFASTA(queries));
-            jSeqTextArea.setText(querySearchAlg.getFasta());
+            multiQueryObj.setFasta(FASTASEQ.asFASTA(queries));
+            jSeqTextArea.setText(multiQueryObj.getFasta());
         } catch (Exception ex) {
             NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
@@ -207,15 +213,6 @@ public class MultiQuerySearchPanel extends javax.swing.JPanel implements Algorit
     private void jBtClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtClearActionPerformed
        jSeqTextArea.setText("");
     }//GEN-LAST:event_jBtClearActionPerformed
-
-    @Override
-    public JPanel getSettingPanel(Algorithm algo) {
-        querySearchAlg = (MultiQuerySearch) algo;
-        if (querySearchAlg.getFasta()!= null){
-            jSeqTextArea.setText(querySearchAlg.getFasta());
-        }
-        return this;
-    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

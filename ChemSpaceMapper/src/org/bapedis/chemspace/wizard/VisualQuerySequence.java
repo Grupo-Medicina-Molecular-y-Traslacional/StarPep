@@ -7,6 +7,7 @@ package org.bapedis.chemspace.wizard;
 
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
+import org.bapedis.chemspace.model.SimilaritySearchingOption;
 import org.openide.util.NbBundle;
 
 /**
@@ -18,11 +19,32 @@ public class VisualQuerySequence extends javax.swing.JPanel {
     /**
      * Creates new form VisualQuerySequence
      */
+    static final String CHANGED_OPTION = "removing_redundant_changed";
+    private final JPanel settingPanel;
+    private SimilaritySearchingOption searchingOption;
+    
     public VisualQuerySequence(JPanel settingPanel) {
         initComponents();
-        
+        this.settingPanel = settingPanel;        
         centerPanel.add(settingPanel, BorderLayout.CENTER);
     }
+
+    public SimilaritySearchingOption getSearchingOption() {
+        return searchingOption;
+    }
+
+    public void setSearchingOption(SimilaritySearchingOption searchingOption) {
+        this.searchingOption = searchingOption;
+        switch (searchingOption) {
+            case NO:
+                jOption1.setSelected(true);
+                break;
+            case YES:
+                jOption2.setSelected(true);
+                break;
+        }
+        settingPanel.setEnabled(searchingOption == SimilaritySearchingOption.YES);        
+    }           
     
     @Override
     public String getName() {
@@ -39,8 +61,12 @@ public class VisualQuerySequence extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jInfoLabel = new javax.swing.JLabel();
         centerPanel = new javax.swing.JPanel();
+        topPanel = new javax.swing.JPanel();
+        jOption1 = new javax.swing.JRadioButton();
+        jOption2 = new javax.swing.JRadioButton();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
         setPreferredSize(new java.awt.Dimension(560, 580));
@@ -50,7 +76,6 @@ public class VisualQuerySequence extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
@@ -61,17 +86,75 @@ public class VisualQuerySequence extends javax.swing.JPanel {
         centerPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(centerPanel, gridBagConstraints);
+
+        topPanel.setLayout(new java.awt.GridBagLayout());
+
+        buttonGroup1.add(jOption1);
+        jOption1.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(VisualQuerySequence.class, "VisualQuerySequence.jOption1.text")); // NOI18N
+        jOption1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOption1ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        topPanel.add(jOption1, gridBagConstraints);
+
+        buttonGroup1.add(jOption2);
+        org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(VisualQuerySequence.class, "VisualQuerySequence.jOption2.text")); // NOI18N
+        jOption2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOption2ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        topPanel.add(jOption2, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(topPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
+        SimilaritySearchingOption oldOption = searchingOption;
+        searchingOption = SimilaritySearchingOption.NO;
+        settingPanel.setEnabled(false);
+        firePropertyChange(CHANGED_OPTION, oldOption, searchingOption);
+    }//GEN-LAST:event_jOption1ActionPerformed
+
+    private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
+        SimilaritySearchingOption oldOption = searchingOption;
+        searchingOption = SimilaritySearchingOption.YES;
+        settingPanel.setEnabled(true);
+        firePropertyChange(CHANGED_OPTION, oldOption, searchingOption);
+    }//GEN-LAST:event_jOption2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel centerPanel;
     private javax.swing.JLabel jInfoLabel;
+    private javax.swing.JRadioButton jOption1;
+    private javax.swing.JRadioButton jOption2;
+    private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 }

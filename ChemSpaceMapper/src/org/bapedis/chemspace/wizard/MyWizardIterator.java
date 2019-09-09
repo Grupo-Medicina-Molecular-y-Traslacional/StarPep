@@ -30,8 +30,7 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
         listeners = new EventListenerList();
 
         panels = new WizardDescriptor.Panel[]{
-            new WizardInputSequence(csMapper), 
-//            new WizardQuerySequence(csMapper),
+            new WizardQuerySequence(csMapper),
             new WizardFeatureExtraction(csMapper), 
             new WizardFeatureSelection(csMapper), 
             new WizardDistanceFunc(csMapper),

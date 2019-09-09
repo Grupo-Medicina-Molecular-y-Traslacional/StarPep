@@ -41,7 +41,7 @@ public class AttributesModel {
     protected final Map<Integer, Peptide> peptideMap;
     protected final Map<String, List<MolecularDescriptor>> mdMap;
     protected final Set<PeptideAttribute> displayedColumnsModel;
-    private static final int MAX_DISPLAYED_COLUMNS = 6;
+    private static final int MAX_DISPLAYED_COLUMNS = 10;
     protected List<PeptideNode> nodeList;
     private PeptideNodeContainer container;
     private List<Peptide> filteredPept;

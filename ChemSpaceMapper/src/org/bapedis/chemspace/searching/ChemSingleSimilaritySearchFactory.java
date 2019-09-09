@@ -3,10 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.spi.alg.impl;
+package org.bapedis.chemspace.searching;
 
 import org.bapedis.core.spi.alg.Algorithm;
-import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.openide.util.NbBundle;
 
@@ -14,9 +13,9 @@ import org.openide.util.NbBundle;
  *
  * @author Loge
  */
-public class EmbeddingAlgorithmFactory implements AlgorithmFactory {
+public class ChemSingleSimilaritySearchFactory implements SimilaritySearchTag {
 
-    private static EmbeddingAlgorithmPanel setupUI = new EmbeddingAlgorithmPanel();
+    private static ChemSimilaritySearchSetupUI setupUI = new ChemSimilaritySearchSetupUI();
     
     @Override
     public String getCategory() {
@@ -25,12 +24,12 @@ public class EmbeddingAlgorithmFactory implements AlgorithmFactory {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(EmbeddingAlgorithm.class, "EmbeddingAlgorithm.name");
+        return NbBundle.getMessage(ChemSingleSimilaritySearchAlg.class, "ChemSingleSimilaritySearch.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(EmbeddingAlgorithm.class, "EmbeddingAlgorithm.desc");
+        return NbBundle.getMessage(ChemSingleSimilaritySearchAlg.class, "ChemSingleSimilaritySearch.desc");
     }
 
     @Override
@@ -40,7 +39,7 @@ public class EmbeddingAlgorithmFactory implements AlgorithmFactory {
 
     @Override
     public Algorithm createAlgorithm() {
-        return new EmbeddingAlgorithm(this);
+        return new ChemSingleSimilaritySearchAlg(this);
     }
     
 }

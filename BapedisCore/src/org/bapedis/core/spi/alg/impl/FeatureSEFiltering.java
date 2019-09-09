@@ -36,6 +36,9 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected final FeatureSEFilteringFactory factory;
     private final NotifyDescriptor errorND;
+    
+    public static final int MIN_THRESHOLD_PERCENT=1;
+    public static final int MAX_THRESHOLD_PERCENT=50;
 
     public static final int CORRELATION_NONE = 0;
     public static final int CORRELATION_PEARSON = 1;
@@ -61,7 +64,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         errorND = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureSEFiltering.class, "FeatureSEFiltering.errorND"), NotifyDescriptor.ERROR_MESSAGE);
         thresholdPercent = 10;
         correlationOption = CORRELATION_SPEARMAN;
-        correlationCutoff = 0.9;
+        correlationCutoff = 0.95;
         selectTop = false;
         topRank = 50;
         debug = false;
@@ -69,7 +72,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     }
 
     private boolean isValid() {
-        boolean isValid = thresholdPercent >= 0 && thresholdPercent <= 100 && maxEntropy != Double.NaN;
+        boolean isValid = thresholdPercent >= MIN_THRESHOLD_PERCENT && thresholdPercent <= MAX_THRESHOLD_PERCENT && maxEntropy != Double.NaN;
         if (correlationOption != CORRELATION_NONE) {
             isValid = correlationCutoff >= 0 && correlationCutoff <= 1;
         }
@@ -194,7 +197,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
             pc.reportMsg("Entropy cutoff value: " + threshold, workspace);
             for (String key : attrModel.getMolecularDescriptorKeys()) {
                 for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
-                    if (attr.getBinsPartition().getEntropy() <= threshold) {
+                    if (attr.getBinsPartition().getEntropy() < threshold) {
                         toRemove.add(attr);
                     } else {
                         features.add(attr);

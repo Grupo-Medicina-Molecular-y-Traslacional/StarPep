@@ -3,23 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.spi.alg.impl;
+package org.bapedis.chemspace.searching;
 
 import org.bapedis.core.spi.alg.Algorithm;
-import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.SearchTag;
 import org.openide.util.NbBundle;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Loge
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 20)
-public class MultiQuerySearchFactory implements SearchTag {
-    private SequenceSearchSetupUI setupUI = new SequenceSearchSetupUI(new MultiQuerySearchPanel());
+public class ChemMultiSimilaritySearchFactory implements SimilaritySearchTag{
 
+    private static ChemSimilaritySearchSetupUI setupUI = new ChemSimilaritySearchSetupUI();
+            
     @Override
     public String getCategory() {
         return null;
@@ -27,12 +24,12 @@ public class MultiQuerySearchFactory implements SearchTag {
 
     @Override
     public String getName() {
-       return NbBundle.getMessage(SingleQuerySearch.class, "MultiQuerySearch.name");
+        return NbBundle.getMessage(ChemMultiSimilaritySearchAlg.class, "ChemMultiSimilaritySearch.name");
     }
 
     @Override
     public String getDescription() {
-       return NbBundle.getMessage(SingleQuerySearch.class, "MultiQuerySearch.desc");
+        return NbBundle.getMessage(ChemMultiSimilaritySearchAlg.class, "ChemMultiSimilaritySearch.desc");
     }
 
     @Override
@@ -42,7 +39,7 @@ public class MultiQuerySearchFactory implements SearchTag {
 
     @Override
     public Algorithm createAlgorithm() {
-        return new MultiQuerySearch(this);
+        return new ChemMultiSimilaritySearchAlg(this);
     }
     
 }

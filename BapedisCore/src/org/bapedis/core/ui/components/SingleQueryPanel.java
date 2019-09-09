@@ -3,40 +3,38 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.spi.alg.impl;
+package org.bapedis.core.ui.components;
 
 import java.beans.PropertyChangeSupport;
-import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.bapedis.core.spi.alg.Algorithm;
-import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
-import org.biojava.nbio.core.sequence.ProteinSequence;
+import org.bapedis.core.spi.alg.SingleQuery;
 import org.biojava.nbio.core.sequence.compound.AminoAcidCompoundSet;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author loge
  */
-public class SingleQuerySearchPanel extends javax.swing.JPanel implements AlgorithmSetupUI {
-
-
+public class SingleQueryPanel extends javax.swing.JPanel {
     protected final PropertyChangeSupport changeSupport;
-    protected SingleQuerySearch searchAlg;
+    protected final SingleQuery singleQueryObj;
     protected final AminoAcidCompoundSet compoundSet;
 
     /**
      * Creates new form SeqAlignmentFilterSetupUI
+     * @param singleQueryObj
      */
-    public SingleQuerySearchPanel() {
+    public SingleQueryPanel(SingleQuery singleQueryObj) {
         initComponents();
-
+        this.singleQueryObj = singleQueryObj;
+        
         changeSupport = new PropertyChangeSupport(this);
         jErrorLabel.setText(" ");
         compoundSet = AminoAcidCompoundSet.getAminoAcidCompoundSet();
+
+        String seq = singleQueryObj.getQuery();
+        jSeqTextArea.setText(seq != null ? seq : "");
         jSeqTextArea.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
@@ -64,19 +62,15 @@ public class SingleQuerySearchPanel extends javax.swing.JPanel implements Algori
         for (int i = 0; i < seq.length() && validState; i++) {
             aa = seq.substring(i, i + 1);
             if (compoundSet.getCompoundForString(aa) == null) {
-                jErrorLabel.setText(NbBundle.getMessage(SingleQuerySearchPanel.class, "SequenceSearchSetupUI.jErrorLabel.text", aa));
+                jErrorLabel.setText(NbBundle.getMessage(SingleQueryPanel.class, "SingleQueryPanel.jErrorLabel.text", aa));
                 validState = false;
             }
         }
-        if (searchAlg != null) {
+        if (singleQueryObj != null) {
             if (validState) {
-                try {
-                    searchAlg.setQuery(new ProteinSequence(jSeqTextArea.getText()));
-                } catch (CompoundNotFoundException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
+                singleQueryObj.setQuery(jSeqTextArea.getText());
             } else {
-                searchAlg.setQuery(null);
+                singleQueryObj.setQuery(null);
             }
         }
     }
@@ -109,7 +103,7 @@ public class SingleQuerySearchPanel extends javax.swing.JPanel implements Algori
         setPreferredSize(new java.awt.Dimension(460, 300));
         setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(SingleQuerySearchPanel.class, "SingleQuerySearchPanel.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(SingleQueryPanel.class, "SingleQueryPanel.jLabel1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -136,7 +130,7 @@ public class SingleQuerySearchPanel extends javax.swing.JPanel implements Algori
         add(jseqPane, gridBagConstraints);
 
         jErrorLabel.setForeground(new java.awt.Color(255, 0, 0));
-        org.openide.awt.Mnemonics.setLocalizedText(jErrorLabel, org.openide.util.NbBundle.getMessage(SingleQuerySearchPanel.class, "SingleQuerySearchPanel.jErrorLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jErrorLabel, org.openide.util.NbBundle.getMessage(SingleQueryPanel.class, "SingleQueryPanel.jErrorLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -147,13 +141,6 @@ public class SingleQuerySearchPanel extends javax.swing.JPanel implements Algori
         add(jErrorLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    @Override
-    public JPanel getSettingPanel(Algorithm algo) {
-        searchAlg = (SingleQuerySearch) algo;
-        ProteinSequence seq = searchAlg.getQuery();
-        jSeqTextArea.setText(seq != null ? seq.getSequenceAsString() : "");
-        return this;
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jErrorLabel;

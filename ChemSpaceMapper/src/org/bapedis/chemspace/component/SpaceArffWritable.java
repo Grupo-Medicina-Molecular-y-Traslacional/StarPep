@@ -8,7 +8,7 @@ package org.bapedis.chemspace.component;
 import java.util.List;
 import org.bapedis.chemspace.model.CoordinateSpace;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.spi.alg.impl.AbstractClusterizer;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.util.ArffWritable;
 
 /**
@@ -78,7 +78,7 @@ public class SpaceArffWritable implements ArffWritable {
             case 3:
                 return Float.toString(xyzSpace.getCoordinates()[instance][zAxis]);
             case 4:
-                return peptide.getAttributeValue(AbstractClusterizer.CLUSTER_ATTR).toString();
+                return peptide.getAttributeValue(PeptideAttribute.CLUSTER_ATTR).toString();
         }
         return "";
     }

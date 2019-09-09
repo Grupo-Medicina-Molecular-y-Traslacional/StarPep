@@ -13,8 +13,8 @@ import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.distance.DistanceFunction;
 import org.bapedis.chemspace.distance.Euclidean;
 import org.bapedis.chemspace.model.FeatureSelectionOption;
-import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
+import org.bapedis.chemspace.model.SimilaritySearchingOption;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
@@ -25,10 +25,8 @@ import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
-import org.bapedis.core.spi.alg.impl.EmbeddingAlgorithm;
-import org.bapedis.core.spi.alg.impl.EmbeddingAlgorithmFactory;
-import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
-import org.bapedis.core.spi.alg.impl.NonRedundantSetAlgFactory;
+import org.bapedis.core.spi.alg.impl.EmbeddingQuerySeqAlg;
+import org.bapedis.core.spi.alg.impl.EmbeddingQuerySeqFactory;
 import org.bapedis.core.spi.alg.impl.UnsupervisedFeatureSelection;
 import org.bapedis.core.spi.alg.impl.UnsupervisedFeatureSelectionFactory;
 import org.bapedis.core.spi.ui.GraphWindowController;
@@ -50,14 +48,13 @@ public class MapperAlgorithm implements Algorithm {
     protected ProgressTicket progressTicket;
     protected boolean stopRun;
 
-    //Mapping Options
-    protected RemovingRedundantOption nrdOption;
+    //Mapping Options    
     protected FeatureExtractionOption feOption;
     protected FeatureSelectionOption fsOption;
+    protected SimilaritySearchingOption searchingOption;    
 
     //Mapping Algorithms   
-    private NonRedundantSetAlg nrdAlg;
-    private EmbeddingAlgorithm embeddingAlg;
+    private EmbeddingQuerySeqAlg embeddingAlg;
     private AllDescriptors featureExtractionAlg;
     private UnsupervisedFeatureSelection featureSelectionAlg;
     private AbstractDistance distFunction;
@@ -71,13 +68,12 @@ public class MapperAlgorithm implements Algorithm {
         this.factory = factory;
 
         //Mapping Options        
-        nrdOption = RemovingRedundantOption.NO;
+        searchingOption = SimilaritySearchingOption.NO;
         feOption = FeatureExtractionOption.YES;
         fsOption = FeatureSelectionOption.YES;
 
         //Mapping algorithms
-        nrdAlg = (NonRedundantSetAlg) new NonRedundantSetAlgFactory().createAlgorithm();
-        embeddingAlg = (EmbeddingAlgorithm) new EmbeddingAlgorithmFactory().createAlgorithm();
+        embeddingAlg = (EmbeddingQuerySeqAlg) new EmbeddingQuerySeqFactory().createAlgorithm();
         featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
         featureSelectionAlg = (UnsupervisedFeatureSelection) new UnsupervisedFeatureSelectionFactory().createAlgorithm();
         pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
@@ -101,16 +97,16 @@ public class MapperAlgorithm implements Algorithm {
 
     @Override
     public void run() {
-        // Non-redundant set
-        pc.reportMsg(String.format("Removing redundant sequences: %s", nrdOption), workspace);
-        if (nrdOption == RemovingRedundantOption.YES && !stopRun) {
-            if (nrdAlg != null) {
-                nrdAlg.setWorkspaceInput(true);
-                currentAlg = nrdAlg;
-                execute();
-            } else {
-                throw new RuntimeException("Internal error: Non-redundant algorithm is null");
-            }
+        // Chemical similarity searching
+        pc.reportMsg(String.format("Chemical similarity searching: %s", searchingOption), workspace);
+        if (searchingOption == SimilaritySearchingOption.YES && !stopRun) {
+//            if (nrdAlg != null) {
+//                nrdAlg.setWorkspaceInput(true);
+//                currentAlg = nrdAlg;
+//                execute();
+//            } else {
+//                throw new RuntimeException("Internal error: Non-redundant algorithm is null");
+//            }
         }
 
         // Embedding peptide sequences
@@ -247,27 +243,19 @@ public class MapperAlgorithm implements Algorithm {
         this.fsOption = fsOption;
     }
 
-    public RemovingRedundantOption getNrdOption() {
-        return nrdOption;
+    public SimilaritySearchingOption getSearchingOption() {
+        return searchingOption;
     }
 
-    public void setNrdOption(RemovingRedundantOption nrdOption) {
-        this.nrdOption = nrdOption;
-    }       
-
-    public NonRedundantSetAlg getNonRedundantSetAlg() {
-        return nrdAlg;
+    public void setSearchingOption(SimilaritySearchingOption searchingOption) {
+        this.searchingOption = searchingOption;
     }
 
-    public void setNonRedundantSetAlg(NonRedundantSetAlg nrdAlg) {
-        this.nrdAlg = nrdAlg;
-    }
-
-    public EmbeddingAlgorithm getEmbeddingAlg() {
+    public EmbeddingQuerySeqAlg getEmbeddingAlg() {
         return embeddingAlg;
     }
 
-    public void setEmbeddingAlg(EmbeddingAlgorithm embeddingAlg) {
+    public void setEmbeddingAlg(EmbeddingQuerySeqAlg embeddingAlg) {
         this.embeddingAlg = embeddingAlg;
     }        
 

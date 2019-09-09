@@ -6,7 +6,6 @@
 package org.bapedis.core.spi.alg.impl;
 
 import java.awt.event.ItemEvent;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -64,23 +63,23 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
             DialogDisplayer.getDefault().notify(errorND);
             algorithm.setTopRank(-1);
         }
-    }   
+    }
 
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled); //To change body of generated methods, choose Tools | Templates.
         centerPanel.setEnabled(enabled);
-        
+
         jcbSelectTop.setEnabled(enabled);
         jTF_top.setEnabled(jcbSelectTop.isSelected() && enabled);
-        
+
         uselessPanel.setEnabled(enabled);
         jLabel1.setEnabled(enabled);
         jLabel2.setEnabled(enabled);
         infoLabel1.setEnabled(enabled);
         jrankingComboBox.setEnabled(enabled);
         jSpinnerEntropy.setEnabled(enabled);
-        
+
         redundancyPanel.setEnabled(enabled);
         jLabel3.setEnabled(enabled);
         jLabel4.setEnabled(enabled);
@@ -88,8 +87,6 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         jSpinnerCorrelation.setEnabled(enabled);
         infoLabel2.setEnabled(enabled);
     }
-    
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -159,7 +156,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         uselessPanel.add(jLabel1, gridBagConstraints);
         jLabel1.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jLabel1.AccessibleContext.accessibleName")); // NOI18N
 
-        jSpinnerEntropy.setModel(new javax.swing.SpinnerNumberModel(10, 0, 100, 1));
+        jSpinnerEntropy.setModel(new javax.swing.SpinnerNumberModel(10, 1, 50, 1));
         jSpinnerEntropy.setPreferredSize(new java.awt.Dimension(50, 27));
         jSpinnerEntropy.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -296,7 +293,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
     }// </editor-fold>//GEN-END:initComponents
 
     private void corrComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_corrComboBoxActionPerformed
-        if (algorithm != null && algorithm.getCorrelationOption()!= corrComboBox.getSelectedIndex()) {
+        if (algorithm != null && algorithm.getCorrelationOption() != corrComboBox.getSelectedIndex()) {
             algorithm.setCorrelationOption(corrComboBox.getSelectedIndex());
         }
     }//GEN-LAST:event_corrComboBoxActionPerformed
@@ -316,13 +313,17 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
     }//GEN-LAST:event_jcbSelectTopActionPerformed
 
     private void jSpinnerEntropyStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinnerEntropyStateChanged
-        int threshold = (int)jSpinnerEntropy.getModel().getValue();
-        algorithm.setThresholdPercent(threshold);
+        int threshold = (int) jSpinnerEntropy.getModel().getValue();
+        if (algorithm.getThresholdPercent() != threshold) {
+            algorithm.setThresholdPercent(threshold);
+        }
     }//GEN-LAST:event_jSpinnerEntropyStateChanged
 
     private void jSpinnerCorrelationStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinnerCorrelationStateChanged
-        double threshold = (double)jSpinnerCorrelation.getModel().getValue();
-        algorithm.setCorrelationCutoff(threshold);
+        double threshold = (double) jSpinnerCorrelation.getModel().getValue();
+        if (algorithm.getCorrelationCutoff() != threshold) {
+            algorithm.setCorrelationCutoff(threshold);
+        }
     }//GEN-LAST:event_jSpinnerCorrelationStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -345,7 +346,6 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
     private javax.swing.JPanel uselessPanel;
     // End of variables declaration//GEN-END:variables
 
-
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         this.algorithm = (FeatureSEFiltering) algo;
@@ -354,8 +354,11 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         jTF_top.setEnabled(jcbSelectTop.isSelected());
         corrComboBox.setSelectedIndex(algorithm.getCorrelationOption());
         int entropyThreshold = algorithm.getThresholdPercent();
-        double corrThreshold = algorithm.getCorrelationCutoff();
+        jSpinnerEntropy.getModel().setValue(entropyThreshold);
         
+        double corrThreshold = algorithm.getCorrelationCutoff();
+        jSpinnerCorrelation.getModel().setValue(corrThreshold);
+
         return this;
     }
 

@@ -63,7 +63,7 @@ public class NonRedundantSetAlg implements Algorithm, Cloneable {
         return workspaceInput;
     }
 
-    public void setWorkspaceInput(boolean workspaceInput) {
+     public void setWorkspaceInput(boolean workspaceInput) {
         this.workspaceInput = workspaceInput;
     }
 

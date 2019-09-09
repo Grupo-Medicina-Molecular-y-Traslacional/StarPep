@@ -10,7 +10,7 @@ import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.FeatureSelectionOption;
 import org.bapedis.chemspace.model.NetworkType;
-import org.bapedis.chemspace.model.RemovingRedundantOption;
+import org.bapedis.chemspace.model.SimilaritySearchingOption;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
 import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.core.spi.alg.Algorithm;
@@ -18,7 +18,7 @@ import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.spi.alg.ChemSpaceTag;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
-import org.bapedis.core.spi.alg.impl.EmbeddingAlgorithm;
+import org.bapedis.core.spi.alg.impl.EmbeddingQuerySeqAlg;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
 import org.bapedis.core.spi.alg.impl.UnsupervisedFeatureSelection;
 import org.openide.WizardDescriptor;
@@ -68,17 +68,17 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
         }
 
         //Non-redundant set
-        RemovingRedundantOption nrdOption = (RemovingRedundantOption) wiz.getProperty(RemovingRedundantOption.class.getName());
-        if (nrdOption != null) {
-            csMapper.setNrdOption(nrdOption);
-            if (nrdOption == RemovingRedundantOption.YES) {
-                NonRedundantSetAlg nrdAlg = (NonRedundantSetAlg) wiz.getProperty(NonRedundantSetAlg.class.getName());
-                csMapper.setNonRedundantSetAlg(nrdAlg);
+        SimilaritySearchingOption searchingOption = (SimilaritySearchingOption) wiz.getProperty(SimilaritySearchingOption.class.getName());
+        if (searchingOption != null) {
+            csMapper.setSearchingOption(searchingOption);
+            if (searchingOption == SimilaritySearchingOption.YES) {
+//                NonRedundantSetAlg nrdAlg = (NonRedundantSetAlg) wiz.getProperty(NonRedundantSetAlg.class.getName());
+//                csMapper.setNonRedundantSetAlg(nrdAlg);
             }
         }      
         
         //Embedding query sequences
-        EmbeddingAlgorithm embeddingAlg = (EmbeddingAlgorithm) wiz.getProperty(EmbeddingAlgorithm.class.getName());
+        EmbeddingQuerySeqAlg embeddingAlg = (EmbeddingQuerySeqAlg) wiz.getProperty(EmbeddingQuerySeqAlg.class.getName());
         if (embeddingAlg != null){
             csMapper.setEmbeddingAlg(embeddingAlg);
         } 

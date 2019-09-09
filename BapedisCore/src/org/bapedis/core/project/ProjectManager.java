@@ -26,7 +26,7 @@ import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
-import org.bapedis.core.spi.alg.impl.SingleQuerySearchFactory;
+import org.bapedis.core.spi.alg.impl.SingleQuerySeqSearchFactory;
 import org.bapedis.core.spi.filters.FilterFactory;
 import org.gephi.graph.api.Configuration;
 import org.gephi.graph.api.Graph;
@@ -411,7 +411,7 @@ public class ProjectManager implements Lookup.Provider {
         if (model == null) {
             model = new AlgorithmModel(workspace);
             //Initialize the default sequence search algorithm
-            AlgorithmFactory seqSearchfactory = Lookup.getDefault().lookup(SingleQuerySearchFactory.class);
+            AlgorithmFactory seqSearchfactory = Lookup.getDefault().lookup(SingleQuerySeqSearchFactory.class);
             if (seqSearchfactory != null) {
                 Algorithm defaultAlgorithm = getOrCreateAlgorithm(seqSearchfactory);
                 if (defaultAlgorithm != null) {

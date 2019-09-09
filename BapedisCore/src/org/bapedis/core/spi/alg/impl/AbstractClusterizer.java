@@ -16,7 +16,6 @@ import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorException;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
@@ -28,14 +27,14 @@ import org.gephi.graph.api.Origin;
 import org.gephi.graph.api.Table;
 import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
+import static org.bapedis.core.model.PeptideAttribute.CLUSTER_ATTR; 
 
 /**
  *
  * @author loge
  */
 public abstract class AbstractClusterizer implements Algorithm, Cloneable {
-
-    public static PeptideAttribute CLUSTER_ATTR = new PeptideAttribute("cluster", "Cluster", Integer.class, true, -1);
+    
     protected final AlgorithmFactory factory;
     protected boolean stopRun;
     protected ProgressTicket ticket;
@@ -121,7 +120,6 @@ public abstract class AbstractClusterizer implements Algorithm, Cloneable {
                 nodeTable.addColumn(CLUSTER_ATTR.getId(), CLUSTER_ATTR.getDisplayName(), CLUSTER_ATTR.getType(), Origin.DATA, CLUSTER_ATTR.getDefaultValue(), true);
                 fireEvent = true;
             }
-
             
             //Set default values            
             for (Peptide peptide : attrModel.getPeptideMap().values()) {

@@ -9,7 +9,8 @@ import java.awt.Component;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
-import org.bapedis.core.spi.alg.impl.EmbeddingAlgorithm;
+import org.bapedis.chemspace.model.SimilaritySearchingOption;
+import org.bapedis.core.spi.alg.impl.EmbeddingQuerySeqAlg;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
@@ -21,7 +22,7 @@ import org.openide.util.HelpCtx;
 public class WizardQuerySequence implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
     private final MapperAlgorithm csMapper;
-    private EmbeddingAlgorithm alg;
+    private EmbeddingQuerySeqAlg alg;
     private VisualQuerySequence component;
     
     public WizardQuerySequence(MapperAlgorithm csMapper) {
@@ -34,12 +35,13 @@ public class WizardQuerySequence implements WizardDescriptor.FinishablePanel<Wiz
     }
 
     @Override
-    public Component getComponent() {
+    public VisualQuerySequence getComponent() {
         if (component == null) {
             try {
-                alg = (EmbeddingAlgorithm) csMapper.getEmbeddingAlg().clone();
+                alg = (EmbeddingQuerySeqAlg) csMapper.getEmbeddingAlg().clone();
                 JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
                 component = new VisualQuerySequence(settingPanel);
+                component.setSearchingOption(csMapper.getSearchingOption());
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
                 alg = null;
@@ -54,12 +56,24 @@ public class WizardQuerySequence implements WizardDescriptor.FinishablePanel<Wiz
     }
 
     @Override
-    public void readSettings(WizardDescriptor data) {
+    public void readSettings(WizardDescriptor wiz) {
+        // use wiz.getProperty to retrieve previous panel state
+        SimilaritySearchingOption searchingOption = (SimilaritySearchingOption) wiz.getProperty(SimilaritySearchingOption.class.getName());
+        if (searchingOption == null) {
+            searchingOption = csMapper.getSearchingOption();
+        }
+        getComponent().setSearchingOption(searchingOption);        
     }
 
     @Override
-    public void storeSettings(WizardDescriptor wiz) {
-        wiz.putProperty(EmbeddingAlgorithm.class.getName(), alg);
+    public void storeSettings(WizardDescriptor wiz) {        
+        SimilaritySearchingOption searchingOption = getComponent().getSearchingOption();
+        wiz.putProperty(SimilaritySearchingOption.class.getName(), searchingOption);
+        if (searchingOption == SimilaritySearchingOption.YES) {
+            //wiz.putProperty(EmbeddingQuerySeqAlg.class.getName(), alg);
+        } else{
+            //wiz.putProperty(EmbeddingQuerySeqAlg.class.getName(), null);
+        }        
     }
 
     @Override

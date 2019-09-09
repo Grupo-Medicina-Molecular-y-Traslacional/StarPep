@@ -109,22 +109,11 @@ public class MapperAlgorithm implements Algorithm {
         // Embedding peptide sequences        
         if (searchingOption == SimilaritySearchingOption.YES && !stopRun) {
             pc.reportMsg("Embedding query sequences", workspace);
-            List<ProteinSequence> queries = null;
-            try {
-                if (simSearchingAlg instanceof ChemMultiSimilaritySearchAlg) {
-                    String fasta = ((ChemMultiSimilaritySearchAlg) simSearchingAlg).getFasta();
-                    queries = FASTASEQ.load(fasta);
-                    embeddingQueryAlg.setQueries(queries);
-                    currentAlg = embeddingQueryAlg;
-                    execute();
-                    embeddingQueryAlg.setQueries(null);
-                } else {
-                    throw new RuntimeException("Internal error: Unsupported similarity searching algorithm");
-                }
-            } catch (Exception ex) {
-                NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
-                DialogDisplayer.getDefault().notify(nd);
-                cancel();
+            if (embeddingQueryAlg != null) {
+                currentAlg = embeddingQueryAlg;
+                execute();
+            } else {
+                throw new RuntimeException("Internal error: Embedding query algorithm is null");
             }
         }
 
@@ -280,6 +269,15 @@ public class MapperAlgorithm implements Algorithm {
     public void setSearchingOption(SimilaritySearchingOption searchingOption) {
         this.searchingOption = searchingOption;
     }
+
+    public EmbeddingQuerySeqAlg getEmbeddingQueryAlg() {
+        return embeddingQueryAlg;
+    }
+
+    public void setEmbeddingQueryAlg(EmbeddingQuerySeqAlg embeddingQueryAlg) {
+        this.embeddingQueryAlg = embeddingQueryAlg;
+    }
+        
 
     public ChemBaseSimilaritySearchAlg getSimSearchingAlg() {
         return simSearchingAlg;

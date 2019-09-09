@@ -31,6 +31,7 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
 
         panels = new WizardDescriptor.Panel[]{
             new WizardQuerySequence(csMapper),
+            new WizardSimilaritySearching(csMapper),
             new WizardFeatureExtraction(csMapper), 
             new WizardFeatureSelection(csMapper), 
             new WizardDistanceFunc(csMapper),

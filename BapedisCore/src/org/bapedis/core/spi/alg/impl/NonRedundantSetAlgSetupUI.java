@@ -1,4 +1,4 @@
- /*
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -6,26 +6,81 @@
 package org.bapedis.core.spi.alg.impl;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.GridBagConstraints;
 import javax.swing.JPanel;
 import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.ui.components.SequenceAlignmentPanel;
+import org.jdesktop.swingx.JXHyperlink;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author loge
  */
-public class NonRedundantSetAlgSetupUI extends javax.swing.JPanel implements AlgorithmSetupUI{
+public class NonRedundantSetAlgSetupUI extends javax.swing.JPanel implements AlgorithmSetupUI {
+
+    protected enum Card {
+        FRONT, BACK
+    };
 
     protected NonRedundantSetAlg nrsAlg;
     private SequenceAlignmentPanel alignmentPanel;
-    
+    protected final JXHyperlink switcherLink;
+    protected Card card;
+
     /**
      * Creates new form NonRedundantSetFilterSetupUI
      */
     public NonRedundantSetAlgSetupUI() {
         initComponents();
+
+        card = Card.FRONT;
+        switcherLink = new JXHyperlink();
+        configureSwitcherLink();
+
+        CardLayout cl = (CardLayout) centerPanel.getLayout();
+        cl.show(centerPanel, "front");
+    }
+
+    private void configureSwitcherLink() {
+        switcherLink.setText(NbBundle.getMessage(NonRedundantSetAlgSetupUI.class, "NonRedundantSetAlgSetupUI.switcherLink.text"));
+        switcherLink.setClickedColor(new java.awt.Color(0, 51, 255));
+        switcherLink.setFocusPainted(false);
+        switcherLink.setFocusable(false);
+        switcherLink.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        switcherLink.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        switcherLink.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                switchPanel();
+            }
+        });
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(switcherLink, gridBagConstraints);
+    }
+
+    private void switchPanel() {
+        CardLayout cl = (CardLayout) centerPanel.getLayout();
+        switch (card) {
+            case BACK:
+                cl.show(centerPanel, "front");
+                switcherLink.setText(NbBundle.getMessage(NonRedundantSetAlgSetupUI.class, "NonRedundantSetAlgSetupUI.switcherLink.text"));
+                card = Card.FRONT;
+                break;
+            case FRONT:
+                switcherLink.setText(NbBundle.getMessage(NonRedundantSetAlgSetupUI.class, "NonRedundantSetAlgSetupUI.switcherLink.alternativeText"));
+                cl.show(centerPanel, "back");
+                card = Card.BACK;
+                break;
+        }
     }
 
     /**
@@ -39,16 +94,20 @@ public class NonRedundantSetAlgSetupUI extends javax.swing.JPanel implements Alg
         java.awt.GridBagConstraints gridBagConstraints;
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        topPanel = new javax.swing.JPanel();
+        centerPanel = new javax.swing.JPanel();
+        frontPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jOption1 = new javax.swing.JRadioButton();
         jOption2 = new javax.swing.JRadioButton();
-        centerPanel = new javax.swing.JPanel();
+        extLabel = new javax.swing.JLabel();
+        backPanel = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
-        topPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(NonRedundantSetAlgSetupUI.class, "NonRedundantSetAlgSetupUI.topPanel.border.title"))); // NOI18N
-        topPanel.setLayout(new java.awt.GridBagLayout());
+        centerPanel.setLayout(new java.awt.CardLayout());
+
+        frontPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(NonRedundantSetAlgSetupUI.class, "NonRedundantSetAlgSetupUI.frontPanel.border.title"))); // NOI18N
+        frontPanel.setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(NonRedundantSetAlgSetupUI.class, "NonRedundantSetAlgSetupUI.jLabel1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -58,7 +117,7 @@ public class NonRedundantSetAlgSetupUI extends javax.swing.JPanel implements Alg
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        topPanel.add(jLabel1, gridBagConstraints);
+        frontPanel.add(jLabel1, gridBagConstraints);
 
         buttonGroup1.add(jOption1);
         jOption1.setSelected(true);
@@ -73,7 +132,7 @@ public class NonRedundantSetAlgSetupUI extends javax.swing.JPanel implements Alg
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 10, 0, 0);
-        topPanel.add(jOption1, gridBagConstraints);
+        frontPanel.add(jOption1, gridBagConstraints);
 
         buttonGroup1.add(jOption2);
         org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(NonRedundantSetAlgSetupUI.class, "NonRedundantSetAlgSetupUI.jOption2.text")); // NOI18N
@@ -87,18 +146,22 @@ public class NonRedundantSetAlgSetupUI extends javax.swing.JPanel implements Alg
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 10, 0, 0);
-        topPanel.add(jOption2, gridBagConstraints);
+        frontPanel.add(jOption2, gridBagConstraints);
 
+        org.openide.awt.Mnemonics.setLocalizedText(extLabel, org.openide.util.NbBundle.getMessage(NonRedundantSetAlgSetupUI.class, "NonRedundantSetAlgSetupUI.extLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-        add(topPanel, gridBagConstraints);
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 1.0;
+        frontPanel.add(extLabel, gridBagConstraints);
 
-        centerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(NonRedundantSetAlgSetupUI.class, "NonRedundantSetAlgSetupUI.centerPanel.border.title"))); // NOI18N
-        centerPanel.setLayout(new java.awt.BorderLayout());
+        centerPanel.add(frontPanel, "front");
+
+        backPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(NonRedundantSetAlgSetupUI.class, "NonRedundantSetAlgSetupUI.backPanel.border.title"))); // NOI18N
+        backPanel.setLayout(new java.awt.BorderLayout());
+        centerPanel.add(backPanel, "back");
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -110,52 +173,54 @@ public class NonRedundantSetAlgSetupUI extends javax.swing.JPanel implements Alg
     }// </editor-fold>//GEN-END:initComponents
 
     private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
-        if (nrsAlg != null && nrsAlg.isWorkspaceInput()){
+        if (nrsAlg != null && nrsAlg.isWorkspaceInput()) {
             nrsAlg.setWorkspaceInput(false);
         }
     }//GEN-LAST:event_jOption1ActionPerformed
 
     private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
-        if (nrsAlg != null && !nrsAlg.isWorkspaceInput()){
+        if (nrsAlg != null && !nrsAlg.isWorkspaceInput()) {
             nrsAlg.setWorkspaceInput(true);
         }
     }//GEN-LAST:event_jOption2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel backPanel;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel centerPanel;
+    private javax.swing.JLabel extLabel;
+    private javax.swing.JPanel frontPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JRadioButton jOption1;
     private javax.swing.JRadioButton jOption2;
-    private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
-        nrsAlg = (NonRedundantSetAlg)algo;
+        nrsAlg = (NonRedundantSetAlg) algo;
         SequenceAlignmentModel alignmentModel = (SequenceAlignmentModel) nrsAlg.getAlignmentModel();
-        
-        if (nrsAlg.isWorkspaceInput()){
+
+        if (nrsAlg.isWorkspaceInput()) {
             jOption2.setSelected(true);
-        }else{
+        } else {
             jOption1.setSelected(true);
         }
-        centerPanel.removeAll();
+        backPanel.removeAll();
         alignmentPanel = new SequenceAlignmentPanel(alignmentModel);
-        centerPanel.add(alignmentPanel, BorderLayout.CENTER);
-        centerPanel.revalidate();
-        centerPanel.repaint();        
-        
+        backPanel.add(alignmentPanel, BorderLayout.CENTER);
+        backPanel.revalidate();
+        backPanel.repaint();
+
         return this;
     }
 
     @Override
     public void setEnabled(boolean enabled) {
-        if (alignmentPanel != null){
+        switcherLink.setEnabled(enabled);
+        if (alignmentPanel != null) {
             alignmentPanel.setEnabled(enabled);
         }
     }
-    
-    
+
 }

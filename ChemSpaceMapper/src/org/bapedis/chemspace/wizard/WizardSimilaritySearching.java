@@ -8,8 +8,7 @@ package org.bapedis.chemspace.wizard;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
-import org.bapedis.chemspace.model.SimilaritySearchingOption;
-import org.bapedis.chemspace.searching.EmbeddingQuerySeqAlg;
+import org.bapedis.chemspace.searching.ChemBaseSimilaritySearchAlg;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
@@ -18,13 +17,13 @@ import org.openide.util.HelpCtx;
  *
  * @author Loge
  */
-public class WizardQuerySequence implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
+public class WizardSimilaritySearching implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
     private final MapperAlgorithm csMapper;
-    private EmbeddingQuerySeqAlg alg;
-    private VisualQuerySequence component;
+    private ChemBaseSimilaritySearchAlg alg;
+    private VisualSimilaritySearching component;
     
-    public WizardQuerySequence(MapperAlgorithm csMapper) {
+    public WizardSimilaritySearching(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
     }
     
@@ -34,13 +33,12 @@ public class WizardQuerySequence implements WizardDescriptor.FinishablePanel<Wiz
     }
 
     @Override
-    public VisualQuerySequence getComponent() {
+    public VisualSimilaritySearching getComponent() {
         if (component == null) {
             try {
-                alg = (EmbeddingQuerySeqAlg) csMapper.getEmbeddingQueryAlg().clone();
+                alg = (ChemBaseSimilaritySearchAlg) csMapper.getSimSearchingAlg().clone();
                 JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
-                component = new VisualQuerySequence(settingPanel);
-                component.setSearchingOption(csMapper.getSearchingOption());
+                component = new VisualSimilaritySearching(settingPanel);
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
                 alg = null;
@@ -57,22 +55,12 @@ public class WizardQuerySequence implements WizardDescriptor.FinishablePanel<Wiz
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
-        SimilaritySearchingOption searchingOption = (SimilaritySearchingOption) wiz.getProperty(SimilaritySearchingOption.class.getName());
-        if (searchingOption == null) {
-            searchingOption = csMapper.getSearchingOption();
-        }
-        getComponent().setSearchingOption(searchingOption);        
+        
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {        
-        SimilaritySearchingOption searchingOption = getComponent().getSearchingOption();
-        wiz.putProperty(SimilaritySearchingOption.class.getName(), searchingOption);
-        if (searchingOption == SimilaritySearchingOption.YES) {
-            wiz.putProperty(EmbeddingQuerySeqAlg.class.getName(), alg);
-        } else{
-            wiz.putProperty(EmbeddingQuerySeqAlg.class.getName(), null);
-        }        
+        wiz.putProperty(VisualSimilaritySearching.class.getName(), alg);       
     }
 
     @Override

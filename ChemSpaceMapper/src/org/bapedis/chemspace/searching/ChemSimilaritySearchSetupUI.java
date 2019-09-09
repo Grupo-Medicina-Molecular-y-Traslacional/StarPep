@@ -5,20 +5,12 @@
  */
 package org.bapedis.chemspace.searching;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.GridBagConstraints;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.bapedis.chemspace.model.SimilaritySearchingModel;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.MultiQuery;
-import org.bapedis.core.spi.alg.SingleQuery;
-import org.bapedis.core.ui.components.MultiQueryPanel;
-import org.bapedis.core.ui.components.SingleQueryPanel;
-import org.jdesktop.swingx.JXHyperlink;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
@@ -29,13 +21,8 @@ import org.openide.util.NbBundle;
  */
 public class ChemSimilaritySearchSetupUI extends javax.swing.JPanel implements AlgorithmSetupUI {
 
-    protected enum Card {
-        SEQUENCE, SETTINGS
-    };
-
     private final NotifyDescriptor errorND;
-    protected final JXHyperlink switcherLink;
-    protected Card card;
+
     protected ChemBaseSimilaritySearchAlg searchAlg;
     protected SimilaritySearchingModel searchingModel;
     protected JPanel querySetupPanel;
@@ -45,14 +32,6 @@ public class ChemSimilaritySearchSetupUI extends javax.swing.JPanel implements A
      */
     public ChemSimilaritySearchSetupUI() {
         initComponents();
-
-        card = Card.SEQUENCE;
-        switcherLink = new JXHyperlink();
-        configureSwitcherLink();
-
-        CardLayout cl = (CardLayout) centerPanel.getLayout();
-        cl.show(centerPanel, "sequence");
-
         errorND = new NotifyDescriptor.Message(NbBundle.getMessage(ChemSimilaritySearchSetupUI.class, "ChemSimilaritySearchSetupUI.errorND"), NotifyDescriptor.ERROR_MESSAGE);
 
         jTFTopRank.getDocument().addDocumentListener(new DocumentListener() {
@@ -88,48 +67,8 @@ public class ChemSimilaritySearchSetupUI extends javax.swing.JPanel implements A
         }
     }
 
-    private void configureSwitcherLink() {
-        switcherLink.setText(NbBundle.getMessage(ChemSimilaritySearchSetupUI.class, "ChemSimilaritySearchSetupUI.switcherLink.text"));
-        switcherLink.setClickedColor(new java.awt.Color(0, 51, 255));
-        switcherLink.setFocusPainted(false);
-        switcherLink.setFocusable(false);
-        switcherLink.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        switcherLink.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        switcherLink.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                switchPanel();
-            }
-        });
-
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(switcherLink, gridBagConstraints);
-    }
-
-    private void switchPanel() {
-        CardLayout cl = (CardLayout) centerPanel.getLayout();
-        switch (card) {
-            case SETTINGS:
-                cl.show(centerPanel, "sequence");
-                switcherLink.setText(NbBundle.getMessage(ChemSimilaritySearchSetupUI.class, "ChemSimilaritySearchSetupUI.switcherLink.text"));
-                card = Card.SEQUENCE;
-                break;
-            case SEQUENCE:
-                switcherLink.setText(NbBundle.getMessage(ChemSimilaritySearchSetupUI.class, "ChemSimilaritySearchSetupUI.switcherLink.alternativeText"));
-                cl.show(centerPanel, "settings");
-                card = Card.SETTINGS;
-                break;
-        }
-    }
-
     @Override
-    public void setEnabled(boolean enabled) {
-        switcherLink.setEnabled(enabled);
-        
+    public void setEnabled(boolean enabled) {                
         settingPanel.setEnabled(enabled);
         jOption1.setEnabled(enabled);
         jTopPercentComboBox.setEnabled(enabled);
@@ -149,19 +88,6 @@ public class ChemSimilaritySearchSetupUI extends javax.swing.JPanel implements A
         searchAlg = (ChemBaseSimilaritySearchAlg) algo;
         searchingModel = searchAlg.getSearchingModel();
         setupSearchingModel();
-
-        if (searchAlg instanceof SingleQuery) {
-            querySetupPanel = new SingleQueryPanel((SingleQuery) searchAlg);
-        } else if (searchAlg instanceof MultiQuery) {
-            querySetupPanel = new MultiQueryPanel((MultiQuery) searchAlg);
-        } else {
-            querySetupPanel = null;
-        }
-
-        seqPanel.removeAll();
-        seqPanel.add(querySetupPanel, BorderLayout.CENTER);
-        seqPanel.revalidate();
-        seqPanel.repaint();
 
         return this;
     }
@@ -195,8 +121,6 @@ public class ChemSimilaritySearchSetupUI extends javax.swing.JPanel implements A
         java.awt.GridBagConstraints gridBagConstraints;
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        centerPanel = new javax.swing.JPanel();
-        seqPanel = new javax.swing.JPanel();
         settingPanel = new javax.swing.JPanel();
         jOption1 = new javax.swing.JRadioButton();
         jOption2 = new javax.swing.JRadioButton();
@@ -207,12 +131,7 @@ public class ChemSimilaritySearchSetupUI extends javax.swing.JPanel implements A
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
 
-        setLayout(new java.awt.GridBagLayout());
-
-        centerPanel.setLayout(new java.awt.CardLayout());
-
-        seqPanel.setLayout(new java.awt.BorderLayout());
-        centerPanel.add(seqPanel, "sequence");
+        setLayout(new java.awt.BorderLayout());
 
         settingPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ChemSimilaritySearchSetupUI.class, "ChemSimilaritySearchSetupUI.settingPanel.border.title"))); // NOI18N
         settingPanel.setLayout(new java.awt.GridBagLayout());
@@ -314,16 +233,7 @@ public class ChemSimilaritySearchSetupUI extends javax.swing.JPanel implements A
         gridBagConstraints.insets = new java.awt.Insets(10, 5, 5, 5);
         settingPanel.add(jLabel2, gridBagConstraints);
 
-        centerPanel.add(settingPanel, "settings");
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(centerPanel, gridBagConstraints);
+        add(settingPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jSpinnerSimThresholdStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinnerSimThresholdStateChanged
@@ -358,7 +268,6 @@ public class ChemSimilaritySearchSetupUI extends javax.swing.JPanel implements A
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JPanel centerPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JRadioButton jOption1;
@@ -367,7 +276,6 @@ public class ChemSimilaritySearchSetupUI extends javax.swing.JPanel implements A
     private javax.swing.JSpinner jSpinnerSimThreshold;
     private javax.swing.JTextField jTFTopRank;
     private javax.swing.JComboBox<String> jTopPercentComboBox;
-    private javax.swing.JPanel seqPanel;
     private javax.swing.JPanel settingPanel;
     // End of variables declaration//GEN-END:variables
 }

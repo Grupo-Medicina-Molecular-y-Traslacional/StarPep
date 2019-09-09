@@ -10,15 +10,12 @@ import java.util.List;
 import org.bapedis.core.model.PeptideHit;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
-import org.bapedis.core.spi.alg.MultiQuery;
 
 /**
  *
  * @author Loge
  */
-public class ChemMultiSimilaritySearchAlg extends ChemBaseSimilaritySearchAlg implements MultiQuery {
-
-    private String fasta;
+public class ChemMultiSimilaritySearchAlg extends ChemBaseSimilaritySearchAlg {
     
     public ChemMultiSimilaritySearchAlg(AlgorithmFactory factory) {
         super(factory);
@@ -45,21 +42,8 @@ public class ChemMultiSimilaritySearchAlg extends ChemBaseSimilaritySearchAlg im
     }
 
     @Override
-    public void setFasta(String fasta) {
-        this.fasta = fasta;
-    }
-
-    @Override
-    public String getFasta() {
-        return fasta;
-    }
-
-    @Override
     public Object clone() throws CloneNotSupportedException {
-        ChemMultiSimilaritySearchAlg copy = (ChemMultiSimilaritySearchAlg) super.clone(); //To change body of generated methods, choose Tools | Templates.        
-        if (fasta != null) {
-            copy.fasta = String.copyValueOf(fasta.toCharArray());
-        }        
+        ChemMultiSimilaritySearchAlg copy = (ChemMultiSimilaritySearchAlg) super.clone(); //To change body of generated methods, choose Tools | Templates.            
         return copy;
     }
 }

@@ -69,7 +69,7 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(switcherLink, gridBagConstraints);
     }
 
@@ -224,6 +224,7 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
 
         centerPanel.add(seqPanel, "sequence");
 
+        alignmentPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.alignmentPanel.border.title"))); // NOI18N
         alignmentPanel.setLayout(new java.awt.BorderLayout());
         centerPanel.add(alignmentPanel, "alignment");
 

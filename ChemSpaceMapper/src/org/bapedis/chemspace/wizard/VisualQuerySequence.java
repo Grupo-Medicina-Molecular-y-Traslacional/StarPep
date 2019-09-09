@@ -19,7 +19,7 @@ public class VisualQuerySequence extends javax.swing.JPanel {
     /**
      * Creates new form VisualQuerySequence
      */
-    static final String CHANGED_OPTION = "removing_redundant_changed";
+    static final String CHANGED_OPTION = "embedding_changed";
     private final JPanel settingPanel;
     private SimilaritySearchingOption searchingOption;
     
@@ -80,7 +80,7 @@ public class VisualQuerySequence extends javax.swing.JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(jInfoLabel, gridBagConstraints);
-        jInfoLabel.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(VisualQuerySequence.class, "VisualQuerySequence.jInfoLabel.AccessibleContext.accessibleName")); // NOI18N
+        jInfoLabel.getAccessibleContext().setAccessibleName("<html><b>Add query sequences (optional)</b></html>");
 
         centerPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         centerPanel.setLayout(new java.awt.BorderLayout());

@@ -5,22 +5,19 @@
  */
 package org.bapedis.chemspace.searching;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.SwingUtilities;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.MultiQuery;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.core.util.FASTASEQ;
@@ -38,7 +35,7 @@ import org.openide.util.Lookup;
  *
  * @author Loge
  */
-public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable {
+public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
 
     public static String QUERY_LABEL = "Query";
     static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
@@ -51,7 +48,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable {
     private AttributesModel newAttrModel;
     protected boolean stopRun;
     protected final GraphWindowController graphWC;
-    protected List<ProteinSequence> queries;
+    private String fasta;
     protected List<Peptide> targetList, queryList;
     private static final AtomicInteger COUNTER = new AtomicInteger(45120);
 
@@ -61,19 +58,21 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable {
     }
 
     @Override
+    public void setFasta(String fasta) {
+        this.fasta = fasta;
+    }
+
+    @Override
+    public String getFasta() {
+        return fasta;
+    }
+
+    @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
         this.progressTicket = progressTicket;
         graphModel = pc.getGraphModel(workspace);
         stopRun = false;
-    }
-
-    public List<ProteinSequence> getQueries() {
-        return queries;
-    }
-
-    public void setQueries(List<ProteinSequence> queries) {
-        this.queries = queries;
     }
 
     @Override
@@ -127,6 +126,14 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable {
 
     @Override
     public void run() {
+        List<ProteinSequence> queries = null;
+        try {
+            queries = FASTASEQ.load(fasta);
+        } catch (Exception ex) {
+            NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
+            DialogDisplayer.getDefault().notify(nd);
+            cancel();
+        }
         if (!stopRun && queries != null) {
             Graph mainGraph = graphModel.getGraph();
             AttributesModel attrModel = pc.getAttributesModel(workspace);
@@ -215,6 +222,9 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable {
     @Override
     public Object clone() throws CloneNotSupportedException {
         EmbeddingQuerySeqAlg copy = (EmbeddingQuerySeqAlg) super.clone(); //To change body of generated methods, choose Tools | Templates.
+        if (fasta != null) {
+            copy.fasta = String.copyValueOf(fasta.toCharArray());
+        }
         return copy;
     }
 

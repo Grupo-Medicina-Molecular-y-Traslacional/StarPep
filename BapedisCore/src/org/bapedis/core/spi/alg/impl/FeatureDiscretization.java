@@ -112,45 +112,49 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
     @Override
     public void run() {
         int numberOfInstances = peptides.size();
-        switch (binsOption) {
-            case Sturges_Rule:
-                numberOfBins = (int) (Math.log(numberOfInstances) / Math.log(2)) + 1;
-                break;
-            case Rice_Rule:
-                numberOfBins = 2 * (int) Math.cbrt(numberOfInstances);
-                break;
-            default:
-                if (binsOption != BinsOption.User_Defined) {
-                    throw new IllegalStateException("Unknown number of bins");
-                }
-        }
-
-        pc.reportMsg("Bins option: " + binsOption, workspace);
-        pc.reportMsg("Number of bins: " + numberOfBins, workspace);
-
-        List<MolecularDescriptor> allFeatures = new LinkedList<>();
-
-        for (String key : attrModel.getMolecularDescriptorKeys()) {
-            for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
-                allFeatures.add(attr);
+        if (numberOfInstances > 0) {
+            switch (binsOption) {
+                case Sturges_Rule:
+                    numberOfBins = (int) (Math.log(numberOfInstances) / Math.log(2)) + 1;
+                    break;
+                case Rice_Rule:
+                    numberOfBins = 2 * (int) Math.cbrt(numberOfInstances);
+                    break;
+                default:
+                    if (binsOption != BinsOption.User_Defined) {
+                        throw new IllegalStateException("Unknown number of bins");
+                    }
             }
-        }
 
-        ticket.switchToDeterminate(allFeatures.size());
-        allFeatures.parallelStream().forEach(descriptor -> {
-            if (!stopRun.get()) {
-                try {
-                    computeBinsPartition(descriptor);
-                } catch (MolecularDescriptorNotFoundException ex) {
-                    Exceptions.printStackTrace(ex);
-                    DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
-                    stopRun.set(true);
+            pc.reportMsg("Bins option: " + binsOption, workspace);
+            pc.reportMsg("Number of bins: " + numberOfBins, workspace);
+
+            List<MolecularDescriptor> allFeatures = new LinkedList<>();
+
+            for (String key : attrModel.getMolecularDescriptorKeys()) {
+                for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
+                    allFeatures.add(attr);
                 }
-                ticket.progress();
             }
-        });
 
-        maxEntropy = Math.log(numberOfBins);
+            ticket.switchToDeterminate(allFeatures.size());
+            allFeatures.parallelStream().forEach(descriptor -> {
+                if (!stopRun.get()) {
+                    try {
+                        computeBinsPartition(descriptor);
+                    } catch (MolecularDescriptorNotFoundException ex) {
+                        Exceptions.printStackTrace(ex);
+                        DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
+                        stopRun.set(true);
+                    }
+                    ticket.progress();
+                }
+            });
+
+            maxEntropy = Math.log(numberOfBins);
+        } else {
+            throw new IllegalStateException("There is not instances to compute");
+        }
     }
 
     private void computeBinsPartition(MolecularDescriptor descriptor) throws MolecularDescriptorNotFoundException {

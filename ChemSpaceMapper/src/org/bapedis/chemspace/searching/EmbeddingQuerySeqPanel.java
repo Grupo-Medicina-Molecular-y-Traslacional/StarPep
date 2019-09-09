@@ -3,9 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.spi.alg.impl;
+package org.bapedis.chemspace.searching;
 
-import java.awt.Cursor;
 import java.io.File;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
@@ -13,8 +12,6 @@ import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 
 /**
@@ -30,7 +27,7 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
     private File inputFile;
     private DefaultListModel<String> listModel1, listModel2;
 
-    private EmbeddingQuerySeqAlg embeddingAlg;
+    private Algorithm embeddingAlg;
 
     public EmbeddingQuerySeqPanel() {
         initComponents();
@@ -62,11 +59,6 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        topPanel = new javax.swing.JPanel();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
-        jRadioButton3 = new javax.swing.JRadioButton();
-        jRadioButton4 = new javax.swing.JRadioButton();
         bottomPanel = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -84,22 +76,6 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
         jButton4 = new javax.swing.JButton();
 
         setLayout(new java.awt.BorderLayout());
-
-        topPanel.setLayout(new java.awt.GridBagLayout());
-
-        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton1, org.openide.util.NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "EmbeddingQuerySeqPanel.jRadioButton1.text")); // NOI18N
-        topPanel.add(jRadioButton1, new java.awt.GridBagConstraints());
-
-        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton2, org.openide.util.NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "EmbeddingQuerySeqPanel.jRadioButton2.text")); // NOI18N
-        topPanel.add(jRadioButton2, new java.awt.GridBagConstraints());
-
-        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton3, org.openide.util.NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "EmbeddingQuerySeqPanel.jRadioButton3.text")); // NOI18N
-        topPanel.add(jRadioButton3, new java.awt.GridBagConstraints());
-
-        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton4, org.openide.util.NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "EmbeddingQuerySeqPanel.jRadioButton4.text")); // NOI18N
-        topPanel.add(jRadioButton4, new java.awt.GridBagConstraints());
-
-        add(topPanel, java.awt.BorderLayout.NORTH);
 
         bottomPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "EmbeddingQuerySeqPanel.bottomPanel.border.title"))); // NOI18N
         bottomPanel.setLayout(new java.awt.GridBagLayout());
@@ -229,21 +205,21 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
     public JPanel getSettingPanel(Algorithm algo) {
         embeddingAlg = (EmbeddingQuerySeqAlg) algo;
         listModel1.clear();
-        for (String ds : embeddingAlg.selected.keySet()) {
-            listModel1.addElement(ds);
-        }
+//        for (String ds : embeddingAlg.selected.keySet()) {
+//            listModel1.addElement(ds);
+//        }
         
         listModel2.clear();
-        for (String ds : embeddingAlg.nonSelected.keySet()) {
-            listModel2.addElement(ds);
-        }
+//        for (String ds : embeddingAlg.nonSelected.keySet()) {
+//            listModel2.addElement(ds);
+//        }
         return this;
     }
 
     private void button1Action() {
         int[] indices = jList1.getSelectedIndices();
         for (int i = 0; i < indices.length; i++) {
-            embeddingAlg.remove(listModel1.get(indices[i]));
+//            embeddingAlg.remove(listModel1.get(indices[i]));
         }
         moveFromTo(indices, listModel1, listModel2);
     }
@@ -251,7 +227,7 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
     private void button2Action() {
         int[] indices = jList2.getSelectedIndices();
         for (int i = 0; i < indices.length; i++) {
-            embeddingAlg.recover(listModel2.get(indices[i]));
+//            embeddingAlg.recover(listModel2.get(indices[i]));
         }
         moveFromTo(indices, listModel2, listModel1);
     }
@@ -281,14 +257,9 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
     private javax.swing.JLabel jLabel6;
     private javax.swing.JList jList1;
     private javax.swing.JList jList2;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
-    private javax.swing.JRadioButton jRadioButton3;
-    private javax.swing.JRadioButton jRadioButton4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 }

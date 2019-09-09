@@ -47,26 +47,27 @@ public abstract class ChemBaseSimilaritySearchAlg implements Algorithm, Cloneabl
     protected Workspace workspace;
     protected ProgressTicket progressTicket;
     protected List<Node> graphNodes;
-    protected List<Peptide> targetList, queryList;
-
+    protected List<Peptide> targetList, queryList;    
     protected AttributesModel newAttrModel;
     protected boolean stopRun;
     protected DistanceFunction distance;
+    
 
     public ChemBaseSimilaritySearchAlg(AlgorithmFactory factory) {
         this.factory = factory;
         searchingModel = new SimilaritySearchingModel();
-    }
+        
+    }     
 
     public SimilaritySearchingModel getSearchingModel() {
         return searchingModel;
     }
 
-    public DistanceFunction getDistance() {
+    public DistanceFunction getDistanceFunction() {
         return distance;
     }
 
-    public void setDistance(DistanceFunction distance) {
+    public void setDistanceFunction(DistanceFunction distance) {
         this.distance = distance;
     }
 
@@ -179,7 +180,7 @@ public abstract class ChemBaseSimilaritySearchAlg implements Algorithm, Cloneabl
 
         if (attrModel != null) {
             for (Peptide peptide : attrModel.getPeptides()) {
-                if (peptide.getGraphNode().getLabel().equals("Query peptide")) {
+                if (peptide.getGraphNode().getLabel().equals(EmbeddingQuerySeqAlg.QUERY_LABEL)) {
                     queryList.add(peptide);
                 } else {
                     targetList.add(peptide);
@@ -191,7 +192,6 @@ public abstract class ChemBaseSimilaritySearchAlg implements Algorithm, Cloneabl
         newAttrModel = new AttributesModel(workspace);
         graphNodes = new LinkedList<>();
         stopRun = false;
-        graphNodes = null;
     }
 
     @Override

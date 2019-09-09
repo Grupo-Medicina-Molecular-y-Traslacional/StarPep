@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.core.spi.alg.impl;
+package org.bapedis.chemspace.searching;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -29,9 +29,10 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphFactory;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
-import org.openide.util.NbBundle;
 
 /**
  *
@@ -39,11 +40,10 @@ import org.openide.util.NbBundle;
  */
 public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable {
 
+    public static String QUERY_LABEL = "Query";
     static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-    static int DEFAULT_TOP_K_INDEX = 0;
 
     protected final EmbeddingQuerySeqFactory factory;
-    protected LinkedHashMap<String, List<ProteinSequence>> selected, nonSelected;
     protected GraphModel graphModel;
     protected Workspace workspace;
     protected ProgressTicket progressTicket;
@@ -51,53 +51,13 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable {
     private AttributesModel newAttrModel;
     protected boolean stopRun;
     protected final GraphWindowController graphWC;
-    protected final SequenceAlignmentModel alignmentModel;
-    protected int topKIndex;
-    private static AtomicInteger counter = new AtomicInteger(45120);
+    protected List<ProteinSequence> queries;
+    protected List<Peptide> targetList, queryList;
+    private static final AtomicInteger COUNTER = new AtomicInteger(45120);
 
     public EmbeddingQuerySeqAlg(EmbeddingQuerySeqFactory factory) {
         this.factory = factory;
-        selected = new LinkedHashMap<>();
-        nonSelected = new LinkedHashMap<>();
         graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
-        alignmentModel = new SequenceAlignmentModel();
-        alignmentModel.setPercentIdentity(30);
-        topKIndex = DEFAULT_TOP_K_INDEX;
-    }
-
-    public int getTopKIndex() {
-        return topKIndex;
-    }
-
-    public void setTopKIndex(int topKIndex) {
-        this.topKIndex = topKIndex;
-    }
-
-    public void addDataSetFromFile(String ds, File inputFile) throws Exception {
-        if (selected.containsKey(ds) || nonSelected.containsKey(ds)) {
-            throw new Exception(NbBundle.getMessage(EmbeddingQuerySeqAlg.class, "EmbeddingAlgorithm.invalidDS", ds));
-        } else {
-            List<ProteinSequence> entries = FASTASEQ.load(inputFile);
-            selected.put(ds, entries);
-        }
-    }
-
-    public void remove(String ds) {
-        moveFromTo(ds, selected, nonSelected);
-    }
-
-    private void moveFromTo(String ds, LinkedHashMap<String, List<ProteinSequence>> from,
-            LinkedHashMap<String, List<ProteinSequence>> to) {
-        if (!from.containsKey(ds)) {
-            throw new IllegalArgumentException("Can not be removed: " + ds);
-        }
-        List<ProteinSequence> list = from.get(ds);
-        from.remove(ds);
-        to.put(ds, list);
-    }
-
-    public void recover(String ds) {
-        moveFromTo(ds, nonSelected, selected);
     }
 
     @Override
@@ -106,14 +66,20 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable {
         this.progressTicket = progressTicket;
         graphModel = pc.getGraphModel(workspace);
         stopRun = false;
-        graphNodes = null;
+    }
+
+    public List<ProteinSequence> getQueries() {
+        return queries;
+    }
+
+    public void setQueries(List<ProteinSequence> queries) {
+        this.queries = queries;
     }
 
     @Override
     public void endAlgo() {
         if (newAttrModel != null && !stopRun) {
             // To refresh graph view
-            GraphModel graphModel = pc.getGraphModel(workspace);
             Graph graph = graphModel.getGraphVisible();
             graph.clear();
             graphWC.refreshGraphView(workspace, graphNodes, null);
@@ -121,6 +87,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable {
             final Workspace ws = workspace;
             final AttributesModel modelToRemove = pc.getAttributesModel(workspace);
             final AttributesModel modelToAdd = newAttrModel;
+            modelToRemove.getBridge().copyTo(modelToAdd, null);
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
                     @Override
@@ -134,9 +101,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable {
                         }
                     }
                 });
-            } catch (InterruptedException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (InvocationTargetException ex) {
+            } catch (InterruptedException | InvocationTargetException ex) {
                 Exceptions.printStackTrace(ex);
             }
         }
@@ -146,9 +111,9 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable {
         graphModel = null;
         newAttrModel = null;
         graphNodes = null;
+        targetList = null;
+        queryList = null;
     }
-
-
 
     @Override
     public AlgorithmProperty[] getProperties() {
@@ -162,67 +127,54 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable {
 
     @Override
     public void run() {
-        Graph mainGraph = graphModel.getGraph();
-        AttributesModel attrModel = pc.getAttributesModel(workspace);
-        //Create new workspace
-        newAttrModel = new AttributesModel(workspace);
-        graphNodes = new LinkedList<>();
+        if (!stopRun && queries != null) {
+            Graph mainGraph = graphModel.getGraph();
+            AttributesModel attrModel = pc.getAttributesModel(workspace);
 
-        // Target list of peptides
-        List<Peptide> targetList = new LinkedList<>();
-        if (attrModel != null) {
-            //Target list
-            for (Peptide peptide : attrModel.getPeptides()) {
-                if (peptide.getGraphNode().getLabel().equals("Peptide")) {
-                    targetList.add(peptide);
+            // Target list of peptides
+            targetList = new LinkedList<>();
+            if (attrModel != null) {
+                //Target list
+                for (Peptide peptide : attrModel.getPeptides()) {
+                    if (!peptide.getGraphNode().getLabel().equals(QUERY_LABEL)) {
+                        targetList.add(peptide);
+                    }
                 }
-            }
 
-            //Add query peptides and graph nodes            
-            List<Peptide> queryList = new LinkedList<>();
-            Peptide peptide;
-            Node node;
-            String id, seq;
-            for (Map.Entry<String, List<ProteinSequence>> entry : selected.entrySet()) {
-                for (ProteinSequence protein : entry.getValue()) {
+                //Add query peptides and graph nodes            
+                queryList = new LinkedList<>();
+                Peptide peptide;
+                Node node;
+                String id, seq;
+                for (ProteinSequence protein : queries) {
                     id = protein.getAccession().getID();
                     seq = protein.getSequenceAsString();
 
-                    node = getOrAddGraphNode(graphModel, entry.getKey(), id);
+                    node = getOrAddGraphNode(graphModel, QUERY_LABEL, id);
 
                     peptide = new Peptide(node, mainGraph);
-                    peptide.setAttributeValue(Peptide.ID, counter.getAndIncrement());
+                    peptide.setAttributeValue(Peptide.ID, COUNTER.getAndIncrement());
                     peptide.setAttributeValue(Peptide.SEQ, seq);
                     peptide.setAttributeValue(Peptide.LENGHT, seq.length());
                     peptide.setBiojavaSeq(protein);
 
                     queryList.add(peptide);
                 }
-            }
 
-            if (!stopRun) {
-                if (queryList.size() > 0) {
-                    //Add query peptides to new attribute model
-                    for (Peptide query : queryList) {
-                        newAttrModel.addPeptide(query);
-                        graphNodes.add(query.getGraphNode());
-                    }
-                } else {
-                    for (Peptide query : targetList) {
-                        newAttrModel.addPeptide(query);
-                        graphNodes.add(query.getGraphNode());
-                    }
+                //Create new workspace
+                newAttrModel = new AttributesModel(workspace);
+                graphNodes = new LinkedList<>();
+
+                //Add target peptides to new attribute model
+                for (Peptide query : targetList) {
+                    newAttrModel.addPeptide(query);
+                    graphNodes.add(query.getGraphNode());
                 }
 
-                //Removing non selected nodes
-                for (Map.Entry<String, List<ProteinSequence>> entry : nonSelected.entrySet()) {
-                    for (ProteinSequence protein : entry.getValue()) {
-                        id = protein.getAccession().getID();
-                        node = mainGraph.getNode(id);
-                        if (node != null) {
-                            mainGraph.removeNode(node);
-                        }
-                    }
+                //Add query peptides to new attribute model
+                for (Peptide query : queryList) {
+                    newAttrModel.addPeptide(query);
+                    graphNodes.add(query.getGraphNode());
                 }
             }
         }
@@ -255,17 +207,15 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable {
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        EmbeddingQuerySeqAlg copy = (EmbeddingQuerySeqAlg) super.clone(); //To change body of generated methods, choose Tools | Templates.
-        copy.selected = (LinkedHashMap<String, List<ProteinSequence>>) selected.clone();
-        copy.nonSelected = (LinkedHashMap<String, List<ProteinSequence>>) nonSelected.clone();
-        return copy;
+    public boolean cancel() {
+        stopRun = true;
+        return true;
     }
 
     @Override
-    public boolean cancel() {
-        stopRun = true;
-        return true; 
+    public Object clone() throws CloneNotSupportedException {
+        EmbeddingQuerySeqAlg copy = (EmbeddingQuerySeqAlg) super.clone(); //To change body of generated methods, choose Tools | Templates.
+        return copy;
     }
 
 }

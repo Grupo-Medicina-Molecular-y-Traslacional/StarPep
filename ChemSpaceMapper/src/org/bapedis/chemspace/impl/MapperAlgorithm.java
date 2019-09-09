@@ -1,4 +1,4 @@
-  /*
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -16,7 +16,10 @@ import org.bapedis.chemspace.model.FeatureSelectionOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.SimilaritySearchingOption;
 import org.bapedis.chemspace.searching.ChemBaseSimilaritySearchAlg;
+import org.bapedis.chemspace.searching.ChemMultiSimilaritySearchAlg;
 import org.bapedis.chemspace.searching.ChemMultiSimilaritySearchFactory;
+import org.bapedis.chemspace.searching.EmbeddingQuerySeqAlg;
+import org.bapedis.chemspace.searching.EmbeddingQuerySeqFactory;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
@@ -27,13 +30,14 @@ import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
-import org.bapedis.core.spi.alg.impl.EmbeddingQuerySeqAlg;
-import org.bapedis.core.spi.alg.impl.EmbeddingQuerySeqFactory;
 import org.bapedis.core.spi.alg.impl.UnsupervisedFeatureSelection;
 import org.bapedis.core.spi.alg.impl.UnsupervisedFeatureSelectionFactory;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.task.ProgressTicket;
+import org.bapedis.core.util.FASTASEQ;
+import org.biojava.nbio.core.sequence.ProteinSequence;
 import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -53,9 +57,10 @@ public class MapperAlgorithm implements Algorithm {
     //Mapping Options    
     protected FeatureExtractionOption feOption;
     protected FeatureSelectionOption fsOption;
-    protected SimilaritySearchingOption searchingOption;    
+    protected SimilaritySearchingOption searchingOption;
 
     //Mapping Algorithms   
+    private EmbeddingQuerySeqAlg embeddingQueryAlg;
     private ChemBaseSimilaritySearchAlg simSearchingAlg;
     private AllDescriptors featureExtractionAlg;
     private UnsupervisedFeatureSelection featureSelectionAlg;
@@ -75,6 +80,7 @@ public class MapperAlgorithm implements Algorithm {
         fsOption = FeatureSelectionOption.YES;
 
         //Mapping algorithms
+        embeddingQueryAlg = (EmbeddingQuerySeqAlg) new EmbeddingQuerySeqFactory().createAlgorithm();
         simSearchingAlg = (ChemBaseSimilaritySearchAlg) new ChemMultiSimilaritySearchFactory().createAlgorithm();
         featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
         featureSelectionAlg = (UnsupervisedFeatureSelection) new UnsupervisedFeatureSelectionFactory().createAlgorithm();
@@ -99,28 +105,28 @@ public class MapperAlgorithm implements Algorithm {
 
     @Override
     public void run() {
-        // Chemical similarity searching
-        pc.reportMsg(String.format("Chemical similarity searching: %s", searchingOption), workspace);
-        if (searchingOption == SimilaritySearchingOption.YES && !stopRun) {
-//            if (nrdAlg != null) {
-//                nrdAlg.setWorkspaceInput(true);
-//                currentAlg = nrdAlg;
-//                execute();
-//            } else {
-//                throw new RuntimeException("Internal error: Non-redundant algorithm is null");
-//            }
-        }
 
-        // Embedding peptide sequences
-//        pc.reportMsg("Embedding peptide sequences", workspace);
-//        if (!stopRun) {
-//            if (embeddingAlg != null) {
-//                currentAlg = embeddingAlg;
-//                execute();
-//            } else {
-//                throw new RuntimeException("Internal error: Embedding algorithm is null");
-//            }
-//        }
+        // Embedding peptide sequences        
+        if (searchingOption == SimilaritySearchingOption.YES && !stopRun) {
+            pc.reportMsg("Embedding query sequences", workspace);
+            List<ProteinSequence> queries = null;
+            try {
+                if (simSearchingAlg instanceof ChemMultiSimilaritySearchAlg) {
+                    String fasta = ((ChemMultiSimilaritySearchAlg) simSearchingAlg).getFasta();
+                    queries = FASTASEQ.load(fasta);
+                    embeddingQueryAlg.setQueries(queries);
+                    currentAlg = embeddingQueryAlg;
+                    execute();
+                    embeddingQueryAlg.setQueries(null);
+                } else {
+                    throw new RuntimeException("Internal error: Unsupported similarity searching algorithm");
+                }
+            } catch (Exception ex) {
+                NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
+                DialogDisplayer.getDefault().notify(nd);
+                cancel();
+            }
+        }
 
         // Feature Extraction
         pc.reportMsg(String.format("Feature extraction: %s", feOption), workspace);
@@ -160,10 +166,32 @@ public class MapperAlgorithm implements Algorithm {
         if (!stopRun) {
             try {
                 MolecularDescriptor.preprocessing(allFeatures, attrModel.getPeptides());
+                if (distFunction != null) {
+                    distFunction.setFeatures(allFeatures);
+                } else {
+                    throw new RuntimeException("Internal error: Distance function is null");
+                }
             } catch (MolecularDescriptorException ex) {
                 DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
                 pc.reportError(ex.getMessage(), workspace);
                 cancel();
+            }
+        }
+
+        // Chemical similarity searching
+        pc.reportMsg(String.format("Chemical similarity searching: %s", searchingOption), workspace);
+        if (searchingOption == SimilaritySearchingOption.YES && !stopRun) {
+            if (simSearchingAlg != null) {
+                if (distFunction != null) {
+                    pc.reportMsg(String.format("Distance Function: %s", distFunction.getName()), workspace);
+                    simSearchingAlg.setDistanceFunction(distFunction);
+                    currentAlg = simSearchingAlg;
+                    execute();
+                } else {
+                    throw new RuntimeException("Internal error: Distance function is null");
+                }
+            } else {
+                throw new RuntimeException("Internal error: Similarity searching algorithm is null");
             }
         }
 
@@ -259,7 +287,7 @@ public class MapperAlgorithm implements Algorithm {
 
     public void setSimSearchingAlg(ChemBaseSimilaritySearchAlg simSearchingAlg) {
         this.simSearchingAlg = simSearchingAlg;
-    }         
+    }
 
     public void setFeatureExtractionAlg(AllDescriptors alg) {
         this.featureExtractionAlg = alg;

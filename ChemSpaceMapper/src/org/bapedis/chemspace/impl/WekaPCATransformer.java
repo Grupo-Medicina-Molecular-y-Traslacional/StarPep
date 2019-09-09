@@ -66,7 +66,7 @@ public class WekaPCATransformer implements Algorithm {
 
     public CoordinateSpace getXYZSpace() {
         return xyzSpace;
-    }        
+    }
 
     public MD_OUTPUT_OPTION getOption() {
         return option;
@@ -74,7 +74,7 @@ public class WekaPCATransformer implements Algorithm {
 
     public void setOption(MD_OUTPUT_OPTION option) {
         this.option = option;
-    }        
+    }
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
@@ -119,50 +119,51 @@ public class WekaPCATransformer implements Algorithm {
 
     @Override
     public void run() {
-        try {
-            MyArffWritable writable = new MyArffWritable(peptides, features, option);
-            File f = ArffWriter.writeToArffFile(writable);
-            BufferedReader reader = new BufferedReader(new FileReader(f));
-            Instances data = new Instances(reader);
-            pca.setCenterData(true);
-            pca.setVarianceCovered(varianceCovered);
-            pca.buildEvaluator(data);
-            Instances resultData = pca.transformedData(data);
+        if (peptides != null && peptides.length > 0) {
+            try {
+                MyArffWritable writable = new MyArffWritable(peptides, features, option);
+                File f = ArffWriter.writeToArffFile(writable);
+                BufferedReader reader = new BufferedReader(new FileReader(f));
+                Instances data = new Instances(reader);
+                pca.setCenterData(true);
+                pca.setVarianceCovered(varianceCovered);
+                pca.buildEvaluator(data);
+                Instances resultData = pca.transformedData(data);
 
-            //The Kaiser criterion. We can retain only factors with eigenvalues greater than 1
-            double[] eigenValues = pca.getEigenValues();
-            double sumOfEigenValues = Utils.sum(eigenValues);
+                //The Kaiser criterion. We can retain only factors with eigenvalues greater than 1
+                double[] eigenValues = pca.getEigenValues();
+                double sumOfEigenValues = Utils.sum(eigenValues);
 
-            //Axis labels
-            String[] axisLabels = new String[resultData.numAttributes()];
-            double[] explainedVar = new double[axisLabels.length];
-            int index = eigenValues.length - 1;
-            double varExp;
-            double cumulativeEigen = 0;
-            pc.reportMsg("Factor, Eigenvalue, Cumulative eigenvalue, ", workspace);
-            for (int i = 0; i < axisLabels.length; i++) {
-                varExp = (eigenValues[index] / sumOfEigenValues) * 100;
-                explainedVar[i] = varExp;
-                cumulativeEigen += eigenValues[index];
-                axisLabels[i] = String.format("PCA %d (%s%% explained var.)", (i + 1), df.format(varExp));
-                pc.reportMsg(String.format("%s, %s, %s", String.valueOf(i + 1), df.format(eigenValues[index]), df.format(cumulativeEigen) ), workspace);
-                index--;
-            }
-            
-            //Coordinates
-            float[][] coordinates = new float[peptides.length][axisLabels.length];
-            Instance in;
-            for (int i = 0; i < resultData.numInstances(); i++) {
-                in = resultData.instance(i);
-                for (int j = 0; j < axisLabels.length; j++) {
-                    coordinates[i][j] = (float) in.value(j);
+                //Axis labels
+                String[] axisLabels = new String[resultData.numAttributes()];
+                double[] explainedVar = new double[axisLabels.length];
+                int index = eigenValues.length - 1;
+                double varExp;
+                double cumulativeEigen = 0;
+                pc.reportMsg("Factor, Eigenvalue, Cumulative eigenvalue, ", workspace);
+                for (int i = 0; i < axisLabels.length; i++) {
+                    varExp = (eigenValues[index] / sumOfEigenValues) * 100;
+                    explainedVar[i] = varExp;
+                    cumulativeEigen += eigenValues[index];
+                    axisLabels[i] = String.format("PCA %d (%s%% explained var.)", (i + 1), df.format(varExp));
+                    pc.reportMsg(String.format("%s, %s, %s", String.valueOf(i + 1), df.format(eigenValues[index]), df.format(cumulativeEigen)), workspace);
+                    index--;
                 }
-            }
-            
-            xyzSpace = new CoordinateSpace(peptides, axisLabels, coordinates, explainedVar);
-        } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
-        }
 
+                //Coordinates
+                float[][] coordinates = new float[peptides.length][axisLabels.length];
+                Instance in;
+                for (int i = 0; i < resultData.numInstances(); i++) {
+                    in = resultData.instance(i);
+                    for (int j = 0; j < axisLabels.length; j++) {
+                        coordinates[i][j] = (float) in.value(j);
+                    }
+                }
+
+                xyzSpace = new CoordinateSpace(peptides, axisLabels, coordinates, explainedVar);
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
     }
 }

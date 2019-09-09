@@ -6,8 +6,6 @@
 package org.bapedis.chemspace.impl;
 
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.vecmath.Vector3f;
@@ -15,7 +13,6 @@ import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.model.CoordinateSpace;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
@@ -118,16 +115,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
             graphModel = pc.getGraphModel(workspace);
             mainGraph = graphModel.getGraph();
             graph = graphModel.getGraphVisible();
-            relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
-
-            //Load features
-            List<MolecularDescriptor> allFeatures = new LinkedList<>();
-            for (String key : attrModel.getMolecularDescriptorKeys()) {
-                for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
-                    allFeatures.add(attr);
-                }
-            }
-            distFunc.setFeatures(allFeatures);
+            relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);            
         }
         maxDistance = 0;
         densityChart = null;
@@ -165,40 +153,42 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
 
     @Override
     public void run() {
-        // Remove all edges..
-        mainGraph.writeLock();
-        try {
-            for (Node node : mainGraph.getNodes()) {
-                mainGraph.clearEdges(node, relType);
+        if (peptides != null && peptides.length > 0) {
+            // Remove all edges..
+            mainGraph.writeLock();
+            try {
+                for (Node node : mainGraph.getNodes()) {
+                    mainGraph.clearEdges(node, relType);
+                }
+            } finally {
+                mainGraph.writeUnlock();
             }
-        } finally {
-            mainGraph.writeUnlock();
+
+            switch (networkType) {
+                case FULL:
+                    createFullNetwork();
+                    break;
+                case HSP:
+                    createHSPNetwork();
+                    break;
+                default:
+                    throw new IllegalStateException("Unknown network type: " + networkType);
+            }
+
+            // Report max distance
+            if (!stopRun.get()) {
+                pc.reportMsg("Max distance: " + maxDistance, workspace);
+            }
+
+            //Compute similarity values
+            computeSimilarityRelationships();
+
+            //Update node positions
+            updateNodePositions();
+
+            densityChart = new ChartPanel(createXYLineChart("Network Density", createDensityDataSet()));
+            ticket.progress();
         }
-
-        switch (networkType) {
-            case FULL:
-                createFullNetwork();
-                break;
-            case HSP:
-                createHSPNetwork();
-                break;
-            default:
-                throw new IllegalStateException("Unknown network type: " + networkType);
-        }
-
-        // Report max distance
-        if (!stopRun.get()) {
-            pc.reportMsg("Max distance: " + maxDistance, workspace);
-        }
-
-        //Compute similarity values
-        computeSimilarityRelationships();
-
-        //Update node positions
-        updateNodePositions();
-
-        densityChart = new ChartPanel(createXYLineChart("Network Density", createDensityDataSet()));
-        ticket.progress();
     }
 
     private void createFullNetwork() {
@@ -235,7 +225,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
                 }
                 if (distance > maxDistance) {
                     maxDistance = distance;
-                }                
+                }
             }
             ticket.progress();
         }

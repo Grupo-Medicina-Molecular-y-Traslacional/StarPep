@@ -129,7 +129,7 @@ public class UnsupervisedFeatureSelection implements Algorithm, Cloneable {
 
     @Override
     public void run() {
-        if (attrModel != null) {
+        if (attrModel != null && attrModel.getPeptides().size() > 0) {
             try {
                 double maxEntropy = Double.NaN;
                 //----------Preprocessing all descriptors                

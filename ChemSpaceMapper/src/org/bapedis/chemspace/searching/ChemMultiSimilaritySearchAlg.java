@@ -18,8 +18,8 @@ import org.bapedis.core.spi.alg.MultiQuery;
  */
 public class ChemMultiSimilaritySearchAlg extends ChemBaseSimilaritySearchAlg implements MultiQuery {
 
-    protected String fasta;
-
+    private String fasta;
+    
     public ChemMultiSimilaritySearchAlg(AlgorithmFactory factory) {
         super(factory);
     }
@@ -56,10 +56,10 @@ public class ChemMultiSimilaritySearchAlg extends ChemBaseSimilaritySearchAlg im
 
     @Override
     public Object clone() throws CloneNotSupportedException {
-        ChemMultiSimilaritySearchAlg copy = (ChemMultiSimilaritySearchAlg) super.clone(); //To change body of generated methods, choose Tools | Templates.
+        ChemMultiSimilaritySearchAlg copy = (ChemMultiSimilaritySearchAlg) super.clone(); //To change body of generated methods, choose Tools | Templates.        
         if (fasta != null) {
             copy.fasta = String.copyValueOf(fasta.toCharArray());
-        }
+        }        
         return copy;
     }
 }

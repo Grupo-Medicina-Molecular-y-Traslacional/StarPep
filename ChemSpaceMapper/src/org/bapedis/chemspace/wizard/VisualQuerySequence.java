@@ -19,7 +19,7 @@ public class VisualQuerySequence extends javax.swing.JPanel {
     /**
      * Creates new form VisualQuerySequence
      */
-    static final String CHANGED_OPTION = "embedding_changed";
+    static final String CHANGED_OPTION = "embedding_query";
     private final JPanel settingPanel;
     private SimilaritySearchingOption searchingOption;
     

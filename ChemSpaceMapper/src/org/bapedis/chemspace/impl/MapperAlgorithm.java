@@ -16,8 +16,9 @@ import org.bapedis.chemspace.model.FeatureSelectionOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.SimilaritySearchingOption;
 import org.bapedis.chemspace.searching.ChemBaseSimilaritySearchAlg;
-import org.bapedis.chemspace.searching.ChemMultiSimilaritySearchAlg;
 import org.bapedis.chemspace.searching.ChemMultiSimilaritySearchFactory;
+import org.bapedis.chemspace.searching.EmbeddingInputSeqAlg;
+import org.bapedis.chemspace.searching.EmbeddingInputSeqFactory;
 import org.bapedis.chemspace.searching.EmbeddingQuerySeqAlg;
 import org.bapedis.chemspace.searching.EmbeddingQuerySeqFactory;
 import org.bapedis.core.model.AlgorithmProperty;
@@ -34,10 +35,7 @@ import org.bapedis.core.spi.alg.impl.UnsupervisedFeatureSelection;
 import org.bapedis.core.spi.alg.impl.UnsupervisedFeatureSelectionFactory;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.task.ProgressTicket;
-import org.bapedis.core.util.FASTASEQ;
-import org.biojava.nbio.core.sequence.ProteinSequence;
 import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -60,6 +58,7 @@ public class MapperAlgorithm implements Algorithm {
     protected SimilaritySearchingOption searchingOption;
 
     //Mapping Algorithms   
+    private EmbeddingInputSeqAlg embeddingInputAlg;
     private EmbeddingQuerySeqAlg embeddingQueryAlg;
     private ChemBaseSimilaritySearchAlg simSearchingAlg;
     private AllDescriptors featureExtractionAlg;
@@ -80,6 +79,7 @@ public class MapperAlgorithm implements Algorithm {
         fsOption = FeatureSelectionOption.YES;
 
         //Mapping algorithms
+        embeddingInputAlg = (EmbeddingInputSeqAlg) new EmbeddingInputSeqFactory().createAlgorithm();
         embeddingQueryAlg = (EmbeddingQuerySeqAlg) new EmbeddingQuerySeqFactory().createAlgorithm();
         simSearchingAlg = (ChemBaseSimilaritySearchAlg) new ChemMultiSimilaritySearchFactory().createAlgorithm();
         featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
@@ -105,6 +105,13 @@ public class MapperAlgorithm implements Algorithm {
 
     @Override
     public void run() {
+        // Embedding input sequences
+        if (embeddingInputAlg != null) {
+            currentAlg = embeddingInputAlg;
+            execute();
+        } else {
+            throw new RuntimeException("Internal error: Embedding input sequences is null");
+        }
 
         // Embedding peptide sequences        
         if (searchingOption == SimilaritySearchingOption.YES && !stopRun) {
@@ -246,6 +253,14 @@ public class MapperAlgorithm implements Algorithm {
         return stopRun;
     }
 
+    public EmbeddingInputSeqAlg getEmbeddingInputAlg() {
+        return embeddingInputAlg;
+    }
+
+    public void setEmbeddingInputAlg(EmbeddingInputSeqAlg embeddingInputAlg) {
+        this.embeddingInputAlg = embeddingInputAlg;
+    }            
+
     public FeatureExtractionOption getFEOption() {
         return feOption;
     }
@@ -277,7 +292,6 @@ public class MapperAlgorithm implements Algorithm {
     public void setEmbeddingQueryAlg(EmbeddingQuerySeqAlg embeddingQueryAlg) {
         this.embeddingQueryAlg = embeddingQueryAlg;
     }
-        
 
     public ChemBaseSimilaritySearchAlg getSimSearchingAlg() {
         return simSearchingAlg;

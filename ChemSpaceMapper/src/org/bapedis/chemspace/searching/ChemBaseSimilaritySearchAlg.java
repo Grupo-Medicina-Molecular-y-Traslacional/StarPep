@@ -42,7 +42,7 @@ public abstract class ChemBaseSimilaritySearchAlg implements Algorithm, Cloneabl
     protected static final GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
 
     protected final AlgorithmFactory factory;
-    protected final SimilaritySearchingModel searchingModel;
+    protected SimilaritySearchingModel searchingModel;
     protected GraphModel graphModel;
     protected Workspace workspace;
     protected ProgressTicket progressTicket;
@@ -94,10 +94,10 @@ public abstract class ChemBaseSimilaritySearchAlg implements Algorithm, Cloneabl
                 case TOP_RANK_VALUE_OPTION:
                     topK = searchingModel.getTopRank();
                     break;
-                case SIMILARITY_THRESHOD_OPTION:
+                case SIMILARITY_THRESHOD_VALUE_OPTION:
                     threshold = searchingModel.getThreshold();
                     break;
-                case SIMILARITY_PERCENT_OPTION:
+                case SIMILARITY_THRESHOD_PERCENT_OPTION:
                     similarity = 1.0 - candidates[0].getDistance() / maxDistance;
                     threshold = searchingModel.getTopPercentValue() * similarity / 100;
                     break;
@@ -143,10 +143,10 @@ public abstract class ChemBaseSimilaritySearchAlg implements Algorithm, Cloneabl
             case TOP_RANK_VALUE_OPTION:
                 topK = searchingModel.getTopRank();
                 break;
-            case SIMILARITY_THRESHOD_OPTION:
+            case SIMILARITY_THRESHOD_VALUE_OPTION:
                 threshold = searchingModel.getThreshold();
                 break;
-            case SIMILARITY_PERCENT_OPTION:
+            case SIMILARITY_THRESHOD_PERCENT_OPTION:
                 similarity = results[0].getScore();
                 threshold = searchingModel.getTopPercentValue() * similarity / 100;
                 break;
@@ -252,6 +252,7 @@ public abstract class ChemBaseSimilaritySearchAlg implements Algorithm, Cloneabl
     @Override
     public Object clone() throws CloneNotSupportedException {
         ChemBaseSimilaritySearchAlg copy = (ChemBaseSimilaritySearchAlg) super.clone(); //To change body of generated methods, choose Tools | Templates.
+        copy.searchingModel = (SimilaritySearchingModel)this.searchingModel.clone();
         return copy;
     }       
 }

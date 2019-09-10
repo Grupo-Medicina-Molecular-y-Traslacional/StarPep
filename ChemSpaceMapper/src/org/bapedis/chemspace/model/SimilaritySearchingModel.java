@@ -9,30 +9,30 @@ package org.bapedis.chemspace.model;
  *
  * @author Loge
  */
-public class SimilaritySearchingModel {
+public class SimilaritySearchingModel implements Cloneable {
 
     public enum Options {
-        TOP_RANK_VALUE_OPTION, TOP_RANK_PERCENT_OPTION, SIMILARITY_THRESHOD_OPTION, SIMILARITY_PERCENT_OPTION
+        TOP_RANK_VALUE_OPTION, TOP_RANK_PERCENT_OPTION, SIMILARITY_THRESHOD_VALUE_OPTION, SIMILARITY_THRESHOD_PERCENT_OPTION
     }
 
     public static final int[] TOP_RANK_PERCENT = new int[]{1, 3, 5, 10};
-    
+
     public static final int[] SIMILARITY_THRESHOLD_PERCENT = new int[]{50, 60, 70, 80, 90};
 
     private Options option;
 
     private int topRank;
     private int topPercentIndex;
-    
+
     private double threshold;
     private int thresholdPercentIndex;
-    
 
     public SimilaritySearchingModel() {
-        topRank = 50;
         topPercentIndex = 3;
+        topRank = 50;
         threshold = 0.7;
         thresholdPercentIndex = 2;
+        option = Options.TOP_RANK_PERCENT_OPTION;
     }
 
     public Options getOption() {
@@ -81,12 +81,18 @@ public class SimilaritySearchingModel {
     public void setThresholdPercentIndex(int thresholdPercentIndex) {
         if (thresholdPercentIndex < 0 || thresholdPercentIndex > SIMILARITY_THRESHOLD_PERCENT.length) {
             throw new IllegalStateException("Unknown value for  threshold percent index: " + thresholdPercentIndex);
-        }        
+        }
         this.thresholdPercentIndex = thresholdPercentIndex;
     }
-    
-    public int getThresholdPercentValue(){
+
+    public int getThresholdPercentValue() {
         return SIMILARITY_THRESHOLD_PERCENT[thresholdPercentIndex];
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        SimilaritySearchingModel copy = (SimilaritySearchingModel)super.clone();
+        return copy;
     }
 
 }

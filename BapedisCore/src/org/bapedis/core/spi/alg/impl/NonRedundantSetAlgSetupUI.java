@@ -47,6 +47,7 @@ public class NonRedundantSetAlgSetupUI extends javax.swing.JPanel implements Alg
 
     private void configureSwitcherLink() {
         switcherLink.setText(NbBundle.getMessage(NonRedundantSetAlgSetupUI.class, "NonRedundantSetAlgSetupUI.switcherLink.text"));
+        switcherLink.setToolTipText(NbBundle.getMessage(NonRedundantSetAlgSetupUI.class, "NonRedundantSetAlgSetupUI.switcherLink.toolTipText"));
         switcherLink.setClickedColor(new java.awt.Color(0, 51, 255));
         switcherLink.setFocusPainted(false);
         switcherLink.setFocusable(false);
@@ -73,10 +74,12 @@ public class NonRedundantSetAlgSetupUI extends javax.swing.JPanel implements Alg
             case BACK:
                 cl.show(centerPanel, "front");
                 switcherLink.setText(NbBundle.getMessage(NonRedundantSetAlgSetupUI.class, "NonRedundantSetAlgSetupUI.switcherLink.text"));
+                switcherLink.setToolTipText(NbBundle.getMessage(NonRedundantSetAlgSetupUI.class, "NonRedundantSetAlgSetupUI.switcherLink.toolTipText"));
                 card = Card.FRONT;
                 break;
             case FRONT:
                 switcherLink.setText(NbBundle.getMessage(NonRedundantSetAlgSetupUI.class, "NonRedundantSetAlgSetupUI.switcherLink.alternativeText"));
+                switcherLink.setToolTipText(NbBundle.getMessage(NonRedundantSetAlgSetupUI.class, "NonRedundantSetAlgSetupUI.switcherLink.alternaToolTipText"));
                 cl.show(centerPanel, "back");
                 card = Card.BACK;
                 break;

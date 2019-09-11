@@ -53,6 +53,7 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
 
     private void configureSwitcherLink() {
         switcherLink.setText(NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.switcherLink.text"));
+        switcherLink.setToolTipText(NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.switcherLink.toolTipText"));
         switcherLink.setClickedColor(new java.awt.Color(0, 51, 255));
         switcherLink.setFocusPainted(false);
         switcherLink.setFocusable(false);
@@ -79,10 +80,12 @@ public class SequenceSearchSetupUI extends javax.swing.JPanel implements Algorit
             case ALIGNMENT:
                 cl.show(centerPanel, "sequence");
                 switcherLink.setText(NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.switcherLink.text"));
+                switcherLink.setToolTipText(NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.switcherLink.toolTipText"));
                 card = Card.SEQUENCE;
                 break;
             case SEQUENCE:
                 switcherLink.setText(NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.switcherLink.alternativeText"));
+                switcherLink.setToolTipText(NbBundle.getMessage(SequenceSearchSetupUI.class, "SequenceSearchSetupUI.switcherLink.alternaToolTipText"));
                 cl.show(centerPanel, "alignment");
                 card = Card.ALIGNMENT;
                 break;

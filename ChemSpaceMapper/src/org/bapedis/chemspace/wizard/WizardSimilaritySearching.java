@@ -60,7 +60,7 @@ public class WizardSimilaritySearching implements WizardDescriptor.FinishablePan
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {        
-        wiz.putProperty(VisualSimilaritySearching.class.getName(), alg);       
+        wiz.putProperty(ChemBaseSimilaritySearchAlg.class.getName(), alg);       
     }
 
     @Override

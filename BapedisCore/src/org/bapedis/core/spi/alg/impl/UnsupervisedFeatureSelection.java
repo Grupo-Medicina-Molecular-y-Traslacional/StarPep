@@ -54,7 +54,7 @@ public class UnsupervisedFeatureSelection implements Algorithm, Cloneable {
         emptyMDs = new NotifyDescriptor.Message(NbBundle.getMessage(UnsupervisedFeatureSelection.class, "UnsupervisedFeatureSelection.emptyMDs.info"), NotifyDescriptor.ERROR_MESSAGE);
 
         firstStage = true;
-        secondStage = true;
+        secondStage = false;
 
         debug = true;
     }

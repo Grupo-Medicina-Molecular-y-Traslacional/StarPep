@@ -99,7 +99,7 @@ public abstract class ChemBaseSimilaritySearchAlg implements Algorithm, Cloneabl
                     break;
                 case SIMILARITY_THRESHOD_PERCENT_OPTION:
                     similarity = 1.0 - candidates[0].getDistance() / maxDistance;
-                    threshold = searchingModel.getTopPercentValue() * similarity / 100;
+                    threshold = searchingModel.getThresholdPercentValue() * similarity / 100;
                     break;
             }
 
@@ -148,7 +148,7 @@ public abstract class ChemBaseSimilaritySearchAlg implements Algorithm, Cloneabl
                 break;
             case SIMILARITY_THRESHOD_PERCENT_OPTION:
                 similarity = results[0].getScore();
-                threshold = searchingModel.getTopPercentValue() * similarity / 100;
+                threshold = searchingModel.getThresholdPercentValue()* similarity / 100;
                 break;
         }
 

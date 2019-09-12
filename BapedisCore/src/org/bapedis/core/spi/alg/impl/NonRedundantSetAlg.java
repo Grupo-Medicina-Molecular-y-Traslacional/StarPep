@@ -35,8 +35,9 @@ import org.openide.util.NbBundle;
  */
 public class NonRedundantSetAlg implements Algorithm, Cloneable {
 
-    private final ProjectManager pc;
-    protected final PeptideDAO dao;
+    private static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+    protected static final PeptideDAO dao = Lookup.getDefault().lookup(PeptideDAO.class);
+    protected static final GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
     private List<Node> graphNodes;
     private final NonRedundantSetAlgFactory factory;
     protected SequenceClustering clusteringAlg;
@@ -44,14 +45,10 @@ public class NonRedundantSetAlg implements Algorithm, Cloneable {
     private Workspace workspace;
     private ProgressTicket ticket;
     private boolean stopRun, workspaceInput;
-    protected final GraphWindowController graphWC;
-
+    
     public NonRedundantSetAlg(NonRedundantSetAlgFactory factory) {
         this.factory = factory;
         this.clusteringAlg = (SequenceClustering) new SequenceClusteringFactory().createAlgorithm();
-        pc = Lookup.getDefault().lookup(ProjectManager.class);
-        graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
-        dao = Lookup.getDefault().lookup(PeptideDAO.class);
         workspaceInput = false;
     }
 

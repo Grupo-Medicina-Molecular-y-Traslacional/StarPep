@@ -13,6 +13,7 @@ import org.bapedis.chemspace.model.InputSequenceOption;
 import org.bapedis.chemspace.model.NetworkType;
 import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.bapedis.chemspace.model.SimilaritySearchingOption;
+import org.bapedis.chemspace.searching.ChemBaseSimilaritySearchAlg;
 import org.bapedis.chemspace.searching.EmbeddingQuerySeqAlg;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
 import org.bapedis.core.io.MD_OUTPUT_OPTION;
@@ -77,6 +78,19 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
                 csMapper.setNonRedundantAlg(alg);
             }
         }
+        
+        //Similarity searching
+        SimilaritySearchingOption searchingOption = (SimilaritySearchingOption) wiz.getProperty(SimilaritySearchingOption.class.getName());
+        if (searchingOption != null) {
+            csMapper.setSearchingOption(searchingOption);
+            if (searchingOption == SimilaritySearchingOption.YES) {
+                EmbeddingQuerySeqAlg embeddingQueryAlg = (EmbeddingQuerySeqAlg) wiz.getProperty(EmbeddingQuerySeqAlg.class.getName());
+                csMapper.setEmbeddingQueryAlg(embeddingQueryAlg);
+                
+                ChemBaseSimilaritySearchAlg searchingAlg = (ChemBaseSimilaritySearchAlg) wiz.getProperty(ChemBaseSimilaritySearchAlg.class.getName());
+                csMapper.setSimSearchingAlg(searchingAlg);
+            }
+        }            
                 
         // Feature Extraction Option
         FeatureExtractionOption feOption = (FeatureExtractionOption) wiz.getProperty(FeatureExtractionOption.class.getName());
@@ -104,17 +118,7 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
         if (distFunction != null) {
             distFunction.setOption(option);
             csMapper.setDistanceFunction(distFunction);
-        }
-        
-        //Similarity searching
-        SimilaritySearchingOption searchingOption = (SimilaritySearchingOption) wiz.getProperty(SimilaritySearchingOption.class.getName());
-        if (searchingOption != null) {
-            csMapper.setSearchingOption(searchingOption);
-            if (searchingOption == SimilaritySearchingOption.YES) {
-                EmbeddingQuerySeqAlg embeddingQueryAlg = (EmbeddingQuerySeqAlg) wiz.getProperty(EmbeddingQuerySeqAlg.class.getName());
-                csMapper.setEmbeddingQueryAlg(embeddingQueryAlg);
-            }
-        }            
+        }                
         
         //Network type
         NetworkType networkType = (NetworkType) wiz.getProperty(NetworkType.class.getName());

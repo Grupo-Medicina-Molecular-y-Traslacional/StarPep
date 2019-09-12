@@ -32,9 +32,9 @@ import org.openide.util.Lookup;
  */
 public class EmbeddingInputSeqAlg implements Algorithm, Cloneable {
 
-    private final ProjectManager pc;
-    protected final PeptideDAO dao;
-    protected final GraphWindowController graphWC;
+    private static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);;
+    protected static final PeptideDAO dao = Lookup.getDefault().lookup(PeptideDAO.class);
+    protected static final GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
     private final AlgorithmFactory factory;
     private Workspace workspace;
     private ProgressTicket ticket;
@@ -42,10 +42,7 @@ public class EmbeddingInputSeqAlg implements Algorithm, Cloneable {
     private List<Node> graphNodes;
     private boolean stopRun;
 
-    public EmbeddingInputSeqAlg(AlgorithmFactory factory) {
-        pc = Lookup.getDefault().lookup(ProjectManager.class);
-        dao = Lookup.getDefault().lookup(PeptideDAO.class);
-        graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
+    public EmbeddingInputSeqAlg(AlgorithmFactory factory) {        
         this.factory = factory;
     }
 

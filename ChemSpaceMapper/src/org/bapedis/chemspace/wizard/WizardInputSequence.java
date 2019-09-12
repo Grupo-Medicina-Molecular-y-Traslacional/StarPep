@@ -5,11 +5,12 @@
  */
 package org.bapedis.chemspace.wizard;
 
-import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
-import org.bapedis.chemspace.searching.EmbeddingInputSeqAlg;
+import org.bapedis.chemspace.model.InputSequenceOption;
+import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
+import org.bapedis.core.ui.components.SequenceAlignmentPanel;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
@@ -17,7 +18,7 @@ import org.openide.util.HelpCtx;
 public class WizardInputSequence implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
     private final MapperAlgorithm csMapper;
-    private EmbeddingInputSeqAlg alg;
+    private  NonRedundantSetAlg alg;
 
     public WizardInputSequence(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
@@ -37,9 +38,8 @@ public class WizardInputSequence implements WizardDescriptor.FinishablePanel<Wiz
     public VisualInputSequence getComponent() {
         if (component == null) {
             try {
-                alg = (EmbeddingInputSeqAlg) csMapper.getEmbeddingInputAlg().clone();
-                JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
-                component = new VisualInputSequence(settingPanel);
+                alg = (NonRedundantSetAlg) csMapper.getNonRedundantAlg().clone();
+                component = new VisualInputSequence(new SequenceAlignmentPanel(alg.getAlignmentModel()));
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
                 alg = null;
@@ -77,12 +77,33 @@ public class WizardInputSequence implements WizardDescriptor.FinishablePanel<Wiz
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
+        InputSequenceOption inputOption = (InputSequenceOption) wiz.getProperty(InputSequenceOption.class.getName());
+        if (inputOption == null) {
+            inputOption = csMapper.getInputOption();
+        }
+        getComponent().setInputOption(inputOption);
+      
+        RemovingRedundantOption nrdOption = (RemovingRedundantOption) wiz.getProperty(RemovingRedundantOption.class.getName());
+        if (nrdOption == null) {
+            nrdOption = csMapper.getNrdOption();
+        }
+        getComponent().setNrdOption(nrdOption);        
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        wiz.putProperty(EmbeddingInputSeqAlg.class.getName(), alg);
+        InputSequenceOption inputOption = component.getInputOption();
+        wiz.putProperty(InputSequenceOption.class.getName(), inputOption);
+
+        RemovingRedundantOption nrdOption = component.getNrdOption();
+        wiz.putProperty(RemovingRedundantOption.class.getName(), nrdOption);
+        
+        if (nrdOption == RemovingRedundantOption.YES) {
+            wiz.putProperty(NonRedundantSetAlg.class.getName(), alg);
+        } else {
+            wiz.putProperty(NonRedundantSetAlg.class.getName(), null);
+        }
     }
 
     @Override

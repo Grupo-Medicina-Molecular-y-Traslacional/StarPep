@@ -7,18 +7,54 @@ package org.bapedis.chemspace.wizard;
 
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
+import org.bapedis.chemspace.model.InputSequenceOption;
+import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.openide.util.NbBundle;
 
 public final class VisualInputSequence extends JPanel {
-
-    static final String CHANGED_OPTION = "removing_redundant_changed";
-    private final JPanel settingPanel;
+    protected InputSequenceOption inputOption;
+    protected RemovingRedundantOption nrdOption;
+    protected final JPanel settingPanel;
 
     public VisualInputSequence(JPanel settingPanel) {
         initComponents();
         this.settingPanel = settingPanel;
         centerPanel.add(settingPanel, BorderLayout.CENTER);
     }
+
+    public InputSequenceOption getInputOption() {
+        return inputOption;
+    }
+
+    public void setInputOption(InputSequenceOption inputOption) {
+        this.inputOption = inputOption;
+        switch (inputOption) {
+            case EMBEDDED_DB:
+                jOption1.setSelected(true);
+                break;
+            case CURRENT_WORKSPACE:
+                jOption2.setSelected(true);
+                break;
+        }        
+    }
+
+    public RemovingRedundantOption getNrdOption() {
+        return nrdOption;
+    }
+
+    public void setNrdOption(RemovingRedundantOption nrdOption) {
+        this.nrdOption = nrdOption;
+        switch (nrdOption) {
+            case NO:
+                jOption3.setSelected(true);
+                settingPanel.setEnabled(false);
+                break;
+            case YES:
+                jOption4.setSelected(true);
+                settingPanel.setEnabled(true);
+                break;
+        }            
+    }        
 
     @Override
     public String getName() {
@@ -35,7 +71,14 @@ public final class VisualInputSequence extends JPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup2 = new javax.swing.ButtonGroup();
         centerPanel = new javax.swing.JPanel();
+        jInfoLabel1 = new javax.swing.JLabel();
+        jOption1 = new javax.swing.JRadioButton();
+        jOption2 = new javax.swing.JRadioButton();
+        jInfoLabel2 = new javax.swing.JLabel();
+        jOption3 = new javax.swing.JRadioButton();
+        jOption4 = new javax.swing.JRadioButton();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
         setPreferredSize(new java.awt.Dimension(560, 580));
@@ -45,17 +88,123 @@ public final class VisualInputSequence extends JPanel {
         centerPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(centerPanel, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel1, org.openide.util.NbBundle.getMessage(VisualInputSequence.class, "VisualInputSequence.jInfoLabel1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(jInfoLabel1, gridBagConstraints);
+
+        buttonGroup1.add(jOption1);
+        org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(VisualInputSequence.class, "VisualInputSequence.jOption1.text")); // NOI18N
+        jOption1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOption1ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 0, 0);
+        add(jOption1, gridBagConstraints);
+
+        buttonGroup1.add(jOption2);
+        org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(VisualInputSequence.class, "VisualInputSequence.jOption2.text")); // NOI18N
+        jOption2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOption2ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 0, 0);
+        add(jOption2, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel2, org.openide.util.NbBundle.getMessage(VisualInputSequence.class, "VisualInputSequence.jInfoLabel2.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(jInfoLabel2, gridBagConstraints);
+
+        buttonGroup2.add(jOption3);
+        org.openide.awt.Mnemonics.setLocalizedText(jOption3, org.openide.util.NbBundle.getMessage(VisualInputSequence.class, "VisualInputSequence.jOption3.text")); // NOI18N
+        jOption3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOption3ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 0, 0);
+        add(jOption3, gridBagConstraints);
+
+        buttonGroup2.add(jOption4);
+        org.openide.awt.Mnemonics.setLocalizedText(jOption4, org.openide.util.NbBundle.getMessage(VisualInputSequence.class, "VisualInputSequence.jOption4.text")); // NOI18N
+        jOption4.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jOption4ItemStateChanged(evt);
+            }
+        });
+        jOption4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOption4ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 0, 0);
+        add(jOption4, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
+        inputOption = InputSequenceOption.EMBEDDED_DB;
+    }//GEN-LAST:event_jOption1ActionPerformed
+
+    private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
+        inputOption = InputSequenceOption.CURRENT_WORKSPACE;
+    }//GEN-LAST:event_jOption2ActionPerformed
+
+    private void jOption3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption3ActionPerformed
+        nrdOption = RemovingRedundantOption.NO;
+    }//GEN-LAST:event_jOption3ActionPerformed
+
+    private void jOption4ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jOption4ItemStateChanged
+        if (settingPanel != null){
+            settingPanel.setEnabled(jOption4.isSelected());
+        }
+    }//GEN-LAST:event_jOption4ItemStateChanged
+
+    private void jOption4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption4ActionPerformed
+        nrdOption = RemovingRedundantOption.YES;
+    }//GEN-LAST:event_jOption4ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JPanel centerPanel;
+    private javax.swing.JLabel jInfoLabel1;
+    private javax.swing.JLabel jInfoLabel2;
+    private javax.swing.JRadioButton jOption1;
+    private javax.swing.JRadioButton jOption2;
+    private javax.swing.JRadioButton jOption3;
+    private javax.swing.JRadioButton jOption4;
     // End of variables declaration//GEN-END:variables
 }

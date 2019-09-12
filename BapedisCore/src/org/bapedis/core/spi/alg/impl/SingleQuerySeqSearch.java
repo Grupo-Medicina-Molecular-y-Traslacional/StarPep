@@ -7,10 +7,8 @@ package org.bapedis.core.spi.alg.impl;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeSet;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideHit;

@@ -25,16 +25,12 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import org.bapedis.chemspace.component.SpaceArffWritable;
 import org.bapedis.chemspace.component.VisualizePanel3D;
 import org.bapedis.chemspace.model.CoordinateSpace;
 import org.bapedis.chemspace.model.PCATableModel;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.ui.components.JQuickHistogram;
-import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.bapedis.core.util.ArffWriter;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXHyperlink;
@@ -55,7 +51,6 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
     protected final JXHyperlink openWizardLink, scatter3DLink;
     protected MapperAlgorithm csMapper;
-    protected final JToolBar toolBar;
     protected NetworkEmbedderAlg netEmbedder;
     private final DecimalFormat formatter;
     protected final JXBusyLabel busyLabel;
@@ -72,20 +67,15 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     public MapperAlgorithmPanel() {
         initComponents();
 
-        // Tool bar
-        toolBar = new JToolBar();
-        toolBar.setFloatable(false);
-        rightTopPanel.add(toolBar);
-
         scatter3DLink = new JXHyperlink();
 //        configureScatter3DLink();
 //        toolBar.add(scatter3DLink);
 
-        toolBar.addSeparator();
 
         openWizardLink = new JXHyperlink();
         configureOpenWizardLink();
-        toolBar.add(openWizardLink);
+        // Tool bar
+        rightTopPanel.add(openWizardLink);        
 
         Hashtable<Integer, JLabel> thresholdLabelTable = new Hashtable<>();
         thresholdLabelTable.put(0, new JLabel("0"));

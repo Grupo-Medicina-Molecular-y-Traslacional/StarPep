@@ -9,9 +9,10 @@ import java.text.MessageFormat;
 import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.FeatureSelectionOption;
+import org.bapedis.chemspace.model.InputSequenceOption;
 import org.bapedis.chemspace.model.NetworkType;
+import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.bapedis.chemspace.model.SimilaritySearchingOption;
-import org.bapedis.chemspace.searching.ChemBaseSimilaritySearchAlg;
 import org.bapedis.chemspace.searching.EmbeddingQuerySeqAlg;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
 import org.bapedis.core.io.MD_OUTPUT_OPTION;
@@ -20,6 +21,7 @@ import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.spi.alg.ChemSpaceTag;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
+import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
 import org.bapedis.core.spi.alg.impl.UnsupervisedFeatureSelection;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
@@ -60,23 +62,22 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
     }
 
     public static void setUp(MapperAlgorithm csMapper, WizardDescriptor wiz) {
-        
-        //Network type
-        NetworkType networkType = (NetworkType) wiz.getProperty(NetworkType.class.getName());
-        if (networkType != null){
-            csMapper.getNetworkEmbedderAlg().setNetworkType(networkType);
+                 
+        //Input sequences
+        InputSequenceOption inputOption = (InputSequenceOption) wiz.getProperty(InputSequenceOption.class.getName());
+        if (inputOption != null){
+            csMapper.setInputOption(inputOption);
         }
-
-        //Similarity searching
-        SimilaritySearchingOption searchingOption = (SimilaritySearchingOption) wiz.getProperty(SimilaritySearchingOption.class.getName());
-        if (searchingOption != null) {
-            csMapper.setSearchingOption(searchingOption);
-            if (searchingOption == SimilaritySearchingOption.YES) {
-                EmbeddingQuerySeqAlg embeddingQueryAlg = (EmbeddingQuerySeqAlg) wiz.getProperty(EmbeddingQuerySeqAlg.class.getName());
-                csMapper.setEmbeddingQueryAlg(embeddingQueryAlg);
+        
+        RemovingRedundantOption nrdOption = (RemovingRedundantOption) wiz.getProperty(RemovingRedundantOption.class.getName());
+        if(nrdOption != null){
+            csMapper.setNrdOption(nrdOption);
+            if (nrdOption == RemovingRedundantOption.YES){
+                NonRedundantSetAlg alg = (NonRedundantSetAlg) wiz.getProperty(NonRedundantSetAlg.class.getName());
+                csMapper.setNonRedundantAlg(alg);
             }
-        }              
-
+        }
+                
         // Feature Extraction Option
         FeatureExtractionOption feOption = (FeatureExtractionOption) wiz.getProperty(FeatureExtractionOption.class.getName());
         if (feOption != null) {
@@ -97,13 +98,29 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
             }
         }
 
-        // Similarity  
+        // Distance  
         AbstractDistance distFunction = (AbstractDistance) wiz.getProperty(AbstractDistance.class.getName());
         MD_OUTPUT_OPTION option = (MD_OUTPUT_OPTION) wiz.getProperty(MD_OUTPUT_OPTION.class.getName());
         if (distFunction != null) {
             distFunction.setOption(option);
             csMapper.setDistanceFunction(distFunction);
         }
+        
+        //Similarity searching
+        SimilaritySearchingOption searchingOption = (SimilaritySearchingOption) wiz.getProperty(SimilaritySearchingOption.class.getName());
+        if (searchingOption != null) {
+            csMapper.setSearchingOption(searchingOption);
+            if (searchingOption == SimilaritySearchingOption.YES) {
+                EmbeddingQuerySeqAlg embeddingQueryAlg = (EmbeddingQuerySeqAlg) wiz.getProperty(EmbeddingQuerySeqAlg.class.getName());
+                csMapper.setEmbeddingQueryAlg(embeddingQueryAlg);
+            }
+        }            
+        
+        //Network type
+        NetworkType networkType = (NetworkType) wiz.getProperty(NetworkType.class.getName());
+        if (networkType != null){
+            csMapper.getNetworkEmbedderAlg().setNetworkType(networkType);
+        }        
     }
 
     public static WizardDescriptor createWizardDescriptor(MapperAlgorithm csMapper) {

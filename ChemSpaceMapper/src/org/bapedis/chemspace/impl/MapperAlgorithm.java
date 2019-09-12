@@ -14,6 +14,8 @@ import org.bapedis.chemspace.distance.DistanceFunction;
 import org.bapedis.chemspace.distance.Euclidean;
 import org.bapedis.chemspace.model.FeatureSelectionOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
+import org.bapedis.chemspace.model.InputSequenceOption;
+import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.bapedis.chemspace.model.SimilaritySearchingOption;
 import org.bapedis.chemspace.searching.ChemBaseSimilaritySearchAlg;
 import org.bapedis.chemspace.searching.ChemMultiSimilaritySearchFactory;
@@ -31,6 +33,8 @@ import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
+import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
+import org.bapedis.core.spi.alg.impl.NonRedundantSetAlgFactory;
 import org.bapedis.core.spi.alg.impl.UnsupervisedFeatureSelection;
 import org.bapedis.core.spi.alg.impl.UnsupervisedFeatureSelectionFactory;
 import org.bapedis.core.spi.ui.GraphWindowController;
@@ -52,13 +56,16 @@ public class MapperAlgorithm implements Algorithm {
     protected ProgressTicket progressTicket;
     protected boolean stopRun;
 
-    //Mapping Options    
+    //Mapping Options   
+    protected InputSequenceOption inputOption;
+    protected RemovingRedundantOption nrdOption;
     protected FeatureExtractionOption feOption;
     protected FeatureSelectionOption fsOption;
     protected SimilaritySearchingOption searchingOption;
 
     //Mapping Algorithms   
     private EmbeddingInputSeqAlg embeddingInputAlg;
+    private NonRedundantSetAlg nonRedundantAlg;
     private EmbeddingQuerySeqAlg embeddingQueryAlg;
     private ChemBaseSimilaritySearchAlg simSearchingAlg;
     private AllDescriptors featureExtractionAlg;
@@ -73,13 +80,16 @@ public class MapperAlgorithm implements Algorithm {
     public MapperAlgorithm(MapperAlgorithmFactory factory) {
         this.factory = factory;
 
-        //Mapping Options        
+        //Mapping Options    
+        inputOption = InputSequenceOption.CURRENT_WORKSPACE;
+        nrdOption = RemovingRedundantOption.NO;
         searchingOption = SimilaritySearchingOption.NO;
         feOption = FeatureExtractionOption.YES;
         fsOption = FeatureSelectionOption.YES;
 
         //Mapping algorithms
         embeddingInputAlg = (EmbeddingInputSeqAlg) new EmbeddingInputSeqFactory().createAlgorithm();
+        nonRedundantAlg = (NonRedundantSetAlg) new NonRedundantSetAlgFactory().createAlgorithm();
         embeddingQueryAlg = (EmbeddingQuerySeqAlg) new EmbeddingQuerySeqFactory().createAlgorithm();
         simSearchingAlg = (ChemBaseSimilaritySearchAlg) new ChemMultiSimilaritySearchFactory().createAlgorithm();
         featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
@@ -105,15 +115,28 @@ public class MapperAlgorithm implements Algorithm {
 
     @Override
     public void run() {
+
         // Embedding input sequences
-        if (embeddingInputAlg != null) {
-            currentAlg = embeddingInputAlg;
-            execute();
-        } else {
-            throw new RuntimeException("Internal error: Embedding input sequences is null");
+        if (nrdOption == RemovingRedundantOption.YES) {
+            if (nonRedundantAlg != null) {
+                nonRedundantAlg.setWorkspaceInput(inputOption == InputSequenceOption.CURRENT_WORKSPACE);
+                pc.reportMsg("Removing redundant sequences", workspace);
+                currentAlg = nonRedundantAlg;
+                execute();
+            } else {
+                throw new RuntimeException("Internal error: Non redundant sequence algorithm is null");
+            }
+        } else if (inputOption == InputSequenceOption.EMBEDDED_DB) {
+            if (embeddingInputAlg != null) {
+                pc.reportMsg("Embedding input sequences", workspace);
+                currentAlg = embeddingInputAlg;
+                execute();
+            } else {
+                throw new RuntimeException("Internal error: Embedding input sequences is null");
+            }
         }
 
-        // Embedding peptide sequences        
+        // Embedding query sequences        
         if (searchingOption == SimilaritySearchingOption.YES && !stopRun) {
             pc.reportMsg("Embedding query sequences", workspace);
             if (embeddingQueryAlg != null) {
@@ -253,13 +276,37 @@ public class MapperAlgorithm implements Algorithm {
         return stopRun;
     }
 
+    public InputSequenceOption getInputOption() {
+        return inputOption;
+    }
+
+    public void setInputOption(InputSequenceOption inputOption) {
+        this.inputOption = inputOption;
+    }
+
+    public RemovingRedundantOption getNrdOption() {
+        return nrdOption;
+    }
+
+    public void setNrdOption(RemovingRedundantOption nrdOption) {
+        this.nrdOption = nrdOption;
+    }
+
     public EmbeddingInputSeqAlg getEmbeddingInputAlg() {
         return embeddingInputAlg;
     }
 
     public void setEmbeddingInputAlg(EmbeddingInputSeqAlg embeddingInputAlg) {
         this.embeddingInputAlg = embeddingInputAlg;
-    }            
+    }
+
+    public NonRedundantSetAlg getNonRedundantAlg() {
+        return nonRedundantAlg;
+    }
+
+    public void setNonRedundantAlg(NonRedundantSetAlg nonRedundantAlg) {
+        this.nonRedundantAlg = nonRedundantAlg;
+    }
 
     public FeatureExtractionOption getFEOption() {
         return feOption;

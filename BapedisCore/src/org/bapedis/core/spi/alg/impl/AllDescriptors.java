@@ -31,7 +31,7 @@ import org.bapedis.core.spi.alg.FeatureExtractionTag;
 public class AllDescriptors extends AbstractMD implements PropertyChangeListener, Cloneable {
 
     private Set<String> descriptorKeys;
-    private final List<AbstractMD> algorithms;    
+    private final List<AbstractMD> algorithms;
     protected final NotifyDescriptor emptyKeys;
 
     public AllDescriptors(AlgorithmFactory factory) {
@@ -51,7 +51,7 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
 
     public List<AbstractMD> getAlgorithms() {
         return algorithms;
-    }        
+    }
 
     public Set<String> getDescriptorKeys() {
         return descriptorKeys;
@@ -100,6 +100,11 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
                         algorithms.add(algoModamp);
                     }
                 }
+            }
+
+            //Remove all descriptors
+            if (attrModel != null) {
+                attrModel.deleteAllMolecularDescriptors();
             }
 
             // Init all algoritms

@@ -144,6 +144,13 @@ public class AttributesModel {
         propertyChangeSupport.firePropertyChange(MD_ATTR_ADDED, null, category);
     }
 
+    public void deleteAllMolecularDescriptors(){
+        Set<String> categories = mdMap.keySet();
+        mdMap.clear();
+        for(String category: categories){
+            propertyChangeSupport.firePropertyChange(MD_ATTR_REMOVED, category, null);
+        }
+    }
     public void deleteAllMolecularDescriptors(String category) {
         for (PeptideAttribute attr : mdMap.remove(category)) {
             delete(attr);

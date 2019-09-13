@@ -16,7 +16,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Loge
  */
-//@ServiceProvider(service = AlgorithmFactory.class, position = 0)
+@ServiceProvider(service = AlgorithmFactory.class, position = 0)
 public class LengthDescriptorFactory implements FeatureExtractionTag {
 
     @Override

@@ -16,12 +16,14 @@ import java.util.Map;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
+import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 /**
@@ -40,19 +42,19 @@ public abstract class AbstractMD implements Algorithm {
     private final Map<String, MolecularDescriptor> map;
     public static final String MD_ADDED = "md_added";
     protected final PropertyChangeSupport propertyChangeSupport;
-    
+
     public AbstractMD(AlgorithmFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         this.factory = factory;
         map = Collections.synchronizedMap(new LinkedHashMap<>());
         propertyChangeSupport = new PropertyChangeSupport(this);
     }
-    
+
     protected void addAttribute(String id, String displayName, Class<?> type) {
         MolecularDescriptor attr = new MolecularDescriptor(id, displayName, type, factory.getName());
         addAttribute(attr);
     }
-    
+
     public MolecularDescriptor getOrAddAttribute(String id, String displayName, Class<?> type, Double defaultValue) {
         synchronized (map) {
             MolecularDescriptor attr = map.get(id);
@@ -128,13 +130,31 @@ public abstract class AbstractMD implements Algorithm {
                 HashMap<String, List<MolecularDescriptor>> byCategory = new LinkedHashMap<>();
                 String category;
                 List<MolecularDescriptor> list;
+                double[] data = new double[peptides.size()];
+                double min, max;
+                int ignoredAttr = 0;
                 for (MolecularDescriptor attr : map.values()) {
-                    category = attr.getCategory();
-                    if (!byCategory.containsKey(category)) {
-                        byCategory.put(category, new LinkedList<>());
+                    try {
+                        int pos = 0;
+                        for (Peptide pept : peptides) {
+                            data[pos++] = MolecularDescriptor.getDoubleValue(pept, attr);
+                        }
+                        min = MolecularDescriptor.min(data);
+                        max = MolecularDescriptor.max(data);
+                        // Add non-constant molecular features
+                        if (!Double.isNaN(min) && !Double.isNaN(max) && min != max) {
+                            category = attr.getCategory();
+                            if (!byCategory.containsKey(category)) {
+                                byCategory.put(category, new LinkedList<>());
+                            }
+                            list = byCategory.get(category);
+                            list.add(attr);
+                        }else{
+                            ignoredAttr++;
+                        }
+                    } catch (MolecularDescriptorNotFoundException ex) {
+                        Exceptions.printStackTrace(ex);
                     }
-                    list = byCategory.get(category);
-                    list.add(attr);
                 }
                 String key;
                 int maxKeyLength = 0;
@@ -161,6 +181,7 @@ public abstract class AbstractMD implements Algorithm {
                     pc.reportMsg(msg.toString(), workspace);
                     total += size;
                 }
+                pc.reportMsg("Ignored attributes: " + ignoredAttr, workspace);
                 pc.reportMsg("Total of calculated features: " + total, workspace);
                 progressTicket.progress();
             }

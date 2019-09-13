@@ -126,8 +126,8 @@ public class IndicesBasedOperators extends AbstractMD
         setVariationCoefficientOpertor( true );
         setRangeOpertor( true );
         setI50Opertor( true );
-        setGowawaOperator( true );
-        setChoquetOperator( true );
+        setGowawaOperator( false );
+        setChoquetOperator( false );
         
         setAutocorrelationOperator( true );
         setGravitationalOperator( true );

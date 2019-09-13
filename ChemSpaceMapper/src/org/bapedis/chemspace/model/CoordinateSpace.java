@@ -33,9 +33,9 @@ public class CoordinateSpace {
         positions = new Vector3f[peptides.length];
         for (int i = 0; i < positions.length; i++){
             positions[i] = new Vector3f();
-            positions[i].setX(coordinates[i][xAxis]);
-            positions[i].setY(coordinates[i][yAxis]);
-            positions[i].setZ(coordinates[i][zAxis]);            
+            positions[i].x=coordinates[i][xAxis];
+            positions[i].y=coordinates[i][yAxis];
+            positions[i].z=coordinates[i][zAxis];            
         }
         VectorUtil.normalize(positions); 
     }
@@ -57,9 +57,9 @@ public class CoordinateSpace {
         this.zAxis = zAxis;
         
         for (int i = 0; i < positions.length; i++) {            
-            positions[i].setX(coordinates[i][xAxis]);
-            positions[i].setY(coordinates[i][yAxis]);
-            positions[i].setZ(coordinates[i][zAxis]);
+            positions[i].x=coordinates[i][xAxis];
+            positions[i].y=coordinates[i][yAxis];
+            positions[i].z=coordinates[i][zAxis];
         }
         VectorUtil.normalize(positions);        
     }

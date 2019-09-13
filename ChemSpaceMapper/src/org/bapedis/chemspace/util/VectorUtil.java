@@ -78,31 +78,31 @@ public class VectorUtil {
         float maxZ = Float.NEGATIVE_INFINITY;
         
         for (Vector3f v1 : v) {
-            minX = Math.min(minX, v1.getX());
-            maxX = Math.max(maxX, v1.getX());
+            minX = Math.min(minX, v1.x);
+            maxX = Math.max(maxX, v1.x);
             
-            minY = Math.min(minY, v1.getY());
-            maxY = Math.max(maxY, v1.getY());
+            minY = Math.min(minY, v1.y);
+            maxY = Math.max(maxY, v1.y);
             
-            minZ = Math.min(minZ, v1.getZ());
-            maxZ = Math.max(maxZ, v1.getZ());            
+            minZ = Math.min(minZ, v1.z);
+            maxZ = Math.max(maxZ, v1.z);            
         }
 
         float x, y, z;
         for (Vector3f v1 : v) {
-            x = v1.getX();
+            x = v1.x;
             if (x != 0.0) {
-                v1.setX((x - minX) / (maxX - minX));
+                v1.x=(x - minX) / (maxX - minX);
             }
 
-            y = v1.getY();
+            y = v1.y;
             if (y != 0.0) {
-                v1.setY((y - minY) / (maxY - minY));
+                v1.y = (y - minY) / (maxY - minY);
             }
             
-            z = v1.getZ();
+            z = v1.z;
             if (z != 0.0) {
-                v1.setZ((z - minZ) / (maxZ - minZ));
+                v1.z = (z - minZ) / (maxZ - minZ);
             }            
         }
     }

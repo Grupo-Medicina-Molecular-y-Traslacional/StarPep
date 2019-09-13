@@ -15,7 +15,7 @@ import org.bapedis.core.task.ProgressTicket;
  * @author Loge
  */
 public class LengthDescriptor extends AbstractMD {
-
+    protected final String LENGTH = "length";
     
     public LengthDescriptor(AlgorithmFactory factory) {
         super(factory);
@@ -24,12 +24,12 @@ public class LengthDescriptor extends AbstractMD {
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         super.initAlgo(workspace, progressTicket); 
-//        addAttribute(Peptide.LENGHT);
+        addAttribute(LENGTH, LENGTH, Integer.class);
     }    
 
     @Override
     protected void compute(Peptide peptide) {
-//        peptide.setAttributeValue(Peptide.LENGHT, peptide.getLength());
+        peptide.setAttributeValue(getAttribute(LENGTH), peptide.getLength());
     }
     
 }

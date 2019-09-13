@@ -66,8 +66,8 @@ public class NetworkCoordinateUpdater extends SwingWorker<Void, Void> {
             for (int i = 0; i < positions.length && !stopRun.get(); i++) {
                 p = positions[i];
                 node = peptides[i].getGraphNode();
-                node.setX((float) ((0.01 + p.getX()) * 1000) - 500);
-                node.setY((float) ((0.01 + p.getY()) * 1000) - 500);
+                node.setX((float) ((0.01 + p.x) * 1000) - 500);
+                node.setY((float) ((0.01 + p.y) * 1000) - 500);
                 node.setZ(0); // 2D  
                 ticket.progress();
             }

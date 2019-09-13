@@ -29,7 +29,7 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
     public FeatureDiscretizationPanel() {
         initComponents();
         errorND = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureDiscretizationPanel.class, "FeatureDiscretizationPanel.errorND"), NotifyDescriptor.ERROR_MESSAGE);
-        
+
         //Create document listeners
         jTF_value.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -47,9 +47,9 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
             public void changedUpdate(DocumentEvent e) {
 
             }
-        });        
+        });
     }
-    
+
     private void updateNumberOfBins() {
         try {
             if (!jTF_value.getText().isEmpty()) {
@@ -61,7 +61,7 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
         } catch (NumberFormatException ex) {
             DialogDisplayer.getDefault().notify(errorND);
         }
-    }    
+    }
 
     @Override
     public void setEnabled(boolean enabled) {
@@ -69,10 +69,10 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
 
         jLabel1.setEnabled(enabled);
         jComboBox1.setEnabled(enabled);
-        
+
         if (discretizationAlg != null) {
             jTF_value.setEnabled(enabled && discretizationAlg.getBinsOption() == FeatureDiscretization.BinsOption.User_Defined);
-        } else{
+        } else {
             jTF_value.setEnabled(false);
         }
     }
@@ -101,8 +101,7 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jLabel1, gridBagConstraints);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "<html>Sturges's rule</html>", "<html>Rice's rule</html>", "<html>User defined value</html>" }));
-        jComboBox1.setSelectedIndex(-1);
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "<html>Sturges's rule</html>", "<html>Rice's rule</html>", "<html>User defined value</html>", "<html>The number of peptides ( <i>n</i> )</html>", "<html>Half of the number of <i>n</i></html>", "<html>One-third of the number of <i>n</i></html>", "<html>The square root of the number of <i>n</i></html>" }));
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox1ActionPerformed(evt);
@@ -136,20 +135,18 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
     }// </editor-fold>//GEN-END:initComponents
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        jTF_value.setText("");
+        jTF_value.setEnabled(false);
         switch (jComboBox1.getSelectedIndex()) {
             case 0:
                 if (discretizationAlg.getBinsOption() != FeatureDiscretization.BinsOption.Sturges_Rule) {
                     discretizationAlg.setBinsOption(FeatureDiscretization.BinsOption.Sturges_Rule);
                 }
-                jTF_value.setText("");
-                jTF_value.setEnabled(false);
                 break;
             case 1:
                 if (discretizationAlg.getBinsOption() != FeatureDiscretization.BinsOption.Rice_Rule) {
                     discretizationAlg.setBinsOption(FeatureDiscretization.BinsOption.Rice_Rule);
                 }
-                jTF_value.setText("");
-                jTF_value.setEnabled(false);
                 break;
             case 2:
                 if (discretizationAlg.getBinsOption() != FeatureDiscretization.BinsOption.User_Defined) {
@@ -157,11 +154,31 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
                 }
                 jTF_value.setText(String.valueOf(discretizationAlg.getNumberOfBins()));
                 jTF_value.setEnabled(true);
-                break;                
+                break;
+            case 3:
+                if (discretizationAlg.getBinsOption() != FeatureDiscretization.BinsOption.Number_peptides) {
+                    discretizationAlg.setBinsOption(FeatureDiscretization.BinsOption.Number_peptides);
+                }                
+                break;
+            case 4:
+                if (discretizationAlg.getBinsOption() != FeatureDiscretization.BinsOption.Half_number_peptides) {
+                    discretizationAlg.setBinsOption(FeatureDiscretization.BinsOption.Half_number_peptides);
+                }                       
+                break;
+            case 5:
+                if (discretizationAlg.getBinsOption() != FeatureDiscretization.BinsOption.One_third_number_peptides) {
+                    discretizationAlg.setBinsOption(FeatureDiscretization.BinsOption.One_third_number_peptides);
+                }                       
+                break;
+            case 6:
+                if (discretizationAlg.getBinsOption() != FeatureDiscretization.BinsOption.Square_root_number_peptides) {
+                    discretizationAlg.setBinsOption(FeatureDiscretization.BinsOption.Square_root_number_peptides);
+                }                       
+                break;
             default:
                 jTF_value.setText("");
                 jTF_value.setEnabled(false);
-                
+
         }
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
@@ -178,10 +195,22 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
                 break;
             case User_Defined:
                 jComboBox1.setSelectedIndex(2);
-                break;                
-            default:                
+                break;
+            case Number_peptides:
+                jComboBox1.setSelectedIndex(3);
+                break;
+            case Half_number_peptides:
+                jComboBox1.setSelectedIndex(4);
+                break;
+            case One_third_number_peptides:
+                jComboBox1.setSelectedIndex(5);
+                break;
+            case Square_root_number_peptides:
+                jComboBox1.setSelectedIndex(6);
+                break;
+            default:
                 throw new IllegalStateException("Unknown option for the number of bins");
-                
+
         }
 
         return this;

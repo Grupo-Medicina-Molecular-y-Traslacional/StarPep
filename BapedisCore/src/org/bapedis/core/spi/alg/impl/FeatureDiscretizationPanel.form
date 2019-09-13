@@ -31,13 +31,16 @@
     <Component class="javax.swing.JComboBox" name="jComboBox1">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="3">
+          <StringArray count="7">
             <StringItem index="0" value="&lt;html&gt;Sturges&apos;s rule&lt;/html&gt;"/>
             <StringItem index="1" value="&lt;html&gt;Rice&apos;s rule&lt;/html&gt;"/>
             <StringItem index="2" value="&lt;html&gt;User defined value&lt;/html&gt;"/>
+            <StringItem index="3" value="&lt;html&gt;The number of peptides ( &lt;i&gt;n&lt;/i&gt; )&lt;/html&gt;"/>
+            <StringItem index="4" value="&lt;html&gt;Half of the number of &lt;i&gt;n&lt;/i&gt;&lt;/html&gt;"/>
+            <StringItem index="5" value="&lt;html&gt;One-third of the number of &lt;i&gt;n&lt;/i&gt;&lt;/html&gt;"/>
+            <StringItem index="6" value="&lt;html&gt;The square root of the number of &lt;i&gt;n&lt;/i&gt;&lt;/html&gt;"/>
           </StringArray>
         </Property>
-        <Property name="selectedIndex" type="int" value="-1"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBox1ActionPerformed"/>

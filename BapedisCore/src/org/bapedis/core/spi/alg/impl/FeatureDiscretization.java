@@ -33,7 +33,7 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
 
     public enum BinsOption {
-        Sturges_Rule, Rice_Rule, User_Defined
+        Sturges_Rule, Rice_Rule, User_Defined,  Number_peptides, Half_number_peptides, One_third_number_peptides, Square_root_number_peptides
     }
 
     private final FeatureDiscretizationFactory factory;
@@ -51,7 +51,7 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
     public FeatureDiscretization(FeatureDiscretizationFactory factory) {
         this.factory = factory;
         stopRun = new AtomicBoolean();
-        binsOption = BinsOption.Sturges_Rule;
+        binsOption = BinsOption.Number_peptides;
         numberOfBins = 50;
     }
 
@@ -119,6 +119,18 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
                     break;
                 case Rice_Rule:
                     numberOfBins = 2 * (int) Math.cbrt(numberOfInstances);
+                    break;
+                case Number_peptides:
+                    numberOfBins = numberOfInstances;
+                    break;
+                case Half_number_peptides:
+                    numberOfBins = numberOfInstances / 2;
+                    break;
+                case One_third_number_peptides:
+                    numberOfBins = numberOfInstances / 3;
+                    break;
+                case Square_root_number_peptides:
+                    numberOfBins = (int) Math.sqrt(numberOfInstances);
                     break;
                 default:
                     if (binsOption != BinsOption.User_Defined) {

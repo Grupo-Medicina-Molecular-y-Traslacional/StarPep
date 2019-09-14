@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.spi.alg.impl;
 
+import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
@@ -19,6 +20,7 @@ public class FeatureSubsetOptimizationSetupUI extends javax.swing.JPanel impleme
      * Creates new form FeatureSubsetOptimizationSetupUI
      */
     private FeatureSubsetOptimization optimizationAlg;
+    private JPanel discretizationPanel;    
     
     public FeatureSubsetOptimizationSetupUI() {
         initComponents();
@@ -34,15 +36,29 @@ public class FeatureSubsetOptimizationSetupUI extends javax.swing.JPanel impleme
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        preprocessingPanel = new javax.swing.JPanel();
         strategyPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jStrategyComboBox = new javax.swing.JComboBox<>();
         info = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jDirectionComboBox = new javax.swing.JComboBox<>();
+        extLabel = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
+        preprocessingPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.preprocessingPanel.border.title"))); // NOI18N
+        preprocessingPanel.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(preprocessingPanel, gridBagConstraints);
+
+        strategyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.strategyPanel.border.title"))); // NOI18N
         strategyPanel.setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.jLabel1.text")); // NOI18N
@@ -65,7 +81,6 @@ public class FeatureSubsetOptimizationSetupUI extends javax.swing.JPanel impleme
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         strategyPanel.add(info, gridBagConstraints);
 
@@ -92,11 +107,21 @@ public class FeatureSubsetOptimizationSetupUI extends javax.swing.JPanel impleme
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(strategyPanel, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(extLabel, org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.extLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(extLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jDirectionComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDirectionComboBoxActionPerformed
@@ -113,8 +138,35 @@ public class FeatureSubsetOptimizationSetupUI extends javax.swing.JPanel impleme
     }//GEN-LAST:event_jDirectionComboBoxActionPerformed
 
     @Override
+    public void setEnabled(boolean enabled) {
+        if (discretizationPanel != null){
+            discretizationPanel.setEnabled(enabled);
+        }
+        preprocessingPanel.setEnabled(enabled);
+        
+        strategyPanel.setEnabled(enabled);
+        jLabel1.setEnabled(enabled);
+        jLabel2.setEnabled(enabled);
+        jStrategyComboBox.setEnabled(enabled);
+        jDirectionComboBox.setEnabled(enabled);
+        info.setEnabled(enabled);
+    }
+
+    
+    private void setupPreprocessingPanel(FeatureDiscretization alg){
+        discretizationPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
+        preprocessingPanel.removeAll();
+        preprocessingPanel.add(discretizationPanel, BorderLayout.CENTER);
+        preprocessingPanel.revalidate();
+        preprocessingPanel.repaint();    
+    }
+    
+    @Override
     public JPanel getSettingPanel(Algorithm algo) {
         optimizationAlg = (FeatureSubsetOptimization) algo;
+        
+        //Discretization algorithm        
+        setupPreprocessingPanel(optimizationAlg.getPreprocessingAlg());
         
         switch(optimizationAlg.getDirection()){
             case Forward:
@@ -131,11 +183,13 @@ public class FeatureSubsetOptimizationSetupUI extends javax.swing.JPanel impleme
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel extLabel;
     private javax.swing.JLabel info;
     private javax.swing.JComboBox<String> jDirectionComboBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JComboBox<String> jStrategyComboBox;
+    private javax.swing.JPanel preprocessingPanel;
     private javax.swing.JPanel strategyPanel;
     // End of variables declaration//GEN-END:variables
 }

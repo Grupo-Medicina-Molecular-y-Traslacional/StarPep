@@ -69,6 +69,7 @@ public class FeatureDiscretizationPanel extends javax.swing.JPanel implements Al
 
         jLabel1.setEnabled(enabled);
         jComboBox1.setEnabled(enabled);
+        infoLabel.setEnabled(enabled);
 
         if (discretizationAlg != null) {
             jTF_value.setEnabled(enabled && discretizationAlg.getBinsOption() == FeatureDiscretization.BinsOption.User_Defined);

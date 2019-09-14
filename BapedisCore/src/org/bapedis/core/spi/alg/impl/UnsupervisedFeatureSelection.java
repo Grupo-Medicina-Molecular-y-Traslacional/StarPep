@@ -39,15 +39,13 @@ public class UnsupervisedFeatureSelection implements Algorithm, Cloneable {
     private boolean firstStage, secondStage;
 
     //Algorithm
-    protected FeatureDiscretization preprocessing;
     protected FeatureSEFiltering filtering;
     protected FeatureSubsetOptimization subsetOptimization;
-    private boolean debug;
+    private final boolean debug;
 
     public UnsupervisedFeatureSelection(UnsupervisedFeatureSelectionFactory factory) {
         this.factory = factory;
-
-        preprocessing = (FeatureDiscretization) (new FeatureDiscretizationFactory()).createAlgorithm();
+        
         filtering = (FeatureSEFiltering) (new FeatureSEFilteringFactory()).createAlgorithm();
         subsetOptimization = (FeatureSubsetOptimization) (new FeatureSubsetOptimizationFactory()).createAlgorithm();
 
@@ -57,10 +55,6 @@ public class UnsupervisedFeatureSelection implements Algorithm, Cloneable {
         secondStage = false;
 
         debug = true;
-    }
-
-    public FeatureDiscretization getPreprocessingAlg() {
-        return preprocessing;
     }
 
     public FeatureSEFiltering getFilteringAlg() {
@@ -131,7 +125,6 @@ public class UnsupervisedFeatureSelection implements Algorithm, Cloneable {
     public void run() {
         if (attrModel != null && attrModel.getPeptides().size() > 0) {
             try {
-                double maxEntropy = Double.NaN;
                 //----------Preprocessing all descriptors                
                 if (firstStage || secondStage) {
                     List<MolecularDescriptor> allFeatures = new LinkedList<>();
@@ -150,18 +143,15 @@ public class UnsupervisedFeatureSelection implements Algorithm, Cloneable {
                         pc.reportError("There is not calculated molecular descriptors", workspace);
                         stopRun = true;
                     }
-                    execute(preprocessing);
-                    maxEntropy = preprocessing.getMaxEntropy();
-                    pc.reportMsg("Maximum entropy: " + maxEntropy, workspace);
                 }
 
+                //First stage
                 if (firstStage) {
-                    filtering.setMaxEntropy(maxEntropy);
                     execute(filtering);
                 }
 
+                //Second stage
                 if (secondStage) {
-                    subsetOptimization.setMaxEntropy(maxEntropy);
                     execute(subsetOptimization);
                 }
 
@@ -173,7 +163,7 @@ public class UnsupervisedFeatureSelection implements Algorithm, Cloneable {
         }
     }
 
-    private void execute(Algorithm currentAlg) {
+    protected void execute(Algorithm currentAlg) {
         if (!stopRun) {
             String taskName = NbBundle.getMessage(UnsupervisedFeatureSelection.class, "UnsupervisedFeatureSelection.workflow.taskName", currentAlg.getFactory().getName());
             ticket.progress(taskName);
@@ -188,8 +178,7 @@ public class UnsupervisedFeatureSelection implements Algorithm, Cloneable {
 
     @Override
     public Object clone() throws CloneNotSupportedException {
-        UnsupervisedFeatureSelection copy = (UnsupervisedFeatureSelection) super.clone();
-        copy.preprocessing = (FeatureDiscretization) this.preprocessing.clone();
+        UnsupervisedFeatureSelection copy = (UnsupervisedFeatureSelection) super.clone();        
         copy.filtering = (FeatureSEFiltering) this.filtering.clone();
         copy.subsetOptimization = (FeatureSubsetOptimization) this.subsetOptimization.clone();
         return copy;

@@ -38,15 +38,15 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
 
         WizardDescriptor.Panel<WizardDescriptor>[] allPanels = new WizardDescriptor.Panel[]{
             new WizardInputSequence(csMapper), //0 
-            new WizardQuerySequence(csMapper), //1
-            new WizardSimilaritySearching(csMapper), //2
+//            new WizardQuerySequence(csMapper), //1
+//            new WizardSimilaritySearching(csMapper), //2
             new WizardFeatureExtraction(csMapper), //3
             new WizardFeatureSelection(csMapper), //4
             new WizardDistanceFunc(csMapper), //5
             new WizardNetworkRepresentation(csMapper) //6
         };
         //Register to listener changes
-        allPanels[1].getComponent().addPropertyChangeListener(this);
+//        allPanels[1].getComponent().addPropertyChangeListener(this);
 
         String[] steps = new String[allPanels.length];
         for (int i = 0; i < allPanels.length; i++) {
@@ -64,34 +64,35 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
         }
         
         //With similarity searching option
-        withSimPanels = allPanels;
-        withSimSteps = steps;
+//        withSimPanels = allPanels;
+//        withSimSteps = steps;
         
         //Without similarity searching option
-        withoutSimPanels = new WizardDescriptor.Panel[]{
-            allPanels[0],
-            allPanels[1],
-            allPanels[3],
-            allPanels[4],
-            allPanels[5],
-            allPanels[6]
-        };
+//        withoutSimPanels = new WizardDescriptor.Panel[]{
+//            allPanels[0],
+//            allPanels[1],
+//            allPanels[3],
+//            allPanels[4],
+//            allPanels[5],
+//            allPanels[6]
+//        };
         
-        withoutSimSteps = new String[]{
-            steps[0],
-            steps[1],
-            steps[3],
-            steps[4],
-            steps[5],
-            steps[6]
-        };
+//        withoutSimSteps = new String[]{
+//            steps[0],
+//            steps[1],
+//            steps[3],
+//            steps[4],
+//            steps[5],
+//            steps[6]
+//        };
         
+        currentPanels = allPanels;
         index = 0;
     }
 
     public void initialize(WizardDescriptor wizardDesc) {
         this.wizardDesc = wizardDesc;
-        setSearchingOptionPanels(csMapper.getSearchingOption());
+//        setSearchingOptionPanels(csMapper.getSearchingOption());
     }
     
     private void setSearchingOptionPanels(SimilaritySearchingOption similarityOption){
@@ -105,7 +106,7 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
             case YES:
                 currentPanels = withSimPanels;
                 steps = withSimSteps;
-                break;
+                break;                
        
         }   
         //update                

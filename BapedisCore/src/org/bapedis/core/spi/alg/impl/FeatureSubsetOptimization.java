@@ -30,6 +30,7 @@ import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -47,18 +48,18 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
     //To initialize
     protected Workspace workspace;
     private AttributesModel attrModel;
-    private double maxEntropy;
     protected final AtomicBoolean stopRun;
     protected ProgressTicket ticket;
     protected Direction direction;
     private boolean debug, parallel;
-
+    protected FeatureDiscretization preprocessing;
     protected final FeatureSubsetOptimizationFactory factory;
 
     public FeatureSubsetOptimization(FeatureSubsetOptimizationFactory factory) {
         this.factory = factory;
+        preprocessing = (FeatureDiscretization) (new FeatureDiscretizationFactory()).createAlgorithm();
+        preprocessing.setBinsOption(FeatureDiscretization.BinsOption.Sturges_Rule);
         direction = Direction.Backward;
-        maxEntropy = Double.NaN;
         debug = false;
         parallel = true;
         stopRun = new AtomicBoolean();
@@ -71,14 +72,10 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
     public void setDirection(Direction direction) {
         this.direction = direction;
     }
-
-    public double getMaxEntropy() {
-        return maxEntropy;
-    }
-
-    public void setMaxEntropy(double maxEntropy) {
-        this.maxEntropy = maxEntropy;
-    }
+    
+    public FeatureDiscretization getPreprocessingAlg() {
+        return preprocessing;
+    }    
 
     public boolean isDebug() {
         return debug;
@@ -122,6 +119,16 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
     @Override
     public void run() {
         if (attrModel != null) {
+            //-----------Feature discretization
+            String taskName = NbBundle.getMessage(FeatureSubsetOptimization.class, "FeatureSubsetOptimization.preprocessing.taskName", preprocessing.getFactory().getName());
+            ticket.progress(taskName);
+            ticket.switchToIndeterminate();
+            pc.reportMsg(taskName, workspace);
+
+            preprocessing.initAlgo(workspace, ticket);
+            preprocessing.run();
+            preprocessing.endAlgo();
+            
             List<MolecularDescriptor> allFeatures = new LinkedList<>();
             for (String key : attrModel.getMolecularDescriptorKeys()) {
                 for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
@@ -132,6 +139,10 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
             Peptide[] peptides = attrModel.getPeptides().toArray(new Peptide[0]);
             MolecularDescriptor[] descriptors = allFeatures.toArray(new MolecularDescriptor[0]);
 
+            // Running subset optimization
+            taskName = "Searching...";
+            ticket.progress(taskName);
+            pc.reportMsg(taskName, workspace);
             try {
                 MIMatrixBuilder task = createMatrixBuilder(peptides, descriptors);
                 fjPool.invoke(task);
@@ -307,11 +318,11 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
 
         return m_best_group;
     }
-    
-     private double evaluateSubset(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException{
-         return evaluateSubset1(subset, features, miMatrix);
-     }
-    
+
+    private double evaluateSubset(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
+        return evaluateSubset1(subset, features, miMatrix);
+    }
+
     private double evaluateSubset2(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
         double score = 0;
         double entropy, maxMI;
@@ -321,18 +332,18 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
                 maxMI = 0.0;
                 for (int k = 0; k < features.length; k++) {
                     if (j != k && subset.get(k)) {
-                        if (miMatrix.getValue(j, k) > maxMI){
+                        if (miMatrix.getValue(j, k) > maxMI) {
                             maxMI = miMatrix.getValue(j, k);
                         }
                     }
                 }
                 // Score(fi) = Relevance(fi) - Redundancy(fi)
-                score += entropy/maxEntropy - maxMI/entropy;
+                score += entropy / preprocessing.getMaxEntropy() - maxMI / entropy;
             }
         }
         return score;
-    }    
-    
+    }
+
     private double evaluateSubset1(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
         double relevance = 0, redundancy = 0;
         int n = 0;
@@ -340,7 +351,7 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
         double minVal;
         for (int j = 0; j < features.length; j++) {
             if (subset.get(j)) {
-                entropy = features[j].getBinsPartition().getEntropy() / maxEntropy;
+                entropy = features[j].getBinsPartition().getEntropy() / preprocessing.getMaxEntropy();
                 relevance += entropy;
                 redundancy += entropy;
                 n++;
@@ -354,7 +365,7 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
             }
         }
         return relevance / n - redundancy / (n * n);
-    }    
+    }
 
     private MIMatrixBuilder createMatrixBuilder(Peptide[] peptides, MolecularDescriptor[] features) throws MolecularDescriptorNotFoundException {
         int[][] binIndex = new int[peptides.length][features.length];
@@ -369,6 +380,7 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
     @Override
     public Object clone() throws CloneNotSupportedException {
         FeatureSubsetOptimization copy = (FeatureSubsetOptimization) super.clone(); //To change body of generated methods, choose Tools | Templates.
+        copy.preprocessing = (FeatureDiscretization) this.preprocessing.clone();
         return copy;
     }
 

@@ -36,9 +36,9 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected final FeatureSEFilteringFactory factory;
     private final NotifyDescriptor errorND;
-    
-    public static final int MIN_THRESHOLD_PERCENT=1;
-    public static final int MAX_THRESHOLD_PERCENT=50;
+
+    public static final int MIN_THRESHOLD_PERCENT = 1;
+    public static final int MAX_THRESHOLD_PERCENT = 50;
 
     public static final int CORRELATION_NONE = 0;
     public static final int CORRELATION_PEARSON = 1;
@@ -54,25 +54,29 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     private int correlationOption;
     private double correlationCutoff;
     private int thresholdPercent;
-    private double maxEntropy;
     private boolean selectTop;
     private int topRank;
     private boolean debug;
+    protected FeatureDiscretization preprocessing;
 
     public FeatureSEFiltering(FeatureSEFilteringFactory factory) {
         this.factory = factory;
+        preprocessing = (FeatureDiscretization) (new FeatureDiscretizationFactory()).createAlgorithm();
         errorND = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureSEFiltering.class, "FeatureSEFiltering.errorND"), NotifyDescriptor.ERROR_MESSAGE);
         thresholdPercent = 10;
         correlationOption = CORRELATION_SPEARMAN;
-        correlationCutoff = 0.95;
+        correlationCutoff = 0.9;
         selectTop = false;
         topRank = 50;
         debug = false;
-        maxEntropy = Double.NaN;
+    }
+
+    public FeatureDiscretization getPreprocessingAlg() {
+        return preprocessing;
     }
 
     private boolean isValid() {
-        boolean isValid = thresholdPercent >= MIN_THRESHOLD_PERCENT && thresholdPercent <= MAX_THRESHOLD_PERCENT && maxEntropy != Double.NaN;
+        boolean isValid = thresholdPercent >= MIN_THRESHOLD_PERCENT && thresholdPercent <= MAX_THRESHOLD_PERCENT;
         if (correlationOption != CORRELATION_NONE) {
             isValid = correlationCutoff >= 0 && correlationCutoff <= 1;
         }
@@ -85,14 +89,6 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
 
     public void setThresholdPercent(int thresholdPercent) {
         this.thresholdPercent = thresholdPercent;
-    }
-
-    public double getMaxEntropy() {
-        return maxEntropy;
-    }
-
-    public void setMaxEntropy(double maxEntropy) {
-        this.maxEntropy = maxEntropy;
     }
 
     public int getCorrelationOption() {
@@ -188,8 +184,24 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         }
 
         try {
+            //-----------Feature discretization
+            String taskName = NbBundle.getMessage(FeatureSEFiltering.class, "FeatureSEFiltering.preprocessing.taskName", preprocessing.getFactory().getName());
+            ticket.progress(taskName);
+            ticket.switchToIndeterminate();
+            pc.reportMsg(taskName, workspace);
+
+            preprocessing.initAlgo(workspace, ticket);
+            preprocessing.run();
+            preprocessing.endAlgo();
+
+            double maxEntropy = preprocessing.getMaxEntropy();
+            pc.reportMsg("Maximum entropy: " + maxEntropy, workspace);
+
             //-----------Removing useless features
-            pc.reportMsg("Removing useless features", workspace);
+            taskName = "Removing useless features";
+            ticket.progress(taskName);
+            pc.reportMsg(taskName, workspace);
+            
             List<MolecularDescriptor> features = new LinkedList<>();
             List<MolecularDescriptor> toRemove = new LinkedList<>();
 
@@ -224,7 +236,9 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
             pc.reportMsg("Done", workspace);
 
             //-----------Removing redundant features
-            pc.reportMsg("Removing redundant features", workspace);
+            taskName = "Removing redundant features";
+            ticket.progress(taskName);
+            pc.reportMsg(taskName, workspace);
             double[][] descriptorMatrix = new double[rankedFeatures.length][];
             int count = 0;
             int workUnits = rankedFeatures.length;
@@ -328,6 +342,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     @Override
     public Object clone() throws CloneNotSupportedException {
         FeatureSEFiltering copy = (FeatureSEFiltering) super.clone(); //To change body of generated methods, choose Tools | Templates.
+        copy.preprocessing = (FeatureDiscretization) this.preprocessing.clone();
         return copy;
     }
 

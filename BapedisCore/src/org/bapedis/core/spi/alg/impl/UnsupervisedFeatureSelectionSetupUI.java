@@ -24,14 +24,7 @@ public class UnsupervisedFeatureSelectionSetupUI extends javax.swing.JPanel impl
     
     public UnsupervisedFeatureSelectionSetupUI() {
         initComponents();
-    }
-    
-    private void setupPanel(Algorithm alg, JPanel panel){
-        panel.removeAll();
-        panel.add(alg.getFactory().getSetupUI().getSettingPanel(alg), BorderLayout.CENTER);
-        panel.revalidate();
-        panel.repaint();    
-    }
+    }   
          
     private void setupPanel(JPanel stagePanel, JPanel parentPanel){
         parentPanel.removeAll();
@@ -49,8 +42,6 @@ public class UnsupervisedFeatureSelectionSetupUI extends javax.swing.JPanel impl
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        preprocessingPanel = new javax.swing.JPanel();
-        topPanel = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         filteringPanel = new javax.swing.JPanel();
         jcbFiltering = new javax.swing.JCheckBox();
@@ -61,26 +52,6 @@ public class UnsupervisedFeatureSelectionSetupUI extends javax.swing.JPanel impl
         extLabel = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
-
-        preprocessingPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(UnsupervisedFeatureSelectionSetupUI.class, "UnsupervisedFeatureSelectionSetupUI.preprocessingPanel.border.title"))); // NOI18N
-        preprocessingPanel.setLayout(new java.awt.GridBagLayout());
-
-        topPanel.setLayout(new java.awt.BorderLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        preprocessingPanel.add(topPanel, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-        add(preprocessingPanel, gridBagConstraints);
 
         filteringPanel.setLayout(new java.awt.GridBagLayout());
 
@@ -169,10 +140,7 @@ public class UnsupervisedFeatureSelectionSetupUI extends javax.swing.JPanel impl
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         featureSelection = (UnsupervisedFeatureSelection) algo;
-
-        //Discretization algorithm
-        setupPanel(featureSelection.getPreprocessingAlg(), topPanel);
-        
+               
         //Filtering algorithm
         Algorithm alg = featureSelection.getFilteringAlg();
         firstStagePanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
@@ -199,7 +167,5 @@ public class UnsupervisedFeatureSelectionSetupUI extends javax.swing.JPanel impl
     private javax.swing.JCheckBox jcbFiltering;
     private javax.swing.JCheckBox jcbSubsetOptimization;
     private javax.swing.JPanel optimizationPanel;
-    private javax.swing.JPanel preprocessingPanel;
-    private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 }

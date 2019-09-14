@@ -164,6 +164,7 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
             });
 
             maxEntropy = Math.log(numberOfBins);
+            pc.reportMsg("Max entropy: " + maxEntropy, workspace);
         } else {
             throw new IllegalStateException("There is not instances to compute");
         }

@@ -140,8 +140,9 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
             MolecularDescriptor[] descriptors = allFeatures.toArray(new MolecularDescriptor[0]);
 
             // Running subset optimization
-            taskName = "Searching...";
+            taskName = NbBundle.getMessage(FeatureSubsetOptimization.class, "FeatureSubsetOptimization.preprocessing.taskName", factory.getName());
             ticket.progress(taskName);
+            ticket.switchToIndeterminate();
             pc.reportMsg(taskName, workspace);
             try {
                 MIMatrixBuilder task = createMatrixBuilder(peptides, descriptors);

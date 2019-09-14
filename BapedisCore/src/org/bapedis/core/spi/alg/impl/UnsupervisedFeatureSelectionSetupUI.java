@@ -85,6 +85,7 @@ public class UnsupervisedFeatureSelectionSetupUI extends javax.swing.JPanel impl
         optimizationPanel.setLayout(new java.awt.GridBagLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jcbSubsetOptimization, org.openide.util.NbBundle.getMessage(UnsupervisedFeatureSelectionSetupUI.class, "UnsupervisedFeatureSelectionSetupUI.jcbSubsetOptimization.text")); // NOI18N
+        jcbSubsetOptimization.setEnabled(false);
         jcbSubsetOptimization.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbSubsetOptimizationActionPerformed(evt);

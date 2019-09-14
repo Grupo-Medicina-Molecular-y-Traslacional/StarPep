@@ -158,7 +158,7 @@ public class FeatureSubsetOptimizationSetupUI extends javax.swing.JPanel impleme
         preprocessingPanel.removeAll();
         preprocessingPanel.add(discretizationPanel, BorderLayout.CENTER);
         preprocessingPanel.revalidate();
-        preprocessingPanel.repaint();    
+        preprocessingPanel.repaint();   
     }
     
     @Override

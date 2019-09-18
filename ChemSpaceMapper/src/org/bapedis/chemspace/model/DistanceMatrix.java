@@ -13,7 +13,7 @@ import org.bapedis.core.model.PeptideAttribute;
  */
 public class DistanceMatrix {
 
-    protected static PeptideAttribute INDEX_ATTR = new PeptideAttribute("indexAttr", "indexAttr", Integer.class, false);
+    protected static PeptideAttribute INDEX_ATTR = new PeptideAttribute("indexAttr", "indexAttr", Integer.class, false, true);
     protected double[] data;
 
     public DistanceMatrix(Peptide[] peptides) {

@@ -54,7 +54,9 @@ import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.NodeIterable;
 import org.gephi.graph.api.Table;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -73,9 +75,51 @@ public class WeightedDegree implements Algorithm {
     private boolean isCanceled;
     private ProgressTicket progress;
     private GraphVizSetting graphViz;
+    protected AlgorithmProperty[] properties;
+    private boolean total, internal, external;
 
     public WeightedDegree(AlgorithmFactory factory) {
         this.factory = factory;
+        properties = new AlgorithmProperty[3];
+
+        try {
+            String CATEGORY = "Properties";
+            total = true;
+            properties[0] = AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(WeightedDegree.class, "Property.total.name"), CATEGORY, NbBundle.getMessage(WeightedDegree.class, "Property.total.desc"), "isTotal", "setTotal");
+
+            internal = true;
+            properties[1] = AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(WeightedDegree.class, "Property.internal.name"), CATEGORY, NbBundle.getMessage(WeightedDegree.class, "Property.internal.desc"), "isInternal", "setInternal");
+
+            external = true;
+            properties[2] = AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(WeightedDegree.class, "Property.external.name"), CATEGORY, NbBundle.getMessage(WeightedDegree.class, "Property.external.desc"), "isExternal", "setExternal");
+        } catch (NoSuchMethodException ex) {
+            Exceptions.printStackTrace(ex);
+            properties = null;
+        }
+    }
+
+    public boolean isTotal() {
+        return total;
+    }
+
+    public void setTotal(Boolean total) {
+        this.total = total;
+    }
+
+    public boolean isInternal() {
+        return internal;
+    }
+
+    public void setInternal(Boolean internal) {
+        this.internal = internal;
+    }
+
+    public boolean isExternal() {
+        return external;
+    }
+
+    public void setExternal(Boolean external) {
+        this.external = external;
     }
 
     @Override
@@ -107,7 +151,7 @@ public class WeightedDegree implements Algorithm {
 
     @Override
     public AlgorithmProperty[] getProperties() {
-        return null;
+        return properties;
     }
 
     @Override
@@ -118,38 +162,44 @@ public class WeightedDegree implements Algorithm {
     @Override
     public void run() {
         Table nodeTable = graphModel.getNodeTable();
-        if (!nodeTable.hasColumn(WINDEGREE)) {
+        if (internal && !nodeTable.hasColumn(WINDEGREE)) {
             nodeTable.addColumn(WINDEGREE, "Internal strength", Double.class, 0.0);
         }
-        if (!nodeTable.hasColumn(WOUTDEGREE)) {
+        if (external && !nodeTable.hasColumn(WOUTDEGREE)) {
             nodeTable.addColumn(WOUTDEGREE, "External strength", Double.class, 0.0);
         }
-        if (!nodeTable.hasColumn(WDEGREE)) {
+        if (total && !nodeTable.hasColumn(WDEGREE)) {
             nodeTable.addColumn(WDEGREE, "Weighted degree", Double.class, 0.0);
         }
 
-        if (nodeTable.hasColumn(Modularity.MODULARITY_CLASS)) {
+        if (nodeTable.hasColumn(ProjectManager.COMMUNITY_ATTR_ID)) {
 
             //Set default values
             Double defaultValue = new Double(0);
             for (Node node : graphModel.getGraph().getNodes()) {
-                node.setAttribute(WINDEGREE, defaultValue);
-                node.setAttribute(WOUTDEGREE, defaultValue);
-                node.setAttribute(WDEGREE, defaultValue);                
+                if (nodeTable.hasColumn(WINDEGREE)) {
+                    node.setAttribute(WINDEGREE, defaultValue);
+                }
+                if (nodeTable.hasColumn(WOUTDEGREE)) {
+                    node.setAttribute(WOUTDEGREE, defaultValue);
+                }
+                if (nodeTable.hasColumn(WDEGREE)) {
+                    node.setAttribute(WDEGREE, defaultValue);
+                }
             }
 
             Node oppositeNode;
             progress.switchToDeterminate(graph.getNodeCount());
             NodeIterable nodesIterable = graph.getNodes();
             for (Node n : nodesIterable) {
-                Integer comunity = (Integer) n.getAttribute(Modularity.MODULARITY_CLASS);
+                Integer comunity = (Integer) n.getAttribute(ProjectManager.COMMUNITY_ATTR_ID);
                 double totalWeight = 0;
                 double totalInWeight = 0;
                 double totalOutWeight = 0;
                 for (Edge e : graph.getEdges(n)) {
                     oppositeNode = graph.getOpposite(n, e);
-                    if (oppositeNode.getAttribute(Modularity.MODULARITY_CLASS) != null) {
-                        if (comunity.equals(oppositeNode.getAttribute(Modularity.MODULARITY_CLASS))) {
+                    if (oppositeNode.getAttribute(ProjectManager.COMMUNITY_ATTR_ID) != null) {
+                        if (comunity.equals(oppositeNode.getAttribute(ProjectManager.COMMUNITY_ATTR_ID))) {
                             totalInWeight += e.getWeight();
                         } else {
                             totalOutWeight += e.getWeight();
@@ -157,10 +207,15 @@ public class WeightedDegree implements Algorithm {
                         totalWeight += totalInWeight + totalOutWeight;
                     }
                 }
-                n.setAttribute(WINDEGREE, totalInWeight);
-                n.setAttribute(WOUTDEGREE, totalOutWeight);
-                n.setAttribute(WDEGREE, totalWeight);
-
+                if (internal) {
+                    n.setAttribute(WINDEGREE, totalInWeight);
+                }
+                if (external) {
+                    n.setAttribute(WOUTDEGREE, totalOutWeight);
+                }
+                if (total) {
+                    n.setAttribute(WDEGREE, totalWeight);
+                }
                 if (isCanceled) {
                     nodesIterable.doBreak();
                     break;

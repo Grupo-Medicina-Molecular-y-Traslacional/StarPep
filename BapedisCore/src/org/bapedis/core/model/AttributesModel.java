@@ -144,13 +144,14 @@ public class AttributesModel {
         propertyChangeSupport.firePropertyChange(MD_ATTR_ADDED, null, category);
     }
 
-    public void deleteAllMolecularDescriptors(){
+    public void deleteAllMolecularDescriptors() {
         Set<String> categories = mdMap.keySet();
         mdMap.clear();
-        for(String category: categories){
+        for (String category : categories) {
             propertyChangeSupport.firePropertyChange(MD_ATTR_REMOVED, category, null);
         }
     }
+
     public void deleteAllMolecularDescriptors(String category) {
         for (PeptideAttribute attr : mdMap.remove(category)) {
             delete(attr);
@@ -195,7 +196,7 @@ public class AttributesModel {
     public AttributeModelBridge getBridge() {
         return bridge;
     }
-    
+
     public Node getRootNode() {
         return rootNode;
     }
@@ -207,7 +208,7 @@ public class AttributesModel {
     public void addPeptide(Peptide peptide) {
         nodeList.add(new PeptideNode(peptide));
         peptideMap.put(peptide.getId(), peptide);
-        checkDefaultNodeAttributes(peptide);     
+        checkDefaultNodeAttributes(peptide);
         filteredPept = null;
     }
 
@@ -287,7 +288,12 @@ public class AttributesModel {
 
         private void interCopy(AttributesModel attrModel, List<Integer> peptideIDs) {
             attrModel.mdMap.putAll(mdMap);
-            attrModel.displayedColumnsModel.addAll(displayedColumnsModel);
+
+            for (PeptideAttribute attr : displayedColumnsModel) {
+                if (!attr.isVolatil()) {
+                    attrModel.displayedColumnsModel.add(attr);
+                }
+            }
 
             if (peptideIDs != null) {
                 for (Integer id : peptideIDs) {
@@ -338,22 +344,21 @@ public class AttributesModel {
                 org.gephi.graph.api.Node[] nodes = currentGraphModel.getGraph().getNodes().toArray();
                 targetGraphModel.bridge().copyNodes(nodes);
 
-                
                 Graph targetGraph = targetGraphModel.getGraph();
                 Graph visibleCurrentGraph = currentGraphModel.getGraphVisible();
-                
+
                 List<Edge> edgesToAdd = new LinkedList<>();
                 for (Edge edge : targetGraph.getEdges()) {
-                    if (visibleCurrentGraph.hasEdge(edge.getId()) 
+                    if (visibleCurrentGraph.hasEdge(edge.getId())
                             && targetGraph.hasNode(edge.getSource().getId())
                             && targetGraph.hasNode(edge.getTarget().getId())) {
                         edgesToAdd.add(edge);
                     }
-                }  
+                }
                 if (!edgesToAdd.isEmpty()) {
                     targetGraphModel.getGraphVisible().addAllEdges(edgesToAdd);
-                }                
-                
+                }
+
 //                
 //                List<Edge> edgesToRemove = new LinkedList<>();
 //                for (Edge edge : targetGraph.getEdges()) {

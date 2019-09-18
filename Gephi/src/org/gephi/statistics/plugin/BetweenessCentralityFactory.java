@@ -26,7 +26,7 @@ public class BetweenessCentralityFactory implements NetworkTag {
 
     @Override
     public String getCategory() {
-        return NbBundle.getMessage(BetweenessCentralityFactory.class, "Measure.category");
+        return NbBundle.getMessage(BetweenessCentralityFactory.class, "BetweenessCentrality.category");
     }
 
     @Override

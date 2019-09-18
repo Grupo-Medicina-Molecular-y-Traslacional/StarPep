@@ -73,6 +73,7 @@ public class MapperAlgorithm implements Algorithm {
     private AbstractDistance distFunction;
     private final WekaPCATransformer pcaTransformer;
     private final NetworkEmbedderAlg networkAlg;
+    private final Modularity modularityOptimization;
 
     //Algorithm workflow
     private Algorithm currentAlg;
@@ -96,7 +97,8 @@ public class MapperAlgorithm implements Algorithm {
         featureSelectionAlg = (UnsupervisedFeatureSelection) new UnsupervisedFeatureSelectionFactory().createAlgorithm();
         pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
         networkAlg = (NetworkEmbedderAlg) new NetworkEmbedderFactory().createAlgorithm();
-
+        modularityOptimization = (Modularity) new ModularityFactory().createAlgorithm();
+        
         //Default distance function
         Collection<? extends DistanceFunction> factories = Lookup.getDefault().lookupAll(DistanceFunction.class);
         for (DistanceFunction distFunc : factories) {
@@ -237,6 +239,17 @@ public class MapperAlgorithm implements Algorithm {
                 throw new RuntimeException("Internal error: Distance function is null");
             }
         }
+        
+        //Modularity optimization
+        pc.reportMsg("Modularity optimization", workspace);
+        if (!stopRun){
+            if (modularityOptimization != null){
+                currentAlg = modularityOptimization;
+                execute();
+            } else {
+                throw new RuntimeException("Internal error: Modularity optimization algorithm is null");
+            }
+        }        
     }
 
     private void execute() {

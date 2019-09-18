@@ -23,7 +23,7 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
     }    
 
     public MolecularDescriptor(String id, String displayName, Class<?> type, String category, Object defaulValue) {
-        super(id, displayName, type, true, defaulValue);
+        super(id, displayName, type, true, false, defaulValue);
         this.category = category;
         min = Double.NaN;
         max = Double.NaN;

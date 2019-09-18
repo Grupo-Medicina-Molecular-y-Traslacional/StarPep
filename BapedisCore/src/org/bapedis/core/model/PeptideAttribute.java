@@ -14,27 +14,28 @@ import java.util.Objects;
  */
 public class PeptideAttribute implements Cloneable {
 
-    public static PeptideAttribute CLUSTER_ATTR = new PeptideAttribute("cluster", "Cluster", Integer.class, true, -1);
-    public static PeptideAttribute RANK_ATTR = new PeptideAttribute("rank", "Rank", Integer.class, true, -1);
-    public static PeptideAttribute SCORE_ATTR = new PeptideAttribute("score", "Score", Double.class, true, -1.0);
+    public static PeptideAttribute CLUSTER_ATTR = new PeptideAttribute("cluster", "Cluster", Integer.class, true, true, -1);
+    public static PeptideAttribute SIMILARITY_RANK_ATTR = new PeptideAttribute("similarity_rank", "Similarity rank", Integer.class, true, true, -1);
+    public static PeptideAttribute SIMILARITY_SCORE_ATTR = new PeptideAttribute("score", "Score", Double.class, true, true, -1.0);
 
     protected final String id;
     protected final String displayName;
     protected final Class<?> type;
-    protected final boolean visible;
+    protected final boolean visible, volatil;
     protected final Object defaultValue;
 
-    public PeptideAttribute(String id, String displayName, Class<?> type, boolean visible) {
-        this(id, displayName, type, visible, null);
+    public PeptideAttribute(String id, String displayName, Class<?> type, boolean visible, boolean volatil) {
+        this(id, displayName, type, visible, volatil, null);
     }
 
-    public PeptideAttribute(String id, String displayName, Class<?> type, boolean visible, Object defaultValue) {
+    public PeptideAttribute(String id, String displayName, Class<?> type, boolean visible,  boolean volatil, Object defaultValue) {
         this.id = id;
         this.displayName = displayName;
         this.type = type;
         this.defaultValue = defaultValue;
         this.visible = visible;
-    }
+        this.volatil = volatil;
+    }        
 
     public String getId() {
         return id;
@@ -51,6 +52,10 @@ public class PeptideAttribute implements Cloneable {
     public boolean isVisible() {
         return visible;
     }
+
+    public boolean isVolatil() {
+        return volatil;
+    }        
 
     public Object getDefaultValue() {
         return defaultValue;

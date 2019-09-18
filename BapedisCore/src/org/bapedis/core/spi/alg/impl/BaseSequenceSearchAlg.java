@@ -17,8 +17,6 @@ import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
-import static org.bapedis.core.model.PeptideAttribute.RANK_ATTR;
-import static org.bapedis.core.model.PeptideAttribute.SCORE_ATTR;
 import org.bapedis.core.model.PeptideHit;
 import org.bapedis.core.model.SequenceAlignmentModel;
 import org.bapedis.core.model.Workspace;
@@ -37,6 +35,8 @@ import org.gephi.graph.api.Origin;
 import org.gephi.graph.api.Table;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import static org.bapedis.core.model.PeptideAttribute.SIMILARITY_RANK_ATTR;
+import static org.bapedis.core.model.PeptideAttribute.SIMILARITY_SCORE_ATTR;
 
 /**
  *
@@ -134,8 +134,8 @@ public abstract class BaseSequenceSearchAlg implements Algorithm {
         // Set new Model
         if (newAttrModel != null && graphNodes != null && !stopRun) {
 
-            newAttrModel.addDisplayedColumn(PeptideAttribute.RANK_ATTR);
-            newAttrModel.addDisplayedColumn(PeptideAttribute.SCORE_ATTR);
+            newAttrModel.addDisplayedColumn(PeptideAttribute.SIMILARITY_RANK_ATTR);
+            newAttrModel.addDisplayedColumn(PeptideAttribute.SIMILARITY_SCORE_ATTR);
 
             //Save results
             Peptide peptide;
@@ -153,35 +153,35 @@ public abstract class BaseSequenceSearchAlg implements Algorithm {
 
             boolean fireEvent = false;
             Table nodeTable = graphModel.getNodeTable();
-            if (!nodeTable.hasColumn(RANK_ATTR.getId())) {
-                nodeTable.addColumn(RANK_ATTR.getId(), RANK_ATTR.getDisplayName(), RANK_ATTR.getType(), Origin.DATA, RANK_ATTR.getDefaultValue(), true);
+            if (!nodeTable.hasColumn(SIMILARITY_RANK_ATTR.getId())) {
+                nodeTable.addColumn(SIMILARITY_RANK_ATTR.getId(), SIMILARITY_RANK_ATTR.getDisplayName(), SIMILARITY_RANK_ATTR.getType(), Origin.DATA, SIMILARITY_RANK_ATTR.getDefaultValue(), true);
                 fireEvent = true;
             }
-            if (!nodeTable.hasColumn(SCORE_ATTR.getId())) {
-                nodeTable.addColumn(SCORE_ATTR.getId(), SCORE_ATTR.getDisplayName(), SCORE_ATTR.getType(), Origin.DATA, SCORE_ATTR.getDefaultValue(), true);
+            if (!nodeTable.hasColumn(SIMILARITY_SCORE_ATTR.getId())) {
+                nodeTable.addColumn(SIMILARITY_SCORE_ATTR.getId(), SIMILARITY_SCORE_ATTR.getDisplayName(), SIMILARITY_SCORE_ATTR.getType(), Origin.DATA, SIMILARITY_SCORE_ATTR.getDefaultValue(), true);
                 fireEvent = true;
             }
 
             //Set default values            
             for (Peptide p : newAttrModel.getPeptideMap().values()) {
-                p.setAttributeValue(RANK_ATTR, RANK_ATTR.getDefaultValue());
-                p.setAttributeValue(SCORE_ATTR, SCORE_ATTR.getDefaultValue());
+                p.setAttributeValue(SIMILARITY_RANK_ATTR, SIMILARITY_RANK_ATTR.getDefaultValue());
+                p.setAttributeValue(SIMILARITY_SCORE_ATTR, SIMILARITY_SCORE_ATTR.getDefaultValue());
             }
             for (Node node : graphModel.getGraph().getNodes()) {
-                node.setAttribute(RANK_ATTR.getId(), RANK_ATTR.getDefaultValue());
-                node.setAttribute(SCORE_ATTR.getId(), SCORE_ATTR.getDefaultValue());
+                node.setAttribute(SIMILARITY_RANK_ATTR.getId(), SIMILARITY_RANK_ATTR.getDefaultValue());
+                node.setAttribute(SIMILARITY_SCORE_ATTR.getId(), SIMILARITY_SCORE_ATTR.getDefaultValue());
             }
             //Set values
             Node graphNode;
             int rank = 1;
             for (PeptideHit hit : results) {
                 peptide = hit.getPeptide();
-                peptide.setAttributeValue(RANK_ATTR, rank);
-                peptide.setAttributeValue(SCORE_ATTR, hit.getScore());
+                peptide.setAttributeValue(SIMILARITY_RANK_ATTR, rank);
+                peptide.setAttributeValue(SIMILARITY_SCORE_ATTR, hit.getScore());
 
                 graphNode = peptide.getGraphNode();
-                graphNode.setAttribute(RANK_ATTR.getId(), rank);
-                graphNode.setAttribute(SCORE_ATTR.getId(), hit.getScore());
+                graphNode.setAttribute(SIMILARITY_RANK_ATTR.getId(), rank);
+                graphNode.setAttribute(SIMILARITY_SCORE_ATTR.getId(), hit.getScore());
                 rank++;
             }
 

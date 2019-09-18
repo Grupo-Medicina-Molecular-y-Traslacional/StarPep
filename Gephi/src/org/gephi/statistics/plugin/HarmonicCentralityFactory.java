@@ -62,7 +62,7 @@ public class HarmonicCentralityFactory implements NetworkTag {
 
     @Override
     public String getCategory() {
-        return NbBundle.getMessage(HarmonicCentralityFactory.class, "Measure.category");
+        return NbBundle.getMessage(HarmonicCentralityFactory.class, "HarmonicCentrality.category");
     }
 
     @Override

@@ -21,7 +21,7 @@ public class WeightedDegreeFactory implements NetworkTag {
 
     @Override
     public String getCategory() {
-        return NbBundle.getMessage(HarmonicCentralityFactory.class, "Measure.category");
+        return NbBundle.getMessage(HarmonicCentralityFactory.class, "WeightedDegree.category");
     }
 
     @Override

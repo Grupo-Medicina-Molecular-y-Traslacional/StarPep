@@ -39,7 +39,7 @@
 
  Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.statistics.plugin;
+package org.bapedis.chemspace.impl;
 
 import java.util.*;
 import org.bapedis.core.model.AlgorithmProperty;
@@ -56,7 +56,6 @@ import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.NodeIterable;
 import org.gephi.graph.api.Table;
-import static org.gephi.statistics.plugin.BetweenessCentrality.BETWEENNESS;
 import org.openide.util.Lookup;
 
 /**
@@ -67,7 +66,6 @@ import org.openide.util.Lookup;
 // Fast unfolding of communities in large networks (2008)
 public class Modularity implements Algorithm {
 
-    public static final String MODULARITY_CLASS = "community";
     protected static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected final ModularityFactory factory;
     protected GraphModel graphModel;
@@ -669,9 +667,9 @@ public class Modularity implements Algorithm {
 
     private void saveValues(int[] struct, Graph graph, CommunityStructure theStructure) {
         Table nodeTable = graph.getModel().getNodeTable();
-        Column modCol = nodeTable.getColumn(MODULARITY_CLASS);
+        Column modCol = nodeTable.getColumn(ProjectManager.COMMUNITY_ATTR_ID);
         if (modCol == null) {
-            modCol = nodeTable.addColumn(MODULARITY_CLASS, "Modularity Class", Integer.class, 0);
+            modCol = nodeTable.addColumn(ProjectManager.COMMUNITY_ATTR_ID, ProjectManager.COMMUNITY_ATTR_TITLE, Integer.class, 0);
         }
         
         //Set default values
@@ -694,7 +692,7 @@ public class Modularity implements Algorithm {
 //        //Distribution series
 //        Map<Integer, Integer> sizeDist = new HashMap<>();
 //        for (Node n : structure.graph.getNodes()) {
-//            Integer v = (Integer) n.getAttribute(MODULARITY_CLASS);
+//            Integer v = (Integer) n.getAttribute(COMMUNITY_ATTR);
 //            if (!sizeDist.containsKey(v)) {
 //                sizeDist.put(v, 0);
 //            }

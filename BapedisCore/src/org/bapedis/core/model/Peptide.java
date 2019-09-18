@@ -28,9 +28,9 @@ import org.openide.util.NbBundle;
  */
  public class Peptide {
 
-    public static final PeptideAttribute ID = new PeptideAttribute("id", NbBundle.getMessage(Peptide.class, "Peptide.attribute.id"), Integer.class, true);
-    public static final PeptideAttribute SEQ = new PeptideAttribute("seq", NbBundle.getMessage(Peptide.class, "Peptide.attribute.seq"), String.class, true);
-    public static final PeptideAttribute LENGHT = new PeptideAttribute("length", NbBundle.getMessage(Peptide.class, "Peptide.attribute.length"), Integer.class, true);
+    public static final PeptideAttribute ID = new PeptideAttribute("id", NbBundle.getMessage(Peptide.class, "Peptide.attribute.id"), Integer.class, true, false);
+    public static final PeptideAttribute SEQ = new PeptideAttribute("seq", NbBundle.getMessage(Peptide.class, "Peptide.attribute.seq"), String.class, true, false);
+    public static final PeptideAttribute LENGHT = new PeptideAttribute("length", NbBundle.getMessage(Peptide.class, "Peptide.attribute.length"), Integer.class, true, false);
     public final static String CHANGED_ATTRIBUTE = "changed_attribute";
     protected final PropertyChangeSupport propertyChangeSupport;
 

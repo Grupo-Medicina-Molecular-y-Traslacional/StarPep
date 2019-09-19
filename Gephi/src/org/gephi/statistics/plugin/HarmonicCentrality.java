@@ -50,7 +50,6 @@ import java.util.Set;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.Workspace;
-import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.task.ProgressTicket;
 import org.gephi.graph.api.*;
 import org.openide.util.Exceptions;
@@ -59,6 +58,10 @@ import org.openide.util.NbBundle;
 public class HarmonicCentrality extends AbstractCentrality {
 
     public static final String HARMONIC_CLOSENESS = "harmonicclosnesscentrality";
+    public static final String HARMONIC_CLOSENESS_TITLE = "Harmonic Centrality (HC)";
+
+    public static final String RANKING_BY_HARMONIC_CLOSENESS = "rankingByharmonicclosnesscentrality";
+    public static final String RANKING_BY_HARMONIC_CLOSENESS_TITLE = "Ranking by HC";
 
     private final List<AlgorithmProperty> properties;
 
@@ -208,20 +211,30 @@ public class HarmonicCentrality extends AbstractCentrality {
         boolean fireEvent = false;
         Table nodeTable = graphModel.getNodeTable();
         if (!nodeTable.hasColumn(HARMONIC_CLOSENESS)) {
-            nodeTable.addColumn(HARMONIC_CLOSENESS, "Harmonic Centrality", Double.class, new Double(0));
+            nodeTable.addColumn(HARMONIC_CLOSENESS, HARMONIC_CLOSENESS_TITLE, Double.class, new Double(0));
+            nodeTable.addColumn(RANKING_BY_HARMONIC_CLOSENESS, RANKING_BY_HARMONIC_CLOSENESS_TITLE, Integer.class, -1);
             fireEvent = true;
         }
 
         //Set default values
         Double defaultValue = new Double(0);
+        Integer defaultRank = new Integer(-1);
         for (Node node : graphModel.getGraph().getNodes()) {
             node.setAttribute(HARMONIC_CLOSENESS, defaultValue);
+            node.setAttribute(RANKING_BY_HARMONIC_CLOSENESS, defaultRank);
         }
 
         //Save values
-        for (Node s : nodes) {
-            int s_index = (Integer) s.getAttribute(NODE_INDEX);
-            s.setAttribute(HARMONIC_CLOSENESS, harmonic[s_index]);
+        if (!isCanceled.get()) {
+            for (Node s : nodes) {
+                int s_index = (Integer) s.getAttribute(NODE_INDEX);
+                s.setAttribute(HARMONIC_CLOSENESS, harmonic[s_index]);
+            }
+            
+            Arrays.parallelSort(nodes, new RankComparator(HARMONIC_CLOSENESS));
+            for(int i=0; i<nodes.length; i++){
+                nodes[i].setAttribute(RANKING_BY_HARMONIC_CLOSENESS, i+1);
+            }            
         }
 
         super.endAlgo();

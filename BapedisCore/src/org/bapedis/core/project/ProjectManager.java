@@ -87,6 +87,9 @@ public class ProjectManager implements Lookup.Provider {
     public static final String COMMUNITY_ATTR_ID = "community";
     public static final String COMMUNITY_ATTR_TITLE = "Community";
     
+    public static final String ROLE_ATTR_ID = "role";
+    public static final String ROLE_ATTR_TITLE = "Role";    
+    
     final String OUTPUT_ID = "output";
     TopComponent outputWindow;
 

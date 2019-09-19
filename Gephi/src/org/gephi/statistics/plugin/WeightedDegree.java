@@ -41,6 +41,7 @@
  */
 package org.gephi.statistics.plugin;
 
+import java.util.Arrays;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.Workspace;
@@ -66,9 +67,24 @@ public class WeightedDegree implements Algorithm {
 
     protected static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private final AlgorithmFactory factory;
-    public static final String WDEGREE = "weighted degree";
-    public static final String WINDEGREE = "internal strength";
-    public static final String WOUTDEGREE = "external strength";
+    public static final String WDEGREE = "totalstrength";
+    public static final String WDEGREE_TITLE = "Total Strength (TS)";
+
+    public static final String RANKING_BY_WDEGREE = "rankingBytotalstrength";
+    public static final String RANKING_BY_WDEGREE_TITLE = "Ranking by TS";
+
+    public static final String WINDEGREE = "internalstrength";
+    public static final String WINDEGREE_TITLE = "Internal Strength (IS)";
+
+    public static final String RANKING_BY_WINDEGREE = "rankingByinternalstrength";
+    public static final String RANKING_BY_WINDEGREE_TITLE = "Ranking by IS";
+
+    public static final String WOUTDEGREE = "externalstrength";
+    public static final String WOUTDEGREE_TITLE = "External Strength (ES)";
+
+    public static final String RANKING_BY_WOUTDEGREE = "rankingByexternalstrength";
+    public static final String RANKING_BY_WOUTDEGREE_TITLE = "Ranking by ES";
+
     protected Workspace workspace;
     protected GraphModel graphModel;
     protected Graph graph;
@@ -163,13 +179,16 @@ public class WeightedDegree implements Algorithm {
     public void run() {
         Table nodeTable = graphModel.getNodeTable();
         if (internal && !nodeTable.hasColumn(WINDEGREE)) {
-            nodeTable.addColumn(WINDEGREE, "Internal strength", Double.class, 0.0);
+            nodeTable.addColumn(WINDEGREE, WINDEGREE_TITLE, Double.class, 0.0);
+            nodeTable.addColumn(RANKING_BY_WINDEGREE, RANKING_BY_WINDEGREE_TITLE, Integer.class, -1);
         }
         if (external && !nodeTable.hasColumn(WOUTDEGREE)) {
-            nodeTable.addColumn(WOUTDEGREE, "External strength", Double.class, 0.0);
+            nodeTable.addColumn(WOUTDEGREE, WOUTDEGREE_TITLE, Double.class, 0.0);
+            nodeTable.addColumn(RANKING_BY_WOUTDEGREE, RANKING_BY_WOUTDEGREE_TITLE, Integer.class, -1);
         }
         if (total && !nodeTable.hasColumn(WDEGREE)) {
-            nodeTable.addColumn(WDEGREE, "Weighted degree", Double.class, 0.0);
+            nodeTable.addColumn(WDEGREE, WDEGREE_TITLE, Double.class, 0.0);
+            nodeTable.addColumn(RANKING_BY_WDEGREE, RANKING_BY_WDEGREE_TITLE, Integer.class, -1);
         }
 
         if (nodeTable.hasColumn(ProjectManager.COMMUNITY_ATTR_ID)) {
@@ -190,8 +209,11 @@ public class WeightedDegree implements Algorithm {
 
             Node oppositeNode;
             progress.switchToDeterminate(graph.getNodeCount());
-            NodeIterable nodesIterable = graph.getNodes();
-            for (Node n : nodesIterable) {
+            Node[] nodes = graph.getNodes().toArray();
+            for (Node n : nodes) {
+                if (isCanceled) {
+                    return;
+                }
                 Integer comunity = (Integer) n.getAttribute(ProjectManager.COMMUNITY_ATTR_ID);
                 double totalWeight = 0;
                 double totalInWeight = 0;
@@ -216,12 +238,30 @@ public class WeightedDegree implements Algorithm {
                 if (total) {
                     n.setAttribute(WDEGREE, totalWeight);
                 }
-                if (isCanceled) {
-                    nodesIterable.doBreak();
-                    break;
-                }
                 progress.progress();
             }
+
+            if (!isCanceled) {
+                if (internal) {
+                    Arrays.parallelSort(nodes, new RankComparator(WINDEGREE));
+                    for (int i = 0; i < nodes.length; i++) {
+                        nodes[i].setAttribute(RANKING_BY_WINDEGREE, i + 1);
+                    }
+                }
+                if (external) {
+                    Arrays.parallelSort(nodes, new RankComparator(WOUTDEGREE));
+                    for (int i = 0; i < nodes.length; i++) {
+                        nodes[i].setAttribute(RANKING_BY_WOUTDEGREE, i + 1);
+                    }
+                }
+                if (total) {
+                    Arrays.parallelSort(nodes, new RankComparator(WDEGREE));
+                    for (int i = 0; i < nodes.length; i++) {
+                        nodes[i].setAttribute(RANKING_BY_WDEGREE, i + 1);
+                    }
+                }
+            }
+
         }
     }
 }

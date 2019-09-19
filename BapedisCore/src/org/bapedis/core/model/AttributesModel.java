@@ -41,7 +41,7 @@ public class AttributesModel {
     protected final Map<Integer, Peptide> peptideMap;
     protected final Map<String, List<MolecularDescriptor>> mdMap;
     protected final Set<PeptideAttribute> displayedColumnsModel;
-    private static final int MAX_DISPLAYED_COLUMNS = 10;
+    private static final int MAX_DISPLAYED_MD_COLUMNS = 10;
     protected List<PeptideNode> nodeList;
     private PeptideNodeContainer container;
     private List<Peptide> filteredPept;
@@ -88,12 +88,15 @@ public class AttributesModel {
         return displayedColumnsModel.toArray(new PeptideAttribute[0]);
     }
 
-    public boolean canAddDisplayColumn() {
-        return displayedColumnsModel.size() < MAX_DISPLAYED_COLUMNS;
+    public boolean canAddMDColumn() {
+        return displayedColumnsModel.size() < MAX_DISPLAYED_MD_COLUMNS;
     }
 
     public boolean addDisplayedColumn(PeptideAttribute attr) {
-        if (canAddDisplayColumn() && displayedColumnsModel.add(attr)) {
+        if (attr instanceof MolecularDescriptor && !canAddMDColumn()){
+            return false;
+        }
+        if (displayedColumnsModel.add(attr)) {
             propertyChangeSupport.firePropertyChange(DISPLAY_ATTR_ADDED, null, attr);
             return true;
         }

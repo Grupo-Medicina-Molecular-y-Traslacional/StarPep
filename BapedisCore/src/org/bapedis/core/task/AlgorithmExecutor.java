@@ -202,6 +202,7 @@ public final class AlgorithmExecutor {
             running.set(true);
             ticket.progress(NbBundle.getMessage(AlgorithmExecutor.class, "AlgorithmExecutor.task.running"));
             pc.reportRunningTask(algorithm.getFactory().getName(), workspace);
+            long startTime = System.currentTimeMillis();
             try {
                 algorithm.initAlgo(workspace, ticket);
                 algorithm.run();
@@ -215,6 +216,14 @@ public final class AlgorithmExecutor {
                 e.printStackTrace(new PrintWriter(errors));
                 pc.reportError(errors.toString(), workspace);
             } finally {
+                long millis = System.currentTimeMillis() - startTime;
+                String elapsedTime = String.format("%02d:%02d:%02d",
+                        TimeUnit.MILLISECONDS.toHours(millis),
+                        TimeUnit.MILLISECONDS.toMinutes(millis)
+                        - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
+                        TimeUnit.MILLISECONDS.toSeconds(millis)
+                        - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+                pc.reportMsg("Elapsed time (hh:mm:ss): " + elapsedTime, workspace);
                 finish();
             }
         }

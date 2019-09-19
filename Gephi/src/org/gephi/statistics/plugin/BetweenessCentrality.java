@@ -5,6 +5,8 @@
  */
 package org.gephi.statistics.plugin;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Stack;
@@ -29,6 +31,11 @@ import org.openide.util.NbBundle;
 public class BetweenessCentrality extends AbstractCentrality {
 
     public static final String BETWEENNESS = "betweenesscentrality";
+    public static final String BETWEENNESS_TITLE = "Betweenness Centrality (BC)";
+    
+    public static final String RANKING_BY_BETWEENNESS = "rankingBybetweenesscentrality";
+    public static final String RANKING_BY_BETWEENNESS_TITLE = "Ranking by BC";
+    
     private AlgorithmProperty[] property;
     private boolean normalized;
     private double[] nodeBetweenness;
@@ -172,20 +179,30 @@ public class BetweenessCentrality extends AbstractCentrality {
         boolean fireEvent = false;
         Table nodeTable = graphModel.getNodeTable();
         if (!nodeTable.hasColumn(BETWEENNESS)) {
-            nodeTable.addColumn(BETWEENNESS, "Betweenness Centrality", Double.class, new Double(0));
+            nodeTable.addColumn(BETWEENNESS, BETWEENNESS_TITLE, Double.class, new Double(0));
+            nodeTable.addColumn(RANKING_BY_BETWEENNESS, RANKING_BY_BETWEENNESS_TITLE, Integer.class, -1);
             fireEvent = true;
         }
 
         //Set default values
         Double defaultValue = new Double(0);
+        Integer defaultRank = new Integer(-1);
         for (Node node : graphModel.getGraph().getNodes()) {
             node.setAttribute(BETWEENNESS, defaultValue);
+            node.setAttribute(RANKING_BY_BETWEENNESS, defaultRank);
         }
 
         //Save values
-        for (Node s : nodes) {
-            int s_index = (Integer) s.getAttribute(NODE_INDEX);
-            s.setAttribute(BETWEENNESS, nodeBetweenness[s_index]);
+        if (!isCanceled.get()) {
+            for (Node s : nodes) {
+                int s_index = (Integer) s.getAttribute(NODE_INDEX);
+                s.setAttribute(BETWEENNESS, nodeBetweenness[s_index]);
+            }
+            
+            Arrays.parallelSort(nodes, new RankComparator(BETWEENNESS));
+            for(int i=0; i<nodes.length; i++){
+                nodes[i].setAttribute(RANKING_BY_BETWEENNESS, i+1);
+            }
         }
 
         super.endAlgo();

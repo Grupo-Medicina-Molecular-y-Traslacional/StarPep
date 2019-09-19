@@ -12,12 +12,16 @@ import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -30,9 +34,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.bapedis.core.events.WorkspaceEventListener;
 import org.bapedis.core.model.FilterModel;
-import org.bapedis.core.model.GraphElementAttributeColumn;
 import org.bapedis.core.model.GraphElementDataColumn;
-import org.bapedis.core.model.GraphEdgeAttributeColumn;
 import org.bapedis.core.model.GraphEdgeWrapper;
 import org.bapedis.core.model.GraphElementAvailableColumnsModel;
 import org.bapedis.core.model.GraphElementNavigatorModel;
@@ -44,6 +46,7 @@ import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.QueryModel;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
+import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.core.ui.actions.CenterNodeOnGraph;
 import org.bapedis.core.ui.actions.SelectEdgeOnGraph;
 import org.bapedis.core.ui.actions.SelectNodeOnGraph;
@@ -55,7 +58,6 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.Table;
-import org.gephi.graph.impl.GraphStoreConfiguration;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
@@ -64,6 +66,7 @@ import org.netbeans.spi.navigator.NavigatorPanelWithToolbar;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.MouseUtils;
+import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
@@ -85,11 +88,16 @@ public class GraphElementNavigator extends JComponent implements
     protected final InstanceContent content;
 
     protected final JToggleButton nodesBtn, edgesBtn;
-    protected final JButton availableColumnsButton;
+    protected final JButton availableColumnsButton, saveTableModelBtn;
     protected final JXBusyLabel busyLabel;
     protected final JXTable table;
     protected final JLabel nodeSizeLabel, edgeSizeLabel;
     protected GraphElementNavigatorModel navigatorModel;
+
+    protected JFileChooser chooser;
+    protected File parentDirectory;
+    protected File selectedFile;
+
     /**
      * Creates new form GraphElementNavigator
      */
@@ -135,6 +143,9 @@ public class GraphElementNavigator extends JComponent implements
             }
         });
 
+        chooser = new JFileChooser();
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
         // Tool bar
         toolBar = new JToolBar();
         toolBar.setFloatable(false);
@@ -162,8 +173,20 @@ public class GraphElementNavigator extends JComponent implements
             }
         });
         toolBar.add(availableColumnsButton);
-        //----------
 
+        toolBar.addSeparator();
+        saveTableModelBtn = new JButton();
+        saveTableModelBtn.setIcon(ImageUtilities.loadImageIcon("org/bapedis/core/resources/save.png", false));
+        saveTableModelBtn.setToolTipText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.saveTableModelButton.toolTipText"));
+        saveTableModelBtn.setFocusable(false);
+        saveTableModelBtn.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveTableModelButtonActionPerformed(evt);
+            }
+        });
+        toolBar.add(saveTableModelBtn);
+        //----------
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         busyLabel.setText(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.busyLabel.text"));
@@ -222,15 +245,92 @@ public class GraphElementNavigator extends JComponent implements
             availableColumnsModel = navigatorModel.getNodeAvailableColumnsModel();
         } else if (elementType == GraphElementType.Edge) {
             columns = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel().getEdgeTable();
-            availableColumnsModel = navigatorModel.getEdgeAvailableColumnsModel();            
+            availableColumnsModel = navigatorModel.getEdgeAvailableColumnsModel();
         }
 
-        if (columns != null && availableColumnsModel != null) {            
+        if (columns != null && availableColumnsModel != null) {
             availableColumnsModel.syncronizeTableColumns(columns);
             DialogDescriptor dd = new DialogDescriptor(new GraphElementAvailableColumnsPanel(availableColumnsModel), NbBundle.getMessage(GraphElementAvailableColumnsPanel.class, "GraphElementAvailableColumnsPanel.title"));
             dd.setOptions(new Object[]{DialogDescriptor.OK_OPTION});
             DialogDisplayer.getDefault().notify(dd);
             ((GraphElementsDataTable) table.getModel()).resetColumns(availableColumnsModel.getAvailableColumns());
+        }
+    }
+
+    private void saveTableModelButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        if (parentDirectory != null) {
+            chooser.setCurrentDirectory(parentDirectory);
+        }
+        String suffix = "_graph_table";
+        if (navigatorModel.getElementType() == GraphElementType.Node) {
+            suffix = "_node_table";
+        } else if (navigatorModel.getElementType() == GraphElementType.Edge) {
+            suffix = "_edge_table";
+        }
+        chooser.setSelectedFile(new File(parentDirectory, pc.getCurrentWorkspace().getName() + suffix + ".csv"));
+        int returnVal = chooser.showSaveDialog(GraphElementNavigator.this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File datafile = chooser.getSelectedFile();
+            SwingWorker sw = new SwingWorker() {
+                private char separator = ',';
+                private final AtomicBoolean stopRun = new AtomicBoolean(false);
+                private final ProgressTicket ticket = new ProgressTicket(NbBundle.getMessage(GraphElementNavigator.class, "GraphElementNavigator.saveTask.name"), new Cancellable() {
+                    @Override
+                    public boolean cancel() {
+                        stopRun.set(true);
+                        return true;
+                    }
+                });
+
+                @Override
+                protected Object doInBackground() throws Exception {
+                    ticket.start();
+                    PrintWriter pw = new PrintWriter(datafile);
+                    GraphElementsDataTable dataTable = (GraphElementsDataTable) table.getModel();
+
+                    try {
+                        //Write header            
+                        if (dataTable.getColumnCount() > 0) {
+                            pw.format("\"%s\"", dataTable.getColumnName(0));
+                            for (int c = 1; c < dataTable.getColumnCount(); c++) {
+                                pw.write(separator);
+                                pw.format("\"%s\"", dataTable.getColumnName(c));
+                            }
+                            pw.println();
+                            // Write data 
+                            ticket.switchToDeterminate(dataTable.getRowCount());
+                            for (int r = 0; r < dataTable.getRowCount(); r++) {
+                                if (stopRun.get()) {
+                                    break;
+                                }
+                                pw.format("\"%s\"", dataTable.getValueAt(r, 0));
+                                for (int c = 1; c < dataTable.getColumnCount(); c++) {
+                                    pw.write(separator);
+                                    pw.format("\"%s\"", dataTable.getValueAt(r, c));
+                                }
+                                pw.println();
+                                ticket.progress();
+                            }
+                        }
+                    } finally {
+                        pw.flush();
+                        pw.close();
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        get();
+                    } catch (InterruptedException | ExecutionException ex) {
+                        Exceptions.printStackTrace(ex);
+                    } finally {
+                        ticket.finish();
+                    }
+                }
+            };
+            sw.execute();
         }
     }
 

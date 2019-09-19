@@ -112,7 +112,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         }
 
         // Configure components...
-        infoLabel.setVisible(!attrModel.canAddDisplayColumn());
+        infoLabel.setVisible(!attrModel.canAddMDColumn());
 
         leftList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
@@ -124,7 +124,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
                         setStats(((DefaultListModel<MolecularDescriptor>) leftList.getModel()).get(leftList.getSelectedIndex()));
                         loadButton.setEnabled(true);
                     }
-                    addToDisplayButton.setEnabled(!lsm.isSelectionEmpty() && attrModel.canAddDisplayColumn());
+                    addToDisplayButton.setEnabled(!lsm.isSelectionEmpty() && attrModel.canAddMDColumn());
                 }
             }
         });
@@ -184,13 +184,13 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
                 addToDisplayFromTable();
                 break;
         }
-        infoLabel.setVisible(!attrModel.canAddDisplayColumn());
+        infoLabel.setVisible(!attrModel.canAddMDColumn());
     }
 
     private void addToDisplayFromList() {
         int[] indices = leftList.getSelectedIndices();
         DefaultListModel<MolecularDescriptor> leftListModel = (DefaultListModel<MolecularDescriptor>) leftList.getModel();
-        for (int i = 0; i < indices.length && attrModel.canAddDisplayColumn(); i++) {
+        for (int i = 0; i < indices.length && attrModel.canAddMDColumn(); i++) {
             if (rightListModel.indexOf(leftListModel.get(indices[i])) < 0) {
                 attrModel.addDisplayedColumn(leftListModel.get(indices[i]));
                 rightListModel.addElement(leftListModel.get(indices[i]));
@@ -216,7 +216,7 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
             attrModel.removeDisplayedColumn(rightListModel.get(indices[i]));
             rightListModel.removeElementAt(indices[i]);
         }
-        infoLabel.setVisible(!attrModel.canAddDisplayColumn());
+        infoLabel.setVisible(!attrModel.canAddMDColumn());
     }
 
     /**

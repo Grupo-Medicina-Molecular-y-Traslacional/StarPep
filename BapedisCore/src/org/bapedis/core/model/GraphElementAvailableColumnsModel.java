@@ -43,10 +43,8 @@ package org.bapedis.core.model;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import org.bapedis.core.project.ProjectManager;
 import org.gephi.graph.api.Column;
 import org.gephi.graph.api.Table;
-import org.gephi.graph.impl.GraphStoreConfiguration;
 
 /**
  * Class to keep available state (in data laboratory) of the columns of a table
@@ -57,7 +55,7 @@ import org.gephi.graph.impl.GraphStoreConfiguration;
  */
 public class GraphElementAvailableColumnsModel {
 
-    protected static final int MAX_AVAILABLE_COLUMNS = 5;
+    protected static final int MAX_AVAILABLE_COLUMNS = 10;
     protected final Set<GraphElementDataColumn> availableColumns;
     protected final Set<GraphElementDataColumn> allKnownColumns;
     protected final String[] defaultColumnID;

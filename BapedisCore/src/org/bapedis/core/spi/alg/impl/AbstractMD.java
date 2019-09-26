@@ -126,63 +126,65 @@ public abstract class AbstractMD implements Algorithm {
                     }
                 });
             } finally {
-                //Add molecular descriptors to attributes model
-                HashMap<String, List<MolecularDescriptor>> byCategory = new LinkedHashMap<>();
-                String category;
-                List<MolecularDescriptor> list;
-                double[] data = new double[peptides.size()];
-                double min, max;
-                int ignoredAttr = 0;
-                for (MolecularDescriptor attr : map.values()) {
-                    try {
-                        int pos = 0;
-                        for (Peptide pept : peptides) {
-                            data[pos++] = MolecularDescriptor.getDoubleValue(pept, attr);
-                        }
-                        min = MolecularDescriptor.min(data);
-                        max = MolecularDescriptor.max(data);
-                        // Add non-constant molecular features
-                        if (!Double.isNaN(min) && !Double.isNaN(max) && min != max) {
-                            category = attr.getCategory();
-                            if (!byCategory.containsKey(category)) {
-                                byCategory.put(category, new LinkedList<>());
+                if (!stopRun) {
+                    //Add molecular descriptors to attributes model
+                    HashMap<String, List<MolecularDescriptor>> byCategory = new LinkedHashMap<>();
+                    String category;
+                    List<MolecularDescriptor> list;
+                    double[] data = new double[peptides.size()];
+                    double min, max;
+                    int ignoredAttr = 0;
+                    for (MolecularDescriptor attr : map.values()) {
+                        try {
+                            int pos = 0;
+                            for (Peptide pept : peptides) {
+                                data[pos++] = MolecularDescriptor.getDoubleValue(pept, attr);
                             }
-                            list = byCategory.get(category);
-                            list.add(attr);
-                        }else{
-                            ignoredAttr++;
+                            min = MolecularDescriptor.min(data);
+                            max = MolecularDescriptor.max(data);
+                            // Add non-constant molecular features
+                            if (!Double.isNaN(min) && !Double.isNaN(max) && min != max) {
+                                category = attr.getCategory();
+                                if (!byCategory.containsKey(category)) {
+                                    byCategory.put(category, new LinkedList<>());
+                                }
+                                list = byCategory.get(category);
+                                list.add(attr);
+                            } else {
+                                ignoredAttr++;
+                            }
+                        } catch (MolecularDescriptorNotFoundException ex) {
+                            Exceptions.printStackTrace(ex);
                         }
-                    } catch (MolecularDescriptorNotFoundException ex) {
-                        Exceptions.printStackTrace(ex);
                     }
-                }
-                String key;
-                int maxKeyLength = 0;
-                for (Map.Entry<String, List<MolecularDescriptor>> entry : byCategory.entrySet()) {
-                    key = entry.getKey();
-                    attrModel.addMolecularDescriptors(key, entry.getValue());
-                    if (key.length() > maxKeyLength) {
-                        maxKeyLength = key.length();
+                    String key;
+                    int maxKeyLength = 0;
+                    for (Map.Entry<String, List<MolecularDescriptor>> entry : byCategory.entrySet()) {
+                        key = entry.getKey();
+                        attrModel.addMolecularDescriptors(key, entry.getValue());
+                        if (key.length() > maxKeyLength) {
+                            maxKeyLength = key.length();
+                        }
                     }
-                }
-                //Report messages
-                StringBuilder msg;
-                int total = 0, size;
-                for (Map.Entry<String, List<MolecularDescriptor>> entry : byCategory.entrySet()) {
-                    key = entry.getKey();
-                    size = entry.getValue().size();
-                    msg = new StringBuilder(key);
-                    for (int i = key.length() + 1; i <= maxKeyLength; i++) {
-                        msg.append(' ');
+                    //Report messages
+                    StringBuilder msg;
+                    int total = 0, size;
+                    for (Map.Entry<String, List<MolecularDescriptor>> entry : byCategory.entrySet()) {
+                        key = entry.getKey();
+                        size = entry.getValue().size();
+                        msg = new StringBuilder(key);
+                        for (int i = key.length() + 1; i <= maxKeyLength; i++) {
+                            msg.append(' ');
+                        }
+                        msg.append(" : ");
+                        msg.append(size);
+                        msg.append(size > 1 ? " features" : " feature");
+                        pc.reportMsg(msg.toString(), workspace);
+                        total += size;
                     }
-                    msg.append(" : ");
-                    msg.append(size);
-                    msg.append(size > 1 ? " features" : " feature");
-                    pc.reportMsg(msg.toString(), workspace);
-                    total += size;
+                    pc.reportMsg("Ignored attributes: " + ignoredAttr, workspace);
+                    pc.reportMsg("Total of calculated features: " + total, workspace);
                 }
-                pc.reportMsg("Ignored attributes: " + ignoredAttr, workspace);
-                pc.reportMsg("Total of calculated features: " + total, workspace);
                 progressTicket.progress();
             }
         }

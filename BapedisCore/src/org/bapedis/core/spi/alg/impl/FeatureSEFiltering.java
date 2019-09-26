@@ -64,9 +64,9 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         preprocessing = (FeatureDiscretization) (new FeatureDiscretizationFactory()).createAlgorithm();
         errorND = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureSEFiltering.class, "FeatureSEFiltering.errorND"), NotifyDescriptor.ERROR_MESSAGE);
         thresholdPercent = 10;
-        correlationOption = CORRELATION_SPEARMAN;
-        correlationCutoff = 0.9;
-        selectTop = false;
+        correlationOption = CORRELATION_PEARSON;
+        correlationCutoff = 0.8;
+        selectTop = true;
         topRank = 50;
         debug = false;
     }

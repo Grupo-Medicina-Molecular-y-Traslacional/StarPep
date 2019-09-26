@@ -337,7 +337,7 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
     }
 
     private double evaluateSubset(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
-        return evaluateSubset2(subset, features, miMatrix);
+        return evaluateSubset1(subset, features, miMatrix);
     }
 
     private double evaluateSubset3(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {

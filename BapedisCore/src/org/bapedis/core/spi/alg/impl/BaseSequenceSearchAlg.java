@@ -37,6 +37,7 @@ import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import static org.bapedis.core.model.PeptideAttribute.SIMILARITY_RANK_ATTR;
 import static org.bapedis.core.model.PeptideAttribute.SIMILARITY_SCORE_ATTR;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -62,8 +63,6 @@ public abstract class BaseSequenceSearchAlg implements Algorithm {
         this.factory = factory;
         alignmentModel = new SequenceAlignmentModel();
 
-//        int percentIdentity = NbPreferences.forModule(SequenceSearch.class).getInt("PercentIdentity", 70);
-        alignmentModel.setPercentIdentity(70);
         dao = Lookup.getDefault().lookup(PeptideDAO.class);
         graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
         workspaceInput = false;
@@ -86,7 +85,7 @@ public abstract class BaseSequenceSearchAlg implements Algorithm {
         // Sort by decreasing common words
         Arrays.parallelSort(targets, new CommonKMersComparator(query.getSequenceAsString()));
 
-        float identityScore = alignmentModel.getIndentityScore();
+        double identityScore = alignmentModel.getIndentityScore();
         double score;
         int rejections = 0;  // Stop if max rejects ocurred        
         for (int i = 0; i < targets.length && !stopRun && rejections < MAX_REJECTS; i++) {
@@ -111,6 +110,10 @@ public abstract class BaseSequenceSearchAlg implements Algorithm {
         newAttrModel = null;
         graphNodes = null;
         results = null;
+
+        pc.reportMsg("Alignment type: " + SequenceAlignmentModel.ALIGNMENT_TYPE[alignmentModel.getAlignmentTypeIndex()], workspace);
+        pc.reportMsg("Substitution matrix: " + SequenceAlignmentModel.SUBSTITUTION_MATRIX[alignmentModel.getSubstitutionMatrixIndex()], workspace);
+        pc.reportMsg(NbBundle.getMessage(BaseSequenceSearchAlg.class, "BaseSequenceSearchAlg.pid.text", alignmentModel.getPercentIdentity()), workspace);
     }
 
     @Override

@@ -16,6 +16,7 @@ import org.bapedis.core.model.Workspace;
 import org.bapedis.core.task.ProgressTicket;
 import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
 import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -58,7 +59,10 @@ public class SequenceClustering extends AbstractClusterizer {
     @Override
     protected List<Cluster> cluterize() {
         List<Cluster> clusterList = new LinkedList<>();
-        if (alignmentModel != null) {
+        if (alignmentModel != null) {            
+            pc.reportMsg("Alignment type: " + SequenceAlignmentModel.ALIGNMENT_TYPE[alignmentModel.getAlignmentTypeIndex()], workspace);
+            pc.reportMsg("Substitution matrix: " + SequenceAlignmentModel.SUBSTITUTION_MATRIX[alignmentModel.getSubstitutionMatrixIndex()], workspace);
+            pc.reportMsg(NbBundle.getMessage(SequenceClustering.class, "SequenceClustering.pid.text", alignmentModel.getPercentIdentity()), workspace);
             ticket.switchToDeterminate(peptides.length);
 
             // Sort by decreasing sequence length
@@ -77,7 +81,7 @@ public class SequenceClustering extends AbstractClusterizer {
             Peptide query;
             Peptide centroid;
             int rejections;
-            float identityScore = alignmentModel.getIndentityScore();
+            double identityScore = alignmentModel.getIndentityScore();
             for (int i = 1; i < peptides.length && !stopRun; i++) {
                 isRepresentative = true;
                 query = peptides[i];
@@ -120,7 +124,7 @@ public class SequenceClustering extends AbstractClusterizer {
                 ticket.progress();
             }
 
-            pc.reportMsg("Number of clusters: " + clusterList.size(), workspace);
+            pc.reportMsg(NbBundle.getMessage(SequenceClustering.class, "SequenceClustering.clusters.text", clusterList.size()), workspace);
         }
         return clusterList;
     }

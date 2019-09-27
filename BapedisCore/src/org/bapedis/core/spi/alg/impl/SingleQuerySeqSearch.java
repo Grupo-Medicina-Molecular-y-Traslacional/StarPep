@@ -72,7 +72,7 @@ public class SingleQuerySeqSearch extends BaseSequenceSearchAlg implements Singl
                     tmpAttrModel = pc.getAttributesModel(workspace);
                 } else {
                     tmpAttrModel = dao.getPeptides(new QueryModel(workspace), pc.getGraphModel(workspace), pc.getAttributesModel(workspace));
-                }                
+                }
                 Peptide[] targets = tmpAttrModel.getPeptides().toArray(new Peptide[0]);
 
                 // Assign peptide from targets to result list

@@ -203,6 +203,7 @@ public class SequenceAlignmentPanel extends javax.swing.JPanel {
         jToolBar1.add(jLessButton);
 
         jPIDSlider.setMajorTickSpacing(10);
+        jPIDSlider.setMaximum(98);
         jPIDSlider.setMinimum(30);
         jPIDSlider.setMinorTickSpacing(5);
         jPIDSlider.setPaintLabels(true);

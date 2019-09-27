@@ -37,7 +37,7 @@ public class MDExporter implements Exporter {
 
     public MDExporter(AttributesModel attrModel) {
         this.attrModel = attrModel;
-        this.output = MD_OUTPUT_OPTION.None;
+        this.output = MD_OUTPUT_OPTION.Z_SCORE;
     }
 
     public MD_OUTPUT_OPTION getOutput() {

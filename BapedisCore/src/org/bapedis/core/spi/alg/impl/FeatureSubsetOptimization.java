@@ -157,6 +157,10 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
                     double[] data = miMatrix.getValues();
                     double avg = MolecularDescriptor.mean(data);
                     double std = Math.sqrt(MolecularDescriptor.varp(data, avg));
+                    
+                    
+                    pc.reportMsg("Avg: " + avg, workspace);
+                    pc.reportMsg("Std: " + std, workspace);
 
 //                    BitSet subset = new BitSet(descriptors.length);
                     List<MolecularDescriptor> remainingFeatures = new LinkedList<>();
@@ -165,7 +169,7 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
                         if (descriptors[j] != null) {
                             for (int k = j + 1; k < descriptors.length; k++) {
                                 if (descriptors[k] != null) {
-                                    if (miMatrix.getValue(j, k) < avg ) {
+                                    if (miMatrix.getValue(j, k) > avg + std ) {
                                         removed++;
                                         attrModel.deleteAttribute(descriptors[k]);                                        
                                         if (debug) {

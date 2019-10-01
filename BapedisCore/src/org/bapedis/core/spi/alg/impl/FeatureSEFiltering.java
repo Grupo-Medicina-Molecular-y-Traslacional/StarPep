@@ -64,9 +64,9 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         preprocessing = (FeatureDiscretization) (new FeatureDiscretizationFactory()).createAlgorithm();
         errorND = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureSEFiltering.class, "FeatureSEFiltering.errorND"), NotifyDescriptor.ERROR_MESSAGE);
         thresholdPercent = 10;
-        correlationOption = CORRELATION_PEARSON;
+        correlationOption = CORRELATION_SPEARMAN;
         correlationCutoff = 0.8;
-        selectTop = true;
+        selectTop = false;
         topRank = 50;
         debug = false;
     }
@@ -207,11 +207,14 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
 
             double threshold = ((double) thresholdPercent / 100.0) * maxEntropy;
             pc.reportMsg("Entropy cutoff value: " + threshold, workspace);
+            double score;
             for (String key : attrModel.getMolecularDescriptorKeys()) {
                 for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
-                    if (attr.getBinsPartition().getEntropy() < threshold) {
+                    score = attr.getBinsPartition().getEntropy();
+                    if ( score < threshold) {
                         toRemove.add(attr);
                     } else {
+                        attr.setScore(score);
                         features.add(attr);
                     }
                 }
@@ -536,8 +539,8 @@ class FeatureComparator implements Comparator<MolecularDescriptor> {
 
     @Override
     public int compare(MolecularDescriptor o1, MolecularDescriptor o2) {
-        double entropy1 = o1.getBinsPartition().getEntropy();
-        double entropy2 = o2.getBinsPartition().getEntropy();
+        double entropy1 = o1.getScore();
+        double entropy2 = o2.getScore();
         if (entropy1 > entropy2) {
             return -1;
         }

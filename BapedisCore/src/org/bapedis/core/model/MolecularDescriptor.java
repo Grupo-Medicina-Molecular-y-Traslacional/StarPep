@@ -16,6 +16,7 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
 
     protected final String category;
     protected double max, min, mean, var, std;
+    protected double score;
     protected BinsPartition binsPartition;
     
     public MolecularDescriptor(String id, String displayName, Class<?> type, String category) {
@@ -31,6 +32,14 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
         std = Double.NaN;
         binsPartition = null;
     }
+
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
+    }        
 
     public String getCategory() {
         return category;

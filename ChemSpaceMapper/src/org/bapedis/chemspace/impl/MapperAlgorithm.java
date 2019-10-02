@@ -35,8 +35,8 @@ import org.bapedis.core.spi.alg.impl.AllDescriptors;
 import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlg;
 import org.bapedis.core.spi.alg.impl.NonRedundantSetAlgFactory;
-import org.bapedis.core.spi.alg.impl.UnsupervisedFeatureSelection;
-import org.bapedis.core.spi.alg.impl.UnsupervisedFeatureSelectionFactory;
+import org.bapedis.core.spi.alg.impl.FeatureSEFiltering;
+import org.bapedis.core.spi.alg.impl.FeatureSEFilteringFactory;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.task.ProgressTicket;
 import org.openide.DialogDisplayer;
@@ -69,7 +69,7 @@ public class MapperAlgorithm implements Algorithm {
     private EmbeddingQuerySeqAlg embeddingQueryAlg;
     private ChemBaseSimilaritySearchAlg simSearchingAlg;
     private AllDescriptors featureExtractionAlg;
-    private UnsupervisedFeatureSelection featureSelectionAlg;
+    private FeatureSEFiltering featureSelectionAlg;
     private AbstractDistance distFunction;
     private final WekaPCATransformer pcaTransformer;
     private final NetworkEmbedderAlg networkAlg;
@@ -94,7 +94,7 @@ public class MapperAlgorithm implements Algorithm {
         embeddingQueryAlg = (EmbeddingQuerySeqAlg) new EmbeddingQuerySeqFactory().createAlgorithm();
         simSearchingAlg = (ChemBaseSimilaritySearchAlg) new ChemMultiSimilaritySearchFactory().createAlgorithm();
         featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
-        featureSelectionAlg = (UnsupervisedFeatureSelection) new UnsupervisedFeatureSelectionFactory().createAlgorithm();
+        featureSelectionAlg = (FeatureSEFiltering) new FeatureSEFilteringFactory().createAlgorithm();
         pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
         networkAlg = (NetworkEmbedderAlg) new NetworkEmbedderFactory().createAlgorithm();
         modularityOptimization = (Modularity) new ModularityFactory().createAlgorithm();
@@ -369,11 +369,11 @@ public class MapperAlgorithm implements Algorithm {
         return featureExtractionAlg;
     }
 
-    public void setFeatureSelectionAlg(UnsupervisedFeatureSelection alg) {
+    public void setFeatureSelectionAlg(FeatureSEFiltering alg) {
         this.featureSelectionAlg = alg;
     }
 
-    public UnsupervisedFeatureSelection getFeatureSelectionAlg() {
+    public FeatureSEFiltering getFeatureSelectionAlg() {
         return featureSelectionAlg;
     }
 

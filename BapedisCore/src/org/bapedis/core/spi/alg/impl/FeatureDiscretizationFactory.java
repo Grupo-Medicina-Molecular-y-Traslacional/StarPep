@@ -15,9 +15,7 @@ import org.openide.util.NbBundle;
  * @author Loge
  */
 public class FeatureDiscretizationFactory implements AlgorithmFactory {
-
-    FeatureDiscretizationPanel setupUI = new FeatureDiscretizationPanel();
-    
+   
     @Override
     public String getCategory() {
         return null;
@@ -35,7 +33,7 @@ public class FeatureDiscretizationFactory implements AlgorithmFactory {
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        return setupUI;
+        return null;
     }
 
     @Override

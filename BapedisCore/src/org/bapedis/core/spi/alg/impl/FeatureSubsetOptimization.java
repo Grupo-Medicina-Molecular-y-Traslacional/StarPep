@@ -39,7 +39,6 @@ import org.openide.util.NbBundle;
 public class FeatureSubsetOptimization implements Algorithm, Cloneable {
 
     protected ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-    protected static final ForkJoinPool fjPool = new ForkJoinPool();
 
     public enum Direction {
         Backward, Forward
@@ -129,10 +128,8 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
             }
 
             if (allFeatures.size() > 1) {
-                Peptide[] peptides = attrModel.getPeptides().toArray(new Peptide[0]);
-                MolecularDescriptor[] descriptors = allFeatures.toArray(new MolecularDescriptor[0]);
-                Arrays.parallelSort(descriptors, new FeatureComparator());
 
+//                Arrays.parallelSort(descriptors, new FeatureComparator());
                 //-----------Feature discretization
                 String taskName = NbBundle.getMessage(FeatureSubsetOptimization.class, "FeatureSubsetOptimization.preprocessing.taskName", preprocessing.getFactory().getName());
                 ticket.progress(taskName);
@@ -149,39 +146,6 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
                 ticket.switchToIndeterminate();
                 pc.reportMsg(taskName, workspace);
                 try {
-                    MIMatrixBuilder task = createMatrixBuilder(peptides, descriptors);
-                    fjPool.invoke(task);
-                    task.join();
-                    MIMatrix miMatrix = task.getMIMatrix();
-
-                    double[] data = miMatrix.getValues();
-                    double avg = MolecularDescriptor.mean(data);
-                    double std = Math.sqrt(MolecularDescriptor.varp(data, avg));
-                    
-                    
-                    pc.reportMsg("Avg: " + avg, workspace);
-                    pc.reportMsg("Std: " + std, workspace);
-
-//                    BitSet subset = new BitSet(descriptors.length);
-                    List<MolecularDescriptor> remainingFeatures = new LinkedList<>();
-                    int removed = 0;
-                    for (int j = 0; j < descriptors.length; j++) {
-                        if (descriptors[j] != null) {
-                            for (int k = j + 1; k < descriptors.length; k++) {
-                                if (descriptors[k] != null) {
-                                    if (miMatrix.getValue(j, k) > avg + std ) {
-                                        removed++;
-                                        attrModel.deleteAttribute(descriptors[k]);                                        
-                                        if (debug) {
-                                            pc.reportMsg("Removed: " + descriptors[k].getDisplayName() + " - score: " + descriptors[k].getBinsPartition().getEntropy(), workspace);
-                                        }
-                                        descriptors[k] = null;
-                                    }
-                                }
-                            }
-                            remainingFeatures.add(descriptors[j]);
-                        }
-                    }
 
 //                    BitSet subset = hillClimbingSearch(descriptors, miMatrix);
 //                    
@@ -200,12 +164,11 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
 //                        }
 //                    }
                     //Print top 5 bottom 3
-                    descriptors = remainingFeatures.toArray(new MolecularDescriptor[0]);
-                    Arrays.sort(descriptors, new FeatureComparator());
-                    FeatureComparator.printTop5Buttom3(descriptors, workspace);
-
-                    pc.reportMsg("\nTotal of removed features: " + removed, workspace);
-                    pc.reportMsg("Total of remaining features: " + remainingFeatures.size(), workspace);
+//                    descriptors = remainingFeatures.toArray(new MolecularDescriptor[0]);
+//                    Arrays.sort(descriptors, new FeatureComparator());
+//                    FeatureComparator.printTop5Buttom3(descriptors, workspace);
+//                    pc.reportMsg("\nTotal of removed features: " + removed, workspace);
+//                    pc.reportMsg("Total of remaining features: " + remainingFeatures.size(), workspace);
                 } catch (Exception ex) {
                     Exceptions.printStackTrace(ex);
                 }
@@ -427,177 +390,11 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
         return relevance / n - redundancy / (n * n);
     }
 
-    private MIMatrixBuilder createMatrixBuilder(Peptide[] peptides, MolecularDescriptor[] features) throws MolecularDescriptorNotFoundException {
-        int[][] binIndex = new int[peptides.length][features.length];
-        for (int i = 0; i < peptides.length; i++) {
-            for (int j = 0; j < features.length; j++) {
-                binIndex[i][j] = FeatureDiscretization.getBinIndex(peptides[i], features[j], features[j].getBinsPartition().getBins().length);
-            }
-        }
-        return new MIMatrixBuilder(features, binIndex, ticket, stopRun);
-    }
-
     @Override
     public Object clone() throws CloneNotSupportedException {
         FeatureSubsetOptimization copy = (FeatureSubsetOptimization) super.clone(); //To change body of generated methods, choose Tools | Templates.
         copy.preprocessing = (FeatureDiscretization) this.preprocessing.clone();
         return copy;
-    }
-
-}
-
-class MIMatrix {
-
-    protected double[] data;
-
-    public MIMatrix(int size) {
-        data = new double[size * (size - 1) / 2];
-    }
-
-    public void setValue(int j, int k, double value) {
-        assert j != k;
-        data[pos(j, k)] = value;
-    }
-
-    public double getValue(int j, int k) {
-        assert j != k;
-        return data[pos(j, k)];
-    }
-
-    public double[] getValues() {
-        return data;
-    }
-
-    public int getSize() {
-        return data.length;
-    }
-
-    private int pos(int j, int k) {
-        int a = j > k ? j : k;
-        int b = j < k ? j : k;
-        return a * (a - 1) / 2 + b;
-    }
-
-}
-
-class MIMatrixBuilder extends RecursiveAction {
-
-    private static final int SEQUENTIAL_THRESHOLD = 10;
-    private int[][] binIndex;
-    private MolecularDescriptor[] features;
-    private ProgressTicket progressTicket;
-    private AtomicBoolean stopRun;
-
-    private final MIMatrix matrix;
-    private int xlow, xhigh, ylow, yhigh;
-
-    MIMatrixBuilder(MolecularDescriptor[] features, int[][] binIndex, ProgressTicket progressTicket, AtomicBoolean stopRun) {
-        this(features, binIndex, new MIMatrix(features.length),
-                0, features.length, 0, features.length,
-                progressTicket, stopRun);
-    }
-
-    private MIMatrixBuilder(MolecularDescriptor[] features, int[][] binIndex, MIMatrix matrix,
-            int xlow, int xhigh, int ylow, int yhigh,
-            ProgressTicket progressTicket, AtomicBoolean stopRun) {
-        this.binIndex = binIndex;
-        this.features = features;
-        this.matrix = matrix;
-        this.xlow = xlow;
-        this.xhigh = xhigh;
-        this.ylow = ylow;
-        this.yhigh = yhigh;
-        this.progressTicket = progressTicket;
-        this.stopRun = stopRun;
-    }
-
-    void setStopRun(boolean stop) {
-        stopRun.set(stop);
-    }
-
-    public MIMatrix getMIMatrix() {
-        return matrix;
-    }
-
-    public int getWorkUnits() {
-        return matrix.getSize();
-    }
-
-    @Override
-    protected void compute() {
-        if (xlow >= yhigh || stopRun.get()) {
-            return; // Discard the elements above the diagonal
-        }
-        if (xhigh - xlow <= SEQUENTIAL_THRESHOLD) {
-            if (yhigh - ylow <= SEQUENTIAL_THRESHOLD) {
-                if (!stopRun.get()) {
-                    computeDirectly();
-                }
-            } else if (!stopRun.get()) {
-                int middle = ylow + (yhigh - ylow) / 2;
-                // up and down
-                MIMatrixBuilder up = new MIMatrixBuilder(features, binIndex, matrix, xlow, xhigh, ylow, middle, progressTicket, stopRun);
-                MIMatrixBuilder down = new MIMatrixBuilder(features, binIndex, matrix, xlow, xhigh, middle, yhigh, progressTicket, stopRun);
-                invokeAll(up, down);
-            }
-        } else if (!stopRun.get()) {
-            int middle = xlow + (xhigh - xlow) / 2;
-            // left and right            
-            MIMatrixBuilder left = new MIMatrixBuilder(features, binIndex, matrix, xlow, middle, ylow, yhigh, progressTicket, stopRun);
-            MIMatrixBuilder right = new MIMatrixBuilder(features, binIndex, matrix, middle, xhigh, ylow, yhigh, progressTicket, stopRun);
-            invokeAll(left, right);
-        }
-    }
-
-    private void computeDirectly() {
-        double mi;
-        for (int y = ylow; y < yhigh; y++) {
-            for (int x = xlow; x < Math.min(xhigh, y); x++) {
-                if (!stopRun.get()) {
-                    try {
-                        mi = mutualInformation(y, x);
-                        matrix.setValue(y, x, mi);
-//                        progressTicket.progress();
-                    } catch (Exception ex) {
-                        stopRun.set(true);
-                        throw new RuntimeException(ex);
-                    }
-                }
-            }
-        }
-    }
-
-    private double mutualInformation(int j, int k) throws MolecularDescriptorNotFoundException {
-        double sum = 0.;
-
-        Bin[] bj = features[j].getBinsPartition().getBins();
-        Bin[] bk = features[k].getBinsPartition().getBins();
-
-        //Calculating mutual information
-        int numberOfInstances = binIndex.length;
-        double pj, pk, pjk;
-        for (int i = 0; i < bj.length; i++) {
-            pj = (double) bj[i].getCount() / numberOfInstances;
-            for (int l = 0; l < bk.length; l++) {
-                pk = (double) bk[l].getCount() / numberOfInstances;
-                pjk = (double) countInstances(binIndex, j, i, k, l) / numberOfInstances;
-                if (pj > 0 && pk > 0 && pjk > 0) {
-                    sum += pjk * Math.log(pjk / (pj * pk));
-                }
-            }
-        }
-
-        return sum;
-    }
-
-    private int countInstances(int[][] binIndex, int j, int i, int k, int l) throws MolecularDescriptorNotFoundException {
-        int count = 0;
-        for (int p = 0; p < binIndex.length; p++) {
-            if (binIndex[p][j] == i && binIndex[p][k] == l) {
-                count++;
-            }
-        }
-        return count;
     }
 
 }

@@ -33,7 +33,7 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
 
     public enum BinsOption {
-        Sturges_Rule, Rice_Rule, User_Defined,  Number_peptides, Half_number_peptides, One_third_number_peptides, Square_root_number_peptides
+        Sturges_Rule, Rice_Rule, User_Defined, Number_peptides, Half_number_peptides, One_third_number_peptides, Square_root_number_peptides
     }
 
     private final FeatureDiscretizationFactory factory;
@@ -45,6 +45,7 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
     protected Workspace workspace;
     private AttributesModel attrModel;
     private List<Peptide> peptides;
+    private List<MolecularDescriptor> allFeatures;
     protected final AtomicBoolean stopRun;
     ProgressTicket ticket;
 
@@ -54,6 +55,14 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
         binsOption = BinsOption.Number_peptides;
         numberOfBins = 50;
     }
+
+    public List<MolecularDescriptor> getAllFeatures() {
+        return allFeatures;
+    }
+
+    public void setAllFeatures(List<MolecularDescriptor> allFeatures) {
+        this.allFeatures = allFeatures;
+    }       
 
     public BinsOption getBinsOption() {
         return binsOption;
@@ -91,6 +100,7 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
         attrModel = null;
         peptides = null;
         ticket = null;
+        allFeatures = null;
     }
 
     @Override
@@ -141,14 +151,15 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
             pc.reportMsg("Bins option: " + binsOption, workspace);
             pc.reportMsg("Number of bins: " + numberOfBins, workspace);
 
-            List<MolecularDescriptor> allFeatures = new LinkedList<>();
-
-            for (String key : attrModel.getMolecularDescriptorKeys()) {
-                for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
-                    allFeatures.add(attr);
+            if (allFeatures == null) {
+                allFeatures = new LinkedList<>();
+                for (String key : attrModel.getMolecularDescriptorKeys()) {
+                    for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
+                        allFeatures.add(attr);
+                    }
                 }
             }
-
+            
             ticket.switchToDeterminate(allFeatures.size());
             allFeatures.parallelStream().forEach(descriptor -> {
                 if (!stopRun.get()) {

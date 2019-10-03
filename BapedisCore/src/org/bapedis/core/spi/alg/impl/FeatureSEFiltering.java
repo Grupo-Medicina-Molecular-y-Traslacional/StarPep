@@ -382,7 +382,6 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                                 preprocessing.setNumberOfBins(numberOfBins2);
                             }
                             preprocessing.setAllFeatures(allFeatures);
-                            preprocessing.setBinsOption(FeatureDiscretization.BinsOption.Sturges_Rule);
                             executePreprocessing();
 
                             MolecularDescriptor[] descriptors = allFeatures.toArray(new MolecularDescriptor[0]);
@@ -436,11 +435,13 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
 
                             //Included descriptors
                             pc.reportMsg("Included descriptors", workspace);
+                            pc.reportMsg("Count: " + count(true, subset), workspace);
                             pc.reportMsg("Score (avg): " + avgScore(true, subset, descriptors), workspace);
                             pc.reportMsg("Merit: " + merit(true, subset, descriptors, miMatrix), workspace);
 
                             //Excluded descriptors
                             pc.reportMsg("Excluded descriptors", workspace);
+                            pc.reportMsg("Count: " + count(false, subset), workspace);
                             pc.reportMsg("Score (avg): " + avgScore(false, subset, descriptors), workspace);
                             pc.reportMsg("Merit: " + merit(false, subset, descriptors, miMatrix), workspace);
                         }

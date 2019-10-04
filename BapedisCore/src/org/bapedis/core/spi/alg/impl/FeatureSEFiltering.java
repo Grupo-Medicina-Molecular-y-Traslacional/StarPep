@@ -433,6 +433,10 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                             }
                             rankedFeatures = descriptors;
 
+                            pc.reportMsg("Computing merit....", workspace);
+                            preprocessing.setBinsOption(FeatureDiscretization.BinsOption.One_third_number_peptides);
+                            executePreprocessing();
+                            
                             //Included descriptors
                             pc.reportMsg("Included descriptors", workspace);
                             pc.reportMsg("Count: " + count(true, subset), workspace);

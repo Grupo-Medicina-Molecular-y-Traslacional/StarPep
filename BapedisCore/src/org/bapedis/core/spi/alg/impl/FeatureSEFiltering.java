@@ -437,6 +437,11 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                             preprocessing.setBinsOption(FeatureDiscretization.BinsOption.One_third_number_peptides);
                             executePreprocessing();
                             
+                            task = createMatrixBuilder(peptides, descriptors);
+                            fjPool.invoke(task);
+                            task.join();
+                            miMatrix = task.getMIMatrix();                            
+                            
                             //Included descriptors
                             pc.reportMsg("Included descriptors", workspace);
                             pc.reportMsg("Count: " + count(true, subset), workspace);

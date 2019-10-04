@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.spi.alg.impl;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Comparator;
@@ -61,9 +62,9 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     //To initialize
     protected Workspace workspace;
     private AttributesModel attrModel;
-    private List<Peptide> peptides;
     protected final AtomicBoolean stopRun;
     protected ProgressTicket ticket;
+    private List<Peptide> peptides;
 
     private FeatureDiscretization.BinsOption binsOption1, binsOption2;
     int numberOfBins1, numberOfBins2;
@@ -76,6 +77,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     protected FeatureDiscretization preprocessing;
     private MIThresholdOption miThresholdOption;
     private final NotifyDescriptor emptyMDs;
+    private boolean merit;
 
     public FeatureSEFiltering(FeatureSEFilteringFactory factory) {
         this.factory = factory;
@@ -205,6 +207,14 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         this.debug = debug;
     }
 
+    public boolean isMerit() {
+        return merit;
+    }
+
+    public void setMerit(boolean merit) {
+        this.merit = merit;
+    }
+
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
@@ -258,7 +268,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                 for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
                     if (!stopRun.get()) {
                         allFeatures.add(attr);
-                        attr.resetSummaryStats(attrModel.getPeptides());
+                        attr.resetSummaryStats(peptides);
                     }
                 }
             }
@@ -308,11 +318,10 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                 for (MolecularDescriptor attr : toRemove) {
                     attrModel.deleteAttribute(attr);
                     if (debug) {
-                        pc.reportMsg("Removed: " + attr.getDisplayName() + " - score: " + attr.getBinsPartition().getEntropy(), workspace);
+                        pc.reportMsg("Removed feature: " + attr.getDisplayName() + " - score: " + attr.getBinsPartition().getEntropy(), workspace);
                     }
                 }
-                int removed = toRemove.size();
-                pc.reportMsg("Useless features removed: " + removed, workspace);
+                int useless = toRemove.size();
                 toRemove = null;
 
                 //----------Ranking all features
@@ -327,39 +336,48 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                 ticket.progress(taskName);
                 pc.reportMsg(taskName, workspace);
                 double[][] descriptorMatrix = new double[rankedFeatures.length][];
-                int count = 0;
+
                 int workUnits = rankedFeatures.length;
                 ticket.switchToDeterminate(workUnits);
 
                 pc.reportMsg("Correlation method: " + getCorrelationMethod(), workspace);
                 pc.reportMsg("Correlation cutoff value: " + correlationCutoff, workspace);
 
+                BitSet retainedSet = new BitSet(rankedFeatures.length);
+                for (int j = 0; j < rankedFeatures.length; j++) {
+                    retainedSet.set(j);
+                }
+
+                Peptide[] peptideArr = null;
+                int redundant = 0;
+                int removed = useless;
+                int retained = 0;
                 if (selectionOption == SELECT_TOP) {
                     pc.reportMsg("Ranking output: select top " + topRank, workspace);
                     for (int i = 0; i < rankedFeatures.length && !stopRun.get(); i++) {
-                        if (rankedFeatures[i] != null) {
-                            if (count < topRank) {
-                                count++;
+                        if (retainedSet.get(i)) {
+                            if (retained < topRank) {
+                                retained++;
                                 if (correlationOption != CORRELATION_NONE) {
-                                    removed += removeCorrelated(descriptorMatrix, i, rankedFeatures);
+                                    redundant += removeCorrelated(descriptorMatrix, i, rankedFeatures, retainedSet);
                                 }
                             } else {
                                 removed++;
                                 attrModel.deleteAttribute(rankedFeatures[i]);
                                 if (debug) {
-                                    pc.reportMsg("Removed: " + rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getBinsPartition().getEntropy(), workspace);
+                                    pc.reportMsg("Removed feature: " + rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getBinsPartition().getEntropy(), workspace);
                                 }
-                                rankedFeatures[i] = null;
+                                retainedSet.flip(i);
                             }
                         }
                         ticket.progress();
                     }
                 } else {
                     for (int i = 0; i < rankedFeatures.length && !stopRun.get(); i++) {
-                        if (rankedFeatures[i] != null) {
-                            count++;
+                        if (retainedSet.get(i)) {
+                            retained++;
                             if (correlationOption != CORRELATION_NONE) {
-                                removed += removeCorrelated(descriptorMatrix, i, rankedFeatures);
+                                redundant += removeCorrelated(descriptorMatrix, i, rankedFeatures, retainedSet);
                             }
                         }
                         ticket.progress();
@@ -368,9 +386,8 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                     if (selectionOption == SELECT_BY_MI) {
                         pc.reportMsg("Ranking output: select by mutual information ", workspace);
                         allFeatures.clear();
-                        count = 0;
                         for (int i = 0; i < rankedFeatures.length; i++) {
-                            if (rankedFeatures[i] != null) {
+                            if (retainedSet.get(i)) {
                                 allFeatures.add(rankedFeatures[i]);
                             }
                         }
@@ -384,9 +401,9 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                             preprocessing.setAllFeatures(allFeatures);
                             executePreprocessing();
 
-                            MolecularDescriptor[] descriptors = allFeatures.toArray(new MolecularDescriptor[0]);
-                            Peptide[] peptides = attrModel.getPeptides().toArray(new Peptide[0]);
-                            MIMatrixBuilder task = createMatrixBuilder(peptides, descriptors);
+                            rankedFeatures = allFeatures.toArray(new MolecularDescriptor[0]);
+                            peptideArr = peptides.toArray(new Peptide[0]);
+                            MIMatrixBuilder task = createMatrixBuilder(peptideArr, rankedFeatures);
                             fjPool.invoke(task);
                             task.join();
                             MIMatrix miMatrix = task.getMIMatrix();
@@ -409,59 +426,87 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                                     threshold = avg + std;
                             }
 
-                            BitSet subset = new BitSet(descriptors.length);
-                            for (int j = 0; j < descriptors.length; j++){
-                                subset.set(j);
+                            //Reset
+                            retained = 0;
+                            retainedSet = new BitSet(rankedFeatures.length);
+                            for (int j = 0; j < rankedFeatures.length; j++) {
+                                retainedSet.set(j);
                             }
 
-                            for (int j = 0; j < descriptors.length; j++) {
-                                if (subset.get(j)) {
-                                    count++;
-                                    for (int k = j + 1; k < descriptors.length; k++) {
-                                        if (subset.get(k)) {
+                            for (int j = 0; j < rankedFeatures.length; j++) {
+                                if (retainedSet.get(j)) {
+                                    retained++;
+                                    for (int k = j + 1; k < rankedFeatures.length; k++) {
+                                        if (retainedSet.get(k)) {
                                             if (miMatrix.getValue(j, k) < threshold) {
+                                                retainedSet.flip(k);
                                                 removed++;
-                                                attrModel.deleteAttribute(descriptors[k]);
-                                                subset.flip(k);
+//                                                attrModel.deleteAttribute(rankedFeatures[k]);
                                                 if (debug) {
-                                                    pc.reportMsg("Removed: " + descriptors[k].getDisplayName() + " - score: " + descriptors[k].getBinsPartition().getEntropy(), workspace);
+                                                    pc.reportMsg("Removed feature: " + rankedFeatures[k].getDisplayName() + " - score: " + rankedFeatures[k].getBinsPartition().getEntropy(), workspace);
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
-                            rankedFeatures = descriptors;
-
-                            pc.reportMsg("Computing merit....", workspace);
-                            preprocessing.setBinsOption(FeatureDiscretization.BinsOption.One_third_number_peptides);
-                            executePreprocessing();
-                            
-                            task = createMatrixBuilder(peptides, descriptors);
-                            fjPool.invoke(task);
-                            task.join();
-                            miMatrix = task.getMIMatrix();                            
-                            
-                            //Included descriptors
-                            pc.reportMsg("Included descriptors", workspace);
-                            pc.reportMsg("Count: " + count(true, subset), workspace);
-                            pc.reportMsg("Score (avg): " + avgScore(true, subset, descriptors), workspace);
-                            pc.reportMsg("Merit: " + merit(true, subset, descriptors, miMatrix), workspace);
-
-                            //Excluded descriptors
-                            pc.reportMsg("Excluded descriptors", workspace);
-                            pc.reportMsg("Count: " + count(false, subset), workspace);
-                            pc.reportMsg("Score (avg): " + avgScore(false, subset, descriptors), workspace);
-                            pc.reportMsg("Merit: " + merit(false, subset, descriptors, miMatrix), workspace);
                         }
+                    }
+                }
+                removed += redundant;
+
+                if (merit) {
+                    if (selectionOption == SELECT_ALL
+                            || selectionOption == SELECT_TOP) {
+                        allFeatures.clear();
+                        for (int i = 0; i < rankedFeatures.length; i++) {
+                            if (retainedSet.get(i)) {
+                                allFeatures.add(rankedFeatures[i]);
+                            }
+                        }
+                        rankedFeatures = allFeatures.toArray(new MolecularDescriptor[0]);
+                        //Reset
+                        retainedSet = new BitSet(rankedFeatures.length);
+                        for (int j = 0; j < rankedFeatures.length; j++) {
+                            retainedSet.set(j);
+                        }
+                    }
+
+                    pc.reportMsg("Merit calculation....", workspace);
+                    preprocessing.setBinsOption(FeatureDiscretization.BinsOption.One_third_number_peptides);
+                    executePreprocessing();
+
+                    if (peptideArr == null) {
+                        peptideArr = peptides.toArray(new Peptide[0]);
+                    }
+                    MIMatrixBuilder task = createMatrixBuilder(peptideArr, rankedFeatures);
+                    fjPool.invoke(task);
+                    task.join();
+                    MIMatrix miMatrix = task.getMIMatrix();
+
+                    DecimalFormat df = new DecimalFormat("0.0##");
+
+                    pc.reportMsg("Merit of retained descriptors", workspace);
+                    pc.reportMsg("Count: " + count(true, retainedSet), workspace);
+                    pc.reportMsg("Score (avg): " + df.format(avgScore(true, retainedSet, rankedFeatures)), workspace);
+                    pc.reportMsg("Merit: " + df.format(calcMerit(true, retainedSet, rankedFeatures, miMatrix)), workspace);
+
+                    if (selectionOption == SELECT_BY_MI) {
+                        pc.reportMsg("Merit of removed  descriptors", workspace);
+                        pc.reportMsg("Count: " + count(false, retainedSet), workspace);
+                        pc.reportMsg("Score (avg): " + df.format(avgScore(false, retainedSet, rankedFeatures)), workspace);
+                        pc.reportMsg("Merit: " + df.format(calcMerit(false, retainedSet, rankedFeatures, miMatrix)), workspace);
                     }
                 }
 
                 //Print top 5 bottom 3
-                FeatureComparator.printTop5Buttom3(rankedFeatures, workspace);
+                FeatureComparator.printTop5Buttom3(retainedSet, rankedFeatures, workspace);
 
+                pc.reportMsg("Useless features: " + useless, workspace);
+                pc.reportMsg("Redundant features: " + redundant, workspace);
+                
                 pc.reportMsg("\nTotal of removed features: " + removed, workspace);
-                pc.reportMsg("Total of remaining features: " + count, workspace);
+                pc.reportMsg("Total of retained features: " + retained, workspace);
             }
         } catch (MolecularDescriptorNotFoundException ex) {
             DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
@@ -479,18 +524,18 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         preprocessing.run();
         preprocessing.endAlgo();
     }
-    
-    private int count(boolean flag, BitSet subset){
+
+    private int count(boolean flag, BitSet subset) {
         int c = 0;
         for (int j = 0; j < subset.size(); j++) {
-            if (subset.get(j) == flag){
+            if (subset.get(j) == flag) {
                 c++;
             }
         }
         return c;
     }
 
-    private double merit(boolean flag, BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
+    private double calcMerit(boolean flag, BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
         double relevance = 0, redundancy = 0;
         int n = 0;
         double entropy;
@@ -535,16 +580,16 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         return new MIMatrixBuilder(features, binIndex, ticket, stopRun);
     }
 
-    private int removeCorrelated(double[][] descriptorMatrix, int beginIndex, MolecularDescriptor[] rankedFeatures) throws MolecularDescriptorNotFoundException {
+    private int removeCorrelated(double[][] descriptorMatrix, int beginIndex, MolecularDescriptor[] rankedFeatures, BitSet retainedSet) throws MolecularDescriptorNotFoundException {
         if (descriptorMatrix[beginIndex] == null) {
             descriptorMatrix[beginIndex] = computeColumn(beginIndex, rankedFeatures);
         }
         double[] column1 = descriptorMatrix[beginIndex];
         double[] column2;
         double score;
-        int removed = 0;
+        int redundant = 0;
         for (int j = beginIndex + 1; j < rankedFeatures.length && !stopRun.get(); j++) {
-            if (rankedFeatures[j] != null) {
+            if (retainedSet.get(j)) {
                 if (descriptorMatrix[j] == null) {
                     descriptorMatrix[j] = computeColumn(j, rankedFeatures);
                 }
@@ -553,15 +598,15 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                 if (Math.abs(score) >= correlationCutoff) {
                     attrModel.deleteAttribute(rankedFeatures[j]);
                     if (debug) {
-                        pc.reportMsg("Removed: " + rankedFeatures[j].getDisplayName() + " - " + String.format("corr(%s) = %f", rankedFeatures[beginIndex].getDisplayName(), score), workspace);
+                        pc.reportMsg("Removed feature: " + rankedFeatures[j].getDisplayName() + " - " + String.format("corr(%s) = %f", rankedFeatures[beginIndex].getDisplayName(), score), workspace);
                     }
-                    removed++;
-                    rankedFeatures[j] = null;
+                    redundant++;
+                    retainedSet.flip(j);
                     descriptorMatrix[j] = null;
                 }
             }
         }
-        return removed;
+        return redundant;
     }
 
     private double[] computeColumn(int index, MolecularDescriptor[] rankedFeatures) throws MolecularDescriptorNotFoundException {
@@ -792,12 +837,12 @@ class FeatureComparator implements Comparator<MolecularDescriptor> {
         return 0;
     }
 
-    public static void printTop5Buttom3(MolecularDescriptor[] rankedFeatures, Workspace workspace) {
+    public static void printTop5Buttom3(BitSet retainedSet, MolecularDescriptor[] rankedFeatures, Workspace workspace) {
         //Print top 5 bottom 3
         FeatureSEFiltering.pc.reportMsg("Top 5", workspace);
         int top5 = 0;
         for (int i = 0; i < rankedFeatures.length && top5 < 5; i++) {
-            if (rankedFeatures[i] != null) {
+            if (retainedSet.get(i)) {
                 FeatureSEFiltering.pc.reportMsg(rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
                 top5++;
             }
@@ -807,7 +852,7 @@ class FeatureComparator implements Comparator<MolecularDescriptor> {
         Stack<MolecularDescriptor> stack = new Stack<>();
         int bottom3 = 0;
         for (int i = rankedFeatures.length - 1; i >= 0 && bottom3 < 3; i--) {
-            if (rankedFeatures[i] != null) {
+            if (retainedSet.get(i)) {
                 stack.push(rankedFeatures[i]);
                 bottom3++;
             }

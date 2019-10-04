@@ -168,6 +168,8 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         corrComboBox.setEnabled(enabled);
         jSpinnerCorrelation.setEnabled(enabled);
         infoLabel2.setEnabled(enabled);
+        
+        jCBMerit.setEnabled(enabled);
     }
 
     /**
@@ -206,6 +208,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         jNumberOfBins2Label = new javax.swing.JLabel();
         jCBNumberOfBins2 = new javax.swing.JComboBox<>();
         jTF_value2 = new javax.swing.JTextField();
+        jCBMerit = new javax.swing.JCheckBox();
         extLabel = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(440, 380));
@@ -296,8 +299,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -368,8 +370,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(redundancyPanel, gridBagConstraints);
@@ -495,10 +496,23 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(outputPanel, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jCBMerit, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jCBMerit.text")); // NOI18N
+        jCBMerit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCBMeritActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(jCBMerit, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(extLabel, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.extLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -647,6 +661,10 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         }
     }//GEN-LAST:event_jCBNumberOfBins2ActionPerformed
 
+    private void jCBMeritActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBMeritActionPerformed
+        algorithm.setMerit(jCBMerit.isSelected());
+    }//GEN-LAST:event_jCBMeritActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox<String> corrComboBox;
@@ -654,6 +672,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
     private javax.swing.JLabel infoLabel1;
     private javax.swing.JLabel infoLabel2;
     private javax.swing.JComboBox<String> jCBMIThreshold;
+    private javax.swing.JCheckBox jCBMerit;
     private javax.swing.JComboBox<String> jCBNumberOfBins1;
     private javax.swing.JComboBox<String> jCBNumberOfBins2;
     private javax.swing.JLabel jLabel1;
@@ -754,8 +773,19 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
 
         double corrThreshold = algorithm.getCorrelationCutoff();
         jSpinnerCorrelation.getModel().setValue(corrThreshold);
+        
+        jCBMerit.setSelected(algorithm.isMerit());
 
         return this;
     }
 
+//Mean - 2.0 Std.Desv
+//Mean + 1.5 Std.Desv
+//Mean - Std.Desv
+//Mean - 0.5 * Std.Desv
+//Mean
+//Mean - 0.5 * Std.Desv
+//Mean - Std.Desv
+//Mean - 1.5 Std.Desv
+//Mean - 2.0 Std.Desv    
 }

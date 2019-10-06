@@ -13,14 +13,14 @@ import java.util.Map;
  *
  * @author Cesar
  */
-public class AminoAcidProperties 
+public class AminoacidPropertiesGetter 
 {
     private final Map<String, double[]> aaProperties;
     
     private final List<String> header;    
     private final String configFile = "org/bapedis/modamp/aminoacid_weights.txt";
     
-    public AminoAcidProperties() throws IOException 
+    public AminoacidPropertiesGetter() throws IOException 
     {
         aaProperties = new HashMap<>();        
         header = new ArrayList<>();
@@ -58,7 +58,7 @@ public class AminoAcidProperties
         bufferedReader.close();
     }
     
-    public double[] getAminoacidPropertyValues( String seq, AminoAcidProperty property ) 
+    public double[] getAminoacidPropertyValues( String seq, EAminoacidProperty property, EAminoacidLocal local ) 
     {
         double[] lovis = new double[ seq.length() ];
         
@@ -68,7 +68,7 @@ public class AminoAcidProperties
             String aa = Character.toString( seq.charAt( i ) );
             if ( aaProperties.containsKey( aa ) )
             {
-                lovis[ i ] = aaProperties.get( aa )[pos];
+                lovis[ i ] = aaProperties.get( aa )[pos] * LocalTool.belong2Local( aa, local );
             }
         }
         

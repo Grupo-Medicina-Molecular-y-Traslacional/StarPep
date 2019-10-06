@@ -288,6 +288,19 @@ public class MD {
         
         return bi;
     }
+    
+    public static double[] bomanByAA( String seq, EAminoacidLocal local )
+    {
+        Map<String, Double> BI = otherScales.bomanIndex();
+        
+        double[] bi = new double[ seq.length() ];
+        for ( int i = 0; i < seq.length(); i++ )
+        {
+            bi[i] = BI.getOrDefault( seq.subSequence( i, i + 1 ), 0.0 ) * LocalTool.belong2Local( seq.subSequence( i, i + 1 ).toString(), local );
+        }
+        
+        return bi;
+    }
 
     /**
      * compute the max averaged hydrophobic moment. The averaged hydrophobic
@@ -391,6 +404,17 @@ public class MD {
         return gravyByAA;
     }
     
+    public static double[] gravyByAA( String seq, Map<String, Double> hydro_scale, EAminoacidLocal local )
+    {
+        double[] gravyByAA = new double[ seq.length() ];
+        for ( int i = 0; i < seq.length(); i++ ) 
+        {
+            gravyByAA[i] = hydro_scale.getOrDefault( seq.subSequence( i, i + 1 ), 0.0 ) * LocalTool.belong2Local( seq.subSequence( i, i + 1 ).toString(), local ); //sum
+        }
+        
+        return gravyByAA;
+    }
+    
     /**
      * The Grand average of hydropathicity GRAVY value for a peptide or protein
      * is calculated as the sum of hydropathy values [9] of all the amino acids,
@@ -410,7 +434,12 @@ public class MD {
     {
         return gravyByAA( seq, HydrophobicityScale.kyte_doolittle_hydrov_hash() );
     }
-
+    
+    public static double[] gravyByAA( String seq, EAminoacidLocal local ) 
+    {
+        return gravyByAA( seq, HydrophobicityScale.kyte_doolittle_hydrov_hash(), local );
+    }
+    
     /**
      * compute the max averaged hydrophobicity. The averaged hydrophobicity
      * moment are calculated using a rectangular window of size n. The averaged
@@ -604,6 +633,17 @@ public class MD {
         for ( int i = 0; i < seq.length(); i++ ) 
         {
             lovis[i] = aa_hash.getOrDefault( seq.subSequence( i, i + 1 ), 0.0 );
+        }
+        
+        return lovis;
+    }
+    
+    public static double[] sumAndAvgByAA( String seq, Map<String, Double> aa_hash, EAminoacidLocal local )
+    {
+        double[] lovis = new double[ seq.length() ];
+        for ( int i = 0; i < seq.length(); i++ ) 
+        {
+            lovis[i] = aa_hash.getOrDefault( seq.subSequence( i, i + 1 ), 0.0 ) * LocalTool.belong2Local( seq.subSequence( i, i + 1 ).toString(), local );
         }
         
         return lovis;

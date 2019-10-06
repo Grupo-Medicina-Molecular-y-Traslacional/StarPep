@@ -25,7 +25,14 @@ final public class NonClassicAggregationOperatorMeans extends NonClassicAggregat
     {
         super.applyOperators( lovis, keyAttr, peptide, md, applyMeans, operatorsList ); //To change body of generated methods, choose Tools | Templates.
         
-        double val;        
+        double val;
+        if ( operatorsList.contains( "AM" ) )
+        {
+            val = this.generalizedMean( lovis, 1 );
+            peptide.setAttributeValue( md.getOrAddAttribute( keyAttr + "-AM",
+                                                             keyAttr + "-AM", Double.class, 0d ), val );
+        }
+        
         if ( operatorsList.contains( "P2" ) )
         {
             val = this.generalizedMean( lovis, 2 );
@@ -62,7 +69,11 @@ final public class NonClassicAggregationOperatorMeans extends NonClassicAggregat
         double value = 0;
         for ( int i = 0; i < n; i++ )
         {
-            if ( lovis[i] < 0 && ( pot % 2 != 0 ) )
+            if ( pot == 1 )
+            {
+                value += lovis[i];
+            }
+            else if ( lovis[i] < 0 && ( pot % 2 != 0 ) )
             {
                 return Double.NaN;
             }
@@ -87,6 +98,9 @@ final public class NonClassicAggregationOperatorMeans extends NonClassicAggregat
             {
                 case -1: // harmonic mean
                     value = ( n - nZeros ) / value;
+                    break;
+                case 1: // arithmetic mean
+                    value = value / ( n - nZeros );
                     break;
                 case 2: // quadratic mean
                     value = Math.sqrt( value / ( n - nZeros ) );

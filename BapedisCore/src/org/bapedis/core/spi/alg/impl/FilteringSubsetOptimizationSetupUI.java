@@ -44,11 +44,34 @@ public class FilteringSubsetOptimizationSetupUI extends javax.swing.JPanel imple
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
         filteringPanel = new javax.swing.JPanel();
+        jcbFiltering = new javax.swing.JCheckBox();
         centerPanel1 = new javax.swing.JPanel();
+        subsetOptimizationPanel = new javax.swing.JPanel();
+        jcbSubsetOptimization = new javax.swing.JCheckBox();
+        centerPanel2 = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
         filteringPanel.setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(jcbFiltering, org.openide.util.NbBundle.getMessage(FilteringSubsetOptimizationSetupUI.class, "FilteringSubsetOptimizationSetupUI.jcbFiltering.text")); // NOI18N
+        jcbFiltering.setFocusable(false);
+        jcbFiltering.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jcbFilteringItemStateChanged(evt);
+            }
+        });
+        jcbFiltering.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jcbFilteringActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        filteringPanel.add(jcbFiltering, gridBagConstraints);
 
         centerPanel1.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -62,6 +85,40 @@ public class FilteringSubsetOptimizationSetupUI extends javax.swing.JPanel imple
 
         jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(FilteringSubsetOptimizationSetupUI.class, "FilteringSubsetOptimizationSetupUI.filteringPanel.TabConstraints.tabTitle"), filteringPanel); // NOI18N
 
+        subsetOptimizationPanel.setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(jcbSubsetOptimization, org.openide.util.NbBundle.getMessage(FilteringSubsetOptimizationSetupUI.class, "FilteringSubsetOptimizationSetupUI.jcbSubsetOptimization.text")); // NOI18N
+        jcbSubsetOptimization.setFocusable(false);
+        jcbSubsetOptimization.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jcbSubsetOptimizationItemStateChanged(evt);
+            }
+        });
+        jcbSubsetOptimization.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jcbSubsetOptimizationActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        subsetOptimizationPanel.add(jcbSubsetOptimization, gridBagConstraints);
+
+        centerPanel2.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        subsetOptimizationPanel.add(centerPanel2, gridBagConstraints);
+
+        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(FilteringSubsetOptimizationSetupUI.class, "FilteringSubsetOptimizationSetupUI.subsetOptimizationPanel.TabConstraints.tabTitle"), subsetOptimizationPanel); // NOI18N
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -72,6 +129,26 @@ public class FilteringSubsetOptimizationSetupUI extends javax.swing.JPanel imple
         add(jTabbedPane1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jcbSubsetOptimizationItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbSubsetOptimizationItemStateChanged
+        if (secondStagePanel != null){
+            secondStagePanel.setEnabled(jcbSubsetOptimization.isSelected());
+        }
+    }//GEN-LAST:event_jcbSubsetOptimizationItemStateChanged
+
+    private void jcbSubsetOptimizationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbSubsetOptimizationActionPerformed
+        featureSelection.setSecondStage(jcbSubsetOptimization.isSelected());
+    }//GEN-LAST:event_jcbSubsetOptimizationActionPerformed
+
+    private void jcbFilteringActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbFilteringActionPerformed
+        featureSelection.setFirstStage(jcbFiltering.isSelected());
+    }//GEN-LAST:event_jcbFilteringActionPerformed
+
+    private void jcbFilteringItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbFilteringItemStateChanged
+        if (firstStagePanel != null){
+            firstStagePanel.setEnabled(jcbFiltering.isSelected());
+        }        
+    }//GEN-LAST:event_jcbFilteringItemStateChanged
+
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         featureSelection = (FilteringSubsetOptimization) algo;
@@ -80,20 +157,27 @@ public class FilteringSubsetOptimizationSetupUI extends javax.swing.JPanel imple
         Algorithm alg = featureSelection.getFilteringAlg();
         firstStagePanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
         setupPanel(firstStagePanel, centerPanel1);
+        firstStagePanel.setEnabled(featureSelection.isFirstStage());
+        jcbFiltering.setSelected(featureSelection.isFirstStage());
         
         //Subset optimization algorithm
-//        alg = featureSelection.getSubsetOptimizationAlg();
-//        secondStagePanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
-//        setupPanel(secondStagePanel, centerPanel2);
-//        secondStagePanel.setEnabled(jcbSubsetOptimization.isSelected());
-//        jcbSubsetOptimization.setSelected(featureSelection.isSecondStage());
+        alg = featureSelection.getSubsetOptimizationAlg();
+        secondStagePanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
+        setupPanel(secondStagePanel, centerPanel2);        
+        secondStagePanel.setEnabled(featureSelection.isSecondStage());
+        jcbSubsetOptimization.setSelected(featureSelection.isSecondStage());
+        
         return this;
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel1;
+    private javax.swing.JPanel centerPanel2;
     private javax.swing.JPanel filteringPanel;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JCheckBox jcbFiltering;
+    private javax.swing.JCheckBox jcbSubsetOptimization;
+    private javax.swing.JPanel subsetOptimizationPanel;
     // End of variables declaration//GEN-END:variables
 }

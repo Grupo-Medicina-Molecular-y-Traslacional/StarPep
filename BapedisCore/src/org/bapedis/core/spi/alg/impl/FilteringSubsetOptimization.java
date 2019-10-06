@@ -7,6 +7,7 @@ package org.bapedis.core.spi.alg.impl;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
@@ -36,12 +37,11 @@ public class FilteringSubsetOptimization implements Algorithm, Cloneable {
     protected boolean stopRun;
     protected ProgressTicket ticket;
     private final NotifyDescriptor emptyMDs;
-    private boolean secondStage;
+    private boolean firstStage, secondStage;
 
     //Algorithm
     protected FeatureSEFiltering filtering;
     protected FeatureSubsetOptimization subsetOptimization;
-    private final boolean debug;
 
     public FilteringSubsetOptimization(FilteringSubsetOptimizationFactory factory) {
         this.factory = factory;
@@ -51,9 +51,8 @@ public class FilteringSubsetOptimization implements Algorithm, Cloneable {
 
         emptyMDs = new NotifyDescriptor.Message(NbBundle.getMessage(FilteringSubsetOptimizationFactory.class, "FeatureSubsetOptimization.emptyMDs.info"), NotifyDescriptor.ERROR_MESSAGE);
 
-        secondStage = false;
-
-        debug = true;
+        firstStage = true;
+        secondStage = true;
     }
 
     public FeatureSEFiltering getFilteringAlg() {
@@ -62,6 +61,14 @@ public class FilteringSubsetOptimization implements Algorithm, Cloneable {
 
     public FeatureSubsetOptimization getSubsetOptimizationAlg() {
         return subsetOptimization;
+    }
+
+    public boolean isFirstStage() {
+        return firstStage;
+    }
+
+    public void setFirstStage(boolean firstStage) {
+        this.firstStage = firstStage;
     }
 
     public boolean isSecondStage() {
@@ -78,9 +85,6 @@ public class FilteringSubsetOptimization implements Algorithm, Cloneable {
         ticket = progressTicket;
         attrModel = pc.getAttributesModel(workspace);
         stopRun = false;
-
-        filtering.setDebug(debug);
-        subsetOptimization.setDebug(debug);
     }
 
     @Override
@@ -93,6 +97,8 @@ public class FilteringSubsetOptimization implements Algorithm, Cloneable {
     @Override
     public boolean cancel() {
         stopRun = true;
+        filtering.cancel();
+        subsetOptimization.cancel();
         return true;
     }
 
@@ -129,7 +135,9 @@ public class FilteringSubsetOptimization implements Algorithm, Cloneable {
                 }
 
                 //First stage
-                execute(filtering);
+                if (firstStage) {
+                    execute(filtering);
+                }
 
                 //Second stage
                 if (secondStage) {
@@ -141,6 +149,33 @@ public class FilteringSubsetOptimization implements Algorithm, Cloneable {
                 pc.reportError(ex.getMessage(), workspace);
             }
 
+        }
+    }
+
+    public static void printTop5Buttom3(MolecularDescriptor[] rankedFeatures, Workspace workspace) {
+        //Print top 5 bottom 3
+        FeatureSEFiltering.pc.reportMsg("Top 5", workspace);
+        int top5 = 0;
+        for (int i = 0; i < rankedFeatures.length && top5 < 5; i++) {
+            if (rankedFeatures[i] != null) {
+                FeatureSEFiltering.pc.reportMsg(rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+                top5++;
+            }
+        }
+        FeatureSEFiltering.pc.reportMsg("...", workspace);
+        FeatureSEFiltering.pc.reportMsg("Bottom 3", workspace);
+        Stack<MolecularDescriptor> stack = new Stack<>();
+        int bottom3 = 0;
+        for (int i = rankedFeatures.length - 1; i >= 0 && bottom3 < 3; i--) {
+            if (rankedFeatures[i] != null) {
+                stack.push(rankedFeatures[i]);
+                bottom3++;
+            }
+        }
+        MolecularDescriptor descriptor;
+        while (!stack.isEmpty()) {
+            descriptor = stack.pop();
+            FeatureSEFiltering.pc.reportMsg(descriptor.getDisplayName() + " - score: " + descriptor.getScore(), workspace);
         }
     }
 

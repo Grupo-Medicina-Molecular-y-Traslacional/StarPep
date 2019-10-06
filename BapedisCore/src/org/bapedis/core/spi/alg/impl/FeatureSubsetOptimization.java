@@ -15,19 +15,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
-import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.Bin;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
+import org.bapedis.core.model.NMIMatrix;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
+import static org.bapedis.core.spi.alg.impl.FeatureSEFiltering.pc;
 import org.bapedis.core.task.ProgressTicket;
+import org.bapedis.core.util.FeatureComparator;
+import org.bapedis.core.util.NMIMatrixBuilder;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -39,6 +41,7 @@ import org.openide.util.NbBundle;
 public class FeatureSubsetOptimization implements Algorithm, Cloneable {
 
     protected ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+    protected static final ForkJoinPool fjPool = new ForkJoinPool();
 
     public enum Direction {
         Backward, Forward
@@ -51,6 +54,8 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
     protected ProgressTicket ticket;
     protected Direction direction;
     private boolean debug, parallel;
+    private FeatureDiscretization.BinsOption binsOption2;
+    private int numberOfBins2;
     protected FeatureDiscretization preprocessing;
     protected final FeatureSubsetOptimizationFactory factory;
     protected int seed;
@@ -58,11 +63,28 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
     public FeatureSubsetOptimization(FeatureSubsetOptimizationFactory factory) {
         this.factory = factory;
         preprocessing = (FeatureDiscretization) (new FeatureDiscretizationFactory()).createAlgorithm();
-        preprocessing.setBinsOption(FeatureDiscretization.BinsOption.Sturges_Rule);
+        binsOption2 = FeatureDiscretization.BinsOption.Square_root_number_peptides;
+        numberOfBins2 = 50;
         direction = Direction.Backward;
         debug = false;
         parallel = true;
         stopRun = new AtomicBoolean();
+    }
+
+    public FeatureDiscretization.BinsOption getBinsOption2() {
+        return binsOption2;
+    }
+
+    public void setBinsOption2(FeatureDiscretization.BinsOption binsOption2) {
+        this.binsOption2 = binsOption2;
+    }
+
+    public int getNumberOfBins2() {
+        return numberOfBins2;
+    }
+
+    public void setNumberOfBins2(int numberOfBins2) {
+        this.numberOfBins2 = numberOfBins2;
     }
 
     public Direction getDirection() {
@@ -120,22 +142,28 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
     @Override
     public void run() {
         if (attrModel != null) {
-            List<MolecularDescriptor> allFeatures = new LinkedList<>();
+            List<MolecularDescriptor> retainedlFeatures = new LinkedList<>();
             for (String key : attrModel.getMolecularDescriptorKeys()) {
                 for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
-                    allFeatures.add(attr);
+                    retainedlFeatures.add(attr);
                 }
             }
 
-            if (allFeatures.size() > 1) {
+            if (retainedlFeatures.size() > 1) {
+                MolecularDescriptor[] descriptors = retainedlFeatures.toArray(new MolecularDescriptor[0]);
+                Arrays.parallelSort(descriptors, new FeatureComparator());
 
-//                Arrays.parallelSort(descriptors, new FeatureComparator());
                 //-----------Feature discretization
                 String taskName = NbBundle.getMessage(FeatureSubsetOptimization.class, "FeatureSubsetOptimization.preprocessing.taskName", preprocessing.getFactory().getName());
                 ticket.progress(taskName);
                 ticket.switchToIndeterminate();
                 pc.reportMsg(taskName, workspace);
 
+                preprocessing.setAllFeatures(retainedlFeatures);
+                preprocessing.setBinsOption(binsOption2);
+                if (binsOption2 == FeatureDiscretization.BinsOption.User_Defined) {
+                    preprocessing.setNumberOfBins(numberOfBins2);
+                }
                 preprocessing.initAlgo(workspace, ticket);
                 preprocessing.run();
                 preprocessing.endAlgo();
@@ -146,29 +174,35 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
                 ticket.switchToIndeterminate();
                 pc.reportMsg(taskName, workspace);
                 try {
+                    NMIMatrixBuilder task = NMIMatrixBuilder.createMatrixBuilder(attrModel.getPeptides().toArray(new Peptide[0]), descriptors, ticket, stopRun);
+                    ticket.progress(taskName);
+                    ticket.switchToDeterminate(task.getWorkUnits() + descriptors.length);
+                    fjPool.invoke(task);
+                    task.join();
+                    NMIMatrix miMatrix = task.getMIMatrix();
 
-//                    BitSet subset = hillClimbingSearch(descriptors, miMatrix);
-//                    
-//                    MolecularDescriptor attr;
-//                    int removed = 0;
-//                    for (int i = 0; i < descriptors.length; i++) {
-//                        attr = descriptors[i];
-//                        if (!subset.get(i)) {
-//                            removed++;
-//                            attrModel.deleteAttribute(attr);
-//                            if (debug) {
-//                                pc.reportMsg("Removed: " + attr.getDisplayName() + " - score: " + attr.getBinsPartition().getEntropy(), workspace);
-//                            }
-//                        } else {
-//                            remainingFeatures.add(attr);
-//                        }
-//                    }
+                    int removed = 0;
+                    if (!stopRun.get()) {
+                        BitSet subset = hillClimbingSearch(descriptors, miMatrix);
+
+                        MolecularDescriptor attr;
+                        retainedlFeatures.clear();
+                        for (int i = 0; i < descriptors.length; i++) {
+                            attr = descriptors[i];
+                            if (!subset.get(i)) {
+                                removed++;
+                                attrModel.deleteAttribute(attr);
+                            } else {
+                                retainedlFeatures.add(attr);
+                            }
+                        }
+                    }
                     //Print top 5 bottom 3
-//                    descriptors = remainingFeatures.toArray(new MolecularDescriptor[0]);
-//                    Arrays.sort(descriptors, new FeatureComparator());
-//                    FeatureComparator.printTop5Buttom3(descriptors, workspace);
-//                    pc.reportMsg("\nTotal of removed features: " + removed, workspace);
-//                    pc.reportMsg("Total of remaining features: " + remainingFeatures.size(), workspace);
+                    descriptors = retainedlFeatures.toArray(new MolecularDescriptor[0]);
+                    Arrays.sort(descriptors, new FeatureComparator());
+                    FilteringSubsetOptimization.printTop5Buttom3(descriptors, workspace);
+                    pc.reportMsg("\nTotal of removed features: " + removed, workspace);
+                    pc.reportMsg("Total of retained features: " + retainedlFeatures.size(), workspace);
                 } catch (Exception ex) {
                     Exceptions.printStackTrace(ex);
                 }
@@ -176,7 +210,52 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
         }
     }
 
-    private BitSet hillClimbingSearch(MolecularDescriptor[] features, MIMatrix miMatrix) throws Exception {
+    private int count(boolean flag, BitSet subset) {
+        int c = 0;
+        for (int j = 0; j < subset.size(); j++) {
+            if (subset.get(j) == flag) {
+                c++;
+            }
+        }
+        return c;
+    }
+
+    private double calcMerit(boolean flag, BitSet subset, MolecularDescriptor[] features, NMIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
+        double relevance = 0, redundancy = 0;
+        int n = 0;
+        double entropy;
+        double minVal;
+        for (int j = 0; j < features.length; j++) {
+            if (subset.get(j) == flag) {
+                entropy = features[j].getBinsPartition().getEntropy() / preprocessing.getMaxEntropy();
+                relevance += entropy;
+                redundancy += entropy;
+                n++;
+                for (int k = 0; k < features.length; k++) {
+                    if (j != k && subset.get(k) == flag) {
+                        minVal = Math.min(features[j].getBinsPartition().getEntropy(),
+                                features[k].getBinsPartition().getEntropy());
+                        redundancy += miMatrix.getValue(j, k) / minVal;
+                    }
+                }
+            }
+        }
+        return relevance / n - redundancy / (n * n);
+    }
+
+    private double avgScore(boolean flag, BitSet subset, MolecularDescriptor[] features) {
+        double sum = 0;
+        int n = 0;
+        for (int j = 0; j < features.length; j++) {
+            if (subset.get(j) == flag) {
+                sum += features[j].getScore();
+                n++;
+            }
+        }
+        return sum / n;
+    }
+
+    private BitSet hillClimbingSearch(MolecularDescriptor[] features, NMIMatrix nmiMatrix) throws Exception {
         int i;
         double best_merit;
         double temp_best, temp_merit;
@@ -195,7 +274,7 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
                 m_best_group.set(i);
             }
         }
-        best_merit = evaluateSubset(m_best_group, features, miMatrix);
+        best_merit = evaluateSubset(m_best_group, features, nmiMatrix);
 
         // main search loop
         boolean done = false;
@@ -240,7 +319,7 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
                             public Double[] call() throws Exception {
                                 Double[] r = new Double[2];
                                 if (!stopRun.get()) {
-                                    double e = evaluateSubset(tempCopy, features, miMatrix);
+                                    double e = evaluateSubset(tempCopy, features, nmiMatrix);
                                     r[0] = new Double(attBeingEvaluated);
                                     r[1] = e;
                                 }
@@ -250,7 +329,7 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
 
                         results.add(future);
                     } else {
-                        temp_merit = evaluateSubset(temp_group, features, miMatrix);
+                        temp_merit = evaluateSubset(temp_group, features, nmiMatrix);
                         if (direction == Direction.Backward) {
                             z = (temp_merit >= temp_best);
                         } else {
@@ -316,62 +395,10 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
         return m_best_group;
     }
 
-    private double evaluateSubset(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
-        return evaluateSubset1(subset, features, miMatrix);
-    }
-
-    private double evaluateSubset3(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
-        double relevance = 0, redundancy = 0;
-        double score = 0;
-        int n = 0;
-        for (int j = 0; j < features.length; j++) {
-            if (subset.get(j)) {
-                n++;
-            }
-        }
-        double minVal;
-        for (int j = 0; j < features.length; j++) {
-            if (subset.get(j)) {
-                relevance = (seed == j) ? 1 : miMatrix.getValue(seed, j);
-                for (int k = 0; k < features.length; k++) {
-                    if (subset.get(k)) {
-                        minVal = Math.min(features[j].getBinsPartition().getEntropy(),
-                                features[k].getBinsPartition().getEntropy());
-                        redundancy += (j == k) ? 1 : miMatrix.getValue(j, k) / minVal;
-                    }
-                }
-                score += relevance - redundancy / n;
-            }
-        }
-        return score;
-    }
-
-    private double evaluateSubset2(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
-        double score = 0;
-        double entropy, maxMI;
-        for (int j = 0; j < features.length; j++) {
-            if (subset.get(j)) {
-                entropy = features[j].getBinsPartition().getEntropy();
-                maxMI = 0.0;
-                for (int k = 0; k < features.length; k++) {
-                    if (j != k && subset.get(k)) {
-                        if (miMatrix.getValue(j, k) > maxMI) {
-                            maxMI = miMatrix.getValue(j, k);
-                        }
-                    }
-                }
-                // Score(fi) = Relevance(fi) - Redundancy(fi)
-                score += entropy / preprocessing.getMaxEntropy() - maxMI / entropy;
-            }
-        }
-        return score;
-    }
-
-    private double evaluateSubset1(BitSet subset, MolecularDescriptor[] features, MIMatrix miMatrix) throws MolecularDescriptorNotFoundException {
+    private double evaluateSubset(BitSet subset, MolecularDescriptor[] features, NMIMatrix nmiMatrix) throws MolecularDescriptorNotFoundException {
         double relevance = 0, redundancy = 0;
         int n = 0;
         double entropy;
-        double minVal;
         for (int j = 0; j < features.length; j++) {
             if (subset.get(j)) {
                 entropy = features[j].getBinsPartition().getEntropy() / preprocessing.getMaxEntropy();
@@ -380,9 +407,7 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
                 n++;
                 for (int k = 0; k < features.length; k++) {
                     if (j != k && subset.get(k)) {
-                        minVal = Math.min(features[j].getBinsPartition().getEntropy(),
-                                features[k].getBinsPartition().getEntropy());
-                        redundancy += miMatrix.getValue(j, k) / minVal;
+                        redundancy += nmiMatrix.getValue(j, k);
                     }
                 }
             }

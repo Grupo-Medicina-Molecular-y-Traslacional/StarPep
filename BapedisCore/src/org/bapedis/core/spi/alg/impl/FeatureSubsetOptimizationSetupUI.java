@@ -5,10 +5,14 @@
  */
 package org.bapedis.core.spi.alg.impl;
 
-import java.awt.BorderLayout;
 import javax.swing.JPanel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -20,10 +24,44 @@ public class FeatureSubsetOptimizationSetupUI extends javax.swing.JPanel impleme
      * Creates new form FeatureSubsetOptimizationSetupUI
      */
     private FeatureSubsetOptimization optimizationAlg;
-    private JPanel discretizationPanel;    
-    
+    private final NotifyDescriptor errorNumberOfBinsND;
+
     public FeatureSubsetOptimizationSetupUI() {
         initComponents();
+
+        errorNumberOfBinsND = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.errorNumberOfBinsND"), NotifyDescriptor.ERROR_MESSAGE);
+        
+        //Create document listeners
+        jTF_value2.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateNumberOfBins2();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateNumberOfBins2();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
+            }
+        });
+    }
+
+    private void updateNumberOfBins2() {
+        try {
+            if (!jTF_value2.getText().isEmpty()) {
+                int value = Integer.parseInt(jTF_value2.getText());
+                if (optimizationAlg.getBinsOption2() == FeatureDiscretization.BinsOption.User_Defined) {
+                    optimizationAlg.setNumberOfBins2(value);
+                }
+            }
+        } catch (NumberFormatException ex) {
+            DialogDisplayer.getDefault().notify(errorNumberOfBinsND);
+        }
     }
 
     /**
@@ -36,61 +74,156 @@ public class FeatureSubsetOptimizationSetupUI extends javax.swing.JPanel impleme
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        preprocessingPanel = new javax.swing.JPanel();
-        strategyPanel = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jStrategyComboBox = new javax.swing.JComboBox<>();
-        info = new javax.swing.JLabel();
+        meritPanel = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jCBNumberOfBins2 = new javax.swing.JComboBox<>();
+        jTF_value2 = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
+        redundancyomboBox = new javax.swing.JComboBox<>();
+        infoLabel2 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        relevanceComboBox = new javax.swing.JComboBox<>();
+        infoLabel1 = new javax.swing.JLabel();
+        strategyPanel = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        jStrategyComboBox = new javax.swing.JComboBox<>();
+        infoLabel3 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
         jDirectionComboBox = new javax.swing.JComboBox<>();
         extLabel = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
-        preprocessingPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.preprocessingPanel.border.title"))); // NOI18N
-        preprocessingPanel.setLayout(new java.awt.BorderLayout());
+        meritPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.meritPanel.border.title"))); // NOI18N
+        meritPanel.setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.jLabel3.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        meritPanel.add(jLabel3, gridBagConstraints);
+
+        jCBNumberOfBins2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "<html>Sturges's rule</html>", "<html>Rice's rule</html>", "<html>The square root of the number of <i>n</i></html>", "<html>User defined value</html>" }));
+        jCBNumberOfBins2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCBNumberOfBins2ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        meritPanel.add(jCBNumberOfBins2, gridBagConstraints);
+
+        jTF_value2.setText(org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.jTF_value2.text")); // NOI18N
+        jTF_value2.setMinimumSize(new java.awt.Dimension(50, 27));
+        jTF_value2.setPreferredSize(new java.awt.Dimension(90, 27));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        meritPanel.add(jTF_value2, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.jLabel2.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        meritPanel.add(jLabel2, gridBagConstraints);
+
+        redundancyomboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Mutual Information" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        meritPanel.add(redundancyomboBox, gridBagConstraints);
+
+        infoLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(infoLabel2, org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.infoLabel2.text")); // NOI18N
+        infoLabel2.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.infoLabel2.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-        add(preprocessingPanel, gridBagConstraints);
-
-        strategyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.strategyPanel.border.title"))); // NOI18N
-        strategyPanel.setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
+        meritPanel.add(infoLabel2, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.jLabel1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        meritPanel.add(jLabel1, gridBagConstraints);
+
+        relevanceComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Shannon Entropy" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        strategyPanel.add(jLabel1, gridBagConstraints);
+        meritPanel.add(relevanceComboBox, gridBagConstraints);
+
+        infoLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(infoLabel1, org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.infoLabel1.text")); // NOI18N
+        infoLabel1.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.infoLabel1.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
+        meritPanel.add(infoLabel1, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(meritPanel, gridBagConstraints);
+
+        strategyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.strategyPanel.border.title"))); // NOI18N
+        strategyPanel.setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.jLabel4.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        strategyPanel.add(jLabel4, gridBagConstraints);
 
         jStrategyComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Greedy hill-climbing search" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         strategyPanel.add(jStrategyComboBox, gridBagConstraints);
 
-        info.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(info, org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.info.text")); // NOI18N
-        info.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.info.toolTipText")); // NOI18N
+        infoLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(infoLabel3, org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.infoLabel3.text")); // NOI18N
+        infoLabel3.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.infoLabel3.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        strategyPanel.add(info, gridBagConstraints);
+        strategyPanel.add(infoLabel3, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(FeatureSubsetOptimizationSetupUI.class, "FeatureSubsetOptimizationSetupUI.jLabel5.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        strategyPanel.add(jLabel2, gridBagConstraints);
+        strategyPanel.add(jLabel5, gridBagConstraints);
 
         jDirectionComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Forward", "Backward" }));
         jDirectionComboBox.addActionListener(new java.awt.event.ActionListener() {
@@ -125,7 +258,7 @@ public class FeatureSubsetOptimizationSetupUI extends javax.swing.JPanel impleme
     }// </editor-fold>//GEN-END:initComponents
 
     private void jDirectionComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDirectionComboBoxActionPerformed
-        switch(jDirectionComboBox.getSelectedIndex()){
+        switch (jDirectionComboBox.getSelectedIndex()) {
             case 0:
                 optimizationAlg.setDirection(FeatureSubsetOptimization.Direction.Forward);
                 break;
@@ -137,38 +270,79 @@ public class FeatureSubsetOptimizationSetupUI extends javax.swing.JPanel impleme
         }
     }//GEN-LAST:event_jDirectionComboBoxActionPerformed
 
+    private void jCBNumberOfBins2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBNumberOfBins2ActionPerformed
+        jTF_value2.setText("");
+        jTF_value2.setEnabled(false);
+        switch (jCBNumberOfBins2.getSelectedIndex()) {
+            case 0:
+                if (optimizationAlg.getBinsOption2() != FeatureDiscretization.BinsOption.Sturges_Rule) {
+                    optimizationAlg.setBinsOption2(FeatureDiscretization.BinsOption.Sturges_Rule);
+                }
+                break;
+            case 1:
+                if (optimizationAlg.getBinsOption2() != FeatureDiscretization.BinsOption.Rice_Rule) {
+                    optimizationAlg.setBinsOption2(FeatureDiscretization.BinsOption.Rice_Rule);
+                }
+                break;
+            case 2:
+                if (optimizationAlg.getBinsOption2() != FeatureDiscretization.BinsOption.Square_root_number_peptides) {
+                    optimizationAlg.setBinsOption2(FeatureDiscretization.BinsOption.Square_root_number_peptides);
+                }
+                break;                  
+            case 3:
+                if (optimizationAlg.getBinsOption2() != FeatureDiscretization.BinsOption.User_Defined) {
+                    optimizationAlg.setBinsOption2(FeatureDiscretization.BinsOption.User_Defined);
+                }
+                jTF_value2.setText(String.valueOf(optimizationAlg.getNumberOfBins2()));
+                jTF_value2.setEnabled(true);
+                break;
+        }
+    }//GEN-LAST:event_jCBNumberOfBins2ActionPerformed
+
     @Override
     public void setEnabled(boolean enabled) {
-        if (discretizationPanel != null){
-            discretizationPanel.setEnabled(enabled);
-        }
-        preprocessingPanel.setEnabled(enabled);
-        
-        strategyPanel.setEnabled(enabled);
+
+        meritPanel.setEnabled(enabled);
         jLabel1.setEnabled(enabled);
         jLabel2.setEnabled(enabled);
+        jLabel3.setEnabled(enabled);
+        relevanceComboBox.setEnabled(enabled);
+        redundancyomboBox.setEnabled(enabled);
+        jCBNumberOfBins2.setEnabled(enabled);
+        infoLabel1.setEnabled(enabled);
+        infoLabel2.setEnabled(enabled);                
+        jTF_value2.setEnabled((jCBNumberOfBins2.getSelectedIndex() == jCBNumberOfBins2.getItemCount() - 1) && enabled);        
+
+        strategyPanel.setEnabled(enabled);
+        jLabel4.setEnabled(enabled);
+        jLabel5.setEnabled(enabled);
         jStrategyComboBox.setEnabled(enabled);
         jDirectionComboBox.setEnabled(enabled);
-        info.setEnabled(enabled);
+        infoLabel3.setEnabled(enabled);
     }
 
-    
-    private void setupPreprocessingPanel(FeatureDiscretization alg){
-        discretizationPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
-        preprocessingPanel.removeAll();
-        preprocessingPanel.add(discretizationPanel, BorderLayout.CENTER);
-        preprocessingPanel.revalidate();
-        preprocessingPanel.repaint();   
-    }
-    
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         optimizationAlg = (FeatureSubsetOptimization) algo;
+
+        switch (optimizationAlg.getBinsOption2()) {
+            case Sturges_Rule:
+                jCBNumberOfBins2.setSelectedIndex(0);
+                break;
+            case Rice_Rule:
+                jCBNumberOfBins2.setSelectedIndex(1);
+                break;
+            case Square_root_number_peptides:
+                jCBNumberOfBins2.setSelectedIndex(2);
+                break;                
+            case User_Defined:
+                jCBNumberOfBins2.setSelectedIndex(3);
+                break;
+            default:
+                jCBNumberOfBins2.setSelectedIndex(-1);
+        }
         
-        //Discretization algorithm        
-        setupPreprocessingPanel(optimizationAlg.getPreprocessingAlg());
-        
-        switch(optimizationAlg.getDirection()){
+        switch (optimizationAlg.getDirection()) {
             case Forward:
                 jDirectionComboBox.setSelectedIndex(0);
                 break;
@@ -184,12 +358,21 @@ public class FeatureSubsetOptimizationSetupUI extends javax.swing.JPanel impleme
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel extLabel;
-    private javax.swing.JLabel info;
+    private javax.swing.JLabel infoLabel1;
+    private javax.swing.JLabel infoLabel2;
+    private javax.swing.JLabel infoLabel3;
+    private javax.swing.JComboBox<String> jCBNumberOfBins2;
     private javax.swing.JComboBox<String> jDirectionComboBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JComboBox<String> jStrategyComboBox;
-    private javax.swing.JPanel preprocessingPanel;
+    private javax.swing.JTextField jTF_value2;
+    private javax.swing.JPanel meritPanel;
+    private javax.swing.JComboBox<String> redundancyomboBox;
+    private javax.swing.JComboBox<String> relevanceComboBox;
     private javax.swing.JPanel strategyPanel;
     // End of variables declaration//GEN-END:variables
 }

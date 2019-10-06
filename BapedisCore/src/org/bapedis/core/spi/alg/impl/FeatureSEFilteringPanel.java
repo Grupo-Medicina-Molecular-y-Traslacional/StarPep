@@ -144,14 +144,6 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         jRBSelectTop.setEnabled(enabled);
         jTF_top.setEnabled(jRBSelectTop.isSelected() && enabled);
 
-        jLabel5.setEnabled(enabled);
-        miComboBox.setEnabled(enabled);
-        jCBMIThreshold.setEnabled(miComboBox.getSelectedIndex() != 0 && enabled);
-        jMIThresholdLabel.setEnabled(miComboBox.getSelectedIndex() != 0 && enabled);
-        jNumberOfBins2Label.setEnabled(miComboBox.getSelectedIndex() != 0 && enabled);
-        jCBNumberOfBins2.setEnabled(miComboBox.getSelectedIndex() != 0 && enabled);
-        jTF_value2.setEnabled(miComboBox.getSelectedIndex() != 0 && enabled);
-
         uselessPanel.setEnabled(enabled);
         jLabel1.setEnabled(enabled);
         jLabel2.setEnabled(enabled);
@@ -161,14 +153,18 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
 
         jNumberOfBins1Label.setEnabled(enabled);
         jCBNumberOfBins1.setEnabled(enabled);
-        jTF_value1.setEnabled(enabled);
+        jTF_value1.setEnabled((jCBNumberOfBins1.getSelectedIndex() == jCBNumberOfBins1.getItemCount() - 1) && enabled);
 
         redundancyPanel.setEnabled(enabled);
         jLabel3.setEnabled(enabled);
-        corrComboBox.setEnabled(enabled);
-        jLabel4.setEnabled(corrComboBox.getSelectedIndex() != 0 && enabled);        
-        jSpinnerCorrelation.setEnabled(corrComboBox.getSelectedIndex() != 0 && enabled);
-        infoLabel2.setEnabled(corrComboBox.getSelectedIndex() != 0 && enabled);
+        redundancyComboBox.setEnabled(enabled);
+        jLabel4.setEnabled(redundancyComboBox.getSelectedIndex() != 0 && enabled);
+        jSpinnerRedundancy.setEnabled(redundancyComboBox.getSelectedIndex() != 0 && enabled);
+        infoLabel2.setEnabled(redundancyComboBox.getSelectedIndex() != 0 && enabled);
+        
+        jLabel5.setEnabled(enabled);
+        jCBNumberOfBins2.setEnabled(enabled);
+        jTF_value2.setEnabled(enabled);
 
         jCBMerit.setEnabled(enabled);
     }
@@ -194,21 +190,14 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         jCBNumberOfBins1 = new javax.swing.JComboBox<>();
         jTF_value1 = new javax.swing.JTextField();
         redundancyPanel = new javax.swing.JPanel();
-        firstIterationPanel = new javax.swing.JPanel();
-        corrComboBox = new javax.swing.JComboBox<>();
+        redundancyComboBox = new javax.swing.JComboBox<>();
         jLabel4 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jSpinnerCorrelation = new javax.swing.JSpinner();
+        jSpinnerRedundancy = new javax.swing.JSpinner();
         infoLabel2 = new javax.swing.JLabel();
-        secondIterationPanel = new javax.swing.JPanel();
-        jNumberOfBins2Label = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
         jCBNumberOfBins2 = new javax.swing.JComboBox<>();
         jTF_value2 = new javax.swing.JTextField();
-        jMIThresholdLabel = new javax.swing.JLabel();
-        jCBMIThreshold = new javax.swing.JComboBox<>();
-        jLabel5 = new javax.swing.JLabel();
-        miComboBox = new javax.swing.JComboBox<>();
-        infoLabel3 = new javax.swing.JLabel();
         outputPanel = new javax.swing.JPanel();
         jTF_top = new javax.swing.JTextField();
         jRBSelectTop = new javax.swing.JRadioButton();
@@ -268,7 +257,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
@@ -281,7 +270,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         uselessPanel.add(jNumberOfBins1Label, gridBagConstraints);
 
-        jCBNumberOfBins1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "<html>The number of peptides ( <i>n</i> )</html>", "<html>Half of the number of <i>n</i></html>", "<html>One-third of the number of <i>n</i></html>", "<html>The square root of the number of <i>n</i></html>", "<html>User defined value</html>" }));
+        jCBNumberOfBins1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "<html>The number of peptides ( <i>n</i> )</html>", "<html>Half of the number of <i>n</i></html>", "<html>One-third of the number of <i>n</i></html>", "<html>User defined value</html>" }));
         jCBNumberOfBins1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jCBNumberOfBins1ActionPerformed(evt);
@@ -300,7 +289,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         uselessPanel.add(jTF_value1, gridBagConstraints);
 
@@ -315,19 +304,15 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         redundancyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.redundancyPanel.border.title"))); // NOI18N
         redundancyPanel.setLayout(new java.awt.GridBagLayout());
 
-        firstIterationPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.firstIterationPanel.border.title"))); // NOI18N
-        firstIterationPanel.setLayout(new java.awt.GridBagLayout());
-
-        corrComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None", "Pearson", "Spearman" }));
-        corrComboBox.setSelectedIndex(2);
-        corrComboBox.addItemListener(new java.awt.event.ItemListener() {
+        redundancyComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None", "Pearson correlation ", "Spearman correlation ", "Normalized Mutual Information" }));
+        redundancyComboBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                corrComboBoxItemStateChanged(evt);
+                redundancyComboBoxItemStateChanged(evt);
             }
         });
-        corrComboBox.addActionListener(new java.awt.event.ActionListener() {
+        redundancyComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                corrComboBoxActionPerformed(evt);
+                redundancyComboBoxActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -336,15 +321,15 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        firstIterationPanel.add(corrComboBox, gridBagConstraints);
+        redundancyPanel.add(redundancyComboBox, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jLabel4.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
-        firstIterationPanel.add(jLabel4, gridBagConstraints);
+        redundancyPanel.add(jLabel4, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jLabel3.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -352,53 +337,43 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        firstIterationPanel.add(jLabel3, gridBagConstraints);
+        redundancyPanel.add(jLabel3, gridBagConstraints);
 
-        jSpinnerCorrelation.setModel(new javax.swing.SpinnerNumberModel(0.9d, 0.0d, 1.0d, 0.01d));
-        jSpinnerCorrelation.setPreferredSize(new java.awt.Dimension(60, 27));
-        jSpinnerCorrelation.addChangeListener(new javax.swing.event.ChangeListener() {
+        jSpinnerRedundancy.setModel(new javax.swing.SpinnerNumberModel(0.9d, 0.0d, 1.0d, 0.01d));
+        jSpinnerRedundancy.setPreferredSize(new java.awt.Dimension(60, 27));
+        jSpinnerRedundancy.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jSpinnerCorrelationStateChanged(evt);
+                jSpinnerRedundancyStateChanged(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
-        firstIterationPanel.add(jSpinnerCorrelation, gridBagConstraints);
+        redundancyPanel.add(jSpinnerRedundancy, gridBagConstraints);
 
         infoLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(infoLabel2, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.infoLabel2.text")); // NOI18N
         infoLabel2.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.infoLabel2.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
-        firstIterationPanel.add(infoLabel2, gridBagConstraints);
+        redundancyPanel.add(infoLabel2, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        redundancyPanel.add(firstIterationPanel, gridBagConstraints);
-
-        secondIterationPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.secondIterationPanel.border.title"))); // NOI18N
-        secondIterationPanel.setLayout(new java.awt.GridBagLayout());
-
-        org.openide.awt.Mnemonics.setLocalizedText(jNumberOfBins2Label, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jNumberOfBins2Label.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jLabel5.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        secondIterationPanel.add(jNumberOfBins2Label, gridBagConstraints);
+        redundancyPanel.add(jLabel5, gridBagConstraints);
 
-        jCBNumberOfBins2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "<html>Sturges's rule</html>", "<html>Rice's rule</html>", "<html>User defined value</html>" }));
+        jCBNumberOfBins2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "<html>Sturges's rule</html>", "<html>Rice's rule</html>", "<html>The square root of the number of <i>n</i></html>", "<html>User defined value</html>" }));
         jCBNumberOfBins2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jCBNumberOfBins2ActionPerformed(evt);
@@ -407,85 +382,21 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        secondIterationPanel.add(jCBNumberOfBins2, gridBagConstraints);
+        redundancyPanel.add(jCBNumberOfBins2, gridBagConstraints);
 
         jTF_value2.setText(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jTF_value2.text")); // NOI18N
         jTF_value2.setMinimumSize(new java.awt.Dimension(50, 27));
         jTF_value2.setPreferredSize(new java.awt.Dimension(90, 27));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        secondIterationPanel.add(jTF_value2, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jMIThresholdLabel, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jMIThresholdLabel.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        secondIterationPanel.add(jMIThresholdLabel, gridBagConstraints);
-
-        jCBMIThreshold.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Mean - Std.Desv", "Mean", "Mean + Std.Desv" }));
-        jCBMIThreshold.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCBMIThresholdActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        secondIterationPanel.add(jCBMIThreshold, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.jLabel5.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        secondIterationPanel.add(jLabel5, gridBagConstraints);
-
-        miComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None", "Mutual Information" }));
-        miComboBox.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                miComboBoxItemStateChanged(evt);
-            }
-        });
-        miComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miComboBoxActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        secondIterationPanel.add(miComboBox, gridBagConstraints);
-
-        infoLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/core/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(infoLabel3, org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.infoLabel3.text")); // NOI18N
-        infoLabel3.setToolTipText(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.infoLabel3.toolTipText")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
-        secondIterationPanel.add(infoLabel3, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        redundancyPanel.add(secondIterationPanel, gridBagConstraints);
+        redundancyPanel.add(jTF_value2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -577,20 +488,25 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         add(bottomPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void corrComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_corrComboBoxActionPerformed
-        if (algorithm != null && algorithm.getCorrelationOption() != corrComboBox.getSelectedIndex()) {
-            algorithm.setCorrelationOption(corrComboBox.getSelectedIndex());
+    private void redundancyComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_redundancyComboBoxActionPerformed
+        if (algorithm != null && algorithm.getRedundancyOption() != redundancyComboBox.getSelectedIndex()) {
+            algorithm.setRedundancyOption(redundancyComboBox.getSelectedIndex());
         }
-    }//GEN-LAST:event_corrComboBoxActionPerformed
+    }//GEN-LAST:event_redundancyComboBoxActionPerformed
 
-    private void corrComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_corrComboBoxItemStateChanged
+    private void redundancyComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_redundancyComboBoxItemStateChanged
         if (evt.getStateChange() == ItemEvent.SELECTED) {
-            boolean enable = corrComboBox.getSelectedIndex() != FeatureSEFiltering.CORRELATION_NONE;
-            jSpinnerCorrelation.setEnabled(enable);
+            boolean enable = redundancyComboBox.getSelectedIndex() != FeatureSEFiltering.REDUNDANCY_NONE;
+            jSpinnerRedundancy.setEnabled(enable);
             jLabel4.setEnabled(enable);
             infoLabel2.setEnabled(enable);
+
+            boolean visible = redundancyComboBox.getSelectedIndex() == FeatureSEFiltering.REDUNDANCY_NMI;
+            jLabel5.setVisible(visible);
+            jCBNumberOfBins2.setVisible(visible);
+            jTF_value2.setVisible(visible);
         }
-    }//GEN-LAST:event_corrComboBoxItemStateChanged
+    }//GEN-LAST:event_redundancyComboBoxItemStateChanged
 
     private void jSpinnerEntropyStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinnerEntropyStateChanged
         int threshold = (int) jSpinnerEntropy.getModel().getValue();
@@ -599,26 +515,12 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         }
     }//GEN-LAST:event_jSpinnerEntropyStateChanged
 
-    private void jSpinnerCorrelationStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinnerCorrelationStateChanged
-        double threshold = (double) jSpinnerCorrelation.getModel().getValue();
-        if (algorithm.getCorrelationCutoff() != threshold) {
-            algorithm.setCorrelationCutoff(threshold);
+    private void jSpinnerRedundancyStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinnerRedundancyStateChanged
+        double threshold = (double) jSpinnerRedundancy.getModel().getValue();
+        if (algorithm.getRedundancyCutoff() != threshold) {
+            algorithm.setRedundancyCutoff(threshold);
         }
-    }//GEN-LAST:event_jSpinnerCorrelationStateChanged
-
-    private void jCBMIThresholdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBMIThresholdActionPerformed
-        switch (jCBMIThreshold.getSelectedIndex()) {
-            case 0:
-                algorithm.setMiThresholdOption(FeatureSEFiltering.MIThresholdOption.Left);
-                break;
-            case 1:
-                algorithm.setMiThresholdOption(FeatureSEFiltering.MIThresholdOption.Mean);
-                break;
-            case 2:
-                algorithm.setMiThresholdOption(FeatureSEFiltering.MIThresholdOption.Right);
-                break;
-        }
-    }//GEN-LAST:event_jCBMIThresholdActionPerformed
+    }//GEN-LAST:event_jSpinnerRedundancyStateChanged
 
     private void jRBSelectTopItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRBSelectTopItemStateChanged
         jTF_top.setEnabled(jRBSelectTop.isSelected());
@@ -656,11 +558,6 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
                 }
                 break;
             case 3:
-                if (algorithm.getBinsOption1() != FeatureDiscretization.BinsOption.Square_root_number_peptides) {
-                    algorithm.setBinsOption1(FeatureDiscretization.BinsOption.Square_root_number_peptides);
-                }
-                break;
-            case 4:
                 if (algorithm.getBinsOption1() != FeatureDiscretization.BinsOption.User_Defined) {
                     algorithm.setBinsOption1(FeatureDiscretization.BinsOption.User_Defined);
                 }
@@ -673,6 +570,10 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
 
         }
     }//GEN-LAST:event_jCBNumberOfBins1ActionPerformed
+
+    private void jCBMeritActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBMeritActionPerformed
+        algorithm.setMerit(jCBMerit.isSelected());
+    }//GEN-LAST:event_jCBMeritActionPerformed
 
     private void jCBNumberOfBins2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBNumberOfBins2ActionPerformed
         jTF_value2.setText("");
@@ -689,6 +590,11 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
                 }
                 break;
             case 2:
+                if (algorithm.getBinsOption2() != FeatureDiscretization.BinsOption.Square_root_number_peptides) {
+                    algorithm.setBinsOption2(FeatureDiscretization.BinsOption.Square_root_number_peptides);
+                }
+                break;                
+            case 3:
                 if (algorithm.getBinsOption2() != FeatureDiscretization.BinsOption.User_Defined) {
                     algorithm.setBinsOption2(FeatureDiscretization.BinsOption.User_Defined);
                 }
@@ -698,38 +604,11 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         }
     }//GEN-LAST:event_jCBNumberOfBins2ActionPerformed
 
-    private void jCBMeritActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBMeritActionPerformed
-        algorithm.setMerit(jCBMerit.isSelected());
-    }//GEN-LAST:event_jCBMeritActionPerformed
-
-    private void miComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miComboBoxActionPerformed
-        boolean filterByMI = miComboBox.getSelectedIndex() == 1;
-        if (algorithm.isFilterByMI() != filterByMI){
-            algorithm.setFilterByMI(filterByMI);
-        }
-    }//GEN-LAST:event_miComboBoxActionPerformed
-
-    private void miComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_miComboBoxItemStateChanged
-        if (evt.getStateChange() == ItemEvent.SELECTED) {
-            boolean enable = miComboBox.getSelectedIndex() == 1;
-            jCBMIThreshold.setEnabled(enable);
-            jMIThresholdLabel.setEnabled(enable);
-            jNumberOfBins2Label.setEnabled(enable);
-            jCBNumberOfBins2.setEnabled(enable);
-            jTF_value2.setEnabled(enable);
-            infoLabel3.setEnabled(enable);
-        }
-    }//GEN-LAST:event_miComboBoxItemStateChanged
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bottomPanel;
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JComboBox<String> corrComboBox;
-    private javax.swing.JPanel firstIterationPanel;
     private javax.swing.JLabel infoLabel1;
     private javax.swing.JLabel infoLabel2;
-    private javax.swing.JLabel infoLabel3;
-    private javax.swing.JComboBox<String> jCBMIThreshold;
     private javax.swing.JCheckBox jCBMerit;
     private javax.swing.JComboBox<String> jCBNumberOfBins1;
     private javax.swing.JComboBox<String> jCBNumberOfBins2;
@@ -738,21 +617,18 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jMIThresholdLabel;
     private javax.swing.JLabel jNumberOfBins1Label;
-    private javax.swing.JLabel jNumberOfBins2Label;
     private javax.swing.JRadioButton jRBSelectAll;
     private javax.swing.JRadioButton jRBSelectTop;
-    private javax.swing.JSpinner jSpinnerCorrelation;
     private javax.swing.JSpinner jSpinnerEntropy;
+    private javax.swing.JSpinner jSpinnerRedundancy;
     private javax.swing.JTextField jTF_top;
     private javax.swing.JTextField jTF_value1;
     private javax.swing.JTextField jTF_value2;
     private javax.swing.JComboBox<String> jrankingComboBox;
-    private javax.swing.JComboBox<String> miComboBox;
     private javax.swing.JPanel outputPanel;
+    private javax.swing.JComboBox<String> redundancyComboBox;
     private javax.swing.JPanel redundancyPanel;
-    private javax.swing.JPanel secondIterationPanel;
     private javax.swing.JPanel uselessPanel;
     // End of variables declaration//GEN-END:variables
 
@@ -770,15 +646,29 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
             case One_third_number_peptides:
                 jCBNumberOfBins1.setSelectedIndex(2);
                 break;
-            case Square_root_number_peptides:
-                jCBNumberOfBins1.setSelectedIndex(3);
-                break;
             case User_Defined:
-                jCBNumberOfBins1.setSelectedIndex(4);
+                jCBNumberOfBins1.setSelectedIndex(3);
                 break;
             default:
                 jCBNumberOfBins1.setSelectedIndex(-1);
         }
+        
+        switch (algorithm.getBinsOption2()) {
+            case Sturges_Rule:
+                jCBNumberOfBins2.setSelectedIndex(0);
+                break;
+            case Rice_Rule:
+                jCBNumberOfBins2.setSelectedIndex(1);
+                break;
+            case Square_root_number_peptides:
+                jCBNumberOfBins2.setSelectedIndex(2);
+                break;                
+            case User_Defined:
+                jCBNumberOfBins2.setSelectedIndex(3);
+                break;
+            default:
+                jCBNumberOfBins2.setSelectedIndex(-1);
+        }        
 
         switch (algorithm.getSelectionOption()) {
             case FeatureSEFiltering.SELECT_ALL:
@@ -789,43 +679,15 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
                 break;
         }
 
-        switch (algorithm.getBinsOption2()) {
-            case Sturges_Rule:
-                jCBNumberOfBins2.setSelectedIndex(0);
-                break;
-            case Rice_Rule:
-                jCBNumberOfBins2.setSelectedIndex(1);
-                break;
-            case User_Defined:
-                jCBNumberOfBins2.setSelectedIndex(2);
-                break;
-            default:
-                jCBNumberOfBins2.setSelectedIndex(-1);
-        }
-
         jTF_top.setText(String.valueOf(algorithm.getTopRank()));
         jTF_top.setEnabled(jRBSelectTop.isSelected());
 
-        switch (algorithm.getMiThresholdOption()) {
-            case Left:
-                jCBMIThreshold.setSelectedIndex(0);
-                break;
-            case Mean:
-                jCBMIThreshold.setSelectedIndex(1);
-                break;
-            case Right:
-                jCBMIThreshold.setSelectedIndex(2);
-                break;
-        }
-
-        miComboBox.setSelectedIndex(algorithm.isFilterByMI() ? 1 : 0);
-
-        corrComboBox.setSelectedIndex(algorithm.getCorrelationOption());
+        redundancyComboBox.setSelectedIndex(algorithm.getRedundancyOption());
         int entropyThreshold = algorithm.getThresholdPercent();
         jSpinnerEntropy.getModel().setValue(entropyThreshold);
 
-        double corrThreshold = algorithm.getCorrelationCutoff();
-        jSpinnerCorrelation.getModel().setValue(corrThreshold);
+        double redundancyThreshold = algorithm.getRedundancyCutoff();
+        jSpinnerRedundancy.getModel().setValue(redundancyThreshold);
 
         jCBMerit.setSelected(algorithm.isMerit());
 

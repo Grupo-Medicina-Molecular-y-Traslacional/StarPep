@@ -135,16 +135,16 @@ public class IndicesBasedOperators extends AbstractMD
         hydrophilicity = true;
         
         setTotal( true );
-        setAliphatic( true );
-        setAlphaHelixFavoring( true );
-        setApolar( true );
-        setAromatic( true );
-        setBetaSheetFavoring( true );
-        setBetaTurnFavoring( true );
-        setNegativelyChargedPolar( true );
-        setPositivelyChargedPolar( true );
-        setUnchargedPolar( true );
-        setUnfolding( true );
+        setAliphatic( false );
+        setAlphaHelixFavoring( false );
+        setApolar( false );
+        setAromatic( false );
+        setBetaSheetFavoring( false );
+        setBetaTurnFavoring( false );
+        setNegativelyChargedPolar( false );
+        setPositivelyChargedPolar( false );
+        setUnchargedPolar( false );
+        setUnfolding( false );
         
         setManhattanNorm( true );
         setEuclideanNorm( true );
@@ -162,10 +162,10 @@ public class IndicesBasedOperators extends AbstractMD
         setGowawaOperator( false );
         setChoquetOperator( false );
         
-        setAutocorrelationOperator( false );
-        setGravitationalOperator( false );
-        setTotalSumOperator( false );
-        setElectroTopStateOperator( false );
+        setAutocorrelationOperator( true );
+        setGravitationalOperator( true );
+        setTotalSumOperator( true );
+        setElectroTopStateOperator( true );
         
         nonClassicOperators = new NonClassicAggregationOperatorChoquet( new NonClassicAggregationOperatorGOWAWA( 
                                                                         new NonClassicAggregationOperatorStatistics( 

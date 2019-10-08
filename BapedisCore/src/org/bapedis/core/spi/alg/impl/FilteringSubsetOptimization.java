@@ -52,7 +52,7 @@ public class FilteringSubsetOptimization implements Algorithm, Cloneable {
         emptyMDs = new NotifyDescriptor.Message(NbBundle.getMessage(FilteringSubsetOptimizationFactory.class, "FeatureSubsetOptimization.emptyMDs.info"), NotifyDescriptor.ERROR_MESSAGE);
 
         firstStage = true;
-        secondStage = true;
+        secondStage = false;
     }
 
     public FeatureSEFiltering getFilteringAlg() {

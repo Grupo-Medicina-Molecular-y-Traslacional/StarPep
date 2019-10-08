@@ -48,7 +48,6 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     public static final int REDUNDANCY_NONE = 0;
     public static final int REDUNDANCY_PEARSON = 1;
     public static final int REDUNDANCY_SPEARMAN = 2;
-    public static final int REDUNDANCY_NMI = 3;
 
     public static final int SELECT_ALL = 0;
     public static final int SELECT_TOP = 1;
@@ -68,7 +67,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     private int selectionOption;
     private int topRank;
     protected FeatureDiscretization preprocessing;
-    private boolean merit;
+    private boolean meritOption;
     private boolean filterByMI;
     private final DecimalFormat df;
 
@@ -123,8 +122,6 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                 return "Pearson correlation coefficient";
             case REDUNDANCY_SPEARMAN:
                 return "Spearman correlation coefficient";
-            case REDUNDANCY_NMI:
-                return "Normalized Mutual Information";
         }
         throw new IllegalStateException("Unknown correlation option: " + redundancyOption);
     }
@@ -186,11 +183,11 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     }
 
     public boolean isMerit() {
-        return merit;
+        return meritOption;
     }
 
     public void setMerit(boolean merit) {
-        this.merit = merit;
+        this.meritOption = merit;
     }
 
     public boolean isFilterByMI() {
@@ -316,104 +313,90 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                             || redundancyOption == REDUNDANCY_SPEARMAN) {
                         ticket.switchToDeterminate(rankedFeatures.length);
                         retainedFeatures.clear();
-                        for (int i = 0; i < rankedFeatures.length && !stopRun.get(); i++) {
-                            if (rankedFeatures[i] != null) {
-                                redundant += removeCorrelated(descriptorMatrix, i, rankedFeatures);
-                                retainedFeatures.add(rankedFeatures[i]);
-                            }
-                            ticket.progress();
-                        }
-                    } else if (redundancyOption == REDUNDANCY_NMI) {
-                        //-----------Feature discretization
-                        preprocessing.setBinsOption(binsOption2);
-                        if (binsOption2 == FeatureDiscretization.BinsOption.User_Defined) {
-                            preprocessing.setNumberOfBins(numberOfBins2);
-                        }
-                        preprocessing.setAllFeatures(retainedFeatures);
-                        executePreprocessing();
 
-                        NMIMatrixBuilder task = NMIMatrixBuilder.createMatrixBuilder(peptides.toArray(new Peptide[0]), rankedFeatures, ticket, stopRun);
-                        ticket.progress(taskName);
-                        ticket.switchToDeterminate(task.getWorkUnits() + rankedFeatures.length);
-                        fjPool.invoke(task);
-                        task.join();
-                        NMIMatrix miMatrix = task.getMIMatrix();
-
-                        retainedFeatures.clear();
-                        double nmi;
-                        for (int j = 0; j < rankedFeatures.length && !stopRun.get(); j++) {
-                            if (rankedFeatures[j] != null) {
-                                for (int k = j + 1; k < rankedFeatures.length; k++) {
-                                    if (rankedFeatures[k] != null) {
-                                        nmi = miMatrix.getValue(j, k);
-                                        if (nmi >= redundancyCutoff) {
-                                            redundant++;
-                                            attrModel.deleteAttribute(rankedFeatures[k]);
-                                            rankedFeatures[k] = null;
-                                        }
+                        if (selectionOption == SELECT_TOP) {
+                            pc.reportMsg("Ranking output: select top " + topRank, workspace);
+                            for (int i = 0; i < rankedFeatures.length && !stopRun.get(); i++) {
+                                if (rankedFeatures[i] != null) {
+                                    if (retainedFeatures.size() < topRank) {
+                                        redundant += removeCorrelated(descriptorMatrix, i, rankedFeatures);
+                                        retainedFeatures.add(rankedFeatures[i]);
+                                    } else {
+                                        attrModel.deleteAttribute(rankedFeatures[i]);
+                                        rankedFeatures[i] = null;
                                     }
                                 }
-                                retainedFeatures.add(rankedFeatures[j]);
+                                ticket.progress();
                             }
-                            ticket.progress();
-                        }
-
-                        double[] data = miMatrix.getValues();
-                        double max = MolecularDescriptor.max(data);
-                        double min = MolecularDescriptor.min(data);
-                        double avg = MolecularDescriptor.mean(data);
-                        double std = MolecularDescriptor.varp(data, avg);
-
-                        pc.reportMsg("Max (NMI): " + df.format(max), workspace);
-                        pc.reportMsg("Min (NMI): " + df.format(min), workspace);
-                        pc.reportMsg("Avg (NMI): " + df.format(avg), workspace);
-                        pc.reportMsg("Std (NMI): " + df.format(std), workspace);
-                    }
-                }
-
-                if (selectionOption == SELECT_TOP) {
-                    retainedFeatures.clear();
-                    for (int i = 0; i < rankedFeatures.length && !stopRun.get(); i++) {
-                        if (rankedFeatures[i] != null) {
-                            if (retainedFeatures.size() < topRank){
-                                retainedFeatures.add(rankedFeatures[i]);
-                            }else{
-                                attrModel.deleteAttribute(rankedFeatures[i]);
+                        } else {
+                            pc.reportMsg("Ranking output: select all filtered features ", workspace);
+                            for (int i = 0; i < rankedFeatures.length && !stopRun.get(); i++) {
+                                if (rankedFeatures[i] != null) {
+                                    redundant += removeCorrelated(descriptorMatrix, i, rankedFeatures);
+                                    retainedFeatures.add(rankedFeatures[i]);
+                                }
+                                ticket.progress();
                             }
                         }
                     }
+//                    else if (redundancyOption == REDUNDANCY_NMI) {
+//
+//                        retainedFeatures.clear();
+//                        double nmi;
+
+//
+//                        double[] data = miMat rix.getValues();
+//                        double max = MolecularDescriptor.max(data);
+//                        double min = MolecularDescriptor.min(data);
+//                        double avg = MolecularDescriptor.mean(data);
+//                        double std = MolecularDescriptor.varp(data, avg);
+//
+//                        pc.reportMsg("Max (NMI): " + df.format(max), workspace);
+//                        pc.reportMsg("Min (NMI): " + df.format(min), workspace);
+//                        pc.reportMsg("Avg (NMI): " + df.format(avg), workspace);
+//                        pc.reportMsg("Std (NMI): " + df.format(std), workspace);
+//                    }
                 }
 
-//                if (merit) {
-//                    taskName = "Merit calculation";
-//                    pc.reportMsg(taskName, workspace);
-//                    ticket.progress(taskName);
-//
-//                    rankedFeatures = retainedFeatures.toArray(new MolecularDescriptor[0]);
-//                    //Reset
-//                    retainedSet = new BitSet(rankedFeatures.length);
-//                    for (int j = 0; j < rankedFeatures.length; j++) {
-//                        retainedSet.set(j);
-//                    }
-//
-//                    preprocessing.setBinsOption(FeatureDiscretization.BinsOption.One_third_number_peptides);
-//                    executePreprocessing();
-//
-//                    if (peptideArr == null) {
-//                        peptideArr = peptides.toArray(new Peptide[0]);
-//                    }
-//
-//                    task = createMatrixBuilder(peptideArr, rankedFeatures);
-//                    ticket.switchToDeterminate(task.getWorkUnits());
-//                    fjPool.invoke(task);
-//                    task.join();
-//                    MIMatrix miMatrix = task.getMIMatrix();
-//
-//                    pc.reportMsg("Merit of retained features", workspace);
-//                    pc.reportMsg("Count: " + count(true, retainedSet), workspace);
-//                    pc.reportMsg("Score (avg): " + df.format(avgScore(true, retainedSet, rankedFeatures)), workspace);
-//                    pc.reportMsg("Merit: " + df.format(calcMerit(true, retainedSet, rankedFeatures, miMatrix)), workspace);
-//                }
+                double meritValue = Double.NaN;
+                if (meritOption) {
+                    taskName = "Merit calculation...";
+                    pc.reportMsg(taskName, workspace);
+                    ticket.progress(taskName);
+                    //-----------Feature discretization
+                    preprocessing.setBinsOption(binsOption2);
+                    if (binsOption2 == FeatureDiscretization.BinsOption.User_Defined) {
+                        preprocessing.setNumberOfBins(numberOfBins2);
+                    }
+                    preprocessing.setAllFeatures(retainedFeatures);
+                    executePreprocessing();
+
+                    rankedFeatures = retainedFeatures.toArray(new MolecularDescriptor[0]);
+                    NMIMatrixBuilder task = NMIMatrixBuilder.createMatrixBuilder(peptides.toArray(new Peptide[0]), rankedFeatures, ticket, stopRun);
+                    ticket.progress(taskName);
+                    ticket.switchToDeterminate(task.getWorkUnits() + rankedFeatures.length);
+                    fjPool.invoke(task);
+                    task.join();
+                    NMIMatrix nmiMatrix = task.getMIMatrix();
+
+                    double relevance = 0, redundancy = 0;
+                    int n = 0;
+                    double entropy;
+                    for (int j = 0; j < rankedFeatures.length && !stopRun.get(); j++) {
+                        entropy = rankedFeatures[j].getBinsPartition().getEntropy() / preprocessing.getMaxEntropy();
+                        relevance += entropy;
+                        redundancy += entropy;
+                        n++;
+                        for (int k = 0; k < rankedFeatures.length; k++) {
+                            if (j != k) {
+                                redundancy += nmiMatrix.getValue(j, k);
+                            }
+                        }
+                        ticket.progress();
+                    }
+                    meritValue = relevance / n - redundancy / (n * n);
+                }
+
                 //Print top 5 bottom 3
                 FilteringSubsetOptimization.printTop5Buttom3(rankedFeatures, workspace);
 
@@ -422,6 +405,9 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
 
                 pc.reportMsg("\nTotal of removed features: " + (allFeatures.size() - retainedFeatures.size()), workspace);
                 pc.reportMsg("Total of retained features: " + retainedFeatures.size(), workspace);
+                if (meritOption) {
+                    pc.reportMsg("Merit of retained features: " + df.format(meritValue), workspace);
+                }
             }
         } catch (MolecularDescriptorNotFoundException ex) {
             DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());

@@ -5,22 +5,22 @@
  */
 package org.bapedis.core.util;
 
-import static java.util.concurrent.ForkJoinTask.invokeAll;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.bapedis.core.model.Bin;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
-import org.bapedis.core.model.NMIMatrix;
+import org.bapedis.core.model.MIMatrix;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.alg.impl.FeatureDiscretization;
 import org.bapedis.core.task.ProgressTicket;
+import static java.util.concurrent.ForkJoinTask.invokeAll;
 
 /**
  *
  * @author Loge
  */
-public class NMIMatrixBuilder extends RecursiveAction {
+public class MIMatrixBuilder extends RecursiveAction {
 
     private static final int SEQUENTIAL_THRESHOLD = 10;
     private int[][] binIndex;
@@ -28,16 +28,16 @@ public class NMIMatrixBuilder extends RecursiveAction {
     private ProgressTicket progressTicket;
     private AtomicBoolean stopRun;
 
-    private final NMIMatrix matrix;
+    private final MIMatrix matrix;
     private int xlow, xhigh, ylow, yhigh;
 
-    private NMIMatrixBuilder(MolecularDescriptor[] features, int[][] binIndex, ProgressTicket progressTicket, AtomicBoolean stopRun) {
-        this(features, binIndex, new NMIMatrix(features.length),
+    private MIMatrixBuilder(MolecularDescriptor[] features, int[][] binIndex, ProgressTicket progressTicket, AtomicBoolean stopRun) {
+        this(features, binIndex, new MIMatrix(features.length),
                 0, features.length, 0, features.length,
                 progressTicket, stopRun);
     }
 
-    private NMIMatrixBuilder(MolecularDescriptor[] features, int[][] binIndex, NMIMatrix matrix,
+    private MIMatrixBuilder(MolecularDescriptor[] features, int[][] binIndex, MIMatrix matrix,
             int xlow, int xhigh, int ylow, int yhigh,
             ProgressTicket progressTicket, AtomicBoolean stopRun) {
         this.binIndex = binIndex;
@@ -51,21 +51,21 @@ public class NMIMatrixBuilder extends RecursiveAction {
         this.stopRun = stopRun;
     }
     
-    public static NMIMatrixBuilder createMatrixBuilder(Peptide[] peptides, MolecularDescriptor[] features, ProgressTicket ticket, AtomicBoolean stopRun) throws MolecularDescriptorNotFoundException {
+    public static MIMatrixBuilder createMatrixBuilder(Peptide[] peptides, MolecularDescriptor[] features, ProgressTicket ticket, AtomicBoolean stopRun) throws MolecularDescriptorNotFoundException {
         int[][] binIndex = new int[peptides.length][features.length];
         for (int i = 0; i < peptides.length; i++) {
             for (int j = 0; j < features.length; j++) {
                 binIndex[i][j] = FeatureDiscretization.getBinIndex(peptides[i], features[j], features[j].getBinsPartition().getBins().length);
             }
         }
-        return new NMIMatrixBuilder(features, binIndex, ticket, stopRun);
+        return new MIMatrixBuilder(features, binIndex, ticket, stopRun);
     }    
 
     public void setStopRun(boolean stop) {
         stopRun.set(stop);
     }
 
-    public NMIMatrix getMIMatrix() {
+    public MIMatrix getMIMatrix() {
         return matrix;
     }
 
@@ -86,28 +86,25 @@ public class NMIMatrixBuilder extends RecursiveAction {
             } else if (!stopRun.get()) {
                 int middle = ylow + (yhigh - ylow) / 2;
                 // up and down
-                NMIMatrixBuilder up = new NMIMatrixBuilder(features, binIndex, matrix, xlow, xhigh, ylow, middle, progressTicket, stopRun);
-                NMIMatrixBuilder down = new NMIMatrixBuilder(features, binIndex, matrix, xlow, xhigh, middle, yhigh, progressTicket, stopRun);
+                MIMatrixBuilder up = new MIMatrixBuilder(features, binIndex, matrix, xlow, xhigh, ylow, middle, progressTicket, stopRun);
+                MIMatrixBuilder down = new MIMatrixBuilder(features, binIndex, matrix, xlow, xhigh, middle, yhigh, progressTicket, stopRun);
                 invokeAll(up, down);
             }
         } else if (!stopRun.get()) {
             int middle = xlow + (xhigh - xlow) / 2;
             // left and right            
-            NMIMatrixBuilder left = new NMIMatrixBuilder(features, binIndex, matrix, xlow, middle, ylow, yhigh, progressTicket, stopRun);
-            NMIMatrixBuilder right = new NMIMatrixBuilder(features, binIndex, matrix, middle, xhigh, ylow, yhigh, progressTicket, stopRun);
+            MIMatrixBuilder left = new MIMatrixBuilder(features, binIndex, matrix, xlow, middle, ylow, yhigh, progressTicket, stopRun);
+            MIMatrixBuilder right = new MIMatrixBuilder(features, binIndex, matrix, middle, xhigh, ylow, yhigh, progressTicket, stopRun);
             invokeAll(left, right);
         }
     }
 
     private void computeDirectly() {
-        double mi, min;
         for (int y = ylow; y < yhigh; y++) {
             for (int x = xlow; x < Math.min(xhigh, y); x++) {
                 if (!stopRun.get()) {
                     try {
-                        min = Math.min(features[y].getBinsPartition().getEntropy(), features[x].getBinsPartition().getEntropy());
-                        mi = mutualInformation(y, x);
-                        matrix.setValue(y, x, mi/min);
+                        matrix.setValue(y, x, mutualInformation(y, x));
                         progressTicket.progress();
                     } catch (Exception ex) {
                         stopRun.set(true);

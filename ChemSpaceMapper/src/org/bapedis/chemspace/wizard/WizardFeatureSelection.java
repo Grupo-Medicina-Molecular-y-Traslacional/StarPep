@@ -39,7 +39,7 @@ public class WizardFeatureSelection implements WizardDescriptor.Panel<WizardDesc
         if (component == null) {
             try {
                 alg = (FilteringSubsetOptimization) csMapper.getFeatureSelectionAlg().clone();
-                JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
+                JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);                
                 component = new VisualFeatureSelection(settingPanel);
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);

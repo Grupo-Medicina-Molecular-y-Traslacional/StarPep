@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.spi.alg.impl;
 
+import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -30,7 +31,7 @@ public class FilteringSubsetOptimization implements Algorithm, Cloneable {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private final FilteringSubsetOptimizationFactory factory;
-
+    private final NotifyDescriptor errorND;
     //To initialize
     protected Workspace workspace;
     private AttributesModel attrModel;
@@ -38,6 +39,7 @@ public class FilteringSubsetOptimization implements Algorithm, Cloneable {
     protected ProgressTicket ticket;
     private final NotifyDescriptor emptyMDs;
     private boolean firstStage, secondStage;
+    static final DecimalFormat DF = new DecimalFormat("0.0##");
 
     //Algorithm
     protected FeatureSEFiltering filtering;
@@ -48,7 +50,7 @@ public class FilteringSubsetOptimization implements Algorithm, Cloneable {
 
         filtering = (FeatureSEFiltering) (new FeatureSEFilteringFactory()).createAlgorithm();
         subsetOptimization = (FeatureSubsetOptimization) (new FeatureSubsetOptimizationFactory()).createAlgorithm();
-
+        errorND = new NotifyDescriptor.Message(NbBundle.getMessage(FilteringSubsetOptimization.class, "FilteringSubsetOptimization.errorND"), NotifyDescriptor.ERROR_MESSAGE);
         emptyMDs = new NotifyDescriptor.Message(NbBundle.getMessage(FilteringSubsetOptimizationFactory.class, "FeatureSubsetOptimization.emptyMDs.info"), NotifyDescriptor.ERROR_MESSAGE);
 
         firstStage = true;
@@ -116,6 +118,11 @@ public class FilteringSubsetOptimization implements Algorithm, Cloneable {
     public void run() {
         if (attrModel != null && attrModel.getPeptides().size() > 0) {
             try {
+                if (!filtering.isValid()) {
+                    DialogDisplayer.getDefault().notify(errorND);
+                    return;
+                }
+                
                 //----------Preprocessing all descriptors   
                 List<MolecularDescriptor> allFeatures = new LinkedList<>();
 
@@ -158,7 +165,7 @@ public class FilteringSubsetOptimization implements Algorithm, Cloneable {
         int top5 = 0;
         for (int i = 0; i < rankedFeatures.length && top5 < 5; i++) {
             if (rankedFeatures[i] != null) {
-                FeatureSEFiltering.pc.reportMsg(rankedFeatures[i].getDisplayName() + " - score: " + rankedFeatures[i].getScore(), workspace);
+                FeatureSEFiltering.pc.reportMsg(rankedFeatures[i].getDisplayName() + " - score: " + DF.format(rankedFeatures[i].getScore()), workspace);
                 top5++;
             }
         }
@@ -175,7 +182,7 @@ public class FilteringSubsetOptimization implements Algorithm, Cloneable {
         MolecularDescriptor descriptor;
         while (!stack.isEmpty()) {
             descriptor = stack.pop();
-            FeatureSEFiltering.pc.reportMsg(descriptor.getDisplayName() + " - score: " + descriptor.getScore(), workspace);
+            FeatureSEFiltering.pc.reportMsg(descriptor.getDisplayName() + " - score: " + DF.format(descriptor.getScore()), workspace);
         }
     }
 

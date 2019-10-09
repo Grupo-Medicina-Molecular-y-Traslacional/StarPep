@@ -5,19 +5,17 @@
  */
 package org.bapedis.core.spi.alg.impl;
 
-import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
-import org.bapedis.core.model.NMIMatrix;
+import org.bapedis.core.model.MIMatrix;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
@@ -25,11 +23,12 @@ import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.core.util.FeatureComparator;
-import org.bapedis.core.util.NMIMatrixBuilder;
+import org.bapedis.core.util.MIMatrixBuilder;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import static org.bapedis.core.spi.alg.impl.FilteringSubsetOptimization.DF;
 
 /**
  *
@@ -40,7 +39,6 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
     protected final FeatureSEFilteringFactory factory;
-    private final NotifyDescriptor errorND;
 
     public static final int MIN_THRESHOLD_PERCENT = 1;
     public static final int MAX_THRESHOLD_PERCENT = 50;
@@ -69,7 +67,6 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
     protected FeatureDiscretization preprocessing;
     private boolean meritOption;
     private boolean filterByMI;
-    private final DecimalFormat df;
 
     public FeatureSEFiltering(FeatureSEFilteringFactory factory) {
         this.factory = factory;
@@ -78,23 +75,22 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         redundancyOption = REDUNDANCY_SPEARMAN;
         redundancyCutoff = 0.8;
         selectionOption = SELECT_ALL;
-        topRank = 50;
-        errorND = new NotifyDescriptor.Message(NbBundle.getMessage(FeatureSEFiltering.class, "FeatureSEFiltering.errorND"), NotifyDescriptor.ERROR_MESSAGE);
+        topRank = -1;
+        
         stopRun = new AtomicBoolean();
         binsOption1 = FeatureDiscretization.BinsOption.Number_peptides;
         numberOfBins1 = 50;
-        binsOption2 = FeatureDiscretization.BinsOption.Square_root_number_peptides;
+        binsOption2 = FeatureDiscretization.BinsOption.Rice_Rule;
         numberOfBins2 = 50;
         filterByMI = true;
-        df = new DecimalFormat("0.0##");
     }
 
-    private boolean isValid() {
+    public boolean isValid() {
         boolean isValid = thresholdPercent >= MIN_THRESHOLD_PERCENT && thresholdPercent <= MAX_THRESHOLD_PERCENT;
         if (redundancyOption != REDUNDANCY_NONE) {
             isValid = isValid && (redundancyCutoff >= 0 && redundancyCutoff <= 1);
         }
-        isValid = isValid && (selectionOption == SELECT_ALL || selectionOption == SELECT_TOP);
+        isValid = isValid && (selectionOption == SELECT_ALL || (selectionOption == SELECT_TOP && topRank > 0));
         return isValid;
     }
 
@@ -240,11 +236,6 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
 
     @Override
     public void run() {
-        if (!isValid()) {
-            DialogDisplayer.getDefault().notify(errorND);
-            return;
-        }
-
         try {
             //----------All descriptors 
             List<MolecularDescriptor> allFeatures = new LinkedList<>();
@@ -266,7 +257,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                 executePreprocessing();
 
                 double maxEntropy = preprocessing.getMaxEntropy();
-                pc.reportMsg("Maximum entropy: " + df.format(maxEntropy), workspace);
+                pc.reportMsg("Maximum entropy: " + DF.format(maxEntropy), workspace);
 
                 //-----------Removing useless features
                 String taskName = "Removing useless features";
@@ -276,7 +267,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                 List<MolecularDescriptor> retainedFeatures = new LinkedList<>();
 
                 double threshold = ((double) thresholdPercent / 100.0) * maxEntropy;
-                pc.reportMsg("Entropy cutoff value: " + df.format(threshold), workspace);
+                pc.reportMsg("Entropy cutoff value: " + DF.format(threshold), workspace);
                 double score;
                 int useless = 0;
                 for (MolecularDescriptor attr : allFeatures) {
@@ -372,24 +363,24 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                     executePreprocessing();
 
                     rankedFeatures = retainedFeatures.toArray(new MolecularDescriptor[0]);
-                    NMIMatrixBuilder task = NMIMatrixBuilder.createMatrixBuilder(peptides.toArray(new Peptide[0]), rankedFeatures, ticket, stopRun);
+                    MIMatrixBuilder task = MIMatrixBuilder.createMatrixBuilder(peptides.toArray(new Peptide[0]), rankedFeatures, ticket, stopRun);
                     ticket.progress(taskName);
                     ticket.switchToDeterminate(task.getWorkUnits() + rankedFeatures.length);
                     fjPool.invoke(task);
                     task.join();
-                    NMIMatrix nmiMatrix = task.getMIMatrix();
+                    MIMatrix miMatrix = task.getMIMatrix();
 
                     double relevance = 0, redundancy = 0;
                     int n = 0;
                     double entropy;
                     for (int j = 0; j < rankedFeatures.length && !stopRun.get(); j++) {
-                        entropy = rankedFeatures[j].getBinsPartition().getEntropy() / preprocessing.getMaxEntropy();
+                        entropy = rankedFeatures[j].getBinsPartition().getEntropy();
                         relevance += entropy;
                         redundancy += entropy;
                         n++;
                         for (int k = 0; k < rankedFeatures.length; k++) {
                             if (j != k) {
-                                redundancy += nmiMatrix.getValue(j, k);
+                                redundancy += miMatrix.getValue(j, k);
                             }
                         }
                         ticket.progress();
@@ -406,7 +397,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                 pc.reportMsg("\nTotal of removed features: " + (allFeatures.size() - retainedFeatures.size()), workspace);
                 pc.reportMsg("Total of retained features: " + retainedFeatures.size(), workspace);
                 if (meritOption) {
-                    pc.reportMsg("Merit of retained features: " + df.format(meritValue), workspace);
+                    pc.reportMsg("Merit of retained features: " + DF.format(meritValue), workspace);
                 }
             }
         } catch (MolecularDescriptorNotFoundException ex) {

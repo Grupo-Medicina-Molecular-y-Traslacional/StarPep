@@ -129,6 +129,10 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
             algorithm.setTopRank(-1);
         }
     }
+    
+    public void setSubsetEvalPanel(boolean flag){
+        bottomPanel.setVisible(flag);
+    }
 
     @Override
     public void setEnabled(boolean enabled) {
@@ -161,13 +165,11 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         jLabel4.setEnabled(redundancyComboBox.getSelectedIndex() != 0 && enabled);
         jSpinnerRedundancy.setEnabled(redundancyComboBox.getSelectedIndex() != 0 && enabled);
         infoLabel2.setEnabled(redundancyComboBox.getSelectedIndex() != 0 && enabled);
-        
+
         jCBMerit.setEnabled(enabled);
         jLabel5.setEnabled(enabled);
         jCBNumberOfBins2.setEnabled(enabled);
-        jTF_value2.setEnabled(enabled);
-
-        
+        jTF_value2.setEnabled((jCBNumberOfBins2.getSelectedIndex() == jCBNumberOfBins2.getItemCount() - 1) && enabled);
     }
 
     /**
@@ -271,6 +273,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         uselessPanel.add(jNumberOfBins1Label, gridBagConstraints);
 
@@ -308,7 +311,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         redundancyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(FeatureSEFilteringPanel.class, "FeatureSEFilteringPanel.redundancyPanel.border.title"))); // NOI18N
         redundancyPanel.setLayout(new java.awt.GridBagLayout());
 
-        redundancyComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None", "Pearson correlation coefficient", "Spearman correlation coefficient" }));
+        redundancyComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None", "Pearson", "Spearman" }));
         redundancyComboBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 redundancyComboBoxItemStateChanged(evt);
@@ -620,7 +623,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
                 if (algorithm.getBinsOption2() != FeatureDiscretization.BinsOption.Square_root_number_peptides) {
                     algorithm.setBinsOption2(FeatureDiscretization.BinsOption.Square_root_number_peptides);
                 }
-                break;                
+                break;
             case 3:
                 if (algorithm.getBinsOption2() != FeatureDiscretization.BinsOption.User_Defined) {
                     algorithm.setBinsOption2(FeatureDiscretization.BinsOption.User_Defined);
@@ -628,14 +631,17 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
                 jTF_value2.setText(String.valueOf(algorithm.getNumberOfBins2()));
                 jTF_value2.setEnabled(true);
                 break;
+            default:
+                jTF_value2.setText("");
+                jTF_value2.setEnabled(false);
         }
     }//GEN-LAST:event_jCBNumberOfBins2ActionPerformed
 
     private void jCBMeritItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCBMeritItemStateChanged
-            boolean visible = jCBMerit.isSelected();
-            jLabel5.setVisible(visible);
-            jCBNumberOfBins2.setVisible(visible);
-            jTF_value2.setVisible(visible);        
+        boolean visible = jCBMerit.isSelected();
+        jLabel5.setVisible(visible);
+        jCBNumberOfBins2.setVisible(visible);
+        jTF_value2.setVisible(visible);
     }//GEN-LAST:event_jCBMeritItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -688,7 +694,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
             default:
                 jCBNumberOfBins1.setSelectedIndex(-1);
         }
-        
+
         switch (algorithm.getBinsOption2()) {
             case Sturges_Rule:
                 jCBNumberOfBins2.setSelectedIndex(0);
@@ -698,13 +704,13 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
                 break;
             case Square_root_number_peptides:
                 jCBNumberOfBins2.setSelectedIndex(2);
-                break;                
+                break;
             case User_Defined:
                 jCBNumberOfBins2.setSelectedIndex(3);
                 break;
             default:
                 jCBNumberOfBins2.setSelectedIndex(-1);
-        }        
+        }
 
         switch (algorithm.getSelectionOption()) {
             case FeatureSEFiltering.SELECT_ALL:
@@ -715,7 +721,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
                 break;
         }
 
-        jTF_top.setText(String.valueOf(algorithm.getTopRank()));
+        jTF_top.setText(algorithm.getTopRank() > 0 ?String.valueOf(algorithm.getTopRank()):"");
         jTF_top.setEnabled(jRBSelectTop.isSelected());
 
         redundancyComboBox.setSelectedIndex(algorithm.getRedundancyOption());

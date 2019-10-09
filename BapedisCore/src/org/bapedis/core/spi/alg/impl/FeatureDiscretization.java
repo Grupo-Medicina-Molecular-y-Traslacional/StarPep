@@ -23,6 +23,7 @@ import org.bapedis.core.task.ProgressTicket;
 import org.openide.DialogDisplayer;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import static org.bapedis.core.spi.alg.impl.FilteringSubsetOptimization.DF;
 
 /**
  *
@@ -175,7 +176,7 @@ public class FeatureDiscretization implements Algorithm, Cloneable {
             });
 
             maxEntropy = Math.log(numberOfBins);
-            pc.reportMsg("Max entropy: " + maxEntropy, workspace);
+            pc.reportMsg("Max entropy: " + DF.format(maxEntropy), workspace);
         } else {
             throw new IllegalStateException("There is not instances to compute");
         }

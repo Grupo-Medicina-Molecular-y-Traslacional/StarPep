@@ -9,10 +9,10 @@ package org.bapedis.core.model;
  *
  * @author Loge
  */
-public class NMIMatrix {
+public class MIMatrix {
     protected double[] data;
 
-    public NMIMatrix(int size) {
+    public MIMatrix(int size) {
         data = new double[size * (size - 1) / 2];
     }
 

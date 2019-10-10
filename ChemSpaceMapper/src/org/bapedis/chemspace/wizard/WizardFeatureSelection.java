@@ -5,6 +5,8 @@
  */
 package org.bapedis.chemspace.wizard;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
@@ -15,7 +17,7 @@ import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 
 public class WizardFeatureSelection implements WizardDescriptor.Panel<WizardDescriptor>,
-        WizardDescriptor.FinishablePanel<WizardDescriptor> {
+        WizardDescriptor.FinishablePanel<WizardDescriptor>, PropertyChangeListener {
 
     private final MapperAlgorithm csMapper;
     private FilteringSubsetOptimization alg;
@@ -41,6 +43,7 @@ public class WizardFeatureSelection implements WizardDescriptor.Panel<WizardDesc
                 alg = (FilteringSubsetOptimization) csMapper.getFeatureSelectionAlg().clone();
                 JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);                
                 component = new VisualFeatureSelection(settingPanel);
+                component.addPropertyChangeListener(this);
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
                 alg = null;
@@ -100,5 +103,19 @@ public class WizardFeatureSelection implements WizardDescriptor.Panel<WizardDesc
     @Override
     public boolean isFinishPanel() {
         return true;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(VisualFeatureExtraction.CHANGED_OPTION)) {
+            switch ((FeatureSelectionOption) evt.getNewValue()) {
+                case YES:
+                    getComponent().getSettingPanel().setEnabled(true);
+                    break;
+                case NO:
+                    getComponent().getSettingPanel().setEnabled(false);
+                    break;
+            }
+        }
     }
 }

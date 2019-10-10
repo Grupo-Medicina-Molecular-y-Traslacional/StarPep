@@ -25,6 +25,20 @@ public class FilteringSubsetOptimizationSetupUI extends javax.swing.JPanel imple
     public FilteringSubsetOptimizationSetupUI() {
         initComponents();
     }   
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        if (firstStagePanel != null){
+            jcbFiltering.setEnabled(enabled);
+            firstStagePanel.setEnabled(jcbFiltering.isSelected() && enabled);
+        }
+        if (secondStagePanel != null){
+            jcbSubsetOptimization.setEnabled(enabled);
+            secondStagePanel.setEnabled(jcbSubsetOptimization.isEnabled() && enabled);
+        }        
+    }
+    
+    
          
     private void setupPanel(JPanel stagePanel, JPanel parentPanel){
         parentPanel.removeAll();

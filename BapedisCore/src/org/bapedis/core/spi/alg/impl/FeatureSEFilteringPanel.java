@@ -166,6 +166,7 @@ public class FeatureSEFilteringPanel extends javax.swing.JPanel implements Algor
         jSpinnerRedundancy.setEnabled(redundancyComboBox.getSelectedIndex() != 0 && enabled);
         infoLabel2.setEnabled(redundancyComboBox.getSelectedIndex() != 0 && enabled);
 
+        bottomPanel.setEnabled(enabled);
         jCBMerit.setEnabled(enabled);
         jLabel5.setEnabled(enabled);
         jCBNumberOfBins2.setEnabled(enabled);

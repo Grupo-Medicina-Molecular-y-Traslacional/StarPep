@@ -22,6 +22,10 @@ public final class VisualFeatureSelection extends JPanel {
         bottomPanel.add(settingPanel, BorderLayout.CENTER);
     }
 
+    public JPanel getSettingPanel() {
+        return settingPanel;
+    }        
+
     public FeatureSelectionOption getFFOption() {
         return ffOption;
     }

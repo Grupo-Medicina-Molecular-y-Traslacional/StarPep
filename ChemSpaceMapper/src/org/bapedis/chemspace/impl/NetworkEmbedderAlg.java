@@ -5,6 +5,7 @@
  */
 package org.bapedis.chemspace.impl;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -44,6 +45,8 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
+    static final DecimalFormat DF = new DecimalFormat("0.0##");
+    
     public static final int FULL_MAX_NODES = 1000;
 
     protected final AlgorithmFactory factory;
@@ -115,7 +118,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
             graphModel = pc.getGraphModel(workspace);
             mainGraph = graphModel.getGraph();
             graph = graphModel.getGraphVisible();
-            relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);            
+            relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
         }
         maxDistance = 0;
         densityChart = null;
@@ -186,7 +189,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
             //Update node positions
             updateNodePositions();
 
-            densityChart = new ChartPanel(createXYLineChart("Network Density", createDensityDataSet()));
+            densityChart = new ChartPanel(createXYLineChart("", createDensityDataSet()));
             ticket.progress();
         }
     }
@@ -392,7 +395,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
         JFreeChart chart = ChartFactory.createXYLineChart(
                 chartTitle, // chart title
                 "Similarity threshold", // domain axis label
-                "Value", // range axis label
+                "Network density", // range axis label
                 dataset, // data
                 PlotOrientation.HORIZONTAL.VERTICAL, // orientation
                 false, // include legend
@@ -407,10 +410,27 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
         XYSeriesCollection dataset = new XYSeriesCollection();
         XYSeries serieDensity = new XYSeries("Density");
 
-        for (double threshold = 0; threshold < 1.05 && !stopRun.get(); threshold += 0.05) {
-            serieDensity.add(threshold, calculateDensity(threshold));
+        for (int threshold = 0; threshold <= 100 && !stopRun.get(); threshold += 5) {
+            serieDensity.add(threshold/100.0, calculateDensity(threshold/100.0));
         }
 
+        StringBuilder xAxis = new StringBuilder("similarity_threshold = [");
+        StringBuilder yAxis = new StringBuilder("network_density = [");
+        for (int i = 0; i < serieDensity.getItemCount(); i++) {
+            xAxis.append(serieDensity.getX(i));
+            yAxis.append(DF.format(serieDensity.getY(i)));
+
+            if (i < serieDensity.getItemCount() - 1) {
+                xAxis.append(",");
+                yAxis.append(",");
+            }
+        }
+        xAxis.append("];");
+        yAxis.append("];");
+        
+        pc.reportMsg(xAxis.toString(), workspace);
+        pc.reportMsg(yAxis.toString(), workspace);
+        
         dataset.addSeries(serieDensity);
         return dataset;
     }

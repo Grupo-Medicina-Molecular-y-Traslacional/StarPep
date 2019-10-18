@@ -8,6 +8,8 @@ package org.bapedis.chemspace.wizard;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import org.bapedis.chemspace.model.FeatureSelectionOption;
+import org.bapedis.core.spi.alg.impl.FeatureSEFilteringPanel;
+import org.bapedis.core.spi.alg.impl.FilteringSubsetOptimizationSetupUI;
 import org.openide.util.NbBundle;
 
 public final class VisualFeatureSelection extends JPanel {
@@ -20,11 +22,18 @@ public final class VisualFeatureSelection extends JPanel {
         initComponents();
         this.settingPanel = settingPanel;
         bottomPanel.add(settingPanel, BorderLayout.CENTER);
+
+        if (settingPanel instanceof FilteringSubsetOptimizationSetupUI) {            
+            JPanel firstStagePanel = ((FilteringSubsetOptimizationSetupUI)settingPanel).getFirstStagePanel();
+            if (firstStagePanel instanceof FeatureSEFilteringPanel){
+                ((FeatureSEFilteringPanel)firstStagePanel).setSubsetEvalPanel(false);
+            }
+        }
     }
 
     public JPanel getSettingPanel() {
         return settingPanel;
-    }        
+    }
 
     public FeatureSelectionOption getFFOption() {
         return ffOption;

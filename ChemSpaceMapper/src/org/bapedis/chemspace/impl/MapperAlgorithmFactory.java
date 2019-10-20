@@ -16,7 +16,6 @@ import org.bapedis.chemspace.model.SimilaritySearchingOption;
 import org.bapedis.chemspace.searching.ChemBaseSimilaritySearchAlg;
 import org.bapedis.chemspace.searching.EmbeddingQuerySeqAlg;
 import org.bapedis.chemspace.wizard.MyWizardIterator;
-import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
@@ -114,9 +113,7 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
 
         // Distance  
         AbstractDistance distFunction = (AbstractDistance) wiz.getProperty(AbstractDistance.class.getName());
-        MD_OUTPUT_OPTION option = (MD_OUTPUT_OPTION) wiz.getProperty(MD_OUTPUT_OPTION.class.getName());
         if (distFunction != null) {
-            distFunction.setOption(option);
             csMapper.setDistanceFunction(distFunction);
         }                
         

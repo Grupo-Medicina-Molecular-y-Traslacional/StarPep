@@ -8,21 +8,21 @@ package org.bapedis.chemspace.distance;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
-import org.openide.util.lookup.ServiceProvider;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 
 /**
  *
  * @author Loge
  */
-@ServiceProvider(service = DistanceFunction.class, position = 30)
+
 public class Chebyshev extends AbstractDistance{
 
-    public Chebyshev() {
-        super("Chebyshev");
+    public Chebyshev(AlgorithmFactory factory) {
+        super(factory);
     }
 
     @Override
-    public double distance(Peptide peptide1, Peptide peptide2) throws MolecularDescriptorNotFoundException {
+    public double compute(Peptide peptide1, Peptide peptide2) throws MolecularDescriptorNotFoundException {
         double val1, val2, d;
         double dist = 0;
         for (MolecularDescriptor descriptor : features) {

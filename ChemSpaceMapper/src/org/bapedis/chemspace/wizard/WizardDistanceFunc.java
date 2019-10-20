@@ -7,31 +7,47 @@ package org.bapedis.chemspace.wizard;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.core.io.MD_OUTPUT_OPTION;
+import org.bapedis.core.project.ProjectManager;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.bapedis.chemspace.distance.DistanceFunctionTag;
 
 public class WizardDistanceFunc implements WizardDescriptor.ValidatingPanel<WizardDescriptor>,
         WizardDescriptor.FinishablePanel<WizardDescriptor>,
         PropertyChangeListener {
 
+    private final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private final MapperAlgorithm csMapper;
-    private AbstractDistance alg;
     private final EventListenerList listeners = new EventListenerList();
     private boolean isValid;
     private WizardDescriptor model;
+    private final List<AlgorithmFactory> factories;
 
     public WizardDistanceFunc(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
         isValid = true;
+
+        factories = new LinkedList<>();
+        for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
+            final AlgorithmFactory factory = it.next();
+            if (factory instanceof DistanceFunctionTag) {
+                factories.add(factory);
+            }
+        }
     }
 
     /**
@@ -48,13 +64,14 @@ public class WizardDistanceFunc implements WizardDescriptor.ValidatingPanel<Wiza
     public VisualDistanceFunc getComponent() {
         if (component == null) {
             try {
-                alg = (AbstractDistance) csMapper.getDistanceFunction().clone();
+                AbstractDistance alg = (AbstractDistance) csMapper.getDistanceFunction().clone();
                 component = new VisualDistanceFunc();
-                component.setDistanceFunction(alg);
+                component.populateJTree(factories);
+                component.setDistanceFactory(alg.getFactory());
+                component.setOption(alg.getOption());
                 component.addPropertyChangeListener(this);
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
-                alg = null;
             }
         }
         return component;
@@ -92,23 +109,27 @@ public class WizardDistanceFunc implements WizardDescriptor.ValidatingPanel<Wiza
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state  
         this.model = wiz;
-        alg = (AbstractDistance) wiz.getProperty(AbstractDistance.class.getName());
+        AbstractDistance alg = (AbstractDistance) wiz.getProperty(AbstractDistance.class.getName());
         if (alg != null) {
-            getComponent().setDistanceFunction(alg);
+            getComponent().setDistanceFactory(alg.getFactory());
+            getComponent().setOption(alg.getOption());
         }
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        alg = component.getDistanceFunction();
-        wiz.putProperty(AbstractDistance.class.getName(), alg);
-        wiz.putProperty(MD_OUTPUT_OPTION.class.getName(), component.getOption());
+        AlgorithmFactory factory = component.getDistanceFactory();
+        if (factory != null) {
+            AbstractDistance alg = (AbstractDistance) factory.createAlgorithm();
+            alg.setOption(component.getOption());
+            wiz.putProperty(AbstractDistance.class.getName(), alg);
+        }
     }
 
     @Override
     public void validate() throws WizardValidationException {
-        if (getComponent().getDistanceFunction() == null) {
+        if (getComponent().getDistanceFactory() == null) {
             isValid = false;
             throw new WizardValidationException(null, NbBundle.getMessage(WizardDistanceFunc.class, "DistanceFunction.invalid.text"), null);
         }
@@ -136,5 +157,4 @@ public class WizardDistanceFunc implements WizardDescriptor.ValidatingPanel<Wiza
         return isValid;
     }
 
-    
 }

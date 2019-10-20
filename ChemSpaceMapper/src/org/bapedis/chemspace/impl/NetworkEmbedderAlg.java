@@ -321,7 +321,9 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
                     if (graphEdge != null) {
                         distance = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE);
                     } else {
-                        distance = distFunc.distance(peptide, peptides[j]);
+                        distFunc.setPeptides(peptide, peptides[j]);
+                        distFunc.run();
+                        distance = distFunc.getDistance();
                     }
                     candidates[cursor++] = new CandidatePeptide(peptides[j], distance);
                 }
@@ -356,7 +358,9 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
                             if (graphEdge != null) {
                                 distance = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE);
                             } else {
-                                distance = distFunc.distance(closestPeptide, candidates[k].getPeptide());
+                                distFunc.setPeptides(closestPeptide, candidates[k].getPeptide());
+                                distFunc.run();
+                                distance = distFunc.getDistance();
                             }
                             if (distance < candidates[k].getDistance()) {
                                 candidates[k] = null;

@@ -5,13 +5,12 @@
  */
 package org.bapedis.chemspace.distance;
 
-import org.bapedis.core.model.MolecularDescriptorNotFoundException;
-import org.bapedis.core.model.Peptide;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 
 /**
  *
  * @author Loge
  */
-public interface DistanceFunction  {
-    double distance(Peptide peptide1, Peptide peptide2) throws MolecularDescriptorNotFoundException;
+public interface DistanceFunctionTag extends AlgorithmFactory  {
+    
 }

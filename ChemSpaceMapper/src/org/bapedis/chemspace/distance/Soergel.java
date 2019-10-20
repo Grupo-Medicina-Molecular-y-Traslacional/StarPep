@@ -7,23 +7,22 @@ package org.bapedis.chemspace.distance;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
-import org.openide.util.lookup.ServiceProvider;
-
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 
 /**
  *
  * @author crjacas, loge
  */
-@ServiceProvider(service = DistanceFunction.class, position = 50)
+
 public class Soergel extends AbstractDistance
 {
-    public Soergel(  )
+    public Soergel( AlgorithmFactory factory  )
     {
-       super("Soergel");
+       super(factory);
     }
 
     @Override
-    public double distance(Peptide peptide1, Peptide peptide2) throws MolecularDescriptorNotFoundException {
+    public double compute(Peptide peptide1, Peptide peptide2) throws MolecularDescriptorNotFoundException {
         double val1, val2;
         double num = 0, den = 0;
         for (MolecularDescriptor descriptor : features) {

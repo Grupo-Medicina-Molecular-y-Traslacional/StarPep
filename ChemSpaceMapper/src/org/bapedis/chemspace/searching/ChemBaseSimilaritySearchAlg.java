@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.SwingUtilities;
-import org.bapedis.chemspace.distance.DistanceFunction;
+import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.model.CandidatePeptide;
 import org.bapedis.core.model.PeptideHit;
 import org.bapedis.chemspace.model.SimilaritySearchingModel;
@@ -31,6 +31,7 @@ import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.bapedis.chemspace.distance.DistanceFunctionTag;
 
 /**
  *
@@ -47,74 +48,71 @@ public abstract class ChemBaseSimilaritySearchAlg implements Algorithm, Cloneabl
     protected Workspace workspace;
     protected ProgressTicket progressTicket;
     protected List<Node> graphNodes;
-    protected List<Peptide> targetList, queryList;    
+    protected List<Peptide> targetList, queryList;
     protected AttributesModel newAttrModel;
     protected boolean stopRun;
-    protected DistanceFunction distance;
-    
+    protected AbstractDistance distFunc;
 
     public ChemBaseSimilaritySearchAlg(AlgorithmFactory factory) {
         this.factory = factory;
         searchingModel = new SimilaritySearchingModel();
-        
-    }     
+
+    }
 
     public SimilaritySearchingModel getSearchingModel() {
         return searchingModel;
     }
 
-    public DistanceFunction getDistanceFunction() {
-        return distance;
+    public AbstractDistance getDistanceFunction() {
+        return distFunc;
     }
 
-    public void setDistanceFunction(DistanceFunction distance) {
-        this.distance = distance;
+    public void setDistanceFunction(AbstractDistance distFunc) {
+        this.distFunc = distFunc;
     }
 
     protected List<PeptideHit> searchSimilarTo(Peptide query) {
         List<PeptideHit> resultList = new LinkedList<>();
         //Searching in target list
-        try {
-            CandidatePeptide[] candidates = new CandidatePeptide[targetList.size()];
-            int cursor = 0;
-            for (Peptide peptide : targetList) {
-                candidates[cursor++] = new CandidatePeptide(peptide, distance.distance(query, peptide));
-            }
-            //Sort candidates
-            Arrays.parallelSort(candidates);
+        CandidatePeptide[] candidates = new CandidatePeptide[targetList.size()];
+        int cursor = 0;
+        for (Peptide peptide : targetList) {
+            distFunc.setPeptides(query, peptide);
+            distFunc.run();
+            candidates[cursor++] = new CandidatePeptide(peptide, distFunc.getDistance());
+        }
+        //Sort candidates
+        Arrays.parallelSort(candidates);
 
-            double maxDistance = candidates[candidates.length - 1].getDistance();
-            int topK = -1;
-            double threshold = -1;
-            double similarity;
-            switch (searchingModel.getOption()) {
-                case TOP_RANK_PERCENT_OPTION:
-                    topK = (int) Math.round(((double) searchingModel.getTopPercentValue()) * candidates.length / 100);
-                    break;
-                case TOP_RANK_VALUE_OPTION:
-                    topK = searchingModel.getTopRank();
-                    break;
-                case SIMILARITY_THRESHOD_VALUE_OPTION:
-                    threshold = searchingModel.getThreshold();
-                    break;
-                case SIMILARITY_THRESHOD_PERCENT_OPTION:
-                    similarity = 1.0 - candidates[0].getDistance() / maxDistance;
-                    threshold = searchingModel.getThresholdPercentValue() * similarity / 100;
-                    break;
-            }
+        double maxDistance = candidates[candidates.length - 1].getDistance();
+        int topK = -1;
+        double threshold = -1;
+        double similarity;
+        switch (searchingModel.getOption()) {
+            case TOP_RANK_PERCENT_OPTION:
+                topK = (int) Math.round(((double) searchingModel.getTopPercentValue()) * candidates.length / 100);
+                break;
+            case TOP_RANK_VALUE_OPTION:
+                topK = searchingModel.getTopRank();
+                break;
+            case SIMILARITY_THRESHOD_VALUE_OPTION:
+                threshold = searchingModel.getThreshold();
+                break;
+            case SIMILARITY_THRESHOD_PERCENT_OPTION:
+                similarity = 1.0 - candidates[0].getDistance() / maxDistance;
+                threshold = searchingModel.getThresholdPercentValue() * similarity / 100;
+                break;
+        }
 
-            boolean flag = true;
-            for (int i = 0; i < candidates.length && flag; i++) {
-                similarity = 1.0 - candidates[i].getDistance() / maxDistance;
-                if ((threshold != -1 && similarity >= threshold)
-                        || (topK != -1 && i < topK)) {
-                    resultList.add(new PeptideHit(candidates[i].getPeptide(), similarity));
-                } else {
-                    flag = false;
-                }
+        boolean flag = true;
+        for (int i = 0; i < candidates.length && flag; i++) {
+            similarity = 1.0 - candidates[i].getDistance() / maxDistance;
+            if ((threshold != -1 && similarity >= threshold)
+                    || (topK != -1 && i < topK)) {
+                resultList.add(new PeptideHit(candidates[i].getPeptide(), similarity));
+            } else {
+                flag = false;
             }
-        } catch (MolecularDescriptorNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
         }
         return resultList;
     }
@@ -148,7 +146,7 @@ public abstract class ChemBaseSimilaritySearchAlg implements Algorithm, Cloneabl
                 break;
             case SIMILARITY_THRESHOD_PERCENT_OPTION:
                 similarity = results[0].getScore();
-                threshold = searchingModel.getThresholdPercentValue()* similarity / 100;
+                threshold = searchingModel.getThresholdPercentValue() * similarity / 100;
                 break;
         }
 
@@ -252,7 +250,7 @@ public abstract class ChemBaseSimilaritySearchAlg implements Algorithm, Cloneabl
     @Override
     public Object clone() throws CloneNotSupportedException {
         ChemBaseSimilaritySearchAlg copy = (ChemBaseSimilaritySearchAlg) super.clone(); //To change body of generated methods, choose Tools | Templates.
-        copy.searchingModel = (SimilaritySearchingModel)this.searchingModel.clone();
+        copy.searchingModel = (SimilaritySearchingModel) this.searchingModel.clone();
         return copy;
-    }       
+    }
 }

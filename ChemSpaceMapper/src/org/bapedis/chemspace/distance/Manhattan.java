@@ -8,21 +8,21 @@ package org.bapedis.chemspace.distance;
 import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
-import org.openide.util.lookup.ServiceProvider;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 
 /**
  *
  * @author Loge
  */
-@ServiceProvider(service = DistanceFunction.class, position = 10)
+
 public class Manhattan extends AbstractDistance {
 
-    public Manhattan() {
-        super("Manhattan");
+    public Manhattan(AlgorithmFactory factory) {
+        super(factory);
     }
 
     @Override
-    public double distance(Peptide peptide1, Peptide peptide2) throws MolecularDescriptorNotFoundException {
+    public double compute(Peptide peptide1, Peptide peptide2) throws MolecularDescriptorNotFoundException {
         double val1, val2;
         double sum = 0;
         for (MolecularDescriptor descriptor : features) {

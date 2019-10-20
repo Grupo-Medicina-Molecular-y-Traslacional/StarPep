@@ -6,7 +6,7 @@
 package org.bapedis.chemspace.wizard;
 
 import java.awt.Component;
-import java.util.Collection;
+import java.util.List;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JTree;
@@ -15,48 +15,49 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import org.bapedis.chemspace.distance.AbstractDistance;
-import org.bapedis.chemspace.distance.DistanceFunction;
 import org.bapedis.core.io.MD_OUTPUT_OPTION;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.openide.util.ImageUtilities;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 public final class VisualDistanceFunc extends JPanel {
 
     public static final String DISTANCE_FUNCTION = "distance_function";
     private final DefaultMutableTreeNode treeNode;
-    private AbstractDistance distFunc;
+    private AlgorithmFactory distFactory;
 
     public VisualDistanceFunc() {
         initComponents();
         treeNode = new DefaultMutableTreeNode(NbBundle.getMessage(VisualDistanceFunc.class, "DistanceFunction.root.name"), true);
-        populateJTree();
         jTree1.setModel(new DefaultTreeModel(treeNode));
         jTree1.setRootVisible(true);
         jTree1.setCellRenderer(new DistanceFactoryNodeRenderer());
     }
 
-    public AbstractDistance getDistanceFunction() {
-        return distFunc;
+    public AlgorithmFactory getDistanceFactory() {
+        return distFactory;
     }    
 
-    public void setDistanceFunction(AbstractDistance distFunc) {
-        this.distFunc = distFunc;
-        DistanceFunctionTreeNode distNode;
+    public void setDistanceFactory(AlgorithmFactory distFactory) {        
+        DistanceFactoryTreeNode distNode;
         for (int i = 0; i < treeNode.getChildCount(); i++) {
-            distNode = (DistanceFunctionTreeNode) treeNode.getChildAt(i);
-            if (distNode.getDistanceFunction().getName().equals(distFunc.getName())) {
+            distNode = (DistanceFactoryTreeNode) treeNode.getChildAt(i);
+            if (distNode.getDistanceFactory().getName().equals(distFactory .getName())) {
                 jTree1.setSelectionPath(new TreePath(distNode.getPath()));
+                this.distFactory = distFactory;
             }
         }
-        switch(distFunc.getOption()){
+    }
+    
+    public void setOption(MD_OUTPUT_OPTION option){
+        switch(option){
             case Z_SCORE:
                 jOptionZscore.setSelected(true);
                 break;
             case MIN_MAX:
                 jOptionMinMax.setSelected(true);
                 break;
-        }
+        }    
     }
     
     public MD_OUTPUT_OPTION getOption(){
@@ -69,12 +70,9 @@ public final class VisualDistanceFunc extends JPanel {
         return MD_OUTPUT_OPTION.None;
     }
 
-    private void populateJTree() {
-        Collection<? extends DistanceFunction> factories = Lookup.getDefault().lookupAll(DistanceFunction.class);
-        for (DistanceFunction distFunc : factories) {
-            if (distFunc instanceof AbstractDistance) {
-                treeNode.add(new DistanceFunctionTreeNode((AbstractDistance)distFunc));
-            }
+    void populateJTree(List<AlgorithmFactory> distFactory) {       
+        for (AlgorithmFactory factory : distFactory) {
+            treeNode.add(new DistanceFactoryTreeNode(factory));
         }
     }
 
@@ -201,16 +199,16 @@ public final class VisualDistanceFunc extends JPanel {
 
     private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
         TreePath newPath = evt.getNewLeadSelectionPath();
-        if (newPath != null && newPath.getLastPathComponent() instanceof DistanceFunctionTreeNode) {
-            DistanceFunctionTreeNode newNode = (DistanceFunctionTreeNode) newPath.getLastPathComponent();
-            distFunc = newNode.getDistanceFunction();
-            jDescLabel.setText(distFunc.getDescription());
+        if (newPath != null && newPath.getLastPathComponent() instanceof DistanceFactoryTreeNode) {
+            DistanceFactoryTreeNode newNode = (DistanceFactoryTreeNode) newPath.getLastPathComponent();
+            distFactory = newNode.getDistanceFactory();
+            jDescLabel.setText(distFactory.getDescription());
             jDescLabel.setVisible(true);            
         } else {
-            distFunc = null;
+            distFactory = null;
             jDescLabel.setText("");
         }
-        firePropertyChange(DISTANCE_FUNCTION, null, distFunc);
+        firePropertyChange(DISTANCE_FUNCTION, null, distFactory);
     }//GEN-LAST:event_jTree1ValueChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -226,19 +224,19 @@ public final class VisualDistanceFunc extends JPanel {
     private javax.swing.JPanel optionPanel;
     // End of variables declaration//GEN-END:variables
 
-    private static class DistanceFunctionTreeNode extends DefaultMutableTreeNode {
+    private static class DistanceFactoryTreeNode extends DefaultMutableTreeNode {
 
-        public DistanceFunctionTreeNode(AbstractDistance distFunc) {
-            super(distFunc, false);
+        public DistanceFactoryTreeNode(AlgorithmFactory distFactory) {
+            super(distFactory, false);
         }
 
-        public AbstractDistance getDistanceFunction() {
-            return (AbstractDistance) userObject;
+        public AlgorithmFactory getDistanceFactory() {
+            return (AlgorithmFactory) userObject;
         }
 
         @Override
         public String toString() {
-            return getDistanceFunction().getName();
+            return getDistanceFactory().getName();
         }
 
     }
@@ -266,7 +264,7 @@ public final class VisualDistanceFunc extends JPanel {
                     expanded, leaf, row,
                     hasFocus);
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-            if (!(node instanceof DistanceFunctionTreeNode)) {
+            if (!(node instanceof DistanceFactoryTreeNode)) {
                 // Root node
                 setIcon(icon);
             }

@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.swing.SwingUtilities;
 import org.bapedis.chemspace.distance.AbstractDistance;
-import org.bapedis.chemspace.distance.DistanceFunction;
 import org.bapedis.chemspace.distance.Euclidean;
 import org.bapedis.chemspace.model.FeatureSelectionOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
@@ -42,6 +41,8 @@ import org.bapedis.core.task.ProgressTicket;
 import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.bapedis.chemspace.distance.DistanceFunctionTag;
+import org.bapedis.chemspace.distance.EuclideanFactory;
 
 /**
  *
@@ -98,14 +99,7 @@ public class MapperAlgorithm implements Algorithm {
         pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
         networkAlg = (NetworkEmbedderAlg) new NetworkEmbedderFactory().createAlgorithm();
         modularityOptimization = (Modularity) new ModularityFactory().createAlgorithm();
-        
-        //Default distance function
-        Collection<? extends DistanceFunction> factories = Lookup.getDefault().lookupAll(DistanceFunction.class);
-        for (DistanceFunction distFunc : factories) {
-            if (distFunc instanceof Euclidean) {
-                this.distFunction = (AbstractDistance) distFunc;
-            }
-        }
+        distFunction = (AbstractDistance) new EuclideanFactory().createAlgorithm();        
     }
 
     @Override
@@ -204,7 +198,7 @@ public class MapperAlgorithm implements Algorithm {
         if (searchingOption == SimilaritySearchingOption.YES && !stopRun) {
             if (simSearchingAlg != null) {
                 if (distFunction != null) {
-                    pc.reportMsg(String.format("Distance Function: %s", distFunction.getName()), workspace);
+                    pc.reportMsg(String.format("Distance Function: %s", distFunction.getFactory().getName()), workspace);
                     simSearchingAlg.setDistanceFunction(distFunction);
                     currentAlg = simSearchingAlg;
                     execute();
@@ -230,7 +224,7 @@ public class MapperAlgorithm implements Algorithm {
         pc.reportMsg("Network construction", workspace);
         if (!stopRun) {
             if (distFunction != null) {
-                pc.reportMsg(String.format("Distance Function: %s", distFunction.getName()), workspace);
+                pc.reportMsg(String.format("Distance Function: %s", distFunction.getFactory().getName()), workspace);
                 networkAlg.setDistanceFunction(distFunction);
                 networkAlg.setXyzSpace(pcaTransformer.getXYZSpace());
                 currentAlg = networkAlg;

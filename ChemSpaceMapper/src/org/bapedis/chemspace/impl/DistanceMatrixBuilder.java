@@ -91,13 +91,13 @@ class DistanceMatrixBuilder extends RecursiveAction {
     }
 
     private void computeDirectly() {
-        double distance;
         for (int y = ylow; y < yhigh; y++) {
             for (int x = xlow; x < Math.min(xhigh, y); x++) {
                 if (!stopRun.get()) {
                     try {
-                        distance = distFunc.distance(peptides[y], peptides[x]);
-                        matrix.setValue(peptides[y], peptides[x], distance);
+                        distFunc.setPeptides(peptides[y], peptides[x]);
+                        distFunc.run();
+                        matrix.setValue(peptides[y], peptides[x], distFunc.getDistance());
                         progressTicket.progress();
                     } catch(Exception ex){
                         stopRun.set(true);

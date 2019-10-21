@@ -330,23 +330,6 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                             }
                         }
                     }
-//                    else if (redundancyOption == REDUNDANCY_NMI) {
-//
-//                        retainedFeatures.clear();
-//                        double nmi;
-
-//
-//                        double[] data = miMat rix.getValues();
-//                        double max = MolecularDescriptor.max(data);
-//                        double min = MolecularDescriptor.min(data);
-//                        double avg = MolecularDescriptor.mean(data);
-//                        double std = MolecularDescriptor.varp(data, avg);
-//
-//                        pc.reportMsg("Max (NMI): " + df.format(max), workspace);
-//                        pc.reportMsg("Min (NMI): " + df.format(min), workspace);
-//                        pc.reportMsg("Avg (NMI): " + df.format(avg), workspace);
-//                        pc.reportMsg("Std (NMI): " + df.format(std), workspace);
-//                    }
                 }
 
                 double meritValue = Double.NaN;

@@ -180,6 +180,7 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
                     MIMatrix miMatrix = task.getMIMatrix();
 
                     int removed = 0;
+                    double bestMerit = Double.NaN;
                     if (!stopRun.get()) {
                         pc.reportMsg("Direction: " + direction, workspace);
                         double initialMerit = 0;
@@ -204,7 +205,7 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
                                 retainedlFeatures.add(attr);
                             }
                         }
-                        pc.reportMsg("The best merit found is " + DF.format(evaluateSubset(subset, descriptors, miMatrix)), workspace);
+                        bestMerit = evaluateSubset(subset, descriptors, miMatrix);
                     }
                     //Print top 5 bottom 3
                     descriptors = retainedlFeatures.toArray(new MolecularDescriptor[0]);
@@ -212,6 +213,9 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
                     FilteringSubsetOptimization.printTop5Buttom3(descriptors, workspace);
                     pc.reportMsg("\nTotal of removed features: " + removed, workspace);
                     pc.reportMsg("Total of retained features: " + retainedlFeatures.size(), workspace);
+                    if (bestMerit != Double.NaN) {
+                        pc.reportMsg("The best merit found is " + DF.format(bestMerit), workspace);
+                    }
                 } catch (Exception ex) {
                     Exceptions.printStackTrace(ex);
                 }

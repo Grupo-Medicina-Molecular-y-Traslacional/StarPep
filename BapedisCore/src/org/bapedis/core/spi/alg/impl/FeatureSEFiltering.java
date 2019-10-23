@@ -80,7 +80,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         stopRun = new AtomicBoolean();
         binsOption1 = FeatureDiscretization.BinsOption.Number_peptides;
         numberOfBins1 = 50;
-        binsOption2 = FeatureDiscretization.BinsOption.Rice_Rule;
+        binsOption2 = FeatureDiscretization.BinsOption.Square_root_number_peptides;
         numberOfBins2 = 50;
         filterByMI = true;
     }

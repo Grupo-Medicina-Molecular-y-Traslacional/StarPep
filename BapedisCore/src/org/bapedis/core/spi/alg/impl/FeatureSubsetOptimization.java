@@ -62,7 +62,7 @@ public class FeatureSubsetOptimization implements Algorithm, Cloneable {
     public FeatureSubsetOptimization(FeatureSubsetOptimizationFactory factory) {
         this.factory = factory;
         preprocessing = (FeatureDiscretization) (new FeatureDiscretizationFactory()).createAlgorithm();
-        binsOption2 = FeatureDiscretization.BinsOption.Rice_Rule;
+        binsOption2 = FeatureDiscretization.BinsOption.Square_root_number_peptides;
         numberOfBins2 = 50;
         direction = Direction.Backward;
         debug = false;

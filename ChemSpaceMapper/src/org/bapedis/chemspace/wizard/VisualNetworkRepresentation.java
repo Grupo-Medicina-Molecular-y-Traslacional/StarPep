@@ -38,13 +38,11 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
                 if (!jOptionFull.isSelected()) {
                     jOptionFull.setSelected(true);
                 }
-                infoLabel.setText(NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.jOptionFull.info"));
                 break;
             case HSP:
                 if (!jOptionHSP.isSelected()) {
                     jOptionHSP.setSelected(true);
                 }
-                infoLabel.setText(NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.jOptionHSP.info"));
                 break;
         }
         firePropertyChange(CHANGED_NET_TYPE, oldOption, networkType);
@@ -69,7 +67,9 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         jQuestionLabel = new javax.swing.JLabel();
         jOptionHSP = new javax.swing.JRadioButton();
         jOptionFull = new javax.swing.JRadioButton();
-        infoLabel = new javax.swing.JLabel();
+        infoLabel1 = new javax.swing.JLabel();
+        infoLabel2 = new javax.swing.JLabel();
+        extLabel = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
         setPreferredSize(new java.awt.Dimension(560, 580));
@@ -79,6 +79,7 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
@@ -94,9 +95,7 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(jOptionHSP, gridBagConstraints);
 
@@ -110,22 +109,45 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(jOptionFull, gridBagConstraints);
 
-        infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(infoLabel, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.infoLabel.text")); // NOI18N
-        infoLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        infoLabel.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
+        infoLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
+        infoLabel1.setToolTipText(org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.jOptionHSP.info")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(infoLabel1, gridBagConstraints);
+
+        infoLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(infoLabel2, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.infoLabel2.text")); // NOI18N
+        infoLabel2.setToolTipText(org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.jOptionFull.info")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(infoLabel2, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(extLabel, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.extLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(20, 5, 5, 5);
-        add(infoLabel, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(extLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jOptionHSPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOptionHSPActionPerformed
@@ -139,7 +161,9 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JLabel infoLabel;
+    private javax.swing.JLabel extLabel;
+    private javax.swing.JLabel infoLabel1;
+    private javax.swing.JLabel infoLabel2;
     private javax.swing.JRadioButton jOptionFull;
     private javax.swing.JRadioButton jOptionHSP;
     private javax.swing.JLabel jQuestionLabel;

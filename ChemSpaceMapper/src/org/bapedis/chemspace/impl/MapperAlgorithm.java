@@ -5,12 +5,10 @@
  */
 package org.bapedis.chemspace.impl;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.SwingUtilities;
 import org.bapedis.chemspace.distance.AbstractDistance;
-import org.bapedis.chemspace.distance.Euclidean;
 import org.bapedis.chemspace.model.FeatureSelectionOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.InputSequenceOption;
@@ -41,7 +39,6 @@ import org.bapedis.core.task.ProgressTicket;
 import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.bapedis.chemspace.distance.DistanceFunctionTag;
 import org.bapedis.chemspace.distance.EuclideanFactory;
 
 /**

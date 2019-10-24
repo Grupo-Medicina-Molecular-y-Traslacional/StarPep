@@ -93,7 +93,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
         DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
         symbols.setDecimalSeparator('.');
-        formatter = new DecimalFormat("0.00", symbols);
+        formatter = new DecimalFormat("0.00#", symbols);
 
         busyLabel = new JXBusyLabel(new Dimension(12, 12));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -191,9 +191,14 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private void setupThreshold() {
         double similarityThreshold = netEmbedder.getSimilarityThreshold();
         jCutoffCurrentValue.setText(formatter.format(similarityThreshold));
-        cutoffSlider.setValue((int) (similarityThreshold * 100));
+        int t = (int) Math.round(similarityThreshold * 100);
+        cutoffSlider.setValue(t);
         jCutoffNewLabel.setVisible(false);
         jCutoffNewValue.setVisible(false);
+        jNewDensityLabel.setVisible(false);
+        jNewDensityValue.setVisible(false);
+        
+        jCurrentDensityValue.setText(formatter.format(netEmbedder.getDensityValues()[t]));
 
         densityPanel.removeAll();
         if (netEmbedder.getDensityChart() != null) {
@@ -249,8 +254,12 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private void thresholdChanged(double value) {
         netEmbedder.setSimilarityThreshold(value);
         jCutoffCurrentValue.setText(formatter.format(value));
+        int t = (int) Math.round(value * 100);
+        jCurrentDensityValue.setText(formatter.format(netEmbedder.getDensityValues()[t]));
         jCutoffNewLabel.setVisible(false);
         jCutoffNewValue.setVisible(false);
+        jNewDensityLabel.setVisible(false);
+        jNewDensityValue.setVisible(false);
         jApplyThresholdButton.setEnabled(false);
     }
 
@@ -272,6 +281,10 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         jCutoffCurrentValue.setEnabled(enabled);
         jCutoffNewLabel.setEnabled(enabled);
         jCutoffNewValue.setEnabled(enabled);
+        jNewDensityLabel.setEnabled(enabled);
+        jNewDensityValue.setEnabled(enabled);
+        jCurrentDensityLabel.setEnabled(enabled);
+        jCurrentDensityValue.setEnabled(enabled);
         jCutoffToolBar.setEnabled(enabled);
         jLessCutoffButton.setEnabled(enabled);
         jMoreCutoffButton.setEnabled(enabled);
@@ -315,6 +328,10 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         densityPanel = new javax.swing.JPanel();
         jApplyThresholdButton = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
+        jCurrentDensityLabel = new javax.swing.JLabel();
+        jCurrentDensityValue = new javax.swing.JLabel();
+        jNewDensityLabel = new javax.swing.JLabel();
+        jNewDensityValue = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -429,7 +446,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         org.openide.awt.Mnemonics.setLocalizedText(jCutoffCurrentLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.jCutoffCurrentLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         tab2.add(jCutoffCurrentLabel, gridBagConstraints);
@@ -437,7 +454,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         org.openide.awt.Mnemonics.setLocalizedText(jCutoffCurrentValue, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.jCutoffCurrentValue.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
@@ -446,7 +463,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         org.openide.awt.Mnemonics.setLocalizedText(jCutoffNewLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.jCutoffNewLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         tab2.add(jCutoffNewLabel, gridBagConstraints);
@@ -454,7 +471,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         org.openide.awt.Mnemonics.setLocalizedText(jCutoffNewValue, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.jCutoffNewValue.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
@@ -505,7 +522,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -549,6 +566,41 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         tab2.add(jLabel4, gridBagConstraints);
 
+        org.openide.awt.Mnemonics.setLocalizedText(jCurrentDensityLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.jCurrentDensityLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        tab2.add(jCurrentDensityLabel, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jCurrentDensityValue, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.jCurrentDensityValue.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        tab2.add(jCurrentDensityValue, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jNewDensityLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.jNewDensityLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        tab2.add(jNewDensityLabel, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jNewDensityValue, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.jNewDensityValue.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        tab2.add(jNewDensityValue, gridBagConstraints);
+
         jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.tab2.TabConstraints.tabTitle"), tab2); // NOI18N
 
         centerPanel.add(jTabbedPane1, "tabCard");
@@ -572,17 +624,25 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     }//GEN-LAST:event_jLessCutoffButtonActionPerformed
 
     private void cutoffSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_cutoffSliderStateChanged
-        float threshold = cutoffSlider.getValue() / 100.f;
+        int t = cutoffSlider.getValue();
+        double threshold = t / 100.0;
         if (threshold != Float.parseFloat(jCutoffCurrentValue.getText())) {
             jCutoffNewLabel.setVisible(true);
             jCutoffNewValue.setVisible(true);
             jCutoffNewValue.setText(formatter.format(threshold));
+            
+            jNewDensityLabel.setVisible(true);
+            jNewDensityValue.setVisible(true);
+            jNewDensityValue.setText(formatter.format(netEmbedder.getDensityValues()[t]));
             jApplyThresholdButton.setEnabled(netEmbedder != null);
         } else {
             jCutoffNewLabel.setVisible(false);
             jCutoffNewValue.setVisible(false);
+            jNewDensityLabel.setVisible(false);
+            jNewDensityValue.setVisible(false);
             jApplyThresholdButton.setEnabled(false);
             jCutoffNewValue.setText("");
+            jNewDensityValue.setText("");
         }
     }//GEN-LAST:event_cutoffSliderStateChanged
 
@@ -631,6 +691,8 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private javax.swing.JPanel densityPanel;
     private javax.swing.JButton jApplyCoordinateButton;
     private javax.swing.JButton jApplyThresholdButton;
+    private javax.swing.JLabel jCurrentDensityLabel;
+    private javax.swing.JLabel jCurrentDensityValue;
     private javax.swing.JLabel jCutoffCurrentLabel;
     private javax.swing.JLabel jCutoffCurrentValue;
     private javax.swing.JLabel jCutoffNewLabel;
@@ -643,6 +705,8 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private javax.swing.JLabel jLabel5;
     private javax.swing.JButton jLessCutoffButton;
     private javax.swing.JButton jMoreCutoffButton;
+    private javax.swing.JLabel jNewDensityLabel;
+    private javax.swing.JLabel jNewDensityValue;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JComboBox<String> jXComboBox;
     private javax.swing.JComboBox<String> jYComboBox;

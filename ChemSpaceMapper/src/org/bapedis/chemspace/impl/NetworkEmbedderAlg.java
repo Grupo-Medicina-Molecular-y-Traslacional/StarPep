@@ -62,12 +62,18 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
     private double currentThreshold;
     private ChartPanel densityChart;
     private NetworkType networkType;
+    private final double[] densityValues;
 
     public NetworkEmbedderAlg(AlgorithmFactory factory) {
         this.factory = factory;
         currentThreshold = 0.0;
         stopRun = new AtomicBoolean(false);
         networkType = NetworkType.HSP;
+        densityValues = new double[101];
+    }
+
+    public double[] getDensityValues() {
+        return densityValues;
     }
 
     public NetworkType getNetworkType() {
@@ -118,6 +124,9 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
             mainGraph = graphModel.getGraph();
             graph = graphModel.getGraphVisible();
             relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+        }
+        for (int i = 0; i < densityValues.length; i++) {
+            densityValues[i] = 0;
         }
         densityChart = null;
     }
@@ -185,17 +194,36 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
             //Compute similarity values
             computeSimilarityRelationships(maxDistance);
 
-            XYSeriesCollection dataset = createDensityDataSet();
+            //Populate density array
+            populateDensityArray();
+
+            StringBuilder xAxis = new StringBuilder("similarity_threshold = [");
+            StringBuilder yAxis = new StringBuilder("network_density = [");
+            for (int t = 0; t <= 100; t++) {
+                xAxis.append(t / 100.0);
+                yAxis.append(densityValues[t]);
+
+                if (t < 100) {
+                    xAxis.append(",");
+                    yAxis.append(",");
+                }
+            }
+            xAxis.append("];");
+            yAxis.append("];");
+
+            pc.reportMsg(xAxis.toString(), workspace);
+            pc.reportMsg(yAxis.toString(), workspace);
 
             if (networkType == NetworkType.FULL) {
                 //Estimate current threshold
-                XYSeries serieDensity = dataset.getSeries(0);
-                int i = 0;
+                int t = 0;
                 do {
-                    currentThreshold = (double) serieDensity.getX(i++);
-                } while (i < serieDensity.getItemCount() && (double) serieDensity.getY(i) > 0.1);
+                    t++;
+                } while (t <= 100 && densityValues[t] > 0.1);
 
-                if (currentThreshold == (double) serieDensity.getX(serieDensity.getItemCount() - 1)) {
+                if (t < 100) {
+                    currentThreshold = t / 100.0;
+                } else {
                     currentThreshold = 0.7;
                 }
             } else {
@@ -208,7 +236,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
             //Update node positions
             updateNodePositions();
 
-            densityChart = new ChartPanel(createXYLineChart("", dataset));
+            densityChart = new ChartPanel(createXYLineChart("", createDensityDataSet()));
             ticket.progress();
         }
     }
@@ -257,7 +285,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
 
     private double createHSPNetwork() {
         // task size
-        ticket.switchToDeterminate(3 * peptides.length + 1);
+        ticket.switchToDeterminate(peptides.length);
 
         // Create new edges...
         if (peptides != null && !stopRun.get()) {
@@ -448,51 +476,36 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
         XYSeriesCollection dataset = new XYSeriesCollection();
         XYSeries serieDensity = new XYSeries("Density");
 
-        for (int threshold = 0; threshold <= 100 && !stopRun.get(); threshold += 5) {
-            serieDensity.add(threshold / 100.0, calculateDensity(threshold / 100.0));
+        for (int t = 0; t <= 100 && !stopRun.get(); t++) {
+            serieDensity.add(t / 100.0, densityValues[t]);
         }
-
-        StringBuilder xAxis = new StringBuilder("similarity_threshold = [");
-        StringBuilder yAxis = new StringBuilder("network_density = [");
-        for (int i = 0; i < serieDensity.getItemCount(); i++) {
-            xAxis.append(serieDensity.getX(i));
-            yAxis.append(serieDensity.getY(i));
-
-            if (i < serieDensity.getItemCount() - 1) {
-                xAxis.append(",");
-                yAxis.append(",");
-            }
-        }
-        xAxis.append("];");
-        yAxis.append("];");
-
-        pc.reportMsg(xAxis.toString(), workspace);
-        pc.reportMsg(yAxis.toString(), workspace);
 
         dataset.addSeries(serieDensity);
         return dataset;
     }
 
-    private double calculateDensity(double threshold) {
+    private void populateDensityArray() {
+        long[] edgeCount = new long[101];
         int n = peptides.length;
-        double edgeCount = 0;
         Node node1, node2;
         Edge graphEdge;
-        double similarity;
+        int threshold;
         for (int i = 0; i < peptides.length; i++) {
             node1 = peptides[i].getGraphNode();
             for (int j = i + 1; j < peptides.length; j++) {
                 node2 = peptides[j].getGraphNode();
                 graphEdge = mainGraph.getEdge(node1, node2, relType);
                 if (graphEdge != null) {
-                    similarity = graphEdge.getWeight();
-                    if (similarity >= threshold) {
-                        edgeCount++;
+                    threshold = (int) Math.round(graphEdge.getWeight() * 100);
+                    for (int t = 0; t <= threshold; t++) {
+                        edgeCount[t]++;
                     }
                 }
             }
         }
-        return 2 * edgeCount / (n * (n - 1));
+        for (int t = 0; t < densityValues.length; t++) {
+            densityValues[t] = 2.0 * edgeCount[t] / (n * (n - 1));
+        }
     }
 }
 

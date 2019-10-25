@@ -25,7 +25,6 @@ import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.core.util.FeatureComparator;
 import org.bapedis.core.util.MIMatrixBuilder;
 import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import static org.bapedis.core.spi.alg.impl.FilteringSubsetOptimization.DF;
@@ -74,8 +73,8 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         thresholdPercent = 10;
         redundancyOption = REDUNDANCY_SPEARMAN;
         redundancyCutoff = 0.8;
-        selectionOption = SELECT_ALL;
-        topRank = -1;
+        selectionOption = SELECT_TOP;
+        topRank = 40;
         
         stopRun = new AtomicBoolean();
         binsOption1 = FeatureDiscretization.BinsOption.Number_peptides;

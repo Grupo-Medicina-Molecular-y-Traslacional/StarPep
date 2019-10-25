@@ -676,7 +676,8 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         showEdgeButton.setSelected(vizModel.isShowEdges());
 
         //Edge color mode
-        edgeHasNodeColorButton.setSelected(!vizModel.isEdgeHasUniColor());
+        edgeHasNodeColorButton.setSelected(true);
+//        edgeHasNodeColorButton.setSelected(!vizModel.isEdgeHasUniColor());
 
         //Edge color
 //        float[] edgeColorArray = vizModel.getEdgeUniColor();

@@ -3,22 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.impl;
+package org.bapedis.clustering.impl;
 
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.ClusteringTag;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Loge
  */
-public class ModularityFactory implements AlgorithmFactory {
+@ServiceProvider(service = AlgorithmFactory.class, position = 50)
+public class ModularityFactory implements ClusteringTag {
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(ModularityFactory.class, "ModularityFactory.category");
     }
 
     @Override

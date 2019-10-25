@@ -44,6 +44,7 @@ package org.gephi.statistics.plugin;
 import java.util.Arrays;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.GraphVizSetting;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
@@ -53,7 +54,6 @@ import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
-import org.gephi.graph.api.NodeIterable;
 import org.gephi.graph.api.Table;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
@@ -191,7 +191,7 @@ public class WeightedDegree implements Algorithm {
             nodeTable.addColumn(RANKING_BY_WDEGREE, RANKING_BY_WDEGREE_TITLE, Integer.class, -1);
         }
 
-        if (nodeTable.hasColumn(ProjectManager.COMMUNITY_ATTR_ID)) {
+        if (nodeTable.hasColumn(PeptideAttribute.CLUSTER_ATTR.getId())) {
 
             //Set default values
             Double defaultValue = new Double(0);
@@ -214,14 +214,14 @@ public class WeightedDegree implements Algorithm {
                 if (isCanceled) {
                     return;
                 }
-                Integer comunity = (Integer) n.getAttribute(ProjectManager.COMMUNITY_ATTR_ID);
+                Integer comunity = (Integer) n.getAttribute(PeptideAttribute.CLUSTER_ATTR.getId());
                 double totalWeight = 0;
                 double totalInWeight = 0;
                 double totalOutWeight = 0;
                 for (Edge e : graph.getEdges(n)) {
                     oppositeNode = graph.getOpposite(n, e);
-                    if (oppositeNode.getAttribute(ProjectManager.COMMUNITY_ATTR_ID) != null) {
-                        if (comunity.equals(oppositeNode.getAttribute(ProjectManager.COMMUNITY_ATTR_ID))) {
+                    if (oppositeNode.getAttribute(PeptideAttribute.CLUSTER_ATTR.getId()) != null) {
+                        if (comunity.equals(oppositeNode.getAttribute(PeptideAttribute.CLUSTER_ATTR.getId()))) {
                             totalInWeight += e.getWeight();
                         } else {
                             totalOutWeight += e.getWeight();

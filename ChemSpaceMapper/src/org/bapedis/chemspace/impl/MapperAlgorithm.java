@@ -40,7 +40,8 @@ import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.bapedis.chemspace.distance.EuclideanFactory;
-
+import org.bapedis.clustering.impl.ModularityFactory;
+import org.bapedis.clustering.impl.Modularity;
 /**
  *
  * @author loge

@@ -83,9 +83,6 @@ public class ProjectManager implements Lookup.Provider {
 
     public static final String EDGE_TABLE_PRO_DISTANCE = "distance";
     public static final String EDGE_TABLE_PRO_DISTANCE_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.distance.title");
-
-    public static final String COMMUNITY_ATTR_ID = "community";
-    public static final String COMMUNITY_ATTR_TITLE = "Community";
     
     public static final String ROLE_ATTR_ID = "role";
     public static final String ROLE_ATTR_TITLE = "Role";    

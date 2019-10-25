@@ -34,6 +34,7 @@ import static org.bapedis.core.model.PeptideAttribute.CLUSTER_ATTR;
  * @author loge
  */
 public abstract class AbstractClusterizer implements Algorithm, Cloneable {
+    static public final String PRO_CATEGORY = "Properties";
     
     protected final AlgorithmFactory factory;
     protected boolean stopRun;

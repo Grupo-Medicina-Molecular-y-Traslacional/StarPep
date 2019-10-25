@@ -31,9 +31,7 @@ import weka.core.Instances;
  *
  * @author loge
  */
-public abstract class WekaClusterer<T extends Clusterer> extends AbstractClusterizer {
-
-    static protected final String PRO_CATEGORY = "Properties";
+public abstract class WekaClusterer<T extends Clusterer> extends AbstractClusterizer {    
 
     static public final String CLUSTER_DISTANCE = "-A";
     static public final String CLUSTER_DISTANCE_MANHATTAN = "weka.core.ManhattanDistance -R first-last";

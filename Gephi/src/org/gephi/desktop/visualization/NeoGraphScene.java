@@ -25,6 +25,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSlider;
@@ -96,7 +97,9 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
     private final JPopupMenu configurePopup = new JPopupMenu();
     private final JButton configureButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/configure.png", false), configurePopup);
     private final JToggleButton extendButton = new JToggleButton();
-
+    private final JPopupMenu screenshotPopup = new JPopupMenu();
+    private final JButton screenshotButton = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon("org/gephi/desktop/visualization/resources/screenshot.png", false), screenshotPopup);
+    
     //Node
     private final JToggleButton showNodeLabelsButton = new JToggleButton();
     private final JButton nodeFontButton = new JButton();
@@ -342,6 +345,28 @@ public class NeoGraphScene extends JPanel implements MultiViewElement, Workspace
         configurePopup.add(showPeptideLabelsItem);
         topToolbar.add(configureButton);
 
+        //Screenshots        
+//        JMenuItem configureScreenshotItem = new JMenuItem(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.screenshot.configure"));
+//        configureScreenshotItem.setFocusable(false);
+//        configureScreenshotItem.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                VizController.getInstance().getScreenshotMaker().configure();
+//            }
+//        });
+//        screenshotPopup.add(configureScreenshotItem);
+//
+//        screenshotButton.setFocusable(false);
+//        screenshotButton.setToolTipText(NbBundle.getMessage(NeoGraphScene.class, "NeoGraphScene.screenshot.toolTipText"));
+//        screenshotButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                VizController.getInstance().getScreenshotMaker().takeScreenshot();
+//            }
+//        });
+
+//        topToolbar.add(screenshotButton);
+        
         //More/Less button
         topToolbar.addSeparator();
         extendButton.setFocusable(false);

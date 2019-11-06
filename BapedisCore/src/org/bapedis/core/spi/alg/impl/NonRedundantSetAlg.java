@@ -49,7 +49,7 @@ public class NonRedundantSetAlg implements Algorithm, Cloneable {
     public NonRedundantSetAlg(NonRedundantSetAlgFactory factory) {
         this.factory = factory;
         this.clusteringAlg = (SequenceClustering) new SequenceClusteringFactory().createAlgorithm();
-        workspaceInput = false;
+        workspaceInput = true;
     }
 
     public SequenceAlignmentModel getAlignmentModel() {

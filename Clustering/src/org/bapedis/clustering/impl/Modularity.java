@@ -101,14 +101,14 @@ public class Modularity implements Algorithm {
         properties = new LinkedList<>();
         populateProperties();
     }
-    
+
     private void populateProperties() {
         try {
             properties.add(AlgorithmProperty.createProperty(this, Boolean.class, NbBundle.getMessage(KMeans.class, "Modularity.useWeight.name"), AbstractClusterizer.PRO_CATEGORY, NbBundle.getMessage(KMeans.class, "Modularity.useWeight.desc"), "getUseWeight", "setUseWeight"));
         } catch (NoSuchMethodException ex) {
             Exceptions.printStackTrace(ex);
         }
-    }      
+    }
 
     public Peptide[] getPeptides() {
         return peptides;
@@ -160,12 +160,14 @@ public class Modularity implements Algorithm {
                     nodes[i++] = peptide.getGraphNode();
                 }
             }
-        }        
+        }
         isCanceled = false;
         graphModel = pc.getGraphModel(workspace);
         graph = graphModel.getGraphVisible();
         graphViz = pc.getGraphVizSetting(workspace);
         relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+        modularity = 0;
+        modularityResolution = 0;
     }
 
     @Override
@@ -195,13 +197,13 @@ public class Modularity implements Algorithm {
                 graphNode = p.getGraphNode();
                 int n_index = structure.map.get(graphNode);
                 community = comStructure[n_index];
-                p.setAttributeValue(CLUSTER_ATTR, community);                
+                p.setAttributeValue(CLUSTER_ATTR, community);
                 graphNode.setAttribute(CLUSTER_ATTR.getId(), community);
             }
-            
+
             if (fireEvent) {
                 graphViz.fireChangedGraphView();
-            }            
+            }
         }
         attrModel = null;
         peptides = null;
@@ -234,12 +236,15 @@ public class Modularity implements Algorithm {
 
                 if (nodes.length > 0) {//Fixes issue #713 Modularity Calculation Throws Exception On Empty Graph
                     HashMap<String, Double> computedModularityMetrics = computeModularity(structure, comStructure, resolution, isRandomized, useWeight);
-                    modularity = computedModularityMetrics.get("modularity");
-                    modularityResolution = computedModularityMetrics.get("modularityResolution");
-                } else {
-                    modularity = 0;
-                    modularityResolution = 0;
-                }
+                    if (computedModularityMetrics.containsKey("modularity")) {
+                        modularity = computedModularityMetrics.get("modularity");
+                    }
+
+                    if (computedModularityMetrics.containsKey("modularityResolution")) {
+                        modularityResolution = computedModularityMetrics.get("modularityResolution");
+                    }
+                } 
+                pc.reportMsg(String.format("Modularity: %.2f", modularity), workspace);
             } finally {
                 graph.readUnlock();
             }

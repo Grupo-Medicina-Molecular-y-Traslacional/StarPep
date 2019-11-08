@@ -161,6 +161,9 @@ public class Modularity implements Algorithm {
                 }
             }
         }
+        if(attrModel != null){
+            attrModel.removeDisplayedColumn(CLUSTER_ATTR);
+        }        
         isCanceled = false;
         graphModel = pc.getGraphModel(workspace);
         graph = graphModel.getGraphVisible();

@@ -6,7 +6,6 @@
 package org.gephi.statistics.plugin;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Stack;

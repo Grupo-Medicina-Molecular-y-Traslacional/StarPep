@@ -87,7 +87,6 @@ public abstract class AbstractClusterizer implements Algorithm, Cloneable {
         if (peptides == null) {
             if (attrModel != null) {
                 peptides = attrModel.getPeptides().toArray(new Peptide[0]);
-                attrModel.removeDisplayedColumn(CLUSTER_ATTR);
                 //Load features
                 List<MolecularDescriptor> allFeatures = new LinkedList<>();
                 for (String key : attrModel.getMolecularDescriptorKeys()) {
@@ -107,6 +106,9 @@ public abstract class AbstractClusterizer implements Algorithm, Cloneable {
                     }
                 }
             }
+        }
+        if(!stopRun && attrModel != null){
+            attrModel.removeDisplayedColumn(CLUSTER_ATTR);
         }
     }
 

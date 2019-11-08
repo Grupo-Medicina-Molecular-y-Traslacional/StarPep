@@ -17,21 +17,21 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Loge
  */
 @ServiceProvider(service=AlgorithmFactory.class)
-public class WeightedDegreeFactory implements NetworkTag {
+public class IntrinsicStrengthFactory implements NetworkTag {
 
     @Override
     public String getCategory() {
-        return NbBundle.getMessage(HarmonicCentralityFactory.class, "WeightedDegree.category");
+        return NbBundle.getMessage(HarmonicCentralityFactory.class, "IntrinsicStrength.category");
     }
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(WeightedDegree.class, "WeightedDegree.name");
+        return NbBundle.getMessage(IntrinsicStrength.class, "IntrinsicStrength.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(WeightedDegree.class, "WeightedDegree.desc");
+        return NbBundle.getMessage(IntrinsicStrength.class, "IntrinsicStrength.desc");
     }
 
     @Override
@@ -41,7 +41,7 @@ public class WeightedDegreeFactory implements NetworkTag {
 
     @Override
     public Algorithm createAlgorithm() {
-        return new WeightedDegree(this);
+        return new IntrinsicStrength(this);
     }
     
 }

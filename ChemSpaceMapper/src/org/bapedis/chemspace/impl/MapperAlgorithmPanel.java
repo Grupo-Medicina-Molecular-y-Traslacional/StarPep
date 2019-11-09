@@ -50,7 +50,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
     protected final JXHyperlink openWizardLink, scatter3DLink;
     protected MapperAlgorithm csMapper;
-    protected NetworkEmbedderAlg netEmbedder;
+    protected NetworkConstructionAlg netEmbedder;
     private final DecimalFormat formatter;
     protected final JXBusyLabel busyLabel;
     protected final DefaultComboBoxModel<String> modelX, modelY;

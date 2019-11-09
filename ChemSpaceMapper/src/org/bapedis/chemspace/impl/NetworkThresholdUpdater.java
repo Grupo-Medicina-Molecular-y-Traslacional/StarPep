@@ -31,10 +31,10 @@ public class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
     static final String CHANGED_THRESHOLD = "changed_threshold";
     private final AtomicBoolean stopRun;
     private final ProgressTicket ticket;
-    protected NetworkEmbedderAlg netEmbedder;
+    protected NetworkConstructionAlg netEmbedder;
     private final double newThreshold;
 
-    public NetworkThresholdUpdater(double newThreshold, NetworkEmbedderAlg netEmbedder) {
+    public NetworkThresholdUpdater(double newThreshold, NetworkConstructionAlg netEmbedder) {
         this.newThreshold = newThreshold;
         this.netEmbedder = netEmbedder;
         stopRun = new AtomicBoolean(false);

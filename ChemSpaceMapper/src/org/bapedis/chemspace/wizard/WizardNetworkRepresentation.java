@@ -7,11 +7,11 @@ package org.bapedis.chemspace.wizard;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
-import org.bapedis.chemspace.impl.NetworkEmbedderAlg;
-import org.bapedis.chemspace.model.NetworkType;
+import org.bapedis.chemspace.impl.NetworkConstructionAlg;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
@@ -20,7 +20,7 @@ import org.openide.util.NbBundle;
 public class WizardNetworkRepresentation implements WizardDescriptor.FinishablePanel<WizardDescriptor>, PropertyChangeListener {
 
     private final MapperAlgorithm csMapper;
-    private NetworkEmbedderAlg alg;
+    private NetworkConstructionAlg alg;
     private final EventListenerList listeners;
     private WizardDescriptor model;
 
@@ -43,10 +43,10 @@ public class WizardNetworkRepresentation implements WizardDescriptor.FinishableP
     public VisualNetworkRepresentation getComponent() {
         if (component == null) {
             try {
-                alg = (NetworkEmbedderAlg) csMapper.getNetworkEmbedderAlg().clone();
-                component = new VisualNetworkRepresentation();
+                alg = (NetworkConstructionAlg) csMapper.getNetworkEmbedderAlg().clone();
+                JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg); 
+                component = new VisualNetworkRepresentation(settingPanel);
                 component.addPropertyChangeListener(this);
-                component.setDiversityRadio(alg.getDiversityRadio());
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
             }
@@ -88,20 +88,20 @@ public class WizardNetworkRepresentation implements WizardDescriptor.FinishableP
 
         this.model = wiz;
         //Setting for Network embedder
-        NetworkType netType = (NetworkType) wiz.getProperty(NetworkType.class.getName());
-        if (netType == null) {
-            netType = alg.getNetworkType();
-        }
-        getComponent().setNetworkType(netType);
+//        NetworkType netType = (NetworkType) wiz.getProperty(NetworkType.class.getName());
+//        if (netType == null) {
+//            netType = alg.getNetworkType();
+//        }
+//        getComponent().setNetworkType(netType);
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state                
-        NetworkType netType = component.getNetworkType();
-        wiz.putProperty(NetworkType.class.getName(), netType);
-        
-        wiz.putProperty(NetworkType.SCAFFOLD.name(), component.getDiveristyRadio());
+//        NetworkType netType = component.getNetworkType();
+//        wiz.putProperty(NetworkType.class.getName(), netType);
+//        
+//        wiz.putProperty(NetworkType.SCAFFOLD.name(), component.getDiveristyRadio());
     }
 
     @Override
@@ -112,12 +112,12 @@ public class WizardNetworkRepresentation implements WizardDescriptor.FinishableP
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(VisualNetworkRepresentation.CHANGED_NET_TYPE)) {
-            NetworkType netType = component.getNetworkType();
-            if (netType == NetworkType.FULL) {
-                model.getNotificationLineSupport().setWarningMessage(NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.FNWaring.text"));
-            } else{
-                model.getNotificationLineSupport().setWarningMessage(null);                
-            }
+//            NetworkType netType = component.getNetworkType();
+//            if (netType == NetworkType.FULL) {
+//                model.getNotificationLineSupport().setWarningMessage(NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.FNWaring.text"));
+//            } else{
+//                model.getNotificationLineSupport().setWarningMessage(null);                
+//            }
         }
     }
 

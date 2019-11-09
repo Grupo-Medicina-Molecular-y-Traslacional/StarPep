@@ -10,7 +10,6 @@ import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.FeatureSelectionOption;
 import org.bapedis.chemspace.model.InputSequenceOption;
-import org.bapedis.chemspace.model.NetworkType;
 import org.bapedis.chemspace.model.RemovingRedundantOption;
 import org.bapedis.chemspace.model.SimilaritySearchingOption;
 import org.bapedis.chemspace.searching.ChemBaseSimilaritySearchAlg;
@@ -118,14 +117,14 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
         }                
         
         //Network type
-        NetworkType networkType = (NetworkType) wiz.getProperty(NetworkType.class.getName());
-        if (networkType != null){
-            csMapper.getNetworkEmbedderAlg().setNetworkType(networkType);
-            if (networkType == NetworkType.SCAFFOLD){
-                double diversityRadio = (double)wiz.getProperty(NetworkType.SCAFFOLD.name());
-                csMapper.getNetworkEmbedderAlg().setDiversityRadio(diversityRadio);
-            }
-        }        
+//        NetworkType networkType = (NetworkType) wiz.getProperty(NetworkType.class.getName());
+//        if (networkType != null){
+//            csMapper.getNetworkEmbedderAlg().setNetworkType(networkType);
+//            if (networkType == NetworkType.SCAFFOLD){
+//                double diversityRadio = (double)wiz.getProperty(NetworkType.SCAFFOLD.name());
+//                csMapper.getNetworkEmbedderAlg().setDiversityRadio(diversityRadio);
+//            }
+//        }        
     }
 
     public static WizardDescriptor createWizardDescriptor(MapperAlgorithm csMapper) {

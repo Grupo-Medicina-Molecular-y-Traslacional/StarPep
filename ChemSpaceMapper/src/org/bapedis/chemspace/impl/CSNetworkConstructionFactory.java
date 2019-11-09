@@ -9,13 +9,14 @@ import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
- * @author loge
+ * @author Loge
  */
-public class NetworkEmbedderFactory implements AlgorithmFactory {
-
+@ServiceProvider(service = AlgorithmFactory.class, position = 100)
+public class CSNetworkConstructionFactory implements NetworkConstructionTag {
     @Override
     public String getCategory() {
         return null;
@@ -23,12 +24,12 @@ public class NetworkEmbedderFactory implements AlgorithmFactory {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(NetworkEmbedderFactory.class, "NetworkEmbedder.name");
+        return NbBundle.getMessage(CSNetworkConstructionFactory.class, "CSNetworkConstruction.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(NetworkEmbedderFactory.class, "NetworkEmbedder.desc");
+        return NbBundle.getMessage(CSNetworkConstructionFactory.class, "CSNetworkConstruction.desc");
     }
 
     @Override
@@ -38,7 +39,6 @@ public class NetworkEmbedderFactory implements AlgorithmFactory {
 
     @Override
     public Algorithm createAlgorithm() {
-        return new NetworkEmbedderAlg(this);
-    }
-    
+        return new CSNetworkConstruction(this);
+    }    
 }

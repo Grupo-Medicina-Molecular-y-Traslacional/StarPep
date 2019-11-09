@@ -6,7 +6,6 @@
 package org.bapedis.chemspace.impl;
 
 import java.text.DecimalFormat;
-import java.util.Arrays;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.vecmath.Vector3f;
@@ -14,7 +13,6 @@ import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.model.CoordinateSpace;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
@@ -31,17 +29,13 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.openide.DialogDisplayer;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
-import org.bapedis.chemspace.model.NetworkType;
-import org.bapedis.chemspace.model.DistanceMatrix;
 
 /**
  *
  * @author loge
  */
-public class NetworkEmbedderAlg implements Algorithm, Cloneable {
+public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
@@ -56,34 +50,22 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
     protected Graph graph, mainGraph;
     protected int relType;
     protected ProgressTicket ticket;
-    private final AtomicBoolean stopRun;
-    private CoordinateSpace xyzSpace;
-    private AbstractDistance distFunc;
-    private double currentThreshold;
-    private ChartPanel densityChart;
-    private NetworkType networkType;
-    private final double[] densityValues;
-    private double diversityRadio;
+    protected final AtomicBoolean stopRun;
+    protected CoordinateSpace xyzSpace;
+    protected AbstractDistance distFunc;
+    protected double currentThreshold;
+    protected ChartPanel densityChart;
+    protected final double[] densityValues;
 
-    public NetworkEmbedderAlg(AlgorithmFactory factory) {
+    public NetworkConstructionAlg(AlgorithmFactory factory) {
         this.factory = factory;
         currentThreshold = 0.0;
         stopRun = new AtomicBoolean(false);
-        networkType = NetworkType.HSP;
         densityValues = new double[101];
-        diversityRadio = 0.8;
     }
 
     public double[] getDensityValues() {
         return densityValues;
-    }
-
-    public NetworkType getNetworkType() {
-        return networkType;
-    }
-
-    public void setNetworkType(NetworkType networkType) {
-        this.networkType = networkType;
     }
 
     public AbstractDistance getDistanceFunction() {
@@ -109,14 +91,6 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
     public void setSimilarityThreshold(double threshold) {
         this.currentThreshold = threshold;
     }
-
-    public double getDiversityRadio() {
-        return diversityRadio;
-    }
-
-    public void setDiversityRadio(double diversityRadio) {
-        this.diversityRadio = diversityRadio;
-    }        
 
     public ChartPanel getDensityChart() {
         return densityChart;
@@ -184,21 +158,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
                 mainGraph.writeUnlock();
             }
 
-            double maxDistance;
-            switch (networkType) {
-                case FULL:
-                    maxDistance = createFullNetwork();
-                    break;
-                case HSP:
-                    maxDistance = createHSPNetwork();
-                    break;
-                case SCAFFOLD:
-                    maxDistance = 0;
-                    pc.reportMsg("Diversity radio: " + String.format("%.2f", diversityRadio), workspace);
-                    break;
-                default:
-                    throw new IllegalStateException("Unknown network type: " + networkType);
-            }
+            double maxDistance = createNetwork();
 
             // Report max distance
             if (!stopRun.get()) {
@@ -228,20 +188,16 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
             pc.reportMsg(xAxis.toString(), workspace);
             pc.reportMsg(yAxis.toString(), workspace);
 
-            if (networkType == NetworkType.FULL) {
-                //Estimate current threshold
-                int t = 0;
-                do {
-                    t++;
-                } while (t <= 100 && densityValues[t] > 0.1);
+            //Estimate current threshold
+            int t = 0;
+            do {
+                t++;
+            } while (t <= 100 && densityValues[t] > 0.1);
 
-                if (t < 100) {
-                    currentThreshold = t / 100.0;
-                } else {
-                    currentThreshold = 0.7;
-                }
+            if (t < 100) {
+                currentThreshold = t / 100.0;
             } else {
-                currentThreshold = 0;
+                currentThreshold = 0.7;
             }
 
             // Update similarity edges
@@ -255,71 +211,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
         }
     }
 
-    private double createFullNetwork() {
-        // Setup Similarity Matrix Builder
-        DistanceMatrixBuilder task = new DistanceMatrixBuilder(peptides);
-        task.setContext(distFunc, ticket, stopRun);
-        int workunits = task.getWorkUnits();
-        ticket.switchToDeterminate(workunits + peptides.length - 1);
-
-        // Compute new distance matrix        
-        fjPool.invoke(task);
-        task.join();
-        DistanceMatrix distanceMatrix = task.getDistanceMatrix();
-
-        //Create full network
-        Node node1, node2;
-        Edge graphEdge;
-        double maxDistance = 0;
-        double distance;
-        for (int i = 0; i < peptides.length - 1 && !stopRun.get(); i++) {
-            node1 = peptides[i].getGraphNode();
-            for (int j = i + 1; j < peptides.length && !stopRun.get(); j++) {
-                distance = distanceMatrix.getValue(peptides[i], peptides[j]);
-                node2 = peptides[j].getGraphNode();
-                mainGraph.writeLock();
-                try {
-                    graphEdge = mainGraph.getEdge(node1, node2, relType);
-                    if (graphEdge == null) {
-                        graphEdge = createEdge(node1, node2);
-                        mainGraph.addEdge(graphEdge);
-                        graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE, distance);
-                    }
-                } finally {
-                    mainGraph.writeUnlock();
-                }
-                if (distance > maxDistance) {
-                    maxDistance = distance;
-                }
-            }
-            ticket.progress();
-        }
-        return maxDistance;
-    }
-
-    private double createHSPNetwork() {
-        // task size
-        ticket.switchToDeterminate(peptides.length);
-
-        // Create new edges...
-        if (peptides != null && !stopRun.get()) {
-            return Arrays.stream(peptides).parallel().mapToDouble(peptide -> {
-                double maxDistance = 0;
-                if (!stopRun.get()) {
-                    try {
-                        maxDistance = computeHSPNeighbors(peptide);
-                        ticket.progress();
-                    } catch (MolecularDescriptorNotFoundException ex) {
-                        DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
-                        Exceptions.printStackTrace(ex);
-                        cancel();
-                    }
-                }
-                return maxDistance;
-            }).max().getAsDouble();
-        }
-        return 0;
-    }
+    protected abstract double createNetwork();
 
     private void updateNodePositions() {
         Vector3f[] positions = xyzSpace.getPositions();
@@ -365,7 +257,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
         }
     }
 
-    private void computeSimilarityRelationships(double maxDistance) {
+    protected void computeSimilarityRelationships(double maxDistance) {
         double distance, similarity;
         Node node1, node2;
         Edge graphEdge;
@@ -384,78 +276,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
         }
     }
 
-    private double computeHSPNeighbors(Peptide peptide) throws MolecularDescriptorNotFoundException {
-        Node node1, node2, node3;
-        Edge graphEdge;
-        Peptide closestPeptide;
-        double distance, maxDistance = 0;
-        int cursor;
-
-        if (!stopRun.get()) {
-            CandidatePeptide[] candidates = new CandidatePeptide[peptides.length - 1];
-            node1 = peptide.getGraphNode();
-            cursor = 0;
-            for (int j = 0; j < peptides.length; j++) {
-                if (peptide != peptides[j]) {
-                    node2 = peptides[j].getGraphNode();
-                    graphEdge = mainGraph.getEdge(node1, node2, relType);
-                    if (graphEdge != null) {
-                        distance = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE);
-                    } else {
-                        distFunc.setPeptides(peptide, peptides[j]);
-                        distFunc.run();
-                        distance = distFunc.getDistance();
-                    }
-                    candidates[cursor++] = new CandidatePeptide(peptides[j], distance);
-                }
-            }
-
-            Arrays.parallelSort(candidates);
-            maxDistance = candidates[candidates.length - 1].getDistance();
-            cursor = 0;
-            while (cursor < candidates.length) {
-                if (candidates[cursor] != null) {
-                    //Create an edge to the closest peptide
-                    closestPeptide = candidates[cursor].getPeptide();
-                    node2 = closestPeptide.getGraphNode();
-                    distance = candidates[cursor].getDistance();
-                    mainGraph.writeLock();
-                    try {
-                        graphEdge = mainGraph.getEdge(node1, node2, relType);
-                        if (graphEdge == null) {
-                            graphEdge = createEdge(node1, node2);
-                            mainGraph.addEdge(graphEdge);
-                            graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE, distance);
-                        }
-                    } finally {
-                        mainGraph.writeUnlock();
-                    }
-
-                    // ignore elements in the forbidden area
-                    for (int k = cursor + 1; k < candidates.length; k++) {
-                        if (candidates[k] != null) {
-                            node3 = candidates[k].getPeptide().getGraphNode();
-                            graphEdge = mainGraph.getEdge(node2, node3, relType);
-                            if (graphEdge != null) {
-                                distance = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE);
-                            } else {
-                                distFunc.setPeptides(closestPeptide, candidates[k].getPeptide());
-                                distFunc.run();
-                                distance = distFunc.getDistance();
-                            }
-                            if (distance < candidates[k].getDistance()) {
-                                candidates[k] = null;
-                            }
-                        }
-                    }
-                }
-                cursor++;
-            }
-        }
-        return maxDistance;
-    }
-
-    private Edge createEdge(Node node1, Node node2) {
+    protected Edge createEdge(Node node1, Node node2) {
         // Create an edge between two nodes
         String id = String.format("%s-%s", node1.getId(), node2.getId());
         Edge graphEdge = graphModel.factory().newEdge(id, node1, node2, relType, ProjectManager.GRAPH_EDGE_WEIGHT, false);
@@ -470,7 +291,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
         return graphEdge;
     }
 
-    private JFreeChart createXYLineChart(String chartTitle, XYSeriesCollection dataset) {
+    protected JFreeChart createXYLineChart(String chartTitle, XYSeriesCollection dataset) {
 
         JFreeChart chart = ChartFactory.createXYLineChart(
                 chartTitle, // chart title

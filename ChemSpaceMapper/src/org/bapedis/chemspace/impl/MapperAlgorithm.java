@@ -71,7 +71,7 @@ public class MapperAlgorithm implements Algorithm {
     private FilteringSubsetOptimization featureSelectionAlg;
     private AbstractDistance distFunction;
     private final WekaPCATransformer pcaTransformer;
-    private final NetworkEmbedderAlg networkAlg;
+    private final NetworkConstructionAlg networkAlg;
     private final Modularity modularityOptimization;
 
     //Algorithm workflow
@@ -95,7 +95,7 @@ public class MapperAlgorithm implements Algorithm {
         featureExtractionAlg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
         featureSelectionAlg = (FilteringSubsetOptimization) new FilteringSubsetOptimizationFactory().createAlgorithm();
         pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
-        networkAlg = (NetworkEmbedderAlg) new NetworkEmbedderFactory().createAlgorithm();
+        networkAlg = (NetworkConstructionAlg) new HSPNetworkConstructionFactory().createAlgorithm();
         modularityOptimization = (Modularity) new ModularityFactory().createAlgorithm();
         distFunction = (AbstractDistance) new EuclideanFactory().createAlgorithm();        
     }
@@ -373,7 +373,7 @@ public class MapperAlgorithm implements Algorithm {
         return pcaTransformer;
     }
 
-    public NetworkEmbedderAlg getNetworkEmbedderAlg() {
+    public NetworkConstructionAlg getNetworkEmbedderAlg() {
         return networkAlg;
     }
 

@@ -22,7 +22,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import org.bapedis.chemspace.component.SpaceArffWritable;
@@ -626,7 +625,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private void cutoffSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_cutoffSliderStateChanged
         int t = cutoffSlider.getValue();
         double threshold = t / 100.0;
-        if (threshold != Float.parseFloat(jCutoffCurrentValue.getText())) {
+        if (threshold != Double.parseDouble(jCutoffCurrentValue.getText())) {
             jCutoffNewLabel.setVisible(true);
             jCutoffNewValue.setVisible(true);
             jCutoffNewValue.setText(formatter.format(threshold));

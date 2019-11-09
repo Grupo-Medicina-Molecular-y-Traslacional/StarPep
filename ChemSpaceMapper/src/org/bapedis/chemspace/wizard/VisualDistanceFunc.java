@@ -14,7 +14,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.openide.util.ImageUtilities;

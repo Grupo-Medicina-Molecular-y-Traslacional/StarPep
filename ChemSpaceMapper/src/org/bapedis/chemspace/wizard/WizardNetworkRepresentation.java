@@ -46,6 +46,7 @@ public class WizardNetworkRepresentation implements WizardDescriptor.FinishableP
                 alg = (NetworkEmbedderAlg) csMapper.getNetworkEmbedderAlg().clone();
                 component = new VisualNetworkRepresentation();
                 component.addPropertyChangeListener(this);
+                component.setDiversityRadio(alg.getDiversityRadio());
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
             }
@@ -99,6 +100,8 @@ public class WizardNetworkRepresentation implements WizardDescriptor.FinishableP
         // use wiz.putProperty to remember current panel state                
         NetworkType netType = component.getNetworkType();
         wiz.putProperty(NetworkType.class.getName(), netType);
+        
+        wiz.putProperty(NetworkType.SCAFFOLD.name(), component.getDiveristyRadio());
     }
 
     @Override
@@ -110,10 +113,10 @@ public class WizardNetworkRepresentation implements WizardDescriptor.FinishableP
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(VisualNetworkRepresentation.CHANGED_NET_TYPE)) {
             NetworkType netType = component.getNetworkType();
-            if (netType == NetworkType.HSP) {
-                model.getNotificationLineSupport().setWarningMessage(null);
-            } else{
+            if (netType == NetworkType.FULL) {
                 model.getNotificationLineSupport().setWarningMessage(NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.FNWaring.text"));
+            } else{
+                model.getNotificationLineSupport().setWarningMessage(null);                
             }
         }
     }

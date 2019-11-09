@@ -63,6 +63,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
     private ChartPanel densityChart;
     private NetworkType networkType;
     private final double[] densityValues;
+    private double diversityRadio;
 
     public NetworkEmbedderAlg(AlgorithmFactory factory) {
         this.factory = factory;
@@ -70,6 +71,7 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
         stopRun = new AtomicBoolean(false);
         networkType = NetworkType.HSP;
         densityValues = new double[101];
+        diversityRadio = 0.8;
     }
 
     public double[] getDensityValues() {
@@ -107,6 +109,14 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
     public void setSimilarityThreshold(double threshold) {
         this.currentThreshold = threshold;
     }
+
+    public double getDiversityRadio() {
+        return diversityRadio;
+    }
+
+    public void setDiversityRadio(double diversityRadio) {
+        this.diversityRadio = diversityRadio;
+    }        
 
     public ChartPanel getDensityChart() {
         return densityChart;
@@ -181,6 +191,10 @@ public class NetworkEmbedderAlg implements Algorithm, Cloneable {
                     break;
                 case HSP:
                     maxDistance = createHSPNetwork();
+                    break;
+                case SCAFFOLD:
+                    maxDistance = 0;
+                    pc.reportMsg("Diversity radio: " + String.format("%.2f", diversityRadio), workspace);
                     break;
                 default:
                     throw new IllegalStateException("Unknown network type: " + networkType);

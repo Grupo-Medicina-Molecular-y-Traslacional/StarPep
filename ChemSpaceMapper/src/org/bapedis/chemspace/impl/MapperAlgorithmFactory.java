@@ -121,6 +121,10 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
         NetworkType networkType = (NetworkType) wiz.getProperty(NetworkType.class.getName());
         if (networkType != null){
             csMapper.getNetworkEmbedderAlg().setNetworkType(networkType);
+            if (networkType == NetworkType.SCAFFOLD){
+                double diversityRadio = (double)wiz.getProperty(NetworkType.SCAFFOLD.name());
+                csMapper.getNetworkEmbedderAlg().setDiversityRadio(diversityRadio);
+            }
         }        
     }
 

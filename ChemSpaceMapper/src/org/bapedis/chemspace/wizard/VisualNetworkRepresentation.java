@@ -5,6 +5,8 @@
  */
 package org.bapedis.chemspace.wizard;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import org.bapedis.chemspace.model.NetworkType;
 import org.openide.util.NbBundle;
 
@@ -18,12 +20,16 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
      * Creates new form VisualNetworkRepresentation
      */
     static final String CHANGED_NET_TYPE = "network_type";
-
+    private final DecimalFormat formatter;
     private NetworkType networkType;
 
     public VisualNetworkRepresentation() {
         initComponents();
         networkType = null;
+
+        DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
+        symbols.setDecimalSeparator('.');
+        formatter = new DecimalFormat("0.00#", symbols);
     }
 
     public NetworkType getNetworkType() {
@@ -44,8 +50,23 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
                     jOptionHSP.setSelected(true);
                 }
                 break;
+            case SCAFFOLD:
+                if (!jOptionScaffold.isSelected()) {
+                    jOptionScaffold.setSelected(true);                    
+                }
+                break;
         }
         firePropertyChange(CHANGED_NET_TYPE, oldOption, networkType);
+    }
+
+    void setDiversityRadio(double diversityRadio) {
+        int r = (int) Math.round(diversityRadio * 100);
+        cutoffSlider.setValue(r);
+
+    }
+    
+    double getDiveristyRadio(){
+        return Double.parseDouble(jDiversitytValue.getText());
     }
 
     @Override
@@ -67,9 +88,15 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         jQuestionLabel = new javax.swing.JLabel();
         jOptionHSP = new javax.swing.JRadioButton();
         jOptionFull = new javax.swing.JRadioButton();
-        infoLabel1 = new javax.swing.JLabel();
-        infoLabel2 = new javax.swing.JLabel();
+        jOptionScaffold = new javax.swing.JRadioButton();
         extLabel = new javax.swing.JLabel();
+        scaffoldPanel = new javax.swing.JPanel();
+        diversityLabel = new javax.swing.JLabel();
+        jDiversitytValue = new javax.swing.JLabel();
+        jCutoffToolBar = new javax.swing.JToolBar();
+        jLessCutoffButton = new javax.swing.JButton();
+        cutoffSlider = new javax.swing.JSlider();
+        jMoreCutoffButton = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
         setPreferredSize(new java.awt.Dimension(560, 580));
@@ -79,7 +106,6 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
@@ -87,6 +113,11 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
 
         buttonGroup1.add(jOptionHSP);
         org.openide.awt.Mnemonics.setLocalizedText(jOptionHSP, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.jOptionHSP.text")); // NOI18N
+        jOptionHSP.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jOptionHSPItemStateChanged(evt);
+            }
+        });
         jOptionHSP.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOptionHSPActionPerformed(evt);
@@ -94,13 +125,19 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(jOptionHSP, gridBagConstraints);
 
         buttonGroup1.add(jOptionFull);
         org.openide.awt.Mnemonics.setLocalizedText(jOptionFull, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.jOptionFull.text")); // NOI18N
+        jOptionFull.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jOptionFullItemStateChanged(evt);
+            }
+        });
         jOptionFull.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOptionFullActionPerformed(evt);
@@ -108,46 +145,121 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(jOptionFull, gridBagConstraints);
 
-        infoLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
-        infoLabel1.setToolTipText(org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.jOptionHSP.info")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(infoLabel1, gridBagConstraints);
-
-        infoLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(infoLabel2, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.infoLabel2.text")); // NOI18N
-        infoLabel2.setToolTipText(org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.jOptionFull.info")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(infoLabel2, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(extLabel, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.extLabel.text")); // NOI18N
+        buttonGroup1.add(jOptionScaffold);
+        org.openide.awt.Mnemonics.setLocalizedText(jOptionScaffold, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.jOptionScaffold.text")); // NOI18N
+        jOptionScaffold.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jOptionScaffoldItemStateChanged(evt);
+            }
+        });
+        jOptionScaffold.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOptionScaffoldActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        add(jOptionScaffold, gridBagConstraints);
+
+        extLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(extLabel, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.extLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(extLabel, gridBagConstraints);
+
+        scaffoldPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.scaffoldPanel.border.title"))); // NOI18N
+        scaffoldPanel.setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(diversityLabel, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.diversityLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        scaffoldPanel.add(diversityLabel, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jDiversitytValue, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.jDiversitytValue.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        scaffoldPanel.add(jDiversitytValue, gridBagConstraints);
+
+        jCutoffToolBar.setFloatable(false);
+        jCutoffToolBar.setRollover(true);
+        jCutoffToolBar.setPreferredSize(new java.awt.Dimension(420, 90));
+
+        jLessCutoffButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/less.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLessCutoffButton, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.jLessCutoffButton.text")); // NOI18N
+        jLessCutoffButton.setFocusable(false);
+        jLessCutoffButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jLessCutoffButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jLessCutoffButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jLessCutoffButtonActionPerformed(evt);
+            }
+        });
+        jCutoffToolBar.add(jLessCutoffButton);
+
+        cutoffSlider.setMajorTickSpacing(10);
+        cutoffSlider.setMinorTickSpacing(5);
+        cutoffSlider.setPaintLabels(true);
+        cutoffSlider.setPaintTicks(true);
+        cutoffSlider.setToolTipText(org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.cutoffSlider.toolTipText")); // NOI18N
+        cutoffSlider.setValue(70);
+        cutoffSlider.setMinimumSize(new java.awt.Dimension(360, 80));
+        cutoffSlider.setPreferredSize(new java.awt.Dimension(360, 80));
+        cutoffSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                cutoffSliderStateChanged(evt);
+            }
+        });
+        jCutoffToolBar.add(cutoffSlider);
+
+        jMoreCutoffButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/more.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jMoreCutoffButton, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.jMoreCutoffButton.text")); // NOI18N
+        jMoreCutoffButton.setFocusable(false);
+        jMoreCutoffButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jMoreCutoffButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jMoreCutoffButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMoreCutoffButtonActionPerformed(evt);
+            }
+        });
+        jCutoffToolBar.add(jMoreCutoffButton);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        scaffoldPanel.add(jCutoffToolBar, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 25, 5, 5);
+        add(scaffoldPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jOptionHSPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOptionHSPActionPerformed
@@ -158,14 +270,69 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         setNetworkType(NetworkType.FULL);
     }//GEN-LAST:event_jOptionFullActionPerformed
 
+    private void jOptionScaffoldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOptionScaffoldActionPerformed
+        setNetworkType(NetworkType.SCAFFOLD);
+    }//GEN-LAST:event_jOptionScaffoldActionPerformed
+
+    private void jOptionFullItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jOptionFullItemStateChanged
+        if (jOptionFull.isSelected()) {
+            extLabel.setText(NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.jOptionFull.info"));
+        }
+    }//GEN-LAST:event_jOptionFullItemStateChanged
+
+    private void jOptionHSPItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jOptionHSPItemStateChanged
+        if (jOptionHSP.isSelected()) {
+            extLabel.setText(NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.jOptionHSP.info"));
+        }
+    }//GEN-LAST:event_jOptionHSPItemStateChanged
+
+    private void jOptionScaffoldItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jOptionScaffoldItemStateChanged
+        boolean flag = jOptionScaffold.isSelected();
+        if (flag) {
+            extLabel.setText(NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.jOptionScaffold.info"));
+        }
+        scaffoldPanel.setEnabled(flag);
+        diversityLabel.setEnabled(flag);
+        jCutoffToolBar.setEnabled(flag);
+        jLessCutoffButton.setEnabled(flag);
+        cutoffSlider.setEnabled(flag);
+        jMoreCutoffButton.setEnabled(flag);
+    }//GEN-LAST:event_jOptionScaffoldItemStateChanged
+
+    private void jLessCutoffButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLessCutoffButtonActionPerformed
+        int cutoff = cutoffSlider.getValue();
+        if (cutoff > cutoffSlider.getMinimum()) {
+            cutoffSlider.setValue(cutoff - 1);
+        }
+    }//GEN-LAST:event_jLessCutoffButtonActionPerformed
+
+    private void cutoffSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_cutoffSliderStateChanged
+        int t = cutoffSlider.getValue();
+        double threshold = t / 100.0;
+        jDiversitytValue.setText(formatter.format(threshold));
+    }//GEN-LAST:event_cutoffSliderStateChanged
+
+    private void jMoreCutoffButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMoreCutoffButtonActionPerformed
+        int cutoff = cutoffSlider.getValue();
+        if (cutoff < cutoffSlider.getMaximum()) {
+            cutoffSlider.setValue(cutoff + 1);
+        }
+    }//GEN-LAST:event_jMoreCutoffButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JSlider cutoffSlider;
+    private javax.swing.JLabel diversityLabel;
     private javax.swing.JLabel extLabel;
-    private javax.swing.JLabel infoLabel1;
-    private javax.swing.JLabel infoLabel2;
+    private javax.swing.JToolBar jCutoffToolBar;
+    private javax.swing.JLabel jDiversitytValue;
+    private javax.swing.JButton jLessCutoffButton;
+    private javax.swing.JButton jMoreCutoffButton;
     private javax.swing.JRadioButton jOptionFull;
     private javax.swing.JRadioButton jOptionHSP;
+    private javax.swing.JRadioButton jOptionScaffold;
     private javax.swing.JLabel jQuestionLabel;
+    private javax.swing.JPanel scaffoldPanel;
     // End of variables declaration//GEN-END:variables
 }

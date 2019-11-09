@@ -15,7 +15,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
-import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.openide.WizardDescriptor;

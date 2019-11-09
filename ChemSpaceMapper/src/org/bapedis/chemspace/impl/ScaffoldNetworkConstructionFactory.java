@@ -34,7 +34,7 @@ public class ScaffoldNetworkConstructionFactory implements NetworkConstructionTa
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        return  null;
+        return  new ScaffoldNetworkConstructionSetupUI();
     }
 
     @Override

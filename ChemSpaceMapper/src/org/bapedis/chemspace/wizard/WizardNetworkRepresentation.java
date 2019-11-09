@@ -12,6 +12,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.impl.NetworkConstructionAlg;
+import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
@@ -44,7 +45,11 @@ public class WizardNetworkRepresentation implements WizardDescriptor.FinishableP
         if (component == null) {
             try {
                 alg = (NetworkConstructionAlg) csMapper.getNetworkEmbedderAlg().clone();
-                JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg); 
+                JPanel settingPanel = null;
+                AlgorithmSetupUI setupUI = alg.getFactory().getSetupUI();
+                if (setupUI != null) {
+                    settingPanel = setupUI.getSettingPanel(alg);
+                }
                 component = new VisualNetworkRepresentation(settingPanel);
                 component.addPropertyChangeListener(this);
             } catch (CloneNotSupportedException ex) {

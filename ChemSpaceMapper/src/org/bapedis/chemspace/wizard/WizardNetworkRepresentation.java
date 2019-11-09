@@ -7,27 +7,45 @@ package org.bapedis.chemspace.wizard;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.JPanel;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
+import org.bapedis.chemspace.impl.CSNetworkConstruction;
 import org.bapedis.chemspace.impl.MapperAlgorithm;
 import org.bapedis.chemspace.impl.NetworkConstructionAlg;
-import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.bapedis.chemspace.impl.NetworkConstructionTag;
+import org.bapedis.core.project.ProjectManager;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 public class WizardNetworkRepresentation implements WizardDescriptor.FinishablePanel<WizardDescriptor>, PropertyChangeListener {
 
+    private static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private final MapperAlgorithm csMapper;
     private NetworkConstructionAlg alg;
     private final EventListenerList listeners;
     private WizardDescriptor model;
+    private static List<AlgorithmFactory> factories;
 
     public WizardNetworkRepresentation(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
         listeners = new EventListenerList();
+
+        if (factories == null) {
+            factories = new LinkedList<>();
+            for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
+                final AlgorithmFactory factory = it.next();
+                if (factory instanceof NetworkConstructionTag) {
+                    factories.add(factory);
+                }
+            }
+        }
     }
 
     /**
@@ -44,13 +62,9 @@ public class WizardNetworkRepresentation implements WizardDescriptor.FinishableP
     public VisualNetworkRepresentation getComponent() {
         if (component == null) {
             try {
-                alg = (NetworkConstructionAlg) csMapper.getNetworkEmbedderAlg().clone();
-                JPanel settingPanel = null;
-                AlgorithmSetupUI setupUI = alg.getFactory().getSetupUI();
-                if (setupUI != null) {
-                    settingPanel = setupUI.getSettingPanel(alg);
-                }
-                component = new VisualNetworkRepresentation(settingPanel);
+                alg = (NetworkConstructionAlg) csMapper.getNetworkAlg().clone();
+                component = new VisualNetworkRepresentation();
+                component.populateComboBox(factories, alg);
                 component.addPropertyChangeListener(this);
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
@@ -90,23 +104,16 @@ public class WizardNetworkRepresentation implements WizardDescriptor.FinishableP
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
-
         this.model = wiz;
-        //Setting for Network embedder
-//        NetworkType netType = (NetworkType) wiz.getProperty(NetworkType.class.getName());
-//        if (netType == null) {
-//            netType = alg.getNetworkType();
-//        }
-//        getComponent().setNetworkType(netType);
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
-        // use wiz.putProperty to remember current panel state                
-//        NetworkType netType = component.getNetworkType();
-//        wiz.putProperty(NetworkType.class.getName(), netType);
-//        
-//        wiz.putProperty(NetworkType.SCAFFOLD.name(), component.getDiveristyRadio());
+        // use wiz.putProperty to remember current panel state 
+        alg = getComponent().getSelectedAlg();
+        if (alg != null){
+            wiz.putProperty(NetworkConstructionAlg.class.getName(), alg);
+        }
     }
 
     @Override
@@ -117,12 +124,12 @@ public class WizardNetworkRepresentation implements WizardDescriptor.FinishableP
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(VisualNetworkRepresentation.CHANGED_NET_TYPE)) {
-//            NetworkType netType = component.getNetworkType();
-//            if (netType == NetworkType.FULL) {
-//                model.getNotificationLineSupport().setWarningMessage(NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.FNWaring.text"));
-//            } else{
-//                model.getNotificationLineSupport().setWarningMessage(null);                
-//            }
+            NetworkConstructionAlg netType = (NetworkConstructionAlg)evt.getNewValue();
+            if (netType instanceof CSNetworkConstruction) {
+                model.getNotificationLineSupport().setWarningMessage(NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.FNWaring.text"));
+            } else{
+                model.getNotificationLineSupport().setWarningMessage(null);                
+            }
         }
     }
 

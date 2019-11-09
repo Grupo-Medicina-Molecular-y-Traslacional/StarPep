@@ -17,6 +17,9 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service = AlgorithmFactory.class, position = 300)
 public class ScaffoldNetworkConstructionFactory implements NetworkConstructionTag {
+
+    private ScaffoldNetworkConstructionSetupUI setupUI = new ScaffoldNetworkConstructionSetupUI();
+
     @Override
     public String getCategory() {
         return null;
@@ -34,12 +37,12 @@ public class ScaffoldNetworkConstructionFactory implements NetworkConstructionTa
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        return  new ScaffoldNetworkConstructionSetupUI();
+        return setupUI;
     }
 
     @Override
     public Algorithm createAlgorithm() {
         return new ScaffoldNetworkConstruction(this);
-    }    
-    
+    }
+
 }

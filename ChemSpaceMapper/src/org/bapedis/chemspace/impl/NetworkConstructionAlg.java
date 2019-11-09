@@ -188,18 +188,6 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
             pc.reportMsg(xAxis.toString(), workspace);
             pc.reportMsg(yAxis.toString(), workspace);
 
-            //Estimate current threshold
-            int t = 0;
-            do {
-                t++;
-            } while (t <= 100 && densityValues[t] > 0.1);
-
-            if (t < 100) {
-                currentThreshold = t / 100.0;
-            } else {
-                currentThreshold = 0.7;
-            }
-
             // Update similarity edges
             updateSimilarityEdges();
 
@@ -213,7 +201,7 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
 
     protected abstract double createNetwork();
 
-    private void updateNodePositions() {
+    protected void updateNodePositions() {
         Vector3f[] positions = xyzSpace.getPositions();
         graph.readLock();
         try {
@@ -232,7 +220,7 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
         }
     }
 
-    private void updateSimilarityEdges() {
+    protected void updateSimilarityEdges() {
         double similarity;
         Node node1, node2;
         Edge graphEdge;
@@ -307,7 +295,7 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
         return chart;
     }
 
-    private XYSeriesCollection createDensityDataSet() {
+    protected XYSeriesCollection createDensityDataSet() {
         XYSeriesCollection dataset = new XYSeriesCollection();
         XYSeries serieDensity = new XYSeries("Density");
 
@@ -319,7 +307,7 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
         return dataset;
     }
 
-    private void populateDensityArray() {
+    protected void populateDensityArray() {
         long[] edgeCount = new long[101];
         int n = peptides.length;
         Node node1, node2;

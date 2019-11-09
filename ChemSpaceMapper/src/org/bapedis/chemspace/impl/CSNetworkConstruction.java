@@ -18,8 +18,19 @@ import org.gephi.graph.api.Node;
  */
 public class CSNetworkConstruction extends NetworkConstructionAlg implements Cloneable {
 
+    private double defaultDensity;
+
     public CSNetworkConstruction(AlgorithmFactory factory) {
         super(factory);
+        defaultDensity = 0.1;
+    }
+
+    public double getDefaultDensity() {
+        return defaultDensity;
+    }
+
+    public void setDefaultDensity(double defaultDensity) {
+        this.defaultDensity = defaultDensity;
     }
 
     @Override
@@ -62,12 +73,23 @@ public class CSNetworkConstruction extends NetworkConstructionAlg implements Clo
             }
             ticket.progress();
         }
-        return maxDistance;
 
+        return maxDistance;
     }
-    
+
+    @Override
+    protected void updateSimilarityEdges() {
+        //Estimate current threshold
+        int t = 0;
+        while (t + 1 <= 100 && densityValues[t + 1] >= defaultDensity) {
+            t++;
+        }
+        currentThreshold = t / 100.0;
+        super.updateSimilarityEdges(); //To change body of generated methods, choose Tools | Templates.
+    }
+
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
-    }    
+    }
 }

@@ -70,8 +70,8 @@ public class MapperAlgorithm implements Algorithm {
     private AllDescriptors featureExtractionAlg;
     private FilteringSubsetOptimization featureSelectionAlg;
     private AbstractDistance distFunction;
+    private NetworkConstructionAlg networkAlg;    
     private final WekaPCATransformer pcaTransformer;
-    private final NetworkConstructionAlg networkAlg;
     private final Modularity modularityOptimization;
 
     //Algorithm workflow
@@ -373,8 +373,12 @@ public class MapperAlgorithm implements Algorithm {
         return pcaTransformer;
     }
 
-    public NetworkConstructionAlg getNetworkEmbedderAlg() {
+    public NetworkConstructionAlg getNetworkAlg() {
         return networkAlg;
+    }
+    
+    public void setNetworkAlg(NetworkConstructionAlg alg){
+        this.networkAlg = alg;
     }
 
     public AbstractDistance getDistanceFunction() {

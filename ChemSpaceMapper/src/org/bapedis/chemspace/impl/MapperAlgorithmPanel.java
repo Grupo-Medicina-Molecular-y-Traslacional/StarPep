@@ -50,7 +50,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
     protected final JXHyperlink openWizardLink, scatter3DLink;
     protected MapperAlgorithm csMapper;
-    protected NetworkConstructionAlg netEmbedder;
+    protected NetworkConstructionAlg networkAlg;
     private final DecimalFormat formatter;
     protected final JXBusyLabel busyLabel;
     protected final DefaultComboBoxModel<String> modelX, modelY;
@@ -180,7 +180,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         this.csMapper = (MapperAlgorithm) algo;
-        netEmbedder = csMapper.getNetworkEmbedderAlg();
+        networkAlg = csMapper.getNetworkAlg();
 
         setupAxis();
         setupThreshold();
@@ -188,7 +188,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     }
 
     private void setupThreshold() {
-        double similarityThreshold = netEmbedder.getSimilarityThreshold();
+        double similarityThreshold = networkAlg.getSimilarityThreshold();
         jCutoffCurrentValue.setText(formatter.format(similarityThreshold));
         int t = (int) Math.round(similarityThreshold * 100);
         cutoffSlider.setValue(t);
@@ -197,11 +197,11 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         jNewDensityLabel.setVisible(false);
         jNewDensityValue.setVisible(false);
         
-        jCurrentDensityValue.setText(formatter.format(netEmbedder.getDensityValues()[t]));
+        jCurrentDensityValue.setText(formatter.format(networkAlg.getDensityValues()[t]));
 
         densityPanel.removeAll();
-        if (netEmbedder.getDensityChart() != null) {
-            densityPanel.add(netEmbedder.getDensityChart(), BorderLayout.CENTER);
+        if (networkAlg.getDensityChart() != null) {
+            densityPanel.add(networkAlg.getDensityChart(), BorderLayout.CENTER);
         }
 
         densityPanel.revalidate();
@@ -251,10 +251,10 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     }
 
     private void thresholdChanged(double value) {
-        netEmbedder.setSimilarityThreshold(value);
+        networkAlg.setSimilarityThreshold(value);
         jCutoffCurrentValue.setText(formatter.format(value));
         int t = (int) Math.round(value * 100);
-        jCurrentDensityValue.setText(formatter.format(netEmbedder.getDensityValues()[t]));
+        jCurrentDensityValue.setText(formatter.format(networkAlg.getDensityValues()[t]));
         jCutoffNewLabel.setVisible(false);
         jCutoffNewValue.setVisible(false);
         jNewDensityLabel.setVisible(false);
@@ -632,8 +632,8 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
             
             jNewDensityLabel.setVisible(true);
             jNewDensityValue.setVisible(true);
-            jNewDensityValue.setText(formatter.format(netEmbedder.getDensityValues()[t]));
-            jApplyThresholdButton.setEnabled(netEmbedder != null);
+            jNewDensityValue.setText(formatter.format(networkAlg.getDensityValues()[t]));
+            jApplyThresholdButton.setEnabled(networkAlg != null);
         } else {
             jCutoffNewLabel.setVisible(false);
             jCutoffNewValue.setVisible(false);
@@ -653,9 +653,9 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     }//GEN-LAST:event_jMoreCutoffButtonActionPerformed
 
     private void jApplyThresholdButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jApplyThresholdButtonActionPerformed
-        if (netEmbedder != null) {
+        if (networkAlg != null) {
             double threshold = cutoffSlider.getValue() / 100.0;
-            NetworkThresholdUpdater fnUpdater = new NetworkThresholdUpdater(threshold, netEmbedder);
+            NetworkThresholdUpdater fnUpdater = new NetworkThresholdUpdater(threshold, networkAlg);
             fnUpdater.addPropertyChangeListener(this);
             setRunning(true);
             fnUpdater.execute();

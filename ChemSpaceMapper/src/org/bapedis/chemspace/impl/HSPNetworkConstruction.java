@@ -6,6 +6,7 @@
 package org.bapedis.chemspace.impl;
 
 import java.util.Arrays;
+import java.util.Collections;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.project.ProjectManager;
@@ -21,8 +22,19 @@ import org.openide.util.Exceptions;
  */
 public class HSPNetworkConstruction extends NetworkConstructionAlg implements Cloneable {
 
+    private boolean reverseOrder;
+
     public HSPNetworkConstruction(AlgorithmFactory factory) {
         super(factory);
+        reverseOrder = false;
+    }
+
+    public boolean isReverseOrder() {
+        return reverseOrder;
+    }
+
+    public void setReverseOrder(boolean reverseOrder) {
+        this.reverseOrder = reverseOrder;
     }
 
     @Override
@@ -76,7 +88,11 @@ public class HSPNetworkConstruction extends NetworkConstructionAlg implements Cl
                 }
             }
 
-            Arrays.parallelSort(candidates);
+            if (reverseOrder) {
+                Arrays.parallelSort(candidates, Collections.reverseOrder());
+            } else {
+                Arrays.parallelSort(candidates);
+            }
             maxDistance = candidates[candidates.length - 1].getDistance();
             cursor = 0;
             while (cursor < candidates.length) {
@@ -124,5 +140,5 @@ public class HSPNetworkConstruction extends NetworkConstructionAlg implements Cl
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
-    }    
+    }
 }

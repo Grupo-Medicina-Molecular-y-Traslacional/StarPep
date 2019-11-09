@@ -30,6 +30,7 @@ public class ScaffoldNetworkConstruction extends NetworkConstructionAlg implemen
     @Override
     protected double createNetwork() {
         pc.reportMsg("Diversity radio: " + String.format("%.2f", diversityRadio), workspace);
+        
         return 0;
     }
     

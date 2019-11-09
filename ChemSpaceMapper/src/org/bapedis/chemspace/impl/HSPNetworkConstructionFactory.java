@@ -17,6 +17,8 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service = AlgorithmFactory.class, position = 200)
 public class HSPNetworkConstructionFactory implements NetworkConstructionTag {
+    private HSPNetworkConstructionSetupUI setupUI = new HSPNetworkConstructionSetupUI();
+    
     @Override
     public String getCategory() {
         return null;
@@ -34,7 +36,7 @@ public class HSPNetworkConstructionFactory implements NetworkConstructionTag {
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        return  null;
+        return  setupUI;
     }
 
     @Override

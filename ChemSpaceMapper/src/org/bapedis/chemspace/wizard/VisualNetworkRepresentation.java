@@ -5,7 +5,15 @@
  */
 package org.bapedis.chemspace.wizard;
 
+import java.awt.BorderLayout;
+import java.util.List;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
+import org.bapedis.chemspace.impl.NetworkConstructionAlg;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
+import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.bapedis.core.ui.components.AlgDescriptionImage;
+import org.bapedis.core.ui.components.richTooltip.RichTooltip;
 import org.openide.util.NbBundle;
 
 /**
@@ -18,18 +26,64 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
      * Creates new form VisualNetworkRepresentation
      */
     static final String CHANGED_NET_TYPE = "network_type";
-    
+    private DefaultComboBoxModel comboboxModel;
+    private RichTooltip richTooltip;
 
-    public VisualNetworkRepresentation(JPanel settingPanel) {
+    public VisualNetworkRepresentation() {
         initComponents();
-        
-//        firePropertyChange(CHANGED_NET_TYPE, oldOption, networkType);
+        comboboxModel = (DefaultComboBoxModel) jNetworkComboBox.getModel();
     }
-
 
     @Override
     public String getName() {
         return NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.name");
+    }
+
+    void populateComboBox(List<AlgorithmFactory> distFactory, NetworkConstructionAlg algorithm) {
+        comboboxModel.removeAllElements();
+        FactoryComboboxItem item = null;
+        for (AlgorithmFactory factory : distFactory) {
+            if (factory.getName().equals(algorithm.getFactory().getName())) {
+                item = new FactoryComboboxItem(factory, algorithm);
+                comboboxModel.addElement(item);
+                setAlgorithm(algorithm);
+            } else {
+                comboboxModel.addElement(new FactoryComboboxItem(factory));
+            }
+        }
+        if (item != null) {
+            comboboxModel.setSelectedItem(item);
+        }
+    }
+
+    private void setAlgorithm(NetworkConstructionAlg algorithm) {
+        centerPanel.removeAll();
+        AlgorithmSetupUI setupUI = algorithm.getFactory().getSetupUI();
+        if (setupUI != null) {
+            JPanel settingPanel = setupUI.getSettingPanel(algorithm);
+            centerPanel.add(settingPanel, BorderLayout.CENTER);
+        }
+        centerPanel.revalidate();
+        centerPanel.repaint();
+        richTooltip = null;
+    }
+
+    public NetworkConstructionAlg getSelectedAlg() {
+        FactoryComboboxItem item = (FactoryComboboxItem) comboboxModel.getSelectedItem();
+        return item.getAlgorithm();
+    }
+
+    private RichTooltip buildTooltip(FactoryComboboxItem item) {
+        AlgorithmFactory factory = item.getFactory();
+        String description = factory.getDescription();
+        RichTooltip tooltip = new RichTooltip(factory.getName(), description);
+        int qualityRank = factory.getQualityRank();
+        int speedRank = factory.getSpeedRank();
+        if (qualityRank > 0 && qualityRank <= 5 && speedRank > 0 && speedRank <= 5) {
+            AlgDescriptionImage algoDescriptionImage = new AlgDescriptionImage(factory);
+            tooltip.setMainImage(algoDescriptionImage.getImage());
+        }
+        return tooltip;
     }
 
     /**
@@ -42,10 +96,10 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
         jQuestionLabel = new javax.swing.JLabel();
         jNetworkComboBox = new javax.swing.JComboBox<>();
         centerPanel = new javax.swing.JPanel();
+        infoLabel = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
         setPreferredSize(new java.awt.Dimension(560, 580));
@@ -55,34 +109,114 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jQuestionLabel, gridBagConstraints);
 
+        jNetworkComboBox.setFocusable(false);
+        jNetworkComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jNetworkComboBoxActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
         add(jNetworkComboBox, gridBagConstraints);
 
         centerPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        centerPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(centerPanel, gridBagConstraints);
+
+        infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(infoLabel, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.infoLabel.text")); // NOI18N
+        infoLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                infoLabelMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                infoLabelMouseExited(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(infoLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jNetworkComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jNetworkComboBoxActionPerformed
+        FactoryComboboxItem item = (FactoryComboboxItem) comboboxModel.getSelectedItem();
+        setAlgorithm(item.getAlgorithm());
+        firePropertyChange(CHANGED_NET_TYPE, null, item.getAlgorithm());
+    }//GEN-LAST:event_jNetworkComboBoxActionPerformed
+
+    private void infoLabelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_infoLabelMouseEntered
+        if (richTooltip == null) {
+            FactoryComboboxItem item = (FactoryComboboxItem) comboboxModel.getSelectedItem();
+            if (infoLabel.isEnabled() && item.getFactory() != null) {
+                richTooltip = buildTooltip(item);
+            }
+        }
+        if (richTooltip != null) {
+            richTooltip.showTooltip(infoLabel, evt.getLocationOnScreen());
+        }
+    }//GEN-LAST:event_infoLabelMouseEntered
+
+    private void infoLabelMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_infoLabelMouseExited
+        if (richTooltip != null) {
+            richTooltip.hideTooltip();
+        }
+    }//GEN-LAST:event_infoLabelMouseExited
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel centerPanel;
+    private javax.swing.JLabel infoLabel;
     private javax.swing.JComboBox<String> jNetworkComboBox;
     private javax.swing.JLabel jQuestionLabel;
     // End of variables declaration//GEN-END:variables
+}
+
+class FactoryComboboxItem {
+
+    private final AlgorithmFactory factory;
+    private NetworkConstructionAlg algorithm;
+
+    public FactoryComboboxItem(AlgorithmFactory factory) {
+        this(factory, null);
+    }
+
+    public FactoryComboboxItem(AlgorithmFactory factory, NetworkConstructionAlg alg) {
+        this.factory = factory;
+        this.algorithm = alg;
+    }
+
+    public AlgorithmFactory getFactory() {
+        return factory;
+    }
+
+    public NetworkConstructionAlg getAlgorithm() {
+        if (algorithm == null) {
+            algorithm = (NetworkConstructionAlg) factory.createAlgorithm();
+        }
+        return algorithm;
+    }
+
+    @Override
+    public String toString() {
+        return factory.getName();
+    }
 }

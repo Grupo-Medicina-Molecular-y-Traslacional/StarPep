@@ -29,22 +29,24 @@ public class WizardDistanceFunc implements WizardDescriptor.ValidatingPanel<Wiza
         WizardDescriptor.FinishablePanel<WizardDescriptor>,
         PropertyChangeListener {
 
-    private final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+    private static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private final MapperAlgorithm csMapper;
     private final EventListenerList listeners = new EventListenerList();
     private boolean isValid;
     private WizardDescriptor model;
-    private final List<AlgorithmFactory> factories;
+    private static List<AlgorithmFactory> factories;
 
     public WizardDistanceFunc(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
         isValid = true;
 
-        factories = new LinkedList<>();
-        for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
-            final AlgorithmFactory factory = it.next();
-            if (factory instanceof DistanceFunctionTag) {
-                factories.add(factory);
+        if (factories == null) {
+            factories = new LinkedList<>();
+            for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
+                final AlgorithmFactory factory = it.next();
+                if (factory instanceof DistanceFunctionTag) {
+                    factories.add(factory);
+                }
             }
         }
     }

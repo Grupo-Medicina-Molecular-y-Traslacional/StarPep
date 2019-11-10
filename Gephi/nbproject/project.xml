@@ -170,6 +170,7 @@
                 <package>org.gephi.preview.spi</package>
                 <package>org.gephi.preview.types</package>
                 <package>org.gephi.preview.types.editors</package>
+                <package>org.gephi.statistics.plugin</package>
                 <package>org.gephi.ui.appearance.plugin</package>
                 <package>org.gephi.ui.appearance.plugin.category</package>
                 <package>org.gephi.ui.appearance.plugin.palette</package>

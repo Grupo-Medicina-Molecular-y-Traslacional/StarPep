@@ -15,12 +15,22 @@ public class CandidatePeptide implements Comparable<CandidatePeptide> {
 
     private final double distance;
     private final Peptide peptide;
+    private final int index;
 
     public CandidatePeptide(Peptide peptide, double distance) {
+        this(-1, peptide, distance);
+    }
+
+    public CandidatePeptide(int index, Peptide peptide, double distance) {
+        this.index = index;
         this.peptide = peptide;
         this.distance = distance;
     }
 
+    public int getIndex() {
+        return index;
+    }        
+    
     public Peptide getPeptide() {
         return peptide;
     }

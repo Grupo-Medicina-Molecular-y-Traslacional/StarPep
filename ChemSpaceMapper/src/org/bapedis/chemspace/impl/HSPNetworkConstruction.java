@@ -7,6 +7,7 @@ package org.bapedis.chemspace.impl;
 
 import java.util.Arrays;
 import java.util.Collections;
+import org.bapedis.chemspace.model.CandidatePeptide;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.project.ProjectManager;

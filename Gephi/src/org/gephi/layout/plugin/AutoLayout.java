@@ -46,7 +46,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.project.ProjectManager;
-import org.gephi.graph.api.GraphModel;
 import org.openide.nodes.Node.Property;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;

@@ -7,7 +7,7 @@
             <suite-component/>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>org.bapedis.clustering</code-name-base>
+                    <code-name-base>org.bapedis.core</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -15,7 +15,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.bapedis.core</code-name-base>
+                    <code-name-base>org.bapedis.graphmining</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>

@@ -10,6 +10,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.vecmath.Vector3f;
 import org.bapedis.chemspace.distance.AbstractDistance;
+import static org.bapedis.chemspace.impl.NetworkThresholdUpdater.pc;
 import org.bapedis.chemspace.model.CoordinateSpace;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
@@ -121,6 +122,7 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
         peptides = null;
         graphModel = null;
         graph = null;
+        pc.getGraphVizSetting().setSimilarityThreshold(currentThreshold);
         pc.getGraphVizSetting().fireChangedGraphView();
     }
 

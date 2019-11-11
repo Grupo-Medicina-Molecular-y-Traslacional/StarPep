@@ -16,22 +16,22 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Loge
  */
-@ServiceProvider(service=AlgorithmFactory.class)
-public class IntrinsicStrengthFactory implements NetworkTag {
+@ServiceProvider(service=AlgorithmFactory.class, position = 150)
+public class HubBridgeCentralityFactory implements NetworkTag {
 
     @Override
     public String getCategory() {
-        return NbBundle.getMessage(HarmonicCentralityFactory.class, "IntrinsicStrength.category");
+        return NbBundle.getMessage(HarmonicCentralityFactory.class, "HubBridgeCentrality.category");
     }
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(IntrinsicStrength.class, "IntrinsicStrength.name");
+        return NbBundle.getMessage(HubBridgeCentrality.class, "HubBridgeCentrality.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(IntrinsicStrength.class, "IntrinsicStrength.desc");
+        return NbBundle.getMessage(HubBridgeCentrality.class, "HubBridgeCentrality.desc");
     }
 
     @Override
@@ -41,7 +41,7 @@ public class IntrinsicStrengthFactory implements NetworkTag {
 
     @Override
     public Algorithm createAlgorithm() {
-        return new IntrinsicStrength(this);
+        return new HubBridgeCentrality(this);
     }
     
 }

@@ -110,6 +110,7 @@ public class NetworkThresholdUpdater extends SwingWorker<Void, Void> {
             Exceptions.printStackTrace(ex);
         } finally {
             firePropertyChange(CHANGED_THRESHOLD, null, newThreshold);
+            pc.getGraphVizSetting().setSimilarityThreshold(newThreshold);
             pc.getGraphVizSetting().fireChangedGraphView();
             ticket.finish();
         }

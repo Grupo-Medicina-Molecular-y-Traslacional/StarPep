@@ -207,7 +207,7 @@ public class HarmonicCentrality extends AbstractCentrality {
     @Override
     public void endAlgo() {
 
-        //Add betweenness centrality column
+        //Add harmonic centrality column
         boolean fireEvent = false;
         Table nodeTable = graphModel.getNodeTable();
         if (!nodeTable.hasColumn(HARMONIC_CLOSENESS)) {

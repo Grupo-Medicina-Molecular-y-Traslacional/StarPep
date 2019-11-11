@@ -15,8 +15,8 @@ import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.gephi.graph.api.Node;
-import org.bapedis.graphmining.centrality.IntrinsicStrength;
-import org.bapedis.graphmining.centrality.IntrinsicStrengthFactory;
+import org.bapedis.graphmining.centrality.HubBridgeCentrality;
+import org.bapedis.graphmining.centrality.HubBridgeCentralityFactory;
 import org.bapedis.graphmining.clustering.Modularity;
 import org.bapedis.graphmining.clustering.ModularityFactory;
 
@@ -54,7 +54,7 @@ public class ScaffoldNetworkConstruction extends HSPNetworkConstruction implemen
         Modularity modularity = (Modularity) new ModularityFactory().createAlgorithm();
         execute(modularity);
 
-        IntrinsicStrength nodeMeasure = (IntrinsicStrength) new IntrinsicStrengthFactory().createAlgorithm();
+        HubBridgeCentrality nodeMeasure = (HubBridgeCentrality) new HubBridgeCentralityFactory().createAlgorithm();
         execute(nodeMeasure);
 
         //Sort peptides by intrinsic strength
@@ -132,7 +132,7 @@ class RankComparator implements Comparator<Peptide> {
     private final String attribute;
 
     public RankComparator() {
-        this.attribute = IntrinsicStrength.RANKING_BY_STRENGTH;
+        this.attribute = HubBridgeCentrality.RANKING_BY_HUB_BRIDGE;
     }
 
     @Override

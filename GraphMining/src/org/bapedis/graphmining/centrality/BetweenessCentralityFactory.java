@@ -16,7 +16,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author loge
  */
-@ServiceProvider(service=AlgorithmFactory.class)
+@ServiceProvider(service=AlgorithmFactory.class, position = 100)
 public class BetweenessCentralityFactory implements NetworkTag {
 
     @Override

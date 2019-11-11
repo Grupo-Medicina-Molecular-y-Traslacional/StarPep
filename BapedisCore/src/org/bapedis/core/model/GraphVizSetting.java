@@ -20,13 +20,12 @@ public class GraphVizSetting {
 
     protected transient final PropertyChangeSupport propertyChangeSupport;
     protected final Set<StarPepAnnotationType> displayedMetadata;
-    protected boolean csnVisible;
+    protected double similarityThreshold;
 
     public GraphVizSetting() {
         propertyChangeSupport = new PropertyChangeSupport(this);
         displayedMetadata = new HashSet<>(StarPepAnnotationType.values().length);
-//        displayedMetadata.add(AnnotationType.DATABASE);
-        csnVisible = true;
+        similarityThreshold = 0;
     }
     
     public boolean isDisplayedMetadata(StarPepAnnotationType aType){
@@ -44,6 +43,14 @@ public class GraphVizSetting {
             propertyChangeSupport.firePropertyChange(CHANGED_DISPLAYED_METADATA, aType, null);
         }
     }    
+
+    public double getSimilarityThreshold() {
+        return similarityThreshold;
+    }
+
+    public void setSimilarityThreshold(double similarityThreshold) {
+        this.similarityThreshold = similarityThreshold;
+    }        
 
     public void addDisplayedMetadataChangeListener(PropertyChangeListener listener){
         propertyChangeSupport.addPropertyChangeListener(CHANGED_DISPLAYED_METADATA, listener);

@@ -111,13 +111,13 @@ public class HubBridgeCentrality extends AbstractCentrality {
             Table nodeTable = graphModel.getNodeTable();
             if (!nodeTable.hasColumn(HUB_BRIDGE)) {
                 nodeTable.addColumn(HUB_BRIDGE, HUB_BRIDGE_TITLE, Double.class, 0.0);
-                nodeTable.addColumn(RANKING_BY_HUB_BRIDGE, RANKING_BY_HUB_BRIDGE_TITLE, Integer.class, -1);
+                nodeTable.addColumn(RANKING_BY_HUB_BRIDGE, RANKING_BY_HUB_BRIDGE_TITLE, Integer.class, Integer.MAX_VALUE);
                 fireEvent = true;
             }
 
             //Set default values
             Double defaultValue = new Double(0);
-            Integer defaultRanking = -1;
+            Integer defaultRanking = Integer.MAX_VALUE;
             for (Node node : graphModel.getGraph().getNodes()) {
                 if (nodeTable.hasColumn(HUB_BRIDGE)) {
                     node.setAttribute(HUB_BRIDGE, defaultValue);

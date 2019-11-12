@@ -182,13 +182,13 @@ public class BetweenessCentrality extends AbstractCentrality {
             Table nodeTable = graphModel.getNodeTable();
             if (!nodeTable.hasColumn(BETWEENNESS)) {
                 nodeTable.addColumn(BETWEENNESS, BETWEENNESS_TITLE, Double.class, new Double(0));
-                nodeTable.addColumn(RANKING_BY_BETWEENNESS, RANKING_BY_BETWEENNESS_TITLE, Integer.class, -1);
+                nodeTable.addColumn(RANKING_BY_BETWEENNESS, RANKING_BY_BETWEENNESS_TITLE, Integer.class, Integer.MAX_VALUE);
                 fireEvent = true;
             }
 
             //Set default values
             Double defaultValue = new Double(0);
-            Integer defaultRank = new Integer(-1);
+            Integer defaultRank = Integer.MAX_VALUE;
             for (Node node : graphModel.getGraph().getNodes()) {
                 node.setAttribute(BETWEENNESS, defaultValue);
                 node.setAttribute(RANKING_BY_BETWEENNESS, defaultRank);

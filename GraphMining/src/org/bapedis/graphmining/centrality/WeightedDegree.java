@@ -114,15 +114,15 @@ public class WeightedDegree extends AbstractCentrality {
             Table nodeTable = graphModel.getNodeTable();
             if (internal && !nodeTable.hasColumn(WINDEGREE) && nodeTable.hasColumn(PeptideAttribute.CLUSTER_ATTR.getId())) {
                 nodeTable.addColumn(WINDEGREE, WINDEGREE_TITLE, Double.class, 0.0);
-                nodeTable.addColumn(RANKING_BY_WINDEGREE, RANKING_BY_WINDEGREE_TITLE, Integer.class, -1);
+                nodeTable.addColumn(RANKING_BY_WINDEGREE, RANKING_BY_WINDEGREE_TITLE, Integer.class, Integer.MAX_VALUE);
             }
             if (external && !nodeTable.hasColumn(WOUTDEGREE) && nodeTable.hasColumn(PeptideAttribute.CLUSTER_ATTR.getId())) {
                 nodeTable.addColumn(WOUTDEGREE, WOUTDEGREE_TITLE, Double.class, 0.0);
-                nodeTable.addColumn(RANKING_BY_WOUTDEGREE, RANKING_BY_WOUTDEGREE_TITLE, Integer.class, -1);
+                nodeTable.addColumn(RANKING_BY_WOUTDEGREE, RANKING_BY_WOUTDEGREE_TITLE, Integer.class, Integer.MAX_VALUE);
             }
             if (total && !nodeTable.hasColumn(WDEGREE)) {
                 nodeTable.addColumn(WDEGREE, WDEGREE_TITLE, Double.class, 0.0);
-                nodeTable.addColumn(RANKING_BY_WDEGREE, RANKING_BY_WDEGREE_TITLE, Integer.class, -1);
+                nodeTable.addColumn(RANKING_BY_WDEGREE, RANKING_BY_WDEGREE_TITLE, Integer.class, Integer.MAX_VALUE);
             }
 
             //Set default values
@@ -130,12 +130,15 @@ public class WeightedDegree extends AbstractCentrality {
             for (Node node : graphModel.getGraph().getNodes()) {
                 if (nodeTable.hasColumn(WINDEGREE) && nodeTable.hasColumn(PeptideAttribute.CLUSTER_ATTR.getId())) {
                     node.setAttribute(WINDEGREE, defaultValue);
+                    node.setAttribute(RANKING_BY_WINDEGREE, Integer.MAX_VALUE);
                 }
                 if (nodeTable.hasColumn(WOUTDEGREE) && nodeTable.hasColumn(PeptideAttribute.CLUSTER_ATTR.getId())) {
                     node.setAttribute(WOUTDEGREE, defaultValue);
+                    node.setAttribute(RANKING_BY_WOUTDEGREE, Integer.MAX_VALUE);
                 }
                 if (nodeTable.hasColumn(WDEGREE)) {
                     node.setAttribute(WDEGREE, defaultValue);
+                    node.setAttribute(RANKING_BY_WDEGREE, Integer.MAX_VALUE);
                 }
             }
 

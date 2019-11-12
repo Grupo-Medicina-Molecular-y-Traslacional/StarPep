@@ -5,6 +5,7 @@
  */
 package org.bapedis.graphmining.centrality;
 
+import org.bapedis.graphmining.model.NodeCentralityComparator;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -31,10 +32,10 @@ public class BetweenessCentrality extends AbstractCentrality {
 
     public static final String BETWEENNESS = "betweenesscentrality";
     public static final String BETWEENNESS_TITLE = "Betweenness Centrality (BC)";
-    
+
     public static final String RANKING_BY_BETWEENNESS = "rankingBybetweenesscentrality";
     public static final String RANKING_BY_BETWEENNESS_TITLE = "Ranking by BC";
-    
+
     private AlgorithmProperty[] property;
     private boolean normalized;
     private double[] nodeBetweenness;
@@ -163,44 +164,45 @@ public class BetweenessCentrality extends AbstractCentrality {
     public void endAlgo() {
         int n = nodes.length;
 
-        for (Node s : nodes) {
-            int s_index = (Integer) s.getAttribute(NODE_INDEX);
-
-            if (!directed) {
-                nodeBetweenness[s_index] /= 2;
-            }
-            if (normalized) {
-                nodeBetweenness[s_index] /= directed ? (n - 1) * (n - 2) : (n - 1) * (n - 2) / 2;
-            }
-        }
-
         //Add betweenness centrality column
         boolean fireEvent = false;
-        Table nodeTable = graphModel.getNodeTable();
-        if (!nodeTable.hasColumn(BETWEENNESS)) {
-            nodeTable.addColumn(BETWEENNESS, BETWEENNESS_TITLE, Double.class, new Double(0));
-            nodeTable.addColumn(RANKING_BY_BETWEENNESS, RANKING_BY_BETWEENNESS_TITLE, Integer.class, -1);
-            fireEvent = true;
-        }
 
-        //Set default values
-        Double defaultValue = new Double(0);
-        Integer defaultRank = new Integer(-1);
-        for (Node node : graphModel.getGraph().getNodes()) {
-            node.setAttribute(BETWEENNESS, defaultValue);
-            node.setAttribute(RANKING_BY_BETWEENNESS, defaultRank);
-        }
-
-        //Save values
         if (!isCanceled.get()) {
+            for (Node s : nodes) {
+                int s_index = (Integer) s.getAttribute(NODE_INDEX);
+
+                if (!directed) {
+                    nodeBetweenness[s_index] /= 2;
+                }
+                if (normalized) {
+                    nodeBetweenness[s_index] /= directed ? (n - 1) * (n - 2) : (n - 1) * (n - 2) / 2;
+                }
+            }
+
+            Table nodeTable = graphModel.getNodeTable();
+            if (!nodeTable.hasColumn(BETWEENNESS)) {
+                nodeTable.addColumn(BETWEENNESS, BETWEENNESS_TITLE, Double.class, new Double(0));
+                nodeTable.addColumn(RANKING_BY_BETWEENNESS, RANKING_BY_BETWEENNESS_TITLE, Integer.class, -1);
+                fireEvent = true;
+            }
+
+            //Set default values
+            Double defaultValue = new Double(0);
+            Integer defaultRank = new Integer(-1);
+            for (Node node : graphModel.getGraph().getNodes()) {
+                node.setAttribute(BETWEENNESS, defaultValue);
+                node.setAttribute(RANKING_BY_BETWEENNESS, defaultRank);
+            }
+
+            //Save values
             for (Node s : nodes) {
                 int s_index = (Integer) s.getAttribute(NODE_INDEX);
                 s.setAttribute(BETWEENNESS, nodeBetweenness[s_index]);
             }
-            
-            Arrays.parallelSort(nodes, new RankComparator(BETWEENNESS));
-            for(int i=0; i<nodes.length; i++){
-                nodes[i].setAttribute(RANKING_BY_BETWEENNESS, i+1);
+
+            Arrays.parallelSort(nodes, new NodeCentralityComparator(BETWEENNESS));
+            for (int i = 0; i < nodes.length; i++) {
+                nodes[i].setAttribute(RANKING_BY_BETWEENNESS, i + 1);
             }
         }
 

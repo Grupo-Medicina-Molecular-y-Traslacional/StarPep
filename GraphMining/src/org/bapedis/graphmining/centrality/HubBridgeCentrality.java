@@ -41,6 +41,7 @@
  */
 package org.bapedis.graphmining.centrality;
 
+import org.bapedis.graphmining.model.NodeCentralityComparator;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,12 +52,9 @@ import org.bapedis.core.model.GraphVizSetting;
 import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
-import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
 import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.Graph;
-import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.graph.api.Table;
 import org.openide.DialogDisplayer;
@@ -107,32 +105,32 @@ public class HubBridgeCentrality extends AbstractCentrality {
 
     @Override
     public void endAlgo() {
-
         boolean fireEvent = false;
-        Table nodeTable = graphModel.getNodeTable();
-        if (!nodeTable.hasColumn(HUB_BRIDGE)) {
-            nodeTable.addColumn(HUB_BRIDGE, HUB_BRIDGE_TITLE, Double.class, 0.0);
-            nodeTable.addColumn(RANKING_BY_HUB_BRIDGE, RANKING_BY_HUB_BRIDGE_TITLE, Integer.class, -1);
-            fireEvent = true;
-        }
 
-        //Set default values
-        Double defaultValue = new Double(0);
-        Integer defaultRanking = -1;
-        for (Node node : graphModel.getGraph().getNodes()) {
-            if (nodeTable.hasColumn(HUB_BRIDGE)) {
-                node.setAttribute(HUB_BRIDGE, defaultValue);
-                node.setAttribute(RANKING_BY_HUB_BRIDGE, defaultRanking);
-            }
-        }
-
-        //Save values
         if (!isCanceled.get()) {
+            Table nodeTable = graphModel.getNodeTable();
+            if (!nodeTable.hasColumn(HUB_BRIDGE)) {
+                nodeTable.addColumn(HUB_BRIDGE, HUB_BRIDGE_TITLE, Double.class, 0.0);
+                nodeTable.addColumn(RANKING_BY_HUB_BRIDGE, RANKING_BY_HUB_BRIDGE_TITLE, Integer.class, -1);
+                fireEvent = true;
+            }
+
+            //Set default values
+            Double defaultValue = new Double(0);
+            Integer defaultRanking = -1;
+            for (Node node : graphModel.getGraph().getNodes()) {
+                if (nodeTable.hasColumn(HUB_BRIDGE)) {
+                    node.setAttribute(HUB_BRIDGE, defaultValue);
+                    node.setAttribute(RANKING_BY_HUB_BRIDGE, defaultRanking);
+                }
+            }
+            
+            //Save values
             for (int i = 0; i < nodes.length; i++) {
                 nodes[i].setAttribute(HUB_BRIDGE, nodeHubBridge[i]);
             }
 
-            Arrays.parallelSort(nodes, new RankComparator(HUB_BRIDGE));
+            Arrays.parallelSort(nodes, new NodeCentralityComparator(HUB_BRIDGE));
             for (int i = 0; i < nodes.length; i++) {
                 nodes[i].setAttribute(RANKING_BY_HUB_BRIDGE, i + 1);
             }

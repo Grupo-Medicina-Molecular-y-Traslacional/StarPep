@@ -41,6 +41,7 @@
  */
 package org.bapedis.graphmining.centrality;
 
+import org.bapedis.graphmining.model.NodeCentralityComparator;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -209,32 +210,33 @@ public class HarmonicCentrality extends AbstractCentrality {
 
         //Add harmonic centrality column
         boolean fireEvent = false;
-        Table nodeTable = graphModel.getNodeTable();
-        if (!nodeTable.hasColumn(HARMONIC_CLOSENESS)) {
-            nodeTable.addColumn(HARMONIC_CLOSENESS, HARMONIC_CLOSENESS_TITLE, Double.class, new Double(0));
-            nodeTable.addColumn(RANKING_BY_HARMONIC_CLOSENESS, RANKING_BY_HARMONIC_CLOSENESS_TITLE, Integer.class, -1);
-            fireEvent = true;
-        }
-
-        //Set default values
-        Double defaultValue = new Double(0);
-        Integer defaultRank = new Integer(-1);
-        for (Node node : graphModel.getGraph().getNodes()) {
-            node.setAttribute(HARMONIC_CLOSENESS, defaultValue);
-            node.setAttribute(RANKING_BY_HARMONIC_CLOSENESS, defaultRank);
-        }
-
-        //Save values
+        
         if (!isCanceled.get()) {
+            Table nodeTable = graphModel.getNodeTable();
+            if (!nodeTable.hasColumn(HARMONIC_CLOSENESS)) {
+                nodeTable.addColumn(HARMONIC_CLOSENESS, HARMONIC_CLOSENESS_TITLE, Double.class, new Double(0));
+                nodeTable.addColumn(RANKING_BY_HARMONIC_CLOSENESS, RANKING_BY_HARMONIC_CLOSENESS_TITLE, Integer.class, -1);
+                fireEvent = true;
+            }
+
+            //Set default values
+            Double defaultValue = new Double(0);
+            Integer defaultRank = new Integer(-1);
+            for (Node node : graphModel.getGraph().getNodes()) {
+                node.setAttribute(HARMONIC_CLOSENESS, defaultValue);
+                node.setAttribute(RANKING_BY_HARMONIC_CLOSENESS, defaultRank);
+            }
+
+            //Save values
             for (Node s : nodes) {
                 int s_index = (Integer) s.getAttribute(NODE_INDEX);
                 s.setAttribute(HARMONIC_CLOSENESS, harmonic[s_index]);
             }
-            
-            Arrays.parallelSort(nodes, new RankComparator(HARMONIC_CLOSENESS));
-            for(int i=0; i<nodes.length; i++){
-                nodes[i].setAttribute(RANKING_BY_HARMONIC_CLOSENESS, i+1);
-            }            
+
+            Arrays.parallelSort(nodes, new NodeCentralityComparator(HARMONIC_CLOSENESS));
+            for (int i = 0; i < nodes.length; i++) {
+                nodes[i].setAttribute(RANKING_BY_HARMONIC_CLOSENESS, i + 1);
+            }
         }
 
         super.endAlgo();

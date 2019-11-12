@@ -5,6 +5,7 @@
  */
 package org.bapedis.graphmining.centrality;
 
+import org.bapedis.graphmining.model.NodeCentralityComparator;
 import java.util.Arrays;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.GraphVizSetting;
@@ -100,7 +101,7 @@ public class WeightedDegree extends AbstractCentrality {
         intStrength = new double[nodes.length];
         extStrength = new double[nodes.length];
         totalStrength = new double[nodes.length];
-        
+
         relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
         graphViz = pc.getGraphVizSetting(workspace);
     }
@@ -108,61 +109,63 @@ public class WeightedDegree extends AbstractCentrality {
     @Override
     public void endAlgo() {
         boolean fireEvent = false;
-        Table nodeTable = graphModel.getNodeTable();
-        if (internal && !nodeTable.hasColumn(WINDEGREE)) {
-            nodeTable.addColumn(WINDEGREE, WINDEGREE_TITLE, Double.class, 0.0);
-            nodeTable.addColumn(RANKING_BY_WINDEGREE, RANKING_BY_WINDEGREE_TITLE, Integer.class, -1);
-        }
-        if (external && !nodeTable.hasColumn(WOUTDEGREE)) {
-            nodeTable.addColumn(WOUTDEGREE, WOUTDEGREE_TITLE, Double.class, 0.0);
-            nodeTable.addColumn(RANKING_BY_WOUTDEGREE, RANKING_BY_WOUTDEGREE_TITLE, Integer.class, -1);
-        }
-        if (total && !nodeTable.hasColumn(WDEGREE)) {
-            nodeTable.addColumn(WDEGREE, WDEGREE_TITLE, Double.class, 0.0);
-            nodeTable.addColumn(RANKING_BY_WDEGREE, RANKING_BY_WDEGREE_TITLE, Integer.class, -1);
-        }
-
-        //Set default values
-        Double defaultValue = new Double(0);
-        for (Node node : graphModel.getGraph().getNodes()) {
-            if (nodeTable.hasColumn(WINDEGREE)) {
-                node.setAttribute(WINDEGREE, defaultValue);
-            }
-            if (nodeTable.hasColumn(WOUTDEGREE)) {
-                node.setAttribute(WOUTDEGREE, defaultValue);
-            }
-            if (nodeTable.hasColumn(WDEGREE)) {
-                node.setAttribute(WDEGREE, defaultValue);
-            }
-        }
 
         if (!isCanceled.get()) {
+            Table nodeTable = graphModel.getNodeTable();
+            if (internal && !nodeTable.hasColumn(WINDEGREE) && nodeTable.hasColumn(PeptideAttribute.CLUSTER_ATTR.getId())) {
+                nodeTable.addColumn(WINDEGREE, WINDEGREE_TITLE, Double.class, 0.0);
+                nodeTable.addColumn(RANKING_BY_WINDEGREE, RANKING_BY_WINDEGREE_TITLE, Integer.class, -1);
+            }
+            if (external && !nodeTable.hasColumn(WOUTDEGREE) && nodeTable.hasColumn(PeptideAttribute.CLUSTER_ATTR.getId())) {
+                nodeTable.addColumn(WOUTDEGREE, WOUTDEGREE_TITLE, Double.class, 0.0);
+                nodeTable.addColumn(RANKING_BY_WOUTDEGREE, RANKING_BY_WOUTDEGREE_TITLE, Integer.class, -1);
+            }
+            if (total && !nodeTable.hasColumn(WDEGREE)) {
+                nodeTable.addColumn(WDEGREE, WDEGREE_TITLE, Double.class, 0.0);
+                nodeTable.addColumn(RANKING_BY_WDEGREE, RANKING_BY_WDEGREE_TITLE, Integer.class, -1);
+            }
+
+            //Set default values
+            Double defaultValue = new Double(0);
+            for (Node node : graphModel.getGraph().getNodes()) {
+                if (nodeTable.hasColumn(WINDEGREE) && nodeTable.hasColumn(PeptideAttribute.CLUSTER_ATTR.getId())) {
+                    node.setAttribute(WINDEGREE, defaultValue);
+                }
+                if (nodeTable.hasColumn(WOUTDEGREE) && nodeTable.hasColumn(PeptideAttribute.CLUSTER_ATTR.getId())) {
+                    node.setAttribute(WOUTDEGREE, defaultValue);
+                }
+                if (nodeTable.hasColumn(WDEGREE)) {
+                    node.setAttribute(WDEGREE, defaultValue);
+                }
+            }
+
+            //Save values
             for (int i = 0; i < nodes.length; i++) {
-                if (internal) {
+                if (nodeTable.hasColumn(WINDEGREE) && nodeTable.hasColumn(PeptideAttribute.CLUSTER_ATTR.getId())) {
                     nodes[i].setAttribute(WINDEGREE, intStrength[i]);
                 }
-                if (external) {
+                if (nodeTable.hasColumn(WOUTDEGREE) && nodeTable.hasColumn(PeptideAttribute.CLUSTER_ATTR.getId())) {
                     nodes[i].setAttribute(WOUTDEGREE, extStrength[i]);
                 }
-                if (total) {
+                if (nodeTable.hasColumn(WDEGREE)) {
                     nodes[i].setAttribute(WDEGREE, totalStrength[i]);
                 }
             }
 
-            if (internal) {
-                Arrays.parallelSort(nodes, new RankComparator(WINDEGREE));
+            if (nodeTable.hasColumn(WINDEGREE) && nodeTable.hasColumn(PeptideAttribute.CLUSTER_ATTR.getId())) {
+                Arrays.parallelSort(nodes, new NodeCentralityComparator(WINDEGREE));
                 for (int i = 0; i < nodes.length; i++) {
                     nodes[i].setAttribute(RANKING_BY_WINDEGREE, i + 1);
                 }
             }
-            if (external) {
-                Arrays.parallelSort(nodes, new RankComparator(WOUTDEGREE));
+            if (nodeTable.hasColumn(WOUTDEGREE) && nodeTable.hasColumn(PeptideAttribute.CLUSTER_ATTR.getId())) {
+                Arrays.parallelSort(nodes, new NodeCentralityComparator(WOUTDEGREE));
                 for (int i = 0; i < nodes.length; i++) {
                     nodes[i].setAttribute(RANKING_BY_WOUTDEGREE, i + 1);
                 }
             }
-            if (total) {
-                Arrays.parallelSort(nodes, new RankComparator(WDEGREE));
+            if (nodeTable.hasColumn(WDEGREE)) {
+                Arrays.parallelSort(nodes, new NodeCentralityComparator(WDEGREE));
                 for (int i = 0; i < nodes.length; i++) {
                     nodes[i].setAttribute(RANKING_BY_WDEGREE, i + 1);
                 }

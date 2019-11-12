@@ -65,6 +65,7 @@ public class WizardNetworkRepresentation implements WizardDescriptor.FinishableP
                 alg = (NetworkConstructionAlg) csMapper.getNetworkAlg().clone();
                 component = new VisualNetworkRepresentation();
                 component.populateComboBox(factories, alg);
+                component.set2dMap(alg.is2DMap());
                 component.addPropertyChangeListener(this);
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
@@ -112,6 +113,7 @@ public class WizardNetworkRepresentation implements WizardDescriptor.FinishableP
         // use wiz.putProperty to remember current panel state 
         alg = getComponent().getSelectedAlg();
         if (alg != null){
+            alg.set2DMap(getComponent().is2DMap());
             wiz.putProperty(NetworkConstructionAlg.class.getName(), alg);
         }
     }

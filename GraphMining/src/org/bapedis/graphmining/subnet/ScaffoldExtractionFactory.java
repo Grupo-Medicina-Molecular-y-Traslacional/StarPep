@@ -3,11 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.chemspace.impl;
+package org.bapedis.graphmining.subnet;
 
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.NetworkTag;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -15,24 +16,23 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Loge
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 300)
-public class ScaffoldNetworkConstructionFactory implements NetworkConstructionTag {
-
-    private ScaffoldNetworkConstructionSetupUI setupUI = new ScaffoldNetworkConstructionSetupUI();
+@ServiceProvider(service=AlgorithmFactory.class, position = 400)
+public class ScaffoldExtractionFactory implements NetworkTag {
+    ScaffoldExtractionSetupUI setupUI = new ScaffoldExtractionSetupUI();
 
     @Override
     public String getCategory() {
-        return null;
+        return NbBundle.getMessage(ScaffoldExtraction.class, "ScaffoldExtraction.category");
     }
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(ScaffoldNetworkConstructionFactory.class, "ScadffoldNetworkConstruction.name");
+        return NbBundle.getMessage(ScaffoldExtraction.class, "ScaffoldExtraction.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(ScaffoldNetworkConstructionFactory.class, "ScadffoldNetworkConstruction.desc");
+        return NbBundle.getMessage(ScaffoldExtraction.class, "ScaffoldExtraction.desc");
     }
 
     @Override
@@ -42,7 +42,7 @@ public class ScaffoldNetworkConstructionFactory implements NetworkConstructionTa
 
     @Override
     public Algorithm createAlgorithm() {
-        return new ScaffoldNetworkConstruction(this);
+        return new ScaffoldExtraction(this);
     }
-
+    
 }

@@ -38,6 +38,14 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
     public String getName() {
         return NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.name");
     }
+    
+    void set2dMap(boolean flag){
+        j2DCheckBox.setSelected(flag);
+    }
+    
+    boolean is2DMap(){
+        return j2DCheckBox.isSelected();
+    }
 
     void populateComboBox(List<AlgorithmFactory> distFactory, NetworkConstructionAlg algorithm) {
         comboboxModel.removeAllElements();
@@ -100,6 +108,7 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         jNetworkComboBox = new javax.swing.JComboBox<>();
         centerPanel = new javax.swing.JPanel();
         infoLabel = new javax.swing.JLabel();
+        j2DCheckBox = new javax.swing.JCheckBox();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
         setPreferredSize(new java.awt.Dimension(560, 580));
@@ -132,7 +141,7 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         centerPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
@@ -156,6 +165,16 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(infoLabel, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(j2DCheckBox, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.j2DCheckBox.text")); // NOI18N
+        j2DCheckBox.setFocusable(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(j2DCheckBox, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jNetworkComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jNetworkComboBoxActionPerformed
@@ -185,6 +204,7 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
     private javax.swing.JLabel infoLabel;
+    private javax.swing.JCheckBox j2DCheckBox;
     private javax.swing.JComboBox<String> jNetworkComboBox;
     private javax.swing.JLabel jQuestionLabel;
     // End of variables declaration//GEN-END:variables

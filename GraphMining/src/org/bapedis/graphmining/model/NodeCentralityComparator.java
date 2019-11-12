@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.graphmining.centrality;
+package org.bapedis.graphmining.model;
 
 import java.util.Comparator;
 import org.gephi.graph.api.Node;
@@ -12,10 +12,10 @@ import org.gephi.graph.api.Node;
  *
  * @author Loge
  */
-public class RankComparator implements Comparator<Node> {
+public class NodeCentralityComparator implements Comparator<Node> {
     private final String attribute;
 
-    public RankComparator(String attribute) {
+    public NodeCentralityComparator(String attribute) {
         this.attribute = attribute;
     }        
 

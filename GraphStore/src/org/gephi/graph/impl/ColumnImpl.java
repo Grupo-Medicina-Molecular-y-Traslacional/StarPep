@@ -150,7 +150,7 @@ public class ColumnImpl implements Column {
 
     @Override
     public String toString() {
-        return title + " (" + typeClass.toString() + ")";
+        return title;
     }
 
     @Override

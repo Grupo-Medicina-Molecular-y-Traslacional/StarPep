@@ -34,6 +34,7 @@ public class HSPNetworkConstructionSetupUI extends javax.swing.JPanel implements
     private void initComponents() {
 
         jCheckBoxReverse = new javax.swing.JCheckBox();
+        infoLabel = new javax.swing.JLabel();
 
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
@@ -46,6 +47,11 @@ public class HSPNetworkConstructionSetupUI extends javax.swing.JPanel implements
             }
         });
         add(jCheckBoxReverse);
+
+        infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(infoLabel, org.openide.util.NbBundle.getMessage(HSPNetworkConstructionSetupUI.class, "HSPNetworkConstructionSetupUI.infoLabel.text")); // NOI18N
+        infoLabel.setToolTipText(org.openide.util.NbBundle.getMessage(HSPNetworkConstructionSetupUI.class, "HSPNetworkConstructionSetupUI.infoLabel.toolTipText")); // NOI18N
+        add(infoLabel);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jCheckBoxReverseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxReverseActionPerformed
@@ -61,6 +67,7 @@ public class HSPNetworkConstructionSetupUI extends javax.swing.JPanel implements
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel infoLabel;
     private javax.swing.JCheckBox jCheckBoxReverse;
     // End of variables declaration//GEN-END:variables
 }

@@ -57,12 +57,22 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
     protected double currentThreshold;
     protected ChartPanel densityChart;
     protected final double[] densityValues;
+    private boolean twoDMap;
 
     public NetworkConstructionAlg(AlgorithmFactory factory) {
         this.factory = factory;
         currentThreshold = 0.0;
         stopRun = new AtomicBoolean(false);
         densityValues = new double[101];
+        twoDMap = true;
+    }
+
+    public boolean is2DMap() {
+        return twoDMap;
+    }
+
+    public void set2DMap(boolean twoDMap) {
+        this.twoDMap = twoDMap;
     }
 
     public double[] getDensityValues() {
@@ -193,8 +203,10 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
             // Update similarity edges
             updateSimilarityEdges();
 
-            //Update node positions
-            updateNodePositions();
+            if (twoDMap) {
+                //Update node positions
+                updateNodePositions();
+            }
 
             densityChart = new ChartPanel(createXYLineChart("", createDensityDataSet()));
             ticket.progress();

@@ -206,7 +206,7 @@ public class HubBridgeCentrality extends AbstractCentrality {
 
             //-------compute the HUB_BRIDGE centrality    
             double internalStrength, externalStrength;
-            double commDensity, measure;
+            double measure;
             Node node;
             for (int i = 0; i < nodes.length; i++) {
                 node = nodes[i];
@@ -228,8 +228,7 @@ public class HubBridgeCentrality extends AbstractCentrality {
                     }
                 }
                 members = mapC.get(community);
-                commDensity = calcCommDensity(community, members);
-                measure = commDensity * members.size() * internalStrength + (1 - commDensity) * mapNC.get(id).size() * externalStrength;
+                measure = members.size() * internalStrength + mapNC.get(id).size() * externalStrength;
                 nodeHubBridge[i] = measure;
                 progress.progress();
             }
@@ -239,22 +238,22 @@ public class HubBridgeCentrality extends AbstractCentrality {
 
     private double calcCommDensity(int community, Set<Node> nodes) {
         double sum = 0;
-        double internalStrength, externalStrength;
+        int intra, inter;
         Node oppositeNode;
         for (Node node : nodes) {
-            internalStrength = 0;
-            externalStrength = 0;
+            intra = 0;
+            inter = 0;
             for (Edge e : graph.getEdges(node, relType)) {
                 oppositeNode = graph.getOpposite(node, e);
                 if (oppositeNode.getAttribute(PeptideAttribute.CLUSTER_ATTR.getId()) != null) {
                     if (community == (int) oppositeNode.getAttribute(PeptideAttribute.CLUSTER_ATTR.getId())) {
-                        internalStrength += e.getWeight();
+                        intra ++;
                     } else {
-                        externalStrength += e.getWeight();
+                        inter ++;
                     }
                 }
             }
-            sum += externalStrength / (internalStrength + externalStrength);
+            sum += (double)inter / (intra + inter);
         }
         return nodes.size() > 0 ? sum / nodes.size() : 0;
     }

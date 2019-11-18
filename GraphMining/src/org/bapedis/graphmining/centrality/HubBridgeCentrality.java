@@ -124,7 +124,7 @@ public class HubBridgeCentrality extends AbstractCentrality {
                     node.setAttribute(RANKING_BY_HUB_BRIDGE, defaultRanking);
                 }
             }
-            
+
             //Save values
             for (int i = 0; i < nodes.length; i++) {
                 nodes[i].setAttribute(HUB_BRIDGE, nodeHubBridge[i]);
@@ -206,7 +206,7 @@ public class HubBridgeCentrality extends AbstractCentrality {
 
             //-------compute the HUB_BRIDGE centrality    
             double internalStrength, externalStrength;
-            double measure;
+            double commDensity, measure;
             Node node;
             for (int i = 0; i < nodes.length; i++) {
                 node = nodes[i];
@@ -227,7 +227,9 @@ public class HubBridgeCentrality extends AbstractCentrality {
                         }
                     }
                 }
-                measure = mapC.get(community).size() * internalStrength + mapNC.get(id).size() * externalStrength;
+                members = mapC.get(community);
+                commDensity = calcCommDensity(community, members);
+                measure = commDensity * members.size() * internalStrength + (1 - commDensity) * mapNC.get(id).size() * externalStrength;
                 nodeHubBridge[i] = measure;
                 progress.progress();
             }
@@ -235,4 +237,25 @@ public class HubBridgeCentrality extends AbstractCentrality {
         }
     }
 
+    private double calcCommDensity(int community, Set<Node> nodes) {
+        double sum = 0;
+        double internalStrength, externalStrength;
+        Node oppositeNode;
+        for (Node node : nodes) {
+            internalStrength = 0;
+            externalStrength = 0;
+            for (Edge e : graph.getEdges(node, relType)) {
+                oppositeNode = graph.getOpposite(node, e);
+                if (oppositeNode.getAttribute(PeptideAttribute.CLUSTER_ATTR.getId()) != null) {
+                    if (community == (int) oppositeNode.getAttribute(PeptideAttribute.CLUSTER_ATTR.getId())) {
+                        internalStrength += e.getWeight();
+                    } else {
+                        externalStrength += e.getWeight();
+                    }
+                }
+            }
+            sum += externalStrength / (internalStrength + externalStrength);
+        }
+        return nodes.size() > 0 ? sum / nodes.size() : 0;
+    }
 }

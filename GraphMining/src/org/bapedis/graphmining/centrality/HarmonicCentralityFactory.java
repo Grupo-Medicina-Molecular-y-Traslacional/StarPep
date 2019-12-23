@@ -42,15 +42,17 @@ Portions Copyrighted 2011 Gephi Consortium.
 package org.bapedis.graphmining.centrality;
 
 import org.bapedis.core.spi.alg.Algorithm;
+import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.spi.alg.NetworkTag;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author pjmcswee
  */
-//@ServiceProvider(service=AlgorithmFactory.class)
+@ServiceProvider(service=AlgorithmFactory.class, position = 110)
 public class HarmonicCentralityFactory implements NetworkTag {
 
     @Override

@@ -168,6 +168,7 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
                 }
             } finally {
                 mainGraph.writeUnlock();
+                pc.getGraphVizSetting().fireChangedGraphView();
             }
 
             double maxDistance = createNetwork();
@@ -271,7 +272,7 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
                 if (graphEdge != null) {
                     distance = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE);
                     similarity = 1.0 - distance / maxDistance;
-                    graphEdge.setWeight(similarity);
+                    graphEdge.setWeight(Math.round(similarity * 100.0) / 100.0);
                 }
             }
             ticket.progress();

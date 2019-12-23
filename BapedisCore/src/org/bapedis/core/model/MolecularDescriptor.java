@@ -106,7 +106,7 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
         return getDoubleValue(peptide, this);
     }
     
-    public static void preprocessing(List<MolecularDescriptor> allFeatures, List<Peptide> peptides) throws MolecularDescriptorException{
+    public static synchronized void preprocessing(List<MolecularDescriptor> allFeatures, List<Peptide> peptides) throws MolecularDescriptorException{
             // Check feature list size
             if (allFeatures.size() < ProjectManager.MIN_AVAILABLE_FEATURES) {
                 throw new MolecularDescriptorNotEnoughException();
@@ -125,7 +125,7 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
     
     }
 
-    public static double getDoubleValue(Peptide pept, MolecularDescriptor attribute) throws MolecularDescriptorNotFoundException {
+    public static synchronized double getDoubleValue(Peptide pept, MolecularDescriptor attribute) throws MolecularDescriptorNotFoundException {
         Object val = pept.getAttributeValue(attribute);
         if (val == null) {
             throw new MolecularDescriptorNotFoundException(pept, attribute);
@@ -133,7 +133,7 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
         return convertToDouble(val);
     }
 
-    private static double convertToDouble(Object value) {
+    private static synchronized double convertToDouble(Object value) {
         if (value instanceof Double) {
             return (double) value;
         } else if (value instanceof Integer) {
@@ -142,7 +142,7 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
         throw new IllegalArgumentException("Unknown double value : " + value);
     }
 
-    public static double max(double[] data) {
+    public static synchronized double max(double[] data) {
         double max = Double.NEGATIVE_INFINITY;
         for (int i = 0; i < data.length; i++) {
             if (Double.isNaN(data[i])) {
@@ -155,7 +155,7 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
         return max;
     }
 
-    public static double min(double[] data) {
+    public static synchronized double min(double[] data) {
         double min = Double.POSITIVE_INFINITY;
         for (int i = 0; i < data.length; i++) {
             if (Double.isNaN(data[i])) {
@@ -168,7 +168,7 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
         return min;
     }
 
-    public static double mean(double[] data) {
+    public static synchronized double mean(double[] data) {
         if (data.length == 0) {
             return Double.NaN;
         }
@@ -179,7 +179,7 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
         return sum / data.length;
     }
 
-    public static double varp(double[] data, double avg) {
+    public static synchronized double varp(double[] data, double avg) {
         if (data.length == 0) {
             return Double.NaN;
         }

@@ -14,7 +14,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Loge
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 5)
+//@ServiceProvider(service = AlgorithmFactory.class, position = 5)
 public class JaccardTanimotoFactory implements DistanceFunctionTag{
 
     @Override

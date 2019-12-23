@@ -7,6 +7,7 @@ package org.bapedis.chemspace.impl;
 
 import java.util.Arrays;
 import java.util.Collections;
+import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.model.CandidatePeptide;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
@@ -62,6 +63,13 @@ public class HSPNetworkConstruction extends NetworkConstructionAlg implements Cl
         }
         return 0;
     }
+    
+    private synchronized AbstractDistance createDistanceAlg(){
+        AbstractDistance distAlg = (AbstractDistance)distFactory.createAlgorithm();
+        distAlg.setFeatures(features);
+        distAlg.setOption(option);
+        return distAlg;
+    }
 
     private double computeHSPNeighbors(Peptide peptide) throws MolecularDescriptorNotFoundException {
         Node node1, node2, node3;
@@ -70,6 +78,8 @@ public class HSPNetworkConstruction extends NetworkConstructionAlg implements Cl
         double distance, maxDistance = 0;
         int cursor;
 
+        AbstractDistance distAlg = createDistanceAlg();
+        distAlg.initAlgo(workspace, ticket);
         if (!stopRun.get()) {
             CandidatePeptide[] candidates = new CandidatePeptide[peptides.length - 1];
             node1 = peptide.getGraphNode();
@@ -81,9 +91,9 @@ public class HSPNetworkConstruction extends NetworkConstructionAlg implements Cl
                     if (graphEdge != null) {
                         distance = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE);
                     } else {
-                        distFunc.setPeptides(peptide, peptides[j]);
-                        distFunc.run();
-                        distance = distFunc.getDistance();
+                        distAlg.setPeptides(peptide, peptides[j]);
+                        distAlg.run();
+                        distance = distAlg.getDistance();
                     }
                     candidates[cursor++] = new CandidatePeptide(peptides[j], distance);
                 }
@@ -122,9 +132,9 @@ public class HSPNetworkConstruction extends NetworkConstructionAlg implements Cl
                             if (graphEdge != null) {
                                 distance = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE);
                             } else {
-                                distFunc.setPeptides(closestPeptide, candidates[k].getPeptide());
-                                distFunc.run();
-                                distance = distFunc.getDistance();
+                                distAlg.setPeptides(closestPeptide, candidates[k].getPeptide());
+                                distAlg.run();
+                                distance = distAlg.getDistance();
                             }
                             if (distance < candidates[k].getDistance()) {
                                 candidates[k] = null;
@@ -135,6 +145,7 @@ public class HSPNetworkConstruction extends NetworkConstructionAlg implements Cl
                 cursor++;
             }
         }
+        distAlg.endAlgo();
         return maxDistance;
     }
 

@@ -19,11 +19,11 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
-import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.bapedis.chemspace.distance.DistanceFunctionTag;
+import org.bapedis.core.io.MD_OUTPUT_OPTION;
 
 public class WizardDistanceFunc implements WizardDescriptor.ValidatingPanel<WizardDescriptor>,
         WizardDescriptor.FinishablePanel<WizardDescriptor>,
@@ -64,16 +64,11 @@ public class WizardDistanceFunc implements WizardDescriptor.ValidatingPanel<Wiza
     @Override
     public VisualDistanceFunc getComponent() {
         if (component == null) {
-            try {
-                AbstractDistance alg = (AbstractDistance) csMapper.getDistanceFunction().clone();
-                component = new VisualDistanceFunc();
-                component.populateJTree(factories);
-                component.setDistanceFactory(alg.getFactory());
-                component.setOption(alg.getOption());
-                component.addPropertyChangeListener(this);
-            } catch (CloneNotSupportedException ex) {
-                Exceptions.printStackTrace(ex);
-            }
+            component = new VisualDistanceFunc();
+            component.populateJTree(factories);
+            component.setDistanceFactory((AlgorithmFactory) csMapper.getDistanceFactory());
+            component.setOption(csMapper.getMdOption());
+            component.addPropertyChangeListener(this);
         }
         return component;
     }
@@ -110,10 +105,11 @@ public class WizardDistanceFunc implements WizardDescriptor.ValidatingPanel<Wiza
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state  
         this.model = wiz;
-        AbstractDistance alg = (AbstractDistance) wiz.getProperty(AbstractDistance.class.getName());
-        if (alg != null) {
-            getComponent().setDistanceFactory(alg.getFactory());
-            getComponent().setOption(alg.getOption());
+        AlgorithmFactory factory = (AlgorithmFactory) wiz.getProperty(AbstractDistance.class.getName());
+        MD_OUTPUT_OPTION option = (MD_OUTPUT_OPTION) wiz.getProperty(MD_OUTPUT_OPTION.class.getName());
+        if (factory != null && option != null) {
+            getComponent().setDistanceFactory(factory);
+            getComponent().setOption(option);
         }
     }
 
@@ -122,9 +118,8 @@ public class WizardDistanceFunc implements WizardDescriptor.ValidatingPanel<Wiza
         // use wiz.putProperty to remember current panel state
         AlgorithmFactory factory = component.getDistanceFactory();
         if (factory != null) {
-            AbstractDistance alg = (AbstractDistance) factory.createAlgorithm();
-            alg.setOption(component.getOption());
-            wiz.putProperty(AbstractDistance.class.getName(), alg);
+            wiz.putProperty(AbstractDistance.class.getName(), factory);
+            wiz.putProperty(MD_OUTPUT_OPTION.class.getName(), component.getOption());
         }
     }
 

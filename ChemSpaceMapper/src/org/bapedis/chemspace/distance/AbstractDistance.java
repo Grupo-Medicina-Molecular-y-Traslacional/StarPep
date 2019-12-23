@@ -37,8 +37,7 @@ public abstract class AbstractDistance implements Algorithm, Cloneable {
     private double distance;
 
     public AbstractDistance(AlgorithmFactory factory) {
-        this.factory = factory;
-        option = MD_OUTPUT_OPTION.Z_SCORE;
+        this.factory = factory;        
     }
 
     public List<MolecularDescriptor> getFeatures() {
@@ -101,6 +100,7 @@ public abstract class AbstractDistance implements Algorithm, Cloneable {
         if (!stopRun && peptide1 != null && peptide2 != null) {
             try {
                 distance = compute(peptide1, peptide2);
+                assert distance >= 0 : "Invalid distance value: " + distance;
             } catch (MolecularDescriptorNotFoundException ex) {
                 Exceptions.printStackTrace(ex);
                 stopRun = true;
@@ -119,7 +119,7 @@ public abstract class AbstractDistance implements Algorithm, Cloneable {
     protected double normalizedValue(Peptide peptide, MolecularDescriptor attr) throws MolecularDescriptorNotFoundException {
         switch (option) {
             case Z_SCORE:
-                return Math.abs(attr.getNormalizedZscoreValue(peptide));
+                return attr.getNormalizedZscoreValue(peptide);
             case MIN_MAX:
                 return attr.getNormalizedMinMaxValue(peptide);
         }

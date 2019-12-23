@@ -86,7 +86,7 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
         this.binsPartition = binsPartition;
     }    
     
-    public double getNormalizedMinMaxValue(Peptide peptide) throws MolecularDescriptorNotFoundException{
+    public synchronized double getNormalizedMinMaxValue(Peptide peptide) throws MolecularDescriptorNotFoundException{
        if (Double.isNaN(min) || Double.isNaN(max)){
          throw new UnsupportedOperationException("The min and max values have not been calculated for molecular feature: " + displayName);
        }
@@ -94,7 +94,7 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
        return (val - min) / (max - min);
     }
     
-    public double getNormalizedZscoreValue(Peptide peptide) throws MolecularDescriptorNotFoundException{
+    public synchronized double getNormalizedZscoreValue(Peptide peptide) throws MolecularDescriptorNotFoundException{
        if (Double.isNaN(mean) || Double.isNaN(std)){
          throw new UnsupportedOperationException("The mean and std values have not been calculated for molecular feature: " + displayName);
        } 
@@ -102,7 +102,7 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
        return (val - mean) / std;
     }
     
-    public double getDoubleValue(Peptide peptide) throws MolecularDescriptorNotFoundException{
+    public synchronized double getDoubleValue(Peptide peptide) throws MolecularDescriptorNotFoundException{
         return getDoubleValue(peptide, this);
     }
     

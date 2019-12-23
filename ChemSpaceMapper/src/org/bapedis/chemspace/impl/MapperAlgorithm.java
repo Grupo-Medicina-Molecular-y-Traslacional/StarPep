@@ -40,6 +40,7 @@ import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.bapedis.chemspace.distance.EuclideanFactory;
+import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.graphmining.clustering.ModularityFactory;
 import org.bapedis.graphmining.clustering.Modularity;
 /**
@@ -61,6 +62,7 @@ public class MapperAlgorithm implements Algorithm {
     protected FeatureExtractionOption feOption;
     protected FeatureSelectionOption fsOption;
     protected SimilaritySearchingOption searchingOption;
+    protected MD_OUTPUT_OPTION mdOption;
 
     //Mapping Algorithms   
     private EmbeddingInputSeqAlg embeddingInputAlg;
@@ -69,7 +71,7 @@ public class MapperAlgorithm implements Algorithm {
     private ChemBaseSimilaritySearchAlg simSearchingAlg;
     private AllDescriptors featureExtractionAlg;
     private FilteringSubsetOptimization featureSelectionAlg;
-    private AbstractDistance distFunction;
+    private AlgorithmFactory distFactory;
     private NetworkConstructionAlg networkAlg;    
     private final WekaPCATransformer pcaTransformer;
     private final Modularity modularityOptimization;
@@ -86,6 +88,7 @@ public class MapperAlgorithm implements Algorithm {
         searchingOption = SimilaritySearchingOption.NO;
         feOption = FeatureExtractionOption.YES;
         fsOption = FeatureSelectionOption.YES;
+        mdOption = MD_OUTPUT_OPTION.Z_SCORE;
 
         //Mapping algorithms
         embeddingInputAlg = (EmbeddingInputSeqAlg) new EmbeddingInputSeqFactory().createAlgorithm();
@@ -97,7 +100,7 @@ public class MapperAlgorithm implements Algorithm {
         pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
         networkAlg = (NetworkConstructionAlg) new HSPNetworkConstructionFactory().createAlgorithm();
         modularityOptimization = (Modularity) new ModularityFactory().createAlgorithm();
-        distFunction = (AbstractDistance) new EuclideanFactory().createAlgorithm();        
+        distFactory = new EuclideanFactory();        
     }
 
     @Override
@@ -179,11 +182,6 @@ public class MapperAlgorithm implements Algorithm {
         if (!stopRun) {
             try {
                 MolecularDescriptor.preprocessing(allFeatures, attrModel.getPeptides());
-                if (distFunction != null) {
-                    distFunction.setFeatures(allFeatures);
-                } else {
-                    throw new RuntimeException("Internal error: Distance function is null");
-                }
             } catch (MolecularDescriptorException ex) {
                 DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
                 pc.reportError(ex.getMessage(), workspace);
@@ -195,13 +193,16 @@ public class MapperAlgorithm implements Algorithm {
         pc.reportMsg(String.format("Chemical similarity searching: %s", searchingOption), workspace);
         if (searchingOption == SimilaritySearchingOption.YES && !stopRun) {
             if (simSearchingAlg != null) {
-                if (distFunction != null) {
-                    pc.reportMsg(String.format("Distance Function: %s", distFunction.getFactory().getName()), workspace);
+                if (distFactory != null) {
+                    pc.reportMsg(String.format("Distance Function: %s", distFactory.getName()), workspace);
+                    AbstractDistance distFunction = (AbstractDistance)distFactory.createAlgorithm();
+                    distFunction.setOption(mdOption);
+                    distFunction.setFeatures(allFeatures);
                     simSearchingAlg.setDistanceFunction(distFunction);
                     currentAlg = simSearchingAlg;
                     execute();
                 } else {
-                    throw new RuntimeException("Internal error: Distance function is null");
+                    throw new RuntimeException("Internal error: Distance factory is null");
                 }
             } else {
                 throw new RuntimeException("Internal error: Similarity searching algorithm is null");
@@ -211,9 +212,7 @@ public class MapperAlgorithm implements Algorithm {
         //WekaPCA Transformer
         pc.reportMsg("Applying PCA transformation", workspace);
         if (!stopRun) {
-            if (distFunction != null && pcaTransformer.getOption() != distFunction.getOption()) {
-                pcaTransformer.setOption(distFunction.getOption());
-            }
+            pcaTransformer.setOption(mdOption);
             currentAlg = pcaTransformer;
             execute();
         }
@@ -221,9 +220,11 @@ public class MapperAlgorithm implements Algorithm {
         // Network construction
         pc.reportMsg("Network construction", workspace);
         if (!stopRun) {
-            if (distFunction != null) {
-                pc.reportMsg(String.format("Distance Function: %s", distFunction.getFactory().getName()), workspace);
-                networkAlg.setDistanceFunction(distFunction);
+            if (distFactory != null) {
+                pc.reportMsg(String.format("Distance Function: %s", distFactory.getName()), workspace);
+                networkAlg.setDistanceFactory(distFactory);
+                networkAlg.setFeatures(allFeatures);
+                networkAlg.setOption(mdOption);
                 networkAlg.setXyzSpace(pcaTransformer.getXYZSpace());
                 currentAlg = networkAlg;
                 execute();
@@ -296,6 +297,14 @@ public class MapperAlgorithm implements Algorithm {
     public void setNrdOption(RemovingRedundantOption nrdOption) {
         this.nrdOption = nrdOption;
     }
+    
+    public MD_OUTPUT_OPTION getMdOption() {
+        return mdOption;
+    }
+
+    public void setMdOption(MD_OUTPUT_OPTION option) {
+        this.mdOption = option;
+    }    
 
     public EmbeddingInputSeqAlg getEmbeddingInputAlg() {
         return embeddingInputAlg;
@@ -381,12 +390,12 @@ public class MapperAlgorithm implements Algorithm {
         this.networkAlg = alg;
     }
 
-    public AbstractDistance getDistanceFunction() {
-        return distFunction;
+    public AlgorithmFactory getDistanceFactory() {
+        return distFactory;
     }
 
-    public void setDistanceFunction(AbstractDistance distFunction) {
-        this.distFunction = distFunction;
+    public void setDistanceFactory(AlgorithmFactory distFactory) {
+        this.distFactory = distFactory;
     }
 
     @Override

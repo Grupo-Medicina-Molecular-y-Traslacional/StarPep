@@ -6,14 +6,16 @@
 package org.bapedis.chemspace.impl;
 
 import java.text.DecimalFormat;
+import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.vecmath.Vector3f;
 import org.bapedis.chemspace.distance.AbstractDistance;
-import static org.bapedis.chemspace.impl.NetworkThresholdUpdater.pc;
 import org.bapedis.chemspace.model.CoordinateSpace;
+import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
@@ -53,10 +55,12 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
     protected ProgressTicket ticket;
     protected final AtomicBoolean stopRun;
     protected CoordinateSpace xyzSpace;
-    protected AbstractDistance distFunc;
+    protected AlgorithmFactory distFactory;
+    protected MD_OUTPUT_OPTION option;
     protected double currentThreshold;
     protected ChartPanel densityChart;
     protected final double[] densityValues;
+    protected List<MolecularDescriptor> features;
     private boolean twoDMap;
 
     public NetworkConstructionAlg(AlgorithmFactory factory) {
@@ -74,18 +78,33 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
     public void set2DMap(boolean twoDMap) {
         this.twoDMap = twoDMap;
     }
+    public List<MolecularDescriptor> getFeatures() {
+        return features;
+    }
+
+    public void setFeatures(List<MolecularDescriptor> features) {
+        this.features = features;
+    }      
+    
+    public MD_OUTPUT_OPTION getOption() {
+        return option;
+    }
+
+    public void setOption(MD_OUTPUT_OPTION option) {
+        this.option = option;
+    }    
 
     public double[] getDensityValues() {
         return densityValues;
     }
 
-    public AbstractDistance getDistanceFunction() {
-        return distFunc;
+    public AlgorithmFactory getDistanceFactory() {
+        return distFactory;
     }
 
-    public void setDistanceFunction(AbstractDistance distFunc) {
-        this.distFunc = distFunc;
-    }
+    public void setDistanceFactory(AlgorithmFactory distanceFactory) {
+        this.distFactory = distanceFactory;
+    }    
 
     public CoordinateSpace getXyzSpace() {
         return xyzSpace;
@@ -150,7 +169,7 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
     @Override
     public AlgorithmFactory getFactory() {
         return factory;
-    }
+    }        
 
     @Override
     public Object clone() throws CloneNotSupportedException {
@@ -202,6 +221,7 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
             pc.reportMsg(yAxis.toString(), workspace);
 
             // Update similarity edges
+            pc.reportMsg("Threshold: " + String.format("%.2f", currentThreshold), workspace);
             updateSimilarityEdges();
 
             if (twoDMap) {

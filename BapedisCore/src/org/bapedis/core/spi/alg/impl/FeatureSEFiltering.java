@@ -73,7 +73,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         thresholdPercent = 10;
         redundancyOption = REDUNDANCY_SPEARMAN;
         redundancyCutoff = 0.8;
-        selectionOption = SELECT_TOP;
+        selectionOption = SELECT_ALL;
         topRank = 40;
         
         stopRun = new AtomicBoolean();

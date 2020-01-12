@@ -160,9 +160,9 @@ public class Modularity implements Algorithm {
                 }
             }
         }
-        if(attrModel != null){
+        if (attrModel != null) {
             attrModel.removeDisplayedColumn(CLUSTER_ATTR);
-        }        
+        }
         isCanceled = false;
         graphModel = pc.getGraphModel(workspace);
         graph = graphModel.getGraphVisible();
@@ -245,7 +245,7 @@ public class Modularity implements Algorithm {
                     if (computedModularityMetrics.containsKey("modularityResolution")) {
                         modularityResolution = computedModularityMetrics.get("modularityResolution");
                     }
-                } 
+                }
                 pc.reportMsg(String.format("Modularity: %.2f", modularity), workspace);
                 pc.reportMsg("Number of Communities: " + structure.communities.size(), workspace);
             } finally {
@@ -482,7 +482,7 @@ public class Modularity implements Algorithm {
             for (Node node : nodes) {
                 map.put(node, index);
                 nodeCommunities[index] = new Community(this);
-
+                topology[index] = new ArrayList<>();
                 nodeConnectionsWeight[index] = new LinkedHashMap<>();
                 nodeConnectionsCount[index] = new LinkedHashMap<>();
                 weights[index] = 0;
@@ -499,7 +499,6 @@ public class Modularity implements Algorithm {
 
             for (Node node : map.keySet()) {
                 int node_index = map.get(node);
-                topology[node_index] = new ArrayList<>();
 
                 Set<Node> uniqueNeighbors = new HashSet<>(graph.getNeighbors(node, relType).toCollection());
                 for (Node neighbor : uniqueNeighbors) {
@@ -620,6 +619,9 @@ public class Modularity implements Algorithm {
         }
 
         public void removeNodeFromItsCommunity(int node) {
+            if (isCanceled){
+                return;
+            }
             Community community = nodeCommunities[node];
             for (ModEdge e : topology[node]) {
                 int neighbor = e.target;

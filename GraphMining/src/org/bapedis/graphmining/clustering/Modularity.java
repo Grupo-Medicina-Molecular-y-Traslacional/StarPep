@@ -247,13 +247,14 @@ public class Modularity implements Algorithm {
                     }
                 } 
                 pc.reportMsg(String.format("Modularity: %.2f", modularity), workspace);
+                pc.reportMsg("Number of Communities: " + structure.communities.size(), workspace);
             } finally {
                 graph.readUnlock();
             }
         }
     }
 
-    protected HashMap<String, Double> computeModularity(CommunityStructure theStructure, int[] comStructure,
+    private HashMap<String, Double> computeModularity(CommunityStructure theStructure, int[] comStructure,
             double currentResolution, boolean randomized, boolean weighted) {
         isCanceled = false;
         Random rand = new Random();
@@ -325,7 +326,7 @@ public class Modularity implements Algorithm {
         return bestCommunity;
     }
 
-    private int[] fillComStructure(CommunityStructure theStructure, int[] comStructure) {
+    private void fillComStructure(CommunityStructure theStructure, int[] comStructure) {
         int count = 0;
 
         for (Community com : theStructure.communities) {
@@ -337,7 +338,7 @@ public class Modularity implements Algorithm {
             }
             count++;
         }
-        return comStructure;
+        //return comStructure;
     }
 
     private double[] fillDegreeCount(CommunityStructure theStructure, int[] comStructure, double[] nodeDegrees, boolean weighted) {
@@ -435,10 +436,10 @@ public class Modularity implements Algorithm {
 //        return report;
 //    }
     private double q(int node, Community community, CommunityStructure theStructure, double currentResolution) {
-        Float edgesToFloat = theStructure.nodeConnectionsWeight[node].get(community);
+        Double edgesToDouble = theStructure.nodeConnectionsWeight[node].get(community);
         double edgesTo = 0;
-        if (edgesToFloat != null) {
-            edgesTo = edgesToFloat.doubleValue();
+        if (edgesToDouble != null) {
+            edgesTo = edgesToDouble;
         }
         double weightSum = community.weightSum;
         double nodeWeight = theStructure.weights[node];
@@ -454,35 +455,36 @@ public class Modularity implements Algorithm {
 
     class CommunityStructure {
 
-        HashMap<Community, Float>[] nodeConnectionsWeight;
-        HashMap<Community, Integer>[] nodeConnectionsCount;
-        HashMap<Node, Integer> map;
+        Map<Community, Double>[] nodeConnectionsWeight;
+        Map<Community, Integer>[] nodeConnectionsCount;
+        Map<Node, Integer> map;
         Community[] nodeCommunities;
         double[] weights;
         double graphWeightSum;
         List<ModEdge>[] topology;
         List<Community> communities;
         int N;
-        HashMap<Integer, Community> invMap;
+        Map<Integer, Community> invMap;
 
         CommunityStructure() {
             N = nodes.length;
-            invMap = new HashMap<>();
-            nodeConnectionsWeight = new HashMap[N];
-            nodeConnectionsCount = new HashMap[N];
+            invMap = new LinkedHashMap<>();
+            nodeConnectionsWeight = new LinkedHashMap[N];
+            nodeConnectionsCount = new LinkedHashMap[N];
             nodeCommunities = new Community[N];
-            map = new HashMap<>();
+            map = new LinkedHashMap<>();
             topology = new ArrayList[N];
             communities = new ArrayList<>();
             int index = 0;
             weights = new double[N];
+            graphWeightSum = 0;
 
             for (Node node : nodes) {
                 map.put(node, index);
                 nodeCommunities[index] = new Community(this);
 
-                nodeConnectionsWeight[index] = new HashMap<>();
-                nodeConnectionsCount[index] = new HashMap<>();
+                nodeConnectionsWeight[index] = new LinkedHashMap<>();
+                nodeConnectionsCount[index] = new LinkedHashMap<>();
                 weights[index] = 0;
                 nodeCommunities[index].seed(index);
                 Community hidden = new Community(structure);
@@ -505,7 +507,7 @@ public class Modularity implements Algorithm {
                         continue;
                     }
                     int neighbor_index = map.get(neighbor);
-                    float weight = 0;
+                    double weight = 0;
 
                     //Sum all parallel edges weight:
                     for (Edge edge : graph.getEdges(node, neighbor, relType)) {
@@ -555,7 +557,7 @@ public class Modularity implements Algorithm {
 
                 ////////
                 //Remove Node Connection to this community
-                Float neighEdgesTo = nodeConnectionsWeight[neighbor].get(to);
+                Double neighEdgesTo = nodeConnectionsWeight[neighbor].get(to);
                 if (neighEdgesTo == null) {
                     nodeConnectionsWeight[neighbor].put(to, e.weight);
                 } else {
@@ -570,7 +572,7 @@ public class Modularity implements Algorithm {
 
                 ///////////////////
                 Community adjCom = nodeCommunities[neighbor];
-                Float wEdgesto = adjCom.connectionsWeight.get(to);
+                Double wEdgesto = adjCom.connectionsWeight.get(to);
                 if (wEdgesto == null) {
                     adjCom.connectionsWeight.put(to, e.weight);
                 } else {
@@ -584,7 +586,7 @@ public class Modularity implements Algorithm {
                     adjCom.connectionsCount.put(to, cEdgesto + 1);
                 }
 
-                Float nodeEdgesTo = nodeConnectionsWeight[node].get(adjCom);
+                Double nodeEdgesTo = nodeConnectionsWeight[node].get(adjCom);
                 if (nodeEdgesTo == null) {
                     nodeConnectionsWeight[node].put(adjCom, e.weight);
                 } else {
@@ -599,7 +601,7 @@ public class Modularity implements Algorithm {
                 }
 
                 if (to != adjCom) {
-                    Float comEdgesto = to.connectionsWeight.get(adjCom);
+                    Double comEdgesto = to.connectionsWeight.get(adjCom);
                     if (comEdgesto == null) {
                         to.connectionsWeight.put(adjCom, e.weight);
                     } else {
@@ -624,7 +626,7 @@ public class Modularity implements Algorithm {
 
                 ////////
                 //Remove Node Connection to this community
-                Float edgesTo = nodeConnectionsWeight[neighbor].get(community);
+                Double edgesTo = nodeConnectionsWeight[neighbor].get(community);
                 Integer countEdgesTo = nodeConnectionsCount[neighbor].get(community);
                 if (countEdgesTo - 1 == 0) {
                     nodeConnectionsWeight[neighbor].remove(community);
@@ -637,7 +639,7 @@ public class Modularity implements Algorithm {
                 ///////////////////
                 //Remove Adjacency Community's connection to this community
                 Community adjCom = nodeCommunities[neighbor];
-                Float oEdgesto = adjCom.connectionsWeight.get(community);
+                Double oEdgesto = adjCom.connectionsWeight.get(community);
                 Integer oCountEdgesto = adjCom.connectionsCount.get(community);
                 if (oCountEdgesto - 1 == 0) {
                     adjCom.connectionsWeight.remove(community);
@@ -652,7 +654,7 @@ public class Modularity implements Algorithm {
                 }
 
                 if (adjCom != community) {
-                    Float comEdgesto = community.connectionsWeight.get(adjCom);
+                    Double comEdgesto = community.connectionsWeight.get(adjCom);
                     Integer comCountEdgesto = community.connectionsCount.get(adjCom);
                     if (comCountEdgesto - 1 == 0) {
                         community.connectionsWeight.remove(adjCom);
@@ -663,7 +665,7 @@ public class Modularity implements Algorithm {
                     }
                 }
 
-                Float nodeEgesTo = nodeConnectionsWeight[node].get(adjCom);
+                Double nodeEgesTo = nodeConnectionsWeight[node].get(adjCom);
                 Integer nodeCountEgesTo = nodeConnectionsCount[node].get(adjCom);
                 if (nodeCountEgesTo - 1 == 0) {
                     nodeConnectionsWeight[node].remove(adjCom);
@@ -682,18 +684,19 @@ public class Modularity implements Algorithm {
             addNodeTo(node, to);
         }
 
+        //It makes communities into nodes
         public void zoomOut() {
             int M = communities.size();
             ArrayList<ModEdge>[] newTopology = new ArrayList[M];
             int index = 0;
             nodeCommunities = new Community[M];
-            nodeConnectionsWeight = new HashMap[M];
-            nodeConnectionsCount = new HashMap[M];
-            HashMap<Integer, Community> newInvMap = new HashMap<>();
+            nodeConnectionsWeight = new LinkedHashMap[M];
+            nodeConnectionsCount = new LinkedHashMap[M];
+            Map<Integer, Community> newInvMap = new LinkedHashMap<>();
             for (int i = 0; i < communities.size(); i++) {//Community com : mCommunities) {
                 Community com = communities.get(i);
-                nodeConnectionsWeight[index] = new HashMap<>();
-                nodeConnectionsCount[index] = new HashMap<>();
+                nodeConnectionsWeight[index] = new LinkedHashMap<>();
+                nodeConnectionsCount[index] = new LinkedHashMap<>();
 
                 newTopology[index] = new ArrayList<>();
                 nodeCommunities[index] = new Community(com);
@@ -708,7 +711,7 @@ public class Modularity implements Algorithm {
                 newInvMap.put(index, hidden);
                 for (Community adjCom : iter) {
                     int target = communities.indexOf(adjCom);
-                    float weight = com.connectionsWeight.get(adjCom);
+                    double weight = com.connectionsWeight.get(adjCom);
                     if (target == index) {
                         weightSum += 2. * weight;
                     } else {
@@ -746,9 +749,9 @@ public class Modularity implements Algorithm {
 
         int source;
         int target;
-        float weight;
+        double weight;
 
-        public ModEdge(int s, int t, float w) {
+        public ModEdge(int s, int t, double w) {
             source = s;
             target = t;
             weight = w;
@@ -760,8 +763,8 @@ public class Modularity implements Algorithm {
         double weightSum;
         CommunityStructure structure;
         List<Integer> nodes;
-        HashMap<Community, Float> connectionsWeight;
-        HashMap<Community, Integer> connectionsCount;
+        Map<Community, Double> connectionsWeight;
+        Map<Community, Integer> connectionsCount;
 
         public int size() {
             return nodes.size();
@@ -769,16 +772,16 @@ public class Modularity implements Algorithm {
 
         public Community(Community com) {
             structure = com.structure;
-            connectionsWeight = new HashMap<>();
-            connectionsCount = new HashMap<>();
+            connectionsWeight = new LinkedHashMap<>();
+            connectionsCount = new LinkedHashMap<>();
             nodes = new ArrayList<>();
             //mHidden = pCom.mHidden;
         }
 
         public Community(CommunityStructure structure) {
             this.structure = structure;
-            connectionsWeight = new HashMap<>();
-            connectionsCount = new HashMap<>();
+            connectionsWeight = new LinkedHashMap<>();
+            connectionsCount = new LinkedHashMap<>();
             nodes = new ArrayList<>();
         }
 

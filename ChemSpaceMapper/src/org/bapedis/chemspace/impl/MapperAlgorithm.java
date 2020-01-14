@@ -60,6 +60,7 @@ public class MapperAlgorithm implements Algorithm {
     protected Workspace workspace;
     protected ProgressTicket progressTicket;
     protected boolean stopRun;
+    protected String networkModel;
 
     //Mapping Options   
     protected InputSequenceOption inputOption;
@@ -86,7 +87,8 @@ public class MapperAlgorithm implements Algorithm {
 
     public MapperAlgorithm(MapperAlgorithmFactory factory) {
         this.factory = factory;
-
+        networkModel = "Network";
+        
         //Mapping Options    
         inputOption = InputSequenceOption.CURRENT_WORKSPACE;
         nrdOption = RemovingRedundantOption.NO;
@@ -261,6 +263,7 @@ public class MapperAlgorithm implements Algorithm {
                     networkAlg.setXyzSpace(pcaTransformer.getXYZSpace());
                     currentAlg = networkAlg;
                     execute();
+                    networkModel = networkAlg.getFactory().getName();
                     networkAlg.setDescriptorMatrix(null);
                 } else {
                     throw new RuntimeException("Internal error: Distance function is null");
@@ -326,6 +329,10 @@ public class MapperAlgorithm implements Algorithm {
         }
         return stopRun;
     }
+
+    public String getNetworkType() {
+        return networkModel;
+    }        
 
     public InputSequenceOption getInputOption() {
         return inputOption;

@@ -95,7 +95,7 @@ class DistanceMatrixBuilder extends RecursiveAction {
     }      
 
     private void computeDirectly() {
-        AbstractDistance distAlg = (AbstractDistance)distFactory.createAlgorithm();
+        AbstractDistance distAlg = (AbstractDistance)distFactory.createAlgorithm();        
         for (int y = ylow; y < yhigh; y++) {
             for (int x = xlow; x < Math.min(xhigh, y); x++) {
                 if (!stopRun.get()) {
@@ -111,6 +111,7 @@ class DistanceMatrixBuilder extends RecursiveAction {
                 }
             }
         }
+        distAlg.endAlgo();
     }
 
 }

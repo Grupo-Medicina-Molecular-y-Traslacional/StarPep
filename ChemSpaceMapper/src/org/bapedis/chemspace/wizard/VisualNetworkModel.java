@@ -20,23 +20,23 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class VisualNetworkRepresentation extends javax.swing.JPanel {
+public class VisualNetworkModel extends javax.swing.JPanel {
 
     /**
-     * Creates new form VisualNetworkRepresentation
+     * Creates new form VisualNetworkModel
      */
     static final String CHANGED_NET_TYPE = "network_type";
     private DefaultComboBoxModel comboboxModel;
     private RichTooltip richTooltip;
 
-    public VisualNetworkRepresentation() {
+    public VisualNetworkModel() {
         initComponents();
         comboboxModel = (DefaultComboBoxModel) jNetworkComboBox.getModel();
     }
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.name");
+        return NbBundle.getMessage(VisualNetworkModel.class, "VisualNetworkModel.name");
     }
     
     void set2dMap(boolean flag){
@@ -107,14 +107,13 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         jQuestionLabel = new javax.swing.JLabel();
         jNetworkComboBox = new javax.swing.JComboBox<>();
         centerPanel = new javax.swing.JPanel();
-        infoLabel = new javax.swing.JLabel();
         j2DCheckBox = new javax.swing.JCheckBox();
 
         setMinimumSize(new java.awt.Dimension(460, 400));
         setPreferredSize(new java.awt.Dimension(560, 580));
         setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.jQuestionLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jQuestionLabel, org.openide.util.NbBundle.getMessage(VisualNetworkModel.class, "VisualNetworkModel.jQuestionLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -141,7 +140,7 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         centerPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
@@ -149,31 +148,14 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(centerPanel, gridBagConstraints);
 
-        infoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/bapedis/chemspace/resources/info.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(infoLabel, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.infoLabel.text")); // NOI18N
-        infoLabel.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                infoLabelMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                infoLabelMouseExited(evt);
-            }
-        });
+        org.openide.awt.Mnemonics.setLocalizedText(j2DCheckBox, org.openide.util.NbBundle.getMessage(VisualNetworkModel.class, "VisualNetworkModel.j2DCheckBox.text")); // NOI18N
+        j2DCheckBox.setFocusable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(infoLabel, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(j2DCheckBox, org.openide.util.NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.j2DCheckBox.text")); // NOI18N
-        j2DCheckBox.setFocusable(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(j2DCheckBox, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -183,27 +165,8 @@ public class VisualNetworkRepresentation extends javax.swing.JPanel {
         firePropertyChange(CHANGED_NET_TYPE, null, item.getAlgorithm());
     }//GEN-LAST:event_jNetworkComboBoxActionPerformed
 
-    private void infoLabelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_infoLabelMouseEntered
-        if (richTooltip == null) {
-            FactoryComboboxItem item = (FactoryComboboxItem) comboboxModel.getSelectedItem();
-            if (infoLabel.isEnabled() && item.getFactory() != null) {
-                richTooltip = buildTooltip(item);
-            }
-        }
-        if (richTooltip != null) {
-            richTooltip.showTooltip(infoLabel, evt.getLocationOnScreen());
-        }
-    }//GEN-LAST:event_infoLabelMouseEntered
-
-    private void infoLabelMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_infoLabelMouseExited
-        if (richTooltip != null) {
-            richTooltip.hideTooltip();
-        }
-    }//GEN-LAST:event_infoLabelMouseExited
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
-    private javax.swing.JLabel infoLabel;
     private javax.swing.JCheckBox j2DCheckBox;
     private javax.swing.JComboBox<String> jNetworkComboBox;
     private javax.swing.JLabel jQuestionLabel;

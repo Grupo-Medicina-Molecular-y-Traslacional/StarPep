@@ -24,7 +24,7 @@ import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
-public class WizardNetworkRepresentation implements WizardDescriptor.FinishablePanel<WizardDescriptor>, PropertyChangeListener {
+public class WizardNetworkModel implements WizardDescriptor.FinishablePanel<WizardDescriptor>, PropertyChangeListener {
 
     private static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     private final MapperAlgorithm csMapper;
@@ -33,7 +33,7 @@ public class WizardNetworkRepresentation implements WizardDescriptor.FinishableP
     private WizardDescriptor model;
     private static List<AlgorithmFactory> factories;
 
-    public WizardNetworkRepresentation(MapperAlgorithm csMapper) {
+    public WizardNetworkModel(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
         listeners = new EventListenerList();
 
@@ -52,18 +52,18 @@ public class WizardNetworkRepresentation implements WizardDescriptor.FinishableP
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private VisualNetworkRepresentation component;
+    private VisualNetworkModel component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public VisualNetworkRepresentation getComponent() {
+    public VisualNetworkModel getComponent() {
         if (component == null) {
             try {
                 alg = (NetworkConstructionAlg) csMapper.getNetworkAlg().clone();
-                component = new VisualNetworkRepresentation();
+                component = new VisualNetworkModel();
                 component.populateComboBox(factories, alg);
                 component.set2dMap(alg.is2DMap());
                 component.addPropertyChangeListener(this);
@@ -125,10 +125,10 @@ public class WizardNetworkRepresentation implements WizardDescriptor.FinishableP
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(VisualNetworkRepresentation.CHANGED_NET_TYPE)) {
+        if (evt.getPropertyName().equals(VisualNetworkModel.CHANGED_NET_TYPE)) {
             NetworkConstructionAlg netType = (NetworkConstructionAlg)evt.getNewValue();
             if (netType instanceof CSNetworkConstruction) {
-                model.getNotificationLineSupport().setWarningMessage(NbBundle.getMessage(VisualNetworkRepresentation.class, "VisualNetworkRepresentation.FNWaring.text"));
+                model.getNotificationLineSupport().setWarningMessage(NbBundle.getMessage(VisualNetworkModel.class, "VisualNetworkModel.FNWaring.text"));
             } else{
                 model.getNotificationLineSupport().setWarningMessage(null);                
             }

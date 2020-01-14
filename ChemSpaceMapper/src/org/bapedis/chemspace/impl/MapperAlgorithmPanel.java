@@ -180,8 +180,9 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         this.csMapper = (MapperAlgorithm) algo;
+        jLabelNetworkType.setText(csMapper.getNetworkType());
         networkAlg = csMapper.getNetworkAlg();
-
+        
         setupAxis();
         setupThreshold();
         return this;
@@ -302,7 +303,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         java.awt.GridBagConstraints gridBagConstraints;
 
         leftTopPanel = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
+        jLabelNetworkType = new javax.swing.JLabel();
         rightTopPanel = new javax.swing.JPanel();
         centerPanel = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
@@ -336,8 +337,8 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
         leftTopPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.jLabel5.text")); // NOI18N
-        leftTopPanel.add(jLabel5);
+        org.openide.awt.Mnemonics.setLocalizedText(jLabelNetworkType, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.jLabelNetworkType.text")); // NOI18N
+        leftTopPanel.add(jLabelNetworkType);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -701,7 +702,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabelNetworkType;
     private javax.swing.JButton jLessCutoffButton;
     private javax.swing.JButton jMoreCutoffButton;
     private javax.swing.JLabel jNewDensityLabel;

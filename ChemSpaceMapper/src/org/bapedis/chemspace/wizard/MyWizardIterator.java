@@ -43,7 +43,7 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
             new WizardFeatureExtraction(csMapper), //3
             new WizardFeatureSelection(csMapper), //4
             new WizardDistanceFunc(csMapper), //5
-            new WizardNetworkRepresentation(csMapper) //6
+            new WizardNetworkModel(csMapper) //6
         };
         //Register to listener changes
 //        allPanels[1].getComponent().addPropertyChangeListener(this);

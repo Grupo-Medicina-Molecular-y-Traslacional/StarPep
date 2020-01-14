@@ -193,7 +193,7 @@ public class AttributesModel {
             }
         }
         filteredPept = Collections.unmodifiableList(peptides);
-        return peptides;
+        return filteredPept;
     }
 
     public AttributeModelBridge getBridge() {

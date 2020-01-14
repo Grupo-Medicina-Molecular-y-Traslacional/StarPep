@@ -18,7 +18,6 @@ import org.bapedis.core.model.PeptideHit;
 import org.bapedis.chemspace.model.SimilaritySearchingModel;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
@@ -31,7 +30,6 @@ import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
-import org.bapedis.chemspace.distance.DistanceFunctionTag;
 
 /**
  *
@@ -52,12 +50,21 @@ public abstract class ChemBaseSimilaritySearchAlg implements Algorithm, Cloneabl
     protected AttributesModel newAttrModel;
     protected boolean stopRun;
     protected AbstractDistance distFunc;
+    protected double[][] descriptorMatrix;    
 
     public ChemBaseSimilaritySearchAlg(AlgorithmFactory factory) {
         this.factory = factory;
         searchingModel = new SimilaritySearchingModel();
 
     }
+    
+    public double[][] getDescriptorMatrix() {
+        return descriptorMatrix;
+    }
+
+    public void setDescriptorMatrix(double[][] descriptorMatrix) {
+        this.descriptorMatrix = descriptorMatrix;
+    }    
 
     public SimilaritySearchingModel getSearchingModel() {
         return searchingModel;
@@ -77,7 +84,7 @@ public abstract class ChemBaseSimilaritySearchAlg implements Algorithm, Cloneabl
         CandidatePeptide[] candidates = new CandidatePeptide[targetList.size()];
         int cursor = 0;
         for (Peptide peptide : targetList) {
-            distFunc.setPeptides(query, peptide);
+            distFunc.setContext(query, peptide, descriptorMatrix);
             distFunc.run();
             candidates[cursor++] = new CandidatePeptide(peptide, distFunc.getDistance());
         }

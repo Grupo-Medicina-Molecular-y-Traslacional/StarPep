@@ -6,16 +6,12 @@
 package org.bapedis.chemspace.impl;
 
 import java.text.DecimalFormat;
-import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.vecmath.Vector3f;
-import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.model.CoordinateSpace;
-import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
@@ -56,11 +52,10 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
     protected final AtomicBoolean stopRun;
     protected CoordinateSpace xyzSpace;
     protected AlgorithmFactory distFactory;
-    protected MD_OUTPUT_OPTION option;
     protected double currentThreshold;
     protected ChartPanel densityChart;
     protected final double[] densityValues;
-    protected List<MolecularDescriptor> features;
+    protected double[][] descriptorMatrix;
     private boolean twoDMap;
 
     public NetworkConstructionAlg(AlgorithmFactory factory) {
@@ -77,23 +72,16 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
 
     public void set2DMap(boolean twoDMap) {
         this.twoDMap = twoDMap;
-    }
-    public List<MolecularDescriptor> getFeatures() {
-        return features;
-    }
-
-    public void setFeatures(List<MolecularDescriptor> features) {
-        this.features = features;
-    }      
-    
-    public MD_OUTPUT_OPTION getOption() {
-        return option;
-    }
-
-    public void setOption(MD_OUTPUT_OPTION option) {
-        this.option = option;
     }    
 
+    public double[][] getDescriptorMatrix() {
+        return descriptorMatrix;
+    }
+
+    public void setDescriptorMatrix(double[][] descriptorMatrix) {
+        this.descriptorMatrix = descriptorMatrix;
+    }
+    
     public double[] getDensityValues() {
         return densityValues;
     }
@@ -125,6 +113,7 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
     public ChartPanel getDensityChart() {
         return densityChart;
     }
+      
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
@@ -151,6 +140,7 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
         peptides = null;
         graphModel = null;
         graph = null;
+        descriptorMatrix = null;
         pc.getGraphVizSetting().setSimilarityThreshold(currentThreshold);
         pc.getGraphVizSetting().fireChangedGraphView();
     }

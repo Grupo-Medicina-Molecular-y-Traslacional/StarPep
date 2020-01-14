@@ -64,12 +64,6 @@ public class HSPNetworkConstruction extends NetworkConstructionAlg implements Cl
         return 0;
     }
     
-    private synchronized AbstractDistance createDistanceAlg(){
-        AbstractDistance distAlg = (AbstractDistance)distFactory.createAlgorithm();
-        distAlg.setFeatures(features);
-        distAlg.setOption(option);
-        return distAlg;
-    }
 
     private double computeHSPNeighbors(Peptide peptide) throws MolecularDescriptorNotFoundException {
         Node node1, node2, node3;
@@ -78,8 +72,7 @@ public class HSPNetworkConstruction extends NetworkConstructionAlg implements Cl
         double distance, maxDistance = 0;
         int cursor;
 
-        AbstractDistance distAlg = createDistanceAlg();
-        distAlg.initAlgo(workspace, ticket);
+        AbstractDistance distAlg = (AbstractDistance)distFactory.createAlgorithm();
         if (!stopRun.get()) {
             CandidatePeptide[] candidates = new CandidatePeptide[peptides.length - 1];
             node1 = peptide.getGraphNode();
@@ -91,7 +84,7 @@ public class HSPNetworkConstruction extends NetworkConstructionAlg implements Cl
                     if (graphEdge != null) {
                         distance = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE);
                     } else {
-                        distAlg.setPeptides(peptide, peptides[j]);
+                        distAlg.setContext(peptide, peptides[j], descriptorMatrix);
                         distAlg.run();
                         distance = distAlg.getDistance();
                     }
@@ -132,7 +125,7 @@ public class HSPNetworkConstruction extends NetworkConstructionAlg implements Cl
                             if (graphEdge != null) {
                                 distance = (double) graphEdge.getAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE);
                             } else {
-                                distAlg.setPeptides(closestPeptide, candidates[k].getPeptide());
+                                distAlg.setContext(closestPeptide, candidates[k].getPeptide(), descriptorMatrix);
                                 distAlg.run();
                                 distance = distAlg.getDistance();
                             }

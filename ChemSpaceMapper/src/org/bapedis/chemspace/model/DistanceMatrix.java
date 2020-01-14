@@ -5,21 +5,16 @@
 package org.bapedis.chemspace.model;
 
 import org.bapedis.core.model.Peptide;
-import org.bapedis.core.model.PeptideAttribute;
-
+import static org.bapedis.chemspace.impl.MapperAlgorithm.INDEX_ATTR;
 /**
  *
  * @author Longendri Aguilera Mendoza
  */
 public class DistanceMatrix {
 
-    protected static PeptideAttribute INDEX_ATTR = new PeptideAttribute("indexAttr", "indexAttr", Integer.class, false, true);
     protected double[] data;
 
     public DistanceMatrix(Peptide[] peptides) {
-        for (int index = 0; index < peptides.length; index++) {
-            peptides[index].setAttributeValue(INDEX_ATTR, index);
-        }
         int size = peptides.length;
         data = new double[size * (size - 1) / 2];
     }    

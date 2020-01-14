@@ -4,9 +4,6 @@
  */
 package org.bapedis.chemspace.distance;
 
-import org.bapedis.core.model.MolecularDescriptor;
-import org.bapedis.core.model.MolecularDescriptorNotFoundException;
-import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 
 /**
@@ -22,12 +19,13 @@ public class Canberra extends AbstractDistance
     
 
     @Override
-    public double compute(Peptide peptide1, Peptide peptide2) throws MolecularDescriptorNotFoundException {
+    public double compute(){
         double val1, val2;
         double sum = 0;
-        for (MolecularDescriptor descriptor : features) {
-            val1 = normalizedValue(peptide1, descriptor);
-            val2 = normalizedValue(peptide2, descriptor);
+        for (int j=0; j < descriptorMatrix[index1].length; j++) {
+            val1 = descriptorMatrix[index1][j];
+            val2 = descriptorMatrix[index2][j];
+            
             sum += Math.abs(val1-val2) / (Math.abs(val1) + Math.abs(val2));
         }
         return sum;

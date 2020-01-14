@@ -5,20 +5,15 @@
  */
 package org.bapedis.chemspace.distance;
 
-import java.util.LinkedList;
-import java.util.List;
+import static org.bapedis.chemspace.impl.MapperAlgorithm.INDEX_ATTR;
 import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.core.model.AlgorithmProperty;
-import org.bapedis.core.model.AttributesModel;
-import org.bapedis.core.model.MolecularDescriptor;
-import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 /**
@@ -29,44 +24,27 @@ public abstract class AbstractDistance implements Algorithm, Cloneable {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
 
-    protected MD_OUTPUT_OPTION option;
-    protected List<MolecularDescriptor> features;
     protected AlgorithmFactory factory;
     protected boolean stopRun;
     private Peptide peptide1, peptide2;
+    protected double[][] descriptorMatrix;
+    protected int index1, index2;
     private double distance;
 
     public AbstractDistance(AlgorithmFactory factory) {
-        this.factory = factory;        
+        this.factory = factory;
     }
-
-    public List<MolecularDescriptor> getFeatures() {
-        return features;
-    }
-
-    public void setFeatures(List<MolecularDescriptor> features) {
-        this.features = features;
-    }        
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
-        if (features == null) {
-            features = new LinkedList<>();
-            AttributesModel attrModel = pc.getAttributesModel(workspace);
-            for (String key : attrModel.getMolecularDescriptorKeys()) {
-                for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
-                    features.add(attr);
-                }
-            }
-        }
         stopRun = false;
     }
 
     @Override
     public void endAlgo() {
-        features = null;
         peptide1 = null;
         peptide2 = null;
+        descriptorMatrix = null;
         distance = Double.NaN;
     }
 
@@ -86,9 +64,15 @@ public abstract class AbstractDistance implements Algorithm, Cloneable {
         return factory;
     }
 
-    public void setPeptides(Peptide peptide1, Peptide peptide2) {
+    public void setContext(Peptide peptide1, Peptide peptide2, double[][] descriptorMatrix) {
+        if (!peptide1.hasAttribute(INDEX_ATTR) || !peptide2.hasAttribute(INDEX_ATTR)) {
+            throw new IllegalStateException("Not index attribute found for peptides");
+        }
         this.peptide1 = peptide1;
         this.peptide2 = peptide2;
+        index1 = (int) peptide1.getAttributeValue(INDEX_ATTR);
+        index2 = (int) peptide2.getAttributeValue(INDEX_ATTR);
+        this.descriptorMatrix = descriptorMatrix;
     }
 
     public double getDistance() {
@@ -98,35 +82,12 @@ public abstract class AbstractDistance implements Algorithm, Cloneable {
     @Override
     public void run() {
         if (!stopRun && peptide1 != null && peptide2 != null) {
-            try {
-                distance = compute(peptide1, peptide2);
-                assert distance >= 0 : "Invalid distance value: " + distance;
-            } catch (MolecularDescriptorNotFoundException ex) {
-                Exceptions.printStackTrace(ex);
-                stopRun = true;
-            }
+            distance = compute();
+            assert distance >= 0 : "Invalid distance value: " + distance;
         }
     }
 
-    public MD_OUTPUT_OPTION getOption() {
-        return option;
-    }
-
-    public void setOption(MD_OUTPUT_OPTION option) {
-        this.option = option;
-    }
-
-    protected double normalizedValue(Peptide peptide, MolecularDescriptor attr) throws MolecularDescriptorNotFoundException {
-        switch (option) {
-            case Z_SCORE:
-                return attr.getNormalizedZscoreValue(peptide);
-            case MIN_MAX:
-                return attr.getNormalizedMinMaxValue(peptide);
-        }
-        throw new IllegalArgumentException("Unknown value for normalization index: " + option);
-    }
-
-    abstract double compute(Peptide peptide1, Peptide peptide2) throws MolecularDescriptorNotFoundException;
+    abstract double compute();
 
     @Override
     public Object clone() throws CloneNotSupportedException {

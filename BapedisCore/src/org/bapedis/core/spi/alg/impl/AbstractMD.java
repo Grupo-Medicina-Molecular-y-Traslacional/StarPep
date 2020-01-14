@@ -23,6 +23,7 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
+import org.openide.DialogDisplayer;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
@@ -134,8 +135,8 @@ public abstract class AbstractMD implements Algorithm {
                     double[] data = new double[peptides.size()];
                     double min, max;
                     int ignoredAttr = 0;
-                    for (MolecularDescriptor attr : map.values()) {
-                        try {
+                    try {
+                        for (MolecularDescriptor attr : map.values()) {
                             int pos = 0;
                             for (Peptide pept : peptides) {
                                 data[pos++] = MolecularDescriptor.getDoubleValue(pept, attr);
@@ -153,9 +154,11 @@ public abstract class AbstractMD implements Algorithm {
                             } else {
                                 ignoredAttr++;
                             }
-                        } catch (MolecularDescriptorNotFoundException ex) {
-                            Exceptions.printStackTrace(ex);
                         }
+                    } catch (MolecularDescriptorNotFoundException ex) {
+                        DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
+                        Exceptions.printStackTrace(ex);
+                        cancel();
                     }
                     String key;
                     int maxKeyLength = 0;

@@ -8,7 +8,6 @@ package org.bapedis.chemspace.impl;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.SwingUtilities;
-import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.model.FeatureSelectionOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.InputSequenceOption;
@@ -41,8 +40,13 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.bapedis.chemspace.distance.EuclideanFactory;
 import org.bapedis.core.io.MD_OUTPUT_OPTION;
+import org.bapedis.core.model.MolecularDescriptorNotFoundException;
+import org.bapedis.core.model.Peptide;
+import org.bapedis.core.model.PeptideAttribute;
 import org.bapedis.graphmining.clustering.ModularityFactory;
 import org.bapedis.graphmining.clustering.Modularity;
+import org.openide.util.Exceptions;
+
 /**
  *
  * @author loge
@@ -50,6 +54,7 @@ import org.bapedis.graphmining.clustering.Modularity;
 public class MapperAlgorithm implements Algorithm {
 
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
+    public static PeptideAttribute INDEX_ATTR = new PeptideAttribute("indexAttr", "indexAttr", Integer.class, false, true);
 
     private final MapperAlgorithmFactory factory;
     protected Workspace workspace;
@@ -72,7 +77,7 @@ public class MapperAlgorithm implements Algorithm {
     private AllDescriptors featureExtractionAlg;
     private FilteringSubsetOptimization featureSelectionAlg;
     private AlgorithmFactory distFactory;
-    private NetworkConstructionAlg networkAlg;    
+    private NetworkConstructionAlg networkAlg;
     private final WekaPCATransformer pcaTransformer;
     private final Modularity modularityOptimization;
 
@@ -100,7 +105,7 @@ public class MapperAlgorithm implements Algorithm {
         pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
         networkAlg = (NetworkConstructionAlg) new HSPNetworkConstructionFactory().createAlgorithm();
         modularityOptimization = (Modularity) new ModularityFactory().createAlgorithm();
-        distFactory = new EuclideanFactory();        
+        distFactory = new EuclideanFactory();
     }
 
     @Override
@@ -112,137 +117,177 @@ public class MapperAlgorithm implements Algorithm {
 
     @Override
     public void run() {
-
-        // Embedding input sequences
-        if (nrdOption == RemovingRedundantOption.YES) {
-            if (nonRedundantAlg != null) {
-                nonRedundantAlg.setWorkspaceInput(inputOption == InputSequenceOption.CURRENT_WORKSPACE);
-                pc.reportMsg("Removing redundant sequences", workspace);
-                currentAlg = nonRedundantAlg;
-                execute();
-            } else {
-                throw new RuntimeException("Internal error: Non redundant sequence algorithm is null");
-            }
-        } else if (inputOption == InputSequenceOption.EMBEDDED_DB) {
-            if (embeddingInputAlg != null) {
-                pc.reportMsg("Embedding input sequences", workspace);
-                currentAlg = embeddingInputAlg;
-                execute();
-            } else {
-                throw new RuntimeException("Internal error: Embedding input sequences is null");
-            }
-        }
-
-        // Embedding query sequences        
-        if (searchingOption == SimilaritySearchingOption.YES && !stopRun) {
-            pc.reportMsg("Embedding query sequences", workspace);
-            if (embeddingQueryAlg != null) {
-                currentAlg = embeddingQueryAlg;
-                execute();
-            } else {
-                throw new RuntimeException("Internal error: Embedding query algorithm is null");
-            }
-        }
-
-        // Feature Extraction
-        pc.reportMsg(String.format("Feature extraction: %s", feOption), workspace);
-        if (feOption == FeatureExtractionOption.YES && !stopRun) {
-            if (featureExtractionAlg != null) {
-                currentAlg = featureExtractionAlg;
-                execute();
-            } else {
-                throw new RuntimeException("Internal error: Feature extraction algorithm is null");
-            }
-        }
-
-        // Feature Selection
-        pc.reportMsg(String.format("Feature selection: %s", fsOption), workspace);
-        if (fsOption == FeatureSelectionOption.YES && !stopRun) {
-            if (featureSelectionAlg != null) {
-                currentAlg = featureSelectionAlg;
-                execute();
-            } else {
-                throw new RuntimeException("Internal error: Feature selection algorithm is null");
-            }
-        }
-
-        // Load all descriptors
-        List<MolecularDescriptor> allFeatures = new LinkedList<>();
-        AttributesModel attrModel = pc.getAttributesModel();
         if (!stopRun) {
-            for (String key : attrModel.getMolecularDescriptorKeys()) {
-                for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
-                    allFeatures.add(attr);
-                }
-            }
-        }
-
-        // Preprocessing of features. Computing max, min, mean and std
-        pc.reportMsg("Preprocessing of features. Computing max, min, mean and std", workspace);
-        if (!stopRun) {
-            try {
-                MolecularDescriptor.preprocessing(allFeatures, attrModel.getPeptides());
-            } catch (MolecularDescriptorException ex) {
-                DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
-                pc.reportError(ex.getMessage(), workspace);
-                cancel();
-            }
-        }
-
-        // Chemical similarity searching
-        pc.reportMsg(String.format("Chemical similarity searching: %s", searchingOption), workspace);
-        if (searchingOption == SimilaritySearchingOption.YES && !stopRun) {
-            if (simSearchingAlg != null) {
-                if (distFactory != null) {
-                    pc.reportMsg(String.format("Distance Function: %s", distFactory.getName()), workspace);
-                    AbstractDistance distFunction = (AbstractDistance)distFactory.createAlgorithm();
-                    distFunction.setOption(mdOption);
-                    distFunction.setFeatures(allFeatures);
-                    simSearchingAlg.setDistanceFunction(distFunction);
-                    currentAlg = simSearchingAlg;
+            // Embedding input sequences
+            if (nrdOption == RemovingRedundantOption.YES) {
+                if (nonRedundantAlg != null) {
+                    nonRedundantAlg.setWorkspaceInput(inputOption == InputSequenceOption.CURRENT_WORKSPACE);
+                    pc.reportMsg("Removing redundant sequences", workspace);
+                    currentAlg = nonRedundantAlg;
                     execute();
                 } else {
-                    throw new RuntimeException("Internal error: Distance factory is null");
+                    throw new RuntimeException("Internal error: Non redundant sequence algorithm is null");
                 }
-            } else {
-                throw new RuntimeException("Internal error: Similarity searching algorithm is null");
+            } else if (inputOption == InputSequenceOption.EMBEDDED_DB) {
+                if (embeddingInputAlg != null) {
+                    pc.reportMsg("Embedding input sequences", workspace);
+                    currentAlg = embeddingInputAlg;
+                    execute();
+                } else {
+                    throw new RuntimeException("Internal error: Embedding input sequences is null");
+                }
             }
-        }
 
-        //WekaPCA Transformer
-        pc.reportMsg("Applying PCA transformation", workspace);
-        if (!stopRun) {
-            pcaTransformer.setOption(mdOption);
-            currentAlg = pcaTransformer;
-            execute();
-        }
+            // Embedding query sequences        
+//            if (searchingOption == SimilaritySearchingOption.YES && !stopRun) {
+//                pc.reportMsg("Embedding query sequences", workspace);
+//                if (embeddingQueryAlg != null) {
+//                    currentAlg = embeddingQueryAlg;
+//                    execute();
+//                } else {
+//                    throw new RuntimeException("Internal error: Embedding query algorithm is null");
+//                }
+//            }
 
-        // Network construction
-        pc.reportMsg("Network construction", workspace);
-        if (!stopRun) {
-            if (distFactory != null) {
-                pc.reportMsg(String.format("Distance Function: %s", distFactory.getName()), workspace);
-                networkAlg.setDistanceFactory(distFactory);
-                networkAlg.setFeatures(allFeatures);
-                networkAlg.setOption(mdOption);
-                networkAlg.setXyzSpace(pcaTransformer.getXYZSpace());
-                currentAlg = networkAlg;
+            // Feature Extraction
+            pc.reportMsg(String.format("Feature extraction: %s", feOption), workspace);
+            if (feOption == FeatureExtractionOption.YES && !stopRun) {
+                if (featureExtractionAlg != null) {
+                    currentAlg = featureExtractionAlg;
+                    execute();
+                } else {
+                    throw new RuntimeException("Internal error: Feature extraction algorithm is null");
+                }
+            }
+
+            // Feature Selection
+            pc.reportMsg(String.format("Feature selection: %s", fsOption), workspace);
+            if (fsOption == FeatureSelectionOption.YES && !stopRun) {
+                if (featureSelectionAlg != null) {
+                    currentAlg = featureSelectionAlg;
+                    execute();
+                } else {
+                    throw new RuntimeException("Internal error: Feature selection algorithm is null");
+                }
+            }
+
+            // Set peptide index attribute
+            AttributesModel attrModel = pc.getAttributesModel(workspace);
+            List<Peptide> peptides = attrModel.getPeptides();
+            int index = 0;
+            for (Peptide peptide : peptides) {
+                peptide.setAttributeValue(INDEX_ATTR, index++);
+            }
+
+            // Load all descriptors
+            List<MolecularDescriptor> allFeatures = new LinkedList<>();
+            if (!stopRun) {
+                for (String key : attrModel.getMolecularDescriptorKeys()) {
+                    for (MolecularDescriptor attr : attrModel.getMolecularDescriptors(key)) {
+                        allFeatures.add(attr);
+                    }
+                }
+            }
+
+            // Preprocessing all features. Computing max, min, mean and std            
+            if (!stopRun) {
+                pc.reportMsg("Preprocessing of features. Computing max, min, mean and std", workspace);
+                try {
+                    MolecularDescriptor.preprocessing(allFeatures, peptides);
+                } catch (MolecularDescriptorException ex) {
+                    DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
+                    pc.reportError(ex.getMessage(), workspace);
+                    cancel();
+                }
+            }
+
+            //Create descriptor matrix            
+            double[][] descriptorMatrix = null;
+            if (!stopRun) {
+                pc.reportMsg("Descriptor matrix construction", workspace);
+                descriptorMatrix = new double[peptides.size()][allFeatures.size()];
+                try {
+                    int i, j;
+                    i = 0;
+                    for (Peptide peptide : peptides) {
+                        j = 0;
+                        for (MolecularDescriptor md : allFeatures) {
+                            descriptorMatrix[i][j] = normalizedValue(peptide, md);
+                            j++;
+                        }
+                        i++;
+                    }
+                } catch (MolecularDescriptorNotFoundException ex) {
+                        DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
+                        Exceptions.printStackTrace(ex);
+                        cancel();
+                }
+            }
+
+            // Chemical similarity searching
+//        pc.reportMsg(String.format("Chemical similarity searching: %s", searchingOption), workspace);
+//        if (searchingOption == SimilaritySearchingOption.YES && !stopRun) {
+//            if (simSearchingAlg != null) {
+//                if (distFactory != null) {
+//                    pc.reportMsg(String.format("Distance Function: %s", distFactory.getName()), workspace);
+//                    AbstractDistance distFunction = (AbstractDistance)distFactory.createAlgorithm();
+//                    simSearchingAlg.setDistanceFunction(distFunction);
+//                    currentAlg = simSearchingAlg;
+//                    execute();
+//                } else {
+//                    throw new RuntimeException("Internal error: Distance factory is null");
+//                }
+//            } else {
+//                throw new RuntimeException("Internal error: Similarity searching algorithm is null");
+//            }
+//        }
+
+
+            //WekaPCA Transformer            
+            if (!stopRun) {
+                pc.reportMsg("Applying PCA transformation", workspace);
+                pcaTransformer.setOption(mdOption);
+                currentAlg = pcaTransformer;
                 execute();
-            } else {
-                throw new RuntimeException("Internal error: Distance function is null");
+            }
+
+            // Network construction            
+            if (!stopRun) {
+                pc.reportMsg("Network construction", workspace);
+                if (distFactory != null) {
+                    pc.reportMsg(String.format("Distance Function: %s", distFactory.getName()), workspace);
+                    networkAlg.setDistanceFactory(distFactory);
+                    networkAlg.setDescriptorMatrix(descriptorMatrix);
+                    networkAlg.setXyzSpace(pcaTransformer.getXYZSpace());
+                    currentAlg = networkAlg;
+                    execute();
+                    networkAlg.setDescriptorMatrix(null);
+                } else {
+                    throw new RuntimeException("Internal error: Distance function is null");
+                }
+            }
+
+            //Modularity optimization            
+            if (!stopRun) {
+                pc.reportMsg("Modularity optimization", workspace);
+                if (modularityOptimization != null) {
+                    currentAlg = modularityOptimization;
+                    execute();
+                } else {
+                    throw new RuntimeException("Internal error: Modularity optimization algorithm is null");
+                }
             }
         }
-        
-        //Modularity optimization
-        pc.reportMsg("Modularity optimization", workspace);
-        if (!stopRun){
-            if (modularityOptimization != null){
-                currentAlg = modularityOptimization;
-                execute();
-            } else {
-                throw new RuntimeException("Internal error: Modularity optimization algorithm is null");
-            }
-        }        
+    }
+
+    protected double normalizedValue(Peptide peptide, MolecularDescriptor attr) throws MolecularDescriptorNotFoundException {
+        switch (mdOption) {
+            case Z_SCORE:
+                return attr.getNormalizedZscoreValue(peptide);
+            case MIN_MAX:
+                return attr.getNormalizedMinMaxValue(peptide);
+        }
+        throw new IllegalArgumentException("Unknown value for normalization index: " + mdOption);
     }
 
     private void execute() {
@@ -297,14 +342,14 @@ public class MapperAlgorithm implements Algorithm {
     public void setNrdOption(RemovingRedundantOption nrdOption) {
         this.nrdOption = nrdOption;
     }
-    
+
     public MD_OUTPUT_OPTION getMdOption() {
         return mdOption;
     }
 
     public void setMdOption(MD_OUTPUT_OPTION option) {
         this.mdOption = option;
-    }    
+    }
 
     public EmbeddingInputSeqAlg getEmbeddingInputAlg() {
         return embeddingInputAlg;
@@ -385,8 +430,8 @@ public class MapperAlgorithm implements Algorithm {
     public NetworkConstructionAlg getNetworkAlg() {
         return networkAlg;
     }
-    
-    public void setNetworkAlg(NetworkConstructionAlg alg){
+
+    public void setNetworkAlg(NetworkConstructionAlg alg) {
         this.networkAlg = alg;
     }
 

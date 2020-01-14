@@ -4,14 +4,11 @@
  */
 package org.bapedis.chemspace.impl;
 
-import java.util.List;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import org.bapedis.chemspace.distance.AbstractDistance;
 import org.bapedis.chemspace.model.DistanceMatrix;
-import org.bapedis.core.io.MD_OUTPUT_OPTION;
-import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.task.ProgressTicket;
@@ -26,8 +23,7 @@ class DistanceMatrixBuilder extends RecursiveAction {
     private Peptide[] peptides;
     private ProgressTicket progressTicket;
     protected AlgorithmFactory distFactory;
-    protected MD_OUTPUT_OPTION option;
-    protected List<MolecularDescriptor> features;
+    protected double[][] descriptorMatrix;
     private AtomicBoolean stopRun;    
     
     private final DistanceMatrix matrix;
@@ -35,11 +31,10 @@ class DistanceMatrixBuilder extends RecursiveAction {
 
     private final static Logger log = Logger.getLogger(DistanceMatrixBuilder.class.getName());
 
-    DistanceMatrixBuilder(Peptide[] peptides, AlgorithmFactory distFactory, List<MolecularDescriptor> features, MD_OUTPUT_OPTION option, ProgressTicket progressTicket, AtomicBoolean stopRun) {
+    DistanceMatrixBuilder(Peptide[] peptides, AlgorithmFactory distFactory, double[][] descriptorMatrix, ProgressTicket progressTicket, AtomicBoolean stopRun) {
         this(peptides, new DistanceMatrix(peptides), 0, peptides.length, 0, peptides.length); 
         this.distFactory = distFactory;
-        this.features = features;
-        this.option = option;
+        this.descriptorMatrix = descriptorMatrix;
         this.progressTicket = progressTicket;        
         this.stopRun = stopRun;        
     }
@@ -47,8 +42,7 @@ class DistanceMatrixBuilder extends RecursiveAction {
     private DistanceMatrixBuilder(Peptide[] peptides, DistanceMatrix matrix, int xlow, int xhigh, int ylow, int yhigh, DistanceMatrixBuilder parent){
         this(peptides, matrix, xlow, xhigh, ylow, yhigh);
         this.distFactory = parent.distFactory;
-        this.features = parent.features;
-        this.option = parent.option;
+        this.descriptorMatrix = parent.descriptorMatrix;
         this.progressTicket = parent.progressTicket;        
         this.stopRun = parent.stopRun;                
     }
@@ -102,13 +96,11 @@ class DistanceMatrixBuilder extends RecursiveAction {
 
     private void computeDirectly() {
         AbstractDistance distAlg = (AbstractDistance)distFactory.createAlgorithm();
-        distAlg.setFeatures(features);
-        distAlg.setOption(option);        
         for (int y = ylow; y < yhigh; y++) {
             for (int x = xlow; x < Math.min(xhigh, y); x++) {
                 if (!stopRun.get()) {
                     try {
-                        distAlg.setPeptides(peptides[y], peptides[x]);
+                        distAlg.setContext(peptides[y], peptides[x], descriptorMatrix);
                         distAlg.run();
                         matrix.setValue(peptides[y], peptides[x], distAlg.getDistance());
                         progressTicket.progress();

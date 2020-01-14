@@ -36,7 +36,7 @@ public class CSNetworkConstruction extends NetworkConstructionAlg implements Clo
     @Override
     protected double createNetwork() {
         // Setup Similarity Matrix Builder
-        DistanceMatrixBuilder task = new DistanceMatrixBuilder(peptides, distFactory, features, option, ticket, stopRun);
+        DistanceMatrixBuilder task = new DistanceMatrixBuilder(peptides, distFactory, descriptorMatrix, ticket, stopRun);
         int workunits = task.getWorkUnits();
         ticket.switchToDeterminate(workunits + peptides.length - 1);
 

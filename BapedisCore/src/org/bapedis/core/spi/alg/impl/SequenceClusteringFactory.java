@@ -8,7 +8,7 @@ package org.bapedis.core.spi.alg.impl;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.ClusteringTag;
+import org.bapedis.core.spi.alg.NetworkTag;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -16,8 +16,8 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author loge
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 10)
-public class SequenceClusteringFactory implements ClusteringTag {
+@ServiceProvider(service = AlgorithmFactory.class, position = 105)
+public class SequenceClusteringFactory implements NetworkTag {
 
     private final SequenceClusteringPanel setupUI = new SequenceClusteringPanel();
     

@@ -12,6 +12,7 @@ import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.bapedis.core.ui.components.SequenceAlignmentPanel;
 import org.bapedis.graphmining.centrality.BetweenessCentrality;
+import org.bapedis.graphmining.centrality.HarmonicCentrality;
 import org.bapedis.graphmining.centrality.HubBridgeCentrality;
 import org.bapedis.graphmining.centrality.WeightedDegree;
 import org.gephi.graph.api.Column;
@@ -27,6 +28,7 @@ public class ScaffoldExtractionSetupUI extends javax.swing.JPanel implements Alg
     private static String[] centralityColumn = new String[]{
         NbBundle.getMessage(ScaffoldExtraction.class, "ScaffoldExtraction.centrality.text"),
         BetweenessCentrality.BETWEENNESS,
+        HarmonicCentrality.HARMONIC_CLOSENESS,
         HubBridgeCentrality.HUB_BRIDGE,
         WeightedDegree.WINDEGREE,
         WeightedDegree.WOUTDEGREE,

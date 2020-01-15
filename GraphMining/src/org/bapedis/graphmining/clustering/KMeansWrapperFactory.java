@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.clustering.impl;
+package org.bapedis.graphmining.clustering;
 
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.ClusteringTag;
+import org.bapedis.core.spi.alg.NetworkTag;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -16,8 +16,8 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author loge
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 30)
-public class KMeansWrapperFactory implements ClusteringTag{
+@ServiceProvider(service = AlgorithmFactory.class, position = 250)
+public class KMeansWrapperFactory implements NetworkTag{
 
     @Override
     public String getCategory() {

@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.clustering.impl;
+package org.bapedis.graphmining.clustering;
 
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.ClusteringTag;
+import org.bapedis.core.spi.alg.NetworkTag;
 import org.bapedis.core.util.BinaryLocator;
 import org.bapedis.core.util.RUtil;
 import org.openide.util.NbBundle;
@@ -19,8 +19,8 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author loge
  */
-//@ServiceProvider(service = AlgorithmFactory.class, position = 50)
-public class HierarchicalRClustererFactory implements ClusteringTag {
+@ServiceProvider(service = AlgorithmFactory.class, position = 230)
+public class HierarchicalRClustererFactory implements NetworkTag {
     
     public HierarchicalRClustererFactory() {
         if (!RUtil.RSCRIPT_BINARY.isFound()) {

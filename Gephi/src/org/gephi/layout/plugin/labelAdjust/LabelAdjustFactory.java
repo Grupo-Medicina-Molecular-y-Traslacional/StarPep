@@ -51,7 +51,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Mathieu Bastian
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 300)
+@ServiceProvider(service = AlgorithmFactory.class, position = 130)
 public class LabelAdjustFactory extends AbstractLayoutFactory {
 
     @Override

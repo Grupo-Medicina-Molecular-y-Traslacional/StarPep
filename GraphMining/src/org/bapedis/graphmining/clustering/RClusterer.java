@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.clustering.impl;
+package org.bapedis.graphmining.clustering;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -101,6 +101,9 @@ public abstract class RClusterer extends AbstractClusterizer {
                 if (!rScriptPath.equals(RUtil.RSCRIPT_BINARY.getLocation())) {
                     if (new File(rScriptPath).isDirectory()) {
                         RUtil.RSCRIPT_BINARY.setParent(rScriptPath);
+                        if(!RUtil.RSCRIPT_BINARY.isFound()){
+                            RUtil.RSCRIPT_BINARY.setParent(new File(rScriptPath, "bin").getAbsolutePath());
+                        }
                     } else {
                         if (OSUtil.isWindows() && !rScriptPath.endsWith(".exe")) {
                             RUtil.RSCRIPT_BINARY.setLocation(rScriptPath + ".exe"); ;

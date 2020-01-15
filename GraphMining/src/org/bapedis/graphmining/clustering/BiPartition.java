@@ -19,13 +19,13 @@ import org.bapedis.graphmining.model.Vertex;
  *
  * @author loge
  */
-public class CommunityStructure extends AbstractClusterizer {
+public class BiPartition extends AbstractClusterizer {
 
     protected static final ForkJoinPool fjPool = new ForkJoinPool();
     private int level;
     private final AtomicBoolean atomicRun;
 
-    public CommunityStructure(AlgorithmFactory factory) {
+    public BiPartition(AlgorithmFactory factory) {
         super(factory);
         level = 3;
         atomicRun = new AtomicBoolean();

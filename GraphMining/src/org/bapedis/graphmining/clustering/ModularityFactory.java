@@ -16,7 +16,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Loge
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 50)
+@ServiceProvider(service = AlgorithmFactory.class, position = 210)
 public class ModularityFactory implements NetworkTag {
 
     @Override

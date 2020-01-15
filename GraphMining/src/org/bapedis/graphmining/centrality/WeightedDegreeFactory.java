@@ -16,7 +16,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Loge
  */
-@ServiceProvider(service=AlgorithmFactory.class, position = 120)
+@ServiceProvider(service=AlgorithmFactory.class, position = 320)
 public class WeightedDegreeFactory implements NetworkTag {
 
     @Override

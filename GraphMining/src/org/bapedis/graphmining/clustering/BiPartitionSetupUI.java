@@ -13,13 +13,13 @@ import org.bapedis.core.spi.alg.AlgorithmSetupUI;
  *
  * @author Home
  */
-public class CommunityStructureSetupUI extends javax.swing.JPanel implements AlgorithmSetupUI {
+public class BiPartitionSetupUI extends javax.swing.JPanel implements AlgorithmSetupUI {
 
-    private CommunityStructure communityAlg;
+    private BiPartition communityAlg;
     /**
      * Creates new form CommunityStructureSetupUI
      */
-    public CommunityStructureSetupUI() {
+    public BiPartitionSetupUI() {
         initComponents();
     }
 
@@ -39,7 +39,7 @@ public class CommunityStructureSetupUI extends javax.swing.JPanel implements Alg
 
         setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(CommunityStructureSetupUI.class, "CommunityStructureSetupUI.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(BiPartitionSetupUI.class, "BiPartitionSetupUI.jLabel1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -59,7 +59,7 @@ public class CommunityStructureSetupUI extends javax.swing.JPanel implements Alg
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(jComboBox1, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(CommunityStructureSetupUI.class, "CommunityStructureSetupUI.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(BiPartitionSetupUI.class, "BiPartitionSetupUI.jLabel2.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -85,7 +85,7 @@ public class CommunityStructureSetupUI extends javax.swing.JPanel implements Alg
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
-        this.communityAlg = (CommunityStructure)algo;
+        this.communityAlg = (BiPartition)algo;
         jComboBox1.setSelectedIndex(communityAlg.getLevel()-1);
         return this;
     }

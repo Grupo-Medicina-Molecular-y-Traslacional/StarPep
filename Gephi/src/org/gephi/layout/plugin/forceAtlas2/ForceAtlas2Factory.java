@@ -52,7 +52,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Mathieu Jacomy
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 200)
+@ServiceProvider(service = AlgorithmFactory.class, position = 150)
 public class ForceAtlas2Factory extends AbstractLayoutFactory {
 
     @Override

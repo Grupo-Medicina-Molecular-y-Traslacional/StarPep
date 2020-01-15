@@ -43,8 +43,6 @@ import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.PeptideAttribute;
-import org.bapedis.graphmining.clustering.ModularityFactory;
-import org.bapedis.graphmining.clustering.Modularity;
 import org.openide.util.Exceptions;
 
 /**
@@ -80,7 +78,6 @@ public class MapperAlgorithm implements Algorithm {
     private AlgorithmFactory distFactory;
     private NetworkConstructionAlg networkAlg;
     private final WekaPCATransformer pcaTransformer;
-    private final Modularity modularityOptimization;
 
     //Algorithm workflow
     private Algorithm currentAlg;
@@ -106,7 +103,6 @@ public class MapperAlgorithm implements Algorithm {
         featureSelectionAlg = (FilteringSubsetOptimization) new FilteringSubsetOptimizationFactory().createAlgorithm();
         pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
         networkAlg = (NetworkConstructionAlg) new HSPNetworkConstructionFactory().createAlgorithm();
-        modularityOptimization = (Modularity) new ModularityFactory().createAlgorithm();
         distFactory = new EuclideanFactory();
     }
 
@@ -267,17 +263,6 @@ public class MapperAlgorithm implements Algorithm {
                     networkAlg.setDescriptorMatrix(null);
                 } else {
                     throw new RuntimeException("Internal error: Distance function is null");
-                }
-            }
-
-            //Modularity optimization            
-            if (!stopRun) {
-                pc.reportMsg("Modularity optimization", workspace);
-                if (modularityOptimization != null) {
-                    currentAlg = modularityOptimization;
-                    execute();
-                } else {
-                    throw new RuntimeException("Internal error: Modularity optimization algorithm is null");
                 }
             }
         }

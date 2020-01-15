@@ -3,45 +3,45 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.bapedis.clustering.impl;
+package org.bapedis.graphmining.clustering;
 
 import org.bapedis.core.spi.alg.Algorithm;
-import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
-import org.bapedis.core.spi.alg.ClusteringTag;
+import org.bapedis.core.spi.alg.NetworkTag;
 import org.openide.util.NbBundle;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author loge
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 20)
-public class kMeansFactory implements ClusteringTag{
+//@ServiceProvider(service = AlgorithmFactory.class, position = 250)
+public class BiPartitionFactory implements NetworkTag{
+
+    BiPartitionSetupUI setupUI = new BiPartitionSetupUI();
     
     @Override
     public String getCategory() {
-        return NbBundle.getMessage(KMeans.class, "KMeans.category");
+        return NbBundle.getMessage(BiPartitionFactory.class, "BiPartition.category");
     }
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(KMeans.class, "KMeans.name");
+         return NbBundle.getMessage(BiPartitionFactory.class, "BiPartition.name");
     }
 
     @Override
     public String getDescription() {
-        return NbBundle.getMessage(KMeans.class, "KMeans.desc");
+         return NbBundle.getMessage(BiPartitionFactory.class, "BiPartition.desc");
     }
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        return null;
+        return setupUI;
     }
 
     @Override
     public Algorithm createAlgorithm() {
-        return new KMeans(this);
+        return new BiPartition(this);
     }
     
 }

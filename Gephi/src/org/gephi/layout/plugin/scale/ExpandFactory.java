@@ -51,7 +51,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Helder Suzuki <heldersuzuki@gephi.org>>
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 50)
+@ServiceProvider(service = AlgorithmFactory.class, position = 110)
 public class ExpandFactory extends AbstractLayoutFactory{
 
     @Override

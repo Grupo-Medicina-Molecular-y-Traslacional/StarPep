@@ -52,7 +52,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author pjmcswee
  */
-@ServiceProvider(service=AlgorithmFactory.class, position = 110)
+@ServiceProvider(service=AlgorithmFactory.class, position = 310)
 public class HarmonicCentralityFactory implements NetworkTag {
 
     @Override

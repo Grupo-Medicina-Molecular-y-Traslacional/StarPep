@@ -51,7 +51,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Mathieu Jacomy
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 120)
+@ServiceProvider(service = AlgorithmFactory.class, position = 180)
 public class NoverlapLayoutFactory extends AbstractLayoutFactory {
 
     @Override

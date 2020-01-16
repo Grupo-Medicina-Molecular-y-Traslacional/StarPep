@@ -51,7 +51,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Mathieu Bastian
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 140)
+@ServiceProvider(service = AlgorithmFactory.class, position = 110)
 public class FruchtermanReingoldFactory extends AbstractLayoutFactory{
 
     @Override

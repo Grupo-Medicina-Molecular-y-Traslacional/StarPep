@@ -16,7 +16,7 @@ import org.bapedis.core.spi.alg.FeatureExtractionTag;
  *
  * @author Cesar
  */
-@ServiceProvider(service = AlgorithmFactory.class, position = 400)
+@ServiceProvider(service = AlgorithmFactory.class, position = 1000)
 public class IndicesBasedOperatorsFactory implements AlgorithmFactory, FeatureExtractionTag
 {
     @Override

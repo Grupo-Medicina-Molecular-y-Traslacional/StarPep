@@ -5,25 +5,25 @@
  */
 package org.gephi.visualization.apiimpl.contextmenuitems;
 
-import org.bapedis.core.model.GraphNodeWrapper;
-import java.util.LinkedList;
-import java.util.List;
 import javax.swing.Icon;
-import javax.swing.SwingUtilities;
+import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 import org.gephi.visualization.spi.GraphContextMenuItem;
-import org.openide.nodes.NodeOperation;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
-
+/**
+ *
+ * @author Loge
+ */
 @ServiceProvider(service = GraphContextMenuItem.class)
-public class ShowGraphProperties implements GraphContextMenuItem {
+public class SelectNode implements GraphContextMenuItem {
 
     protected Node[] nodes;
     protected Graph graph;
-    protected final String name = NbBundle.getMessage(ShowGraphProperties.class, "ShowProperties.name");
+    protected final String name = NbBundle.getMessage(SelectNode.class, "SelectNode.name");
 
     @Override
     public void setup(Graph graph, Node[] nodes) {
@@ -48,17 +48,10 @@ public class ShowGraphProperties implements GraphContextMenuItem {
 
     @Override
     public void execute() {
-        final List<org.openide.nodes.Node> activeNodes = new LinkedList<>();
-        for(Node n: nodes){
-            activeNodes.add(new GraphNodeWrapper(n));
-        }
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                NodeOperation.getDefault().showProperties(activeNodes.toArray(new org.openide.nodes.Node[0]));
-            }
-        });
-
+        GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
+        for (Node node : nodes) {
+            graphWC.selectNode(node);
+        }        
     }
 
     @Override
@@ -88,6 +81,7 @@ public class ShowGraphProperties implements GraphContextMenuItem {
 
     @Override
     public int getPosition() {
-        return 100;
+        return 80;
     }
+
 }

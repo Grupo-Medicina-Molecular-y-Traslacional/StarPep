@@ -13,5 +13,5 @@ import org.bapedis.core.model.AttributesModel;
  * @author loge
  */
 public interface AttributeModelBridge {
-    void copyTo(AttributesModel attrModel, List<Integer> peptideIDs);
+    void copyTo(AttributesModel attrModel, List<String> peptideIDs);
 }

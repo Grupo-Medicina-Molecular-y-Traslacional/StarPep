@@ -6,6 +6,7 @@
 package org.bapedis.core.ui.actions;
 
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,6 +24,7 @@ import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
@@ -40,6 +42,7 @@ import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.Presenter;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -127,41 +130,24 @@ public class CopyWorkspace extends AbstractAction implements Presenter.Toolbar, 
     }
 
     private void populateMenuItems() {
-        JMenu popupItem = new JMenu(NbBundle.getMessage(CopyPeptides.class, "CTL_CopyWorkspace"));
-        popupItem.add(createJMenuItem(null));
+        JMenu popupItem = new JMenu(NbBundle.getMessage(CopyPeptides.class, "CTL_CopyWorkspace"));             
+        popupItem.add(createJMenuItem());
         popup.add(popupItem);
-
-        JMenuItem item = createJMenuItem(null);
-        menu.add(item);
-        for (Iterator<? extends Workspace> it = pc.getWorkspaceIterator(); it.hasNext();) {
-            Workspace ws = it.next();
-            if (ws != pc.getCurrentWorkspace()) {
-                item = createJMenuItem(ws);
-                popupItem.add(item);
-                popupMap.put(ws.getId(), item);
-
-                item = createJMenuItem(ws);
-                menu.add(item);
-                menuMap.put(ws.getId(), item);
-            }
-        }
+        
+        menu.add(createJMenuItem());
     }
-
-    private JMenuItem createJMenuItem(final Workspace ws) {
-        String name;
-        if (ws == null) {
-            name = NbBundle.getMessage(CopyPeptides.class, "CopyPeptidesToWorkspace.newWorkspace.name");
-        } else {
-            name = ws.getName();
-        }        
+    
+    private JMenuItem createJMenuItem(){
+        String name = NbBundle.getMessage(CopyPeptides.class, "CopyPeptidesToWorkspace.newWorkspace.name");
         JMenuItem item = new JMenuItem(name);
         item.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                SwingWorker worker = new CopyPeptidesWorker(pc.getAttributesModel().getPeptides(), ws);
-                worker.execute();
+            public void actionPerformed(ActionEvent e) {                
+                SwingWorker worker = new CopyPeptidesWorker(pc.getAttributesModel().getPeptides());
+                WindowManager.getDefault().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));  
+                worker.execute();                              
             }
-        });
+        });  
         return item;
     }
 

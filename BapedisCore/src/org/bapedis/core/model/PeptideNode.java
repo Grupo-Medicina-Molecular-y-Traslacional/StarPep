@@ -31,7 +31,6 @@ import org.openide.util.lookup.Lookups;
  */
 public class PeptideNode extends AbstractNode implements PropertyChangeListener {
 
-    protected static final String displayName = NbBundle.getMessage(PeptideNode.class, "PeptideNode.displayName");
     protected static final Action[] globalActions = Utilities.actionsForPath("Actions/EditPeptides").toArray(new Action[0]);
     protected Peptide peptide;
     private final Action[] actions;
@@ -62,13 +61,13 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
 
     @Override
     public String getDisplayName() {
-        return displayName;
+        return peptide.getID();
     }
 
-    @Override
-    public Image getIcon(int type) {
-        return ImageUtilities.loadImage("org/bapedis/core/resources/molecule.png", true);
-    }
+//    @Override
+//    public Image getIcon(int type) {
+//        return ImageUtilities.loadImage("org/bapedis/core/resources/molecule.png", true);
+//    }
 
     public Peptide getPeptide() {
         return peptide;
@@ -90,12 +89,7 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
         PropertySupport.ReadOnly property;
         // Id property
         property = createPropertyField("id", NbBundle.getMessage(PeptideNode.class, "PropertySet.id"),
-                NbBundle.getMessage(PeptideNode.class, "PropertySet.id.desc"), String.class, peptide.getId());
-        set.put(property);
-
-        // Name property
-        property = createPropertyField("name", NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.name"),
-                NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.name.desc"), String.class, peptide.getName());
+                NbBundle.getMessage(PeptideNode.class, "PropertySet.id.desc"), String.class, peptide.getID());
         set.put(property);
 
         // Sequence property

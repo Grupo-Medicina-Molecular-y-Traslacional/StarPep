@@ -227,7 +227,7 @@ public class MapperAlgorithm implements Algorithm {
 //        if (searchingOption == SimilaritySearchingOption.YES && !stopRun) {
 //            if (simSearchingAlg != null) {
 //                if (distFactory != null) {
-//                    pc.reportMsg(String.format("Distance Function: %s", distFactory.getName()), workspace);
+//                    pc.reportMsg(String.format("Distance Function: %s", distFactory.getID()), workspace);
 //                    AbstractDistance distFunction = (AbstractDistance)distFactory.createAlgorithm();
 //                    simSearchingAlg.setDistanceFunction(distFunction);
 //                    currentAlg = simSearchingAlg;

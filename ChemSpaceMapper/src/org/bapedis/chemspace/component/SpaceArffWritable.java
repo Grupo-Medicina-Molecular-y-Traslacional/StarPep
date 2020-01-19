@@ -70,7 +70,7 @@ public class SpaceArffWritable implements ArffWritable {
         Peptide peptide = xyzSpace.getPeptides()[instance];
         switch (attribute) {
             case 0:
-                return Integer.toString(peptide.getId());            
+                return peptide.getID();            
             case 1:
                  return Float.toString(xyzSpace.getCoordinates()[instance][xAxis]);
             case 2:

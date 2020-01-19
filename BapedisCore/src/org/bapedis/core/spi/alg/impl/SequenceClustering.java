@@ -24,7 +24,7 @@ import org.openide.util.NbBundle;
  */
 public class SequenceClustering extends AbstractClusterizer {
 
-    private final HashMap<Integer, Cluster> clusterMap;
+    private final HashMap<String, Cluster> clusterMap;
     private SequenceAlignmentModel alignmentModel;
 
     protected static final int MAX_REJECTS = 8;
@@ -74,7 +74,7 @@ public class SequenceClustering extends AbstractClusterizer {
             cluster.addMember(peptides[0]);
             cluster.setCentroid(peptides[0]);
             clusterList.add(cluster);
-            clusterMap.put(peptides[0].getId(), cluster);
+            clusterMap.put(peptides[0].getID(), cluster);
             Peptide[] centroids = new Peptide[]{peptides[0]};
 
             boolean isRepresentative;
@@ -96,7 +96,7 @@ public class SequenceClustering extends AbstractClusterizer {
                     try {
                         centroid = centroids[j];
                         if (PairwiseSequenceAlignment.computeSequenceIdentity(query.getBiojavaSeq(), centroid.getBiojavaSeq(), alignmentModel) >= identityScore) {
-                            cluster = clusterMap.get(centroid.getId());
+                            cluster = clusterMap.get(centroid.getID());
                             cluster.addMember(query);
                             isRepresentative = false;
                         } else {
@@ -112,7 +112,7 @@ public class SequenceClustering extends AbstractClusterizer {
                     cluster.addMember(query);
                     cluster.setCentroid(query);
                     clusterList.add(cluster);
-                    clusterMap.put(query.getId(), cluster);
+                    clusterMap.put(query.getID(), cluster);
                     // Increase centroids array
                     centroids = new Peptide[centroids.length + 1];
                     int pos = 0;

@@ -65,7 +65,7 @@ public class RemovePeptides extends GlobalContextSensitiveAction<Peptide> {
 
         List<Node> toAddNodes = new LinkedList<>();
         List<Node> toRemoveNodes = new LinkedList<>();
-        List<Integer> peptideIDs = new LinkedList<>();
+        List<String> peptideIDs = new LinkedList<>();
         Collection<? extends Peptide> context = lkpResult.allInstances();
         if (!context.isEmpty()) {
             SwingWorker worker = new SwingWorker<AttributesModel, Void>() {
@@ -75,7 +75,7 @@ public class RemovePeptides extends GlobalContextSensitiveAction<Peptide> {
                         if (context.contains(peptide)) {
                             toRemoveNodes.add(peptide.getGraphNode());
                         }else{
-                            peptideIDs.add(peptide.getId());
+                            peptideIDs.add(peptide.getID());
                             toAddNodes.add(peptide.getGraphNode());                            
                         }
                     }

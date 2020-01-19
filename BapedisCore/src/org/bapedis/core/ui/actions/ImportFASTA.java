@@ -6,11 +6,13 @@
 package org.bapedis.core.ui.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.Iterator;
 import javax.swing.AbstractAction;
 import org.bapedis.core.io.impl.FASTAImporter;
 import org.bapedis.core.io.impl.FASTAImporterUI;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
+import static org.bapedis.core.ui.actions.NewWorkspace.ErrorWS;
 import org.bapedis.core.ui.components.SetupDialog;
 import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
@@ -30,15 +32,13 @@ import org.openide.util.NbBundle;
         id = "org.bapedis.core.ui.actions.ImportFASTA"
 )
 @ActionRegistration(
-        iconBase = "org/bapedis/core/resources/open.png",
         displayName = "#CTL_ImportFASTA"
 )
 @ActionReferences({
     @ActionReference(path = "Actions/ImportPeptides", position = 190),
-    @ActionReference(path = "Menu/File/ImportData", position = 10),
-    @ActionReference(path = "Toolbars/File", position = 290)
+    @ActionReference(path = "Menu/File/ImportData", position = 10)
 })
-@NbBundle.Messages("CTL_ImportFASTA=Import peptides (FASTA format)")
+@NbBundle.Messages("CTL_ImportFASTA=Peptide sequences (FASTA format)")
 public class ImportFASTA extends AbstractAction {
 
     protected final static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
@@ -57,16 +57,22 @@ public class ImportFASTA extends AbstractAction {
             FASTAImporterUI ui = new FASTAImporterUI();
             if (dialog.setup(ui, ui, NbBundle.getMessage(ImportFASTA.class, "ImportFASTA.dialogTitle"))) {
                 try {
-                    Workspace workspace;
-                    if (ui.isCurrentWorkspace()) {
-                        workspace = currentWS;
-                    } else {
-                        workspace = new Workspace(ui.getWorkspaceName());
-                        pc.add(workspace);
+                    String name = ui.getWorkspaceName();
+                    boolean exist = false;
+                    for (Iterator<? extends Workspace> it = pc.getWorkspaceIterator(); it.hasNext();) {
+                        Workspace ws = it.next();
+                        if (ws.getName().equals(name)) {
+                            exist = true;
+                        }
                     }
-                    FASTAImporter importer = new FASTAImporter();
-                    importer.importFASTA(ui.getSelectedFile(), ui.getLabelOfNodes(),
-                            workspace);
+                    if (exist) {
+                        DialogDisplayer.getDefault().notify(ErrorWS);
+                    } else {
+                        Workspace workspace = new Workspace(name);                        
+                        FASTAImporter importer = new FASTAImporter();
+                        importer.importFASTA(ui.getSelectedFile(), ui.getLabelOfNodes(),
+                                workspace);
+                    }
                 } catch (Exception ex) {
                     Exceptions.printStackTrace(ex);
                 }

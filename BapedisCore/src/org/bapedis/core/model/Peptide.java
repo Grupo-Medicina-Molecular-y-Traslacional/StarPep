@@ -28,7 +28,7 @@ import org.openide.util.NbBundle;
  */
  public class Peptide {
 
-    public static final PeptideAttribute ID = new PeptideAttribute("id", NbBundle.getMessage(Peptide.class, "Peptide.attribute.id"), Integer.class, true, false);
+    public static final PeptideAttribute ID = new PeptideAttribute("id", NbBundle.getMessage(Peptide.class, "Peptide.attribute.id"), String.class, true, false);
     public static final PeptideAttribute SEQ = new PeptideAttribute("seq", NbBundle.getMessage(Peptide.class, "Peptide.attribute.seq"), String.class, true, false);
     public static final PeptideAttribute LENGHT = new PeptideAttribute("length", NbBundle.getMessage(Peptide.class, "Peptide.attribute.length"), Integer.class, true, false);
     public final static String CHANGED_ATTRIBUTE = "changed_attribute";
@@ -38,7 +38,7 @@ import org.openide.util.NbBundle;
     protected final Graph graph;
     protected Map<PeptideAttribute, Object> attrsValue;
 
-    protected int id;
+    protected String id;
     protected String seq;
     protected ProteinSequence biojavaSeq;    
 
@@ -48,19 +48,15 @@ import org.openide.util.NbBundle;
         attrsValue = Collections.synchronizedMap(new LinkedHashMap<>());
         propertyChangeSupport = new PropertyChangeSupport(this);
         
-        id = -1;
+        id = null;
         seq = null;
     }
-
-    public int getId() {
-        if (id == -1){
-            id = (int) attrsValue.get(ID);
+    
+    public String getID(){
+        if (id == null){
+            id = (String) attrsValue.get(ID);
         }
         return id;
-    }
-    
-    public String getName(){
-        return (String)graphNode.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME);
     }
 
     public String getSequence() {
@@ -164,7 +160,7 @@ import org.openide.util.NbBundle;
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 37 * hash + Objects.hashCode(getId());
+        hash = 37 * hash + Objects.hashCode(getID());
         return hash;
     }
 
@@ -180,7 +176,7 @@ import org.openide.util.NbBundle;
             return false;
         }
         final Peptide other = (Peptide) obj;
-        return Objects.equals(this.getId(), other.getId());
+        return Objects.equals(this.getID(), other.getID());
     }
 
 }

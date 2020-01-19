@@ -38,7 +38,7 @@ public class AttributesModel {
     protected final static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected static final GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
     protected final Workspace workspace;
-    protected final Map<Integer, Peptide> peptideMap;
+    protected final Map<String, Peptide> peptideMap;
     protected final Map<String, List<MolecularDescriptor>> mdMap;
     protected final Set<PeptideAttribute> displayedColumnsModel;
     private static final int MAX_DISPLAYED_MD_COLUMNS = 10;
@@ -70,17 +70,13 @@ public class AttributesModel {
         displayedColumnsModel.add(Peptide.ID);
         displayedColumnsModel.add(Peptide.SEQ);
         displayedColumnsModel.add(Peptide.LENGHT);
-
-//        List<MolecularDescriptor> list = new LinkedList<>();
-//        list.add(Peptide.LENGHT);
-//        mdMap.put(Peptide.LENGHT.getCategory(), list);
     }
 
     public Workspace getOwnerWS() {
         return workspace;
     }
 
-    public Map<Integer, Peptide> getPeptideMap() {
+    public Map<String, Peptide> getPeptideMap() {
         return peptideMap;
     }
 
@@ -123,6 +119,7 @@ public class AttributesModel {
 //            node.setAttribute(attr.getId(), peptide.getAttributeValue(attr));
 //        }
 //    }
+    
     public Set<String> getMolecularDescriptorKeys() {
         return mdMap.keySet();
     }
@@ -210,17 +207,17 @@ public class AttributesModel {
 
     public void addPeptide(Peptide peptide) {
         nodeList.add(new PeptideNode(peptide));
-        peptideMap.put(peptide.getId(), peptide);
-        checkDefaultNodeAttributes(peptide);
+        peptideMap.put(peptide.getID(), peptide);
+//        checkDefaultNodeAttributes(peptide);
         filteredPept = null;
     }
 
-    private void checkDefaultNodeAttributes(Peptide peptide) {
-        org.gephi.graph.api.Node node = peptide.getGraphNode();
-        if (node.getAttribute(Peptide.ID.getDisplayName()) == null) {
-            node.setAttribute(Peptide.ID.getDisplayName(), peptide.getId());
-        }
-    }
+//    private void checkDefaultNodeAttributes(Peptide peptide) {
+//        org.gephi.graph.api.Node node = peptide.getGraphNode();
+//        if (node.getAttribute(Peptide..getDisplayName()) == null) {
+//            node.setAttribute(Peptide.ID.getDisplayName(), peptide.getId());
+//        }
+//    }
 
     public QuickFilter getQuickFilter() {
         return quickFilter;
@@ -281,7 +278,7 @@ public class AttributesModel {
     private class AttributeModelBridgeImpl implements AttributeModelBridge {
 
         @Override
-        public void copyTo(AttributesModel attrModel, List<Integer> peptideIDs) {
+        public void copyTo(AttributesModel attrModel, List<String> peptideIDs) {
             if (workspace.equals(attrModel.workspace)) {
                 interCopy(attrModel, peptideIDs);
             } else {
@@ -289,7 +286,7 @@ public class AttributesModel {
             }
         }
 
-        private void interCopy(AttributesModel attrModel, List<Integer> peptideIDs) {
+        private void interCopy(AttributesModel attrModel, List<String> peptideIDs) {
             attrModel.mdMap.putAll(mdMap);
 
             for (PeptideAttribute attr : displayedColumnsModel) {
@@ -299,7 +296,7 @@ public class AttributesModel {
             }
 
             if (peptideIDs != null) {
-                for (Integer id : peptideIDs) {
+                for (String id : peptideIDs) {
                     if (!peptideMap.containsKey(id)) {
                         throw new IllegalArgumentException("Invalid peptide id: " + id);
                     }
@@ -309,7 +306,7 @@ public class AttributesModel {
             }
         }
 
-        private void intraCopy(AttributesModel attrModel, List<Integer> peptideIDs) {
+        private void intraCopy(AttributesModel attrModel, List<String> peptideIDs) {
             try {
                 copyMdMapTo(attrModel);
                 copyDisplayedColumnsTo(attrModel);
@@ -378,7 +375,7 @@ public class AttributesModel {
             }
         }
 
-        private void copyDataTo(AttributesModel attrModel, List<Integer> peptideIDs) throws CloneNotSupportedException {
+        private void copyDataTo(AttributesModel attrModel, List<String> peptideIDs) throws CloneNotSupportedException {
             Workspace targetWorkspace = attrModel.getOwnerWS();
             GraphModel targetGraphModel = pc.getGraphModel(targetWorkspace);
 
@@ -392,7 +389,7 @@ public class AttributesModel {
                 //Copy peptides
                 List<org.gephi.graph.api.Node> toAddNodes = new LinkedList<>();
                 Map<PeptideAttribute, Object> currAttrsValue, targetAttrsValue;
-                for (Integer id : peptideIDs) {
+                for (String id : peptideIDs) {
                     if (!peptideMap.containsKey(id)) {
                         throw new IllegalArgumentException("Invalid peptide id: " + id);
                     }

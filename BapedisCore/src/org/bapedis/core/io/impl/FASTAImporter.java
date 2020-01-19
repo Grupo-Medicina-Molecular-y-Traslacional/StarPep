@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.SwingWorker;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.Peptide;
@@ -24,8 +23,6 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphFactory;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
@@ -38,8 +35,7 @@ import org.openide.util.NbBundle;
 public class FASTAImporter {
 
     protected final static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-    protected final static GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
-    private static AtomicInteger counter = new AtomicInteger(45120);
+    protected final static GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);   
 
     public void importFASTA(File file, String label, Workspace workspace) {
         AttributesModel newAttrModel = new AttributesModel(workspace);
@@ -62,9 +58,9 @@ public class FASTAImporter {
             @Override
             protected Object doInBackground() throws Exception {
                 if (oldModel != null) {
-                    List<Integer> peptideIDs = new LinkedList<>();
+                    List<String> peptideIDs = new LinkedList<>();
                     for(Peptide peptide: oldModel.getPeptides()){
-                        peptideIDs.add(peptide.getId());
+                        peptideIDs.add(peptide.getID());
                         graphNodes.add(peptide.getGraphNode());
                     }
                     oldModel.getBridge().copyTo(newAttrModel, peptideIDs);
@@ -81,7 +77,7 @@ public class FASTAImporter {
                     node = getOrAddGraphNode(graphModel, label, id);
 
                     peptide = new Peptide(node, mainGraph);
-                    peptide.setAttributeValue(Peptide.ID, counter.getAndIncrement());
+                    peptide.setAttributeValue(Peptide.ID, id);
                     peptide.setAttributeValue(Peptide.SEQ, seq);
                     peptide.setAttributeValue(Peptide.LENGHT, seq.length());
                     peptide.setBiojavaSeq(protein);
@@ -101,24 +97,18 @@ public class FASTAImporter {
                         workspace.remove(oldModel);                        
                     }
                     workspace.add(newAttrModel);
+                    pc.add(workspace);
                     pc.setCurrentWorkspace(workspace);
                     graphWC.refreshGraphView(workspace, graphNodes, null);
                     pc.getGraphVizSetting(workspace).fireChangedGraphView();
                 } catch (InterruptedException | ExecutionException ex) {
                     Exceptions.printStackTrace(ex);
                 } finally {
-                    ticket.finish();
+                    ticket.finish();                    
                 }
             }
         };
-        sw.execute();
-
-        try {
-
-        } catch (Exception ex) {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
-            DialogDisplayer.getDefault().notify(nd);
-        }
+        sw.execute();       
     }
 
     private Node getOrAddGraphNode(GraphModel graphModel, String label, String id) {

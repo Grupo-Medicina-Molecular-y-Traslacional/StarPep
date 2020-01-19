@@ -33,7 +33,7 @@ import org.openide.util.NbBundle;
  *
  * @author loge
  */
-public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Void> {
+public class FilterExecutor extends SwingWorker<TreeSet<String>, Void> {
 
     protected static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
     protected static final AlgorithmExecutor executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
@@ -96,13 +96,13 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Void> {
     }
 
     @Override
-    protected TreeSet<Integer> doInBackground() throws Exception {
+    protected TreeSet<String> doInBackground() throws Exception {
         pc.reportRunningTask(taskName, workspace);
 
         ticket.start();
         ticket.progress(NbBundle.getMessage(FilterExecutor.class, "FilterExecutor.running"));
 
-        TreeSet<Integer> set = filterModel.isEmpty() ? null : new TreeSet<Integer>();
+        TreeSet<String> set = filterModel.isEmpty() ? null : new TreeSet<String>();
 
         List<PeptideNode> peptideNodes = attrModel.getNodeList();
         Peptide[] targets = new Peptide[peptideNodes.size()];
@@ -148,7 +148,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Void> {
 
                 if (isAccepted(peptide)) {
                     if (!filterModel.isEmpty()) {
-                        set.add(peptide.getId());
+                        set.add(peptide.getID());
                     }
 
                     toAddNodes.add(graphNode);
@@ -189,7 +189,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Void> {
 
     @Override
     protected void done() {
-        TreeSet<Integer> set = null;
+        TreeSet<String> set = null;
         try {
             set = get();
         } catch (InterruptedException | ExecutionException ex) {
@@ -254,9 +254,9 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Void> {
 
     private static class QuickFilterImpl implements QuickFilter {
 
-        private final TreeSet<Integer> set;
+        private final TreeSet<String> set;
 
-        public QuickFilterImpl(TreeSet<Integer> set) {
+        public QuickFilterImpl(TreeSet<String> set) {
             this.set = set;
         }
 
@@ -264,7 +264,7 @@ public class FilterExecutor extends SwingWorker<TreeSet<Integer>, Void> {
         public boolean accept(Object obj) {
             PeptideNode node = ((PeptideNode) obj);
             Peptide peptide = node.getPeptide();
-            return set.contains(peptide.getId());
+            return set.contains(peptide.getID());
         }
 
     }

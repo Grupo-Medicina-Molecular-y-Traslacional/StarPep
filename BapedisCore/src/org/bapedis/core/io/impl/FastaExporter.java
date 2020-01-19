@@ -52,7 +52,7 @@ public class FastaExporter implements Exporter {
                 ProteinSequence seq;
                 for (Peptide pept : attrModel.getPeptides()) {
                     seq = new ProteinSequence(pept.getSequence());
-                    seq.setOriginalHeader(pept.getName());
+                    seq.setOriginalHeader(pept.getID());
                     sequences.add(seq);
                 }
                 if (!stopRun.get()) {

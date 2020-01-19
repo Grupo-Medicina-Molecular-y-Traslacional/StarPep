@@ -45,10 +45,7 @@ public class FASTAImporterUI extends javax.swing.JPanel implements ValidationSup
         validState = false;
         changeSupport = new PropertyChangeSupport(this);
 
-        String name = Workspace.getPrefixName() + " " + Workspace.getCount();
-        jTextField3.setText(name);
-
-        jTextField1.getDocument().addDocumentListener(new DocumentListener() {
+        jTF_file.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -65,24 +62,7 @@ public class FASTAImporterUI extends javax.swing.JPanel implements ValidationSup
             }
         });
 
-        jTextField2.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                updateValidState();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                updateValidState();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-            }
-        });
-
-        jTextField3.getDocument().addDocumentListener(new DocumentListener() {
+        jTF_workspace.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -102,9 +82,8 @@ public class FASTAImporterUI extends javax.swing.JPanel implements ValidationSup
 
     private void updateValidState() {
         boolean oldValidState = validState;
-        if (jTextField1.getText().isEmpty() ||
-            jTextField2.getText().isEmpty() ||
-            (jRadioButton2.isSelected() && jTextField3.getText().isEmpty())) {
+        if (jTF_file.getText().isEmpty() ||
+            jTF_workspace.getText().isEmpty()) {
             validState = false;
         }else{
             validState = true;
@@ -116,19 +95,12 @@ public class FASTAImporterUI extends javax.swing.JPanel implements ValidationSup
         return selectedFile;
     }
 
-    public boolean isCurrentWorkspace() {
-        return jRadioButton1.isSelected();
-    }
-
     public String getLabelOfNodes() {
-        return jTextField2.getText();
+        return jTF_workspace.getText();
     }
 
     public String getWorkspaceName() {
-        if (jRadioButton2.isSelected()) {
-            return jTextField3.getText();
-        }
-        return null;
+        return jTF_workspace.getText();
     }
 
     /**
@@ -142,20 +114,17 @@ public class FASTAImporterUI extends javax.swing.JPanel implements ValidationSup
         java.awt.GridBagConstraints gridBagConstraints;
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        jTextField1 = new javax.swing.JTextField();
+        jTF_file = new javax.swing.JTextField();
         jBtBrowse = new javax.swing.JButton();
         fileLabel = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
-        jTextField3 = new javax.swing.JTextField();
+        jTF_workspace = new javax.swing.JTextField();
 
         setMinimumSize(new java.awt.Dimension(429, 165));
         setPreferredSize(new java.awt.Dimension(430, 200));
         setLayout(new java.awt.GridBagLayout());
 
-        jTextField1.setEditable(false);
+        jTF_file.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -163,7 +132,7 @@ public class FASTAImporterUI extends javax.swing.JPanel implements ValidationSup
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(jTextField1, gridBagConstraints);
+        add(jTF_file, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jBtBrowse, org.openide.util.NbBundle.getMessage(FASTAImporterUI.class, "FASTAImporterUI.jBtBrowse.text")); // NOI18N
         jBtBrowse.addActionListener(new java.awt.event.ActionListener() {
@@ -198,47 +167,7 @@ public class FASTAImporterUI extends javax.swing.JPanel implements ValidationSup
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(jTextField2, gridBagConstraints);
-
-        buttonGroup1.add(jRadioButton1);
-        jRadioButton1.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton1, org.openide.util.NbBundle.getMessage(FASTAImporterUI.class, "FASTAImporterUI.jRadioButton1.text")); // NOI18N
-        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton1ActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(jRadioButton1, gridBagConstraints);
-
-        buttonGroup1.add(jRadioButton2);
-        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton2, org.openide.util.NbBundle.getMessage(FASTAImporterUI.class, "FASTAImporterUI.jRadioButton2.text")); // NOI18N
-        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton2ActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(jRadioButton2, gridBagConstraints);
-
-        jTextField3.setText(org.openide.util.NbBundle.getMessage(FASTAImporterUI.class, "FASTAImporterUI.jTextField3.text")); // NOI18N
-        jTextField3.setEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 10, 0, 0);
-        add(jTextField3, gridBagConstraints);
+        add(jTF_workspace, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBtBrowseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtBrowseActionPerformed
@@ -247,10 +176,10 @@ public class FASTAImporterUI extends javax.swing.JPanel implements ValidationSup
         }
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File inputFile = chooser.getSelectedFile();
-            jTextField1.setText(inputFile.getAbsolutePath());
+            jTF_file.setText(inputFile.getAbsolutePath());
             String name = inputFile.getName();
-            if (jTextField2.getText().isEmpty()) {
-                jTextField2.setText(name.replaceFirst("[.][^.]+$", ""));
+            if (jTF_workspace.getText().isEmpty()) {
+                jTF_workspace.setText(name.replaceFirst("[.][^.]+$", ""));
             }
             boolean oldValidState = validState;
             validState = true;
@@ -258,36 +187,22 @@ public class FASTAImporterUI extends javax.swing.JPanel implements ValidationSup
         }
     }//GEN-LAST:event_jBtBrowseActionPerformed
 
-    private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
-        jTextField3.setEnabled(true);
-    }//GEN-LAST:event_jRadioButton2ActionPerformed
-
-    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
-        jTextField3.setEnabled(false);
-    }//GEN-LAST:event_jRadioButton1ActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel fileLabel;
     private javax.swing.JButton jBtBrowse;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField jTF_file;
+    private javax.swing.JTextField jTF_workspace;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public boolean isValidState() {
-        if (jTextField1.getText().isEmpty()) {
+        if (jTF_file.getText().isEmpty()) {
             return false;
         }
-        if (jTextField2.getText().isEmpty()) {
-            return false;
-        }
-        if (jTextField3.getText().isEmpty()) {
+        if (jTF_workspace.getText().isEmpty()) {
             return false;
         }
         return validState;
@@ -295,7 +210,7 @@ public class FASTAImporterUI extends javax.swing.JPanel implements ValidationSup
 
     @Override
     public void saveSettings() {
-        selectedFile = new File(jTextField1.getText());
+        selectedFile = new File(jTF_file.getText());
         parentDirectory = selectedFile.getParentFile();
     }
 

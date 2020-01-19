@@ -25,7 +25,7 @@ public class GraphElementNavigatorModel {
         // Node      
         Table nodeTable = Lookup.getDefault().lookup(ProjectManager.class).getGraphModel().getNodeTable();
         nodeAvailableColumnsModel = new GraphElementAvailableColumnsModel(new String[]{ProjectManager.NODE_TABLE_PRO_NAME}, 
-                new String[]{GraphStoreConfiguration.ELEMENT_TIMESET_COLUMN_ID});
+                new String[]{GraphStoreConfiguration.ELEMENT_TIMESET_COLUMN_ID, GraphStoreConfiguration.ELEMENT_ID_COLUMN_ID});
         
         nodeAvailableColumnsModel.allKnownColumns.add(new GraphNodeDegreeDataColumn()); 
         

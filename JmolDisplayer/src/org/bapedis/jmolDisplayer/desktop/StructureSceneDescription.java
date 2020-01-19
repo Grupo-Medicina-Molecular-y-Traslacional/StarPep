@@ -33,7 +33,7 @@ public class StructureSceneDescription implements MultiViewDescription, Serializ
 
     @Override
     public String getDisplayName() {
-        return peptide.getName();
+        return peptide.getID();
     }
 
     @Override

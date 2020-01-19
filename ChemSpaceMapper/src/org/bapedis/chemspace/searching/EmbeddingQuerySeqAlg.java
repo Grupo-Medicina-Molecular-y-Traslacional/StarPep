@@ -160,7 +160,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                     node = getOrAddGraphNode(graphModel, QUERY_LABEL, id);
 
                     peptide = new Peptide(node, mainGraph);
-                    peptide.setAttributeValue(Peptide.ID, COUNTER.getAndIncrement());
+                    peptide.setAttributeValue(Peptide.ID, id);
                     peptide.setAttributeValue(Peptide.SEQ, seq);
                     peptide.setAttributeValue(Peptide.LENGHT, seq.length());
                     peptide.setBiojavaSeq(protein);

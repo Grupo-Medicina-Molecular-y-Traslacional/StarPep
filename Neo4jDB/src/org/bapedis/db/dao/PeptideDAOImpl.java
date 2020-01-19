@@ -89,7 +89,7 @@ public class PeptideDAOImpl implements PeptideDAO {
     @Override
     public AttributesModel getPeptides(QueryModel queryModel, GraphModel graphModel, AttributesModel oldModel) {
         AttributesModel attrModel = new AttributesModel(queryModel.getOwnerWS());
-        Map<Integer, Peptide> peptideMap = null;
+        Map<String, Peptide> peptideMap = null;
         if (oldModel != null) {
             oldModel.getBridge().copyTo(attrModel, null);
             peptideMap = oldModel.getPeptideMap();
@@ -112,7 +112,7 @@ public class PeptideDAOImpl implements PeptideDAO {
             // Write lock
             Peptide peptide;
             org.gephi.graph.api.Node graphNode, graphNeighborNode;
-            Integer id;
+            String id;
             String seq;
             Node neoNode, neoNeighborNode;
 
@@ -122,8 +122,7 @@ public class PeptideDAOImpl implements PeptideDAO {
                         neoNode = peptideNodes.next();
                         seq = neoNode.getProperty(PRO_SEQ).toString();
                         // Fill graph
-                        graphNode = getOrAddGraphNodeFromNeoNode(neoNode, graphModel);
-                        id = new Integer((String) graphNode.getId());
+                        graphNode = getOrAddGraphNodeFromNeoNode(neoNode, graphModel);                        
                         for (Relationship relation : neoNode.getRelationships(Direction.OUTGOING)) {
                             neoNeighborNode = relation.getEndNode();
                             graphNeighborNode = getOrAddGraphNodeFromNeoNode(neoNeighborNode, graphModel);
@@ -131,6 +130,7 @@ public class PeptideDAOImpl implements PeptideDAO {
                         }
 
                         //Fill Attribute Model
+                        id = (String)graphNode.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME);
                         if (peptideMap != null && peptideMap.containsKey(id)) {
                             peptide = peptideMap.get(id);
                         } else {

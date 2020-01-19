@@ -12,20 +12,7 @@ import org.openide.util.NbBundle;
  * @author loge
  */
 public enum StarPepAnnotationType {
-    /*
-    NAME("named") {
-
-        @Override
-        public String getDisplayName() {
-            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.name");
-        }
-
-        @Override
-        public String getDescription() {
-            return NbBundle.getMessage(AnnotationType.class, "AnnotationType.name.desc");
-        }
-    },
-     */
+         
     DATABASE("compiled_in") {
 
         @Override

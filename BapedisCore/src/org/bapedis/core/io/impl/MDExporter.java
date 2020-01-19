@@ -95,7 +95,7 @@ public class MDExporter implements Exporter {
                             break;
                         }
                         //Writed ID
-                        pw.format("\"%s\"", pept.getId());
+                        pw.format("\"%s\"", pept.getID());
 
                         //Write features
                         for (String key : keys) {

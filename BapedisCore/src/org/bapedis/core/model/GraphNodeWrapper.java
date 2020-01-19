@@ -41,18 +41,11 @@ public class GraphNodeWrapper extends GraphElementNode {
         set.setName("primary");
         set.setDisplayName(NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.node"));
 
-        // ID property
-        name = NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.id");
-        descName = NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.id.desc");
-        property = createReadOnlyPropertyField("id", name, descName, String.class, (String)node.getId());
-        set.put(property);
-        
         // Name property
         name = NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.name");
         descName = NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.name.desc");
-        final String nameValue = (String)node.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME);
-        property = createReadOnlyPropertyField("name", name, descName, String.class, nameValue);
-        set.put(property);
+        property = createReadOnlyPropertyField("name", name, descName, String.class, (String)node.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
+        set.put(property);        
         
         // Label property
         name = NbBundle.getMessage(GraphNodeWrapper.class, "PropertySet.label");

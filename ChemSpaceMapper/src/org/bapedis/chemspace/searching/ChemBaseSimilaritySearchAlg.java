@@ -124,18 +124,18 @@ public abstract class ChemBaseSimilaritySearchAlg implements Algorithm, Cloneabl
         return resultList;
     }
 
-    protected void dataFusion(List<PeptideHit> resultList, HashMap<Integer, PeptideHit> mapResult) {
+    protected void dataFusion(List<PeptideHit> resultList, HashMap<String, PeptideHit> mapResult) {
         Peptide peptide;
         for (PeptideHit hit : resultList) {
             peptide = hit.getPeptide();
-            if (!mapResult.containsKey(peptide.getId())
-                    || hit.getScore() > mapResult.get(peptide.getId()).getScore()) {
-                mapResult.put(peptide.getId(), hit);
+            if (!mapResult.containsKey(peptide.getID())
+                    || hit.getScore() > mapResult.get(peptide.getID()).getScore()) {
+                mapResult.put(peptide.getID(), hit);
             }
         }
     }
 
-    protected void saveResults(HashMap<Integer, PeptideHit> mapResult) {
+    protected void saveResults(HashMap<String, PeptideHit> mapResult) {
         PeptideHit[] results = mapResult.values().toArray(new PeptideHit[0]);
         Arrays.parallelSort(results, Collections.reverseOrder());
         int topK = -1;

@@ -75,7 +75,7 @@ public class MultiQuerySeqSearch extends BaseSequenceSearchAlg implements MultiQ
                 } else {
                     tmpAttrModel = dao.getPeptides(new QueryModel(workspace), pc.getGraphModel(workspace), pc.getAttributesModel(workspace));
                 }
-                HashMap<Integer, PeptideHit> mapResult = new HashMap<>();
+                HashMap<String, PeptideHit> mapResult = new HashMap<>();
                 Peptide[] targets = tmpAttrModel.getPeptides().toArray(new Peptide[0]);
 
                 List<PeptideHit> hits;
@@ -88,9 +88,9 @@ public class MultiQuerySeqSearch extends BaseSequenceSearchAlg implements MultiQ
                         Peptide peptide;
                         for (PeptideHit hit : hits) {
                             peptide = hit.getPeptide();
-                            if (!mapResult.containsKey(peptide.getId())
-                                    || hit.getScore() > mapResult.get(peptide.getId()).getScore()) {
-                                mapResult.put(peptide.getId(), hit);
+                            if (!mapResult.containsKey(peptide.getID())
+                                    || hit.getScore() > mapResult.get(peptide.getID()).getScore()) {
+                                mapResult.put(peptide.getID(), hit);
                             }
                         }
 

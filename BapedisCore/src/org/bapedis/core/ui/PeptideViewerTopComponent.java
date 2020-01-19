@@ -114,21 +114,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         outline.setPopupUsedFromTheCorner(true);
         outline.setRootVisible(false);
         outline.setColumnHidingAllowed(false);
-//        ETableColumnModel columnModel = (ETableColumnModel) outline.getColumnModel();
-//        //Hide node column
-//        ETableColumn column = (ETableColumn) columnModel.getColumn(0);
-//        columnModel.setColumnHidden(column, true);
 
-//        column.setMaxWidth(120);
-//        column.setPreferredWidth(120);
-//        column.setMinWidth(60);
-        //Sequence column
-//        column = (ETableColumn) columnModel.getColumn(1);
-//        column.setMinWidth(240);
-        //Length column
-//        column = (ETableColumn) columnModel.getColumn(2);
-//        column.setMaxWidth(240);
-//        column.setPreferredWidth(240);
         busyLabel = new JXBusyLabel(new Dimension(20, 20));
         busyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         busyLabel.setText(NbBundle.getMessage(PeptideViewerTopComponent.class, "PeptideViewer.busyLabel.text"));
@@ -143,20 +129,16 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         if (attrModel != null) {
             List<String> columns = new LinkedList<>();
             for (PeptideAttribute attr : attrModel.getDisplayedColumns()) {
-                columns.add(attr.getId());
-                columns.add(attr.getDisplayName());
+                if (attr.isVisible()) {
+                    columns.add(attr.getId());
+                    columns.add(attr.getDisplayName());
+                }
             }
             view.setPropertyColumns(columns.toArray(new String[0]));
             //Hide node column
             ETableColumnModel columnModel = (ETableColumnModel) view.getOutline().getColumnModel();
             ETableColumn column = (ETableColumn) columnModel.getColumn(0);
             columnModel.setColumnHidden(column, true);
-//            ETableColumnModel columnModel = (ETableColumnModel) view.getOutline().getColumnModel();
-//            ETableColumn column;
-//            for (PeptideAttribute attr : attrs) {
-//                column = (ETableColumn) view.getOutline().getColumn(attr.getId());
-//                columnModel.setColumnHidden(column, !attr.isVisible());
-//            }
         } else {
             view.setPropertyColumns(new String[]{});
         }
@@ -319,9 +301,9 @@ public final class PeptideViewerTopComponent extends TopComponent implements
     private void jValueTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jValueTextFieldKeyTyped
         FilterOperator operator = (FilterOperator) jOperatorComboBox.getSelectedItem();
         char c = evt.getKeyChar();
-        if (operator != null && ( operator instanceof IntegerFilterOperator
-                               || operator instanceof LongFilterOperator 
-                               || operator instanceof DoubleFilterOperator)) {
+        if (operator != null && (operator instanceof IntegerFilterOperator
+                || operator instanceof LongFilterOperator
+                || operator instanceof DoubleFilterOperator)) {
             if (c != KeyEvent.VK_BACK_SPACE && c != KeyEvent.VK_DELETE
                     && !operator.isValid(jValueTextField.getText() + c)) {
                 evt.consume();
@@ -473,7 +455,7 @@ public final class PeptideViewerTopComponent extends TopComponent implements
         populateVisibleColumns(attrModel);
         populateFilterFields(attrModel);
         explorerMgr.setRootContext(currentModel == null ? Node.EMPTY : currentModel.getRootNode());
-        setQuickFilter();        
+        setQuickFilter();
     }
 
     private void setQuickFilter() {

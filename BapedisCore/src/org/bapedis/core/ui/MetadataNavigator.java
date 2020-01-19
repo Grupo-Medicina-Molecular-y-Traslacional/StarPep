@@ -384,7 +384,7 @@ public class MetadataNavigator extends JComponent implements
                 TableRowSorter sorter = (TableRowSorter) table.getRowSorter();
                 if (!peptideNodes.isEmpty() && sorter != null) {
                     Peptide peptide = peptideNodes.iterator().next().getPeptide();
-                    sorter.setRowFilter(RowFilter.regexFilter("^" + peptide.getName() + "$", 0));
+                    sorter.setRowFilter(RowFilter.regexFilter("^" + peptide.getID() + "$", 0));
                 }
             }
         }
@@ -447,7 +447,7 @@ public class MetadataNavigator extends JComponent implements
                         Node graphNode;
                         for (Peptide peptide : peptidesModel.getPeptides()) {
                             graphNode = peptide.getGraphNode();
-                            edgeIterable = (annotationType == null) ? graph.getEdges(graphNode) : graph.getEdges(graphNode, relType);
+                            edgeIterable = (annotationType == null) || (relType == -1) ? graph.getEdges(graphNode) : graph.getEdges(graphNode, relType);
                             for (Edge edge : edgeIterable) {
                                 if (annotationType != null) {
                                     if (edge.getTarget().getLabel().equals(annotationType.getLabelName())) {

@@ -24,7 +24,7 @@ public class ChemMultiSimilaritySearchAlg extends ChemBaseSimilaritySearchAlg {
     @Override
     public void run() {
         if (queryList.size() > 0 && targetList.size() > 0) {
-            HashMap<Integer, PeptideHit> mapResult = new HashMap<>();
+            HashMap<String, PeptideHit> mapResult = new HashMap<>();
             List<PeptideHit> resultList;
             for (Peptide query : queryList) {
                 if (!stopRun) {

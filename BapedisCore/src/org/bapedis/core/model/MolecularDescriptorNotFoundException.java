@@ -18,8 +18,8 @@ public class MolecularDescriptorNotFoundException extends MolecularDescriptorExc
     private final MolecularDescriptor attr;
 
     public MolecularDescriptorNotFoundException(Peptide pept, MolecularDescriptor attr) {
-        super(NbBundle.getMessage(MolecularDescriptorNotFoundException.class, "MolecularDescriptorNotFoundException.msg", pept.getName(), attr.getCategory(), attr.getDisplayName()),
-                new NotifyDescriptor.Message(NbBundle.getMessage(MolecularDescriptorNotFoundException.class, "MolecularDescriptorNotFoundException.msgHtml", pept.getName(), attr.getCategory(), attr.getDisplayName()), NotifyDescriptor.ERROR_MESSAGE));
+        super(NbBundle.getMessage(MolecularDescriptorNotFoundException.class, "MolecularDescriptorNotFoundException.msg", pept.getID(), attr.getCategory(), attr.getDisplayName()),
+                new NotifyDescriptor.Message(NbBundle.getMessage(MolecularDescriptorNotFoundException.class, "MolecularDescriptorNotFoundException.msgHtml", pept.getID(), attr.getCategory(), attr.getDisplayName()), NotifyDescriptor.ERROR_MESSAGE));
         this.pept = pept;
         this.attr = attr;
     }

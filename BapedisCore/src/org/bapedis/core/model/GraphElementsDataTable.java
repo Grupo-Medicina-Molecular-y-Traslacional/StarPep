@@ -57,7 +57,7 @@ import org.gephi.graph.api.Element;
 public class GraphElementsDataTable extends AbstractTableModel {
 
     private final ArrayList<Element> elements;
-    private GraphElementDataColumn[] columns;
+    private GraphElementDataColumn[] columns;    
 
     public GraphElementsDataTable(int initialCapacity, GraphElementDataColumn[] columns) {
         this.elements = new ArrayList<>(initialCapacity);

@@ -422,8 +422,10 @@ public class MetadataNavigator extends JComponent implements
         }
 
         final StarPepAnnotationType annotationType = itemAnnotationType;
+        int simType = graphModel.getEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
         int relType = annotationType == null ? -1 : graphModel.getEdgeType(annotationType.getRelationType());
-        int count = relType == -1 ? graph.getEdgeCount() : graph.getEdgeCount(relType);
+        int totalCount = simType == -1 ? graph.getEdgeCount(): graph.getEdgeCount() - graph.getEdgeCount(simType);
+        int count = relType == -1 ? totalCount: graph.getEdgeCount(relType);
 
         final AttributesModel peptidesModel = currentModel;
 
@@ -453,7 +455,7 @@ public class MetadataNavigator extends JComponent implements
                                     if (edge.getTarget().getLabel().equals(annotationType.getLabelName())) {
                                         publish(edge);
                                     }
-                                } else {
+                                } else if (edge.getType() != simType) {
                                     publish(edge);
                                 }
                             }
@@ -486,6 +488,7 @@ public class MetadataNavigator extends JComponent implements
         };
         worker.execute();
     }
+       
 
     class MetadataPopupAdapter extends MouseUtils.PopupMouseAdapter {
 

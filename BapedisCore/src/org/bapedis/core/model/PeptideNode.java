@@ -5,7 +5,6 @@
  */
 package org.bapedis.core.model;
 
-import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
@@ -18,7 +17,6 @@ import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;
-import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
@@ -105,13 +103,13 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
         sheet.put(set);        
 
         // Features         
-        for (PeptideAttribute attr : peptide.getAttributes()) {
-            if (attr instanceof MolecularDescriptor) {
-                setMolecularFeature((MolecularDescriptor) attr);
-            } else if (attr.isVisible() && attr != Peptide.ID && attr != Peptide.SEQ && attr != Peptide.LENGHT) {
-                setOtherFeatures(attr);
-            }
-        }
+//        for (PeptideAttribute attr : peptide.getAttributes()) {
+//            if (attr instanceof MolecularDescriptor) {
+//                setMolecularFeature((MolecularDescriptor) attr);
+//            } else if (attr.isVisible() && attr != Peptide.ID && attr != Peptide.SEQ && attr != Peptide.LENGHT) {
+//                setOtherFeatures(attr);
+//            }
+//        }
 
         return sheet;
     }
@@ -135,6 +133,8 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
             set.remove(attr.getId());
             if (set.getProperties().length == 0) {
                 sheet.remove("molecularFeatures");
+            }else{
+                sheet.put(set);
             }
         }
     }

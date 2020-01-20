@@ -152,6 +152,9 @@ public abstract class AbstractMD implements Algorithm {
                                 list = byCategory.get(category);
                                 list.add(attr);
                             } else {
+                                for (Peptide pept : peptides){
+                                    pept.deleteAttribute(attr);
+                                }
                                 ignoredAttr++;
                             }
                         }

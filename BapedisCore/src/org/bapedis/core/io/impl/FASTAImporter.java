@@ -70,11 +70,12 @@ public class FASTAImporter {
                 Peptide peptide;
                 Node node;
                 String id, seq;
+                int count = 1;
                 for (ProteinSequence protein : entries) {
                     id = protein.getAccession().getID();
                     seq = protein.getSequenceAsString();
-
-                    node = getOrAddGraphNode(graphModel, label, id);
+                    count++;
+                    node = getOrAddGraphNode(graphModel, label, String.valueOf(count), id);
 
                     peptide = new Peptide(node, mainGraph);
                     peptide.setAttributeValue(Peptide.ID, id);
@@ -111,7 +112,7 @@ public class FASTAImporter {
         sw.execute();       
     }
 
-    private Node getOrAddGraphNode(GraphModel graphModel, String label, String id) {
+    private Node getOrAddGraphNode(GraphModel graphModel, String label, String id, String name) {
         Graph mainGraph = graphModel.getGraph();
         Node graphNode = mainGraph.getNode(id);
         if (graphNode == null) {
@@ -120,7 +121,7 @@ public class FASTAImporter {
 
             graphNode.setLabel(label);
             graphNode.setSize(ProjectManager.GRAPH_NODE_SIZE);
-            graphNode.setAttribute(ProjectManager.NODE_TABLE_PRO_NAME, id);
+            graphNode.setAttribute(ProjectManager.NODE_TABLE_PRO_NAME, name);
 
             //Set random position
             graphNode.setX((float) ((0.01 + Math.random()) * 1000) - 500);

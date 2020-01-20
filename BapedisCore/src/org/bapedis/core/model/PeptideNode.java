@@ -5,6 +5,7 @@
  */
 package org.bapedis.core.model;
 
+import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
@@ -17,6 +18,7 @@ import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
@@ -62,10 +64,10 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
         return peptide.getID();
     }
 
-//    @Override
-//    public Image getIcon(int type) {
-//        return ImageUtilities.loadImage("org/bapedis/core/resources/molecule.png", true);
-//    }
+    @Override
+    public Image getIcon(int type) {
+        return ImageUtilities.loadImage("org/bapedis/core/resources/peptide.png", true);
+    }
 
     public Peptide getPeptide() {
         return peptide;
@@ -83,7 +85,7 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
         // Primary
         Sheet.Set set = Sheet.createPropertiesSet();
         set.setName("primary");
-        set.setDisplayName(NbBundle.getMessage(PeptideNode.class, "PropertySet.node"));
+        set.setDisplayName(NbBundle.getMessage(PeptideNode.class, "PropertySet.peptide"));
         PropertySupport.ReadOnly property;
         // Id property
         property = createPropertyField("id", NbBundle.getMessage(PeptideNode.class, "PropertySet.id"),
@@ -103,13 +105,13 @@ public class PeptideNode extends AbstractNode implements PropertyChangeListener 
         sheet.put(set);        
 
         // Features         
-//        for (PeptideAttribute attr : peptide.getAttributes()) {
-//            if (attr instanceof MolecularDescriptor) {
-//                setMolecularFeature((MolecularDescriptor) attr);
-//            } else if (attr.isVisible() && attr != Peptide.ID && attr != Peptide.SEQ && attr != Peptide.LENGHT) {
-//                setOtherFeatures(attr);
-//            }
-//        }
+        for (PeptideAttribute attr : peptide.getAttributes()) {
+            if (attr instanceof MolecularDescriptor) {
+                setMolecularFeature((MolecularDescriptor) attr);
+            } else if (attr.isVisible() && attr != Peptide.ID && attr != Peptide.SEQ && attr != Peptide.LENGHT) {
+                setOtherFeatures(attr);
+            }
+        }
 
         return sheet;
     }

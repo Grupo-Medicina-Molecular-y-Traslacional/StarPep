@@ -77,9 +77,9 @@ import org.openide.util.lookup.ProxyLookup;
         preferredID = "PeptideViewerTopComponent"
 )
 @Messages({
-    "CTL_PeptideViewerAction=Peptide nodes",
-    "CTL_PeptideViewerTopComponent=Peptide nodes",
-    "HINT_PeptideViewerTopComponent=A peptide nodes window"
+    "CTL_PeptideViewerAction=Peptide sequences",
+    "CTL_PeptideViewerTopComponent=Peptide sequences",
+    "HINT_PeptideViewerTopComponent=Peptide sequences"
 })
 public final class PeptideViewerTopComponent extends TopComponent implements
         ExplorerManager.Provider, WorkspaceEventListener, LookupListener, PropertyChangeListener {
@@ -136,9 +136,9 @@ public final class PeptideViewerTopComponent extends TopComponent implements
             }
             view.setPropertyColumns(columns.toArray(new String[0]));
             //Hide node column
-            ETableColumnModel columnModel = (ETableColumnModel) view.getOutline().getColumnModel();
-            ETableColumn column = (ETableColumn) columnModel.getColumn(0);
-            columnModel.setColumnHidden(column, true);
+//            ETableColumnModel columnModel = (ETableColumnModel) view.getOutline().getColumnModel();
+//            ETableColumn column = (ETableColumn) columnModel.getColumn(0);
+//            columnModel.setColumnHidden(column, true);
         } else {
             view.setPropertyColumns(new String[]{});
         }

@@ -14,16 +14,16 @@ import org.openide.util.NbBundle;
  *
  * @author Loge
  */
-public class VisualQuerySequence extends javax.swing.JPanel {
+public class VisualEmbeddingQuerySequence extends javax.swing.JPanel {
 
     /**
-     * Creates new form VisualQuerySequence
+     * Creates new form VisualEmbeddingQuerySequence
      */
     static final String CHANGED_OPTION = "embedding_query";
     private final JPanel settingPanel;
     private SimilaritySearchingOption searchingOption;
     
-    public VisualQuerySequence(JPanel settingPanel) {
+    public VisualEmbeddingQuerySequence(JPanel settingPanel) {
         initComponents();
         this.settingPanel = settingPanel;        
         centerPanel.add(settingPanel, BorderLayout.CENTER);
@@ -48,7 +48,7 @@ public class VisualQuerySequence extends javax.swing.JPanel {
     
     @Override
     public String getName() {
-        return NbBundle.getMessage(VisualQuerySequence.class, "QuerySequence.name");
+        return NbBundle.getMessage(VisualEmbeddingQuerySequence.class, "QuerySequence.name");
     }    
 
     /**
@@ -72,7 +72,7 @@ public class VisualQuerySequence extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(560, 580));
         setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualQuerySequence.class, "VisualQuerySequence.jInfoLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jInfoLabel, org.openide.util.NbBundle.getMessage(VisualEmbeddingQuerySequence.class, "VisualEmbeddingQuerySequence.jInfoLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -97,7 +97,7 @@ public class VisualQuerySequence extends javax.swing.JPanel {
 
         buttonGroup1.add(jOption1);
         jOption1.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(VisualQuerySequence.class, "VisualQuerySequence.jOption1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jOption1, org.openide.util.NbBundle.getMessage(VisualEmbeddingQuerySequence.class, "VisualEmbeddingQuerySequence.jOption1.text")); // NOI18N
         jOption1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOption1ActionPerformed(evt);
@@ -112,7 +112,7 @@ public class VisualQuerySequence extends javax.swing.JPanel {
         topPanel.add(jOption1, gridBagConstraints);
 
         buttonGroup1.add(jOption2);
-        org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(VisualQuerySequence.class, "VisualQuerySequence.jOption2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jOption2, org.openide.util.NbBundle.getMessage(VisualEmbeddingQuerySequence.class, "VisualEmbeddingQuerySequence.jOption2.text")); // NOI18N
         jOption2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jOption2ActionPerformed(evt);

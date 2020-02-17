@@ -28,8 +28,12 @@ import org.bapedis.chemspace.component.SpaceArffWritable;
 import org.bapedis.chemspace.component.VisualizePanel3D;
 import org.bapedis.chemspace.model.CoordinateSpace;
 import org.bapedis.chemspace.model.PCATableModel;
+import org.bapedis.chemspace.searching.EmbeddingQuerySeqAlg;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
+import org.bapedis.core.spi.alg.MultiQuery;
+import org.bapedis.core.task.AlgorithmExecutor;
+import org.bapedis.core.ui.components.MultiQueryPanel;
 import org.bapedis.core.util.ArffWriter;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXHyperlink;
@@ -39,6 +43,7 @@ import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import weka.core.Instances;
 
@@ -50,11 +55,14 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
     protected final JXHyperlink openWizardLink, scatter3DLink;
     protected MapperAlgorithm csMapper;
+    private EmbeddingQuerySeqAlg embeddingAlg;
     protected NetworkConstructionAlg networkAlg;
     private final DecimalFormat formatter;
     protected final JXBusyLabel busyLabel;
     protected final DefaultComboBoxModel<String> modelX, modelY;
     protected final JXTable pcaTable;
+    protected JPanel queryPanel;
+    protected final static AlgorithmExecutor executor = Lookup.getDefault().lookup(AlgorithmExecutor.class);
 
     static {
         UIManager.put("Slider.paintValue", false);
@@ -70,11 +78,10 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 //        configureScatter3DLink();
 //        toolBar.add(scatter3DLink);
 
-
         openWizardLink = new JXHyperlink();
         configureOpenWizardLink();
         // Tool bar
-        rightTopPanel.add(openWizardLink);        
+        rightTopPanel.add(openWizardLink);
 
         Hashtable<Integer, JLabel> thresholdLabelTable = new Hashtable<>();
         thresholdLabelTable.put(0, new JLabel("0"));
@@ -182,10 +189,21 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         this.csMapper = (MapperAlgorithm) algo;
         jLabelNetworkType.setText(csMapper.getNetworkType());
         networkAlg = csMapper.getNetworkAlg();
-        
+        embeddingAlg = csMapper.getEmbeddingQueryAlg();
+
         setupAxis();
         setupThreshold();
+        setupEmbeddingQuery();
         return this;
+    }
+
+    private void setupEmbeddingQuery() {
+        queryPanel = new MultiQueryPanel((MultiQuery) embeddingAlg);
+
+        embeddingPanel.removeAll();
+        embeddingPanel.add(queryPanel, BorderLayout.CENTER);
+        embeddingPanel.revalidate();
+        embeddingPanel.repaint();
     }
 
     private void setupThreshold() {
@@ -197,7 +215,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         jCutoffNewValue.setVisible(false);
         jNewDensityLabel.setVisible(false);
         jNewDensityValue.setVisible(false);
-        
+
         jCurrentDensityValue.setText(formatter.format(networkAlg.getDensityValues()[t]));
 
         densityPanel.removeAll();
@@ -290,6 +308,9 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         jMoreCutoffButton.setEnabled(enabled);
         densityPanel.setEnabled(enabled);
         cutoffSlider.setEnabled(enabled);
+        if (queryPanel != null) {
+            queryPanel.setEnabled(enabled);
+        }
     }
 
     /**
@@ -332,6 +353,10 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         jCurrentDensityValue = new javax.swing.JLabel();
         jNewDensityLabel = new javax.swing.JLabel();
         jNewDensityValue = new javax.swing.JLabel();
+        tab3 = new javax.swing.JPanel();
+        embeddingPanel = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        jProject = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -603,6 +628,44 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
         jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.tab2.TabConstraints.tabTitle"), tab2); // NOI18N
 
+        tab3.setLayout(new java.awt.GridBagLayout());
+
+        embeddingPanel.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        tab3.add(embeddingPanel, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.jLabel5.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        tab3.add(jLabel5, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jProject, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.jProject.text")); // NOI18N
+        jProject.setToolTipText(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.jProject.toolTipText")); // NOI18N
+        jProject.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jProjectActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        tab3.add(jProject, gridBagConstraints);
+
+        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.tab3.TabConstraints.tabTitle"), tab3); // NOI18N
+
         centerPanel.add(jTabbedPane1, "tabCard");
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -630,7 +693,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
             jCutoffNewLabel.setVisible(true);
             jCutoffNewValue.setVisible(true);
             jCutoffNewValue.setText(formatter.format(threshold));
-            
+
             jNewDensityLabel.setVisible(true);
             jNewDensityValue.setVisible(true);
             jNewDensityValue.setText(formatter.format(networkAlg.getDensityValues()[t]));
@@ -684,11 +747,18 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         jApplyCoordinateButton.setEnabled(true);
     }//GEN-LAST:event_jYComboBoxActionPerformed
 
+    private void jProjectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jProjectActionPerformed
+        if (embeddingAlg != null) {
+            executor.execute(embeddingAlg);
+        }
+    }//GEN-LAST:event_jProjectActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
     private javax.swing.JSlider cutoffSlider;
     private javax.swing.JPanel densityPanel;
+    private javax.swing.JPanel embeddingPanel;
     private javax.swing.JButton jApplyCoordinateButton;
     private javax.swing.JButton jApplyThresholdButton;
     private javax.swing.JLabel jCurrentDensityLabel;
@@ -702,11 +772,13 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabelNetworkType;
     private javax.swing.JButton jLessCutoffButton;
     private javax.swing.JButton jMoreCutoffButton;
     private javax.swing.JLabel jNewDensityLabel;
     private javax.swing.JLabel jNewDensityValue;
+    private javax.swing.JButton jProject;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JComboBox<String> jXComboBox;
     private javax.swing.JComboBox<String> jYComboBox;
@@ -715,6 +787,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private javax.swing.JPanel rightTopPanel;
     private javax.swing.JPanel tab1;
     private javax.swing.JPanel tab2;
+    private javax.swing.JPanel tab3;
     private javax.swing.JPanel twoDPanel;
     // End of variables declaration//GEN-END:variables
 

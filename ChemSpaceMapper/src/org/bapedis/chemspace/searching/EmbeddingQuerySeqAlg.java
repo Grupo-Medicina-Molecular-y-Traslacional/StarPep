@@ -6,6 +6,7 @@
 package org.bapedis.chemspace.searching;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,6 +19,8 @@ import org.bapedis.core.project.ProjectManager;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.MultiQuery;
+import org.bapedis.core.spi.alg.impl.AllDescriptors;
+import org.bapedis.core.spi.alg.impl.AllDescriptorsFactory;
 import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.core.util.FASTASEQ;
@@ -26,10 +29,12 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphFactory;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
+import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -41,15 +46,13 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
     static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
 
     protected final EmbeddingQuerySeqFactory factory;
-    protected GraphModel graphModel;
     protected Workspace workspace;
     protected ProgressTicket progressTicket;
-    private List<Node> graphNodes;
     private AttributesModel newAttrModel;
     protected boolean stopRun;
     protected final GraphWindowController graphWC;
     private String fasta;
-    protected List<Peptide> targetList, queryList;
+    static final NotifyDescriptor ErrorWS = new NotifyDescriptor.Message(NbBundle.getMessage(EmbeddingQuerySeqAlg.class, "Newworkspace.exist"), NotifyDescriptor.ERROR_MESSAGE);
     private static final AtomicInteger COUNTER = new AtomicInteger(45120);
 
     public EmbeddingQuerySeqAlg(EmbeddingQuerySeqFactory factory) {
@@ -71,7 +74,6 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
         this.workspace = workspace;
         this.progressTicket = progressTicket;
-        graphModel = pc.getGraphModel(workspace);
         stopRun = false;
     }
 
@@ -79,24 +81,17 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
     public void endAlgo() {
         if (newAttrModel != null && !stopRun) {
             // To refresh graph view
-            Graph graph = graphModel.getGraphVisible();
-            graph.clear();
-            graphWC.refreshGraphView(workspace, graphNodes, null);
 
-            final Workspace ws = workspace;
-            final AttributesModel modelToRemove = pc.getAttributesModel(workspace);
-            final AttributesModel modelToAdd = newAttrModel;
-            modelToRemove.getBridge().copyTo(modelToAdd, null);
+            final Workspace newWS = newAttrModel.getOwnerWS();
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            //To change attribute model
-                            ws.remove(modelToRemove);
-                            ws.add(modelToAdd);
+                            pc.add(newWS);
+                            pc.setCurrentWorkspace(newWS);
                         } finally {
-                            pc.getGraphVizSetting(ws).fireChangedGraphView();
+                            pc.getGraphVizSetting(newWS).fireChangedGraphView();
                         }
                     }
                 });
@@ -107,11 +102,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
 
         workspace = null;
         progressTicket = null;
-        graphModel = null;
         newAttrModel = null;
-        graphNodes = null;
-        targetList = null;
-        queryList = null;
     }
 
     @Override
@@ -126,62 +117,74 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
 
     @Override
     public void run() {
-        List<ProteinSequence> queries = null;
-        try {
-            queries = FASTASEQ.load(fasta);
-        } catch (Exception ex) {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
-            DialogDisplayer.getDefault().notify(nd);
-            cancel();
-        }
-        if (!stopRun && queries != null) {
-            Graph mainGraph = graphModel.getGraph();
-            AttributesModel attrModel = pc.getAttributesModel(workspace);
+        if (fasta != null && !fasta.isEmpty()) {
+            Workspace newWS = pc.createWorkspace();
+            if (newWS != null) {
+                //Create new attr model
+                newAttrModel = new AttributesModel(newWS);
+                newWS.add(newAttrModel);
 
-            // Target list of peptides
-            targetList = new LinkedList<>();
-            if (attrModel != null) {
-                //Target list
-                for (Peptide peptide : attrModel.getPeptides()) {
-                    if (!peptide.getGraphNode().getLabel().equals(QUERY_LABEL)) {
-                        targetList.add(peptide);
-                    }
+                //Copy target peptides and graph
+                AttributesModel currentModel = pc.getAttributesModel(workspace);
+                List<String> peptideIDs = new LinkedList<>();
+                for (Peptide peptide : currentModel.getPeptides()) {
+                    peptideIDs.add(peptide.getID());
                 }
+                currentModel.getBridge().copyTo(newAttrModel, peptideIDs);
 
-                //Add query peptides and graph nodes            
-                queryList = new LinkedList<>();
-                Peptide peptide;
-                Node node;
-                String id, seq;
-                for (ProteinSequence protein : queries) {
-                    id = protein.getAccession().getID();
-                    seq = protein.getSequenceAsString();
-
-                    node = getOrAddGraphNode(graphModel, QUERY_LABEL, id);
-
-                    peptide = new Peptide(node, mainGraph);
-                    peptide.setAttributeValue(Peptide.ID, id);
-                    peptide.setAttributeValue(Peptide.SEQ, seq);
-                    peptide.setAttributeValue(Peptide.LENGHT, seq.length());
-                    peptide.setBiojavaSeq(protein);
-
-                    queryList.add(peptide);
-                }
-
-                //Create new workspace
-                newAttrModel = new AttributesModel(workspace);
-                graphNodes = new LinkedList<>();
-
-                //Add target peptides to new attribute model
-                for (Peptide query : targetList) {
-                    newAttrModel.addPeptide(query);
-                    graphNodes.add(query.getGraphNode());
+                // Target list of peptides
+                List<Peptide> targetList = new LinkedList<>();
+                for (Peptide peptide : newAttrModel.getPeptides()) {
+                    targetList.add(peptide);
                 }
 
                 //Add query peptides to new attribute model
-                for (Peptide query : queryList) {
-                    newAttrModel.addPeptide(query);
-                    graphNodes.add(query.getGraphNode());
+                Workspace tmpWS = new Workspace("tmp");
+                AttributesModel tmpModel = new AttributesModel(tmpWS);
+                tmpWS.add(tmpModel);
+                List<ProteinSequence> queries = null;
+                try {
+                    queries = FASTASEQ.load(fasta);
+                } catch (Exception ex) {
+                    NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
+                    DialogDisplayer.getDefault().notify(nd);
+                    cancel();
+                }
+
+                if (!stopRun && queries != null) {
+                    GraphModel graphModel = pc.getGraphModel(tmpWS);
+                    Graph mainGraph = graphModel.getGraph();
+
+                    //Add query peptides and graph nodes  
+                    peptideIDs.clear();
+                    List<Peptide> queryList = new LinkedList<>();
+                    List<Node> graphNodes = new LinkedList<>();
+                    Peptide peptide;
+                    Node node;
+                    String id, seq;
+                    for (ProteinSequence protein : queries) {
+                        id = protein.getAccession().getID();
+                        seq = protein.getSequenceAsString();
+
+                        node = getOrAddGraphNode(graphModel, QUERY_LABEL, id);
+
+                        peptide = new Peptide(node, mainGraph);
+                        peptide.setAttributeValue(Peptide.ID, id);
+                        peptide.setAttributeValue(Peptide.SEQ, seq);
+                        peptide.setAttributeValue(Peptide.LENGHT, seq.length());
+                        peptide.setBiojavaSeq(protein);
+
+                        peptideIDs.add(peptide.getID());
+                        queryList.add(peptide);
+                        graphNodes.add(node);
+                        tmpModel.addPeptide(peptide);
+                    }
+                    AllDescriptors alg = (AllDescriptors)new AllDescriptorsFactory().createAlgorithm();
+                    alg.initAlgo(tmpWS, progressTicket);
+                    alg.run();
+                    alg.endAlgo();
+                    tmpModel.getBridge().copyTo(newAttrModel, peptideIDs);
+                    //graphModel.getGraphVisible().addAllNodes(graphNodes);
                 }
             }
         }

@@ -18,13 +18,13 @@ import org.openide.util.HelpCtx;
  *
  * @author Loge
  */
-public class WizardQuerySequence implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
+public class WizardEmbeddingQuerySequence implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
     private final MapperAlgorithm csMapper;
     private EmbeddingQuerySeqAlg alg;
-    private VisualQuerySequence component;
+    private VisualEmbeddingQuerySequence component;
     
-    public WizardQuerySequence(MapperAlgorithm csMapper) {
+    public WizardEmbeddingQuerySequence(MapperAlgorithm csMapper) {
         this.csMapper = csMapper;
     }
     
@@ -34,12 +34,12 @@ public class WizardQuerySequence implements WizardDescriptor.FinishablePanel<Wiz
     }
 
     @Override
-    public VisualQuerySequence getComponent() {
+    public VisualEmbeddingQuerySequence getComponent() {
         if (component == null) {
             try {
                 alg = (EmbeddingQuerySeqAlg) csMapper.getEmbeddingQueryAlg().clone();
                 JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
-                component = new VisualQuerySequence(settingPanel);
+                component = new VisualEmbeddingQuerySequence(settingPanel);
                 component.setSearchingOption(csMapper.getSearchingOption());
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);

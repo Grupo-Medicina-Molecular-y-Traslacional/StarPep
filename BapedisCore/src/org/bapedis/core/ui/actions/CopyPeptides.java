@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import javax.swing.AbstractAction;
 import static javax.swing.Action.NAME;
@@ -135,7 +134,7 @@ class CopyPeptidesWorker extends SwingWorker<Workspace, Void> {
                 }
             }
             if (exist) {
-                DialogDisplayer.getDefault().notify(NewWorkspace.ErrorWS);
+                DialogDisplayer.getDefault().notify(ProjectManager.ErrorWS);
                 return null;
             } 
             return new Workspace(name);

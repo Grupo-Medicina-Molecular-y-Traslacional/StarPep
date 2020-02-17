@@ -12,7 +12,6 @@ import org.bapedis.core.io.impl.FASTAImporter;
 import org.bapedis.core.io.impl.FASTAImporterUI;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
-import static org.bapedis.core.ui.actions.NewWorkspace.ErrorWS;
 import org.bapedis.core.ui.components.SetupDialog;
 import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
@@ -66,7 +65,7 @@ public class ImportFASTA extends AbstractAction {
                         }
                     }
                     if (exist) {
-                        DialogDisplayer.getDefault().notify(ErrorWS);
+                        DialogDisplayer.getDefault().notify(ProjectManager.ErrorWS);
                     } else {
                         Workspace workspace = new Workspace(name);                        
                         FASTAImporter importer = new FASTAImporter();

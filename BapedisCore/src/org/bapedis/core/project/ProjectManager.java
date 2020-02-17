@@ -50,6 +50,7 @@ import org.openide.windows.InputOutput;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 import org.bapedis.core.spi.alg.SearchTag;
+import org.openide.DialogDescriptor;
 
 /**
  *
@@ -83,10 +84,12 @@ public class ProjectManager implements Lookup.Provider {
 
     public static final String EDGE_TABLE_PRO_DISTANCE = "distance";
     public static final String EDGE_TABLE_PRO_DISTANCE_TITLE = NbBundle.getMessage(ProjectManager.class, "EdgeTable.column.distance.title");
-    
+
     public static final String ROLE_ATTR_ID = "role";
-    public static final String ROLE_ATTR_TITLE = "Role";    
-    
+    public static final String ROLE_ATTR_TITLE = "Role";
+
+    public static final NotifyDescriptor ErrorWS = new NotifyDescriptor.Message(NbBundle.getMessage(ProjectManager.class, "NewWorkspace.exist"), NotifyDescriptor.ERROR_MESSAGE);
+
     final String OUTPUT_ID = "output";
     TopComponent outputWindow;
 
@@ -105,6 +108,28 @@ public class ProjectManager implements Lookup.Provider {
         wsListeners = new LinkedList<>();
         currentWS = Workspace.getDefault();
         content.add(currentWS);
+    }
+
+    public synchronized Workspace createWorkspace() {
+        String wsName = Workspace.getPrefixName() + " " + Workspace.getCount();
+        DialogDescriptor.InputLine dd = new DialogDescriptor.InputLine("", NbBundle.getMessage(ProjectManager.class, "NewWorkspace.dialog.title"));
+        dd.setInputText(wsName);
+        if (DialogDisplayer.getDefault().notify(dd).equals(DialogDescriptor.OK_OPTION) && !dd.getInputText().isEmpty()) {
+            wsName = dd.getInputText();
+            boolean exist = false;
+            for (Iterator<? extends Workspace> it = getWorkspaceIterator(); it.hasNext();) {
+                Workspace ws = it.next();
+                if (ws.getName().equals(wsName)) {
+                    exist = true;
+                }
+            }
+            if (exist) {
+                DialogDisplayer.getDefault().notify(ErrorWS);
+            } else {
+                return new Workspace(wsName);
+            }
+        }
+        return null;
     }
 
     public synchronized String getProjectName() {

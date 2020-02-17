@@ -175,7 +175,7 @@ public class MyWizardIterator implements WizardDescriptor.Iterator<WizardDescrip
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(VisualQuerySequence.CHANGED_OPTION)) {
+        if (evt.getPropertyName().equals(VisualEmbeddingQuerySequence.CHANGED_OPTION)) {
             SimilaritySearchingOption oldOption = this.similarityOption;
             setSearchingOptionPanels((SimilaritySearchingOption) evt.getNewValue());
             if (oldOption != this.similarityOption) {

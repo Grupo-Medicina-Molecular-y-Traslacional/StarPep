@@ -16,7 +16,6 @@ import org.openide.util.NbBundle;
  */
 public class EmbeddingQuerySeqFactory implements AlgorithmFactory {
 
-    private static EmbeddingQuerySeqPanel setupUI = new EmbeddingQuerySeqPanel();
     
     @Override
     public String getCategory() {
@@ -35,7 +34,7 @@ public class EmbeddingQuerySeqFactory implements AlgorithmFactory {
 
     @Override
     public AlgorithmSetupUI getSetupUI() {
-        return setupUI;
+        return null;
     }
 
     @Override

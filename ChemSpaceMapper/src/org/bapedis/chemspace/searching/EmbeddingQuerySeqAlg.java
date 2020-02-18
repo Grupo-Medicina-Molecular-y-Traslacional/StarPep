@@ -6,13 +6,14 @@
 package org.bapedis.chemspace.searching;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.SwingUtilities;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
+import org.bapedis.core.model.MolecularDescriptor;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
@@ -29,7 +30,6 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphFactory;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
-import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
@@ -183,8 +183,33 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                     alg.initAlgo(tmpWS, progressTicket);
                     alg.run();
                     alg.endAlgo();
+                    
+                    // Update descriptors...
+                    Set<String> refkeys = newAttrModel.getMolecularDescriptorKeys();
+                    Set<String> newKeys = tmpModel.getMolecularDescriptorKeys();
+                    List<MolecularDescriptor> toRemove = new LinkedList<>();
+                    for(String key: newKeys){
+                        if (refkeys.contains(key)){
+                            for(MolecularDescriptor md: tmpModel.getMolecularDescriptors(key)){
+                                if (!newAttrModel.getMolecularDescriptors(key).contains(md)){
+                                    toRemove.add(md);
+                                }
+                            }
+                        }else{
+                            for(MolecularDescriptor md: tmpModel.getMolecularDescriptors(key)){
+                                toRemove.add(md);
+                            }
+                        }
+                    }
+                    for(MolecularDescriptor md: toRemove){
+                        tmpModel.deleteAttribute(md);
+                    }
+                    
+                    
                     tmpModel.getBridge().copyTo(newAttrModel, peptideIDs);
                     //graphModel.getGraphVisible().addAllNodes(graphNodes);
+                    
+                    
                 }
             }
         }

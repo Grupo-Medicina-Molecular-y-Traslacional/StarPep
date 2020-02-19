@@ -749,6 +749,8 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
     private void jProjectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jProjectActionPerformed
         if (embeddingAlg != null) {
+            embeddingAlg.setMdOption(csMapper.getMdOption());
+            embeddingAlg.setDistFactory(csMapper.getDistanceFactory());
             executor.execute(embeddingAlg);
         }
     }//GEN-LAST:event_jProjectActionPerformed

@@ -11,9 +11,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.SwingUtilities;
+import org.bapedis.chemspace.distance.AbstractDistance;
+import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
 import org.bapedis.core.model.MolecularDescriptor;
+import org.bapedis.core.model.MolecularDescriptorException;
+import org.bapedis.core.model.MolecularDescriptorNotFoundException;
 import org.bapedis.core.model.Peptide;
 import org.bapedis.core.model.Workspace;
 import org.bapedis.core.project.ProjectManager;
@@ -26,6 +30,7 @@ import org.bapedis.core.spi.ui.GraphWindowController;
 import org.bapedis.core.task.ProgressTicket;
 import org.bapedis.core.util.FASTASEQ;
 import org.biojava.nbio.core.sequence.ProteinSequence;
+import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphFactory;
 import org.gephi.graph.api.GraphModel;
@@ -52,6 +57,8 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
     protected boolean stopRun;
     protected final GraphWindowController graphWC;
     private String fasta;
+    protected MD_OUTPUT_OPTION mdOption;    
+    private AlgorithmFactory distFactory;
     static final NotifyDescriptor ErrorWS = new NotifyDescriptor.Message(NbBundle.getMessage(EmbeddingQuerySeqAlg.class, "Newworkspace.exist"), NotifyDescriptor.ERROR_MESSAGE);
     private static final AtomicInteger COUNTER = new AtomicInteger(45120);
 
@@ -69,6 +76,14 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
     public String getFasta() {
         return fasta;
     }
+
+    public AlgorithmFactory getDistFactory() {
+        return distFactory;
+    }
+
+    public void setDistFactory(AlgorithmFactory distFactory) {
+        this.distFactory = distFactory;
+    }        
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
@@ -126,11 +141,11 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
 
                 //Copy target peptides and graph
                 AttributesModel currentModel = pc.getAttributesModel(workspace);
-                List<String> peptideIDs = new LinkedList<>();
+                List<String> targetIDs = new LinkedList<>();
                 for (Peptide peptide : currentModel.getPeptides()) {
-                    peptideIDs.add(peptide.getID());
+                    targetIDs.add(peptide.getID());
                 }
-                currentModel.getBridge().copyTo(newAttrModel, peptideIDs);
+                currentModel.getBridge().copyTo(newAttrModel, targetIDs);
 
                 // Target list of peptides
                 List<Peptide> targetList = new LinkedList<>();
@@ -156,9 +171,10 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                     Graph mainGraph = graphModel.getGraph();
 
                     //Add query peptides and graph nodes  
-                    peptideIDs.clear();
+                    List<String> queryIDs = new LinkedList<>();
                     List<Peptide> queryList = new LinkedList<>();
                     List<Node> graphNodes = new LinkedList<>();
+                    List<Edge> graphEdges = new LinkedList<>();
                     Peptide peptide;
                     Node node;
                     String id, seq;
@@ -174,46 +190,107 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                         peptide.setAttributeValue(Peptide.LENGHT, seq.length());
                         peptide.setBiojavaSeq(protein);
 
-                        peptideIDs.add(peptide.getID());
+                        queryIDs.add(peptide.getID());
                         queryList.add(peptide);
                         graphNodes.add(node);
                         tmpModel.addPeptide(peptide);
                     }
-                    AllDescriptors alg = (AllDescriptors)new AllDescriptorsFactory().createAlgorithm();
+                    AllDescriptors alg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
                     alg.initAlgo(tmpWS, progressTicket);
                     alg.run();
                     alg.endAlgo();
-                    
-                    // Update descriptors...
+
+                    // Update new attribute model...
                     Set<String> refkeys = newAttrModel.getMolecularDescriptorKeys();
                     Set<String> newKeys = tmpModel.getMolecularDescriptorKeys();
                     List<MolecularDescriptor> toRemove = new LinkedList<>();
-                    for(String key: newKeys){
-                        if (refkeys.contains(key)){
-                            for(MolecularDescriptor md: tmpModel.getMolecularDescriptors(key)){
-                                if (!newAttrModel.getMolecularDescriptors(key).contains(md)){
+                    for (String key : newKeys) {
+                        if (refkeys.contains(key)) {
+                            for (MolecularDescriptor md : tmpModel.getMolecularDescriptors(key)) {
+                                if (!newAttrModel.getMolecularDescriptors(key).contains(md)) {
                                     toRemove.add(md);
                                 }
                             }
-                        }else{
-                            for(MolecularDescriptor md: tmpModel.getMolecularDescriptors(key)){
+                        } else {
+                            for (MolecularDescriptor md : tmpModel.getMolecularDescriptors(key)) {
                                 toRemove.add(md);
                             }
                         }
                     }
-                    for(MolecularDescriptor md: toRemove){
+                    for (MolecularDescriptor md : toRemove) {
                         tmpModel.deleteAttribute(md);
                     }
-                    
-                    
-                    tmpModel.getBridge().copyTo(newAttrModel, peptideIDs);
+                    tmpModel.getBridge().copyTo(newAttrModel, queryIDs);                    
+
+                    // Load all descriptors
+                    List<MolecularDescriptor> allFeatures = new LinkedList<>();
+                    if (!stopRun) {
+                        for (String key : newAttrModel.getMolecularDescriptorKeys()) {
+                            for (MolecularDescriptor attr : newAttrModel.getMolecularDescriptors(key)) {
+                                allFeatures.add(attr);
+                            }
+                        }
+                    }
+
+                    // Preprocessing all features. Computing max, min, mean and std            
+                    if (!stopRun) {
+                        pc.reportMsg("Preprocessing of features. Computing max, min, mean and std", workspace);
+                        try {
+                            MolecularDescriptor.preprocessing(allFeatures, newAttrModel.getPeptides());
+                        } catch (MolecularDescriptorException ex) {
+                            DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
+                            pc.reportError(ex.getMessage(), workspace);
+                            cancel();
+                        }
+                    }
+
+                    //Create descriptor matrix     
+                    Peptide[] peptides = newAttrModel.getPeptides().toArray(new Peptide[0]);
+                    double[][] descriptorMatrix = null;
+                    if (!stopRun) {
+                        pc.reportMsg("Descriptor matrix construction", workspace);
+                        descriptorMatrix = new double[peptides.length][allFeatures.size()];
+                        try {
+                            int i, j;
+                            i = 0;
+                            for (Peptide p : peptides) {
+                                j = 0;
+                                for (MolecularDescriptor md : allFeatures) {
+                                    descriptorMatrix[i][j] = normalizedValue(p, md);
+                                    j++;
+                                }
+                                i++;
+                            }
+                        } catch (MolecularDescriptorNotFoundException ex) {
+                            DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
+                            Exceptions.printStackTrace(ex);
+                            cancel();
+                        }
+                    }
+
+                    int index = targetIDs.size();
+                    AbstractDistance dist = (AbstractDistance)distFactory.createAlgorithm();                    
+                    for(int i=index; i<peptides.length; i++){
+                        for(int j=0; j < index; j++ ){
+                            dist.setContext(peptides[i], peptides[j], descriptorMatrix);
+                        }
+                    }
                     //graphModel.getGraphVisible().addAllNodes(graphNodes);
-                    
-                    
+
                 }
             }
         }
     }
+    
+    protected double normalizedValue(Peptide peptide, MolecularDescriptor attr) throws MolecularDescriptorNotFoundException {
+        switch (mdOption) {
+            case Z_SCORE:
+                return attr.getNormalizedZscoreValue(peptide);
+            case MIN_MAX:
+                return attr.getNormalizedMinMaxValue(peptide);
+        }
+        throw new IllegalArgumentException("Unknown value for normalization index: " + mdOption);
+    }    
 
     private Node getOrAddGraphNode(GraphModel graphModel, String label, String id) {
         Graph mainGraph = graphModel.getGraph();
@@ -255,5 +332,13 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
         }
         return copy;
     }
+
+    public MD_OUTPUT_OPTION getMdOption() {
+        return mdOption;
+    }
+
+    public void setMdOption(MD_OUTPUT_OPTION mdOption) {
+        this.mdOption = mdOption;
+    }        
 
 }

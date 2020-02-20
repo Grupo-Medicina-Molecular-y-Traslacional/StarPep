@@ -6,12 +6,17 @@
 package org.bapedis.chemspace.searching;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.SwingUtilities;
 import org.bapedis.chemspace.distance.AbstractDistance;
+import static org.bapedis.chemspace.impl.MapperAlgorithm.INDEX_ATTR;
+import org.bapedis.chemspace.util.WekaHeap;
+import org.bapedis.chemspace.util.WekaHeapElement;
 import org.bapedis.core.io.MD_OUTPUT_OPTION;
 import org.bapedis.core.model.AlgorithmProperty;
 import org.bapedis.core.model.AttributesModel;
@@ -57,7 +62,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
     protected boolean stopRun;
     protected final GraphWindowController graphWC;
     private String fasta;
-    protected MD_OUTPUT_OPTION mdOption;    
+    protected MD_OUTPUT_OPTION mdOption;
     private AlgorithmFactory distFactory;
     static final NotifyDescriptor ErrorWS = new NotifyDescriptor.Message(NbBundle.getMessage(EmbeddingQuerySeqAlg.class, "Newworkspace.exist"), NotifyDescriptor.ERROR_MESSAGE);
     private static final AtomicInteger COUNTER = new AtomicInteger(45120);
@@ -83,7 +88,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
 
     public void setDistFactory(AlgorithmFactory distFactory) {
         this.distFactory = distFactory;
-    }        
+    }
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
@@ -220,7 +225,9 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                     for (MolecularDescriptor md : toRemove) {
                         tmpModel.deleteAttribute(md);
                     }
-                    tmpModel.getBridge().copyTo(newAttrModel, queryIDs);                    
+                    graphModel.getGraphVisible().addAllNodes(graphNodes);
+                    tmpModel.getBridge().copyTo(newAttrModel, queryIDs);
+                    
 
                     // Load all descriptors
                     List<MolecularDescriptor> allFeatures = new LinkedList<>();
@@ -268,20 +275,76 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                         }
                     }
 
-                    int index = targetIDs.size();
-                    AbstractDistance dist = (AbstractDistance)distFactory.createAlgorithm();                    
-                    for(int i=index; i<peptides.length; i++){
-                        for(int j=0; j < index; j++ ){
-                            dist.setContext(peptides[i], peptides[j], descriptorMatrix);
-                        }
+                    // Set peptide index attribute
+                    int index = 0;
+                    for (Peptide p : peptides) {
+                        p.setAttributeValue(INDEX_ATTR, index++);
                     }
-                    //graphModel.getGraphVisible().addAllNodes(graphNodes);
 
+                    // Search KKN
+                    graphModel = pc.getGraphModel(newAttrModel.getOwnerWS());
+                    int queryIndex = targetIDs.size();
+                    AbstractDistance dist = (AbstractDistance) distFactory.createAlgorithm();
+                    int k = 5;
+                    WekaHeap heap;
+                    double distance;
+                    int firstkNN;
+                    int[] indices;
+                    Edge edge;
+                    try {
+                        for (int i = queryIndex; i < peptides.length && !stopRun; i++) {
+                            heap = new WekaHeap(k);
+                            firstkNN = 0;
+                            for (int j = 0; j < queryIndex && !stopRun; j++) {
+                                dist.setContext(peptides[i], peptides[j], descriptorMatrix);
+                                dist.run();
+                                distance = dist.getDistance();
+                                if (firstkNN < k) {
+                                    heap.put(j, distance);
+                                    firstkNN++;
+                                } else {
+                                    WekaHeapElement temp = heap.peek();
+                                    if (distance < temp.distance) {
+                                        heap.putBySubstitute(j, distance);
+                                    } else if (distance == temp.distance) {
+                                        heap.putKthNearest(j, distance);
+                                    }
+                                }
+                            }
+                            indices = new int[heap.size() + heap.noOfKthNearest()];
+                            int l = 1;
+                            WekaHeapElement h;
+                            while (heap.noOfKthNearest() > 0) {
+                                h = heap.getKthNearest();
+                                indices[indices.length - l] = h.index;
+//                                distances[indices.length - l] = h.distance;
+                                l++;
+                            }
+                            while (heap.size() > 0) {
+                                h = heap.get();
+                                indices[indices.length - l] = h.index;
+//                                distances[indices.length - l] = h.distance;
+                                l++;
+                            }
+                            for (int r = 0; r < indices.length; r++) {
+                                edge = getOrAddGraphEdge(graphModel, peptides[i], peptides[indices[r]]);
+                                if (edge != null) {
+                                    graphEdges.add(edge);
+                                }
+                            }
+                        }
+                    } catch (Exception ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                    //Add nodes and edges
+                    if (!stopRun) {                        
+                        graphModel.getGraphVisible().addAllEdges(graphEdges);
+                    }
                 }
             }
         }
     }
-    
+
     protected double normalizedValue(Peptide peptide, MolecularDescriptor attr) throws MolecularDescriptorNotFoundException {
         switch (mdOption) {
             case Z_SCORE:
@@ -290,7 +353,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                 return attr.getNormalizedMinMaxValue(peptide);
         }
         throw new IllegalArgumentException("Unknown value for normalization index: " + mdOption);
-    }    
+    }
 
     private Node getOrAddGraphNode(GraphModel graphModel, String label, String id) {
         Graph mainGraph = graphModel.getGraph();
@@ -318,6 +381,30 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
         return graphNode;
     }
 
+    protected Edge getOrAddGraphEdge(GraphModel graphModel, Peptide source, Peptide end) {
+        // Create an edge between two nodes
+        Graph mainGraph = graphModel.getGraph();
+        Node node1 = source.getGraphNode();
+        Node node2 = end.getGraphNode();
+        String id = String.format("%s-%s", node1.getId(), node2.getId());
+        int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+        if (relType != -1) {
+            Edge graphEdge = graphModel.factory().newEdge(id, node1, node2, relType, ProjectManager.GRAPH_EDGE_WEIGHT, false);
+            graphEdge.setLabel(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+
+            //Set color
+            graphEdge.setR(ProjectManager.GRAPH_NODE_COLOR.getRed() / 255f);
+            graphEdge.setG(ProjectManager.GRAPH_NODE_COLOR.getGreen() / 255f);
+            graphEdge.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
+            graphEdge.setAlpha(0f);
+
+            mainGraph.addEdge(graphEdge);
+            
+            return graphEdge;
+        }
+        return null;
+    }
+
     @Override
     public boolean cancel() {
         stopRun = true;
@@ -339,6 +426,6 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
 
     public void setMdOption(MD_OUTPUT_OPTION mdOption) {
         this.mdOption = mdOption;
-    }        
+    }
 
 }

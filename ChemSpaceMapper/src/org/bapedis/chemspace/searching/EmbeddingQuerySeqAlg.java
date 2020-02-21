@@ -5,11 +5,10 @@
  */
 package org.bapedis.chemspace.searching;
 
+import java.awt.Color;
 import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.SwingUtilities;
@@ -66,11 +65,30 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
     private AlgorithmFactory distFactory;
     static final NotifyDescriptor ErrorWS = new NotifyDescriptor.Message(NbBundle.getMessage(EmbeddingQuerySeqAlg.class, "Newworkspace.exist"), NotifyDescriptor.ERROR_MESSAGE);
     private static final AtomicInteger COUNTER = new AtomicInteger(45120);
+    private Color color;
+    private int knn;
 
     public EmbeddingQuerySeqAlg(EmbeddingQuerySeqFactory factory) {
         this.factory = factory;
         graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
+        knn = -1;
     }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public int getKnn() {
+        return knn;
+    }
+
+    public void setKnn(int knn) {
+        this.knn = knn;
+    }        
 
     @Override
     public void setFasta(String fasta) {
@@ -165,6 +183,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                 List<ProteinSequence> queries = null;
                 try {
                     queries = FASTASEQ.load(fasta);
+                    pc.reportMsg("Loaded peptides: " + queries.size(), workspace);
                 } catch (Exception ex) {
                     NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
                     DialogDisplayer.getDefault().notify(nd);
@@ -285,7 +304,6 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                     graphModel = pc.getGraphModel(newAttrModel.getOwnerWS());
                     int queryIndex = targetIDs.size();
                     AbstractDistance dist = (AbstractDistance) distFactory.createAlgorithm();
-                    int k = 5;
                     WekaHeap heap;
                     double distance;
                     int firstkNN;
@@ -293,13 +311,13 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                     Edge edge;
                     try {
                         for (int i = queryIndex; i < peptides.length && !stopRun; i++) {
-                            heap = new WekaHeap(k);
+                            heap = new WekaHeap(knn);
                             firstkNN = 0;
                             for (int j = 0; j < queryIndex && !stopRun; j++) {
                                 dist.setContext(peptides[i], peptides[j], descriptorMatrix);
                                 dist.run();
                                 distance = dist.getDistance();
-                                if (firstkNN < k) {
+                                if (firstkNN < knn) {
                                     heap.put(j, distance);
                                     firstkNN++;
                                 } else {
@@ -378,6 +396,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
 
             mainGraph.addNode(graphNode);
         }
+        graphNode.setColor(color);
         return graphNode;
     }
 

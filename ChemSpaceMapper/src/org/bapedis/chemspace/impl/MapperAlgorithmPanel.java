@@ -45,6 +45,7 @@ import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.bapedis.core.ui.components.ColorChooserButton;
 import weka.core.Instances;
 
 /**
@@ -354,6 +355,12 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         jNewDensityLabel = new javax.swing.JLabel();
         jNewDensityValue = new javax.swing.JLabel();
         tab3 = new javax.swing.JPanel();
+        settingPanel = new javax.swing.JPanel();
+        jLabelColor = new javax.swing.JLabel();
+        colorChooser = new ColorChooserButton(Color.GRAY);
+        jLabel6 = new javax.swing.JLabel();
+        kOptions = new javax.swing.JComboBox<>();
+        extLabel = new javax.swing.JLabel();
         embeddingPanel = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jProject = new javax.swing.JButton();
@@ -630,10 +637,60 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
         tab3.setLayout(new java.awt.GridBagLayout());
 
-        embeddingPanel.setLayout(new java.awt.BorderLayout());
+        settingPanel.setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabelColor, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.jLabelColor.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        settingPanel.add(jLabelColor, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(colorChooser, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.colorChooser.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        settingPanel.add(colorChooser, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.jLabel6.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        settingPanel.add(jLabel6, gridBagConstraints);
+
+        kOptions.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
+        kOptions.setSelectedIndex(4);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        settingPanel.add(kOptions, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(extLabel, org.openide.util.NbBundle.getMessage(MapperAlgorithmPanel.class, "MapperAlgorithmPanel.extLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        settingPanel.add(extLabel, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        tab3.add(settingPanel, gridBagConstraints);
+
+        embeddingPanel.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
@@ -751,6 +808,8 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
         if (embeddingAlg != null) {
             embeddingAlg.setMdOption(csMapper.getMdOption());
             embeddingAlg.setDistFactory(csMapper.getDistanceFactory());
+            embeddingAlg.setKnn(kOptions.getSelectedIndex()+1);
+            embeddingAlg.setColor(((ColorChooserButton)colorChooser).getSelectedColor());
             executor.execute(embeddingAlg);
         }
     }//GEN-LAST:event_jProjectActionPerformed
@@ -758,9 +817,11 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
+    private javax.swing.JButton colorChooser;
     private javax.swing.JSlider cutoffSlider;
     private javax.swing.JPanel densityPanel;
     private javax.swing.JPanel embeddingPanel;
+    private javax.swing.JLabel extLabel;
     private javax.swing.JButton jApplyCoordinateButton;
     private javax.swing.JButton jApplyThresholdButton;
     private javax.swing.JLabel jCurrentDensityLabel;
@@ -775,6 +836,8 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabelColor;
     private javax.swing.JLabel jLabelNetworkType;
     private javax.swing.JButton jLessCutoffButton;
     private javax.swing.JButton jMoreCutoffButton;
@@ -784,9 +847,11 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JComboBox<String> jXComboBox;
     private javax.swing.JComboBox<String> jYComboBox;
+    private javax.swing.JComboBox<String> kOptions;
     private javax.swing.JPanel leftTopPanel;
     private javax.swing.JScrollPane pcaScrollPane;
     private javax.swing.JPanel rightTopPanel;
+    private javax.swing.JPanel settingPanel;
     private javax.swing.JPanel tab1;
     private javax.swing.JPanel tab2;
     private javax.swing.JPanel tab3;

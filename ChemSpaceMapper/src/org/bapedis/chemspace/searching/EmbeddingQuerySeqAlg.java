@@ -7,6 +7,7 @@ package org.bapedis.chemspace.searching;
 
 import java.awt.Color;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -14,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.SwingUtilities;
 import org.bapedis.chemspace.distance.AbstractDistance;
 import static org.bapedis.chemspace.impl.MapperAlgorithm.INDEX_ATTR;
+import org.bapedis.chemspace.model.CandidatePeptide;
 import org.bapedis.chemspace.util.WekaHeap;
 import org.bapedis.chemspace.util.WekaHeapElement;
 import org.bapedis.core.io.MD_OUTPUT_OPTION;
@@ -67,14 +69,12 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
     static final NotifyDescriptor ErrorEmpty = new NotifyDescriptor.Message(NbBundle.getMessage(EmbeddingQuerySeqAlg.class, "EmbeddingAlgorithm.emptySeq"), NotifyDescriptor.ERROR_MESSAGE);
     private static final AtomicInteger COUNTER = new AtomicInteger(45120);
     private Color color;
-    private int knn;
-    private double threshold;
     private double maxDistance;
 
     public EmbeddingQuerySeqAlg(EmbeddingQuerySeqFactory factory) {
         this.factory = factory;
         graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
-        knn = -1;
+        color = Color.GRAY;
     }
 
     public Color getColor() {
@@ -85,25 +85,10 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
         this.color = color;
     }
 
-    public int getKnn() {
-        return knn;
-    }
-
-    public void setKnn(int knn) {
-        this.knn = knn;
-    }
 
     @Override
     public void setFasta(String fasta) {
         this.fasta = fasta;
-    }
-
-    public double getThreshold() {
-        return threshold;
-    }
-
-    public void setThreshold(double threshold) {
-        this.threshold = threshold;
     }
 
     @Override
@@ -188,12 +173,6 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                     targetIDs.add(peptide.getID());
                 }
                 currentModel.getBridge().copyTo(newAttrModel, targetIDs);
-
-                // Target list of peptides
-                List<Peptide> targetList = new LinkedList<>();
-                for (Peptide peptide : newAttrModel.getPeptides()) {
-                    targetList.add(peptide);
-                }
 
                 //Add query peptides to new attribute model
                 Workspace tmpWS = new Workspace("tmp");
@@ -314,67 +293,63 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                         p.setAttributeValue(INDEX_ATTR, index++);
                     }
 
-                    // Search KKN
+                    // HSPN neighbors
                     Graph newVisGraph = pc.getGraphVisible(newWS);
                     GraphModel newGraphModel = pc.getGraphModel(newWS);
                     List<Node> graphNodes = new LinkedList<>();
                     List<Edge> graphEdges = new LinkedList<>();
-
                     int queryIndex = targetIDs.size();
                     AbstractDistance dist = (AbstractDistance) distFactory.createAlgorithm();
                     WekaHeap heap;
-                    double distance;
-                    int firstkNN;
-                    int[] indices;
-                    double[] distances;
                     Edge edge;
-                    try {
-                        for (int i = queryIndex; i < peptides.length && !stopRun; i++) {
-                            heap = new WekaHeap(knn);
-                            firstkNN = 0;
-                            for (int j = 0; j < queryIndex && !stopRun; j++) {
-                                dist.setContext(peptides[i], peptides[j], descriptorMatrix);
-                                dist.run();
-                                distance = dist.getDistance();
-                                if (firstkNN < knn) {
-                                    heap.put(j, distance);
-                                    firstkNN++;
-                                } else {
-                                    WekaHeapElement temp = heap.peek();
-                                    if (distance < temp.distance) {
-                                        heap.putBySubstitute(j, distance);
-                                    } else if (distance == temp.distance) {
-                                        heap.putKthNearest(j, distance);
-                                    }
-                                }
-                            }
-                            indices = new int[heap.size() + heap.noOfKthNearest()];
-                            distances = new double[heap.size() + heap.noOfKthNearest()];
-                            int l = 1;
-                            WekaHeapElement h;
-                            while (heap.noOfKthNearest() > 0) {
-                                h = heap.getKthNearest();
-                                indices[indices.length - l] = h.index;
-                                distances[indices.length - l] = h.distance;
-                                l++;
-                            }
-                            while (heap.size() > 0) {
-                                h = heap.get();
-                                indices[indices.length - l] = h.index;
-                                distances[indices.length - l] = h.distance;
-                                l++;
-                            }
-                            for (int r = 0; r < indices.length; r++) {
-                                edge = getOrAddGraphEdge(newGraphModel, peptides[i], peptides[indices[r]], distances[r]);
+                    double distance;
+                    Peptide queryPeptide;
+                    CandidatePeptide[] candidates;
+                    int cursor;
+                    for (int i = queryIndex; i < peptides.length && !stopRun; i++) {
+                        candidates = new CandidatePeptide[targetIDs.size()];
+                        cursor = 0;
+                        for (int j = 0; j < queryIndex && !stopRun; j++) {
+                            dist.setContext(peptides[i], peptides[j], descriptorMatrix);
+                            dist.run();
+                            distance = dist.getDistance();
+                            candidates[cursor++] = new CandidatePeptide(peptides[j], distance);
+                        }
+                        Arrays.parallelSort(candidates);
+                        int relType = newGraphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+                        cursor = 0;
+                        while (cursor < candidates.length) {
+                            if (candidates[cursor] != null) {
+                                //Create an edge to the closest peptide
+                                edge = getOrAddGraphEdge(newGraphModel, peptides[i], candidates[cursor].getPeptide(), candidates[cursor].getDistance());
                                 if (edge != null) {
                                     graphEdges.add(edge);
                                 }
+                                // ignore elements in the forbidden area
+                                for (int k = cursor + 1; k < candidates.length; k++) {
+                                    if (candidates[k] != null) {
+                                        edge = newGraphModel.getGraph().getEdge(candidates[cursor].getPeptide().getGraphNode(), 
+                                                candidates[k].getPeptide().getGraphNode(), relType);
+                                        if (edge != null) {
+                                            distance = (double) edge.getAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE);
+                                        } else {
+                                            dist.setContext(candidates[cursor].getPeptide(), candidates[k].getPeptide(), descriptorMatrix);
+                                            dist.run();
+                                            distance = dist.getDistance();
+                                        }
+                                        if (distance < candidates[k].getDistance()) {
+                                            candidates[k] = null;
+                                        }
+                                    }
+                                }
                             }
+                            cursor++;
                         }
-                    } catch (Exception ex) {
-                        Exceptions.printStackTrace(ex);
                     }
-                    //Add nodes and edges
+                    //------------------
+                    dist.endAlgo();
+
+                    //Add similarity edges
                     if (!stopRun) {
                         newVisGraph.addAllEdges(graphEdges);
                     }
@@ -429,7 +404,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
         Node node1 = source.getGraphNode();
         Node node2 = end.getGraphNode();
         String id = String.format("%s-%s", node1.getId(), node2.getId());
-        int relType = graphModel.addEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+        int relType = graphModel.getEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
         if (relType != -1) {
             Edge graphEdge = graphModel.factory().newEdge(id, node1, node2, relType, ProjectManager.GRAPH_EDGE_WEIGHT, false);
             graphEdge.setLabel(ProjectManager.GRAPH_EDGE_SIMALIRITY);
@@ -444,7 +419,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
             if (distance <= maxDistance) {
                 similarity = 1.0 - distance / maxDistance;
                 graphEdge.setWeight(Math.round(similarity * 100.0) / 100.0);
-            }else{
+            } else {
                 graphEdge.setWeight(0);
             }
             graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE, distance);

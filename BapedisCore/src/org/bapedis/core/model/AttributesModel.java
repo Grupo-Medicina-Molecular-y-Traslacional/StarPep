@@ -21,6 +21,7 @@ import org.bapedis.core.spi.ui.GraphWindowController;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.GraphView;
 import org.netbeans.swing.etable.QuickFilter;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Index;
@@ -89,7 +90,7 @@ public class AttributesModel {
     }
 
     public boolean addDisplayedColumn(PeptideAttribute attr) {
-        if (attr instanceof MolecularDescriptor && !canAddMDColumn()){
+        if (attr instanceof MolecularDescriptor && !canAddMDColumn()) {
             return false;
         }
         if (displayedColumnsModel.add(attr)) {
@@ -119,7 +120,6 @@ public class AttributesModel {
 //            node.setAttribute(attr.getId(), peptide.getAttributeValue(attr));
 //        }
 //    }
-    
     public Set<String> getMolecularDescriptorKeys() {
         return mdMap.keySet();
     }
@@ -218,7 +218,6 @@ public class AttributesModel {
 //            node.setAttribute(Peptide.ID.getDisplayName(), peptide.getId());
 //        }
 //    }
-
     public QuickFilter getQuickFilter() {
         return quickFilter;
     }
@@ -337,7 +336,8 @@ public class AttributesModel {
             }
         }
 
-        private void copyGraphTo(GraphModel targetGraphModel) {
+        private void copyGraphTo(GraphModel targetGraphModel, Graph targetVisibleGraph) {
+            GraphVizSetting graphViz = pc.getGraphVizSetting(workspace);
             GraphModel currentGraphModel = pc.getGraphModel(workspace);
             currentGraphModel.getGraph().readLock();
             try {
@@ -347,18 +347,36 @@ public class AttributesModel {
                 Graph targetGraph = targetGraphModel.getGraph();
                 Graph visibleCurrentGraph = currentGraphModel.getGraphVisible();
 
+                //Nodes
+                List<org.gephi.graph.api.Node> nodesToAdd = new LinkedList<>();
+                for (org.gephi.graph.api.Node node : targetGraph.getNodes()) {
+                    if (visibleCurrentGraph.hasNode(node.getId())) {
+                        nodesToAdd.add(node);
+                    }
+                }
+
+                //Edges
                 List<Edge> edgesToAdd = new LinkedList<>();
+                int relType = currentGraphModel.getEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
                 for (Edge edge : targetGraph.getEdges()) {
                     if (visibleCurrentGraph.hasEdge(edge.getId())
                             && targetGraph.hasNode(edge.getSource().getId())
                             && targetGraph.hasNode(edge.getTarget().getId())) {
-                        edgesToAdd.add(edge);
+                        if (relType != -1 && edge.getType() == relType) {
+                            if (edge.getWeight() >= graphViz.getSimilarityThreshold()) {
+                                edgesToAdd.add(edge);
+                            }
+                        } else {
+                            edgesToAdd.add(edge);
+                        }
                     }
                 }
-                if (!edgesToAdd.isEmpty()) {
-                    targetGraphModel.getGraphVisible().addAllEdges(edgesToAdd);
+                if (!nodesToAdd.isEmpty()) {
+                    targetVisibleGraph.addAllNodes(nodesToAdd);
                 }
-
+                if (!edgesToAdd.isEmpty()) {
+                    targetVisibleGraph.addAllEdges(edgesToAdd);
+                }
 //                
 //                List<Edge> edgesToRemove = new LinkedList<>();
 //                for (Edge edge : targetGraph.getEdges()) {
@@ -383,11 +401,11 @@ public class AttributesModel {
             org.gephi.graph.api.Node currentNode, targetNode;
 
             if (peptideIDs != null) {
-                //Copy graph                                
-                copyGraphTo(targetGraphModel);
+                //Copy graph  
+                Graph targetVisibleGraph = pc.getGraphVisible(targetWorkspace);
+                copyGraphTo(targetGraphModel, targetVisibleGraph);
 
                 //Copy peptides
-                List<org.gephi.graph.api.Node> toAddNodes = new LinkedList<>();
                 Map<PeptideAttribute, Object> currAttrsValue, targetAttrsValue;
                 for (String id : peptideIDs) {
                     if (!peptideMap.containsKey(id)) {
@@ -410,13 +428,11 @@ public class AttributesModel {
                         }
 
                         attrModel.addPeptide(targetPeptide);
-                        toAddNodes.add(targetNode);
                     } else {
                         throw new IllegalArgumentException("Duplicated peptide id: " + id);
                     }
                     attrModel.filteredPept = null;
                 }
-                graphWC.refreshGraphView(targetWorkspace, toAddNodes, null);
             }
         }
     }

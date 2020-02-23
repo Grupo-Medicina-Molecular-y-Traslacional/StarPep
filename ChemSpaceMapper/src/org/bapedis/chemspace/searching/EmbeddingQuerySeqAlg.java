@@ -64,9 +64,12 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
     protected MD_OUTPUT_OPTION mdOption;
     private AlgorithmFactory distFactory;
     static final NotifyDescriptor ErrorWS = new NotifyDescriptor.Message(NbBundle.getMessage(EmbeddingQuerySeqAlg.class, "Newworkspace.exist"), NotifyDescriptor.ERROR_MESSAGE);
+    static final NotifyDescriptor ErrorEmpty = new NotifyDescriptor.Message(NbBundle.getMessage(EmbeddingQuerySeqAlg.class, "EmbeddingAlgorithm.emptySeq"), NotifyDescriptor.ERROR_MESSAGE);
     private static final AtomicInteger COUNTER = new AtomicInteger(45120);
     private Color color;
     private int knn;
+    private double threshold;
+    private double maxDistance;
 
     public EmbeddingQuerySeqAlg(EmbeddingQuerySeqFactory factory) {
         this.factory = factory;
@@ -88,16 +91,32 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
 
     public void setKnn(int knn) {
         this.knn = knn;
-    }        
+    }
 
     @Override
     public void setFasta(String fasta) {
         this.fasta = fasta;
     }
 
+    public double getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
+    }
+
     @Override
     public String getFasta() {
         return fasta;
+    }
+
+    public double getMaxDistance() {
+        return maxDistance;
+    }
+
+    public void setMaxDistance(double maxDistance) {
+        this.maxDistance = maxDistance;
     }
 
     public AlgorithmFactory getDistFactory() {
@@ -191,14 +210,12 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                 }
 
                 if (!stopRun && queries != null) {
-                    GraphModel graphModel = pc.getGraphModel(tmpWS);
-                    Graph mainGraph = graphModel.getGraph();
+                    GraphModel tmpGraphModel = pc.getGraphModel(tmpWS);
+                    Graph tmpGraph = tmpGraphModel.getGraph();
 
                     //Add query peptides and graph nodes  
                     List<String> queryIDs = new LinkedList<>();
-                    List<Peptide> queryList = new LinkedList<>();
-                    List<Node> graphNodes = new LinkedList<>();
-                    List<Edge> graphEdges = new LinkedList<>();
+
                     Peptide peptide;
                     Node node;
                     String id, seq;
@@ -206,20 +223,19 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                         id = protein.getAccession().getID();
                         seq = protein.getSequenceAsString();
 
-                        node = getOrAddGraphNode(graphModel, QUERY_LABEL, id);
+                        node = getOrAddGraphNode(tmpGraphModel, QUERY_LABEL, id);
 
-                        peptide = new Peptide(node, mainGraph);
+                        peptide = new Peptide(node, tmpGraph);
                         peptide.setAttributeValue(Peptide.ID, id);
                         peptide.setAttributeValue(Peptide.SEQ, seq);
                         peptide.setAttributeValue(Peptide.LENGHT, seq.length());
                         peptide.setBiojavaSeq(protein);
 
                         queryIDs.add(peptide.getID());
-                        queryList.add(peptide);
-                        graphNodes.add(node);
                         tmpModel.addPeptide(peptide);
                     }
                     AllDescriptors alg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
+                    alg.setIncludeUseless(true);
                     alg.initAlgo(tmpWS, progressTicket);
                     alg.run();
                     alg.endAlgo();
@@ -244,9 +260,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                     for (MolecularDescriptor md : toRemove) {
                         tmpModel.deleteAttribute(md);
                     }
-                    graphModel.getGraphVisible().addAllNodes(graphNodes);
                     tmpModel.getBridge().copyTo(newAttrModel, queryIDs);
-                    
 
                     // Load all descriptors
                     List<MolecularDescriptor> allFeatures = new LinkedList<>();
@@ -301,13 +315,18 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                     }
 
                     // Search KKN
-                    graphModel = pc.getGraphModel(newAttrModel.getOwnerWS());
+                    Graph newVisGraph = pc.getGraphVisible(newWS);
+                    GraphModel newGraphModel = pc.getGraphModel(newWS);
+                    List<Node> graphNodes = new LinkedList<>();
+                    List<Edge> graphEdges = new LinkedList<>();
+
                     int queryIndex = targetIDs.size();
                     AbstractDistance dist = (AbstractDistance) distFactory.createAlgorithm();
                     WekaHeap heap;
                     double distance;
                     int firstkNN;
                     int[] indices;
+                    double[] distances;
                     Edge edge;
                     try {
                         for (int i = queryIndex; i < peptides.length && !stopRun; i++) {
@@ -330,22 +349,23 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                                 }
                             }
                             indices = new int[heap.size() + heap.noOfKthNearest()];
+                            distances = new double[heap.size() + heap.noOfKthNearest()];
                             int l = 1;
                             WekaHeapElement h;
                             while (heap.noOfKthNearest() > 0) {
                                 h = heap.getKthNearest();
                                 indices[indices.length - l] = h.index;
-//                                distances[indices.length - l] = h.distance;
+                                distances[indices.length - l] = h.distance;
                                 l++;
                             }
                             while (heap.size() > 0) {
                                 h = heap.get();
                                 indices[indices.length - l] = h.index;
-//                                distances[indices.length - l] = h.distance;
+                                distances[indices.length - l] = h.distance;
                                 l++;
                             }
                             for (int r = 0; r < indices.length; r++) {
-                                edge = getOrAddGraphEdge(graphModel, peptides[i], peptides[indices[r]]);
+                                edge = getOrAddGraphEdge(newGraphModel, peptides[i], peptides[indices[r]], distances[r]);
                                 if (edge != null) {
                                     graphEdges.add(edge);
                                 }
@@ -355,11 +375,14 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                         Exceptions.printStackTrace(ex);
                     }
                     //Add nodes and edges
-                    if (!stopRun) {                        
-                        graphModel.getGraphVisible().addAllEdges(graphEdges);
+                    if (!stopRun) {
+                        newVisGraph.addAllEdges(graphEdges);
                     }
                 }
             }
+        } else {
+            DialogDisplayer.getDefault().notify(ErrorEmpty);
+            cancel();
         }
     }
 
@@ -400,7 +423,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
         return graphNode;
     }
 
-    protected Edge getOrAddGraphEdge(GraphModel graphModel, Peptide source, Peptide end) {
+    protected Edge getOrAddGraphEdge(GraphModel graphModel, Peptide source, Peptide end, double distance) {
         // Create an edge between two nodes
         Graph mainGraph = graphModel.getGraph();
         Node node1 = source.getGraphNode();
@@ -417,8 +440,17 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
             graphEdge.setB(ProjectManager.GRAPH_NODE_COLOR.getBlue() / 255f);
             graphEdge.setAlpha(0f);
 
+            double similarity;
+            if (distance <= maxDistance) {
+                similarity = 1.0 - distance / maxDistance;
+                graphEdge.setWeight(Math.round(similarity * 100.0) / 100.0);
+            }else{
+                graphEdge.setWeight(0);
+            }
+            graphEdge.setAttribute(ProjectManager.EDGE_TABLE_PRO_DISTANCE, distance);
+
             mainGraph.addEdge(graphEdge);
-            
+
             return graphEdge;
         }
         return null;

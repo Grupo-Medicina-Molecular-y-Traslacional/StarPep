@@ -44,7 +44,7 @@ public class FASTASEQ {
         return load(isr);
     }
 
-    private static List<ProteinSequence> load(Reader reader) throws Exception {
+    public static List<ProteinSequence> load(Reader reader) throws Exception {
         try {
             BufferedReaderBytesRead br = new BufferedReaderBytesRead(reader);
             GenericFastaHeaderParser headerParser = new GenericFastaHeaderParser<>();

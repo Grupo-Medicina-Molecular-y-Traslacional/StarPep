@@ -57,10 +57,11 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
     protected final double[] densityValues;
     protected double[][] descriptorMatrix;
     private boolean twoDMap;
+    private double maxDistance;
 
     public NetworkConstructionAlg(AlgorithmFactory factory) {
         this.factory = factory;
-        currentThreshold = 0.0;
+        currentThreshold = pc.getGraphVizSetting().getSimilarityThreshold();
         stopRun = new AtomicBoolean(false);
         densityValues = new double[101];
         twoDMap = true;
@@ -113,7 +114,10 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
     public ChartPanel getDensityChart() {
         return densityChart;
     }
-      
+
+    public double getMaxDistance() {
+        return maxDistance;
+    }          
 
     @Override
     public void initAlgo(Workspace workspace, ProgressTicket progressTicket) {
@@ -132,6 +136,7 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
             densityValues[i] = 0;
         }
         densityChart = null;
+        maxDistance = 0;
     }
 
     @Override
@@ -180,7 +185,7 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
                 pc.getGraphVizSetting().fireChangedGraphView();
             }
 
-            double maxDistance = createNetwork();
+            maxDistance = createNetwork();
 
             // Report max distance
             if (!stopRun.get()) {
@@ -188,7 +193,7 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
             }
 
             //Compute similarity values
-            computeSimilarityRelationships(maxDistance);
+            computeSimilarityRelationships();
 
             //Populate density array
             populateDensityArray();
@@ -270,7 +275,7 @@ public abstract class NetworkConstructionAlg implements Algorithm, Cloneable {
         }
     }
 
-    protected void computeSimilarityRelationships(double maxDistance) {
+    protected void computeSimilarityRelationships() {
         double distance, similarity;
         Node node1, node2;
         Edge graphEdge;

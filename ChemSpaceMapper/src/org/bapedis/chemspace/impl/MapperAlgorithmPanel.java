@@ -24,6 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.table.DefaultTableModel;
 import org.bapedis.chemspace.component.SpaceArffWritable;
 import org.bapedis.chemspace.component.VisualizePanel3D;
 import org.bapedis.chemspace.model.CoordinateSpace;
@@ -244,6 +245,8 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
             modelY.setSelectedItem(axisLabels[xyzSpace.getyAxis()]);
 
             pcaTable.setModel(new PCATableModel(xyzSpace.getExplainedVariance()));
+        }else{
+            pcaTable.setModel(new DefaultTableModel());
         }
     }
 
@@ -810,6 +813,7 @@ public class MapperAlgorithmPanel extends javax.swing.JPanel implements Algorith
             embeddingAlg.setDistFactory(csMapper.getDistanceFactory());
             embeddingAlg.setKnn(kOptions.getSelectedIndex()+1);
             embeddingAlg.setColor(((ColorChooserButton)colorChooser).getSelectedColor());
+            embeddingAlg.setMaxDistance(csMapper.getNetworkAlg().getMaxDistance());
             executor.execute(embeddingAlg);
         }
     }//GEN-LAST:event_jProjectActionPerformed

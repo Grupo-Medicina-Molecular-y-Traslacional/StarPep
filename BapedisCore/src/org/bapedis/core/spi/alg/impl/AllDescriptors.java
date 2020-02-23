@@ -32,13 +32,13 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
 
     private Set<String> descriptorKeys;
     private final List<AbstractMD> algorithms;
-    protected final NotifyDescriptor emptyKeys;
+    protected final NotifyDescriptor emptyKeys;    
 
     public AllDescriptors(AlgorithmFactory factory) {
         super(factory);
         algorithms = new LinkedList<>();
         emptyKeys = new NotifyDescriptor.Message(NbBundle.getMessage(AllDescriptors.class, "AllDescriptors.emptyKeys.info"), NotifyDescriptor.ERROR_MESSAGE);
-        descriptorKeys = new LinkedHashSet<>();
+        descriptorKeys = new LinkedHashSet<>();        
         String key;
         for (Iterator<? extends AlgorithmFactory> it = pc.getAlgorithmFactoryIterator(); it.hasNext();) {
             final AlgorithmFactory f = it.next();
@@ -55,7 +55,7 @@ public class AllDescriptors extends AbstractMD implements PropertyChangeListener
 
     public Set<String> getDescriptorKeys() {
         return descriptorKeys;
-    }
+    }        
 
     public void includeAlgorithm(String algoName) {
         descriptorKeys.add(algoName);

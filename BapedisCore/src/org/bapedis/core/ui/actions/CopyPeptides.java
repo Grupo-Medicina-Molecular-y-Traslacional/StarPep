@@ -171,6 +171,8 @@ class CopyPeptidesWorker extends SwingWorker<Workspace, Void> {
             Workspace newWorkspace = get();
             if (newWorkspace != null) {
                 CopyPeptides.pc.add(newWorkspace);
+                CopyPeptides.pc.getGraphVizSetting(newWorkspace).setSimilarityThreshold(
+                    CopyPeptides.pc.getGraphVizSetting().getSimilarityThreshold());
                 CopyPeptides.pc.setCurrentWorkspace(newWorkspace);
                 CopyPeptides.pc.getGraphVizSetting(newWorkspace).fireChangedGraphView();
             }

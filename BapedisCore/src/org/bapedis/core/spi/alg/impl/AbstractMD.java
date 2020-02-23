@@ -43,12 +43,22 @@ public abstract class AbstractMD implements Algorithm {
     private final Map<String, MolecularDescriptor> map;
     public static final String MD_ADDED = "md_added";
     protected final PropertyChangeSupport propertyChangeSupport;
+    protected boolean includeUseless;
 
     public AbstractMD(AlgorithmFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
         this.factory = factory;
         map = Collections.synchronizedMap(new LinkedHashMap<>());
         propertyChangeSupport = new PropertyChangeSupport(this);
+        includeUseless = false;
+    }
+
+    public boolean isIncludeUseless() {
+        return includeUseless;
+    }
+
+    public void setIncludeUseless(boolean includeUseless) {
+        this.includeUseless = includeUseless;
     }
 
     protected void addAttribute(String id, String displayName, Class<?> type) {
@@ -144,7 +154,7 @@ public abstract class AbstractMD implements Algorithm {
                             min = MolecularDescriptor.min(data);
                             max = MolecularDescriptor.max(data);
                             // Add non-constant molecular features
-                            if (!Double.isNaN(min) && !Double.isNaN(max) && min != max) {
+                            if (includeUseless || (!Double.isNaN(min) && !Double.isNaN(max) && min != max)) {
                                 category = attr.getCategory();
                                 if (!byCategory.containsKey(category)) {
                                     byCategory.put(category, new LinkedList<>());

@@ -72,8 +72,11 @@
                 </dependency>
             </module-dependencies>
             <public-packages>
+                <package>org.bapedis.graphmining.algorithms</package>
                 <package>org.bapedis.graphmining.centrality</package>
                 <package>org.bapedis.graphmining.clustering</package>
+                <package>org.bapedis.graphmining.model</package>
+                <package>org.bapedis.graphmining.subnet</package>
             </public-packages>
         </data>
     </configuration>

@@ -40,7 +40,7 @@ public class WizardEmbeddingQuerySequence implements WizardDescriptor.Finishable
                 alg = (EmbeddingQuerySeqAlg) csMapper.getEmbeddingQueryAlg().clone();
                 JPanel settingPanel = alg.getFactory().getSetupUI().getSettingPanel(alg);
                 component = new VisualEmbeddingQuerySequence(settingPanel);
-                component.setSearchingOption(csMapper.getSearchingOption());
+//                component.setSearchingOption(csMapper.getSearchingOption());
             } catch (CloneNotSupportedException ex) {
                 Exceptions.printStackTrace(ex);
                 alg = null;
@@ -59,7 +59,7 @@ public class WizardEmbeddingQuerySequence implements WizardDescriptor.Finishable
         // use wiz.getProperty to retrieve previous panel state
         SimilaritySearchingOption searchingOption = (SimilaritySearchingOption) wiz.getProperty(SimilaritySearchingOption.class.getName());
         if (searchingOption == null) {
-            searchingOption = csMapper.getSearchingOption();
+//            searchingOption = csMapper.getSearchingOption();
         }
         getComponent().setSearchingOption(searchingOption);        
     }

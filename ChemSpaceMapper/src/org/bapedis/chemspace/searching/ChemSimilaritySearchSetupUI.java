@@ -8,7 +8,6 @@ package org.bapedis.chemspace.searching;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.bapedis.chemspace.model.SimilaritySearchingModel;
 import org.bapedis.core.spi.alg.Algorithm;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.openide.DialogDisplayer;
@@ -24,7 +23,7 @@ public class ChemSimilaritySearchSetupUI extends javax.swing.JPanel implements A
     private final NotifyDescriptor errorND;
 
     protected ChemBaseSimilaritySearchAlg searchAlg;
-    protected SimilaritySearchingModel searchingModel;
+//    protected SimilaritySearchingModel searchingModel;
     protected JPanel querySetupPanel;
 
     /**
@@ -57,9 +56,9 @@ public class ChemSimilaritySearchSetupUI extends javax.swing.JPanel implements A
         try {
             if (!jTFTopRank.getText().isEmpty()) {
                 int topRank = Integer.parseInt(jTFTopRank.getText());
-                if (searchingModel.getTopRank() != topRank) {
-                    searchingModel.setTopRank(topRank);
-                }
+//                if (searchingModel.getTopRank() != topRank) {
+//                    searchingModel.setTopRank(topRank);
+//                }
             }
         } catch (NumberFormatException ex) {
             DialogDisplayer.getDefault().notify(errorND);
@@ -89,32 +88,32 @@ public class ChemSimilaritySearchSetupUI extends javax.swing.JPanel implements A
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         searchAlg = (ChemBaseSimilaritySearchAlg) algo;
-        searchingModel = searchAlg.getSearchingModel();
+//        searchingModel = searchAlg.getSearchingModel();
         setupSearchingModel();
 
         return this;
     }
 
     private void setupSearchingModel() {
-        jTopPercentComboBox.setSelectedIndex(searchingModel.getTopPercentIndex());
-        jTFTopRank.setText(String.valueOf(searchingModel.getTopRank()));
-        jSpinnerSimThreshold.getModel().setValue(searchingModel.getThreshold());
-        jsimTPercentComboBox.setSelectedIndex(searchingModel.getThresholdPercentIndex());
-
-        switch (searchingModel.getOption()) {
-            case TOP_RANK_PERCENT_OPTION:
-                jOption1.setSelected(true);
-                break;
-            case TOP_RANK_VALUE_OPTION:
-                jOption2.setSelected(true);
-                break;
-            case SIMILARITY_THRESHOD_VALUE_OPTION:
-                jOption3.setSelected(true);
-                break;
-            case SIMILARITY_THRESHOD_PERCENT_OPTION:
-                jOption4.setSelected(true);
-                break;
-        }
+//        jTopPercentComboBox.setSelectedIndex(searchingModel.getTopPercentIndex());
+//        jTFTopRank.setText(String.valueOf(searchingModel.getTopRank()));
+//        jSpinnerSimThreshold.getModel().setValue(searchingModel.getThreshold());
+//        jsimTPercentComboBox.setSelectedIndex(searchingModel.getThresholdPercentIndex());
+//
+//        switch (searchingModel.getOption()) {
+//            case TOP_RANK_PERCENT_OPTION:
+//                jOption1.setSelected(true);
+//                break;
+//            case TOP_RANK_VALUE_OPTION:
+//                jOption2.setSelected(true);
+//                break;
+//            case SIMILARITY_THRESHOD_VALUE_OPTION:
+//                jOption3.setSelected(true);
+//                break;
+//            case SIMILARITY_THRESHOD_PERCENT_OPTION:
+//                jOption4.setSelected(true);
+//                break;
+//        }
     }
 
     /**
@@ -299,16 +298,16 @@ public class ChemSimilaritySearchSetupUI extends javax.swing.JPanel implements A
 
     private void jSpinnerSimThresholdStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinnerSimThresholdStateChanged
         double threshold = (double) jSpinnerSimThreshold.getModel().getValue();
-        if (searchingModel.getThreshold() != threshold) {
-            searchingModel.setThreshold(threshold);
-        }
+//        if (searchingModel.getThreshold() != threshold) {
+//            searchingModel.setThreshold(threshold);
+//        }
     }//GEN-LAST:event_jSpinnerSimThresholdStateChanged
 
     private void jTopPercentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTopPercentComboBoxActionPerformed
         int topPercentIndex = jTopPercentComboBox.getSelectedIndex();
-        if (searchingModel.getTopPercentIndex() != topPercentIndex) {
-            searchingModel.setTopPercentIndex(topPercentIndex);
-        }
+//        if (searchingModel.getTopPercentIndex() != topPercentIndex) {
+//            searchingModel.setTopPercentIndex(topPercentIndex);
+//        }
     }//GEN-LAST:event_jTopPercentComboBoxActionPerformed
 
     private void jOption1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jOption1ItemStateChanged
@@ -329,33 +328,33 @@ public class ChemSimilaritySearchSetupUI extends javax.swing.JPanel implements A
 
     private void jsimTPercentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jsimTPercentComboBoxActionPerformed
         int thresholdPercentIndex = jsimTPercentComboBox.getSelectedIndex();
-        if (searchingModel.getThresholdPercentIndex() != thresholdPercentIndex) {
-            searchingModel.setThresholdPercentIndex(thresholdPercentIndex);
-        }
+//        if (searchingModel.getThresholdPercentIndex() != thresholdPercentIndex) {
+//            searchingModel.setThresholdPercentIndex(thresholdPercentIndex);
+//        }
     }//GEN-LAST:event_jsimTPercentComboBoxActionPerformed
 
     private void jOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption1ActionPerformed
-        if (searchingModel.getOption() != SimilaritySearchingModel.Options.TOP_RANK_PERCENT_OPTION) {
-            searchingModel.setOption(SimilaritySearchingModel.Options.TOP_RANK_PERCENT_OPTION);
-        }
+//        if (searchingModel.getOption() != SimilaritySearchingModel.Options.TOP_RANK_PERCENT_OPTION) {
+//            searchingModel.setOption(SimilaritySearchingModel.Options.TOP_RANK_PERCENT_OPTION);
+//        }
     }//GEN-LAST:event_jOption1ActionPerformed
 
     private void jOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption2ActionPerformed
-        if (searchingModel.getOption() != SimilaritySearchingModel.Options.TOP_RANK_VALUE_OPTION) {
-            searchingModel.setOption(SimilaritySearchingModel.Options.TOP_RANK_VALUE_OPTION);
-        }
+//        if (searchingModel.getOption() != SimilaritySearchingModel.Options.TOP_RANK_VALUE_OPTION) {
+//            searchingModel.setOption(SimilaritySearchingModel.Options.TOP_RANK_VALUE_OPTION);
+//        }
     }//GEN-LAST:event_jOption2ActionPerformed
 
     private void jOption3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption3ActionPerformed
-        if (searchingModel.getOption() != SimilaritySearchingModel.Options.SIMILARITY_THRESHOD_VALUE_OPTION) {
-            searchingModel.setOption(SimilaritySearchingModel.Options.SIMILARITY_THRESHOD_VALUE_OPTION);
-        }
+//        if (searchingModel.getOption() != SimilaritySearchingModel.Options.SIMILARITY_THRESHOD_VALUE_OPTION) {
+//            searchingModel.setOption(SimilaritySearchingModel.Options.SIMILARITY_THRESHOD_VALUE_OPTION);
+//        }
     }//GEN-LAST:event_jOption3ActionPerformed
 
     private void jOption4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOption4ActionPerformed
-        if (searchingModel.getOption() != SimilaritySearchingModel.Options.SIMILARITY_THRESHOD_PERCENT_OPTION) {
-            searchingModel.setOption(SimilaritySearchingModel.Options.SIMILARITY_THRESHOD_PERCENT_OPTION);
-        }
+//        if (searchingModel.getOption() != SimilaritySearchingModel.Options.SIMILARITY_THRESHOD_PERCENT_OPTION) {
+//            searchingModel.setOption(SimilaritySearchingModel.Options.SIMILARITY_THRESHOD_PERCENT_OPTION);
+//        }
     }//GEN-LAST:event_jOption4ActionPerformed
 
 

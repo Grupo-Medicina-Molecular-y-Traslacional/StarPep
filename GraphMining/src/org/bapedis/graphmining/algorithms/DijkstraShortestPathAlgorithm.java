@@ -39,7 +39,7 @@
 
  Portions Copyrighted 2011 Gephi Consortium.
  */
-package org.gephi.algorithms.shortestpath;
+package org.bapedis.graphmining.algorithms;
 
 import java.util.HashMap;
 import java.util.HashSet;

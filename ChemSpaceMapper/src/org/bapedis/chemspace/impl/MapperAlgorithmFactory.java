@@ -79,17 +79,17 @@ public class MapperAlgorithmFactory implements AlgorithmFactory, ChemSpaceTag {
         }
         
         //Similarity searching
-        SimilaritySearchingOption searchingOption = (SimilaritySearchingOption) wiz.getProperty(SimilaritySearchingOption.class.getName());
-        if (searchingOption != null) {
-            csMapper.setSearchingOption(searchingOption);
-            if (searchingOption == SimilaritySearchingOption.YES) {
-                EmbeddingQuerySeqAlg embeddingQueryAlg = (EmbeddingQuerySeqAlg) wiz.getProperty(EmbeddingQuerySeqAlg.class.getName());
-                csMapper.setEmbeddingQueryAlg(embeddingQueryAlg);
-                
-                ChemBaseSimilaritySearchAlg searchingAlg = (ChemBaseSimilaritySearchAlg) wiz.getProperty(ChemBaseSimilaritySearchAlg.class.getName());
-                csMapper.setSimSearchingAlg(searchingAlg);
-            }
-        }            
+//        SimilaritySearchingOption searchingOption = (SimilaritySearchingOption) wiz.getProperty(SimilaritySearchingOption.class.getName());
+//        if (searchingOption != null) {
+//            csMapper.setSearchingOption(searchingOption);
+//            if (searchingOption == SimilaritySearchingOption.YES) {
+//                EmbeddingQuerySeqAlg embeddingQueryAlg = (EmbeddingQuerySeqAlg) wiz.getProperty(EmbeddingQuerySeqAlg.class.getName());
+//                csMapper.setEmbeddingQueryAlg(embeddingQueryAlg);
+//                
+//                ChemBaseSimilaritySearchAlg searchingAlg = (ChemBaseSimilaritySearchAlg) wiz.getProperty(ChemBaseSimilaritySearchAlg.class.getName());
+//                csMapper.setSimSearchingAlg(searchingAlg);
+//            }
+//        }            
                 
         // Feature Extraction Option
         FeatureExtractionOption feOption = (FeatureExtractionOption) wiz.getProperty(FeatureExtractionOption.class.getName());

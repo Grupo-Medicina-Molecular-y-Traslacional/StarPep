@@ -65,7 +65,6 @@ public class MapperAlgorithm implements Algorithm {
     protected RemovingRedundantOption nrdOption;
     protected FeatureExtractionOption feOption;
     protected FeatureSelectionOption fsOption;
-    protected SimilaritySearchingOption searchingOption;
     protected MD_OUTPUT_OPTION mdOption;
 
     //Mapping Algorithms   
@@ -88,8 +87,7 @@ public class MapperAlgorithm implements Algorithm {
         
         //Mapping Options    
         inputOption = InputSequenceOption.CURRENT_WORKSPACE;
-        nrdOption = RemovingRedundantOption.NO;
-        searchingOption = SimilaritySearchingOption.NO;
+        nrdOption = RemovingRedundantOption.YES;
         feOption = FeatureExtractionOption.YES;
         fsOption = FeatureSelectionOption.YES;
         mdOption = MD_OUTPUT_OPTION.Z_SCORE;
@@ -373,14 +371,6 @@ public class MapperAlgorithm implements Algorithm {
 
     public void setFSOption(FeatureSelectionOption fsOption) {
         this.fsOption = fsOption;
-    }
-
-    public SimilaritySearchingOption getSearchingOption() {
-        return searchingOption;
-    }
-
-    public void setSearchingOption(SimilaritySearchingOption searchingOption) {
-        this.searchingOption = searchingOption;
     }
 
     public EmbeddingQuerySeqAlg getEmbeddingQueryAlg() {

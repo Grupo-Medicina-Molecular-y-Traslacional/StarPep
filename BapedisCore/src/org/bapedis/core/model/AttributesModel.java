@@ -363,7 +363,7 @@ public class AttributesModel {
                             && targetGraph.hasNode(edge.getSource().getId())
                             && targetGraph.hasNode(edge.getTarget().getId())) {
                         if (relType != -1 && edge.getType() == relType) {
-                            if (edge.getWeight() >= graphViz.getSimilarityThreshold()) {
+                                if (edge.getWeight() >= graphViz.getSimilarityThreshold()) {
                                 edgesToAdd.add(edge);
                             }
                         } else {

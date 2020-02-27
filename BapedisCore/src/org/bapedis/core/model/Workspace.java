@@ -55,7 +55,7 @@ public class Workspace implements Lookup.Provider {
         this(counter.getAndIncrement(), name);
     }
 
-    private Workspace(int id, String name) {
+    public Workspace(int id, String name) {
         this.id = id;
         this.name = name;
         busy = new AtomicBoolean(false);

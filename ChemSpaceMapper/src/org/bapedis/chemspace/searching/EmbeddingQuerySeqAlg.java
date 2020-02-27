@@ -160,6 +160,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                             pc.add(newWS);
                             pc.setCurrentWorkspace(newWS);
                         } finally {
+                            pc.getGraphVizSetting(newWS).setSimilarityThreshold(pc.getGraphVizSetting().getSimilarityThreshold());
                             pc.getGraphVizSetting(newWS).fireChangedGraphView();
                         }
                     }
@@ -202,7 +203,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                 currentModel.getBridge().copyTo(newAttrModel, targetIDs);
 
                 //Add query peptides to new attribute model
-                Workspace tmpWS = new Workspace("tmp");
+                Workspace tmpWS = new Workspace(Integer.MAX_VALUE, "tmp");
                 AttributesModel tmpModel = new AttributesModel(tmpWS);
                 tmpWS.add(tmpModel);
                 List<ProteinSequence> queries = null;
@@ -320,39 +321,43 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                         p.setAttributeValue(INDEX_ATTR, index++);
                     }
 
-                    //Update positions of query nodes
-                    WekaPCATransformer pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
-                    pcaTransformer.initAlgo(newWS, progressTicket);
-                    pcaTransformer.run();
-                    pcaTransformer.endAlgo();
-                    Vector3f[] positions = pcaTransformer.getXYZSpace().getPositions();
+                    //Update position of query nodes
                     Graph newVisGraph = pc.getGraphVisible(newWS);
-                    newVisGraph.readLock();
-                    try {
-                        Vector3f p;
-                        for (int i = targetIDs.size(); i < positions.length && !stopRun; i++) {
-                            p = positions[i];
-                            node = peptides[i].getGraphNode();
-                            node.setX((float) ((0.01 + p.x) * 1000) - 500);
-                            node.setY((float) ((0.01 + p.y) * 1000) - 500);
-                            node.setZ(0); // 2D  
+                    if (!stopRun) {
+                        WekaPCATransformer pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
+                        pcaTransformer.initAlgo(newWS, progressTicket);
+                        pcaTransformer.run();
+                        pcaTransformer.endAlgo();
+                        Vector3f[] positions = pcaTransformer.getXYZSpace().getPositions();
+                        newVisGraph.readLock();
+                        try {
+                            Vector3f p;
+                            for (int i = targetIDs.size(); i < positions.length && !stopRun; i++) {
+                                p = positions[i];
+                                node = peptides[i].getGraphNode();
+                                node.setX((float) ((0.01 + p.x) * 1000) - 500);
+                                node.setY((float) ((0.01 + p.y) * 1000) - 500);
+                                node.setZ(0); // 2D 
+                            }
+                        } finally {
+                            newVisGraph.readUnlock();
                         }
-                    } finally {
-                        newVisGraph.readUnlock();
                     }
 
-                    //Add similarity edges                    
-                    List<Edge> graphEdges = null;
-                    switch (option) {
-                        case HSP:
-                            graphEdges = connectToHSPN(newWS, peptides, targetIDs.size(), descriptorMatrix);
-                            break;
-                        case KNN:
-                            graphEdges = connectToKNN(newWS, peptides, targetIDs.size(), descriptorMatrix);
-                            break;
-                    }
-                    if (!stopRun && graphEdges != null) {
-                        newVisGraph.addAllEdges(graphEdges);
+                    if (!stopRun) {
+                        //Add similarity edges                    
+                        List<Edge> graphEdges = null;
+                        switch (option) {
+                            case HSP:
+                                graphEdges = connectToHSPN(newWS, peptides, targetIDs.size(), descriptorMatrix);
+                                break;
+                            case KNN:
+                                graphEdges = connectToKNN(newWS, peptides, targetIDs.size(), descriptorMatrix);
+                                break;
+                        }
+                        if (graphEdges != null) {
+                            newVisGraph.addAllEdges(graphEdges);
+                        }
                     }
                 }
             }

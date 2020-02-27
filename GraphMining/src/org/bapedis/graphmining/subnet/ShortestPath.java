@@ -19,6 +19,7 @@ import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
+import org.gephi.graph.api.NodeIterable;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
@@ -35,16 +36,15 @@ public class ShortestPath implements Algorithm {
     private ProgressTicket ticket;
     private GraphModel graphModel;
     private boolean stopRun;
-    private String sourceNodeID, targetNodeID;
+    private String sourceNodeName, targetNodeName;
     private final AlgorithmFactory factory;
     private Color color;
-    protected final NotifyDescriptor noPath,invalidID;
+    protected final NotifyDescriptor noPath;
 
     public ShortestPath(AlgorithmFactory factory) {
         this.factory = factory;
         color = Color.RED;
         noPath = new NotifyDescriptor.Message(NbBundle.getMessage(ShortestPath.class, "ShortestPath.none"), NotifyDescriptor.ERROR_MESSAGE);
-        invalidID = new NotifyDescriptor.Message(NbBundle.getMessage(ShortestPath.class, "ShortestPath.invalidInput"), NotifyDescriptor.ERROR_MESSAGE);
     }
 
     @Override
@@ -55,20 +55,20 @@ public class ShortestPath implements Algorithm {
         stopRun = false;
     }
 
-    public String getSourceNodeID() {
-        return sourceNodeID;
+    public String getSourceNodeName() {
+        return sourceNodeName;
     }
 
-    public void setSourceNodeID(String sourceNodeID) {
-        this.sourceNodeID = sourceNodeID;
+    public void setSourceNodeName(String sourceNodeName) {
+        this.sourceNodeName = sourceNodeName;
     }
 
-    public String getTargetNodeID() {
-        return targetNodeID;
+    public String getTargetNodeName() {
+        return targetNodeName;
     }
 
-    public void setTargetNodeID(String targetNodeID) {
-        this.targetNodeID = targetNodeID;
+    public void setTargetNodeName(String targetNodeName) {
+        this.targetNodeName = targetNodeName;
     }
 
     public Color getColor() {
@@ -105,51 +105,68 @@ public class ShortestPath implements Algorithm {
     @Override
     public void run() {
         Graph graph = graphModel.getGraphVisible();
-        try {
-            int sourceID = Integer.parseInt(sourceNodeID);
-            Node sourceNode = graph.getNode(String.valueOf(sourceID));
-            if (!stopRun && sourceNode == null) {
-                DialogDisplayer.getDefault().notify(invalidID);
-                cancel();
-            }
-            int targetID = Integer.parseInt(targetNodeID);
-            Node targetNode = graph.getNode(String.valueOf(targetID));
-            if (!stopRun && targetNode == null) {
-                DialogDisplayer.getDefault().notify(invalidID);
-                cancel();
-            }
-            if (!stopRun) {
-                AbstractShortestPathAlgorithm algorithm = new DijkstraShortestPathAlgorithm(graphModel.getGraphVisible(), sourceNode);
-                algorithm.compute();
 
-                double distance;
-                if ((distance = algorithm.getDistances().get(targetNode)) != Double.POSITIVE_INFINITY) {
-                    targetNode.setColor(color);
-                    Stack<String> pathway = new Stack<>();
-                    pathway.push((String) targetNode.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
-                    Edge predecessorEdge = algorithm.getPredecessorIncoming(targetNode);
-                    Node predecessor = algorithm.getPredecessor(targetNode);
-                    while (predecessorEdge != null && predecessor != sourceNode) {
-                        predecessorEdge.setColor(color);
-                        predecessor.setColor(color);
-                        pathway.push(String.format(" -%.2f-> ", predecessorEdge.getWeight()));
-                        pathway.push((String) predecessor.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
-                        predecessorEdge = algorithm.getPredecessorIncoming(predecessor);
-                        predecessor = algorithm.getPredecessor(predecessor);
-                    }
-                    predecessorEdge.setColor(color);
-                    sourceNode.setColor(color);
-                    pathway.push(String.format(" -%.2f-> ", predecessorEdge.getWeight()));
-                    pathway.push((String) sourceNode.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
-                    String path = shortestPathResult(pathway);
-                    pc.reportMsg(NbBundle.getMessage(ShortestPath.class, "ShortestPath.result", path), workspace);
-                    pc.reportMsg(NbBundle.getMessage(ShortestPath.class, "ShortestPath.distance", distance), workspace);
-                } else {
-                    DialogDisplayer.getDefault().notify(noPath);
-                }
+        Node sourceNode = null;
+        Node targetNode = null;
+        NodeIterable nodeIterable = graph.getNodes();
+
+        for (Node node : nodeIterable) {
+            if (sourceNode == null && node.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME).equals(sourceNodeName)) {
+                sourceNode = node;
             }
-        }catch(NumberFormatException ex){
-            DialogDisplayer.getDefault().notify(invalidID);
+            if (targetNode == null && node.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME).equals(targetNodeName)) {
+                targetNode = node;
+            }
+            if (sourceNode != null && targetNode != null) {
+                nodeIterable.doBreak();
+                break;
+            }
+        }
+
+        if (!stopRun && sourceNode == null) {
+            NotifyDescriptor invalidName = new NotifyDescriptor.Message(NbBundle.getMessage(ShortestPath.class, "ShortestPath.invalidInput", sourceNodeName), NotifyDescriptor.ERROR_MESSAGE);
+            DialogDisplayer.getDefault().notify(invalidName);
+            cancel();
+        }
+        if (!stopRun && targetNode == null) {
+            NotifyDescriptor invalidName = new NotifyDescriptor.Message(NbBundle.getMessage(ShortestPath.class, "ShortestPath.invalidInput", targetNodeName), NotifyDescriptor.ERROR_MESSAGE);
+            DialogDisplayer.getDefault().notify(invalidName);
+            cancel();
+        }
+
+        if (!stopRun) {
+            AbstractShortestPathAlgorithm algorithm = new DijkstraShortestPathAlgorithm(graphModel.getGraphVisible(), sourceNode);
+            algorithm.compute();
+
+            double distance;
+            if ((distance = algorithm.getDistances().get(targetNode)) != Double.POSITIVE_INFINITY) {
+                targetNode.setColor(color);
+                Stack<String> pathway = new Stack<>();
+                pathway.push((String) targetNode.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
+                Edge predecessorEdge = algorithm.getPredecessorIncoming(targetNode);
+                Node predecessor = algorithm.getPredecessor(targetNode);
+                while (predecessorEdge != null && predecessor != sourceNode) {
+                    predecessorEdge.setColor(color);
+                    predecessor.setColor(color);
+                    pathway.push(String.format(" -%.2f-> ", predecessorEdge.getWeight()));
+                    pathway.push((String) predecessor.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
+                    predecessorEdge = algorithm.getPredecessorIncoming(predecessor);
+                    predecessor = algorithm.getPredecessor(predecessor);
+                }
+                if (predecessorEdge != null) {
+                    predecessorEdge.setColor(color);
+                    pathway.push(String.format(" -%.2f-> ", predecessorEdge.getWeight()));
+                }
+                if (sourceNode != targetNode) {
+                    sourceNode.setColor(color);
+                    pathway.push((String) sourceNode.getAttribute(ProjectManager.NODE_TABLE_PRO_NAME));
+                }
+                String path = shortestPathResult(pathway);
+                pc.reportMsg(NbBundle.getMessage(ShortestPath.class, "ShortestPath.result", path), workspace);
+                pc.reportMsg(NbBundle.getMessage(ShortestPath.class, "ShortestPath.distance", distance), workspace);
+            } else {
+                DialogDisplayer.getDefault().notify(noPath);
+            }
         }
     }
 

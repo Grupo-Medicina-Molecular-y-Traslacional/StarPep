@@ -12,7 +12,6 @@ import org.bapedis.chemspace.model.FeatureSelectionOption;
 import org.bapedis.chemspace.model.FeatureExtractionOption;
 import org.bapedis.chemspace.model.InputSequenceOption;
 import org.bapedis.chemspace.model.RemovingRedundantOption;
-import org.bapedis.chemspace.model.SimilaritySearchingOption;
 import org.bapedis.chemspace.searching.ChemBaseSimilaritySearchAlg;
 import org.bapedis.chemspace.searching.ChemMultiSimilaritySearchFactory;
 import org.bapedis.chemspace.searching.EmbeddingInputSeqAlg;
@@ -133,17 +132,6 @@ public class MapperAlgorithm implements Algorithm {
                     throw new RuntimeException("Internal error: Embedding input sequences is null");
                 }
             }
-
-            // Embedding query sequences        
-//            if (searchingOption == SimilaritySearchingOption.YES && !stopRun) {
-//                pc.reportMsg("Embedding query sequences", workspace);
-//                if (embeddingQueryAlg != null) {
-//                    currentAlg = embeddingQueryAlg;
-//                    execute();
-//                } else {
-//                    throw new RuntimeException("Internal error: Embedding query algorithm is null");
-//                }
-//            }
 
             // Feature Extraction
             pc.reportMsg(String.format("Feature extraction: %s", feOption), workspace);

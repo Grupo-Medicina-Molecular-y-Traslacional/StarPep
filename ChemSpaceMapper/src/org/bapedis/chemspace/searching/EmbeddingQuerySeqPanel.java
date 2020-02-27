@@ -41,10 +41,15 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         settingPanel = new javax.swing.JPanel();
         jLabelColor = new javax.swing.JLabel();
         colorChooser = new ColorChooserButton(Color.GRAY);
         extLabel = new javax.swing.JLabel();
+        jOptionKNN = new javax.swing.JRadioButton();
+        jOptionHSP = new javax.swing.JRadioButton();
+        jLabel1 = new javax.swing.JLabel();
+        jComboBoxKNN = new javax.swing.JComboBox<>();
         embeddingPanel = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
@@ -54,7 +59,7 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
         org.openide.awt.Mnemonics.setLocalizedText(jLabelColor, org.openide.util.NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "EmbeddingQuerySeqPanel.jLabelColor.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         settingPanel.add(jLabelColor, gridBagConstraints);
@@ -62,7 +67,8 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
         org.openide.awt.Mnemonics.setLocalizedText(colorChooser, org.openide.util.NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "EmbeddingQuerySeqPanel.colorChooser.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         settingPanel.add(colorChooser, gridBagConstraints);
@@ -74,6 +80,64 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         settingPanel.add(extLabel, gridBagConstraints);
+
+        buttonGroup1.add(jOptionKNN);
+        org.openide.awt.Mnemonics.setLocalizedText(jOptionKNN, org.openide.util.NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "EmbeddingQuerySeqPanel.jOptionKNN.text")); // NOI18N
+        jOptionKNN.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jOptionKNNItemStateChanged(evt);
+            }
+        });
+        jOptionKNN.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOptionKNNActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        settingPanel.add(jOptionKNN, gridBagConstraints);
+
+        buttonGroup1.add(jOptionHSP);
+        org.openide.awt.Mnemonics.setLocalizedText(jOptionHSP, org.openide.util.NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "EmbeddingQuerySeqPanel.jOptionHSP.text")); // NOI18N
+        jOptionHSP.setToolTipText(org.openide.util.NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "EmbeddingQuerySeqPanel.jOptionHSP.toolTipText")); // NOI18N
+        jOptionHSP.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jOptionHSPActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        settingPanel.add(jOptionHSP, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "EmbeddingQuerySeqPanel.jLabel1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        settingPanel.add(jLabel1, gridBagConstraints);
+
+        jComboBoxKNN.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "3", "5", "7", "9", "11" }));
+        jComboBoxKNN.setSelectedIndex(-1);
+        jComboBoxKNN.setToolTipText(org.openide.util.NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "EmbeddingQuerySeqPanel.jComboBoxKNN.toolTipText")); // NOI18N
+        jComboBoxKNN.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxKNNActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        settingPanel.add(jComboBoxKNN, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -95,10 +159,42 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
         add(embeddingPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jOptionKNNItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jOptionKNNItemStateChanged
+        jComboBoxKNN.setEnabled(jOptionKNN.isSelected());
+    }//GEN-LAST:event_jOptionKNNItemStateChanged
+
+    private void jOptionHSPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOptionHSPActionPerformed
+        if (embeddingAlg != null){
+            embeddingAlg.setOption(EmbeddingQuerySeqAlg.EmbeddingOption.HSP);
+        }
+    }//GEN-LAST:event_jOptionHSPActionPerformed
+
+    private void jOptionKNNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOptionKNNActionPerformed
+        if (embeddingAlg != null){
+            embeddingAlg.setOption(EmbeddingQuerySeqAlg.EmbeddingOption.KNN);
+        }
+    }//GEN-LAST:event_jOptionKNNActionPerformed
+
+    private void jComboBoxKNNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxKNNActionPerformed
+        if (embeddingAlg != null){
+            embeddingAlg.setKnn(Integer.parseInt((String)jComboBoxKNN.getSelectedItem()));
+        }
+    }//GEN-LAST:event_jComboBoxKNNActionPerformed
+
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         embeddingAlg = (EmbeddingQuerySeqAlg) algo;
-
+        switch(embeddingAlg.getOption()){
+            case HSP:
+                jOptionHSP.setSelected(true);
+                jComboBoxKNN.setEnabled(false);
+                break;
+            case KNN:
+                jOptionKNN.setSelected(true);
+                jComboBoxKNN.setEnabled(true);
+                break;
+        } 
+        jComboBoxKNN.setSelectedItem(String.valueOf(embeddingAlg.getKnn()));        
         ((ColorChooserButton)colorChooser).setSelectedColor(embeddingAlg.getColor());
         queryPanel = new MultiQueryPanel((MultiQuery) embeddingAlg);
 
@@ -111,10 +207,15 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton colorChooser;
     private javax.swing.JPanel embeddingPanel;
     private javax.swing.JLabel extLabel;
+    private javax.swing.JComboBox<String> jComboBoxKNN;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabelColor;
+    private javax.swing.JRadioButton jOptionHSP;
+    private javax.swing.JRadioButton jOptionKNN;
     private javax.swing.JPanel settingPanel;
     // End of variables declaration//GEN-END:variables
 

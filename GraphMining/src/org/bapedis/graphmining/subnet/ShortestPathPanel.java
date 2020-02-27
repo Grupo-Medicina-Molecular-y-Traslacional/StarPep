@@ -60,13 +60,13 @@ public class ShortestPathPanel extends javax.swing.JPanel implements AlgorithmSe
 
     private void updateSourceNode(){
         if (shortestPath != null){
-            shortestPath.setSourceNodeID(jTF_sourceNode.getText());
+            shortestPath.setSourceNodeName(jTF_sourceNode.getText());
         }
     }
     
     private void updateTargetNode(){
         if (shortestPath != null){
-            shortestPath.setTargetNodeID(jTF_targetNode.getText());
+            shortestPath.setTargetNodeName(jTF_targetNode.getText());
         }
     }
     
@@ -85,11 +85,8 @@ public class ShortestPathPanel extends javax.swing.JPanel implements AlgorithmSe
         jTF_sourceNode = new javax.swing.JTextField();
         jTF_targetNode = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
         colorChooser = new ColorChooserButton(Color.GRAY);
         jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -110,21 +107,25 @@ public class ShortestPathPanel extends javax.swing.JPanel implements AlgorithmSe
         add(jLabel2, gridBagConstraints);
 
         jTF_sourceNode.setText(org.openide.util.NbBundle.getMessage(ShortestPathPanel.class, "ShortestPathPanel.jTF_sourceNode.text")); // NOI18N
-        jTF_sourceNode.setPreferredSize(new java.awt.Dimension(60, 20));
+        jTF_sourceNode.setPreferredSize(new java.awt.Dimension(90, 20));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(jTF_sourceNode, gridBagConstraints);
 
         jTF_targetNode.setText(org.openide.util.NbBundle.getMessage(ShortestPathPanel.class, "ShortestPathPanel.jTF_targetNode.text")); // NOI18N
-        jTF_targetNode.setPreferredSize(new java.awt.Dimension(60, 20));
+        jTF_targetNode.setPreferredSize(new java.awt.Dimension(90, 20));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         add(jTF_targetNode, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(ShortestPathPanel.class, "ShortestPathPanel.jLabel3.text")); // NOI18N
@@ -135,19 +136,10 @@ public class ShortestPathPanel extends javax.swing.JPanel implements AlgorithmSe
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(jLabel3, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(ShortestPathPanel.class, "ShortestPathPanel.jLabel4.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        add(jLabel4, gridBagConstraints);
-
         org.openide.awt.Mnemonics.setLocalizedText(colorChooser, org.openide.util.NbBundle.getMessage(ShortestPathPanel.class, "ShortestPathPanel.colorChooser.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(colorChooser, gridBagConstraints);
@@ -158,27 +150,13 @@ public class ShortestPathPanel extends javax.swing.JPanel implements AlgorithmSe
         gridBagConstraints.gridy = 3;
         gridBagConstraints.weighty = 1.0;
         add(jLabel5, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(ShortestPathPanel.class, "ShortestPathPanel.jLabel6.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(jLabel6, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel7, org.openide.util.NbBundle.getMessage(ShortestPathPanel.class, "ShortestPathPanel.jLabel7.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(jLabel7, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         shortestPath = (ShortestPath) algo;
-        jTF_sourceNode.setText(shortestPath.getSourceNodeID()==null?"":shortestPath.getSourceNodeID());
-        jTF_targetNode.setText(shortestPath.getTargetNodeID()==null?"":shortestPath.getTargetNodeID());
+        jTF_sourceNode.setText(shortestPath.getSourceNodeName()==null?"":shortestPath.getSourceNodeName());
+        jTF_targetNode.setText(shortestPath.getTargetNodeName()==null?"":shortestPath.getTargetNodeName());
         ((ColorChooserButton)colorChooser).setSelectedColor(shortestPath.getColor());
         return this;
     }
@@ -189,10 +167,7 @@ public class ShortestPathPanel extends javax.swing.JPanel implements AlgorithmSe
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JTextField jTF_sourceNode;
     private javax.swing.JTextField jTF_targetNode;
     // End of variables declaration//GEN-END:variables

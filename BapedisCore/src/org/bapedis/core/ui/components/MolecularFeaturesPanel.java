@@ -165,7 +165,8 @@ public class MolecularFeaturesPanel extends javax.swing.JPanel {
         rightBottomPanel.removeAll();
         if (map.containsKey(attribute)) {
             featureLabel.setForeground(Color.black);
-            featureLabel.setText(attribute.getDisplayName());
+            featureLabel.setText(String.format("Score: %.2f", attribute.getScore()));
+            featureLabel.setToolTipText(String.format("Score for %s", attribute.getDisplayName()));
             rightBottomPanel.add(map.get(attribute), BorderLayout.CENTER);
         } else {
             featureLabel.setText("");

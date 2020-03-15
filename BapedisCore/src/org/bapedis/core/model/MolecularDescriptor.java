@@ -31,6 +31,7 @@ public class MolecularDescriptor extends PeptideAttribute implements Cloneable{
         mean = Double.NaN;
         std = Double.NaN;
         binsPartition = null;
+        score = Double.NaN;
     }
 
     public double getScore() {

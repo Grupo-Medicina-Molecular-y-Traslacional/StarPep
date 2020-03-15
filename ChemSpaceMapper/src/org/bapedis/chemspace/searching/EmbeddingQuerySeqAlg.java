@@ -160,7 +160,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                             pc.add(newWS);
                             pc.setCurrentWorkspace(newWS);
                         } finally {
-                            pc.getGraphVizSetting(newWS).setSimilarityThreshold(pc.getGraphVizSetting().getSimilarityThreshold());
+                            pc.getGraphVizSetting(newWS).setSimilarityThreshold(pc.getGraphVizSetting(workspace).getSimilarityThreshold());
                             pc.getGraphVizSetting(newWS).fireChangedGraphView();
                         }
                     }

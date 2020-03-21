@@ -8,9 +8,11 @@ package org.bapedis.chemspace.searching;
 import java.awt.Color;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.SwingUtilities;
 import javax.vecmath.Vector3f;
@@ -57,11 +59,6 @@ import org.openide.util.NbBundle;
 public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
 
     public static String QUERY_LABEL = "Query";
-
-    public enum EmbeddingOption {
-        HSP, KNN
-    };
-
     static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
 
     protected final EmbeddingQuerySeqFactory factory;
@@ -78,14 +75,12 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
     private static final AtomicInteger COUNTER = new AtomicInteger(45120);
     private Color color;
     private double maxDistance;
-    private EmbeddingOption option;
     private int knn;
 
     public EmbeddingQuerySeqAlg(EmbeddingQuerySeqFactory factory) {
         this.factory = factory;
         graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
         color = Color.RED;
-        option = EmbeddingOption.HSP;
         knn = 5;
     }
 
@@ -95,14 +90,6 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
 
     public void setColor(Color color) {
         this.color = color;
-    }
-
-    public EmbeddingOption getOption() {
-        return option;
-    }
-
-    public void setOption(EmbeddingOption option) {
-        this.option = option;
     }
 
     public int getKnn() {
@@ -160,7 +147,8 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                             pc.add(newWS);
                             pc.setCurrentWorkspace(newWS);
                         } finally {
-                            pc.getGraphVizSetting(newWS).setSimilarityThreshold(pc.getGraphVizSetting(workspace).getSimilarityThreshold());
+//                            pc.getGraphVizSetting(newWS).setSimilarityThreshold(pc.getGraphVizSetting(workspace).getSimilarityThreshold());
+                            pc.getGraphVizSetting(newWS).setSimilarityThreshold(0);
                             pc.getGraphVizSetting(newWS).fireChangedGraphView();
                         }
                     }
@@ -190,22 +178,13 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
         if (fasta != null && !fasta.isEmpty()) {
             Workspace newWS = pc.createWorkspace();
             if (newWS != null) {
-                //Create new attr model
-                newAttrModel = new AttributesModel(newWS);
-                newWS.add(newAttrModel);
+                //Current attribute model
+                AttributesModel currentAttrModel = pc.getAttributesModel(workspace);
 
-                //Copy target peptides and graph
-                AttributesModel currentModel = pc.getAttributesModel(workspace);
-                List<String> targetIDs = new LinkedList<>();
-                for (Peptide peptide : currentModel.getPeptides()) {
-                    targetIDs.add(peptide.getID());
-                }
-                currentModel.getBridge().copyTo(newAttrModel, targetIDs);
-
-                //Add query peptides to new attribute model
-                Workspace tmpWS = new Workspace(Integer.MAX_VALUE, "tmp");
-                AttributesModel tmpModel = new AttributesModel(tmpWS);
-                tmpWS.add(tmpModel);
+                //Add query peptides to the query attribute model
+                Workspace queryWS = new Workspace(Integer.MAX_VALUE, "tmp");
+                AttributesModel queryAttrModel = new AttributesModel(queryWS);
+                queryWS.add(queryAttrModel);
                 List<ProteinSequence> queries = null;
                 try {
                     queries = FASTASEQ.load(fasta);
@@ -217,8 +196,8 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                 }
 
                 if (!stopRun && queries != null) {
-                    GraphModel tmpGraphModel = pc.getGraphModel(tmpWS);
-                    Graph tmpGraph = tmpGraphModel.getGraph();
+                    GraphModel queryGraphModel = pc.getGraphModel(queryWS);
+                    Graph queryGraph = queryGraphModel.getGraph();
 
                     //Add query peptides and graph nodes  
                     List<String> queryIDs = new LinkedList<>();
@@ -230,60 +209,74 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                         id = protein.getAccession().getID();
                         seq = protein.getSequenceAsString();
 
-                        node = getOrAddGraphNode(tmpGraphModel, QUERY_LABEL, id);
+                        node = getOrAddGraphNode(queryGraphModel, QUERY_LABEL, id);
 
-                        peptide = new Peptide(node, tmpGraph);
+                        peptide = new Peptide(node, queryGraph);
                         peptide.setAttributeValue(Peptide.ID, id);
                         peptide.setAttributeValue(Peptide.SEQ, seq);
                         peptide.setAttributeValue(Peptide.LENGHT, seq.length());
                         peptide.setBiojavaSeq(protein);
 
                         queryIDs.add(peptide.getID());
-                        tmpModel.addPeptide(peptide);
+                        queryAttrModel.addPeptide(peptide);
                     }
                     AllDescriptors alg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
                     alg.setIncludeUseless(true);
-                    alg.initAlgo(tmpWS, progressTicket);
+                    alg.initAlgo(queryWS, progressTicket);
                     alg.run();
                     alg.endAlgo();
 
-                    // Update new attribute model...
-                    Set<String> refkeys = newAttrModel.getMolecularDescriptorKeys();
-                    Set<String> newKeys = tmpModel.getMolecularDescriptorKeys();
+                    // Remove useless descriptors...
+                    Set<String> refkeys = currentAttrModel.getMolecularDescriptorKeys();
+                    Set<String> newKeys = queryAttrModel.getMolecularDescriptorKeys();
                     List<MolecularDescriptor> toRemove = new LinkedList<>();
                     for (String key : newKeys) {
                         if (refkeys.contains(key)) {
-                            for (MolecularDescriptor md : tmpModel.getMolecularDescriptors(key)) {
-                                if (!newAttrModel.getMolecularDescriptors(key).contains(md)) {
+                            for (MolecularDescriptor md : queryAttrModel.getMolecularDescriptors(key)) {
+                                if (!currentAttrModel.getMolecularDescriptors(key).contains(md)) {
                                     toRemove.add(md);
                                 }
                             }
                         } else {
-                            for (MolecularDescriptor md : tmpModel.getMolecularDescriptors(key)) {
+                            for (MolecularDescriptor md : queryAttrModel.getMolecularDescriptors(key)) {
                                 toRemove.add(md);
                             }
                         }
                     }
                     for (MolecularDescriptor md : toRemove) {
-                        tmpModel.deleteAttribute(md);
+                        queryAttrModel.deleteAttribute(md);
                     }
-                    tmpModel.getBridge().copyTo(newAttrModel, queryIDs);
 
-                    // Load all descriptors
+                    //Create tmp attr model
+                    Workspace tmpWS = new Workspace(UUID.randomUUID().toString());
+                    AttributesModel tmpAttrModel = new AttributesModel(tmpWS);
+                    tmpWS.add(tmpAttrModel);
+
+                    //Copy current model to the tmp attr model
+                    List<String> targetIDs = new LinkedList<>();
+                    for (Peptide targetPeptide : currentAttrModel.getPeptides()) {
+                        targetIDs.add(targetPeptide.getID());
+                    }
+                    currentAttrModel.getBridge().copyTo(tmpAttrModel, targetIDs);
+
+                    //Copy query model to the tmp attr model
+                    queryAttrModel.getBridge().copyTo(tmpAttrModel, queryIDs);
+
+                    // Load all descriptors from tmp attr model
                     List<MolecularDescriptor> allFeatures = new LinkedList<>();
                     if (!stopRun) {
-                        for (String key : newAttrModel.getMolecularDescriptorKeys()) {
-                            for (MolecularDescriptor attr : newAttrModel.getMolecularDescriptors(key)) {
+                        for (String key : tmpAttrModel.getMolecularDescriptorKeys()) {
+                            for (MolecularDescriptor attr : tmpAttrModel.getMolecularDescriptors(key)) {
                                 allFeatures.add(attr);
                             }
                         }
                     }
 
-                    // Preprocessing all features. Computing max, min, mean and std            
+                    // Preprocessing all features from tmp attr model. Computing max, min, mean and std            
                     if (!stopRun) {
                         pc.reportMsg("Preprocessing of features. Computing max, min, mean and std", workspace);
                         try {
-                            MolecularDescriptor.preprocessing(allFeatures, newAttrModel.getPeptides());
+                            MolecularDescriptor.preprocessing(allFeatures, tmpAttrModel.getPeptides());
                         } catch (MolecularDescriptorException ex) {
                             DialogDisplayer.getDefault().notify(ex.getErrorNotifyDescriptor());
                             pc.reportError(ex.getMessage(), workspace);
@@ -291,8 +284,8 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                         }
                     }
 
-                    //Create descriptor matrix     
-                    Peptide[] peptides = newAttrModel.getPeptides().toArray(new Peptide[0]);
+                    //Create descriptor matrix from tmp attr model    
+                    Peptide[] peptides = tmpAttrModel.getPeptides().toArray(new Peptide[0]);
                     double[][] descriptorMatrix = null;
                     if (!stopRun) {
                         pc.reportMsg("Descriptor matrix construction", workspace);
@@ -322,14 +315,14 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                     }
 
                     //Update position of query nodes
-                    Graph newVisGraph = pc.getGraphVisible(newWS);
+                    Graph tmpVisGraph = pc.getGraphVisible(tmpWS);
                     if (!stopRun) {
                         WekaPCATransformer pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
-                        pcaTransformer.initAlgo(newWS, progressTicket);
+                        pcaTransformer.initAlgo(tmpWS, progressTicket);
                         pcaTransformer.run();
                         pcaTransformer.endAlgo();
                         Vector3f[] positions = pcaTransformer.getXYZSpace().getPositions();
-                        newVisGraph.readLock();
+                        tmpVisGraph.readLock();
                         try {
                             Vector3f p;
                             for (int i = targetIDs.size(); i < positions.length && !stopRun; i++) {
@@ -340,24 +333,27 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                                 node.setZ(0); // 2D 
                             }
                         } finally {
-                            newVisGraph.readUnlock();
+                            tmpVisGraph.readUnlock();
                         }
                     }
 
                     if (!stopRun) {
-                        //Add similarity edges                    
-                        List<Edge> graphEdges = null;
-                        switch (option) {
-                            case HSP:
-                                graphEdges = connectToHSPN(newWS, peptides, targetIDs.size(), descriptorMatrix);
-                                break;
-                            case KNN:
-                                graphEdges = connectToKNN(newWS, peptides, targetIDs.size(), descriptorMatrix);
-                                break;
+                        //Search k-nearest neighbor                        
+                        Set<Peptide> targetPeptides = connectToKNN(tmpWS, peptides, targetIDs.size(), descriptorMatrix);
+                        targetIDs.clear();
+                        for (Peptide target : targetPeptides) {
+                            targetIDs.add(target.getID());
                         }
-                        if (graphEdges != null) {
-                            newVisGraph.addAllEdges(graphEdges);
-                        }
+
+                        //Create new attr model
+                        newAttrModel = new AttributesModel(newWS);
+                        newWS.add(newAttrModel);
+
+                        //Copy target peptides from tmp attr model to the new attr model                      
+                        tmpAttrModel.getBridge().copyTo(newAttrModel, targetIDs);
+
+                        //Copy queries from tmp attr model to the new attr model
+                        tmpAttrModel.getBridge().copyTo(newAttrModel, queryIDs);
                     }
                 }
             }
@@ -365,6 +361,91 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
             DialogDisplayer.getDefault().notify(ErrorEmpty);
             cancel();
         }
+    }
+
+    protected Set<Peptide> connectToKNN(Workspace ws, Peptide[] peptides,
+            int queryIndex, double[][] descriptorMatrix) {
+        GraphModel graphModel = pc.getGraphModel(ws);
+        Graph visibleGraph = pc.getGraphVisible(ws);
+        int relType = graphModel.getEdgeType(ProjectManager.GRAPH_EDGE_SIMALIRITY);
+        Set<Peptide> targetPeptides = new HashSet<>();
+        List<Edge> graphEdges = new LinkedList<>();
+        AbstractDistance dist = (AbstractDistance) distFactory.createAlgorithm();
+
+        Graph mainGraph = graphModel.getGraph();
+        mainGraph.writeLock();
+        try {
+            WekaHeap heap;
+            double distance;
+            int firstkNN;
+            double[] distances;
+            int[] indices;
+            Node node;
+            Edge edge;
+
+            try {
+                visibleGraph.clear();
+                for (int i = 0; i < queryIndex; i++) {
+                    mainGraph.clearEdges(peptides[i].getGraphNode(), relType);
+                }
+                for (int i = queryIndex; i < peptides.length && !stopRun; i++) {
+                    node = peptides[i].getGraphNode();
+                    visibleGraph.addNode(node); // Add query node
+                    heap = new WekaHeap(knn);
+                    firstkNN = 0;
+                    for (int j = 0; j < queryIndex && !stopRun; j++) {
+
+                        dist.setContext(peptides[i], peptides[j], descriptorMatrix);
+                        dist.run();
+                        distance = dist.getDistance();
+                        if (firstkNN < knn) {
+                            heap.put(j, distance);
+                            firstkNN++;
+                        } else {
+                            WekaHeapElement temp = heap.peek();
+                            if (distance < temp.distance) {
+                                heap.putBySubstitute(j, distance);
+                            } else if (distance == temp.distance) {
+                                heap.putKthNearest(j, distance);
+                            }
+                        }
+                    }
+                    indices = new int[heap.size() + heap.noOfKthNearest()];
+                    distances = new double[heap.size() + heap.noOfKthNearest()];
+                    int l = 1;
+                    WekaHeapElement h;
+                    while (heap.noOfKthNearest() > 0) {
+                        h = heap.getKthNearest();
+                        indices[indices.length - l] = h.index;
+                        distances[indices.length - l] = h.distance;
+                        l++;
+                    }
+                    while (heap.size() > 0) {
+                        h = heap.get();
+                        indices[indices.length - l] = h.index;
+                        distances[indices.length - l] = h.distance;
+                        l++;
+                    }
+                    for (int r = 0; r < indices.length; r++) {
+                        targetPeptides.add(peptides[indices[r]]); // Add target node
+                        edge = getOrAddGraphEdge(graphModel, peptides[i], peptides[indices[r]], distances[r]);
+                        if (edge != null) {
+                            graphEdges.add(edge);
+                        }
+                    }
+                }
+                for (Peptide target : targetPeptides) {
+                    visibleGraph.addNode(target.getGraphNode());
+                }
+                visibleGraph.addAllEdges(graphEdges);
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        } finally {
+            dist.endAlgo();
+            mainGraph.writeUnlock();
+        }
+        return targetPeptides;
     }
 
     protected List<Edge> connectToHSPN(Workspace newWS, Peptide[] peptides,
@@ -416,70 +497,6 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                     }
                     cursor++;
                 }
-            }
-        } finally {
-            dist.endAlgo();
-        }
-        return graphEdges;
-    }
-
-    protected List<Edge> connectToKNN(Workspace newWS, Peptide[] peptides,
-            int queryIndex, double[][] descriptorMatrix) {
-        GraphModel newGraphModel = pc.getGraphModel(newWS);
-        List<Edge> graphEdges = new LinkedList<>();
-        AbstractDistance dist = (AbstractDistance) distFactory.createAlgorithm();
-        try {
-            WekaHeap heap;
-            double distance;
-            int firstkNN;
-            int[] indices;
-            double[] distances;
-            Edge edge;
-            try {
-                for (int i = queryIndex; i < peptides.length && !stopRun; i++) {
-                    heap = new WekaHeap(knn);
-                    firstkNN = 0;
-                    for (int j = 0; j < queryIndex && !stopRun; j++) {
-                        dist.setContext(peptides[i], peptides[j], descriptorMatrix);
-                        dist.run();
-                        distance = dist.getDistance();
-                        if (firstkNN < knn) {
-                            heap.put(j, distance);
-                            firstkNN++;
-                        } else {
-                            WekaHeapElement temp = heap.peek();
-                            if (distance < temp.distance) {
-                                heap.putBySubstitute(j, distance);
-                            } else if (distance == temp.distance) {
-                                heap.putKthNearest(j, distance);
-                            }
-                        }
-                    }
-                    indices = new int[heap.size() + heap.noOfKthNearest()];
-                    distances = new double[heap.size() + heap.noOfKthNearest()];
-                    int l = 1;
-                    WekaHeapElement h;
-                    while (heap.noOfKthNearest() > 0) {
-                        h = heap.getKthNearest();
-                        indices[indices.length - l] = h.index;
-                        distances[indices.length - l] = h.distance;
-                        l++;
-                    }
-                    while (heap.size() > 0) {
-                        h = heap.get();
-                        indices[indices.length - l] = h.index;
-                        distances[indices.length - l] = h.distance;
-                        l++;
-                    }
-                    for (int r = 0; r < indices.length; r++) {
-                        edge = getOrAddGraphEdge(newGraphModel, peptides[i], peptides[indices[r]], distances[r]);
-                        if (edge != null) {
-                            graphEdges.add(edge);
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                Exceptions.printStackTrace(ex);
             }
         } finally {
             dist.endAlgo();

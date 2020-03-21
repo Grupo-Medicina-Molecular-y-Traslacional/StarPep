@@ -339,13 +339,12 @@ public class AttributesModel {
         private void copyGraphTo(GraphModel targetGraphModel, Graph targetVisibleGraph) {
             GraphVizSetting graphViz = pc.getGraphVizSetting(workspace);
             GraphModel currentGraphModel = pc.getGraphModel(workspace);
+            Graph visibleCurrentGraph = pc.getGraphVisible(workspace);
             currentGraphModel.getGraph().readLock();
             try {
                 org.gephi.graph.api.Node[] nodes = currentGraphModel.getGraph().getNodes().toArray();
                 targetGraphModel.bridge().copyNodes(nodes);
-
                 Graph targetGraph = targetGraphModel.getGraph();
-                Graph visibleCurrentGraph = currentGraphModel.getGraphVisible();
 
                 //Nodes
                 List<org.gephi.graph.api.Node> nodesToAdd = new LinkedList<>();
@@ -363,7 +362,7 @@ public class AttributesModel {
                             && targetGraph.hasNode(edge.getSource().getId())
                             && targetGraph.hasNode(edge.getTarget().getId())) {
                         if (relType != -1 && edge.getType() == relType) {
-                                if (edge.getWeight() >= graphViz.getSimilarityThreshold()) {
+                            if (edge.getWeight() >= graphViz.getSimilarityThreshold()) {
                                 edgesToAdd.add(edge);
                             }
                         } else {
@@ -396,13 +395,13 @@ public class AttributesModel {
         private void copyDataTo(AttributesModel attrModel, List<String> peptideIDs) throws CloneNotSupportedException {
             Workspace targetWorkspace = attrModel.getOwnerWS();
             GraphModel targetGraphModel = pc.getGraphModel(targetWorkspace);
-
+            Graph targetVisibleGraph = pc.getGraphVisible(targetWorkspace);
+            
             Peptide currentPeptide, targetPeptide;
             org.gephi.graph.api.Node currentNode, targetNode;
 
             if (peptideIDs != null) {
                 //Copy graph  
-                Graph targetVisibleGraph = pc.getGraphVisible(targetWorkspace);
                 copyGraphTo(targetGraphModel, targetVisibleGraph);
 
                 //Copy peptides

@@ -48,6 +48,7 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
         extLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jComboBoxKNN = new javax.swing.JComboBox<>();
+        jCBOnlyNeighbors = new javax.swing.JCheckBox();
         embeddingPanel = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
@@ -57,7 +58,7 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
         org.openide.awt.Mnemonics.setLocalizedText(jLabelColor, org.openide.util.NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "EmbeddingQuerySeqPanel.jLabelColor.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         settingPanel.add(jLabelColor, gridBagConstraints);
@@ -65,14 +66,14 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
         org.openide.awt.Mnemonics.setLocalizedText(colorChooser, org.openide.util.NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "EmbeddingQuerySeqPanel.colorChooser.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         settingPanel.add(colorChooser, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(extLabel, org.openide.util.NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "EmbeddingQuerySeqPanel.extLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
@@ -101,6 +102,19 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         settingPanel.add(jComboBoxKNN, gridBagConstraints);
 
+        org.openide.awt.Mnemonics.setLocalizedText(jCBOnlyNeighbors, org.openide.util.NbBundle.getMessage(EmbeddingQuerySeqPanel.class, "EmbeddingQuerySeqPanel.jCBOnlyNeighbors.text")); // NOI18N
+        jCBOnlyNeighbors.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCBOnlyNeighborsActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        settingPanel.add(jCBOnlyNeighbors, gridBagConstraints);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -127,10 +141,17 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
         }
     }//GEN-LAST:event_jComboBoxKNNActionPerformed
 
+    private void jCBOnlyNeighborsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBOnlyNeighborsActionPerformed
+        if (embeddingAlg != null){
+            embeddingAlg.setOnlyNeighbors(jCBOnlyNeighbors.isSelected());
+        }
+    }//GEN-LAST:event_jCBOnlyNeighborsActionPerformed
+
     @Override
     public JPanel getSettingPanel(Algorithm algo) {
         embeddingAlg = (EmbeddingQuerySeqAlg) algo;
-        jComboBoxKNN.setSelectedItem(String.valueOf(embeddingAlg.getKnn()));        
+        jComboBoxKNN.setSelectedItem(String.valueOf(embeddingAlg.getKnn())); 
+        jCBOnlyNeighbors.setSelected(embeddingAlg.isOnlyNeighbors());
         ((ColorChooserButton)colorChooser).setSelectedColor(embeddingAlg.getColor());
         queryPanel = new MultiQueryPanel((MultiQuery) embeddingAlg);
 
@@ -147,6 +168,7 @@ public class EmbeddingQuerySeqPanel extends javax.swing.JPanel implements Algori
     private javax.swing.JButton colorChooser;
     private javax.swing.JPanel embeddingPanel;
     private javax.swing.JLabel extLabel;
+    private javax.swing.JCheckBox jCBOnlyNeighbors;
     private javax.swing.JComboBox<String> jComboBoxKNN;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabelColor;

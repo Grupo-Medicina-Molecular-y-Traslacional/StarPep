@@ -76,12 +76,14 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
     private Color color;
     private double maxDistance;
     private int knn;
+    private boolean onlyNeighbors;
 
     public EmbeddingQuerySeqAlg(EmbeddingQuerySeqFactory factory) {
         this.factory = factory;
         graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
         color = Color.RED;
         knn = 5;
+        onlyNeighbors = true;
     }
 
     public Color getColor() {
@@ -118,6 +120,14 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
         this.maxDistance = maxDistance;
     }
 
+    public boolean isOnlyNeighbors() {
+        return onlyNeighbors;
+    }
+
+    public void setOnlyNeighbors(boolean onlyNeighbors) {
+        this.onlyNeighbors = onlyNeighbors;
+    }        
+
     public AlgorithmFactory getDistFactory() {
         return distFactory;
     }
@@ -147,7 +157,6 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                             pc.add(newWS);
                             pc.setCurrentWorkspace(newWS);
                         } finally {
-//                            pc.getGraphVizSetting(newWS).setSimilarityThreshold(pc.getGraphVizSetting(workspace).getSimilarityThreshold());
                             pc.getGraphVizSetting(newWS).setSimilarityThreshold(0);
                             pc.getGraphVizSetting(newWS).fireChangedGraphView();
                         }
@@ -340,9 +349,11 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                     if (!stopRun) {
                         //Search k-nearest neighbor                        
                         Set<Peptide> targetPeptides = connectToKNN(tmpWS, peptides, targetIDs.size(), descriptorMatrix);
-                        targetIDs.clear();
-                        for (Peptide target : targetPeptides) {
-                            targetIDs.add(target.getID());
+                        if(onlyNeighbors){
+                            targetIDs.clear();
+                            for (Peptide target : targetPeptides) {
+                                targetIDs.add(target.getID());
+                            }
                         }
 
                         //Create new attr model
@@ -384,9 +395,11 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
             Edge edge;
 
             try {
-                visibleGraph.clear();
-                for (int i = 0; i < queryIndex; i++) {
-                    mainGraph.clearEdges(peptides[i].getGraphNode(), relType);
+                if(onlyNeighbors){
+                    visibleGraph.clear();
+                    for (int i = 0; i < queryIndex; i++) {
+                        mainGraph.clearEdges(peptides[i].getGraphNode(), relType);
+                    }
                 }
                 for (int i = queryIndex; i < peptides.length && !stopRun; i++) {
                     node = peptides[i].getGraphNode();

@@ -49,6 +49,7 @@ public class WekaPCATransformer implements Algorithm {
     protected Workspace workspace;
     protected CoordinateSpace xyzSpace;
     protected boolean stopRun;
+    protected boolean silentMode;
 
     public WekaPCATransformer(WekaPCATransformerFactory factory) {
         this.factory = factory;
@@ -58,6 +59,7 @@ public class WekaPCATransformer implements Algorithm {
         symbols.setDecimalSeparator('.');
         df = new DecimalFormat("0.00", symbols);
         option = MD_OUTPUT_OPTION.Z_SCORE;
+        silentMode = false;
     }
 
     public double getVarianceCovered() {
@@ -74,6 +76,14 @@ public class WekaPCATransformer implements Algorithm {
 
     public void setOption(MD_OUTPUT_OPTION option) {
         this.option = option;
+    }
+
+    public boolean isSilentMode() {
+        return silentMode;
+    }
+
+    public void setSilentMode(boolean silentMode) {
+        this.silentMode = silentMode;
     }
 
     @Override
@@ -140,13 +150,17 @@ public class WekaPCATransformer implements Algorithm {
                 int index = eigenValues.length - 1;
                 double varExp;
                 double cumulativeEigen = 0;
-                pc.reportMsg("Factor, Eigenvalue, Cumulative eigenvalue, ", workspace);
+                if (!silentMode) {
+                    pc.reportMsg("Factor, Eigenvalue, Cumulative eigenvalue, ", workspace);
+                }
                 for (int i = 0; i < axisLabels.length; i++) {
                     varExp = (eigenValues[index] / sumOfEigenValues) * 100;
                     explainedVar[i] = varExp;
                     cumulativeEigen += eigenValues[index];
                     axisLabels[i] = String.format("PCA %d (%s%% explained var.)", (i + 1), df.format(varExp));
-                    pc.reportMsg(String.format("%s, %s, %s", String.valueOf(i + 1), df.format(eigenValues[index]), df.format(cumulativeEigen)), workspace);
+                    if (!silentMode) {
+                        pc.reportMsg(String.format("%s, %s, %s", String.valueOf(i + 1), df.format(eigenValues[index]), df.format(cumulativeEigen)), workspace);
+                    }
                     index--;
                 }
 

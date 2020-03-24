@@ -231,6 +231,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                     }
                     AllDescriptors alg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
                     alg.setIncludeUseless(true);
+                    alg.setSilentMode(true);
                     alg.initAlgo(queryWS, progressTicket);
                     alg.run();
                     alg.endAlgo();
@@ -327,6 +328,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                     Graph tmpVisGraph = pc.getGraphVisible(tmpWS);
                     if (!stopRun) {
                         WekaPCATransformer pcaTransformer = (WekaPCATransformer) new WekaPCATransformerFactory().createAlgorithm();
+                        pcaTransformer.setSilentMode(true);
                         pcaTransformer.initAlgo(tmpWS, progressTicket);
                         pcaTransformer.run();
                         pcaTransformer.endAlgo();

@@ -44,6 +44,7 @@ public abstract class AbstractMD implements Algorithm {
     public static final String MD_ADDED = "md_added";
     protected final PropertyChangeSupport propertyChangeSupport;
     protected boolean includeUseless;
+    protected boolean silentMode;
 
     public AbstractMD(AlgorithmFactory factory) {
         pc = Lookup.getDefault().lookup(ProjectManager.class);
@@ -51,6 +52,7 @@ public abstract class AbstractMD implements Algorithm {
         map = Collections.synchronizedMap(new LinkedHashMap<>());
         propertyChangeSupport = new PropertyChangeSupport(this);
         includeUseless = false;
+        silentMode = false;
     }
 
     public boolean isIncludeUseless() {
@@ -59,6 +61,14 @@ public abstract class AbstractMD implements Algorithm {
 
     public void setIncludeUseless(boolean includeUseless) {
         this.includeUseless = includeUseless;
+    }
+
+    public boolean isSilentMode() {
+        return silentMode;
+    }
+
+    public void setSilentMode(boolean silentMode) {
+        this.silentMode = silentMode;
     }
 
     protected void addAttribute(String id, String displayName, Class<?> type) {
@@ -162,7 +172,7 @@ public abstract class AbstractMD implements Algorithm {
                                 list = byCategory.get(category);
                                 list.add(attr);
                             } else {
-                                for (Peptide pept : peptides){
+                                for (Peptide pept : peptides) {
                                     pept.deleteAttribute(attr);
                                 }
                                 ignoredAttr++;
@@ -195,11 +205,15 @@ public abstract class AbstractMD implements Algorithm {
                         msg.append(" : ");
                         msg.append(size);
                         msg.append(size > 1 ? " features" : " feature");
-                        pc.reportMsg(msg.toString(), workspace);
+                        if (!silentMode) {
+                            pc.reportMsg(msg.toString(), workspace);
+                        }
                         total += size;
                     }
-                    pc.reportMsg("Ignored attributes: " + ignoredAttr, workspace);
-                    pc.reportMsg("Total of calculated features: " + total, workspace);
+                    if (!silentMode) {
+                        pc.reportMsg("Ignored attributes: " + ignoredAttr, workspace);
+                        pc.reportMsg("Total of calculated features: " + total, workspace);
+                    }
                 }
                 progressTicket.progress();
             }

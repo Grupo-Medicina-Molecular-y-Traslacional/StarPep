@@ -191,6 +191,7 @@ public class MultiQueryPanel extends javax.swing.JPanel {
 
     private void jBtClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtClearActionPerformed
         jSeqTextArea.setText("");
+        jLabel1.setText("");
     }//GEN-LAST:event_jBtClearActionPerformed
 
 

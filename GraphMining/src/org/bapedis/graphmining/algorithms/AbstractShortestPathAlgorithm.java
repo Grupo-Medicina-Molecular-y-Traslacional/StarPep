@@ -69,9 +69,9 @@ public abstract class AbstractShortestPathAlgorithm {
         Node target = edge.getTarget();
         double distSource = distances.get(source);
         double distTarget = distances.get(target);
-        double weight = edgeWeight(edge);
+        double dist = edgeLength(edge);
 
-        double sourceWeight = distSource + weight;
+        double sourceWeight = distSource + dist;
         if (sourceWeight < distTarget) {
             distances.put(target, sourceWeight);
             maxDistance = Math.max(maxDistance, sourceWeight);
@@ -81,8 +81,8 @@ public abstract class AbstractShortestPathAlgorithm {
         }
     }
 
-    protected double edgeWeight(Edge edge) {
-        return edge.getWeight();
+    protected double edgeLength(Edge edge) {
+        return 1.0 - edge.getWeight();
     }
 
     public abstract void compute();

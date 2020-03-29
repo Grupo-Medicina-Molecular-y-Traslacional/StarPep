@@ -101,7 +101,7 @@ public class DijkstraShortestPathAlgorithm extends AbstractShortestPathAlgorithm
                 for (Edge edge : graph.getEdges(minDistanceNode)) {
                     Node neighbor = graph.getOpposite(minDistanceNode, edge);
                     if (!settledNodes.contains(neighbor)) {
-                        double dist = getShortestDistance(minDistanceNode) + edgeWeight(edge);
+                        double dist = getShortestDistance(minDistanceNode) + edgeLength(edge);
                         if (getShortestDistance(neighbor) > dist) {
 
                             distances.put(neighbor, dist);

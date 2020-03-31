@@ -82,7 +82,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
         this.factory = factory;
         graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
         color = Color.RED;
-        knn = 5;
+        knn = 3;
         onlyNeighbors = true;
     }
 
@@ -126,7 +126,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
 
     public void setOnlyNeighbors(boolean onlyNeighbors) {
         this.onlyNeighbors = onlyNeighbors;
-    }        
+    }
 
     public AlgorithmFactory getDistFactory() {
         return distFactory;
@@ -229,14 +229,22 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                         queryIDs.add(peptide.getID());
                         queryAttrModel.addPeptide(peptide);
                     }
+
                     AllDescriptors alg = (AllDescriptors) new AllDescriptorsFactory().createAlgorithm();
+                    String taskName = NbBundle.getMessage(EmbeddingQuerySeqAlg.class, "EmbeddingQuerySeqAlg.preprocessing.taskName", alg.getFactory().getName());
+                    progressTicket.progress(taskName);
+
                     alg.setIncludeUseless(true);
                     alg.setSilentMode(true);
                     alg.initAlgo(queryWS, progressTicket);
                     alg.run();
                     alg.endAlgo();
 
-                    // Remove useless descriptors...
+                    taskName = NbBundle.getMessage(EmbeddingQuerySeqAlg.class, "EmbeddingQuerySeqAlg.embedding.taskName");
+                    progressTicket.progress(taskName);                    
+                    progressTicket.switchToIndeterminate();
+                    
+                    // Remove useless descriptors...                    
                     Set<String> refkeys = currentAttrModel.getMolecularDescriptorKeys();
                     Set<String> newKeys = queryAttrModel.getMolecularDescriptorKeys();
                     List<MolecularDescriptor> toRemove = new LinkedList<>();
@@ -351,7 +359,7 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
                     if (!stopRun) {
                         //Search k-nearest neighbor                        
                         Set<Peptide> targetPeptides = connectToKNN(tmpWS, peptides, targetIDs.size(), descriptorMatrix);
-                        if(onlyNeighbors){
+                        if (onlyNeighbors) {
                             targetIDs.clear();
                             for (Peptide target : targetPeptides) {
                                 targetIDs.add(target.getID());
@@ -397,11 +405,21 @@ public class EmbeddingQuerySeqAlg implements Algorithm, Cloneable, MultiQuery {
             Edge edge;
 
             try {
-                if(onlyNeighbors){
+                if (onlyNeighbors) {
                     visibleGraph.clear();
                     for (int i = 0; i < queryIndex; i++) {
                         mainGraph.clearEdges(peptides[i].getGraphNode(), relType);
                     }
+                } else {
+                    LinkedList<Edge> toRemove = new LinkedList<>();
+                    for (int i = 0; i < queryIndex; i++) {
+                        for (Edge e : mainGraph.getEdges(peptides[i].getGraphNode(), relType)) {
+                            if (!visibleGraph.hasEdge(e.getId())) {
+                                toRemove.add(e);
+                            }
+                        }
+                    }
+                    mainGraph.removeAllEdges(toRemove);
                 }
                 for (int i = queryIndex; i < peptides.length && !stopRun; i++) {
                     node = peptides[i].getGraphNode();

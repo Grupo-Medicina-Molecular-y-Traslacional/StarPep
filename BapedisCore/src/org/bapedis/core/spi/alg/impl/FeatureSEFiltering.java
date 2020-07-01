@@ -75,7 +75,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
         redundancyCutoff = 0.8;
         selectionOption = SELECT_ALL;
         topRank = 40;
-        
+
         stopRun = new AtomicBoolean();
         binsOption1 = FeatureDiscretization.BinsOption.Number_peptides;
         numberOfBins1 = 50;
@@ -287,7 +287,7 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                 pc.reportMsg("Done", workspace);
 
                 //-----------Removing redundant features
-                taskName = "Removing redundant features";
+                taskName = "Feature filtering";
                 pc.reportMsg(taskName, workspace);
                 ticket.progress(taskName);
                 double[][] descriptorMatrix = new double[rankedFeatures.length][];
@@ -298,18 +298,20 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                 int redundant = 0;
 
                 //Filtering by correlation
-                if (redundancyOption != REDUNDANCY_NONE) {
-                    if (redundancyOption == REDUNDANCY_PEARSON
-                            || redundancyOption == REDUNDANCY_SPEARMAN) {
-                        ticket.switchToDeterminate(rankedFeatures.length);
-                        retainedFeatures.clear();
-
-                        if (selectionOption == SELECT_TOP) {
+                ticket.switchToDeterminate(rankedFeatures.length);
+                retainedFeatures.clear();
+                if (redundancyOption == REDUNDANCY_NONE
+                        || redundancyOption == REDUNDANCY_PEARSON
+                        || redundancyOption == REDUNDANCY_SPEARMAN) {
+                    switch (selectionOption) {
+                        case SELECT_TOP:
                             pc.reportMsg("Ranking output: select top " + topRank, workspace);
                             for (int i = 0; i < rankedFeatures.length && !stopRun.get(); i++) {
                                 if (rankedFeatures[i] != null) {
                                     if (retainedFeatures.size() < topRank) {
-                                        redundant += removeCorrelated(descriptorMatrix, i, rankedFeatures);
+                                        if (redundancyOption != REDUNDANCY_NONE) {
+                                            redundant += removeCorrelated(descriptorMatrix, i, rankedFeatures);
+                                        }
                                         retainedFeatures.add(rankedFeatures[i]);
                                     } else {
                                         attrModel.deleteAttribute(rankedFeatures[i]);
@@ -318,17 +320,24 @@ public class FeatureSEFiltering implements Algorithm, Cloneable {
                                 }
                                 ticket.progress();
                             }
-                        } else {
+                            break;
+                        case SELECT_ALL:
                             pc.reportMsg("Ranking output: select all filtered features ", workspace);
                             for (int i = 0; i < rankedFeatures.length && !stopRun.get(); i++) {
                                 if (rankedFeatures[i] != null) {
-                                    redundant += removeCorrelated(descriptorMatrix, i, rankedFeatures);
+                                    if (redundancyOption != REDUNDANCY_NONE) {
+                                        redundant += removeCorrelated(descriptorMatrix, i, rankedFeatures);
+                                    }
                                     retainedFeatures.add(rankedFeatures[i]);
                                 }
                                 ticket.progress();
                             }
-                        }
+                            break;
+                        default:
+                            throw new IllegalStateException("Unknown filtering option for selecting the top ranked list: " + selectionOption);
                     }
+                } else {
+                    throw new IllegalStateException("Unknown filtering option for redundancy criteria: " + redundancyOption);
                 }
 
                 double meritValue = Double.NaN;

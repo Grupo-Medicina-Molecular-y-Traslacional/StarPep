@@ -42,9 +42,9 @@ public class HydrophobicMoment extends AbstractMD {
 
         scale = new boolean[]{true, true, true};
 
-        attrNames = new String[][]{{"\u03BCH(angle=100,scale=KYTJ820101)", "\u03BCH(angle=160,scale=KYTJ820101)", "\u03BCH(angle=180,scale=KYTJ820101)"},
-        {"\u03BCH(angle=100,scale=Tossi12)", "\u03BCH(angle=160,scale=Tossi12)", "\u03BCH(angle=180,scale=Tossi12)"},
-        {"\u03BCH(angle=100,scale=EISD840101)", "\u03BCH(angle=160,scale=EISD840101)", "\u03BCH(angle=180,scale=EISD840101)"}};
+        attrNames = new String[][]{{"μH(angle_100_scale_KYTJ820101)", "μH(angle_160_scale_KYTJ820101)", "μH(angle_180_scale_KYTJ820101)"},
+        {"μH(angle_100_scale_Tossi12)", "μH(angle_160_scale_Tossi12)", "μH(angle_180_scale_Tossi12)"},
+        {"μH(angle_100_scale_EISD840101)", "μH(angle_160_scale_EISD840101)", "μH(angle_180_scale_EISD840101)"}};
 
         AVGH = new String[]{"maxAvgH(KYTJ820101)", "maxAvgH(Tossi12)", "maxAvgH(EISD840101)"};
         window = 10;

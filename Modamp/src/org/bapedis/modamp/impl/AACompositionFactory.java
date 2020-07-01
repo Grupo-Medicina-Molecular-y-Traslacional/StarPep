@@ -10,6 +10,7 @@ import org.bapedis.core.spi.alg.AlgorithmFactory;
 import org.bapedis.core.spi.alg.AlgorithmSetupUI;
 import org.openide.util.NbBundle;
 import org.bapedis.core.spi.alg.FeatureExtractionTag;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *

@@ -31,7 +31,7 @@ import org.openide.util.NbBundle;
  */
 public class FASTASEQ {
 
-    protected static int MAX_LENGTH = 100;
+    protected static int MAX_LENGTH = 1000;
     protected static final ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
 
     public static List<ProteinSequence> load(String fasta) throws Exception{
@@ -66,8 +66,8 @@ public class FASTASEQ {
                     if (line.startsWith(">")) {//start of new fasta record
                         if (sb.length() > 0) {//i.e. if there is already a sequence before
                             //    logger.debug("Sequence index=" + sequenceIndex);                                
-                            if (sb.length() > 100) {
-                                throw new Exception(NbBundle.getMessage(FASTASEQ.class, "FASTAfile.invalidSeqLength", header));
+                            if (sb.length() > MAX_LENGTH) {
+                                throw new Exception(NbBundle.getMessage(FASTASEQ.class, "FASTAfile.invalidSeqLength", header, MAX_LENGTH));
                             }
 
                             try {
@@ -101,7 +101,7 @@ public class FASTASEQ {
                     }
                     //    logger.debug("Sequence index=" + sequenceIndex + " " + fileIndex );
                     if (sb.length() > MAX_LENGTH) {
-                        throw new Exception(NbBundle.getMessage(FASTASEQ.class, "FASTAfile.invalidSeqLength", header));
+                        throw new Exception(NbBundle.getMessage(FASTASEQ.class, "FASTAfile.invalidSeqLength", header, MAX_LENGTH));
                     }
 
                     try {

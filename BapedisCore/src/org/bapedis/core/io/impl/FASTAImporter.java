@@ -104,7 +104,9 @@ public class FASTAImporter {
                     pc.setCurrentWorkspace(workspace);
                     graphWC.refreshGraphView(workspace, graphNodes, null);
                     pc.getGraphVizSetting(workspace).fireChangedGraphView();
+                    pc.reportMsg("Loaded FASTA file: " + file.getAbsolutePath(), workspace);
                 } catch (InterruptedException | ExecutionException ex) {
+                    pc.reportError("Error loading FASTA file: " + file.getAbsolutePath(), pc.getCurrentWorkspace());
                     if (ex.getCause() != null) {
                         DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(ex.getCause().getMessage(), NotifyDescriptor.ERROR_MESSAGE));
                     } else {

@@ -23,6 +23,8 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphFactory;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
@@ -35,7 +37,7 @@ import org.openide.util.NbBundle;
 public class FASTAImporter {
 
     protected final static ProjectManager pc = Lookup.getDefault().lookup(ProjectManager.class);
-    protected final static GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);   
+    protected final static GraphWindowController graphWC = Lookup.getDefault().lookup(GraphWindowController.class);
 
     public void importFASTA(File file, String label, Workspace workspace) {
         AttributesModel newAttrModel = new AttributesModel(workspace);
@@ -59,7 +61,7 @@ public class FASTAImporter {
             protected Object doInBackground() throws Exception {
                 if (oldModel != null) {
                     List<String> peptideIDs = new LinkedList<>();
-                    for(Peptide peptide: oldModel.getPeptides()){
+                    for (Peptide peptide : oldModel.getPeptides()) {
                         peptideIDs.add(peptide.getID());
                         graphNodes.add(peptide.getGraphNode());
                     }
@@ -94,8 +96,8 @@ public class FASTAImporter {
             protected void done() {
                 try {
                     get();
-                    if (oldModel != null){
-                        workspace.remove(oldModel);                        
+                    if (oldModel != null) {
+                        workspace.remove(oldModel);
                     }
                     workspace.add(newAttrModel);
                     pc.add(workspace);
@@ -103,13 +105,17 @@ public class FASTAImporter {
                     graphWC.refreshGraphView(workspace, graphNodes, null);
                     pc.getGraphVizSetting(workspace).fireChangedGraphView();
                 } catch (InterruptedException | ExecutionException ex) {
-                    Exceptions.printStackTrace(ex);
+                    if (ex.getCause() != null) {
+                        DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(ex.getCause().getMessage(), NotifyDescriptor.ERROR_MESSAGE));
+                    } else {
+                        Exceptions.printStackTrace(ex);
+                    }
                 } finally {
-                    ticket.finish();                    
+                    ticket.finish();
                 }
             }
         };
-        sw.execute();       
+        sw.execute();
     }
 
     private Node getOrAddGraphNode(GraphModel graphModel, String label, String id, String name) {

@@ -1,6 +1,10 @@
 # StarPep toolbox
 Welcome to the _StarPep toolbox_ project GitHub repository. Here is where all the components of the project are developed, reviewed, and maintained.
 
+<p align="aligncenter">
+    <img src="img/StarPep_logo.png" alt="StarPep Logo" style="height: width:800px;"/>
+</p>
+
 **Table of contents:**
 
 - [About the project](#about-the-project)

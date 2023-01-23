@@ -32,6 +32,8 @@ The main features of StarPep toolbox are listed below:
 
 * **Similarity searching:** create multi-query similarity searching models that can lead to the repurposing of AMPs with novel functional activities.
 
+For more details about the software and its features, read the [online User Guide](https://grupo-medicina-molecular-y-traslacional.github.io/StarPep_doc/). 
+
 ## Install and use StarPep toolbox
 The binary executable files for Windows, Mac, and Linux are located in http://mobiosd-hub.com/starpep/. You can download the zip distribution and extract it to a folder or use an installer for the application.
 
@@ -62,6 +64,9 @@ This project was developed by members and collaborators of the *Grupo de Medicin
 
 ## Contributing
 We encourage your participation as a contributor in this project considering your interest, availability, or skill requirements. Detailed information about ways of collaborating on this project can be found in our [contributing guidelines](CONTRIBUTING.md).
+
+## License
+...
 
 ## Get in touch
 If you want to report a problem or suggest an improvement, you should [open an issue](https://github.com/Grupo-Medicina-Molecular-y-Traslacional/StarPep/issues/new) at this Github repository, and we can follow your questions or suggestions. But, you can also contact Yovani by emailing ymarrero77@yahoo.es.

@@ -66,7 +66,7 @@ This project was developed by members and collaborators of the *Grupo de Medicin
 We encourage your participation as a contributor in this project considering your interest, availability, or skill requirements. Detailed information about ways of collaborating on this project can be found in our [contributing guidelines](CONTRIBUTING.md).
 
 ## License
-...
+All underlying code is available under the Apache 2.0 license. Check the license details [here](LICENSE.md).
 
 ## Get in touch
 If you want to report a problem or suggest an improvement, you should [open an issue](https://github.com/Grupo-Medicina-Molecular-y-Traslacional/StarPep/issues/new) at this Github repository, and we can follow your questions or suggestions. But, you can also contact Yovani by emailing ymarrero77@yahoo.es.
